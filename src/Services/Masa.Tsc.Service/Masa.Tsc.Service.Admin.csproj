@@ -8,6 +8,8 @@
 	
 	<ItemGroup>
 		<PackageReference Include="Masa.BuildingBlocks.Dispatcher.Events" Version="0.3.0" />
+		<PackageReference Include="Masa.Contrib.BasicAbility.Auth" Version="0.4.0-rc.4" />
+		<PackageReference Include="Masa.Contrib.BasicAbility.Pm" Version="0.4.0-rc1" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="0.3.0" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EF" Version="0.3.0" />
 		<PackageReference Include="Dapr.AspNetCore" Version="1.5.0" />
@@ -21,5 +23,26 @@
 		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.Dapr" Version="0.3.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.1" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Folder Include="Application\Teams\" />
+	  <Folder Include="Application\Projects\" />
+	  <Folder Include="Application\Apps\" />
+	  <Folder Include="Application\Users\Query\" />
+	  <Folder Include="Domain\Apps\Aggregates\" />
+	  <Folder Include="Domain\Apps\Events\Query\" />
+	  <Folder Include="Domain\Apps\Repositories\" />
+	  <Folder Include="Domain\Apps\Service\" />
+	  <Folder Include="Domain\Instruments\Events\" />
+	  <Folder Include="Domain\Projects\Service\" />
+	  <Folder Include="Domain\Projects\Repositories\" />
+	  <Folder Include="Domain\Instruments\Repositories\" />
+	  <Folder Include="Domain\Instruments\Services\" />
+	  <Folder Include="Domain\Teams\Service\" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Order\Masa.Tsc.Contracts.Admin.csproj" />
 	</ItemGroup>
 </Project>

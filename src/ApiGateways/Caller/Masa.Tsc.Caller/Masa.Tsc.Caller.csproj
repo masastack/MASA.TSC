@@ -13,4 +13,8 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\Contracts\Masa.Tsc.Contracts.Order\Masa.Tsc.Contracts.Admin.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Callers\" />
+	</ItemGroup>
 </Project>
