@@ -1,17 +1,21 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Nest;
+
 namespace Masa.Tsc.Service.Admin.Domain.Teams.Events;
 
 public class QueryHandler
 {
     private readonly IAuthClient _authClient;
     private readonly IPmClient _pmClient;
+    private readonly IElasticClient _elasticClient;    
 
-    public QueryHandler(IAuthClient authClient, IPmClient pmClient)
+    public QueryHandler(IPmClient pmClient, IAuthClient authClient, IElasticClient elasticClient)
     {
         _authClient = authClient;
         _pmClient = pmClient;
+        _elasticClient = elasticClient;
     }
 
     [EventHandler]
