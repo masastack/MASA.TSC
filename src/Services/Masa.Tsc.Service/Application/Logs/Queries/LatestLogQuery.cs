@@ -5,8 +5,6 @@ namespace Masa.Tsc.Service.Admin.Application;
 
 public record LatestLogQuery : Query<object>
 {
-    public IEnumerable<KeyValuePair<string, string>> FieldMaps { get; set; }
-
     public string Query { get; set; }
 
     public DateTime Start { get; set; }

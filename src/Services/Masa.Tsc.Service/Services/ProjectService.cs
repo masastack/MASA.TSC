@@ -21,7 +21,7 @@ public class ProjectService : ServiceBase
         return query.Result;
     }
 
-    private async Task<TeamMonitorDto> OverViewAsync([FromServices] IEventBus eventBus, [FromQuery] RequestTeamMonitorDto model)
+    private async Task<TeamMonitorDto> OverViewAsync([FromServices] IEventBus eventBus, RequestTeamMonitorDto model)
     {
         var teamQuery = new TeamMonitorQuery
         {

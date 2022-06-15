@@ -2,11 +2,11 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 namespace Masa.Tsc.Service.Infrastructure;
 
-public class ShopDbContext : IntegrationEventLogContext
+public class TscDbContext : IntegrationEventLogContext
 {
     //public DbSet<Instrument> Instruments { get; set; } = default!;
 
-    public ShopDbContext(MasaDbContextOptions<ShopDbContext> options) : base(options)
+    public TscDbContext(MasaDbContextOptions<TscDbContext> options) : base(options)
     {
 
     }

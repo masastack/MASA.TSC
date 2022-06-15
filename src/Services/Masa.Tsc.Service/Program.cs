@@ -1,7 +1,29 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Contrib.BasicAbility.Auth;
+using Masa.Contrib.BasicAbility.Pm;
+using Masa.Tsc.Service.Admin.Extenision;
+using Masa.Utils.Caller.Core;
+using Masa.Utils.Caller.HttpClient;
+using Masa.Utils.Data.Elasticsearch;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddAuthClient(builder.Configuration.GetSection("masa:authUri").Value);
+builder.Services.AddPmClient(builder.Configuration.GetSection("masa:pmUri").Value);
+var elasearchUris = builder.Configuration.GetSection("Elastic").Get<string[]>();
+builder.Services.AddCaller(option => {
+    option.UseHttpClient(builder => {
+        builder.Name = Const.DEFAULT_CLIENT_NAME;
+        builder.Configure = opt =>
+        {
+            opt.BaseAddress = new Uri(elasearchUris[0]);
+        };
+    });
+});
+builder.Services.AddElasticsearchClient("tsclog", elasearchUris);
+builder.AddObservable();
 
 builder.Services.AddDaprClient();
 builder.Services.AddAuthorization();
@@ -49,12 +71,14 @@ var app = builder.Services
     .AddDomainEventBus(options =>
     {
         options.UseEventBus()
-               .UseUoW<ShopDbContext>(dbOptions => dbOptions.UseSqlite("DataSource=:memory:"))
+               .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlite("DataSource=:memory:"))
                .UseDaprEventBus<IntegrationEventLogService>()
-               .UseEventLog<ShopDbContext>()
-               .UseRepository<ShopDbContext>();
+               .UseEventLog<TscDbContext>()
+               .UseRepository<TscDbContext>();
     })
     .AddServices(builder);
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

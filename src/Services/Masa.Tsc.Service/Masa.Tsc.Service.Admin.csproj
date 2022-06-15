@@ -10,6 +10,7 @@
 		<PackageReference Include="Masa.BuildingBlocks.Dispatcher.Events" Version="0.3.0" />
 		<PackageReference Include="Masa.Contrib.BasicAbility.Auth" Version="0.4.0-rc.4" />
 		<PackageReference Include="Masa.Contrib.BasicAbility.Pm" Version="0.4.0-rc1" />
+		<PackageReference Include="Masa.Contrib.BasicAbility.Tsc" Version="0.4.0" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="0.3.0" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EF" Version="0.3.0" />
 		<PackageReference Include="Dapr.AspNetCore" Version="1.5.0" />
@@ -36,6 +37,7 @@
 	  <Folder Include="Domain\Apps\Repositories\" />
 	  <Folder Include="Domain\Apps\Service\" />
 	  <Folder Include="Domain\Instruments\Events\" />
+	  <Folder Include="Domain\Logs\" />
 	  <Folder Include="Domain\Projects\Service\" />
 	  <Folder Include="Domain\Projects\Repositories\" />
 	  <Folder Include="Domain\Instruments\Repositories\" />

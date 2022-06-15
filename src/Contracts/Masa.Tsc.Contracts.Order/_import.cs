@@ -2,4 +2,5 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 global using Masa.Tsc.Contracts.Admin.Enums;
-global using Masa.Tsc.Contracts.Admin.Projects;
+global using Masa.BuildingBlocks.BasicAbility.Pm.Enum;
+global using Masa.BuildingBlocks.BasicAbility.Auth.Enum;

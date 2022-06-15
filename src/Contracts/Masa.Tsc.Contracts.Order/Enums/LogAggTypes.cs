@@ -3,7 +3,11 @@
 
 namespace Masa.Tsc.Contracts.Admin.Enums;
 
-public enum TeamTypes
+public enum LogAggTypes
 {
-    Default
+    Count=1,
+
+    Sum=2,
+
+    Avg=3
 }

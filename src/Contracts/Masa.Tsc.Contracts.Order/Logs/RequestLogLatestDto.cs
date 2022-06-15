@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Contracts.Admin;
 
-public class RequestLogLatestDto
+public class RequestLogLatestDto : FromUri<RequestLogLatestDto>
 {
     public string Query { get; set; }
 

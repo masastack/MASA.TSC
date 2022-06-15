@@ -1,15 +1,17 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+namespace Masa.Tsc.Contracts.Admin;
 
-namespace Masa.Tsc.Contracts.Admin.Logs
+public class RequestLogAggDto
 {
-    internal class Class1
-    {
-    }
+    public IEnumerable<RequestLogFieldAggDto> FieldMaps { get; set; }
+
+    public string Query { get; set; }
+
+    public DateTime Start { get; set; }
+
+    public DateTime End { get; set; }
+
+    public bool IsDesc { get; set; } = true;
 }

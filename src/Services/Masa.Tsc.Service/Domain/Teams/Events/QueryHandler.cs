@@ -182,11 +182,13 @@ public class QueryHandler
 
     private async Task<List<string>> GetAllMonitor()
     {
+        await Task.CompletedTask;
         return new List<string> { "service1", "service2" };
     }
 
     private async Task<Dictionary<string, Tuple<int, int>>> GetErrorAndWarn()
     {
+        await Task.CompletedTask;
         return new Dictionary<string, Tuple<int, int>> {
             { "service1",Tuple.Create(5,20)},
             { "service2",Tuple.Create(0,0)}

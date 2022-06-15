@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Contracts.Admin;
 
-public class RequestLogFieldAggDto
+public class RequestLogFieldAggDto : FromUri<RequestLogFieldAggDto>
 {
     public string Name { get; set; }
 

@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application;
 
-public record LogAggQuery : Query<IEnumerable<KeyValuePair<string, double>>>
+public record LogAggQuery : Query<IEnumerable<KeyValuePair<string, string>>>
 {
     public IEnumerable<RequestLogFieldAggDto> FieldMaps { get; set; }
 
@@ -13,5 +13,5 @@ public record LogAggQuery : Query<IEnumerable<KeyValuePair<string, double>>>
 
     public DateTime End { get; set; }
 
-    public override IEnumerable<KeyValuePair<string, double>> Result { get; set; }
+    public override IEnumerable<KeyValuePair<string, string>> Result { get; set; }
 }

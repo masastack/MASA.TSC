@@ -6,4 +6,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth" Version="0.4.0" />
+    <PackageReference Include="Masa.BuildingBlocks.BasicAbility.Pm" Version="0.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Util.Reflection" Version="1.0.3" />
+  </ItemGroup>
+
 </Project>
