@@ -3,20 +3,22 @@
 
 namespace Masa.Tsc.Service.Admin.Infrastructure.Const;
 
-internal class ElasticConst
+internal static class ElasticConst
 {
     public static string LogIndex { get; private set; } = "logs";
 
+    public static string LogTimestamp { get; private set; } = "@timestamp";
+
     public static string TraceIndex { get; private set; } = "trace";
 
-    public static void Configure(IConfiguration configuration)
+    public static void ConfigureElasticIndex(this IConfiguration configuration)
     {
-        var str = configuration.GetSection("elastic:logIndex").Value;
+        var str = configuration.GetSection("masa:elastic:logIndex").Value;
         if (!string.IsNullOrEmpty(str))
             LogIndex = str;
 
-        str = configuration.GetSection("elastic:traceIndex").Value;
+        str = configuration.GetSection("masa:elastic:traceIndex").Value;
         if (!string.IsNullOrEmpty(str))
-            LogIndex = str;
+            TraceIndex = str;
     }
 }

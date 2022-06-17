@@ -1,6 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Service.Admin.Infrastructure.Const;
 using Masa.Utils.Caller.Core;
 using Nest;
 
@@ -23,7 +24,7 @@ namespace Masa.Tsc.Service.Admin.Application
         [EventHandler]
         public async Task GetAggregationAsync(LogAggQuery query)
         {
-            await _elasticClient.GetAggregationAsync<object, LogAggQuery>("index", query, Filter, Aggregation, AggResult);
+            await _elasticClient.GetAggregationAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, Filter, Aggregation, AggResult);
         }
 
         private QueryContainer Filter(QueryContainerDescriptor<object> container, LogAggQuery query)
@@ -35,7 +36,7 @@ namespace Masa.Tsc.Service.Admin.Application
             }
             if (query.Start > DateTime.MinValue && query.End > DateTime.MinValue && query.Start < query.End)
             {
-                list.Add(q => q.DateRange(f => f.GreaterThanOrEquals(query.Start).LessThanOrEquals(query.End).Field("@timestamp")));
+                list.Add(q => q.DateRange(f => f.GreaterThanOrEquals(query.Start).LessThanOrEquals(query.End).Field(ElasticConst.LogTimestamp)));
             }
 
             if (list.Any())
@@ -90,27 +91,38 @@ namespace Masa.Tsc.Service.Admin.Application
                 //item.Value
             }
         }
-        
+
         #endregion
 
         [EventHandler]
         public async Task GetLatestDataAsync(LatestLogQuery query)
         {
-            var response=await _elasticClient.SearchAsync<object>(q => q.Index("").Query(q => Filter(q, new LogAggQuery { Start = query.Start, End = query.End, Query = query.Query })).Sort(s => {
+            var response = await _elasticClient.SearchAsync<object>(q => q.Index(ElasticConst.LogIndex).Query(q => Filter(q, new LogAggQuery { Start = query.Start, End = query.End, Query = query.Query })).Sort(s =>
+            {
                 if (query.IsDesc)
-                    return s.Descending("");
+                    return s.Descending(ElasticConst.LogTimestamp);
                 else
-                    return s.Ascending("");
+                    return s.Ascending(ElasticConst.LogTimestamp);
             }).Size(1));
             if (response.IsValid)
             {
-                if(response.Documents.Any())
+                if (response.Documents.Any())
                     query.Result = response.Documents.First();
             }
             else
             {
-                _logger.LogError("GetLatestDataAsync Error {0}",response);
+                _logger.LogError("GetLatestDataAsync Error {0}", response);
             }
+        }
+
+        [EventHandler]
+        public async Task GetLatestDataAsync(LogFieldQuery query)
+        {
+            if (query == null)
+                return;
+            var result = await _caller.GetMappingAsync(ElasticConst.LogIndex);
+            if (result != null)
+                query.Result = result;
         }
     }
 }

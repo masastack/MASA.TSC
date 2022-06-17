@@ -3,16 +3,19 @@
 
 using Masa.Contrib.BasicAbility.Auth;
 using Masa.Contrib.BasicAbility.Pm;
+using Masa.Contrib.Data.UoW.EF;
 using Masa.Tsc.Service.Admin.Extenision;
+using Masa.Tsc.Service.Admin.Infrastructure.Const;
 using Masa.Utils.Caller.Core;
 using Masa.Utils.Caller.HttpClient;
 using Masa.Utils.Data.Elasticsearch;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAuthClient(builder.Configuration.GetSection("masa:authUri").Value);
 builder.Services.AddPmClient(builder.Configuration.GetSection("masa:pmUri").Value);
-var elasearchUris = builder.Configuration.GetSection("Elastic").Get<string[]>();
+var elasearchUris = builder.Configuration.GetSection("masa:elastic:nodes").Get<string[]>();
 builder.Services.AddCaller(option => {
     option.UseHttpClient(builder => {
         builder.Name = Const.DEFAULT_CLIENT_NAME;
@@ -24,6 +27,7 @@ builder.Services.AddCaller(option => {
 });
 builder.Services.AddElasticsearchClient("tsclog", elasearchUris);
 builder.AddObservable();
+builder.Configuration.ConfigureElasticIndex();
 
 builder.Services.AddDaprClient();
 builder.Services.AddAuthorization();
@@ -43,6 +47,8 @@ var app = builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen(options =>
     {
+        //var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        //options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
         {
             Name = "Authorization",
@@ -67,18 +73,15 @@ var app = builder.Services
             }
         });
     })
-    .AddTransient(typeof(IMiddleware<>), typeof(LogMiddleware<>))
-    .AddDomainEventBus(options =>
+    //.AddTransient(typeof(IMiddleware<>), typeof(LogMiddleware<>))
+    .AddDomainEventBus(builder =>
     {
-        options.UseEventBus()
-               .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlite("DataSource=:memory:"))
-               .UseDaprEventBus<IntegrationEventLogService>()
-               .UseEventLog<TscDbContext>()
-               .UseRepository<TscDbContext>();
+        builder.UseDaprEventBus<IntegrationEventLogService>(options => options.UseEventLog<TscDbContext>())
+        .UseEventBus()
+       .UseUoW<TscDbContext>()
+        .UseRepository<TscDbContext>();
     })
     .AddServices(builder);
-
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

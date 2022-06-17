@@ -9,13 +9,13 @@ using OpenTelemetry.Resources;
 
 namespace Masa.Tsc.Service.Admin.Extenision;
 
-public static class ObservableExtenision
+public static class ObservableExtensions
 {
     public static void AddObservable(this WebApplicationBuilder builder)
     {
         var option = builder.Configuration.GetSection("masa:tsc").Get<MasaObservableOptions>();
         var resources = ResourceBuilder.CreateDefault().AddMasaService(option);
-        var opltUri = builder.Configuration.GetSection("otlpUri").Get<string>();
+        var opltUri = builder.Configuration.GetSection("masa:otlpUri").Get<string>();
         var uri = new Uri(opltUri);
 
         builder.Services.AddMasaMetrics(builder =>

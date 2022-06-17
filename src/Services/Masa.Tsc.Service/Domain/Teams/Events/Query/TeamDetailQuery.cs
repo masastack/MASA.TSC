@@ -6,6 +6,8 @@ namespace Masa.Tsc.Service.Admin.Domain.Teams.Events.Query;
 
 public record TeamDetailQuery : Query<TeamDto>
 {
+    public Guid Id { get; set; }
+
     public string AppId { get; set; }
 
     public override TeamDto Result { get; set; }
