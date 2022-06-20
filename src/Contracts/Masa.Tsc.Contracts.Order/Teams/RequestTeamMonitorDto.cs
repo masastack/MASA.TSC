@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Contracts.Admin;
 
-public class RequestTeamMonitorDto: FromUri<RequestTeamMonitorDto>
+public class RequestTeamMonitorDto : FromUri<RequestTeamMonitorDto>
 {
     public long StartTime { get; set; }
 

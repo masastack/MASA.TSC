@@ -7,5 +7,5 @@ public class TeamMonitorDto
 {
     public AppMonitorDto Monitor { get; set; }
 
-    public List<ProjectOverViewDto> Projects { get; set; }                   
+    public List<ProjectOverViewDto> Projects { get; set; }
 }

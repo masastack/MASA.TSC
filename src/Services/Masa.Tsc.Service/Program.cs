@@ -5,20 +5,20 @@ using Masa.Contrib.BasicAbility.Auth;
 using Masa.Contrib.BasicAbility.Pm;
 using Masa.Contrib.Data.UoW.EF;
 using Masa.Tsc.Service.Admin.Extenision;
-using Masa.Tsc.Service.Admin.Infrastructure.Const;
-using Masa.Utils.Caller.Core;
 using Masa.Utils.Caller.HttpClient;
 using Masa.Utils.Data.Elasticsearch;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAuthClient(builder.Configuration.GetSection("masa:authUri").Value);
 builder.Services.AddPmClient(builder.Configuration.GetSection("masa:pmUri").Value);
 var elasearchUris = builder.Configuration.GetSection("masa:elastic:nodes").Get<string[]>();
-builder.Services.AddCaller(option => {
-    option.UseHttpClient(builder => {
-        builder.Name = Const.DEFAULT_CLIENT_NAME;
+builder.Configuration.ConfigureElasticIndex();
+builder.Services.AddCaller(option =>
+{
+    option.UseHttpClient(builder =>
+    {
+        builder.Name = ElasticConst.ES_HTTP_CLIENT_NAME;
         builder.Configure = opt =>
         {
             opt.BaseAddress = new Uri(elasearchUris[0]);

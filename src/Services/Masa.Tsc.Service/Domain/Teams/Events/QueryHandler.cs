@@ -9,7 +9,7 @@ public class QueryHandler
 {
     private readonly IAuthClient _authClient;
     private readonly IPmClient _pmClient;
-    private readonly IElasticClient _elasticClient;    
+    private readonly IElasticClient _elasticClient;
 
     public QueryHandler(IPmClient pmClient, IAuthClient authClient, IElasticClient elasticClient)
     {

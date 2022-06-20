@@ -5,9 +5,9 @@ namespace Masa.Tsc.Contracts.Admin.Enums;
 
 public enum LogAggTypes
 {
-    Count=1,
+    Count = 1,
 
-    Sum=2,
+    Sum = 2,
 
-    Avg=3
+    Avg = 3
 }

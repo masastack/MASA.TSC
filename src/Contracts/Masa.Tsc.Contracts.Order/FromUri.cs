@@ -1,5 +1,5 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
-// Licensed under the Apache License. See LICENSE.txt in the project root for license information.
+// Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -29,7 +29,7 @@ public class FromUri<T>
         var type = typeof(T);
         if (_map.TryGetValue(type, out var func) is false)
         {
-            var constructor = type.GetConstructors().First();           
+            var constructor = type.GetConstructors().First();
             var constructorParamters = constructor.GetParameters().Select(p =>
             {
                 if (p.ParameterType.IsValueType)

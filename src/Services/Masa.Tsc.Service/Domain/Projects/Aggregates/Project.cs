@@ -3,8 +3,8 @@
 
 namespace Masa.Tsc.Service.Admin.Domain.Teams.Aggregates;
 
-public class Project:Entity<string>
-{   
+public class Project : Entity<string>
+{
 
     public string Identity { get; set; }
 
@@ -14,5 +14,5 @@ public class Project:Entity<string>
 
     public string Description { get; set; }
 
-    public List<App> Apps { get; set; } 
+    public List<App> Apps { get; set; }
 }

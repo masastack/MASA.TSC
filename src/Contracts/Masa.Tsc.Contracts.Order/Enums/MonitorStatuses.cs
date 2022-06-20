@@ -5,9 +5,9 @@ namespace Masa.Tsc.Contracts.Admin.Enums;
 
 public enum MonitorStatuses
 {
-    Nomal=0,
+    Nomal = 0,
 
-    Warn=1,
+    Warn = 1,
 
-    Error=2
+    Error = 2
 }

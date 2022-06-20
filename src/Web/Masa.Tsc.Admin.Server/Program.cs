@@ -1,12 +1,12 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Contrib.BasicAbility.Tsc;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Masa.Contrib.BasicAbility.Tsc;
 
 var builder = WebApplication.CreateBuilder(args);
 

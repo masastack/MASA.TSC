@@ -5,6 +5,8 @@ namespace Masa.Tsc.Service.Admin.Infrastructure.Const;
 
 internal static class ElasticConst
 {
+    public const string ES_HTTP_CLIENT_NAME = "tsc_http_es_client";
+
     public static string LogIndex { get; private set; } = "logs";
 
     public static string LogTimestamp { get; private set; } = "@timestamp";

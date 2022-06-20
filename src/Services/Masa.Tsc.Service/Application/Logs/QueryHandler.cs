@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Service.Admin.Infrastructure.Const;
-using Masa.Utils.Caller.Core;
 using Nest;
 
 namespace Masa.Tsc.Service.Admin.Application
@@ -10,14 +8,16 @@ namespace Masa.Tsc.Service.Admin.Application
     public class QueryHandler
     {
         private IElasticClient _elasticClient;
-        private ICallerProvider _caller;
+        private IServiceProvider _provider;
         private ILogger _logger;
+        private ICallerProvider _caller;
 
-        public QueryHandler(ICallerProvider caller, IElasticClient elasticClient, ILogger<QueryHandler> logger)
+        public QueryHandler(IServiceProvider provider, IElasticClient elasticClient, ILogger<QueryHandler> logger)
         {
-            _caller = caller;
+            _provider = provider;
             _elasticClient = elasticClient;
             _logger = logger;
+            _caller = _provider.GetRequiredService<ICallerFactory>().CreateClient(ElasticConst.ES_HTTP_CLIENT_NAME);
         }
 
         #region agg query
@@ -86,12 +86,16 @@ namespace Masa.Tsc.Service.Admin.Application
             if (response.Aggregations == null || !response.Aggregations.Any())
                 return;
 
+            var result = new Dictionary<string, string>();
             foreach (var item in response.Aggregations)
             {
-                //item.Value
+                if (item.Value is ValueAggregate value && value != null)
+                {
+                    result.Add(item.Key, string.IsNullOrEmpty(value.ValueAsString) ? value.Value.ToString() : value.ValueAsString);
+                }
             }
+            query.Result = result;
         }
-
         #endregion
 
         [EventHandler]
@@ -116,7 +120,7 @@ namespace Masa.Tsc.Service.Admin.Application
         }
 
         [EventHandler]
-        public async Task GetLatestDataAsync(LogFieldQuery query)
+        public async Task GetMappingAsync(LogFieldQuery query)
         {
             if (query == null)
                 return;

@@ -1,8 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Utils.Caller.Core;
-using System.Text.Json.Nodes;
+using System.Text.Json;
 
 namespace Nest;
 
@@ -13,11 +12,11 @@ public static class IElasticClientExtenstion
         Q q,
         Func<QueryContainerDescriptor<T>, Q, QueryContainer> queryFn,
         Func<AggregationContainerDescriptor<T>, Q, IAggregationContainer> aggFn,
-        Action<ISearchResponse<T>,Q> resultFn
+        Action<ISearchResponse<T>, Q> resultFn
         ) where T : class where Q : class
     {
         var rep = await client.SearchAsync<T>(s => s.Index(indexName).Query(query => queryFn?.Invoke(query, q)).Size(1).Aggregations(agg => aggFn?.Invoke(agg, q)));
-        resultFn?.Invoke(rep,q);
+        resultFn?.Invoke(rep, q);
     }
 
     /// <summary>
@@ -31,37 +30,35 @@ public static class IElasticClientExtenstion
     {
         ArgumentNullException.ThrowIfNull(indexName, nameof(indexName));
         var path = $"/{indexName}/_mapping";
-        var result = await caller.GetAsync<JsonObject>(path, false, token);
-        if (result == null)
-            return default;
+        var result = await caller.GetAsync<JsonElement>(path, false, token);
 
-        var root = result.FirstOrDefault(attr => string.Equals(attr.Key, indexName, StringComparison.CurrentCultureIgnoreCase));
-        if (string.IsNullOrEmpty(root.Key))
+        if (!result.TryGetProperty(indexName, out JsonElement root) ||
+            !root.TryGetProperty("mappings", out JsonElement mapping))
+        {
             return default;
+        }
 
-        return GetProperties(root.Value, null);
+        return GetRepProperties(mapping, null);
     }
 
-    private static IEnumerable<MappingResponse>? GetProperties(JsonNode? node, string? parentName = default)
+    private static IEnumerable<MappingResponse>? GetRepProperties(JsonElement node, string? parentName = default)
     {
-        if (node == null)
-            return default;
-        var properties = GetProperties(node);
-        if (properties == null)
+        if (node.ValueKind != JsonValueKind.Object)
             return default;
 
-        var obj = properties.AsObject();
+        var properties = GetProperties(node);
+        if (properties == null || properties.Value.ValueKind != JsonValueKind.Object)
+            return default;
+
         var result = new List<MappingResponse>();
+        var obj = properties.Value.EnumerateObject();
         foreach (var item in obj)
         {
             var type = GetType(item.Value);
-            var childProperties = GetProperties(item.Value);
-            var name = $"{parentName}{item.Key}";
+            var name = $"{parentName}{item.Name}";
             if (string.IsNullOrEmpty(type))
             {
-                if (childProperties == null)
-                    continue;
-                var children = GetProperties(item.Value, $"{name}.");
+                var children = GetRepProperties(item.Value, $"{name}.");
                 if (children != null && children.Any())
                     result.AddRange(children);
             }
@@ -79,33 +76,29 @@ public static class IElasticClientExtenstion
         return result;
     }
 
-    private static JsonNode? GetProperties(JsonNode? value)
+    private static JsonElement? GetProperties(JsonElement value)
     {
-        return value?[MappingConst.PROPERTY];
+        if (value.TryGetProperty(MappingConst.PROPERTY, out JsonElement result))
+            return result;
+        return null;
     }
 
-    private static string? GetType(JsonNode? value)
+    private static string? GetType(JsonElement value)
     {
-        var find = value?[MappingConst.TYPE];
-        if (find == null)
-            return default;
-
-        return find.ToString();
+        if (value.TryGetProperty(MappingConst.TYPE, out JsonElement find))
+            return find.ToString();
+        return default;
     }
 
-    private static void SetKeyword(JsonNode? value, MappingResponse model)
+    private static void SetKeyword(JsonElement value, MappingResponse model)
     {
-        var fields = value?[MappingConst.FIELD];
-        if (fields == null)
-            return;
-
-        var find = fields[MappingConst.KEYWORD];
-        if (find == null)
-            return;
-        var obj = find.AsObject();
-        if (obj.ContainsKey(MappingConst.TYPE) && find[MappingConst.TYPE]?.ToString() == MappingConst.KEYWORD)
-            model.IsKeyword = true;
-        if (obj.ContainsKey(MappingConst.MAXLENGTH))
-            model.MaxLenth = Convert.ToInt32(find[MappingConst.MAXLENGTH]);
+        if (value.TryGetProperty(MappingConst.FIELD, out JsonElement fields) &&
+       fields.TryGetProperty(MappingConst.KEYWORD, out JsonElement find))
+        {
+            if (find.TryGetProperty(MappingConst.TYPE, out JsonElement type) && type.ToString() == MappingConst.KEYWORD)
+                model.IsKeyword = true;
+            if (find.TryGetProperty(MappingConst.MAXLENGTH, out JsonElement maxLength))
+                model.MaxLenth = maxLength.GetInt32();
+        }
     }
 }
