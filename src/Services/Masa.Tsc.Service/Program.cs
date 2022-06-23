@@ -1,12 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Contrib.BasicAbility.Auth;
-using Masa.Contrib.BasicAbility.Pm;
 using Masa.Contrib.Data.UoW.EF;
 using Masa.Tsc.Service.Admin.Extenision;
 using Masa.Utils.Caller.HttpClient;
-using Masa.Utils.Data.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +27,7 @@ builder.AddObservable();
 builder.Configuration.ConfigureElasticIndex();
 
 builder.Services.AddDaprClient();
+builder.Services.AddPromethusClient(builder.Configuration.GetSection("masa:promethus").Value);
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(options =>
 {

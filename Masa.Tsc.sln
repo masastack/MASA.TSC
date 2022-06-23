@@ -40,6 +40,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Tsc.Admin.WebAssembly"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{952C33CD-4AD7-4234-8B7D-A08D9D773E4B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Utils.Data.Promethus", "..\MASA.Utils\Masa.Utils.Data.Promethus\Masa.Utils.Data.Promethus.csproj", "{FFDD2696-6E88-47BA-ABC1-5D52353AFE44}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,14 @@ Global
 		{952C33CD-4AD7-4234-8B7D-A08D9D773E4B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{952C33CD-4AD7-4234-8B7D-A08D9D773E4B}.Release|x86.ActiveCfg = Release|Any CPU
 		{952C33CD-4AD7-4234-8B7D-A08D9D773E4B}.Release|x86.Build.0 = Release|Any CPU
+		{FFDD2696-6E88-47BA-ABC1-5D52353AFE44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFDD2696-6E88-47BA-ABC1-5D52353AFE44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFDD2696-6E88-47BA-ABC1-5D52353AFE44}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FFDD2696-6E88-47BA-ABC1-5D52353AFE44}.Debug|x86.Build.0 = Debug|Any CPU
+		{FFDD2696-6E88-47BA-ABC1-5D52353AFE44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFDD2696-6E88-47BA-ABC1-5D52353AFE44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFDD2696-6E88-47BA-ABC1-5D52353AFE44}.Release|x86.ActiveCfg = Release|Any CPU
+		{FFDD2696-6E88-47BA-ABC1-5D52353AFE44}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -120,6 +130,7 @@ Global
 		{D38D7297-FC98-4126-B320-1322B6F8CCFB} = {88AD0A79-5286-4C1C-8A58-AAC9E6870CCD}
 		{D2175062-0684-48CC-8D94-2D2CAFF0CB8B} = {F3986DD3-0372-4929-B72A-09D93196541E}
 		{310D65E5-ADCB-4CC7-ACFC-861CF5979AFA} = {F3986DD3-0372-4929-B72A-09D93196541E}
+		{FFDD2696-6E88-47BA-ABC1-5D52353AFE44} = {4A1D2DFA-D091-4CD2-B9CB-D7AAA795ABD9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B83BA2BA-19E5-41FB-A92A-16A03DA229E4}

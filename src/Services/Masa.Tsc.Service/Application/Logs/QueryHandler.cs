@@ -3,7 +3,7 @@
 
 using Nest;
 
-namespace Masa.Tsc.Service.Admin.Application
+namespace Masa.Tsc.Service.Admin.Application.Logs
 {
     public class QueryHandler
     {
@@ -91,7 +91,16 @@ namespace Masa.Tsc.Service.Admin.Application
             {
                 if (item.Value is ValueAggregate value && value != null)
                 {
-                    result.Add(item.Key, string.IsNullOrEmpty(value.ValueAsString) ? value.Value.ToString() : value.ValueAsString);
+                    string tem = null;
+                    if (!string.IsNullOrEmpty(value.ValueAsString))
+                        tem = value.ValueAsString;
+                    else if (value.Value.HasValue)
+                        tem = value.Value.Value.ToString();
+
+                    if (string.IsNullOrEmpty(tem))
+                        continue;
+
+                    result.Add(item.Key, tem);
                 }
             }
             query.Result = result;

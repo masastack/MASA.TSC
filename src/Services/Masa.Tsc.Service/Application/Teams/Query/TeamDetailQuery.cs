@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 
-namespace Masa.Tsc.Service.Admin.Domain.Teams.Events.Query;
+namespace Masa.Tsc.Service.Admin.Application.Teams;
 
 public record TeamDetailQuery : Query<TeamDto>
 {

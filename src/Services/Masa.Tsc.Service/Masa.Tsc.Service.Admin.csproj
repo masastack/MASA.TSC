@@ -7,46 +7,44 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="Masa.BuildingBlocks.Dispatcher.Events" Version="00.4.0-rc1" />
-		<PackageReference Include="Masa.Contrib.BasicAbility.Auth" Version="0.4.0-rc.4" />
-		<PackageReference Include="Masa.Contrib.BasicAbility.Pm" Version="0.4.0-rc1" />
-		<PackageReference Include="Masa.Contrib.BasicAbility.Tsc" Version="0.4.0" />
-		<PackageReference Include="Masa.Contrib.Data.EntityFrameworkCore.SqlServer" Version="0.4.0-rc1" />
-		<PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="0.4.0-rc1" />
-		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EF" Version="0.4.0-rc1" />
+		<PackageReference Include="Masa.BuildingBlocks.Dispatcher.Events" Version="0.5.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.BasicAbility.Auth" Version="0.5.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.BasicAbility.Pm" Version="0.5.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.BasicAbility.Tsc" Version="0.5.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Data.EntityFrameworkCore.SqlServer" Version="0.5.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="0.5.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EF" Version="0.5.0-preview.1" />
 		<PackageReference Include="Dapr.AspNetCore" Version="1.7.0" />
-		<PackageReference Include="Masa.BuildingBlocks.Ddd.Domain" Version="0.4.0-rc1" />
-		<PackageReference Include="Masa.Contrib.Ddd.Domain" Version="0.4.0-rc1" />
-		<PackageReference Include="Masa.Contrib.Ddd.Domain.Repository.EF" Version="0.4.0-rc1" />
-		<PackageReference Include="Masa.Contrib.ReadWriteSpliting.Cqrs" Version="0.4.0-rc1" />
-		<PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="0.4.0-rc1" />
-		<PackageReference Include="Masa.Utils.Data.Elasticsearch" Version="0.4.0-rc1" />
+		<PackageReference Include="Masa.BuildingBlocks.Ddd.Domain" Version="0.5.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Ddd.Domain" Version="0.5.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Ddd.Domain.Repository.EF" Version="0.5.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.ReadWriteSpliting.Cqrs" Version="0.5.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="0.5.0-preview.1" />
+		<PackageReference Include="Masa.Utils.Data.Elasticsearch" Version="0.5.0-preview.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.5" />
-		<PackageReference Include="Masa.Contrib.Data.UoW.EF" Version="0.4.0-rc1" />
-		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.Dapr" Version="0.4.0-rc1" />
+		<PackageReference Include="Masa.Contrib.Data.UoW.EF" Version="0.5.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.Dapr" Version="0.5.0-preview.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.5" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <Folder Include="Application\Teams\" />
-	  <Folder Include="Application\Projects\" />
 	  <Folder Include="Application\Apps\" />
 	  <Folder Include="Application\Users\Query\" />
-	  <Folder Include="Domain\Apps\Aggregates\" />
-	  <Folder Include="Domain\Apps\Events\Query\" />
-	  <Folder Include="Domain\Apps\Repositories\" />
-	  <Folder Include="Domain\Apps\Service\" />
 	  <Folder Include="Domain\Instruments\Events\" />
-	  <Folder Include="Domain\Logs\" />
+	  <Folder Include="Domain\Projects\Events\" />
 	  <Folder Include="Domain\Projects\Service\" />
 	  <Folder Include="Domain\Projects\Repositories\" />
 	  <Folder Include="Domain\Instruments\Repositories\" />
 	  <Folder Include="Domain\Instruments\Services\" />
+	  <Folder Include="Domain\Teams\Events\" />
+	  <Folder Include="Domain\Teams\Repositories\" />
 	  <Folder Include="Domain\Teams\Service\" />
+	  <Folder Include="Infrastructure\Repositories\" />
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\..\MASA.Utils\Masa.Utils.Data.Promethus\Masa.Utils.Data.Promethus.csproj" />
 	  <ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Order\Masa.Tsc.Contracts.Admin.csproj" />
 	</ItemGroup>
 </Project>

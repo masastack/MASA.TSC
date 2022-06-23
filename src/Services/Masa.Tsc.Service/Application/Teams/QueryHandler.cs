@@ -3,7 +3,7 @@
 
 using Nest;
 
-namespace Masa.Tsc.Service.Admin.Domain.Teams.Events;
+namespace Masa.Tsc.Service.Admin.Application.Teams;
 
 public class QueryHandler
 {

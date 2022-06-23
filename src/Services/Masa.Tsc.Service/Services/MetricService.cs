@@ -3,6 +3,48 @@
 
 namespace Masa.Tsc.Service.Admin.Services;
 
-public class MetricService
+public class MetricService : ServiceBase
 {
+    public MetricService(IServiceCollection services) : base(services, "/api/metric")
+    {
+        App.MapGet($"{BaseUri}/all", GetMetricAsync);
+        App.MapGet($"{BaseUri}/label-values", GetLabelValuesAsync);
+        App.MapGet($"{BaseUri}/aggregation", GetMetricAggregation);
+    }
+
+    private async Task<IEnumerable<string>> GetMetricAsync([FromServices] IEventBus eventBus, [FromQuery] IEnumerable<string> match)
+    {
+        var query = new MetricQuery() { Match = match };
+        await eventBus.PublishAsync(query);
+        return query.Result;
+    }
+
+    private async Task<Dictionary<string, Dictionary<string, List<string>>>> GetLabelValuesAsync([FromServices] IEventBus eventBus, [FromBody]RequestLabelValuesDto param)
+    {
+        var query = new LableValuesQuery
+        {
+            Start = param.Start,
+            End = param.End,
+            Match = param.Match
+        };
+        await eventBus.PublishAsync(query);
+        return query.Result;
+    }
+
+    private async Task<string> GetMetricAggregation([FromServices] IEventBus eventBus, [FromBody] RequestMetricAggDto param)
+    {
+        var query = new RangeQuery()
+        {
+            Start = param.Start,
+            End = param.End,
+            Match = param.Match
+        };
+        if (param.Labels != null && param.Labels.Any())
+        {
+            query.Match = $"{param.Match}{{{string.Join(',', param.Labels)}}}";
+        }
+
+        await eventBus.PublishAsync(query);
+        return query.Result;
+    }
 }
