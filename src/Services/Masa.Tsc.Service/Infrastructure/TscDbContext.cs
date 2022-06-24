@@ -10,7 +10,6 @@ public class TscDbContext : MasaDbContext
 
     public TscDbContext(MasaDbContextOptions<TscDbContext> options) : base(options)
     {
-
     }
 
     protected override void OnModelCreatingExecuting(ModelBuilder builder)

@@ -12,14 +12,14 @@ public class MetricService : ServiceBase
         App.MapGet($"{BaseUri}/aggregation", GetMetricAggregation);
     }
 
-    private async Task<IEnumerable<string>> GetMetricAsync([FromServices] IEventBus eventBus, [FromQuery] IEnumerable<string> match)
+    private async Task<IEnumerable<string>> GetMetricAsync([FromServices] IEventBus eventBus, [FromQuery] string? match)
     {
-        var query = new MetricQuery() { Match = match };
+        var query = new MetricQuery() { Match = match?.Split(',') ?? default! };
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
-    private async Task<Dictionary<string, Dictionary<string, List<string>>>> GetLabelValuesAsync([FromServices] IEventBus eventBus, [FromBody]RequestLabelValuesDto param)
+    private async Task<Dictionary<string, Dictionary<string, List<string>>>> GetLabelValuesAsync([FromServices] IEventBus eventBus, [FromBody] RequestLabelValuesDto param)
     {
         var query = new LableValuesQuery
         {

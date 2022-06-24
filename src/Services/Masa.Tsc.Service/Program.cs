@@ -1,15 +1,18 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Contrib.BasicAbility.Auth;
+using Masa.Contrib.BasicAbility.Pm;
 using Masa.Contrib.Data.UoW.EF;
+using Masa.Contrib.Ddd.Domain;
 using Masa.Tsc.Service.Admin.Extenision;
 using Masa.Utils.Caller.HttpClient;
+using Masa.Utils.Data.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddAuthClient(builder.Configuration.GetSection("masa:authUri").Value);
-builder.Services.AddPmClient(builder.Configuration.GetSection("masa:pmUri").Value);
-var elasearchUris = builder.Configuration.GetSection("masa:elastic:nodes").Get<string[]>();
+builder.Services.AddAuthClient(builder.Configuration.GetSection("Masa:AuthUri").Value);
+builder.Services.AddPmClient(builder.Configuration.GetSection("Masa:PmUri").Value);
+var elasearchUris = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<string[]>();
 builder.Configuration.ConfigureElasticIndex();
 builder.Services.AddCaller(option =>
 {
@@ -27,7 +30,7 @@ builder.AddObservable();
 builder.Configuration.ConfigureElasticIndex();
 
 builder.Services.AddDaprClient();
-builder.Services.AddPromethusClient(builder.Configuration.GetSection("masa:promethus").Value);
+//builder.Services.AddPromethusClient(builder.Configuration.GetSection("Masa:Promethus").Value);
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(options =>
 {
