@@ -24,7 +24,7 @@ namespace Masa.Tsc.Service.Admin.Application.Logs
         [EventHandler]
         public async Task GetAggregationAsync(LogAggQuery query)
         {
-            await _elasticClient.GetAggregationAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, Filter, Aggregation, AggResult);
+            await _elasticClient.GetAggregationAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, Filter, Aggregation, AggResult,_logger);
         }
 
         private QueryContainer Filter(QueryContainerDescriptor<object> container, LogAggQuery query)
@@ -117,15 +117,12 @@ namespace Masa.Tsc.Service.Admin.Application.Logs
                 else
                     return s.Ascending(ElasticConst.LogTimestamp);
             }).Size(1));
+            response.FriendlyElasticException("GetLatestDataAsync", _logger);
             if (response.IsValid)
             {
                 if (response.Documents.Any())
                     query.Result = response.Documents.First();
-            }
-            else
-            {
-                _logger.LogError("GetLatestDataAsync Error {0}", response);
-            }
+            }            
         }
 
         [EventHandler]
@@ -136,6 +133,48 @@ namespace Masa.Tsc.Service.Admin.Application.Logs
             var result = await _caller.GetMappingAsync(ElasticConst.LogIndex);
             if (result != null)
                 query.Result = result;
+        }
+
+        [EventHandler]
+        public async Task GetLogPageAsync(LogsQuery query)
+        {
+            if (query == null)
+                return;
+            var start = (query.Page - 1) * query.Size;
+            var response = await _elasticClient.SearchAsync<object>(q => q.Index(ElasticConst.LogIndex).Query(q => Filter(q, query))
+             .Sort(s =>
+              {
+                  if (string.Equals("asc", query.Sort, StringComparison.CurrentCultureIgnoreCase))
+                      return s.Ascending(ElasticConst.LogTimestamp);
+                  else
+                      return s.Descending(ElasticConst.LogTimestamp);
+              })
+             .From(start)
+             .Size(query.Size));
+            if (!response.IsValid)
+            {
+                _logger.LogError("GetLogPageAsync Error {0}", response);
+                throw new UserFriendlyException($"elastic query error: status:{response.ServerError?.Status},message:{response.OriginalException?.Message ?? response.ServerError?.ToString()}");
+            }
+            query.Result = new PaginationDto<object>(response.Total, response.Documents.ToList());
+        }
+
+        private QueryContainer Filter(QueryContainerDescriptor<object> container, LogsQuery query)
+        {
+            var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
+            if (!string.IsNullOrEmpty(query.Query))
+            {
+                list.Add(q => q.MultiMatch(q1 => q1.Query(query.Query)));
+            }
+            if (query.Start > DateTime.MinValue && query.End > DateTime.MinValue && query.Start < query.End)
+            {
+                list.Add(q => q.DateRange(f => f.GreaterThanOrEquals(query.Start).LessThanOrEquals(query.End).Field(ElasticConst.LogTimestamp)));
+            }
+
+            if (list.Any())
+                container.Bool(b => b.Must(list));
+
+            return container;
         }
     }
 }

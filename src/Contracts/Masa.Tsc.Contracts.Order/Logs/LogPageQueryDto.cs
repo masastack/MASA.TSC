@@ -3,6 +3,15 @@
 
 namespace Masa.Tsc.Contracts.Admin;
 
-public class LogPageDto
+public class LogPageQueryDto : Pagination<LogPageQueryDto>
 {
+    public string Query { get; set; }
+
+    public DateTime Start { get; set; }
+
+    public DateTime End { get; set; }
+
+    public string Sorting { get; set; }
+
+    public string Duration { get; set; }
 }

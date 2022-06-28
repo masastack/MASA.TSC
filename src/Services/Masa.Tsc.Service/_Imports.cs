@@ -31,3 +31,4 @@ global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.OpenApi.Models;
 global using System.Text.Json;
+global using Masa.Tsc.Contracts.Admin.Infrastructure.Dtos;

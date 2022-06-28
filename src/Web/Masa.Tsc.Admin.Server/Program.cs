@@ -1,7 +1,9 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.Identity.IdentityModel;
 using Masa.Contrib.BasicAbility.Tsc;
+using Masa.Stack.Components;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -13,15 +15,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddMasaBlazor(builder =>
-{
-    builder.UseTheme(option =>
-    {
-        option.Primary = "#4318FF";
-        option.Accent = "#4318FF";
-    });
-});
+
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
+{
+    options.Environment = "environment";
+    options.UserName = "name";
+    options.UserId = "sub";
+});
+builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", builder.Configuration["AuthServiceBaseAddress"]);
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 
 
@@ -38,7 +41,6 @@ builder.Services.AddMasaMetrics(builder =>
         option.Endpoint = new Uri(otlpUri);
     });
 });
-
 
 //trcaing
 builder.Services.AddMasaTracing(configure =>
@@ -80,11 +82,6 @@ else
     app.UseHsts();
 }
 
-//app.Use((context, next) =>
-//{
-//    context.Request.EnableBuffering();
-//    return next(context);
-//});
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();

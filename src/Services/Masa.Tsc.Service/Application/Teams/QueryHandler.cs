@@ -188,6 +188,9 @@ public class QueryHandler
 
     private async Task<Dictionary<string, Tuple<int, int>>> GetErrorAndWarn()
     {
+       // _elasticClient.GetAggregationAsync(ElasticConst.LogIndex,)
+
+
         await Task.CompletedTask;
         return new Dictionary<string, Tuple<int, int>> {
             { "service1",Tuple.Create(5,20)},

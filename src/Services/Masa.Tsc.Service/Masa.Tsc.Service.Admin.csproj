@@ -52,4 +52,10 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Order\Masa.Tsc.Contracts.Admin.csproj" />
 	</ItemGroup>
+	
+	<ItemGroup>
+	  <None Update="Dockerfile">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 </Project>

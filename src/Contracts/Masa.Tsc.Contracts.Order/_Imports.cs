@@ -4,3 +4,5 @@
 global using Masa.BuildingBlocks.BasicAbility.Auth.Enum;
 global using Masa.BuildingBlocks.BasicAbility.Pm.Enum;
 global using Masa.Tsc.Contracts.Admin.Enums;
+global using Masa.Tsc.Contracts.Admin.Infrastructure.Dtos;
+global using System.Text.Json.Serialization;

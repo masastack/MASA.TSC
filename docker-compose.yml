@@ -1,15 +1,25 @@
 version: '3.4'
 
 services:
+  masa.tsc.database:
+     image: mcr.microsoft.com/mssql/server:2019-latest
+     ports:
+       - "1433:1433"
+     environment:
+      - SA_PASSWORD=P@ssw0rd
+      - ACCEPT_EULA=Y
+
   masa.tsc.service.admin:
     image: ${DOCKER_REGISTRY-}masapmserviceadmin
     build:
       context: .
-      dockerfile: src/Services/MASA.Tsc.Service.Admin/Dockerfile
+      dockerfile: src/Services/Masa.Tsc.Service.Admin/Dockerfile
 
   masa.tsc.ui.admin:
     image: ${DOCKER_REGISTRY-}masatscuiadmin
     build:
       context: .
-      dockerfile: src/Web/MASA.Tsc.Admin.Server/Dockerfile
+      dockerfile: src/Web/Masa.Tsc.Admin.Server/Dockerfile
 
+  dapr-placement:
+    image: "daprio/dapr:1.7.1"

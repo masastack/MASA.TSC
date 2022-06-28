@@ -10,11 +10,24 @@ public static class IElasticClientExtenstion
         Q q,
         Func<QueryContainerDescriptor<T>, Q, QueryContainer> queryFn,
         Func<AggregationContainerDescriptor<T>, Q, IAggregationContainer> aggFn,
-        Action<ISearchResponse<T>, Q> resultFn
+        Action<ISearchResponse<T>, Q> resultFn,
+        ILogger logger
         ) where T : class where Q : class
     {
-        var rep = await client.SearchAsync<T>(s => s.Index(indexName).Query(query => queryFn?.Invoke(query, q)).Size(1).Aggregations(agg => aggFn?.Invoke(agg, q)));
-        resultFn?.Invoke(rep, q);
+        try
+        {
+            var rep = await client.SearchAsync<T>(s => s.Index(indexName).Query(query => queryFn?.Invoke(query, q)).Size(1).Aggregations(agg => aggFn?.Invoke(agg, q)));
+            rep.FriendlyElasticException("GetAggregationAsync", logger);
+            if (rep.IsValid)
+            {
+                resultFn?.Invoke(rep, q);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("{0} is error {1}", "GetAggregationAsync", ex);
+            throw new UserFriendlyException($"GetAggregationAsync execute error {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -98,5 +111,13 @@ public static class IElasticClientExtenstion
             if (find.TryGetProperty(MappingConst.MAXLENGTH, out JsonElement maxLength))
                 model.MaxLenth = maxLength.GetInt32();
         }
+    }
+
+    public static void FriendlyElasticException<T>(this ISearchResponse<T> response, string callerName, ILogger logger) where T : class
+    {
+        if (!response.IsValid)
+            return;
+        logger?.LogError("{0} Error {1}", callerName, response);
+        throw new UserFriendlyException($"elastic query error: status:{response.ServerError?.Status},message:{response.OriginalException?.Message ?? response.ServerError?.ToString()}");
     }
 }
