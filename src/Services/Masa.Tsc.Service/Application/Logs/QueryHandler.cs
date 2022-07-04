@@ -91,7 +91,7 @@ namespace Masa.Tsc.Service.Admin.Application.Logs
             {
                 if (item.Value is ValueAggregate value && value != null)
                 {
-                    string tem = null;
+                    string tem = default!;
                     if (!string.IsNullOrEmpty(value.ValueAsString))
                         tem = value.ValueAsString;
                     else if (value.Value.HasValue)

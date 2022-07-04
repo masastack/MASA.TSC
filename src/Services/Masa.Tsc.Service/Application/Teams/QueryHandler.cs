@@ -200,11 +200,11 @@ public class QueryHandler
         return new UserDto
         {
             Id = model.Id,
-            Name = model.User.Name,
-            DisplayName = model.User.DisplayName,
-            Avatar = model.User.Avatar,
-            Account = model.User.Account,
-            Gender = (GenderTypes)((int)model.User.Gender)
+            Name = model.Name,
+            DisplayName = model.DisplayName,
+            Avatar = model.Avatar,
+            Account = model.Account,
+            Gender = model.Gender
         };
     }
 }

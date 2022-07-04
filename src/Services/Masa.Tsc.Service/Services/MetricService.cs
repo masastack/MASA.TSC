@@ -7,12 +7,12 @@ public class MetricService : ServiceBase
 {
     public MetricService(IServiceCollection services) : base(services, "/api/metric")
     {
-        App.MapGet($"{BaseUri}/all", GetMetricAsync);
+        App.MapGet($"{BaseUri}/names", GetNamesAsync);
         App.MapGet($"{BaseUri}/label-values", GetLabelValuesAsync);
-        App.MapGet($"{BaseUri}/aggregation", GetMetricAggregation);
+        App.MapGet($"{BaseUri}/range-values", GetRangeValuesAsync);
     }
 
-    private async Task<IEnumerable<string>> GetMetricAsync([FromServices] IEventBus eventBus, [FromQuery] string? match)
+    private async Task<IEnumerable<string>> GetNamesAsync([FromServices] IEventBus eventBus, [FromQuery] string? match)
     {
         var query = new MetricQuery() { Match = match?.Split(',') ?? default! };
         await eventBus.PublishAsync(query);
@@ -31,7 +31,7 @@ public class MetricService : ServiceBase
         return query.Result;
     }
 
-    private async Task<string> GetMetricAggregation([FromServices] IEventBus eventBus, [FromBody] RequestMetricAggDto param)
+    private async Task<string> GetRangeValuesAsync([FromServices] IEventBus eventBus, [FromBody] RequestMetricAggDto param)
     {
         var query = new RangeQuery()
         {

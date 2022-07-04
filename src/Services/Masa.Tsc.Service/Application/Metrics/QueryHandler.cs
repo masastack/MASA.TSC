@@ -15,7 +15,7 @@ public class QueryHandler
     }
 
     [EventHandler]
-    public async Task GetRangeAggregationAsync(RangeQuery query)
+    public async Task GetRangeValuesAsync(RangeQuery query)
     {
         var data = await _prometheusClient.QueryRangeAsync(new QueryRangeRequest
         {
