@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Metrics;
 
-public record InstantQuery:Query<object>
+public record InstantQuery : Query<object>
 {
     public string Match { get; set; }
 
