@@ -1,0 +1,21 @@
+﻿@inherits TscComponentBase
+
+<MCard>
+    <MCardTitle>@Text</MCardTitle>
+     <MIcon>@ICon</MIcon>
+      <MCardText>@Total</MCardText>
+</MCard>
+@code {
+
+    [Parameter]
+    public int Total { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public string ICon { get; set; }
+}

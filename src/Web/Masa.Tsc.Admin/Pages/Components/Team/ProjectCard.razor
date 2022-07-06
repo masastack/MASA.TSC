@@ -1,0 +1,23 @@
+﻿@inherits TscComponentBase
+
+<MCard>
+    <MCardTitle>Auth</MCardTitle>
+    <MList>
+        <MListItem>
+            @foreach (var item in Apps.Take(3))
+            {
+                <MListItemContent>@item.Name</MListItemContent>
+            }
+        </MListItem>
+    </MList>
+    @if (Apps.Count - 3 > 0)
+    {
+        <span>...</span>
+    }
+</MCard>
+
+@code
+{
+    [Parameter]
+    public List<AppDto> Apps { get; set; }
+}

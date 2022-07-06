@@ -187,7 +187,7 @@ public class QueryHandler
     {
         await Task.CompletedTask;
         return new List<string> { "service1", "service2" };
-    }    
+    }
 
     private async Task<Dictionary<string, Tuple<int, int>>> GetErrorAndWarnAsync()
     {

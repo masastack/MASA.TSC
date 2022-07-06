@@ -24,7 +24,7 @@ public class QueryHandler
     [EventHandler]
     public async Task GetAggregationAsync(LogAggQuery query)
     {
-        await _elasticClient.GetAggregationAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, Filter, Aggregation, AggResult);
+        await _elasticClient.GetAggregationAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, Filter, Aggregation, AggResult,_logger);
     }
 
     private QueryContainer Filter(QueryContainerDescriptor<object> container, LogAggQuery query)

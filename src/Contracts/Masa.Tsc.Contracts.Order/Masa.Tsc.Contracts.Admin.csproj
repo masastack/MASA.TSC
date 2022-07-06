@@ -1,16 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth" Version="0.5.0-preview.4" />
-    <PackageReference Include="Masa.BuildingBlocks.BasicAbility.Pm" Version="0.5.0-preview.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Util.Reflection" Version="1.0.3" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth" Version="0.5.0-preview.2" />
+		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth.Contracts" Version="0.5.0-preview.4" />
+		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Pm" Version="0.5.0-preview.2" />
+		<PackageReference Include="Masa.Contrib.Identity.IdentityModel" Version="0.5.0-preview.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+		<PackageReference Include="Util.Reflection" Version="1.0.3" />
+	</ItemGroup>
 
 </Project>
