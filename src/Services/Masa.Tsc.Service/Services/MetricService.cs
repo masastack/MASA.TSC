@@ -16,7 +16,7 @@ public class MetricService : ServiceBase
     {
         var query = new MetricQuery() { Match = match?.Split(',') ?? default! };
         await eventBus.PublishAsync(query);
-        return query.Result;
+        return query.Result ?? Array.Empty<string>();
     }
 
     private async Task<Dictionary<string, Dictionary<string, List<string>>>> GetLabelValuesAsync([FromServices] IEventBus eventBus, [FromBody] RequestLabelValuesDto param)
@@ -28,7 +28,7 @@ public class MetricService : ServiceBase
             Match = param.Match
         };
         await eventBus.PublishAsync(query);
-        return query.Result;
+        return query.Result ?? new Dictionary<string, Dictionary<string, List<string>>>();
     }
 
     private async Task<string> GetRangeValuesAsync([FromServices] IEventBus eventBus, [FromBody] RequestMetricAggDto param)
@@ -45,6 +45,6 @@ public class MetricService : ServiceBase
         }
 
         await eventBus.PublishAsync(query);
-        return query.Result;
+        return query.Result ?? string.Empty;
     }
 }
