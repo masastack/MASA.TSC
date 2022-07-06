@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  masa.tsc.service.admin:
+    image: ${DOCKER_REGISTRY-}masapmserviceadmin
+    build:
+      context: .
+      dockerfile: src/Services/MASA.Tsc.Service.Admin/Dockerfile
+
+  masa.tsc.ui.admin:
+    image: ${DOCKER_REGISTRY-}masatscuiadmin
+    build:
+      context: .
+      dockerfile: src/Web/MASA.Tsc.Admin.Server/Dockerfile
+
