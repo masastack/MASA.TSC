@@ -10,12 +10,14 @@ public class QueryHandler
     private readonly IAuthClient _authClient;
     private readonly IPmClient _pmClient;
     private readonly IElasticClient _elasticClient;
+    private readonly IMasaPrometheusClient _prometheusClient;
 
-    public QueryHandler(IPmClient pmClient, IAuthClient authClient, IElasticClient elasticClient)
+    public QueryHandler(IPmClient pmClient, IAuthClient authClient, IElasticClient elasticClient, IMasaPrometheusClient prometheusClient)
     {
         _authClient = authClient;
         _pmClient = pmClient;
         _elasticClient = elasticClient;
+        _prometheusClient = prometheusClient;
     }
 
     [EventHandler]
@@ -75,7 +77,8 @@ public class QueryHandler
     [EventHandler]
     public async Task GetTeamMonitorAysnc(TeamMonitorQuery query)
     {
-        var teams = Array.Empty<TeamDetailModel>();
+        var teams = await _authClient.TeamService.GetUserTeamsAsync();
+
         if (teams == null || !teams.Any())
             return;
         query.Result = new TeamMonitorDto
@@ -184,11 +187,11 @@ public class QueryHandler
     {
         await Task.CompletedTask;
         return new List<string> { "service1", "service2" };
-    }
+    }    
 
     private async Task<Dictionary<string, Tuple<int, int>>> GetErrorAndWarnAsync()
     {
-       // _elasticClient.GetAggregationAsync(ElasticConst.LogIndex,)
+        // _elasticClient.GetAggregationAsync(ElasticConst.LogIndex,)
 
 
         await Task.CompletedTask;

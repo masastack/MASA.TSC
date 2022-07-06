@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth" Version="0.5.0-preview.3" />
-    <PackageReference Include="Masa.BuildingBlocks.BasicAbility.Pm" Version="0.4.0" />
+    <PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth" Version="0.5.0-preview.4" />
+    <PackageReference Include="Masa.BuildingBlocks.BasicAbility.Pm" Version="0.5.0-preview.4" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Util.Reflection" Version="1.0.3" />
   </ItemGroup>
