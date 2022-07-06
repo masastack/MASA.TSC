@@ -1,18 +1,16 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Contrib.BasicAbility.Auth;
-using Masa.Contrib.BasicAbility.Pm;
-using Masa.Contrib.Data.UoW.EF;
-using Masa.Contrib.Ddd.Domain;
-using Masa.Tsc.Service.Admin.Extenision;
-using Masa.Utils.Caller.HttpClient;
-using Masa.Utils.Data.Elasticsearch;
-
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddAuthClient(builder.Configuration.GetSection("Masa:AuthUri").Value);
-builder.Services.AddPmClient(builder.Configuration.GetSection("Masa:PmUri").Value);
-var elasearchUris = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<string[]>();
+builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
+{
+    options.Environment = "environment";
+    options.UserName = "name";
+    options.UserId = "sub";
+});
+builder.Services.AddAuthClient(builder.Configuration.GetSection("Masa:AuthUrl").Value);
+builder.Services.AddPmClient(builder.Configuration.GetSection("Masa:PmUrl").Value);
+var elasearchUrls = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<string[]>();
 builder.Configuration.ConfigureElasticIndex();
 builder.Services.AddCaller(option =>
 {
@@ -21,16 +19,16 @@ builder.Services.AddCaller(option =>
         builder.Name = ElasticConst.ES_HTTP_CLIENT_NAME;
         builder.Configure = opt =>
         {
-            opt.BaseAddress = new Uri(elasearchUris[0]);
+            opt.BaseAddress = new Uri(elasearchUrls[0]);
         };
     });
 });
-builder.Services.AddElasticsearchClient("tsclog", elasearchUris);
+builder.Services.AddElasticsearchClient("tsclog", elasearchUrls);
 builder.AddObservable();
 builder.Configuration.ConfigureElasticIndex();
 
 builder.Services.AddDaprClient();
-//builder.Services.AddPromethusClient(builder.Configuration.GetSection("Masa:Promethus").Value);
+builder.Services.AddPrometheusClient(builder.Configuration.GetSection("Masa:Prometheus").Value);
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(options =>
 {

@@ -23,7 +23,7 @@ public class LogService : ServiceBase
             FieldMaps = param.FieldMaps
         };
         await eventBus.PublishAsync(query);
-        return query.Result;
+        return query.Result ?? Array.Empty<KeyValuePair<string, string>>();
     }
 
     private async Task<object> GetLatestAsync([FromServices] IEventBus eventBus, [FromBody] RequestLogLatestDto param)

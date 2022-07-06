@@ -13,5 +13,5 @@ public record RangeQuery : Query<string>
 
     public string Step { get; set; }
 
-    public override string Result { get; set; }
+    public override string Result { get; set; } = string.Empty;
 }

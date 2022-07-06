@@ -7,16 +7,16 @@ public class MetricService : ServiceBase
 {
     public MetricService(IServiceCollection services) : base(services, "/api/metric")
     {
-        App.MapGet($"{BaseUri}/all", GetMetricAsync);
+        App.MapGet($"{BaseUri}/names", GetNamesAsync);
         App.MapGet($"{BaseUri}/label-values", GetLabelValuesAsync);
-        App.MapGet($"{BaseUri}/aggregation", GetMetricAggregation);
+        App.MapGet($"{BaseUri}/range-values", GetRangeValuesAsync);
     }
 
-    private async Task<IEnumerable<string>> GetMetricAsync([FromServices] IEventBus eventBus, [FromQuery] string? match)
+    private async Task<IEnumerable<string>> GetNamesAsync([FromServices] IEventBus eventBus, [FromQuery] string? match)
     {
         var query = new MetricQuery() { Match = match?.Split(',') ?? default! };
         await eventBus.PublishAsync(query);
-        return query.Result;
+        return query.Result ?? Array.Empty<string>();
     }
 
     private async Task<Dictionary<string, Dictionary<string, List<string>>>> GetLabelValuesAsync([FromServices] IEventBus eventBus, [FromBody] RequestLabelValuesDto param)
@@ -28,10 +28,10 @@ public class MetricService : ServiceBase
             Match = param.Match
         };
         await eventBus.PublishAsync(query);
-        return query.Result;
+        return query.Result ?? new Dictionary<string, Dictionary<string, List<string>>>();
     }
 
-    private async Task<string> GetMetricAggregation([FromServices] IEventBus eventBus, [FromBody] RequestMetricAggDto param)
+    private async Task<string> GetRangeValuesAsync([FromServices] IEventBus eventBus, [FromBody] RequestMetricAggDto param)
     {
         var query = new RangeQuery()
         {
@@ -45,6 +45,6 @@ public class MetricService : ServiceBase
         }
 
         await eventBus.PublishAsync(query);
-        return query.Result;
+        return query.Result ?? string.Empty;
     }
 }
