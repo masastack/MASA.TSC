@@ -1,11 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.BuildingBlocks.Identity.IdentityModel;
-using Masa.Contrib.Data.UoW.EF;
-using Masa.Tsc.Service.Admin.Extenision;
-using Masa.Utils.Caller.HttpClient;
-
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
 {

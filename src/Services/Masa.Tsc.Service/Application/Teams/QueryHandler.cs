@@ -75,7 +75,7 @@ public class QueryHandler
     [EventHandler]
     public async Task GetTeamMonitorAysnc(TeamMonitorQuery query)
     {
-        var teams = new TeamDetailModel[] { };
+        var teams = Array.Empty<TeamDetailModel>();
         if (teams == null || !teams.Any())
             return;
         query.Result = new TeamMonitorDto
@@ -84,8 +84,8 @@ public class QueryHandler
             Monitor = new AppMonitorDto()
         };
 
-        var monitors = await GetAllMonitor();
-        var errorWarns = await GetErrorAndWarn();
+        var monitors = await GetAllMonitorAsync();
+        var errorWarns = await GetErrorAndWarnAsync();
 
         int error = 0, warn = 0, errorWarnAppCount = 0;
         if (errorWarns != null && errorWarns.Any())
@@ -180,13 +180,13 @@ public class QueryHandler
         return result;
     }
 
-    private async Task<List<string>> GetAllMonitor()
+    private async Task<List<string>> GetAllMonitorAsync()
     {
         await Task.CompletedTask;
         return new List<string> { "service1", "service2" };
     }
 
-    private async Task<Dictionary<string, Tuple<int, int>>> GetErrorAndWarn()
+    private async Task<Dictionary<string, Tuple<int, int>>> GetErrorAndWarnAsync()
     {
         await Task.CompletedTask;
         return new Dictionary<string, Tuple<int, int>> {
