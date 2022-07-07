@@ -1,14 +1,36 @@
-﻿<Element>
-    <MTabs>
-        <MTab>All</MTab>
+﻿<div class="d-flex d-block" style="background-color:#A3AED0">
+    <MTabs SliderColor="white" Class="flex-row ma-3 font-weight-bold  text-md-h4 col-3">
+        <MTab IsActive>All</MTab>
         <MTab>Operator</MTab>
         <MTab>Basic Ability</MTab>
         <MTab>Data Factory</MTab>
         <MTab>Data Factory2</MTab>
     </MTabs>
-    <SearchTextField></SearchTextField>
-    <MTextField TValue=string></MTextField>
-</Element>
+    <MAutocomplete Class="flex-row col-1" BackgroundColor="white" Items="Projects" TItem="ProjectDto" TValue="string" TItemValue="string" ItemValue="r=>r.Name" ItemText="r=>r.Identity">
+    </MAutocomplete>
+    <SearchTextField Class="flex-row col-5 mb-4 mt-4" BackgroundColor="white"></SearchTextField>
+    <MTextField TValue=string Class="flex-row col-3" BackgroundColor="white" Value="timeStr"></MTextField>
+</div>
 @code {
+    private List<ProjectDto> Projects { get; set; } = new List<ProjectDto>
+    {
+        new ProjectDto
+        {
+             Name="Masa_Auth",
+             Identity="masa-auth"
+        },
+        new ProjectDto
+        {
+            Name="Masa_Pm",
+             Identity="masa-pm"
+        },
+        new ProjectDto
+        {
+            Name="Masa_Dcc",
+             Identity="masa-dcc"
+        }
+    };
+
+    private string timeStr = "2022/07/01 09:00:00~2022/07/01 10:00:00";
 
 }

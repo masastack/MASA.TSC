@@ -4,3 +4,4 @@
 global using BlazorComponent;
 global using Masa.Tsc.Contracts.Admin;
 global using Microsoft.AspNetCore.Components;
+global using Microsoft.Extensions.Logging;

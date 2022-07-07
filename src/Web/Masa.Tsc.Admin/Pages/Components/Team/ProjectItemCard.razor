@@ -1,0 +1,24 @@
+﻿@inherits TscComponentBase
+
+<Hexagon>
+    <HeaderChild>@Project.Name</HeaderChild>
+    <Child>
+              
+            @foreach (var item in Project.Apps.Take(3))
+            {
+                <div class="hex-span flow-col pb-1">@item.Name</div>
+            }        
+    
+    </Child>
+    <TailChild>
+        @if (Project.Apps.Count - 3 > 0)
+        {
+            <span>...</span>
+        }
+    </TailChild>
+</Hexagon>
+@code
+{
+    [Parameter]
+    public ProjectDto Project { get; set; }
+}

@@ -5,3 +5,17 @@
 <Masa.Tsc.Admin.Rcl.Pages.Components.Team.TeamSearch></Masa.Tsc.Admin.Rcl.Pages.Components.Team.TeamSearch>
 <Masa.Tsc.Admin.Rcl.Pages.Components.Team.MonitorCard></Masa.Tsc.Admin.Rcl.Pages.Components.Team.MonitorCard>
 <Masa.Tsc.Admin.Rcl.Pages.Components.Team.ProjectCard></Masa.Tsc.Admin.Rcl.Pages.Components.Team.ProjectCard>
+
+
+@code
+{
+
+    [Inject]
+    public Microsoft.Extensions.Logging.ILogger<Team> Logger { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Logger.LogError("team.OnAfterRender");
+        base.OnAfterRender(firstRender);
+    }
+}

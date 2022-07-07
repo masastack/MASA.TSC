@@ -33,7 +33,7 @@ public class QueryHandler
                 Name = result.Name,
                 Avatar = result.Avatar,
                 Description = result.Description,
-                Admins = result.Admins.Select(ToUser).ToList(),
+                //Admins = result.Admins.Select(ToUser).ToList(),
                 ProjectTotal = projects?.Count ?? 0,
                 CurrentAppId = query.Id
             };
@@ -77,7 +77,7 @@ public class QueryHandler
     [EventHandler]
     public async Task GetTeamMonitorAysnc(TeamMonitorQuery query)
     {
-        var teams = await _authClient.TeamService.GetUserTeamsAsync();
+        var teams = new TeamDetailModel[0];// await _authClient.TeamService.GetUserTeamsAsync();
 
         if (teams == null || !teams.Any())
             return;

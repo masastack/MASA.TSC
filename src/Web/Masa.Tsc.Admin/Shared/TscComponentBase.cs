@@ -5,4 +5,13 @@ namespace Masa.Tsc.Admin.Rcl.Shared;
 
 public class TscComponentBase: ComponentBase
 {
+    [Inject]
+    public ILogger<TscComponentBase> Logger { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Logger.LogInformation("OnAfterRender");
+
+        base.OnAfterRender(firstRender);
+    }
 }

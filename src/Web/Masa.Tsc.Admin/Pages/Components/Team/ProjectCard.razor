@@ -1,23 +1,109 @@
 ﻿@inherits TscComponentBase
 
-<MCard>
-    <MCardTitle>Auth</MCardTitle>
-    <MList>
-        <MListItem>
-            @foreach (var item in Apps.Take(3))
-            {
-                <MListItemContent>@item.Name</MListItemContent>
-            }
-        </MListItem>
-    </MList>
-    @if (Apps.Count - 3 > 0)
-    {
-        <span>...</span>
-    }
-</MCard>
-
+<div class="d-flex ma-10"></div>
+@while (rows-currentRow>0)
+{
+    var data = Projects.Skip(currentRow*RowCount).Take(RowCount);
+    <div class="d-flex @(currentRow>0&&currentRow%2==1?"hex-even":"")">
+        @foreach (var item in data)
+        {
+            <ProjectItemCard Project=item></ProjectItemCard>
+        }
+    </div>
+    currentRow++;
+}
 @code
 {
+    private int rows = 0;
+    private int currentRow = 0;
+
+    protected override void OnParametersSet()
+    {
+        rows = Projects.Count / RowCount;
+        if (Projects.Count % RowCount > 0)
+            rows += 1;
+        currentRow = 0;
+
+        base.OnParametersSet();
+    }
+
+    private static List<AppDto> apps = new List<AppDto>
+    {
+        new AppDto
+       {
+           Id="1",
+            Name="masa-auth-web",
+             Identity="masa-auth-web",
+              ServiceType= BuildingBlocks.BasicAbility.Pm.Enum.ServiceTypes.WebApi,
+               Status= Contracts.Admin.Enums.MonitorStatuses.Nomal
+       },new AppDto
+       {
+           Id="1",
+            Name="masa-auth-api",
+             Identity="masa-auth-api",
+              ServiceType= BuildingBlocks.BasicAbility.Pm.Enum.ServiceTypes.WebApi,
+               Status= Contracts.Admin.Enums.MonitorStatuses.Nomal
+       },new AppDto
+       {
+           Id="1",
+            Name="masa-auth-gateway",
+             Identity="masa-auth-gateway",
+              ServiceType= BuildingBlocks.BasicAbility.Pm.Enum.ServiceTypes.WebApi,
+               Status= Contracts.Admin.Enums.MonitorStatuses.Nomal
+       }
+    };
+
     [Parameter]
-    public List<AppDto> Apps { get; set; }
+    public int RowCount { get; set; } = 3;
+
+    [Parameter]
+    public List<ProjectDto> Projects { get; set; } = new List<ProjectDto>
+        {
+            new ProjectDto
+            {
+                Name="Msas_Auth",
+                 Description="asdasdasdasdasdasdasd",
+                  Id="1",
+                  Identity="masa-auth",
+                   LabelName="auth",
+                   Apps=apps
+            },
+            new ProjectDto
+            {
+                Name="Msas_Pm",
+                 Description="asdasdasdasdasdasdasd",
+                  Id="1",
+                  Identity="masa-auth",
+                   LabelName="auth",
+                   Apps=apps
+            },
+            new ProjectDto
+            {
+                Name="Msas_Dcc",
+                 Description="asdasdasdasdasdasdasd",
+                  Id="1",
+                  Identity="masa-auth",
+                   LabelName="auth",
+                   Apps=apps
+            },
+            new ProjectDto
+            {
+                Name="Msas_Tsc",
+                 Description="asdasdasdasdasdasdasd",
+                  Id="1",
+                  Identity="masa-auth",
+                   LabelName="auth",
+                   Apps=apps
+            },new ProjectDto
+            {
+                Name="Msas_Alert",
+                 Description="asdasdasdasdasdasdasd",
+                  Id="1",
+                  Identity="masa-auth",
+                   LabelName="auth",
+                   Apps=apps
+            }
+        };
+
+
 }

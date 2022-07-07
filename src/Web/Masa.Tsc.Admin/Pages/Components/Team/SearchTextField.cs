@@ -20,7 +20,7 @@ public class SearchTextField : MTextField<string>
         Solo = true;
         HideDetails = "auto";
         BackgroundColor = "fill-background";
-        Style = "max-width:340px;";
+        Style = "max-width:540px;";
         Placeholder = I18n!.T("Search");
         PrependInnerContent = builder =>
         {
@@ -40,7 +40,7 @@ public class SearchTextField : MTextField<string>
     {
         base.OnParametersSet();
         Class ??= "";
-        if (Class.Contains("rounded-2 search") is false)
-            Class += " rounded-2 search";
+        //if (Class.Contains("rounded-2 search") is false)
+        //    Class += " rounded-2 search";
     }
 }

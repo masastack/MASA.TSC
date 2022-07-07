@@ -1,21 +1,45 @@
 ﻿@inherits TscComponentBase
 
-<MCard>
-    <MCardTitle>@Text</MCardTitle>
-     <MIcon>@ICon</MIcon>
-      <MCardText>@Total</MCardText>
-</MCard>
+<div class="d-flex justify-center pt-5">
+    @if (Apps != null && Apps.Any())
+    {
+        foreach (var item in Apps)
+        {
+            <MonitorItemCard Value=@item />
+        }
+    }
+</div>
 @code {
-
     [Parameter]
-    public int Total { get; set; }
-
-    [Parameter]
-    public string Text { get; set; }
-
-    [Parameter]
-    public string Class { get; set; }
-
-    [Parameter]
-    public string ICon { get; set; }
+    public List<AppMonitorViewDto> Apps { get; set; } = new List<AppMonitorViewDto>
+    {
+        new AppMonitorViewDto
+        {
+             Name="MONITORING",
+             Color="#A3AED0",
+             Total=128,
+             Icon="mdi-chart-line-variant"
+        },
+        new AppMonitorViewDto
+        {
+         Name="WARN",
+         Color="#C07401",
+         Total=42,
+         Icon="mdi-bell-ring"
+        },
+        new AppMonitorViewDto
+        {
+             Name="ERROR",
+             Color="#F80E1C",
+             Total=23,
+             Icon="mdi-bell"
+        },
+        new AppMonitorViewDto
+        {
+         Name="NORMAL",
+         Color="#299F00",
+         Total=128,
+         Icon="mdi-shield"
+        }
+    };
 }

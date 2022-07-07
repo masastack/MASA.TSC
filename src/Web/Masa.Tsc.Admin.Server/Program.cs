@@ -27,46 +27,46 @@ builder.Services.AddServerSideBlazor();
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 
 
-//string otlpUri = builder.Configuration.GetSection("otlpUri").Value;
-//var resources = ResourceBuilder.CreateDefault();
-//resources.AddMasaService(builder.Configuration.GetSection("masa:tsc").Get<MasaObservableOptions>());
+string otlpUri = builder.Configuration.GetSection("otlpUri").Value;
+var resources = ResourceBuilder.CreateDefault();
+resources.AddMasaService(builder.Configuration.GetSection("masa:tsc").Get<MasaObservableOptions>());
 
-////metrics
-//builder.Services.AddMasaMetrics(builder =>
-//{
-//    builder.SetResourceBuilder(resources);
-//    builder.AddOtlpExporter(option =>
-//    {
-//        option.Endpoint = new Uri(otlpUri);
-//    });
-//});
+//metrics
+builder.Services.AddMasaMetrics(builder =>
+{
+    builder.SetResourceBuilder(resources);
+    builder.AddOtlpExporter(option =>
+    {
+        option.Endpoint = new Uri(otlpUri);
+    });
+});
 
-////trcaing
-//builder.Services.AddMasaTracing(configure =>
-//{
-//    configure.AspNetCoreInstrumentationOptions.AppendBlazorFilter(configure);
-//    configure.BuildTraceCallback = builder =>
-//    {
-//        builder.SetResourceBuilder(resources);
-//        builder.AddOtlpExporter(option =>
-//        {
-//            option.Endpoint = new Uri(otlpUri);
-//        });
-//    };
-//});
+//trcaing
+builder.Services.AddMasaTracing(configure =>
+{
+    configure.AspNetCoreInstrumentationOptions.AppendBlazorFilter(configure);
+    configure.BuildTraceCallback = builder =>
+    {
+        builder.SetResourceBuilder(resources);
+        builder.AddOtlpExporter(option =>
+        {
+            option.Endpoint = new Uri(otlpUri);
+        });
+    };
+});
 
-////logging
-//builder.Logging.AddOpenTelemetry(builder =>
-//{
-//    builder.SetResourceBuilder(resources);
-//    builder.IncludeScopes = true;
-//    builder.IncludeFormattedMessage = true;
-//    builder.ParseStateValues = true;
-//    builder.AddOtlpExporter(option =>
-//    {
-//        option.Endpoint = new Uri(otlpUri);
-//    });
-//});
+//logging
+builder.Logging.AddOpenTelemetry(builder =>
+{
+    builder.SetResourceBuilder(resources);
+    builder.IncludeScopes = true;
+    builder.IncludeFormattedMessage = true;
+    builder.ParseStateValues = true;
+    builder.AddOtlpExporter(option =>
+    {
+        option.Endpoint = new Uri(otlpUri);
+    });
+});
 
 var app = builder.Build();
 

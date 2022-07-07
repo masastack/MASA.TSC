@@ -1,0 +1,25 @@
+﻿<div class="hex flex-row">
+    <div class="common top"></div>
+    <div class="common bottom"></div>
+    @*<div class="hex">
+        <div class="hex-child common top"></div>
+        <div class="hex-child common bottom"></div>*@
+        <div class="pt-0 pl-2 justify-md-center">@Child</div>
+        
+         @*<div class="bottom overflow-hidden ">@TailChild</div>
+
+    </div>*@
+</div>
+
+@code {
+
+    [Parameter]
+    public RenderFragment HeaderChild { get; set; }
+
+    [Parameter]
+    public RenderFragment Child { get; set; }
+
+    [Parameter]
+    public RenderFragment TailChild { get; set; }
+
+}

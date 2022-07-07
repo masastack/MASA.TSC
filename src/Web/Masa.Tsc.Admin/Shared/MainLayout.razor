@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Components.Rendering
 @inherits LayoutComponentBase
+
 <MApp>
     <MAppBar Elevation=0 App MaxHeight=60 Color="white" Class="m-bar--underline pl-2">
         <MSpacer></MSpacer>
@@ -62,10 +63,19 @@
         </MList>
     </MNavigationDrawer>
     <MMain>
-        <MContainer Fluid>
+        <MContainer Fluid Class="grey lighten-4">
             <CascadingValue Value="this">
                 @Body
             </CascadingValue>
         </MContainer>
     </MMain>
 </MApp>
+
+@*<Layout AppId="Masa-Pm-Web"
+        UserCenterRoute="/user"
+        Logo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo-h-en.png"
+        MiniLogo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo.png">
+    <MErrorHandler ShowDetail=false>
+        @Body
+    </MErrorHandler>
+</Layout>*@
