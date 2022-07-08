@@ -1,15 +1,11 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Contrib.Data.Contracts.EF;
+using Masa.Contrib.Data.EntityFrameworkCore.SqlServer;
+
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
-{
-    options.Environment = "environment";
-    options.UserName = "name";
-    options.UserId = "sub";
-});
-builder.Services.AddAuthClient(builder.Configuration.GetSection("Masa:AuthUrl").Value);
-builder.Services.AddPmClient(builder.Configuration.GetSection("Masa:PmUrl").Value);
+
 var elasearchUrls = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<string[]>();
 builder.Configuration.ConfigureElasticIndex();
 builder.Services.AddCaller(option =>
@@ -41,6 +37,16 @@ builder.Services.AddAuthentication(options =>
     options.RequireHttpsMetadata = false;
     options.Audience = "";
 });
+
+builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
+{
+    options.Environment = "environment";
+    options.UserName = "name";
+    options.UserId = "sub";
+});
+builder.Services.AddAuthClient(builder.Configuration["AuthServiceBaseAddress"]);
+builder.Services.AddPmClient(builder.Configuration["Masa:PmUrl"]);
+
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     .AddEndpointsApiExplorer()
@@ -72,14 +78,13 @@ var app = builder.Services
             }
         });
     })
-    //.AddTransient(typeof(IMiddleware<>), typeof(LogMiddleware<>))
-    .AddDomainEventBus(builder =>
-    {
-        builder.UseDaprEventBus<IntegrationEventLogService>(options => options.UseEventLog<TscDbContext>())
-        .UseEventBus()
-       .UseUoW<TscDbContext>()
-        .UseRepository<TscDbContext>();
-    })
+     .AddIntegrationEventBus<IntegrationEventLogService>(options =>
+     {
+         options.UseDapr();
+         options.UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer().UseFilter())
+                .UseEventLog<TscDbContext>()
+                .UseEventBus();
+     })
     .AddServices(builder);
 
 // Configure the HTTP request pipeline.

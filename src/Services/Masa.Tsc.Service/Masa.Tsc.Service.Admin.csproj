@@ -7,17 +7,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Infrastructure\Repositories\**" />
-	  <Content Remove="Infrastructure\Repositories\**" />
-	  <EmbeddedResource Remove="Infrastructure\Repositories\**" />
-	  <None Remove="Infrastructure\Repositories\**" />
+		<Compile Remove="Infrastructure\Repositories\**" />
+		<Content Remove="Infrastructure\Repositories\**" />
+		<EmbeddedResource Remove="Infrastructure\Repositories\**" />
+		<None Remove="Infrastructure\Repositories\**" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
+		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth" Version="0.5.0-preview.4" />
 		<PackageReference Include="Masa.BuildingBlocks.Dispatcher.Events" Version="0.5.0-preview.4" />
-		<PackageReference Include="Masa.Contrib.BasicAbility.Auth" Version="0.5.0-preview.1" />		
+		<PackageReference Include="Masa.Contrib.BasicAbility.Auth" Version="0.5.0-preview.4" />
 		<PackageReference Include="Masa.Contrib.BasicAbility.Pm" Version="0.5.0-preview.4" />
 		<PackageReference Include="Masa.Contrib.BasicAbility.Tsc" Version="0.5.0-preview.4" />
+		<PackageReference Include="MASA.Contrib.Data.Contracts.EF" Version="0.5.0-preview.4" />
 		<PackageReference Include="Masa.Contrib.Data.EntityFrameworkCore.SqlServer" Version="0.5.0-preview.4" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="0.5.0-preview.4" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EF" Version="0.5.0-preview.4" />
@@ -35,28 +37,28 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.5" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
-	  <Folder Include="Application\Apps\" />
-	  <Folder Include="Application\Users\Query\" />
-	  <Folder Include="Domain\Instruments\Events\" />
-	  <Folder Include="Domain\Projects\Events\" />
-	  <Folder Include="Domain\Projects\Service\" />
-	  <Folder Include="Domain\Projects\Repositories\" />
-	  <Folder Include="Domain\Instruments\Repositories\" />
-	  <Folder Include="Domain\Instruments\Services\" />
-	  <Folder Include="Domain\Teams\Events\" />
-	  <Folder Include="Domain\Teams\Repositories\" />
-	  <Folder Include="Domain\Teams\Service\" />
+		<Folder Include="Application\Apps\" />
+		<Folder Include="Application\Users\Query\" />
+		<Folder Include="Domain\Instruments\Events\" />
+		<Folder Include="Domain\Projects\Events\" />
+		<Folder Include="Domain\Projects\Service\" />
+		<Folder Include="Domain\Projects\Repositories\" />
+		<Folder Include="Domain\Instruments\Repositories\" />
+		<Folder Include="Domain\Instruments\Services\" />
+		<Folder Include="Domain\Teams\Events\" />
+		<Folder Include="Domain\Teams\Repositories\" />
+		<Folder Include="Domain\Teams\Service\" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Order\Masa.Tsc.Contracts.Admin.csproj" />
+		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Order\Masa.Tsc.Contracts.Admin.csproj" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
-	  <None Update="Dockerfile">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </None>
+		<None Update="Dockerfile">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 </Project>

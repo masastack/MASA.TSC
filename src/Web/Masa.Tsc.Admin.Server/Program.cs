@@ -12,6 +12,18 @@ using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+
+//builder.WebHost.UseKestrel(option =>
+//{
+//    option.ConfigureHttpsDefaults(options =>
+//    options.ServerCertificate = new X509Certificate2(Path.Combine("Certificates", "7348307__lonsid.cn.pfx"), "cqUza0MN"));
+//});
+
+StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
+
 builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
 {
     options.Environment = "environment";
@@ -19,13 +31,6 @@ builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
     options.UserId = "sub";
 });
 builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", builder.Configuration["AuthServiceBaseAddress"]);
-
-// Add services to the container.
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
-
-StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
-
 
 string otlpUri = builder.Configuration.GetSection("otlpUri").Value;
 var resources = ResourceBuilder.CreateDefault();
