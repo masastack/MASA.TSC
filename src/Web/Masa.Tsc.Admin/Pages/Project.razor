@@ -1,0 +1,22 @@
+﻿<div>
+    <div>aasdasdasdasdasdadasdas
+        <Masa.Tsc.Admin.Rcl.Pages.Components.Project.TeamDetail Value=Team></Masa.Tsc.Admin.Rcl.Pages.Components.Project.TeamDetail>
+        <Masa.Tsc.Admin.Rcl.Pages.Components.Project.ProjectDetail Value=@Value></Masa.Tsc.Admin.Rcl.Pages.Components.Project.ProjectDetail>
+    </div>
+    <div>
+        <Masa.Tsc.Admin.Rcl.Pages.Components.Project.SearchBar AppId=@AppId Apps=@Value.Apps></Masa.Tsc.Admin.Rcl.Pages.Components.Project.SearchBar>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public TeamDto Team { get; set; }
+
+    [Parameter]
+    public ProjectDto Value { get; set; }
+
+     [Parameter]
+    public string AppId { get; set; }
+
+}

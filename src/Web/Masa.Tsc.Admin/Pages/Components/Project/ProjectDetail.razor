@@ -1,0 +1,11 @@
+﻿<MCard>
+    <MCardTitle>@Value.Name</MCardTitle>
+    <MLabel>@Value.Identity</MLabel>
+    <MLabel>应用：@Value.Apps.Count</MLabel>
+    <MLabel>@Value.Description</MLabel>
+</MCard>
+
+@code {
+    [Parameter]
+    public ProjectDto Value { get; set; } = default!;
+}

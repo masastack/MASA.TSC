@@ -26,12 +26,12 @@
                     <MListItem Linkage Href="/k8s/cluster">
                         <MListItemContent>
                             <MListItemTitle>集群</MListItemTitle>
-                        </MListItemContent>    
+                        </MListItemContent>
                     </MListItem>
                     <MListItem Linkage Href="/k8s/pod">
                         <MListItemContent>
                             <MListItemTitle>服务</MListItemTitle>
-                        </MListItemContent>    
+                        </MListItemContent>
                     </MListItem>
                 </MListItemContent>
             </MListItem>
@@ -65,17 +65,19 @@
     <MMain>
         <MContainer Fluid Class="grey lighten-4">
             <CascadingValue Value="this">
-                @Body
+                <MErrorHandler>
+                    @Body
+                </MErrorHandler>
             </CascadingValue>
         </MContainer>
     </MMain>
 </MApp>
 
 @*<Layout AppId="Masa-Pm-Web"
-        UserCenterRoute="/user"
-        Logo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo-h-en.png"
-        MiniLogo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo.png">
+    UserCenterRoute="/user"
+    Logo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo-h-en.png"
+    MiniLogo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo.png">
     <MErrorHandler ShowDetail=false>
-        @Body
+    @Body
     </MErrorHandler>
-</Layout>*@
+    </Layout>*@

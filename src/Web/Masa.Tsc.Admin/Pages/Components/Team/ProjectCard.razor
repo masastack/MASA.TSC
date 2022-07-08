@@ -1,21 +1,69 @@
 ﻿@inherits TscComponentBase
 
-<div class="d-flex ma-10"></div>
-@while (rows-currentRow>0)
-{
-    var data = Projects.Skip(currentRow*RowCount).Take(RowCount);
-    <div class="d-flex @(currentRow>0&&currentRow%2==1?"hex-even":"")">
-        @foreach (var item in data)
-        {
-            <ProjectItemCard Project=item></ProjectItemCard>
-        }
-    </div>
-    currentRow++;
-}
+<div class="ma-16 pa-16">  
+    @while (rows - currentRow > 0)
+    {
+        var data = Projects.Skip(currentRow * RowCount).Take(RowCount);
+        <div class="d-flex  @GetPardddd(currentRow,data.Count())">
+            @foreach (var item in data)
+            {
+                <ProjectItemCard Project=item OnClick=@(()=>Click(item))></ProjectItemCard>
+            }
+        </div>
+        currentRow++;
+    }    
+</div>
+
+<MButton OnClick=@(()=>Click(default!)) StopPropagation>
+    dialog
+</MButton>
+
+<MDialog @bind-Value=@isShow>
+    <ChildContent>
+        <MCard>
+            dasdasdasdasddas
+            @*<Project Value=@Project AppId="sadasdas" Team=TeamData></Project>*@
+
+        </MCard>
+    </ChildContent>
+</MDialog>
+
 @code
 {
     private int rows = 0;
     private int currentRow = 0;
+    private ProjectDto Project;
+    private bool isShow = false;
+
+    private void Click(ProjectDto dto)
+    {
+        Project = dto;
+        isShow = true;
+    }
+
+    private string GetPardddd(int rowIndex, int total)
+    {
+        if (total - RowCount == 0)
+        {
+            if (rowIndex % 2 == 1)
+                return "hex-even";
+            else
+                return "";
+        }
+
+        var count = RowCount - total;
+        if (rowIndex % 2 == 1)
+        {
+            if ((RowCount + count) % 2 == 0)
+                return "hex-even";
+        }
+        else if ((RowCount + count) % 2 == 1)
+        {
+            return "hex-even";
+        }
+
+        return "";
+    }
 
     protected override void OnParametersSet()
     {
@@ -102,8 +150,51 @@
                   Identity="masa-auth",
                    LabelName="auth",
                    Apps=apps
+            },
+            new ProjectDto
+            {
+                Name="Msas_Tsc",
+                 Description="asdasdasdasdasdasdasd",
+                  Id="1",
+                  Identity="masa-auth",
+                   LabelName="auth",
+                   Apps=apps
+            },new ProjectDto
+            {
+                Name="Msas_Alert",
+                 Description="asdasdasdasdasdasdasd",
+                  Id="1",
+                  Identity="masa-auth",
+                   LabelName="auth",
+                   Apps=apps
+            },new ProjectDto
+            {
+                Name="Msas_Alert",
+                 Description="asdasdasdasdasdasdasd",
+                  Id="1",
+                  Identity="masa-auth",
+                   LabelName="auth",
+                   Apps=apps
             }
         };
 
+    private TeamDto TeamData = new TeamDto
+    {
+        Name="Masa Stack Component Steam",
+         Avatar="https://cdn.masastack.com/stack/images/website/masa-blazor/jack.png",
+          AppTotal=20,
+          ProjectTotal=50,
+           Description="asdasdasdashujbnhsdfsfdbvx, dsifhsndi hj9idf sfgsdfsgbdfojkmopjm erfgsdvsdfsdfsdfsdfsd",
+            Admins=new List<UserDto>
+            {
+                new UserDto
+                {
+                    DisplayName="tdadd",
+                    Avatar="https://cdn.masastack.com/stack/images/website/masa-blazor/jack.png"
+                
+                }    
 
+            }
+
+    };
 }

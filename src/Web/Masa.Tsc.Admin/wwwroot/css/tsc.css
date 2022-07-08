@@ -47,7 +47,7 @@
     position: absolute;
     height: 100%;
     width: 100%;
-    overflow: hidden;    
+    overflow: hidden;
     border-radius: 4px;
 }
 
@@ -68,10 +68,12 @@
 }
 
 .hex-span {
-    font-size:10px;
+    font-size: 10px;
 }
 
 
-    .hex-even {
-        padding-left: 64px;
-    }
+.hex-even {
+    margin-left: 64px;
+}
+
+
