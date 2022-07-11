@@ -1,16 +1,13 @@
 ﻿@using Masa.Tsc.Admin.Rcl.Pages.Components
 @page "/team"
+@inherits TscComponentBase
 
 <Navigation Href="/team"></Navigation>
-<Masa.Tsc.Admin.Rcl.Pages.Components.Team.TeamSearch></Masa.Tsc.Admin.Rcl.Pages.Components.Team.TeamSearch>
-<Masa.Tsc.Admin.Rcl.Pages.Components.Team.MonitorCard></Masa.Tsc.Admin.Rcl.Pages.Components.Team.MonitorCard>
-<Masa.Tsc.Admin.Rcl.Pages.Components.Team.ProjectCard></Masa.Tsc.Admin.Rcl.Pages.Components.Team.ProjectCard>
+<TeamSearch></TeamSearch>
+<MonitorCard></MonitorCard>
+<ProjectCard></ProjectCard>
 @code
 {
-
-    [Inject]
-    public Microsoft.Extensions.Logging.ILogger<Team> Logger { get; set; }
-
     protected override void OnAfterRender(bool firstRender)
     {
         Logger.LogError("team.OnAfterRender");

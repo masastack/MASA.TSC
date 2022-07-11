@@ -6,7 +6,7 @@ using Masa.Blazor;
 using Masa.Stack.Components.Models;
 using Microsoft.AspNetCore.Components.Rendering;
 
-namespace Masa.Tsc.Admin.Rcl.Pages.Components.Team;
+namespace Masa.Tsc.Admin.Rcl.Pages.Components;
 
 public class SearchTextField : MTextField<string>
 {

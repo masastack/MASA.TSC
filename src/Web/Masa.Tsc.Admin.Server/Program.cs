@@ -4,6 +4,7 @@
 using Masa.BuildingBlocks.Identity.IdentityModel;
 using Masa.Contrib.BasicAbility.Tsc;
 using Masa.Stack.Components;
+using Masa.Tsc.Caller;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -13,8 +14,10 @@ using OpenTelemetry.Trace;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddScoped<TscCaller>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
 
 //builder.WebHost.UseKestrel(option =>
 //{

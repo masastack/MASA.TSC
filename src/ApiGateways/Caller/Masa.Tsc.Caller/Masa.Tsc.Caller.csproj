@@ -1,20 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Masa.Utils.Caller.HttpClient" Version="0.5.0-preview.4" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\Contracts\Masa.Tsc.Contracts.Order\Masa.Tsc.Contracts.Admin.csproj" />
+	  <Compile Remove="Callers\**" />
+	  <EmbeddedResource Remove="Callers\**" />
+	  <None Remove="Callers\**" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Callers\" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+		<PackageReference Include="Masa.Utils.Caller.HttpClient" Version="0.5.0-preview.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Contracts\Masa.Tsc.Contracts.Order\Masa.Tsc.Contracts.Admin.csproj" />
 	</ItemGroup>
 </Project>
