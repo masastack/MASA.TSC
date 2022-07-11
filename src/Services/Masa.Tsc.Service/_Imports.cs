@@ -42,3 +42,7 @@ global using OpenTelemetry.Resources;
 global using OpenTelemetry.Trace;
 global using System.Text.Json;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Dtos;
+global using Masa.BuildingBlocks.Ddd.Domain.Repositories;
+global using Masa.Tsc.Service.Admin.Application.Setting.Queries;
+global using Masa.Tsc.Service.Admin.Domain.Setting.Repositories;
+global using Masa.BuildingBlocks.ReadWriteSpliting.Cqrs.Commands;

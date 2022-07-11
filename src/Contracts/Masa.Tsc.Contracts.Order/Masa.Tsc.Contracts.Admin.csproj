@@ -7,6 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Instruments\Query\**" />
+	  <EmbeddedResource Remove="Instruments\Query\**" />
+	  <None Remove="Instruments\Query\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth" Version="0.5.0-preview.4" />
 		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth.Contracts" Version="0.5.0-preview.4" />
 		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Pm" Version="0.5.0-preview.4" />

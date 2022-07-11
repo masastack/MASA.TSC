@@ -15,5 +15,7 @@ public class Instrument : AggregateRoot<Guid>
 
     public bool IsRoot { get; set; }
 
-    public string DirectoryId { get; set; }
+    public Guid DirectoryId { get; set; }
+
+    public List<Pannel> Pannels { get; set; }
 }

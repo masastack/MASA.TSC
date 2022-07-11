@@ -7,9 +7,37 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Remove="Application\Apps\**" />
+		<Compile Remove="Domain\Instruments\Events\**" />
+		<Compile Remove="Domain\Instruments\Services\**" />
+		<Compile Remove="Domain\Projects\Events\**" />
+		<Compile Remove="Domain\Projects\Service\**" />
+		<Compile Remove="Domain\Teams\Events\**" />
+		<Compile Remove="Domain\Teams\Service\**" />
 		<Compile Remove="Infrastructure\Repositories\**" />
+		<Content Remove="Application\Apps\**" />
+		<Content Remove="Domain\Instruments\Events\**" />
+		<Content Remove="Domain\Instruments\Services\**" />
+		<Content Remove="Domain\Projects\Events\**" />
+		<Content Remove="Domain\Projects\Service\**" />
+		<Content Remove="Domain\Teams\Events\**" />
+		<Content Remove="Domain\Teams\Service\**" />
 		<Content Remove="Infrastructure\Repositories\**" />
+		<EmbeddedResource Remove="Application\Apps\**" />
+		<EmbeddedResource Remove="Domain\Instruments\Events\**" />
+		<EmbeddedResource Remove="Domain\Instruments\Services\**" />
+		<EmbeddedResource Remove="Domain\Projects\Events\**" />
+		<EmbeddedResource Remove="Domain\Projects\Service\**" />
+		<EmbeddedResource Remove="Domain\Teams\Events\**" />
+		<EmbeddedResource Remove="Domain\Teams\Service\**" />
 		<EmbeddedResource Remove="Infrastructure\Repositories\**" />
+		<None Remove="Application\Apps\**" />
+		<None Remove="Domain\Instruments\Events\**" />
+		<None Remove="Domain\Instruments\Services\**" />
+		<None Remove="Domain\Projects\Events\**" />
+		<None Remove="Domain\Projects\Service\**" />
+		<None Remove="Domain\Teams\Events\**" />
+		<None Remove="Domain\Teams\Service\**" />
 		<None Remove="Infrastructure\Repositories\**" />
 	</ItemGroup>
 
@@ -39,17 +67,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Application\Apps\" />
-		<Folder Include="Application\Users\Query\" />
-		<Folder Include="Domain\Instruments\Events\" />
-		<Folder Include="Domain\Projects\Events\" />
-		<Folder Include="Domain\Projects\Service\" />
+		<Folder Include="Application\Instruments\Queries\" />
 		<Folder Include="Domain\Projects\Repositories\" />
-		<Folder Include="Domain\Instruments\Repositories\" />
-		<Folder Include="Domain\Instruments\Services\" />
-		<Folder Include="Domain\Teams\Events\" />
 		<Folder Include="Domain\Teams\Repositories\" />
-		<Folder Include="Domain\Teams\Service\" />
 	</ItemGroup>
 
 	<ItemGroup>
