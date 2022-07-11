@@ -1,46 +1,18 @@
 ﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
 <div>
-<div>
-    <MAutocomplete @bind-Value=@AppId  Items=Apps ItemText="r=>r.Name" ItemValue="r=>r.Identity" />
-    <MLabel>Service</MLabel>
-    <MLabel>ID:@AppId</MLabel>
-</div>
-<div>
-    <MTextField TValue=string Value="TimeStr"></MTextField>    
-    <MSelect                  
-                 @bind-Value="@TimeStr"
+    <div>
+        <MAutocomplete @bind-Value=@AppId Items=Apps ItemText="r=>r.Name" ItemValue="r=>r.Identity" />
+        <MLabel>Service</MLabel>
+        <MLabel>ID:@AppId</MLabel>
+    </div>
+    <div>
+        <MTextField TValue=string Value="TimeStr"></MTextField>
+        <MSelect @bind-Value="@TimeStr"
                  Items="@_selectDataSource"
                  ItemText="u => u"
                  ItemValue="u => u">
         </MSelect>
         <MIcon Large>fa-arrows-rotate</MIcon>
         <MButton>查看详情</MButton>
+    </div>
 </div>
-</div>
-@code {
-    private string TimeStr = "2022/07/01 09:00:00~2022/07/01 10:00:00";
-
-    [Parameter]
-    public List<AppDto> Apps { get; set; } = new List<AppDto>
-    {
-        new AppDto
-        {
-            Name="aaa",
-            Identity="111"
-
-        }
-
-    };
-
-    [Parameter]
-    public string AppId { get; set; }
-
-    private List<string> _selectDataSource=new List<string>
-    {
-        "15分钟",
-        "30分钟",
-        "1小时",
-        "5小时"
-    };
-
-}

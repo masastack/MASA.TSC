@@ -11,5 +11,5 @@ public class AppMonitorDto
 
     public int Warn { get; set; }
 
-    public int Nomal { get; set; }
+    public int Normal { get; set; }
 }

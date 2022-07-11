@@ -134,7 +134,7 @@ public class QueryHandler
             query.Result.Monitor.Warn = warn;
             if (monitors.Count - errorWarnAppCount > 0)
             {
-                query.Result.Monitor.Nomal = monitors.Count - errorWarnAppCount;
+                query.Result.Monitor.Normal = monitors.Count - errorWarnAppCount;
             }
         }
 

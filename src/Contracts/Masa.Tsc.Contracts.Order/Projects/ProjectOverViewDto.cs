@@ -3,19 +3,7 @@
 
 namespace Masa.Tsc.Contracts.Admin;
 
-public class ProjectOverViewDto
+public class ProjectOverViewDto : ProjectDto
 {
-    public string Id { get; set; }
-
-    public string Identity { get; set; }
-
-    public string Name { get; set; }
-
-    public string Description { get; set; }
-
-    public string LabelName { get; set; }
-
-    public List<AppDto> Apps { get; set; }
-
     public MonitorStatuses Status { get; set; } = MonitorStatuses.Nomal;
 }

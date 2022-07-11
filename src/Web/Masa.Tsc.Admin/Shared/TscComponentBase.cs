@@ -14,6 +14,8 @@ public class TscComponentBase : ComponentBase
     [Inject]
     public TscCaller ApiCaller{ get; set; }
 
+    public Guid CurrentUserId { get; set; }
+
     protected override void OnAfterRender(bool firstRender)
     {
         Logger.LogInformation("OnAfterRender");

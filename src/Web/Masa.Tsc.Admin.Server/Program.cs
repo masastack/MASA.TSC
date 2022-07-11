@@ -34,6 +34,7 @@ builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
     options.UserId = "sub";
 });
 builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", builder.Configuration["AuthServiceBaseAddress"]);
+//builder.Services.AddMasaOpenIdConnect(builder.Configuration);
 
 string otlpUri = builder.Configuration.GetSection("otlpUri").Value;
 var resources = ResourceBuilder.CreateDefault();
