@@ -1,0 +1,38 @@
+﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
+@using System.Text
+@inherits TscComponentBase
+
+@foreach (var item in Value)
+{
+    if (@item is IEnumerable<KeyValuePair<string, object>> obj)
+    {
+        _isObjectOrArray = true;
+        <TscKeyValue Value=obj />
+    }
+    else if (@item is IEnumerable<object> objs)
+    {
+        _isObjectOrArray = true;
+        <TscValueArray Value=objs />
+    }
+    else
+    {
+        _text.Append($" , {item}");
+    }
+}
+
+@{
+    if (_text.Length > 0)
+    {
+        _text.Remove(0, 3);
+        <MLabel>@_text.ToString()</MLabel>
+    }
+}
+
+@code
+{
+    private bool _isObjectOrArray = false;
+    private StringBuilder _text = new StringBuilder(4096);
+
+    [Parameter]
+    public IEnumerable<object> Value { get; set; }
+}

@@ -1,0 +1,25 @@
+﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
+@inherits TscComponentBase
+
+@foreach (var item in Value)
+{
+    <MLabel>@item.Key</MLabel>
+    if (@item.Value is IEnumerable<KeyValuePair<string, object>> obj)
+    {
+        <TscKeyValue Value=obj />
+    }
+    else if (@item.Value is IEnumerable<object> objs)
+    {
+        <TscValueArray Value=objs />
+    }
+    else
+    {
+        <MLabel>@item.Value</MLabel>
+    }
+}
+
+@code
+{
+    [Parameter]
+    public IEnumerable<KeyValuePair<string, object>> Value { get; set; }
+}

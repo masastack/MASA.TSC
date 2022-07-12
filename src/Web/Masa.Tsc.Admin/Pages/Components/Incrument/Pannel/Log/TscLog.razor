@@ -1,0 +1,29 @@
+﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
+@inherits TscComponentBase
+
+<MTextField TValue=string Placeholder="Date"></MTextField>
+<MIcon>refrsh</MIcon>
+
+<MCard>
+    <SearchTextField Label="请输入内容关键词"></SearchTextField>
+    <MRadio Label="换行" TValue=bool></MRadio>
+    <MButton>时间<BIcon>fa-sort</BIcon></MButton>
+    <MAutocomplete Items="_dicDurations"
+                   @bind-Value="_lastedDuration"
+                   TItem="KeyValuePair<int,string>"
+                   TValue="int"
+                   TItemValue="int"
+                   ItemText="item=>item.Value"
+                   ItemValue="item=>item.Key">
+               <MIcon>fa-sort-down</MIcon>
+               </MAutocomplete>
+</MCard>
+
+<MContainer>
+    @foreach(var item in _data)
+    {
+        <MCard></MCard>
+    }
+
+ <MPagination Length=_totalPage TotalVisible=5></MPagination>
+</MContainer>
