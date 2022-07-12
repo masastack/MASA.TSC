@@ -9,4 +9,14 @@ public static class DateTimeExtensions
     {
         return new DateTimeOffset(time).ToUnixTimeSeconds();
     }
+
+    public static DateTime ToDateTime(this long timestamp)
+    {
+        DateTimeOffset offset;
+        if (timestamp - 0x7ffffffff > 0)
+            offset = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
+        else
+            offset = DateTimeOffset.FromUnixTimeSeconds(timestamp);
+        return offset.DateTime;
+    }
 }

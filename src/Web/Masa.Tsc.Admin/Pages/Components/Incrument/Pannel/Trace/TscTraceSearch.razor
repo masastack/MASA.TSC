@@ -1,0 +1,32 @@
+﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
+@inherits TscComponentBase
+
+<MAutocomplete Label="Service"
+               Items="_services"
+               @bind-Value="_service"
+               TItem=string
+               TValue=string
+               ItemText="item=>item"
+               ItemValue="item=>item"
+               TItemValue=string></MAutocomplete>
+<MAutocomplete Label="Instance"
+               Items="_instances" @bind-Value="_instance"
+               TItem=string
+               TValue=string
+               ItemText="item=>item"
+               ItemValue="item=>item"
+               TItemValue=string></MAutocomplete>
+<MAutocomplete Label="Endpoint"
+               Loading="_isLoading"
+               Items="_endpoints"
+               @bind-Value="_endpoint"
+               TItem=string
+               TValue=string
+               ItemText="item=>item"
+               ItemValue="item=>item"
+               TItemValue=string
+               OnSearchInputUpdate="UpdateSearchInputAsync"
+               OnSelectedItemUpdate="UpdateItemAsync"></MAutocomplete>
+<SearchTextField Label="TraceId/Search" @bind-Value="_keyword"></SearchTextField>
+<MTextField @bind-Value="_timeStr"></MTextField>
+<MButton OnClick="async()=>await SearchAsync()">Query</MButton>

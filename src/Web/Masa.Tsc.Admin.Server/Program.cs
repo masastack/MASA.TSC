@@ -5,6 +5,7 @@ using Masa.BuildingBlocks.Identity.IdentityModel;
 using Masa.Contrib.BasicAbility.Tsc;
 using Masa.Stack.Components;
 using Masa.Tsc.Caller;
+using Masa.Tsc.Caller.Extensions;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -76,6 +77,8 @@ builder.Logging.AddOpenTelemetry(builder =>
         option.Endpoint = new Uri(otlpUri);
     });
 });
+
+builder.Services.AddTscApiCaller(builder.Configuration["masa:tsc:apiUrl"]);
 
 var app = builder.Build();
 

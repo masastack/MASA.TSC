@@ -24,7 +24,7 @@ public class QueryHandler
     [EventHandler]
     public async Task GetAggregationAsync(LogAggQuery query)
     {
-        await _elasticClient.GetAggregationAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, Filter, Aggregation, AggResult,_logger);
+        await _elasticClient.GetAggregationAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, Filter, Aggregation, AggResult, _logger);
     }
 
     private QueryContainer Filter(QueryContainerDescriptor<object> container, LogAggQuery query)
@@ -136,5 +136,41 @@ public class QueryHandler
         var result = await _caller.GetMappingAsync(ElasticConst.LogIndex);
         if (result != null)
             query.Result = result;
+    }
+
+    [EventHandler]
+    public async Task GetPageListAsync(LogsQuery query)
+    {
+        var start = (query.Page - 1) * query.Size;
+        if (ElasticConst.MAX_DATA_COUNT - start - query.Size <= 0)
+            throw new UserFriendlyException($"elastic query data max count must be less {ElasticConst.MAX_DATA_COUNT}, please input more condition to limit");
+        var rep = await _elasticClient.SearchAsync<object>(s => s.Index(ElasticConst.LogIndex).Query(q => Filter(q, query)).From(100).Size(query.Size).Sort(d => d.Field(ElasticConst.LogTimestamp, query.Sort == "asc" ? SortOrder.Ascending : SortOrder.Descending)));
+        if (rep.IsValid)
+        {
+            if (rep.Documents.Any())
+                query.Result = new PaginationDto<object>(rep.Total, rep.Documents.ToList());
+        }
+        else
+        {
+            _logger.LogError("GetLatestDataAsync Error {0}", rep);
+        }
+    }
+
+    private QueryContainer Filter(QueryContainerDescriptor<object> container, LogsQuery query)
+    {
+        var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
+        if (!string.IsNullOrEmpty(query.Query))
+        {
+            list.Add(q => q.Raw(query.Query));
+        }
+        if (query.Start > DateTime.MinValue && query.End > DateTime.MinValue && query.Start < query.End)
+        {
+            list.Add(q => q.DateRange(f => f.GreaterThanOrEquals(query.Start).LessThanOrEquals(query.End).Field(ElasticConst.LogTimestamp)));
+        }
+
+        if (list.Any())
+            container.Bool(b => b.Must(list));
+
+        return container;
     }
 }

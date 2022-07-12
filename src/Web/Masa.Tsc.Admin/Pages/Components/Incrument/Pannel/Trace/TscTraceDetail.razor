@@ -1,0 +1,48 @@
+﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
+@inherits TscComponentBase
+
+<MCard>
+    <MLabel>/homepage</MLabel>
+</MCard>
+<MCard>
+    <MAutocomplete Items="_services"
+                   TItem=string
+                   TValue=string
+                   ItemValue="item=>item"
+                   ItemText="item=>item"
+                   TItemValue=string></MAutocomplete>
+</MCard>
+<MContainer>
+    <MLabel>起始点</MLabel>
+    <MLabel>开始时间</MLabel>
+    <MLabel>结束时间</MLabel>
+    <MLabel>持续时间</MLabel>
+    <MLabel>跨度</MLabel>
+</MContainer>
+
+
+<MCard>
+    table
+</MCard>
+
+<MCard>
+    <MLabel></MLabel>
+    <MTabs>
+        <MTab>属性</MTab>
+        <MTab>资源</MTab>
+        <MTab>详情</MTab>
+        <MTab>日志</MTab>
+    </MTabs>
+    <MTabsItems>
+        <MTabItem>
+            <MCard>
+                <MCard><MLabel>service.id</MLabel><MLabel>masa-stack-auth-web</MLabel></MCard>                
+            </MCard>
+        </MTabItem>
+        <MTabItem></MTabItem>
+        <MTabItem></MTabItem>
+        <MTabItem></MTabItem>
+    </MTabsItems>
+</MCard>
+
+

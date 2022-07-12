@@ -83,7 +83,8 @@ var app = builder.Services
          options.UseDapr();
          options.UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer().UseFilter())
                 .UseEventLog<TscDbContext>()
-                .UseEventBus();
+                .UseEventBus()
+                .UseRepository<TscDbContext>();
      })
     .AddServices(builder);
 

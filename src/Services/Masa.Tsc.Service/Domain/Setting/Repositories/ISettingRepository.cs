@@ -1,9 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.Service.Admin.Domain.Setting.Repositories;
+namespace Masa.Tsc.Service.Admin.Domain.Repositories;
 
-public interface ISettingRepository : IRepository<Aggregates.Setting>
+public interface ISettingRepository : IRepository<Setting>
 {
 
 }

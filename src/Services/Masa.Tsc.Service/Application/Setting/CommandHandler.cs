@@ -17,7 +17,7 @@ public class CommandHandler
         var find = await _settingRepository.FindAsync(m => m.UserId == command.Setting.UserId);
         if (find == null)
         {
-            await _settingRepository.AddAsync(new Domain.Setting.Aggregates.Setting
+            await _settingRepository.AddAsync(new Domain.Aggregates.Setting
             {
                 Interval = command.Setting.Interval,
                 IsEnable = command.Setting.IsEnable,

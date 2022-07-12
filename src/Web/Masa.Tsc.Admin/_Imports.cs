@@ -7,3 +7,4 @@ global using Masa.Tsc.Caller;
 global using Masa.Tsc.Contracts.Admin;
 global using Microsoft.AspNetCore.Components;
 global using Microsoft.Extensions.Logging;
+global using System.Text.Json;

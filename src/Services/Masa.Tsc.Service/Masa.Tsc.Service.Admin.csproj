@@ -14,7 +14,6 @@
 		<Compile Remove="Domain\Projects\Service\**" />
 		<Compile Remove="Domain\Teams\Events\**" />
 		<Compile Remove="Domain\Teams\Service\**" />
-		<Compile Remove="Infrastructure\Repositories\**" />
 		<Content Remove="Application\Apps\**" />
 		<Content Remove="Domain\Instruments\Events\**" />
 		<Content Remove="Domain\Instruments\Services\**" />
@@ -22,7 +21,6 @@
 		<Content Remove="Domain\Projects\Service\**" />
 		<Content Remove="Domain\Teams\Events\**" />
 		<Content Remove="Domain\Teams\Service\**" />
-		<Content Remove="Infrastructure\Repositories\**" />
 		<EmbeddedResource Remove="Application\Apps\**" />
 		<EmbeddedResource Remove="Domain\Instruments\Events\**" />
 		<EmbeddedResource Remove="Domain\Instruments\Services\**" />
@@ -30,7 +28,6 @@
 		<EmbeddedResource Remove="Domain\Projects\Service\**" />
 		<EmbeddedResource Remove="Domain\Teams\Events\**" />
 		<EmbeddedResource Remove="Domain\Teams\Service\**" />
-		<EmbeddedResource Remove="Infrastructure\Repositories\**" />
 		<None Remove="Application\Apps\**" />
 		<None Remove="Domain\Instruments\Events\**" />
 		<None Remove="Domain\Instruments\Services\**" />
@@ -38,7 +35,6 @@
 		<None Remove="Domain\Projects\Service\**" />
 		<None Remove="Domain\Teams\Events\**" />
 		<None Remove="Domain\Teams\Service\**" />
-		<None Remove="Infrastructure\Repositories\**" />
 	</ItemGroup>
 
 	<ItemGroup>

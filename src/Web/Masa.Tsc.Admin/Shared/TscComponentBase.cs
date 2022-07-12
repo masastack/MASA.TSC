@@ -12,9 +12,24 @@ public class TscComponentBase : ComponentBase
     public IPopupService PopupService { get; set; }
 
     [Inject]
-    public TscCaller ApiCaller{ get; set; }
+    public TscCaller ApiCaller { get; set; }
+
+    [Parameter]
+    public SettingDto Setting { get; set; }
 
     public Guid CurrentUserId { get; set; }
+
+    public TimeZoneInfo CurrentTimeZone { get; set; } = TimeZoneInfo.Local;
+
+    public string FormatDateTime(DateTime? time, string fmt="yyyy-MM-dd HH:mm:ss", bool isConvertTimeZone = true)
+    {
+        if (!time.HasValue)
+            return default!;
+
+        if (isConvertTimeZone)
+            time = TimeZoneInfo.ConvertTime(time.Value, CurrentTimeZone);
+        return time.Value.ToString(fmt);
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {

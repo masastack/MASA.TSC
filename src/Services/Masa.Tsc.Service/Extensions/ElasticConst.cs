@@ -13,6 +13,8 @@ internal static class ElasticConst
 
     public static string TraceIndex { get; private set; } = "trace";
 
+    public static int MAX_DATA_COUNT = 10000;
+
     public static void ConfigureElasticIndex(this IConfiguration configuration)
     {
         var str = configuration.GetSection("masa:elastic:logIndex").Value;
