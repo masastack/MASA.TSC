@@ -15,13 +15,34 @@ public class TscComponentBase : ComponentBase
     public TscCaller ApiCaller { get; set; }
 
     [Parameter]
-    public SettingDto Setting { get; set; }
+    public SettingDto Setting { get; set; } = new()
+    {
+        IsEnable = false,
+        Langauge = "zh-cn",
+        TimeZone = (byte)8,
+        UserId = Guid.Empty
+    };
 
     public Guid CurrentUserId { get; set; }
 
     public TimeZoneInfo CurrentTimeZone { get; set; } = TimeZoneInfo.Local;
 
-    public string FormatDateTime(DateTime? time, string fmt="yyyy-MM-dd HH:mm:ss", bool isConvertTimeZone = true)
+    private static List<KeyValuePair<int, string>> _durations = new List<KeyValuePair<int, string>>
+    {
+        KeyValuePair.Create(5,"最近5分钟"),
+        KeyValuePair.Create(15,"最近15分钟"),
+        KeyValuePair.Create(30,"最近30分钟"),
+        KeyValuePair.Create(45,"最近45分钟"),
+        KeyValuePair.Create(60,"最近1小时"),
+        KeyValuePair.Create(120,"最近2小时"),
+        KeyValuePair.Create(360,"最近6小时"),
+        KeyValuePair.Create(720,"最近12小时"),
+        KeyValuePair.Create(24*60,"最近1天"),
+        KeyValuePair.Create(48*60,"最近2天"),
+        KeyValuePair.Create(7*24*60,"最近1周"),
+    };
+
+    public string FormatDateTime(DateTime? time, string fmt = "yyyy-MM-dd HH:mm:ss", bool isConvertTimeZone = true)
     {
         if (!time.HasValue)
             return default!;
@@ -37,4 +58,6 @@ public class TscComponentBase : ComponentBase
 
         base.OnAfterRender(firstRender);
     }
+
+    public static List<KeyValuePair<int, string>> TimeSeries { get { return _durations; } }
 }

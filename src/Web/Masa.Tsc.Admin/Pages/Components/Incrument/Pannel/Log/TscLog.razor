@@ -1,52 +1,71 @@
 ﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
 @inherits TscComponentBase
 
-<MTextField TValue=string Placeholder="Date"></MTextField>
-<MIcon OnClick="RefreshAsync">refrsh</MIcon>
+<MContainer Class="white">
+    <MRow Class="pb-1 border-gray-thcik border-gray-thcik-top">
+        <MCol Cols=3 Md=3>
+            <MTextField TValue=string Label="Date" Outlined Class="rounded-0"></MTextField>
+        </MCol>
+        <MCol Cols=9 Md=9>
+            <MButton OnClick="QueryAsync" Class="mx-0 pa-0 my-2"><MIcon Size=24>fas fa-rotate</MIcon></MButton>
+        </MCol>
+    </MRow>
 
-<MCard>
-    <SearchTextField Label="请输入内容关键词"></SearchTextField>
-    <MRadio Label="换行" TValue=bool OnChange=UpdateWordBreakAsync Value=_isWordBreak></MRadio>
-    <MButton>时间<BIcon OnClick=UpdateSortingAsync>fa-sort</BIcon></MButton>
-    <MAutocomplete Items="_dicDurations"
-                   @bind-Value="_lastedDuration"
-                   TItem="KeyValuePair<int,string>"
-                   TValue="int"
-                   TItemValue="int"
-                   ItemText="item=>item.Value"
-                   ItemValue="item=>item.Key"
-                   OnSelectedItemUpdate=UpdateDurationAsync>
-        <MIcon>fa-sort-down</MIcon>
-    </MAutocomplete>
-</MCard>
+    <MRow Class="border-gray-thcik">
+        <MContainer>
+            <MRow>
+                <MCol Cols=6 Md=6>
+                    <SearchTextField Label="请输入内容关键词" Outlined Class="rounded-0" @bind-Value="_queryStr"></SearchTextField>
+                    </MCol>
+            </MRow>
+            <MRow>
+                <MCol Style="height:60px;" Class="d-inline-flex flex-row justify-start align-center">
+                    <MSwitch Class="ma-1 pa-1 border-gray-thcik border-gray-thcik-top" @bind-Value="_isWordBreak"
+                             OnChange=UpdateWordBreakAsync
+                             Label="换行"></MSwitch>
+                    <MButton Class="ma-1 pa-1 rounded-0" Outlined>时间<BIcon OnClick=UpdateSortingAsync>fas fa-sort</BIcon></MButton>
+                    <MCard Width="200" Class="rounded-0 border-gray-thcik border-gray-thcik-top">
+                        <MAutocomplete 
+                                    Class="rounded-0"
+                                    Items="_dicDurations"
+                                   @bind-Value="_lastedDuration"
+                                   TItem="KeyValuePair<int,string>"
+                                   TValue="int"
+                                   TItemValue="int"
+                                   Dense  
+                                   Outlined
+                                   ItemText="item=>item.Value"
+                                   ItemValue="item=>item.Key"
+                                   OnSelectedItemUpdate=UpdateDurationAsync>
+                        <MIcon>fa-sort-down</MIcon>
+                    </MAutocomplete>
+                    </MCard>
+                </MCol>
+            </MRow>
+        </MContainer>
+    </MRow>
 
-<MContainer>
-    @if (_data is null)
-    {
-        <div>加载中...</div>
-    }
-    else
-    {
-        foreach (var item in _data)
+    <MRow Class="pb-4">
+        @if (_data is null)
         {
-            <MCard>
-                @{
-                    var keyValues = item.ToKeyValuePairs();
-                    if (keyValues != null)
-                    {
-                        <MCard>@FormatDateTime(item.GetTimestamp())</MCard>
-                        <MCard>
-                            @foreach (var keyValue in keyValues)
-                            {
-                                <MLabel>@keyValue.Key</MLabel>
-                                <MLabel>@keyValue.Value</MLabel>
-                            }
-                        </MCard>
-                    }
-                }
-            </MCard>
+            <MCard Width="@("100%")" Class="text-center">@_msg</MCard>
         }
-    }
+        else
+        {
+            <MContainer>
+                @foreach (var item in _data)
+                {
+                    var keyValues = item.ToKeyValuePairs();
+                    <MRow Class="rounded-md-4 border-gray-thcik">
+                        <MCol Cols="2" Class="px-2" Style="text-align:justify" Md=2>@FormatDateTime(item.GetTimestamp())</MCol>
+                        <MCol Cols="10" Md=10><TscKeyValue Value=keyValues WordBreak="_isWordBreak"></TscKeyValue>  </MCol>
+                    </MRow>
+                }
+            </MContainer>
+        }
 
-    <MPagination Length=_totalPage TotalVisible=5></MPagination>
+    </MRow>
+    <MRow Class="d-flex justify-end">
+        <MPagination Length=_totalPage TotalVisible=5 Value="_currentPage" ValueChanged=PageChangeAsync></MPagination>
+    </MRow>
 </MContainer>

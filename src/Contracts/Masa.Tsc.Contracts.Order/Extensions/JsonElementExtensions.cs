@@ -59,7 +59,7 @@ public static class JsonElementExtensions
         var result = new List<KeyValuePair<string, object>>();
         foreach (var item in value.EnumerateObject())
         {
-            var v = GetValue(value);
+            var v = GetValue(item.Value);
             if (v == null)
                 continue;
             result.Add(KeyValuePair.Create(item.Name, v));

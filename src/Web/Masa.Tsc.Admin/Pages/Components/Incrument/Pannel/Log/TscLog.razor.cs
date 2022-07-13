@@ -6,53 +6,85 @@ namespace Masa.Tsc.Admin.Rcl.Pages.Components;
 public partial class TscLog
 {
     private int _lastedDuration = 1;
-
-    private List<KeyValuePair<int, string>> _dicDurations = default!;
-
-    private List<JsonElement> _data = default!;
-
+    private List<KeyValuePair<int, string>> _dicDurations = TimeSeries;
+    private List<JsonElement> _data = null;
     private int _totalPage = 1;
-
-    private bool _isWordBreak = true;
-
+    private bool _isWordBreak = false;
     private bool _isDesc = true;
+    private int _currentPage = 1;
+    private int _pageSize = 10;
+    private string _queryStr = default!;
+    private string _msg = "Loading ...";
+
+    private DateTime _start = DateTime.Now.Date, _end = DateTime.Now;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var query = new LogPageQueryDto { 
-            PageSize=10,
-             Start=DateTime.Now.Date,
-             End=DateTime.Now              
-        };
-        var pageData=await ApiCaller.LogService.GetPageAsync(query);
-        _data = pageData.Items.Select(item => (JsonElement)item).ToList();
+        if (firstRender)
+        {
+            await RefreshAsync();
+            _msg = "query not find data";
+        }
 
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private async Task UpdateWordBreakAsync(ChangeEventArgs e)
+    private async Task UpdateWordBreakAsync(bool value)
     {
-        if (e.Value is not null)
-        {
-            _isWordBreak = (bool)e.Value;
-        }
-
+        _isWordBreak = value;
         await Task.CompletedTask;
     }
 
     private async Task UpdateSortingAsync()
     {
         _isDesc = !_isDesc;
+        await RefreshAsync();
         await Task.CompletedTask;
     }
 
     private async Task UpdateDurationAsync(KeyValuePair<int, string> item)
     {
+        _lastedDuration = item.Key;
+        await RefreshAsync();
         await Task.CompletedTask;
+    }
+
+    private async Task PageChangeAsync(int value)
+    {
+        _currentPage = value;
+        await RefreshAsync();
+        await Task.CompletedTask;
+    }
+
+    private async Task QueryAsync()
+    {
+        _currentPage = 1;
+        await RefreshAsync();
     }
 
     private async Task RefreshAsync()
     {
-        await Task.CompletedTask;
+        var query = new LogPageQueryDto
+        {
+            PageSize = _pageSize,
+            Start = _start,
+            End = _end,
+            Page = _currentPage,
+            Duration = _lastedDuration.ToString(),
+            Sorting = !_isDesc ? "asc" : "desc",
+            Query = _queryStr             
+        };
+        var pageData = await ApiCaller.LogService.GetPageAsync(query);
+        if (pageData.Items != null && pageData.Items.Any())
+        {
+            _data = pageData.Items.Select(item => (JsonElement)item).ToList();
+        }
+        else
+        {
+            _data = null;
+        }
+        var num = pageData.Total % query.PageSize;
+        _totalPage = (int)(pageData.Total / query.PageSize) + (num > 0 ? 1 : 0);
+        StateHasChanged();
     }
 }

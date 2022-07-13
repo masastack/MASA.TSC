@@ -147,8 +147,7 @@ public class QueryHandler
         var rep = await _elasticClient.SearchAsync<object>(s => s.Index(ElasticConst.LogIndex).Query(q => Filter(q, query)).From(100).Size(query.Size).Sort(d => d.Field(ElasticConst.LogTimestamp, query.Sort == "asc" ? SortOrder.Ascending : SortOrder.Descending)));
         if (rep.IsValid)
         {
-            if (rep.Documents.Any())
-                query.Result = new PaginationDto<object>(rep.Total, rep.Documents.ToList());
+            query.Result = new PaginationDto<object>(rep.Total, rep.Documents?.ToList() ?? default!);
         }
         else
         {
@@ -161,7 +160,7 @@ public class QueryHandler
         var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
         if (!string.IsNullOrEmpty(query.Query))
         {
-            list.Add(q => q.Raw(query.Query));
+            list.Add(q => q.QueryString(t => t.Query(query.Query).DefaultOperator(Operator.And)));
         }
         if (query.Start > DateTime.MinValue && query.End > DateTime.MinValue && query.Start < query.End)
         {

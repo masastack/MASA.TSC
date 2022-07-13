@@ -1,25 +1,36 @@
 ﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
 @inherits TscComponentBase
 
-@foreach (var item in Value)
-{
-    <MLabel>@item.Key</MLabel>
-    if (@item.Value is IEnumerable<KeyValuePair<string, object>> obj)
+<MCard Class="@($"{Class} {_classs}")">
+    @foreach (var item in Value)
     {
-        <TscKeyValue Value=obj />
+        <MRow Class="my-1 d-flex">
+            <MLabel Class="blue-grey lighten-3 text-subtitle-2">@item.Key : </MLabel>
+            @if (@item.Value is IEnumerable<KeyValuePair<string, object>> obj)
+            {
+                <TscKeyValue Value=obj />
+            }
+            else if (@item.Value is IEnumerable<object> objs)
+            {
+                <TscValueArray Value=objs />
+            }
+            else
+            {
+                <MLabel Class="@(WordBreak?"text-wrap text-body-1":"text-no-wrap text-body-1")">@item.Value</MLabel>
+            }
+        </MRow>
     }
-    else if (@item.Value is IEnumerable<object> objs)
-    {
-        <TscValueArray Value=objs />
-    }
-    else
-    {
-        <MLabel>@item.Value</MLabel>
-    }
-}
-
+</MCard>
 @code
 {
+    private string _classs = "pa-0 ma-0";
+
     [Parameter]
     public IEnumerable<KeyValuePair<string, object>> Value { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public bool WordBreak { get; set; }
 }

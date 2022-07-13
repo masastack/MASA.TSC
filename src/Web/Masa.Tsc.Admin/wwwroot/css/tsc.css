@@ -76,4 +76,33 @@
     margin-left: 64px;
 }
 
+.border-gray-thcik {
+    border:solid 1px gray;
+    border-top:none
+}
 
+.border-gray-thcik-top {
+    border-top: solid 1px gray;
+}
+
+
+
+.fa-arrows-rotate:before {
+    content: '\f021'
+}
+
+.fa-rotate:before {
+    content: '\f2f1'
+}
+
+.fa-sort:before {
+    content: '\f0dc'
+}
+
+.fa-sort-down:before {
+    content: '\f0dd'
+}
+
+.fa-sort-up:before {
+    content: '\f0de'
+}

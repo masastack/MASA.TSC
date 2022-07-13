@@ -2,17 +2,18 @@
 @using System.Text
 @inherits TscComponentBase
 
+<MCard Class="@($"{Class} {_class}")">
 @foreach (var item in Value)
 {
     if (@item is IEnumerable<KeyValuePair<string, object>> obj)
     {
         _isObjectOrArray = true;
-        <TscKeyValue Value=obj />
+        <TscKeyValue Value=obj WordBreak="WordBreak" />
     }
     else if (@item is IEnumerable<object> objs)
     {
         _isObjectOrArray = true;
-        <TscValueArray Value=objs />
+        <TscValueArray Value=objs  WordBreak="WordBreak"/>
     }
     else
     {
@@ -24,15 +25,22 @@
     if (_text.Length > 0)
     {
         _text.Remove(0, 3);
-        <MLabel>@_text.ToString()</MLabel>
+        <MLabel Class="@(WordBreak?"text-wrap":"text-no-wrap")">@_text.ToString()</MLabel>
     }
 }
-
+</MCard>
 @code
 {
+    private string _class = "ma-0 pa-0";
     private bool _isObjectOrArray = false;
     private StringBuilder _text = new StringBuilder(4096);
 
     [Parameter]
     public IEnumerable<object> Value { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public bool WordBreak { get; set; }
 }
