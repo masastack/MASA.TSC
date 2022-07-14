@@ -39,10 +39,10 @@ public partial class TscTraceChart
     }
 
     [Parameter]
-    public StringNumber Width { get; set; }
+    public StringNumber Width { get; set; } = "100%";
 
     [Parameter]
-    public StringNumber Height { get; set; }
+    public StringNumber Height { get; set; } = 300;
 
     [Parameter]
     public ChartDto Value { get; set; }
