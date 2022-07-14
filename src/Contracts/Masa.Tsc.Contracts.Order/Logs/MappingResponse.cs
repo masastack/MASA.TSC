@@ -10,9 +10,6 @@ public class MappingResponse
     public string DataType { get; set; }
 
     public bool? IsKeyword { get; set; }
-
-    /// <summary>
-    /// keyword 支持最长查询
-    /// </summary>
+    
     public int? MaxLenth { get; set; }
 }

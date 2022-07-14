@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Nest;
-
 namespace Masa.Tsc.Service.Admin.Application.Logs;
 
 public class QueryHandler
@@ -24,7 +22,7 @@ public class QueryHandler
     [EventHandler]
     public async Task GetAggregationAsync(LogAggQuery query)
     {
-        await _elasticClient.GetAggregationAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, Filter, Aggregation, AggResult, _logger);
+        await _elasticClient.SearchAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, queryFn: Filter, aggFn: Aggregation, resultFn: AggResult, logger: _logger);
     }
 
     private QueryContainer Filter(QueryContainerDescriptor<object> container, LogAggQuery query)
@@ -110,22 +108,38 @@ public class QueryHandler
     [EventHandler]
     public async Task GetLatestDataAsync(LatestLogQuery query)
     {
-        var response = await _elasticClient.SearchAsync<object>(q => q.Index(ElasticConst.LogIndex).Query(q => Filter(q, new LogAggQuery { Start = query.Start, End = query.End, Query = query.Query })).Sort(s =>
+        await _elasticClient.SearchAsync<object, LatestLogQuery>(ElasticConst.LogIndex, query, queryFn: Filter,
+           resultFn: (result, q) =>
+           {
+               query.Result = result.Documents.FirstOrDefault() ?? default(JsonElement);
+           },
+           pageFn: () => Tuple.Create(true, 1, 1),
+           sortFn: (sort, q) =>
+           {
+               if (q.IsDesc)
+                   return sort.Descending(ElasticConst.LogTimestamp);
+               else
+                   return sort.Ascending(ElasticConst.LogTimestamp);
+           },
+           logger: _logger);
+    }
+
+    private QueryContainer Filter(QueryContainerDescriptor<object> container, LatestLogQuery query)
+    {
+        var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
+        if (!string.IsNullOrEmpty(query.Query))
         {
-            if (query.IsDesc)
-                return s.Descending(ElasticConst.LogTimestamp);
-            else
-                return s.Ascending(ElasticConst.LogTimestamp);
-        }).Size(1));
-        if (response.IsValid)
-        {
-            if (response.Documents.Any())
-                query.Result = response.Documents.First();
+            list.Add(q => q.Raw(query.Query));
         }
-        else
+        if (query.Start > DateTime.MinValue && query.End > DateTime.MinValue && query.Start < query.End)
         {
-            _logger.LogError("GetLatestDataAsync Error {0}", response);
+            list.Add(q => q.DateRange(f => f.GreaterThanOrEquals(query.Start).LessThanOrEquals(query.End).Field(ElasticConst.LogTimestamp)));
         }
+
+        if (list.Any())
+            container.Bool(b => b.Must(list));
+
+        return container;
     }
 
     [EventHandler]
@@ -135,24 +149,29 @@ public class QueryHandler
             return;
         var result = await _caller.GetMappingAsync(ElasticConst.LogIndex);
         if (result != null)
-            query.Result = result;
+            query.Result = result.Select(m => new Contracts.Admin.MappingResponse
+            {
+                DataType = m.DataType,
+                IsKeyword = m.IsKeyword,
+                MaxLenth = m.MaxLenth,
+                Name = m.Name,
+            });
     }
 
     [EventHandler]
     public async Task GetPageListAsync(LogsQuery query)
     {
-        var start = (query.Page - 1) * query.Size;
-        if (ElasticConst.MAX_DATA_COUNT - start - query.Size <= 0)
-            throw new UserFriendlyException($"elastic query data max count must be less {ElasticConst.MAX_DATA_COUNT}, please input more condition to limit");
-        var rep = await _elasticClient.SearchAsync<object>(s => s.Index(ElasticConst.LogIndex).Query(q => Filter(q, query)).From(100).Size(query.Size).Sort(d => d.Field(ElasticConst.LogTimestamp, query.Sort == "asc" ? SortOrder.Ascending : SortOrder.Descending)));
-        if (rep.IsValid)
-        {
-            query.Result = new PaginationDto<object>(rep.Total, rep.Documents?.ToList() ?? default!);
-        }
-        else
-        {
-            _logger.LogError("GetLatestDataAsync Error {0}", rep);
-        }
+        await _elasticClient.SearchAsync<object, LogsQuery>(ElasticConst.LogIndex, query, queryFn: Filter,
+           resultFn: (result, q) =>
+         {
+             query.Result = new PaginationDto<object>(result.Total, result.Documents?.ToList() ?? default!);
+         },
+           pageFn: () => Tuple.Create(true, query.Page, query.Size),
+           sortFn: (sort, q) =>
+           {
+               return sort.Field(ElasticConst.LogTimestamp, query.Sort == "asc" ? SortOrder.Ascending : SortOrder.Descending);
+           },
+           logger: _logger);
     }
 
     private QueryContainer Filter(QueryContainerDescriptor<object> container, LogsQuery query)

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Nest;
+namespace Masa.Tsc.Observability.Elastic;
 
 public class MappingResponse
 {
@@ -12,7 +12,7 @@ public class MappingResponse
     public bool? IsKeyword { get; set; }
 
     /// <summary>
-    /// keyword 支持最长查询
+    /// keyword query max length
     /// </summary>
     public int? MaxLenth { get; set; }
 }

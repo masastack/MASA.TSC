@@ -1,9 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.Service.Admin.Infrastructure.Const;
+namespace Masa.Tsc.Observability.Elastic;
 
-internal static class ElasticConst
+public static class ElasticConst
 {
     public const string ES_HTTP_CLIENT_NAME = "tsc_http_es_client";
 

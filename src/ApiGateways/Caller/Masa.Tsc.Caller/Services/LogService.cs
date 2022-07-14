@@ -17,9 +17,9 @@ public class LogService : BaseService
         return await Caller.GetByBodyAsync<object>($"{RootPath}/latest", param) ?? default!;
     }
 
-    public async Task<IEnumerable<Nest.MappingResponse>> GetMappingFieldAsync()
+    public async Task<IEnumerable<MappingResponse>> GetMappingFieldAsync()
     {
-        return await Caller.GetAsync<IEnumerable<Nest.MappingResponse>>($"{RootPath}/mapping") ?? default!;
+        return await Caller.GetAsync<IEnumerable<MappingResponse>>($"{RootPath}/mapping") ?? default!;
     }
 
     public async Task<PaginationDto<object>> GetPageAsync(LogPageQueryDto param)

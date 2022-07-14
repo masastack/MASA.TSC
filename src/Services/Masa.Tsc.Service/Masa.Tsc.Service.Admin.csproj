@@ -70,6 +70,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Order\Masa.Tsc.Contracts.Admin.csproj" />
+		<ProjectReference Include="..\Masa.Tsc.Observability\Masa.Tsc.Observability.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

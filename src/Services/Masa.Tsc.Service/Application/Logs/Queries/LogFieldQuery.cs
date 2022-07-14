@@ -3,8 +3,8 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Logs;
 
-public record LogFieldQuery : Query<IEnumerable<Nest.MappingResponse>>
+public record LogFieldQuery : Query<IEnumerable<MappingResponse>>
 {
-    public override IEnumerable<Nest.MappingResponse> Result { get; set; }
+    public override IEnumerable<MappingResponse> Result { get; set; }
 }
 

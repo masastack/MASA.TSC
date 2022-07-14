@@ -39,7 +39,7 @@ public class LogService : ServiceBase
         return query.Result;
     }
 
-    private async Task<IEnumerable<Nest.MappingResponse>> GetMappingFieldAsync([FromServices] IEventBus eventBus)
+    private async Task<IEnumerable<MappingResponse>> GetMappingFieldAsync([FromServices] IEventBus eventBus)
     {
         var query = new LogFieldQuery();
         await eventBus.PublishAsync(query);
