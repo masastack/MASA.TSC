@@ -42,7 +42,6 @@ global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.OpenApi.Models;
-global using Nest;
 global using OpenTelemetry.Logs;
 global using OpenTelemetry.Metrics;
 global using OpenTelemetry.Resources;

@@ -25,7 +25,7 @@ public class TscComponentBase : ComponentBase
 
     public Guid CurrentUserId { get; set; }
 
-    public TimeZoneInfo CurrentTimeZone { get; set; } = TimeZoneInfo.Local;
+    public TimeZoneInfo CurrentTimeZone { get; set; } = TimeZoneInfo.Utc;
 
     private static List<KeyValuePair<int, string>> _durations = new List<KeyValuePair<int, string>>
     {

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.Observability.Elastic;
+namespace Nest;
 
 public static class IElasticClientExtenstion
 {
@@ -40,7 +40,7 @@ public static class IElasticClientExtenstion
                 }
                 return s;
             };
-            var rep = await client.SearchAsync<T>(s => func(s.Index(indexName)).Sort(t => t.Descending("")));
+            var rep = await client.SearchAsync<T>(s => func(s.Index(indexName)));
             rep.FriendlyElasticException("SearchAsync", logger);
             if (rep.IsValid)
             {
@@ -152,7 +152,7 @@ public static class IElasticClientExtenstion
 
     public static void FriendlyElasticException<T>(this ISearchResponse<T> response, string callerName, ILogger? logger) where T : class
     {
-        if (!response.IsValid)
+        if (response.IsValid)
             return;
         logger?.LogError("{0} Error {1}", callerName, response);
         throw new UserFriendlyException($"elastic query error: status:{response.ServerError?.Status},message:{response.OriginalException?.Message ?? response.ServerError?.ToString()}");

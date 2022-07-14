@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Nest;
+
 namespace Masa.Tsc.Service.Admin.Application.Logs;
 
 public class QueryHandler
@@ -148,7 +150,8 @@ public class QueryHandler
         if (query == null)
             return;
         var result = await _caller.GetMappingAsync(ElasticConst.LogIndex);
-        if (result != null)
+        if (result != null && result.Any())
+        {
             query.Result = result.Select(m => new Contracts.Admin.MappingResponse
             {
                 DataType = m.DataType,
@@ -156,6 +159,11 @@ public class QueryHandler
                 MaxLenth = m.MaxLenth,
                 Name = m.Name,
             });
+        }
+        else
+        {
+            query.Result = default!;
+        }
     }
 
     [EventHandler]
