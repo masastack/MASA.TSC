@@ -13,6 +13,8 @@ public static class IElasticClientExtenstion
         Func<AggregationContainerDescriptor<T>, Q, IAggregationContainer>? aggFn = null,
         Func<Tuple<bool, int, int>>? pageFn = null,
         Func<SortDescriptor<T>, Q, SortDescriptor<T>>? sortFn = null,
+        Func<string[]>? includeFieldsFn = null,
+        Func<string[]>? excludeFieldsFn = null,
         ILogger? logger = null
         ) where T : class where Q : class
     {
@@ -34,6 +36,18 @@ public static class IElasticClientExtenstion
                 s = SetPageSize(s, hasPage, page, pageSize);
                 if (sortFn != null)
                     s = s.Sort(sort => sortFn(sort, q));
+                if (includeFieldsFn != null || excludeFieldsFn != null)
+                {
+                    s = s.Source(source =>
+                    {
+                        if (includeFieldsFn != null)
+                            source = source.Includes(f => f.Fields(includeFieldsFn.Invoke()));
+                        if (excludeFieldsFn != null)
+                            source = source.Excludes(f => f.Fields(excludeFieldsFn.Invoke()));
+                        return source;
+                    });
+                }
+
                 if (aggFn != null)
                 {
                     s = s.Aggregations(agg => aggFn?.Invoke(agg, q));

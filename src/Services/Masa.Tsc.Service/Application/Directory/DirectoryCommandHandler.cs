@@ -9,19 +9,19 @@ public class DirectoryCommandHandler
 {
     [EventHandler]
     public async Task AddAsync(AddDirectoryCommand command)
-    { 
-    
+    {
+        await Task.CompletedTask;
     }
 
     [EventHandler]
     public async Task UpdateAsync(UpdateDirectoryCommand command)
     {
-
+        await Task.CompletedTask;
     }
 
     [EventHandler]
     public async Task DeleteAsync(RemoveDirectoryCommand command)
     {
-
+        await Task.CompletedTask;
     }
 }

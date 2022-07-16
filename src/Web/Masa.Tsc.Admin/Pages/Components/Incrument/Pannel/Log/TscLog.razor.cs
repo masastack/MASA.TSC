@@ -7,7 +7,7 @@ public partial class TscLog
 {
     private int _lastedDuration = 1;
     private List<KeyValuePair<int, string>> _dicDurations = TimeSeries;
-    private List<JsonElement> _data = null;
+    private List<JsonElement> _data =default!;
     private int _totalPage = 1;
     private bool _isWordBreak = false;
     private bool _isDesc = true;
@@ -81,7 +81,7 @@ public partial class TscLog
         }
         else
         {
-            _data = null;
+            _data = default!;
         }
         var num = pageData.Total % query.PageSize;
         _totalPage = (int)(pageData.Total / query.PageSize) + (num > 0 ? 1 : 0);

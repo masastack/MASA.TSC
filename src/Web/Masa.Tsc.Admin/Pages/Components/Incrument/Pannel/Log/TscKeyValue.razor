@@ -26,10 +26,10 @@
     private string _classs = "pa-0 ma-0";
 
     [Parameter]
-    public IEnumerable<KeyValuePair<string, object>> Value { get; set; }
+    public IEnumerable<KeyValuePair<string, object>> Value { get; set; } = default!;
 
     [Parameter]
-    public string Class { get; set; }
+    public string Class { get; set; } = default!;
 
     [Parameter]
     public bool WordBreak { get; set; }

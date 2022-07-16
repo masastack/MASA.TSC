@@ -3,18 +3,17 @@
 
 namespace Masa.Tsc.Contracts.Admin;
 
-public class TraceListDto
+public class RequestTraceListDto : Pagination<RequestTraceListDto>
 {
     public string TraceId { get; set; }
 
     public string Service { get; set; }
 
+    public string Instance { get; set; }
+
     public string Endpoint { get; set; }
 
-    public DateTime StartTime { get; set; }
+    public DateTime Start { get; set; }
 
-    public DateTime EndTime { get; set; }
-
-    //unit ms
-    public double Duration { get; set; }
+    public DateTime End { get; set; }
 }

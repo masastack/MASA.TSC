@@ -5,7 +5,7 @@ namespace Masa.Tsc.Service.Admin.Application.Logs;
 
 public record LogAggQuery : Query<IEnumerable<KeyValuePair<string, string>>>
 {
-    public IEnumerable<RequestLogFieldAggDto> FieldMaps { get; set; }
+    public IEnumerable<RequestFieldAggDto> FieldMaps { get; set; }
 
     public string Query { get; set; }
 

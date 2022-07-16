@@ -53,17 +53,17 @@ public class QueryHandler
         {
             switch (item.AggType)
             {
-                case LogAggTypes.Count:
+                case AggTypes.Count:
                     {
                         aggContainer.ValueCount(item.Alias, agg => agg.Field(item.Name));
                     }
                     break;
-                case LogAggTypes.Sum:
+                case AggTypes.Sum:
                     {
                         aggContainer.Sum(item.Alias, agg => agg.Field(item.Name));
                     }
                     break;
-                case LogAggTypes.Avg:
+                case AggTypes.Avg:
                     {
                         aggContainer.Average(item.Alias, agg => agg.Field(item.Name));
                     }

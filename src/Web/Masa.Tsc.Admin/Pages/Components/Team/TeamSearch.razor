@@ -36,15 +36,15 @@
     private string timeStr = "2022/07/01 09:00:00~2022/07/01 10:00:00";
 
     [Parameter]
-    public DateTime Start{ get; set; }
+    public DateTime Start { get; set; }
 
     [Parameter]
     public DateTime End { get; set; }
 
     [Parameter]
-    public string ProjectId { get; set; }
+    public string ProjectId { get; set; } = default!;
 
     [Parameter]
-    public string Keyword { get; set; }
+    public string Keyword { get; set; } = default!;
 
 }

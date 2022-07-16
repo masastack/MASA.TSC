@@ -5,18 +5,18 @@ namespace Masa.Tsc.Admin.Rcl.Pages.Components;
 
 public partial class TscTraceList
 {
-    private List<DataTableHeader<TraceListDto>> _headers = new()
+    private List<DataTableHeader<RequestTraceListDto>> _headers = new()
     {
         new()
         {
             Text = "Service",
             Align = "start",
             Sortable = false,
-            Value = nameof(TraceListDto.Service)
+            Value = nameof(RequestTraceListDto.Service)
         },
-        new() { Text = "Endpoint", Value = nameof(TraceListDto.Endpoint) },
-        new() { Text = "Duration (ms)", Value = nameof(TraceListDto.Duration) },
-        new() { Text = "StatTime", Value = nameof(TraceListDto.Endpoint) },
-        new() { Text = "EndTime", Value = nameof(TraceListDto.StartTime) }
-    };    
+        new() { Text = "Endpoint", Value = nameof(RequestTraceListDto.Endpoint) },
+        new() { Text = "Duration (ms)", Value = "Duration" },
+        new() { Text = "StatTime", Value = nameof(RequestTraceListDto.Endpoint) },
+        new() { Text = "EndTime", Value = nameof(RequestTraceListDto.Start) }
+    };
 }

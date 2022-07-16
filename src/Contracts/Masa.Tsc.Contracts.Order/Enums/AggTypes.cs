@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Contracts.Admin.Enums;
 
-public enum LogAggTypes
+public enum AggTypes
 {
     Count = 1,
     Sum,

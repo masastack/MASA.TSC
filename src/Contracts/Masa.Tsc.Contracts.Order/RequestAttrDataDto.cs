@@ -3,11 +3,15 @@
 
 namespace Masa.Tsc.Contracts.Admin;
 
-public class RequestLogAggDto
+public class RequestAttrDataDto
 {
-    public IEnumerable<RequestLogFieldAggDto> FieldMaps { get; set; }
+    public string Name { get; set; }
 
-    public string Query { get; set; }
+    public string Keyword { get; set; }
+
+    public IEnumerable<KeyValuePair<string, object>> Query { get; set; }
+
+    public int Max { get; set; }
 
     public DateTime Start { get; set; }
 

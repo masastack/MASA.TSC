@@ -5,13 +5,26 @@ namespace Masa.Tsc.Observability.Elastic;
 
 public static class ElasticConst
 {
-    public const string ES_HTTP_CLIENT_NAME = "tsc_http_es_client";
+    public const string ES_HTTP_CLIENT_NAME = "masa.stack.tsc.service.es.client";
 
     public static string LogIndex { get; private set; } = "logs";
 
     public static string LogTimestamp { get; private set; } = "@timestamp";
 
     public static string TraceIndex { get; private set; } = "trace";
+
+    public static string SpanIndex { get; private set; } = "span";
+
+    public const string TraceId = "trace.id";
+    public const string ParentId = "parent.id";
+    public const string SpanId = "span.id";
+    public const string TransactionId = "transaction.id";
+
+    public const string TraceServiceName = "service.name";
+    public const string TraceInstanceName = "service.node.name";
+    public const string TraceEndpointName = "transaction.name";
+
+    public static string TraceTimestamp { get; private set; } = "@timestamp";
 
     public static int MAX_DATA_COUNT = 10000;
 

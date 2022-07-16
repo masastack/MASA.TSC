@@ -8,8 +8,8 @@
 <ProjectCard Projects=_projects></ProjectCard>
 @code
 {
-    private List<ProjectOverViewDto> _projects;
-    private TeamSearch _teamSearch;
+    private List<ProjectOverViewDto> _projects = default!;
+    private TeamSearch _teamSearch = default!;
     private int _error, _warn, _monitor, _normal;
 
     protected override async Task OnParametersSetAsync()
@@ -19,7 +19,7 @@
 
     private async Task LoadData()
     {
-        var data= await ApiCaller.ProjectService.OverViewAsync(new RequestTeamMonitorDto
+        var data = await ApiCaller.ProjectService.OverViewAsync(new RequestTeamMonitorDto
             {
                 EndTime = _teamSearch.End.ToUnixTimeSpan(),
                 StartTime = _teamSearch.Start.ToUnixTimeSpan(),

@@ -10,9 +10,13 @@ public class DirectoryQueryHandler
 
     [EventHandler]
     public async Task GetAsync(DirectoryQuery query)
-    { }
+    {
+        await Task.CompletedTask;
+    }
 
     [EventHandler]
     public async Task GetTreeAsync(DirectoryTreeQuery query)
-    { }
+    {
+        await Task.CompletedTask;
+    }
 }

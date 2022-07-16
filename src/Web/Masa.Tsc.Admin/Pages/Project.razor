@@ -9,14 +9,13 @@
 </div>
 
 @code {
+    [Parameter]
+    public TeamDto Team { get; set; } = default!;
 
     [Parameter]
-    public TeamDto Team { get; set; }
+    public ProjectDto Value { get; set; } = default!;
 
     [Parameter]
-    public ProjectDto Value { get; set; }
-
-     [Parameter]
-    public string AppId { get; set; }
+    public string AppId { get; set; } = default!;
 
 }
