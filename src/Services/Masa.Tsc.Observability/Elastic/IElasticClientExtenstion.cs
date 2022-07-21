@@ -166,9 +166,10 @@ public static class IElasticClientExtenstion
 
     public static void FriendlyElasticException<T>(this ISearchResponse<T> response, string callerName, ILogger? logger) where T : class
     {
-        if (response.IsValid)
-            return;
-        logger?.LogError("{0} Error {1}", callerName, response);
-        throw new UserFriendlyException($"elastic query error: status:{response.ServerError?.Status},message:{response.OriginalException?.Message ?? response.ServerError?.ToString()}");
+        if (!response.IsValid)
+        {
+            logger?.LogError("{0} Error {1}", callerName, response);
+            throw new UserFriendlyException($"elastic query error: status:{response.ServerError?.Status},message:{response.OriginalException?.Message ?? response.ServerError?.ToString()}");
+        }
     }
 }

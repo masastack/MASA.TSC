@@ -21,6 +21,7 @@ global using Masa.Contrib.Dispatcher.IntegrationEvents.Dapr;
 global using Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EF;
 global using Masa.Contrib.Service.MinimalAPIs;
 global using Masa.Tsc.Contracts.Admin;
+global using Masa.Tsc.Contracts.Admin.Chart;
 global using Masa.Tsc.Contracts.Admin.Enums;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Dtos;
 global using Masa.Tsc.Observability.Elastic;

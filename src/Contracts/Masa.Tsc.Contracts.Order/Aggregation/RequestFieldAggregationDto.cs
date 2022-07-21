@@ -3,11 +3,11 @@
 
 namespace Masa.Tsc.Contracts.Admin;
 
-public class RequestFieldAggDto : FromUri<RequestFieldAggDto>
+public class RequestFieldAggregationDto : FromUri<RequestFieldAggregationDto>
 {
     public string Name { get; set; }
 
     public string Alias { get; set; }
 
-    public AggTypes AggType { get; set; }
+    public AggregationTypes AggegationType { get; set; }
 }

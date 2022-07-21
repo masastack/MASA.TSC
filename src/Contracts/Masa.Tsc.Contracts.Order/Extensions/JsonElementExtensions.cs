@@ -46,23 +46,21 @@ public static class JsonElementExtensions
         }
         else
         {
-            var num = value.GetInt32();
-            var num64 = value.GetInt64();
-            if (num - num64 != 0)
-                return num64;
+            if (!value.TryGetInt32(out int num))
+                return value.GetInt64();
             return num;
         }
     }
 
     private static IEnumerable<KeyValuePair<string, object>>? GetObject(JsonElement value)
     {
-        var result = new List<KeyValuePair<string, object>>();
+        var result = new Dictionary<string, object>();
         foreach (var item in value.EnumerateObject())
         {
             var v = GetValue(item.Value);
             if (v == null)
                 continue;
-            result.Add(KeyValuePair.Create(item.Name, v));
+            result.Add(item.Name, v);
         }
         if (result.Any())
             return result;
@@ -83,7 +81,7 @@ public static class JsonElementExtensions
         return list;
     }
 
-    public static DateTime? GetTimestamp(this JsonElement value, string timeSpanKey= "@timestamp")
+    public static DateTime? GetTimestamp(this JsonElement value, string timeSpanKey = "@timestamp")
     {
         if (value.ValueKind == JsonValueKind.Object)
         {

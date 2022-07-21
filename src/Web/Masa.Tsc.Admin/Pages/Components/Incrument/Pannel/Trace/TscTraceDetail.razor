@@ -1,48 +1,122 @@
 ﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
 @inherits TscComponentBase
 
-<MCard>
-    <MLabel>/homepage</MLabel>
-</MCard>
-<MCard>
-    <MAutocomplete Items="_services"
-                   TItem=string
-                   TValue=string
-                   ItemValue="item=>item"
-                   ItemText="item=>item"
-                   TItemValue=string></MAutocomplete>
-</MCard>
 <MContainer>
-    <MLabel>起始点</MLabel>
-    <MLabel>开始时间</MLabel>
-    <MLabel>结束时间</MLabel>
-    <MLabel>持续时间</MLabel>
-    <MLabel>跨度</MLabel>
+    <MRow>
+        <MCol Cols="12">
+            <MLabel>/homepage</MLabel>
+        </MCol>
+    </MRow>
+    <MRow>
+        <MCol Class="py-0 my-0" Cols="2">
+
+            <MAutocomplete Items="_services"
+                           Dense
+                           TItem=string
+                           TValue=string
+                           ItemValue="item=>item"
+                           ItemText="item=>item"
+                           TItemValue=string></MAutocomplete>
+        </MCol>
+    </MRow>
+    <MRow>
+        <MCol Cols="12" Class="d-flex justify-start">
+            <MCard Class="yellow rounded-md-1 body-2 ml-2  pt-1 px-6 rounded-md-1 blue-grey darken-1 white-text" Height="28">起始点 </MCard>
+            <MCard Class="pl-2 pt-1 body-1" style="background:none" Height="28">@FormatDateTime(_startTime)</MCard>
+            <MCard Class="yellow rounded-md-1 body-2 ml-2  pt-1 px-6 rounded-md-1 blue-grey darken-1 white-text" Height="28">结束时间</MCard>
+            <MCard Class="pl-2 pt-1 body-1" style="background:none" Height="28">@_duration</MCard>
+            <MCard Class="yellow rounded-md-1 body-2 ml-2  pt-1 px-6 rounded-md-1 blue-grey darken-1 white-text" Height="28">跨度</MCard>
+            <MCard Class="pl-2 pt-1 body-1" style="background:none" Height="28">@_total</MCard>
+        </MCol>
+    </MRow>
+    <MRow>
+        <MCol Cols="12" Class="d-flex justify-start">
+            <MCard Class="mr-4 rounded-md-1"><MCardText><MIcon Size="2" Class="pr-1">fas fa-cirle</MIcon>massa-auth-web</MCardText></MCard>
+            <MCard Class="mr-4 rounded-md-1"><MCardText><MIcon Size="2" Class="pr-1">fas fa-cirle</MIcon>massa-auth-web</MCardText></MCard>
+            <MCard Class="mr-4 rounded-md-1"><MCardText><MIcon Size="2" Class="pr-1">fas fa-cirle</MIcon>massa-auth-web</MCardText></MCard>
+            <MCard Class="mr-4 rounded-md-1"><MCardText><MIcon Size="2" Class="pr-1">fas fa-cirle</MIcon>massa-auth-web</MCardText></MCard>
+        </MCol>
+    </MRow>
+
+    <MRow>
+        <MCol Cols="8">
+            <TreeTable Expand=true
+                       KeyFunc="@(item=>{
+        var dic=(Dictionary<string,object>)item;
+        return (dic.ContainsKey("transaction")?((Dictionary<string,object>)dic["transaction"])["id"]:((Dictionary<string,object>)dic["span"])["id"]).ToString();
+    })"
+                       ParentFunc="@(item=>{
+        var dic=(Dictionary<string,object>)item;
+        return dic.ContainsKey("parent")?((Dictionary<string,object>)dic["parent"])["id"].ToString():string.Empty;
+    })"
+                       Items="_data"></TreeTable>
+        </MCol>
+        <MCol Cols="4">
+            <MContainer>
+                <MRow>
+                    <MCol Cols=12>
+                        <MCard Class="rounded-0">
+                            <MCardText Class="pa-0 ma-0">
+                                <MListItem Style="min-height:24px">/pagehome</MListItem>
+                                <MListItem Style="min-height:24px">Get</MListItem>
+                                <MListItem Style="min-height:24px">8907ms</MListItem>
+                                <MListItem Style="min-height:24px">20x</MListItem>
+                            </MCardText>
+                        </MCard>
+                    </MCol>
+                </MRow>
+                <MRow>
+                    <MCol Class="ma-0 py-0" Cols=12>
+
+                        <MCard Class="rounded-0">
+                            <MTabs SliderColor="gray" @bind-Value=_tabIndex>
+                                <MTab Value="@("attr")">属性</MTab>
+                                <MTab Value="@("resource")">资源</MTab>
+                                <MTab Value="@("detail")">详情</MTab>
+                                <MTab Value="@("log")">日志</MTab>
+                            </MTabs>
+                        </MCard>
+                    </MCol>
+                </MRow>
+                <MRow>
+                    <MCol Class="py-0" Cols=12>
+                        @{
+                            var _detail = (Dictionary<string, object>)_data.FirstOrDefault()!;
+                            var transaction = (Dictionary<string, object>)GetDictionaryValue(_detail, "transaction");
+                            var span = (Dictionary<string, object>)GetDictionaryValue(_detail, "span");
+                            var service = (Dictionary<string, object>)GetDictionaryValue(_detail, "service");
+                            var http = (Dictionary<string, object>)GetDictionaryValue(_detail, "http");
+                            var db = (Dictionary<string, object>)GetDictionaryValue(_detail, "db");
+                            var url = (Dictionary<string, object>)GetDictionaryValue(_detail, "url");
+                        }
+
+                        <MTabsItems Value=@_tabIndex Style="border:1px solid gray;">
+                            <MTabItem Value="@("attr")">
+                                <MCol>
+                                <TscKeyValue Value="transaction" WordBreak=true></TscKeyValue>
+                                <TscKeyValue Value="span" WordBreak=true></TscKeyValue>
+                                </MCol>
+                            </MTabItem>
+                            <MTabItem Value="@("resource")">
+                                <MCol>
+                                <TscKeyValue Value="service" WordBreak=true></TscKeyValue>
+                                <TscKeyValue Value="http" WordBreak=true></TscKeyValue>
+                                </MCol>
+                            </MTabItem>
+                            <MTabItem Value="@("detail")">
+                                <MCol>
+                                <TscKeyValue Value="db" WordBreak=true></TscKeyValue>
+                                </MCol>
+                            </MTabItem>
+                            <MTabItem Value="@("log")">
+                                <MCol>
+                                <TscKeyValue Value="url" WordBreak=true></TscKeyValue>
+                                </MCol>
+                            </MTabItem>
+                        </MTabsItems>
+                    </MCol>
+                </MRow>
+            </MContainer>
+        </MCol>
+    </MRow>
 </MContainer>
-
-
-<MCard>
-    table
-</MCard>
-
-<MCard>
-    <MLabel></MLabel>
-    <MTabs>
-        <MTab>属性</MTab>
-        <MTab>资源</MTab>
-        <MTab>详情</MTab>
-        <MTab>日志</MTab>
-    </MTabs>
-    <MTabsItems>
-        <MTabItem>
-            <MCard>
-                <MCard><MLabel>service.id</MLabel><MLabel>masa-stack-auth-web</MLabel></MCard>
-            </MCard>
-        </MTabItem>
-        <MTabItem></MTabItem>
-        <MTabItem></MTabItem>
-        <MTabItem></MTabItem>
-    </MTabsItems>
-</MCard>
-
-

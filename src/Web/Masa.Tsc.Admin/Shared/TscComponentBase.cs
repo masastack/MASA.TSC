@@ -52,6 +52,38 @@ public class TscComponentBase : ComponentBase
         return time.Value.ToString(fmt);
     }
 
+    public object GetDictionaryValue(object obj, string path)
+    {
+        if (obj == null || string.IsNullOrEmpty(path))
+            return default!;
+
+        var keys = path.Split('.');
+        foreach (var key in keys)
+        {
+            if (string.IsNullOrEmpty(key))
+                continue;
+            if (obj is null || obj is not Dictionary<string, object> dic)
+            {
+                return default!;
+            }
+            if (dic.ContainsKey(key))
+            {
+                obj = dic[key];
+                continue;
+            }
+
+            var find = dic.Keys.FirstOrDefault(k => string.Equals(k, key, StringComparison.OrdinalIgnoreCase));
+            if (find != null)
+            {
+                obj = dic[find];
+                continue;
+            }
+            return default!;
+        }
+
+        return obj;
+    }
+
     protected override void OnAfterRender(bool firstRender)
     {
         Logger.LogInformation("OnAfterRender");

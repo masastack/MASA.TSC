@@ -1,5 +1,24 @@
 ﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
 @inherits TscComponentBase
 
-<MDataTable Headers="_headers">
+<MDataTable Headers="_headers"
+            OnOptionsUpdate=OnUpdateOptionsAsync
+            ServerItemsLength=_total
+            ItemsPerPage="10"
+            Items=_data
+            TItem="Dictionary<string,object>" Loading="_isLoading" @ref="_mDataTable" OnItemSelect=OnItemSelect>        
 </MDataTable>
+
+<TscTraceDetail TraceId="7834e25540bd5aeb6b1a0ea98a220c43"></TscTraceDetail>
+
+
+@*<MDialog @bind-Value="_showDialog" 
+ Fullscreen
+>
+<ActivatorContent>
+    <button @onclick="@(()=>_showDialog=true)">asdasdasda</button>
+</ActivatorContent>
+<ChildContent>
+    <TscTraceDetail TraceId="7834e25540bd5aeb6b1a0ea98a220c43"></TscTraceDetail>
+</ChildContent>
+</MDialog>*@

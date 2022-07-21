@@ -13,7 +13,7 @@ public class LogService : ServiceBase
         App.MapGet($"{BaseUri}/list", GetPageAsync);
     }
 
-    private async Task<IEnumerable<KeyValuePair<string, string>>> AggegationAsync([FromServices] IEventBus eventBus, [FromBody] RequestAggDto param)
+    private async Task<IEnumerable<KeyValuePair<string, string>>> AggegationAsync([FromServices] IEventBus eventBus, [FromBody] RequestAggregationDto param)
     {
         var query = new LogAggQuery
         {

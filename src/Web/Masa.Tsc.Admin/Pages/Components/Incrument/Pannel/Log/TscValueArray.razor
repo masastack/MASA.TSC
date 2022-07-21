@@ -2,36 +2,39 @@
 @using System.Text
 @inherits TscComponentBase
 
-<MCard Class="@($"{Class} {_class}")">
-    @foreach (var item in Value)
-    {
-        if (@item is IEnumerable<KeyValuePair<string, object>> obj)
+@if (Value != null)
+{
+    <MCard Class="@($"{_class} {Class}")">
+        @foreach (var item in Value)
         {
-            //_isObjectOrArray = true;
-            <TscKeyValue Value=obj WordBreak="WordBreak" />
+            if (@item is IEnumerable<KeyValuePair<string, object>> obj)
+            {
+                //_isObjectOrArray = true;
+                <TscKeyValue Value=obj WordBreak="WordBreak" />
+            }
+            else if (@item is IEnumerable<object> objs)
+            {
+                //_isObjectOrArray = true;
+                <TscValueArray Value=objs WordBreak="WordBreak" />
+            }
+            else
+            {
+                _text.Append($" , {item}");
+            }
         }
-        else if (@item is IEnumerable<object> objs)
-        {
-            //_isObjectOrArray = true;
-            <TscValueArray Value=objs WordBreak="WordBreak" />
-        }
-        else
-        {
-            _text.Append($" , {item}");
-        }
-    }
 
-    @{
-        if (_text.Length > 0)
-        {
-            _text.Remove(0, 3);
-            <MLabel Class="@(WordBreak?"text-wrap":"text-no-wrap")">@_text.ToString()</MLabel>
+        @{
+            if (_text.Length > 0)
+            {
+                _text.Remove(0, 3);
+                <MLabel Class="@($"text{(WordBreak?"-":"-no-")}wrap text-body-1")">@_text.ToString()</MLabel>
+            }
         }
-    }
-</MCard>
+    </MCard>
+}
 @code
 {
-    private string _class = "ma-0 pa-0";
+    private string _class = "";
     //private bool _isObjectOrArray = false;
     private StringBuilder _text = new StringBuilder(4096);
 

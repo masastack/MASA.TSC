@@ -2,7 +2,7 @@
 @inherits TscComponentBase
 
 <MContainer>
-    <TscTraceSearch></TscTraceSearch>
-    <TscTraceChart></TscTraceChart>
-    <TscTraceList></TscTraceList>
+    <TscTraceSearch OnSearchAsync="SearchAsync"></TscTraceSearch>
+    <TscTraceChart Query="_query" @ref="_chart"></TscTraceChart>
+    <TscTraceList Query="_query" @ref="_list"></TscTraceList>
 </MContainer>

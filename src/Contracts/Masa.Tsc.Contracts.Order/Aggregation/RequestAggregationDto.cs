@@ -3,9 +3,9 @@
 
 namespace Masa.Tsc.Contracts.Admin;
 
-public class RequestAggDto
+public class RequestAggregationDto
 {
-    public IEnumerable<RequestFieldAggDto> FieldMaps { get; set; }
+    public IEnumerable<RequestFieldAggregationDto> FieldMaps { get; set; }
 
     /// <summary>
     /// third original query conditions
@@ -15,9 +15,21 @@ public class RequestAggDto
     /// <summary>
     /// key-value exact query like {"name","David"} query name="David" not support fuzzy query
     /// </summary>
-    public IEnumerable<KeyValuePair<string, object>> Queries { get; set; }
+    public Dictionary<string, string> Queries { get; set; }
 
     public DateTime Start { get; set; }
 
     public DateTime End { get; set; }
+
+    public string Interval { get; set; }
+
+    /// <summary>
+    /// true
+    /// </summary>
+    public bool IsDesc { get; set; } = true;
+
+    /// <summary>
+    /// sort key in aggregation keys
+    /// </summary>
+    public string OrderField { get; set; }
 }

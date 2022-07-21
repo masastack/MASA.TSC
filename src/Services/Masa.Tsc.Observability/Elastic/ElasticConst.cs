@@ -15,6 +15,8 @@ public static class ElasticConst
 
     public static string SpanIndex { get; private set; } = "span";
 
+    public static string TraceTimestamp { get; private set; } = "@timestamp";
+
     public const string TraceId = "trace.id";
     public const string ParentId = "parent.id";
     public const string SpanId = "span.id";
@@ -22,9 +24,7 @@ public static class ElasticConst
 
     public const string TraceServiceName = "service.name";
     public const string TraceInstanceName = "service.node.name";
-    public const string TraceEndpointName = "transaction.name";
-
-    public static string TraceTimestamp { get; private set; } = "@timestamp";
+    public const string TraceEndpointName = "transaction.name";    
 
     public static int MAX_DATA_COUNT = 10000;
 
@@ -37,5 +37,9 @@ public static class ElasticConst
         str = configuration.GetSection("masa:elastic:traceIndex").Value;
         if (!string.IsNullOrEmpty(str))
             TraceIndex = str;
+
+        str = configuration.GetSection("masa:elastic:spanIndex").Value;
+        if (!string.IsNullOrEmpty(str))
+            SpanIndex = str;
     }
 }

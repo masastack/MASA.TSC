@@ -3,9 +3,12 @@
 
 namespace Masa.Tsc.Contracts.Admin.Enums;
 
-public enum AggTypes
+public enum AggregationTypes
 {
     Count = 1,
     Sum,
-    Avg
+    Avg,
+    DistinctCount,    
+    DateHistogram,
+    Histogram
 }

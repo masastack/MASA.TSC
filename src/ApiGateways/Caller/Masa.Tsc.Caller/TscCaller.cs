@@ -10,6 +10,7 @@ public class TscCaller
     private readonly ProjectService _projectService;
     private readonly TeamService _teamService;
     private readonly LogService _logService;
+    private readonly TraceService _traceService;
 
     public TscCaller(ICallerProvider caller)
     {
@@ -18,6 +19,7 @@ public class TscCaller
         _projectService = new ProjectService(caller);
         _teamService = new TeamService(caller);
         _logService = new LogService(caller);
+        _traceService=new TraceService(caller);
     }
 
     public AppService AppService { get { return _appService; } }
@@ -27,4 +29,6 @@ public class TscCaller
     public TeamService TeamService { get { return _teamService; } }
 
     public LogService LogService { get { return _logService; } }
+
+    public TraceService TraceService { get { return _traceService; } }
 }

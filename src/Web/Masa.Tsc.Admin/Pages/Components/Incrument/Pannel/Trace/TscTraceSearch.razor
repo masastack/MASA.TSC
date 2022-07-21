@@ -12,7 +12,9 @@
                    TItemValue=string
                    Solo
                    Dense
-                   Class="rounded-0"></MAutocomplete>
+                   Class="rounded-0"
+                   OnSearchInputUpdate="@(async item=>await UpdateSearchInputAsync(1,item))"
+                   OnSelectedItemUpdate="@(async item=>await UpdateItemAsync(1,item))"></MAutocomplete>
     <MAutocomplete Label="Instance"
                    Items="_instances" @bind-Value="_instance"
                    TItem=string
@@ -22,7 +24,9 @@
                    TItemValue=string
                    Solo
                    Dense
-                   Class="rounded-0"></MAutocomplete>
+                   Class="rounded-0"
+                   OnSearchInputUpdate="@(async item=>await UpdateSearchInputAsync(2,item))"
+                   OnSelectedItemUpdate="@(async item=>await UpdateItemAsync(2,item))"></MAutocomplete>
     <MAutocomplete Label="Endpoint"
                    Loading="_isLoading"
                    Items="_endpoints"
@@ -32,12 +36,13 @@
                    ItemText="item=>item"
                    ItemValue="item=>item"
                    TItemValue=string
-                   OnSearchInputUpdate="UpdateSearchInputAsync"
-                   OnSelectedItemUpdate="UpdateItemAsync"
+                   OnSearchInputUpdate="@(async item=>await UpdateSearchInputAsync(3,item))"
+                   OnSelectedItemUpdate="@(async item=>await UpdateItemAsync(3,item))"
                    Solo
                    Dense
                    Class="rounded-0"></MAutocomplete>
     <SearchTextField Label="TraceId/Search" @bind-Value="_keyword" Solo Dense Class="rounded-0 flex-column-4"></SearchTextField>
-    <MTextField @bind-Value="_timeStr" Solo Dense Class="rounded-0" Label="date and time"></MTextField>
+    <MTextField @bind-Value="_start" Solo Dense Class="rounded-0" Label="date and time"></MTextField>
+    <MTextField @bind-Value="_end" Solo Dense Class="rounded-0" Label="date and time"></MTextField>
     <MButton OnClick="async()=>await SearchAsync()" Class="rounded-0" Height="40">Query</MButton>
 </MRow>

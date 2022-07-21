@@ -7,7 +7,7 @@ public class LogService : BaseService
 {
     public LogService(ICallerProvider caller) : base(caller, "/api/log") { }
 
-    public async Task<IEnumerable<KeyValuePair<string, string>>> AggegationAsync(RequestAggDto param)
+    public async Task<IEnumerable<KeyValuePair<string, string>>> AggegationAsync(RequestAggregationDto param)
     {
         return await Caller.GetByBodyAsync<IEnumerable<KeyValuePair<string, string>>>($"{RootPath}/aggregation", param) ?? default!;
     }

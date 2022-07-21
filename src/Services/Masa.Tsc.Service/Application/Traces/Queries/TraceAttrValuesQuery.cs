@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Traces;
 
-public record TraceAttrValuesQuery(IEnumerable<KeyValuePair<string, object>> Query, string Name, string Keyword, DateTime? Start, DateTime? End, int Limit) : Query<IEnumerable<string>>
+public record TraceAttrValuesQuery(IEnumerable<KeyValuePair<string, string>> Queries, string Name, string Keyword, DateTime? Start, DateTime? End, int Limit) : Query<IEnumerable<string>>
 {
     public override IEnumerable<string> Result { get; set; }
 }

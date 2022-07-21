@@ -15,10 +15,7 @@ public static class ObservableExtensions
         builder.Services.AddMasaMetrics(builder =>
         {
             builder.SetResourceBuilder(resources);
-            builder.AddOtlpExporter(options =>
-            {
-                options.Endpoint = uri;
-            });
+            builder.AddOtlpExporter(options =>options.Endpoint = uri);
         });
 
         builder.Services.AddMasaTracing(builder =>
@@ -35,7 +32,7 @@ public static class ObservableExtensions
         builder.Logging.AddMasaOpenTelemetry(builder =>
         {
             builder.SetResourceBuilder(resources);
-            builder.AddOtlpExporter(options => options.Endpoint = uri);
+            builder.AddOtlpExporter(options =>options.Endpoint = uri);
         });
     }
 }

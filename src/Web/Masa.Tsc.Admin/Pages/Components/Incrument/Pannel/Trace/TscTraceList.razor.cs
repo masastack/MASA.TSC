@@ -3,20 +3,88 @@
 
 namespace Masa.Tsc.Admin.Rcl.Pages.Components;
 
-public partial class TscTraceList
+public partial class TscTraceList : Shared.TscComponentBase
 {
-    private List<DataTableHeader<RequestTraceListDto>> _headers = new()
+    [Parameter]
+    public RequestTraceListDto Query { get; set; } = default!;
+    private IEnumerable<Dictionary<string, object>> _data = new List<Dictionary<string, object>>();
+    private int _total = 0;
+    private MDataTable<Dictionary<string, object>> _mDataTable = default!;
+    private bool _isLoading = true;
+    private string _selectTraceId = default!;
+    private bool _showDialog = false;
+
+    private List<DataTableHeader<Dictionary<string, object>>> _headers = new()
     {
-        new()
+        new("Service", item => ((Dictionary<string, object>)item["service"])["name"])
         {
-            Text = "Service",
             Align = "start",
-            Sortable = false,
-            Value = nameof(RequestTraceListDto.Service)
+            Sortable = false
         },
-        new() { Text = "Endpoint", Value = nameof(RequestTraceListDto.Endpoint) },
-        new() { Text = "Duration (ms)", Value = "Duration" },
-        new() { Text = "StatTime", Value = nameof(RequestTraceListDto.Endpoint) },
-        new() { Text = "EndTime", Value = nameof(RequestTraceListDto.Start) }
+        new("Endpoint", item => ((Dictionary<string, object>)item["transaction"])["name"])
+        {
+            Align = "start",
+            Sortable = false
+        },
+        new("Duration (ms)", item => ((Dictionary<string, object>)((Dictionary<string, object>)item["transaction"])["duration"])["us"])
+        {
+            Align = "start",
+            Sortable = false
+        },
+        new("Timestamp", item => item["@timestamp"])
+        {
+            Align = "start",
+            Sortable = false
+        },
+        new("EndTime", item => ((Dictionary<string, object>)item["transaction"])["name"])
+        {
+            Align = "start",
+            Sortable = false
+        }
     };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _isLoading = false;
+            await QueryAsync();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return base.OnParametersSetAsync();
+    }
+
+    private async Task OnUpdateOptionsAsync(DataOptions options)
+    {
+        Query.Page = options.Page;
+        Query.PageSize = options.ItemsPerPage;
+        await QueryAsync();
+    }
+
+    private void OnItemSelect(Dictionary<string, object> item, bool selected)
+    {
+        _selectTraceId = ((Dictionary<string, object>)item["trace"])["id"].ToString()!;
+    }
+
+    public async Task QueryAsync()
+    {
+        _mDataTable.Options.Page = 1;
+        Query.Page = 1;
+        if (_isLoading) return;
+        _isLoading = true;
+        var data = await ApiCaller.TraceService.GetListAsync(Query);
+        _total = (int)data.Total;
+        _data = data.Items.Select(item => ((Dictionary<string, object>)((JsonElement)item).ToKeyValuePairs()!)).ToList();
+        _isLoading = false;
+        StateHasChanged();
+    }
 }

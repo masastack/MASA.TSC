@@ -1,0 +1,55 @@
+﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
+@inherits TscComponentBase
+
+
+<MSimpleTable>
+    <thead>
+        <tr>
+            <th class="text-left col-md-3">
+                Name
+            </th>
+            <th class="text-left col-md-9 mx-4">
+                <MRow Class="mx-4 text-right" Style="border-bottom:solid 4px green">
+                    <MCol Class="col-2">
+                        <MRow>
+                            <MCol Class="text-left">0</MCol>
+                            <MCol>100</MCol>
+                        </MRow>
+                    </MCol>
+                    <MCol Class="col-2">200</MCol>
+                    <MCol Class="col-2">300</MCol>
+                    <MCol Class="col-2">400</MCol>
+                    <MCol Class=" col-2">500</MCol>
+                    <MCol Class=" col-2">500</MCol>
+                </MRow>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Items != null && Items.Any())
+        {
+            foreach (var item in Items)
+            {
+                var id = KeyFunc(item);
+                var dicItem = _keyDeeps[id];
+                <tr @key="item">
+                    <td style="@GetClass(item)" class="col-md-3">
+                        @KeyFunc(item)
+
+                        ms:@(dicItem.Ms/1000.0)
+                    </td>
+                    <td class="col-md-9 px-4">
+                        <MContainer Class="d-flex algin-center">
+                            <div style="width:@(dicItem.Left)" class="flex-col">&nbsp;</div>
+                            <div class="blue flex-col" style="width:@(dicItem.Width)"></div>
+                            <div class="flex-col" style="width:@(dicItem.Right)">&nbsp</div>
+                        </MContainer>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</MSimpleTable>
+@code {
+
+}

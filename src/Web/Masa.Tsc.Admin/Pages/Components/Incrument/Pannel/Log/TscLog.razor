@@ -16,7 +16,7 @@
             <MRow>
                 <MCol Cols=6 Md=6>
                     <SearchTextField Label="请输入内容关键词" Outlined Class="rounded-0" @bind-Value="_queryStr"></SearchTextField>
-                    </MCol>
+                </MCol>
             </MRow>
             <MRow>
                 <MCol Style="height:60px;" Class="d-inline-flex flex-row justify-start align-center">
@@ -25,20 +25,19 @@
                              Label="换行"></MSwitch>
                     <MButton Class="ma-1 pa-1 rounded-0" Outlined>时间<BIcon OnClick=UpdateSortingAsync>fas fa-sort</BIcon></MButton>
                     <MCard Width="200" Class="rounded-0 border-gray-thcik border-gray-thcik-top">
-                        <MAutocomplete 
-                                    Class="rounded-0"
-                                    Items="_dicDurations"
-                                   @bind-Value="_lastedDuration"
-                                   TItem="KeyValuePair<int,string>"
-                                   TValue="int"
-                                   TItemValue="int"
-                                   Dense  
-                                   Outlined
-                                   ItemText="item=>item.Value"
-                                   ItemValue="item=>item.Key"
-                                   OnSelectedItemUpdate=UpdateDurationAsync>
-                        <MIcon>fa-sort-down</MIcon>
-                    </MAutocomplete>
+                        <MAutocomplete Class="rounded-0"
+                                       Items="_dicDurations"
+                                       @bind-Value="_lastedDuration"
+                                       TItem="KeyValuePair<int,string>"
+                                       TValue="int"
+                                       TItemValue="int"
+                                       Dense
+                                       Outlined
+                                       ItemText="item=>item.Value"
+                                       ItemValue="item=>item.Key"
+                                       OnSelectedItemUpdate=UpdateDurationAsync>
+                            <MIcon>fa-sort-down</MIcon>
+                        </MAutocomplete>
                     </MCard>
                 </MCol>
             </MRow>
@@ -58,12 +57,11 @@
                     var keyValues = item.ToKeyValuePairs();
                     <MRow Class="rounded-md-4 border-gray-thcik">
                         <MCol Cols="2" Class="px-2" Style="text-align:justify" Md=2>@FormatDateTime(item.GetTimestamp())</MCol>
-                        <MCol Cols="10" Md=10><TscKeyValue Value=keyValues WordBreak="_isWordBreak"></TscKeyValue>  </MCol>
+                        <MCol Cols="10" Class="my-1" Md=10><TscKeyValue Value=keyValues WordBreak="_isWordBreak"></TscKeyValue>  </MCol>
                     </MRow>
                 }
             </MContainer>
         }
-
     </MRow>
     <MRow Class="d-flex justify-end">
         <MPagination Length=_totalPage TotalVisible=5 Value="_currentPage" ValueChanged=PageChangeAsync></MPagination>

@@ -24,7 +24,10 @@ public class QueryHandler
     [EventHandler]
     public async Task GetAggregationAsync(LogAggQuery query)
     {
-        await _elasticClient.SearchAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, queryFn: Filter, aggFn: Aggregation, resultFn: AggResult, logger: _logger);
+        await _elasticClient.SearchAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, queryFn: Filter,
+            aggFn: (agg, q) => IElasticClientExtenstion.Aggregation(agg, q.FieldMaps),
+            resultFn: (rep, q) => q.Result = IElasticClientExtenstion.AggResult(rep, q.FieldMaps)!,
+            logger: _logger);
     }
 
     private QueryContainer Filter(QueryContainerDescriptor<object> container, LogAggQuery query)
@@ -43,67 +46,6 @@ public class QueryHandler
             container.Bool(b => b.Must(list));
 
         return container;
-    }
-
-    private IAggregationContainer Aggregation(AggregationContainerDescriptor<object> aggContainer, LogAggQuery query)
-    {
-        if (query.FieldMaps == null || !query.FieldMaps.Any())
-            return aggContainer;
-        foreach (var item in query.FieldMaps)
-        {
-            switch (item.AggType)
-            {
-                case AggTypes.Count:
-                    {
-                        aggContainer.ValueCount(item.Alias, agg => agg.Field(item.Name));
-                    }
-                    break;
-                case AggTypes.Sum:
-                    {
-                        aggContainer.Sum(item.Alias, agg => agg.Field(item.Name));
-                    }
-                    break;
-                case AggTypes.Avg:
-                    {
-                        aggContainer.Average(item.Alias, agg => agg.Field(item.Name));
-                    }
-                    break;
-            }
-        }
-        return aggContainer;
-    }
-
-    private void AggResult(ISearchResponse<object> response, LogAggQuery query)
-    {
-        if (!response.IsValid)
-        {
-            if (response.TryGetServerErrorReason(out string msg))
-                throw new UserFriendlyException(msg);
-            else
-                _logger.LogError($"Aggregation query error: {0}", response);
-        }
-
-        if (response.Aggregations == null || !response.Aggregations.Any())
-            return;
-
-        var result = new Dictionary<string, string>();
-        foreach (var item in response.Aggregations)
-        {
-            if (item.Value is ValueAggregate value && value != null)
-            {
-                string tem = default!;
-                if (!string.IsNullOrEmpty(value.ValueAsString))
-                    tem = value.ValueAsString;
-                else if (value.Value.HasValue)
-                    tem = value.Value.Value.ToString();
-
-                if (string.IsNullOrEmpty(tem))
-                    continue;
-
-                result.Add(item.Key, tem);
-            }
-        }
-        query.Result = result;
     }
     #endregion
 

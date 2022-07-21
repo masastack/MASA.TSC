@@ -1,29 +1,34 @@
 ﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
 @inherits TscComponentBase
 
-<MCard Class="@($"{Class} {_classs}")">
+@if (Value != null)
+{
     @foreach (var item in Value)
     {
-        <MRow Class="my-1 d-flex">
-            <MLabel Class="blue-grey lighten-3 text-subtitle-2">@item.Key : </MLabel>
-            @if (@item.Value is IEnumerable<KeyValuePair<string, object>> obj)
-            {
-                <TscKeyValue Value=obj />
-            }
-            else if (@item.Value is IEnumerable<object> objs)
-            {
-                <TscValueArray Value=objs />
-            }
-            else
-            {
-                <MLabel Class="@(WordBreak?"text-wrap text-body-1":"text-no-wrap text-body-1")">@item.Value</MLabel>
-            }
+        <MRow Class="d-block ma-0 pa-0">
+            <MCol Cols="12" Class="@($"{_classs} {Class}")">
+                <MLabel Class="blue-grey lighten-3 text-subtitle-2 text-no-wrap">@item.Key : </MLabel>
+                @if (@item.Value is IEnumerable<KeyValuePair<string, object>> obj)
+                {
+                    <MCard Class="d-flex-inline rounded-0">
+                        <TscKeyValue Value=obj />
+                    </MCard>
+                }
+                else if (@item.Value is IEnumerable<object> objs)
+                {
+                    <TscValueArray Value=objs />
+                }
+                else
+                {
+                    <MLabel Class="@($"text{(WordBreak?"-":"-no-")}wrap text-body-1")">@item.Value</MLabel>
+                }
+            </MCol>
         </MRow>
     }
-</MCard>
+}
 @code
 {
-    private string _classs = "pa-0 ma-0";
+    private string _classs = "pa-0 ma-0 d-flex";
 
     [Parameter]
     public IEnumerable<KeyValuePair<string, object>> Value { get; set; } = default!;

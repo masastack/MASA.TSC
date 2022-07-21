@@ -9,7 +9,7 @@ public class RequestAttrDataDto
 
     public string Keyword { get; set; }
 
-    public IEnumerable<KeyValuePair<string, object>> Query { get; set; }
+    public IEnumerable<KeyValuePair<string, string>> Query { get; set; }
 
     public int Max { get; set; }
 
