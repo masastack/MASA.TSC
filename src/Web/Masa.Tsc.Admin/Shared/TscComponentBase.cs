@@ -52,7 +52,7 @@ public class TscComponentBase : ComponentBase
         return time.Value.ToString(fmt);
     }
 
-    public object GetDictionaryValue(object obj, string path)
+    public static object GetDictionaryValue(object obj, string path)
     {
         if (obj == null || string.IsNullOrEmpty(path))
             return default!;

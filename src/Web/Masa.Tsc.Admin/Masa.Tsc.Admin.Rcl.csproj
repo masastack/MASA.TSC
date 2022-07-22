@@ -25,10 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Resource Include="wwwroot\i18n\supportedCultures.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

@@ -6,19 +6,29 @@
             ServerItemsLength=_total
             ItemsPerPage="10"
             Items=_data
-            TItem="Dictionary<string,object>" Loading="_isLoading" @ref="_mDataTable" OnItemSelect=OnItemSelect>        
+            TItem="Dictionary<string,object>" Loading="_isLoading" @ref="_mDataTable" OnItemSelect=OnItemSelect>
+    <ItemColContent>
+        @if (context.Header.Value == "Operate")
+        {
+            <MIcon OnClick="@(()=>OpenAsync(context.Item))">mdi-view-headline</MIcon>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
 </MDataTable>
 
-<TscTraceDetail TraceId="7834e25540bd5aeb6b1a0ea98a220c43"></TscTraceDetail>
-
-
-@*<MDialog @bind-Value="_showDialog" 
- Fullscreen
->
-<ActivatorContent>
-    <button @onclick="@(()=>_showDialog=true)">asdasdasda</button>
-</ActivatorContent>
-<ChildContent>
-    <TscTraceDetail TraceId="7834e25540bd5aeb6b1a0ea98a220c43"></TscTraceDetail>
-</ChildContent>
-</MDialog>*@
+<MDialog @bind-Value="_showDialog"
+         Fullscreen>
+    <ChildContent>
+        <MCard>
+            <MCardTitle Class="d-flex justify-end">
+                <MIcon OnClick="()=>_showDialog=false" title="Close">mdi-close</MIcon>
+            </MCardTitle>
+            <MCardText>
+                <TscTraceDetail TraceId="@_selectTraceId"></TscTraceDetail>
+            </MCardText>
+        </MCard>
+    </ChildContent>
+</MDialog>

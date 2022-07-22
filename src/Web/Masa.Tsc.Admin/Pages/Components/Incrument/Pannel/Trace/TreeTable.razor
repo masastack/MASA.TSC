@@ -1,7 +1,6 @@
 ﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
 @inherits TscComponentBase
 
-
 <MSimpleTable>
     <thead>
         <tr>
@@ -32,11 +31,11 @@
             {
                 var id = KeyFunc(item);
                 var dicItem = _keyDeeps[id];
-                <tr @key="item">
-                    <td style="@GetClass(item)" class="col-md-3">
-                        @KeyFunc(item)
-
-                        ms:@(dicItem.Ms/1000.0)
+                <tr @key="item" @onclick="@(async()=>await OnRowClickAync(item))">
+                    <td style="@GetPadding(item)" class="col-md-3">
+                        <MIcon>fsa fa-folder-closed</MIcon>
+                        @(GetDictionaryValue(item,"transaction.name")??GetDictionaryValue(item,"span.name"))
+                        @(dicItem.Ms/1000.0) ms
                     </td>
                     <td class="col-md-9 px-4">
                         <MContainer Class="d-flex algin-center">

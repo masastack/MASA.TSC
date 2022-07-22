@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Microsoft.AspNetCore.Components.Web;
+
 namespace Masa.Tsc.Admin.Rcl.Pages.Components;
 
 public partial class TscTraceList : Shared.TscComponentBase
@@ -13,7 +15,6 @@ public partial class TscTraceList : Shared.TscComponentBase
     private bool _isLoading = true;
     private string _selectTraceId = default!;
     private bool _showDialog = false;
-
     private List<DataTableHeader<Dictionary<string, object>>> _headers = new()
     {
         new("Service", item => ((Dictionary<string, object>)item["service"])["name"])
@@ -36,12 +37,21 @@ public partial class TscTraceList : Shared.TscComponentBase
             Align = "start",
             Sortable = false
         },
-        new("EndTime", item => ((Dictionary<string, object>)item["transaction"])["name"])
+        new DataTableHeader<Dictionary<string, object>>
         {
+            Text = "Operate",
+            Value= "Operate",
             Align = "start",
             Sortable = false
         }
     };
+
+    private async Task OpenAsync(Dictionary<string, object> item)
+    {
+        _selectTraceId = GetDictionaryValue(item, "trace.id").ToString()!;
+        _showDialog = true;
+        await Task.CompletedTask;
+    }    
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -72,7 +82,7 @@ public partial class TscTraceList : Shared.TscComponentBase
 
     private void OnItemSelect(Dictionary<string, object> item, bool selected)
     {
-        _selectTraceId = ((Dictionary<string, object>)item["trace"])["id"].ToString()!;
+        OpenAsync(item).Wait();
     }
 
     public async Task QueryAsync()

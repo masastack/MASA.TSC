@@ -3,8 +3,11 @@
 
 namespace Masa.Tsc.Admin.Rcl.Pages.Components;
 
-public partial class TreeTable /*where T : class*/
+public partial class TreeTable
 {
+    [Parameter]
+    public bool Expand { get; set; } = true;
+
     [Parameter]
     public Func<object, string> KeyFunc { get; set; }
 
@@ -21,17 +24,14 @@ public partial class TreeTable /*where T : class*/
         set
         {
             _items = value;
-            SetDeeep();
         }
     }
 
     [Parameter]
-    public bool Expand { get; set; } = true;
-
-    private List<string> _header;
+    public Func<object, Task> OnRowClick { get; set; }
 
     [Parameter]
-    public RenderFragment ChildFragment { get; set; }
+    public Func<TraceOverViewModel, Task> OnOverViewUpdate { get; set; }
 
     private Func<object, long> TimeUsFunc = obj =>
     {
@@ -40,46 +40,63 @@ public partial class TreeTable /*where T : class*/
         return Convert.ToInt64(((Dictionary<string, object>)dic["duration"])["us"]);
 
     };
-
     private Func<object, DateTime> TimeFunc = obj =>
     {
         var dic = (Dictionary<string, object>)obj;
-        return DateTime.Parse(dic["@timestamp"].ToString());
+        return DateTime.Parse(dic["@timestamp"].ToString()!);
     };
-
     private IEnumerable<object> _items;
-
-    private Dictionary<string, asdasdasdasd> _keyDeeps = new Dictionary<string, asdasdasdasd>();
-
+    private Dictionary<string, TraceTableLineModel> _keyDeeps = new Dictionary<string, TraceTableLineModel>();
     private Dictionary<string, List<string>> _dicChild = new Dictionary<string, List<string>>();
+    private TraceOverViewModel _overView = new TraceOverViewModel();
 
-    private void asdasdasdasd()
+    protected override async Task OnParametersSetAsync()
     {
-        var dd = _keyDeeps.Values.OrderBy(t => t.Time).First();
+        SetDeeep();
+        var parentIds = _keyDeeps.Keys;
+        var data = _keyDeeps.Where(item => item.Value.IsTransaction && !_keyDeeps.Keys.Contains(item.Value.ParentId)).ToList();
+        DateTime start = data.Min(item => item.Value.Time);
+        long total = data.Sum(item => item.Value.Ms);
+        
+        SetOverView();
+        if (OnOverViewUpdate != null)
+        {
+            await OnOverViewUpdate(_overView);
+        }
+        SetTreeLine();
+        await base.OnParametersSetAsync();
+    }
+
+    private void SetTreeLine()
+    {
+        DateTime start = _overView.Start;
+        long total = _overView.TimeUs;
+        TraceTableLineModel? last = null;
+        long t_total = 0;
+        double left, width, right;
         foreach (var item in _keyDeeps)
         {
-            if (item.Key == dd.Id)
+            if (item.Value.IsTransaction)
             {
-                item.Value.Left = "0";
-                item.Value.Width = "100%";
-                item.Value.Right = "0";
-                continue;
+                if (last != null)
+                    t_total += last.Ms;
+                last = item.Value;
             }
-            var t1 = (long)Math.Floor((item.Value.Time - dd.Time).TotalMilliseconds * 1000);         
-            double left = Math.Round(t1 * 1.0 / dd.Ms, 4), width = Math.Round(item.Value.Ms * 1.0 / dd.Ms, 4), right = 1 - left - width;
 
-            if (left - 1 > 0)
+            if (item.Value.Ms - total == 0)
             {
                 left = 0;
                 width = 1;
                 right = 0;
             }
-            else if (width - 1 > 0)
+            else
             {
-                width = 1 - left;
-                right = 0;
+                var t1 = last != null ? Math.Round((item.Value.Time - last.Time).TotalMilliseconds * 1000, 0) + t_total : 0;
+                left = Math.Round(t1 * 1.0 / total, 4);
+                width = Math.Round(item.Value.Ms * 1.0 / total, 4);
+                right = 1 - left - width;
             }
-           
+
             item.Value.Left = left.ToString("0.####%");
             item.Value.Width = width.ToString("0.####%");
             item.Value.Right = right.ToString("0.####%");
@@ -104,13 +121,17 @@ public partial class TreeTable /*where T : class*/
                 continue;
             list.Add(item);
             int deep = 0;
+            bool isTransaction = ((Dictionary<string, object>)item).ContainsKey("transaction");
+            string name = GetDictionaryValue(item, "service.name").ToString()!;
 
-            var add = new asdasdasdasd
+            var add = new TraceTableLineModel
             {
                 Id = id,
                 ParentId = parentId,
                 Time = time,
                 Deep = deep,
+                IsTransaction = isTransaction,
+                ServiceName= name,
                 Ms = us
             };
 
@@ -132,12 +153,27 @@ public partial class TreeTable /*where T : class*/
                     _dicChild.Add(parentId, new List<string> { id });
             }
         }
-        _items = list;
 
-        asdasdasdasd();
+        var sortIds = _keyDeeps.Values.OrderBy(item => item.Time).ThenBy(item => item.Deep).Select(item => item.Id).ToList();
+        _items = list.OrderBy(item => sortIds.IndexOf(KeyFunc(item)));
     }
 
-    private string GetClass(object item)
+    private void SetOverView()
+    {
+        _overView.Total = _items.Count();
+        var data = _keyDeeps.Where(item => item.Value.IsTransaction && !_keyDeeps.ContainsKey(item.Value.ParentId)).ToList();
+        DateTime start = data.Min(item => item.Value.Time);
+        long total = data.Sum(item => item.Value.Ms);
+        _overView.Start = start;
+        _overView.TimeUs = total;
+        _overView.Name = GetDictionaryValue(_items.First(), "transaction.name").ToString()!;
+        _overView.Services = _keyDeeps.Values.Select(item=>item.ServiceName).Distinct().Select(item => new TraceOverViewServiceModel {
+            Name = item,
+            Color = "green"
+        }).ToList();
+    }
+
+    private string GetPadding(object item)
     {
         string id = KeyFunc(item), parentId = ParentFunc(item);
         int deep = _keyDeeps[id].Deep;
@@ -158,33 +194,9 @@ public partial class TreeTable /*where T : class*/
         return $"padding-left:{deep * 20}px";
     }
 
-    protected override Task OnAfterRenderAsync(bool firstRender)
+    private async Task OnRowClickAync(object item)
     {
-        //if (firstRender)
-        //{
-        //    SetDeeep();
-        //}
-
-        return base.OnAfterRenderAsync(firstRender);
+        if (OnRowClick != null)
+            await OnRowClick(item);
     }
-}
-
-
-public class asdasdasdasd
-{
-    public string Id { get; set; }
-
-    public string ParentId { get; set; }
-
-    public int Deep { get; set; }
-
-    public DateTime Time { get; set; }
-
-    public long Ms { get; set; }
-
-    public string Left { get; set; }
-
-    public string Width { get; set; }
-
-    public string Right { get; set; }
 }

@@ -5,48 +5,35 @@ namespace Masa.Tsc.Admin.Rcl.Pages.Components;
 
 public partial class TscTraceDetail
 {
-    private List<string> _services = default!;
-    private DateTime _startTime;
-    private string _duration;
-    private int _total;
     private StringNumber _tabIndex = "attr";
-
+    private IEnumerable<object> _items = new List<object>();
     private bool _isLoading = true;
+    private string _traceId = default!;
+    private TraceDetailModel _selectItem;
+    private TraceOverViewModel _overView = new TraceOverViewModel();
+    private List<TraceOverViewServiceModel> _services=new List<TraceOverViewServiceModel>();
 
     [Parameter]
-    public string TraceId { get; set; } = "7834e25540bd5aeb6b1a0ea98a220c43";
+    public string TraceId { get { return _traceId; } set { _traceId = value; _tabIndex = "attr"; } }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async Task OverViewCompeleteAysnc(TraceOverViewModel model)
     {
-        if (firstRender)
-        {
-            var data = await ApiCaller.TraceService.GetAsync(TraceId);
-            if (data != null && data.Any())
-            {
-                _data = data.Select(item => (object)((JsonElement)item).ToKeyValuePairs()!);
-            }
+        _overView = model;
+        _services = model.Services;
+        await Task.CompletedTask;
+    }
 
-            _total = data.Count();
-            _startTime = DateTime.Parse(GetDictionaryValue(_data.First(), "@timestamp").ToString()!);
-            var duration = Convert.ToInt64(GetDictionaryValue(_data.First(), "transaction.duration.us").ToString()!);
-            if (duration / 1000 < 0)
-                _duration = $"{duration}us";
-            else if (duration / 1000_000 < 0)
-                _duration = $"{Math.Round(duration / 1000.0, 2)}ms";
-            else
-                _duration = $"{Math.Round(duration / 1000_000.0, 2)}s";
-            _services = new List<string>();
-            foreach (var item in _data)
-            {              
-                var serviceName = GetDictionaryValue(item, "service.name").ToString()!;
-                if (!_services.Contains(serviceName))
-                    _services.Add(serviceName);
-            }
-            
-            _isLoading = false;
-            StateHasChanged();
-        }
-        await base.OnAfterRenderAsync(firstRender);
+    protected override async Task OnParametersSetAsync()
+    {
+        _isLoading = true;
+        var data = await ApiCaller.TraceService.GetAsync(TraceId);
+        if (data == null)
+            return;
+
+        _items = data.Select(item => (object)((JsonElement)item).ToKeyValuePairs()!);
+        await ChangeRecordAsync(_items.FirstOrDefault()!);
+        await base.OnParametersSetAsync();
+        _isLoading = false;
     }
 
     private List<DataTableHeader<Dictionary<string, object>>> _headers = new()
@@ -78,11 +65,10 @@ public partial class TscTraceDetail
         }
     };
 
-    private IEnumerable<object> _data = new List<object>();
-
-    private string dsadasda(Dictionary<string, object> item)
+    private async Task ChangeRecordAsync(object item)
     {
-        return "";
+        _selectItem = new TraceDetailModel((Dictionary<string, object>)item);
+        StateHasChanged();
+        await Task.CompletedTask;
     }
-
 }

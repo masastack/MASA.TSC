@@ -111,4 +111,22 @@
     content: '\f111'
 }
 
+.fa-square-info:before {
+    content: '\f30f'
+}
 
+.fa-folder-closed:before{
+    content: '\e185'
+}
+
+.fa-folder-open:before {
+    content: '\f07c'
+}
+
+.fa-file:before {
+    content: '\f15b'
+}
+
+.fa-file-check:before {
+    content: '\f136'
+}
