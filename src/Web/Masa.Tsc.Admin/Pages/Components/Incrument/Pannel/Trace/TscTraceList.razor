@@ -6,7 +6,9 @@
             ServerItemsLength=_total
             ItemsPerPage="10"
             Items=_data
-            TItem="Dictionary<string,object>" Loading="_isLoading" @ref="_mDataTable" OnItemSelect=OnItemSelect>
+            TItem="Dictionary<string,object>"
+            Loading="_isLoading"
+            @ref="_mDataTable">
     <ItemColContent>
         @if (context.Header.Value == "Operate")
         {

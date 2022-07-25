@@ -40,7 +40,7 @@ public partial class TscTraceList : Shared.TscComponentBase
         new DataTableHeader<Dictionary<string, object>>
         {
             Text = "Operate",
-            Value= "Operate",
+            Value = "Operate",
             Align = "start",
             Sortable = false
         }
@@ -51,7 +51,7 @@ public partial class TscTraceList : Shared.TscComponentBase
         _selectTraceId = GetDictionaryValue(item, "trace.id").ToString()!;
         _showDialog = true;
         await Task.CompletedTask;
-    }    
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -77,7 +77,7 @@ public partial class TscTraceList : Shared.TscComponentBase
     {
         Query.Page = options.Page;
         Query.PageSize = options.ItemsPerPage;
-        await QueryAsync();
+        await QueryAsync(false);
     }
 
     private void OnItemSelect(Dictionary<string, object> item, bool selected)
@@ -85,16 +85,21 @@ public partial class TscTraceList : Shared.TscComponentBase
         OpenAsync(item).Wait();
     }
 
-    public async Task QueryAsync()
+    public async Task QueryAsync(bool isStateChange = true)
     {
-        _mDataTable.Options.Page = 1;
-        Query.Page = 1;
+        if (isStateChange)
+        {
+            _mDataTable.Options.Page = 1;
+            Query.Page = 1;
+        }
+
         if (_isLoading) return;
         _isLoading = true;
         var data = await ApiCaller.TraceService.GetListAsync(Query);
         _total = (int)data.Total;
         _data = data.Items.Select(item => ((Dictionary<string, object>)((JsonElement)item).ToKeyValuePairs()!)).ToList();
         _isLoading = false;
-        StateHasChanged();
+        if (isStateChange)
+            StateHasChanged();
     }
 }
