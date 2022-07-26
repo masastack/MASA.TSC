@@ -2,46 +2,47 @@
 @inherits TscComponentBase
 
 <MContainer Class="white">
-    <MRow Class="pb-1 border-gray-thcik border-gray-thcik-top">
-        <MCol Cols=3 Md=3>
-            <MTextField TValue=string Label="Date" Outlined Class="rounded-0"></MTextField>
-        </MCol>
-        <MCol Cols=9 Md=9>
-            <MButton OnClick="QueryAsync" Class="mx-0 pa-0 my-2"><MIcon Size=24>fas fa-rotate</MIcon></MButton>
+    <MRow>
+        <MCol Cols="12" Class="d-flex">
+            <MCard Class="rounded-0" Height=38>
+                <MCardText Class="py-2">
+                    <DateTimeRangePicker @bind-StartTime="_start" @bind-EndTime="_end" />
+                </MCardText>
+            </MCard>
+            <MButton OnClick="QueryAsync" Height="38" Class="ml-4"><MIcon Size=20>fas fa-rotate</MIcon></MButton>
         </MCol>
     </MRow>
 
-    <MRow Class="border-gray-thcik">
-        <MContainer>
-            <MRow>
-                <MCol Cols=6 Md=6>
-                    <SearchTextField Label="请输入内容关键词" Outlined Class="rounded-0" @bind-Value="_queryStr"></SearchTextField>
-                </MCol>
-            </MRow>
-            <MRow>
-                <MCol Style="height:60px;" Class="d-inline-flex flex-row justify-start align-center">
-                    <MSwitch Class="ma-1 pa-1 border-gray-thcik border-gray-thcik-top" @bind-Value="_isWordBreak"
-                             OnChange=UpdateWordBreakAsync
-                             Label="换行"></MSwitch>
-                    <MButton Class="ma-1 pa-1 rounded-0" Outlined>时间<BIcon OnClick=UpdateSortingAsync>fas fa-sort</BIcon></MButton>
-                    <MCard Width="200" Class="rounded-0 border-gray-thcik border-gray-thcik-top">
-                        <MAutocomplete Class="rounded-0"
-                                       Items="_dicDurations"
-                                       @bind-Value="_lastedDuration"
-                                       TItem="KeyValuePair<int,string>"
-                                       TValue="int"
-                                       TItemValue="int"
-                                       Dense
-                                       Outlined
-                                       ItemText="item=>item.Value"
-                                       ItemValue="item=>item.Key"
-                                       OnSelectedItemUpdate=UpdateDurationAsync>
-                            <MIcon>fa-sort-down</MIcon>
-                        </MAutocomplete>
-                    </MCard>
-                </MCol>
-            </MRow>
-        </MContainer>
+    <MRow Class="border-gray-thcik border-gray-thcik-top">
+        <MCol Cols="12">
+            <SearchTextField Label="请输入内容关键词" Outlined Class="rounded-0" @bind-Value="_queryStr" Dense Solo></SearchTextField>
+        </MCol>
+    </MRow>
+    <MRow>
+        <MCol Cols="12" Class="d-flex border-gray-thcik">
+            <MSwitch Class="border-gray-thcik border-gray-thcik-top ma-0 pa-0" @bind-Value="_isWordBreak"
+                     OnChange=UpdateWordBreakAsync
+                     Label="NewLine" Dense Height=16>
+            </MSwitch>
+            <MButton Class="rounded-0" Outlined Height="38">时间<BIcon OnClick=UpdateSortingAsync>fas fa-sort</BIcon></MButton>
+            <MCard Height="38" Class="rounded-0">
+                <MCardText Class="pa-0">
+                    <MAutocomplete Class="rounded-0"
+                                   Items="_dicDurations"
+                                   @bind-Value="_lastedDuration"
+                                   TItem="KeyValuePair<int,string>"
+                                   TValue="int"
+                                   TItemValue="int"
+                                   Dense
+                                   Solo
+                                   ItemText="item=>item.Value"
+                                   ItemValue="item=>item.Key"
+                                   OnSelectedItemUpdate=UpdateDurationAsync>
+                        <MIcon>fa-sort-down</MIcon>
+                    </MAutocomplete>
+                </MCardText>
+            </MCard>
+        </MCol>
     </MRow>
 
     <MRow Class="pb-4">

@@ -7,7 +7,7 @@ public partial class TscLog
 {
     private int _lastedDuration = 1;
     private List<KeyValuePair<int, string>> _dicDurations = TimeSeries;
-    private List<JsonElement> _data =default!;
+    private List<JsonElement> _data = default!;
     private int _totalPage = 1;
     private bool _isWordBreak = false;
     private bool _isDesc = true;
@@ -16,13 +16,18 @@ public partial class TscLog
     private string _queryStr = default!;
     private string _msg = "Loading ...";
 
-    private DateTime _start = DateTime.Now.Date, _end = DateTime.Now;
+    private DateTime? _start = DateTime.Now.Date, _end = DateTime.Now;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await RefreshAsync();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await RefreshAsync();
             _msg = "query not find data";
         }
 
@@ -64,15 +69,16 @@ public partial class TscLog
 
     private async Task RefreshAsync()
     {
+        CheckTime();
         var query = new LogPageQueryDto
         {
             PageSize = _pageSize,
-            Start = _start,
-            End = _end,
+            Start = TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone),
+            End = TimeZoneInfo.ConvertTime(_end.Value, CurrentTimeZone),
             Page = _currentPage,
             Duration = _lastedDuration.ToString(),
             Sorting = !_isDesc ? "asc" : "desc",
-            Query = _queryStr             
+            Query = _queryStr
         };
         var pageData = await ApiCaller.LogService.GetPageAsync(query);
         if (pageData.Items != null && pageData.Items.Any())
@@ -87,4 +93,15 @@ public partial class TscLog
         _totalPage = (int)(pageData.Total / query.PageSize) + (num > 0 ? 1 : 0);
         StateHasChanged();
     }
+
+    private void CheckTime()
+    {
+        if (!_start.HasValue || !_end.HasValue)
+        {
+            var time = TimeZoneInfo.ConvertTime(DateTime.Now, CurrentTimeZone);
+            _start = time.Date;
+            _end = time;
+        }
+    }
+
 }
