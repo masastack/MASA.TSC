@@ -49,21 +49,24 @@ public partial class TreeTable
     private Dictionary<string, TraceTableLineModel> _keyDeeps = new Dictionary<string, TraceTableLineModel>();
     private Dictionary<string, List<string>> _dicChild = new Dictionary<string, List<string>>();
     private TraceOverViewModel _overView = new TraceOverViewModel();
+    private bool _isLoading = true;
 
     protected override async Task OnParametersSetAsync()
     {
+        _isLoading = true;
         SetDeeep();
         var parentIds = _keyDeeps.Keys;
         var data = _keyDeeps.Where(item => item.Value.IsTransaction && !_keyDeeps.Keys.Contains(item.Value.ParentId)).ToList();
         DateTime start = data.Min(item => item.Value.Time);
         long total = data.Sum(item => item.Value.Ms);
-        
+
         SetOverView();
         if (OnOverViewUpdate != null)
         {
             await OnOverViewUpdate(_overView);
         }
         SetTreeLine();
+        _isLoading = false;
         await base.OnParametersSetAsync();
     }
 
@@ -131,7 +134,7 @@ public partial class TreeTable
                 Time = time,
                 Deep = deep,
                 IsTransaction = isTransaction,
-                ServiceName= name,
+                ServiceName = name,
                 Ms = us
             };
 
@@ -167,7 +170,8 @@ public partial class TreeTable
         _overView.Start = start;
         _overView.TimeUs = total;
         _overView.Name = GetDictionaryValue(_items.First(), "transaction.name").ToString()!;
-        _overView.Services = _keyDeeps.Values.Select(item=>item.ServiceName).Distinct().Select(item => new TraceOverViewServiceModel {
+        _overView.Services = _keyDeeps.Values.Select(item => item.ServiceName).Distinct().Select(item => new TraceOverViewServiceModel
+        {
             Name = item,
             Color = "green"
         }).ToList();

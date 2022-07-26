@@ -56,7 +56,7 @@
                 {
                     var keyValues = item.ToKeyValuePairs();
                     <MRow Class="rounded-md-4 border-gray-thcik">
-                        <MCol Cols="2" Class="px-2" Style="text-align:justify" Md=2>@FormatDateTime(item.GetTimestamp())</MCol>
+                        <MCol Cols="2" Class="px-2" Style="text-align:justify" Md=2>@item.GetTimestamp().Value.Format(CurrentTimeZone)</MCol>
                         <MCol Cols="10" Class="my-1" Md=10><TscKeyValue Value=keyValues WordBreak="_isWordBreak"></TscKeyValue>  </MCol>
                     </MRow>
                 }

@@ -125,7 +125,7 @@ public partial class TscTraceChart
         });
         if (data.Data == null || !data.Data.Any())
             return;
-        var xPointes = data.Data.Select(item => FormatDateTime(DateTime.Parse(item.X), GetFormat())).ToArray();
+        var xPointes = data.Data.Select(item => DateTime.Parse(item.X).Format(CurrentTimeZone,GetFormat())).ToArray();
         List<ChartViewDto> list = new()
         {
             new ChartViewDto

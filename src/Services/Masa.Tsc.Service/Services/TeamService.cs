@@ -12,10 +12,7 @@ public class TeamService : ServiceBase
 
     private async Task<TeamDto> GetTeamAsync([FromServices] IEventBus eventBus, [FromQuery] string appId)
     {
-        var teamQuery = new TeamDetailQuery
-        {
-            AppId = appId
-        };
+        var teamQuery = new TeamDetailQuery(Guid.Empty, appId);
         await eventBus.PublishAsync(teamQuery);
         return teamQuery.Result;
     }

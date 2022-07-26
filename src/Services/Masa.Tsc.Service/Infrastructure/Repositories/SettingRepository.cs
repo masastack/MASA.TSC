@@ -5,5 +5,5 @@ namespace Masa.Tsc.Service.Admin.Infrastructure.Repositories;
 
 public class SettingRepository : Repository<TscDbContext, Setting, Guid>, ISettingRepository
 {
-    public SettingRepository(TscDbContext context, IUnitOfWork unitOfWork) : base(context, unitOfWork) { }
+    public SettingRepository(TscDbContext context, IUnitOfWork unitOfWork) : base(context, unitOfWork) { }    
 }

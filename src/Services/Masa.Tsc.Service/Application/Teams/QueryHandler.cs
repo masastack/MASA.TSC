@@ -23,10 +23,10 @@ public class QueryHandler
     [EventHandler]
     public async Task GetTeamDetailAsync(TeamDetailQuery query)
     {
-        var result = await _authClient.TeamService.GetDetailAsync(query.Id);
+        var result = await _authClient.TeamService.GetDetailAsync(query.TeamId);
         if (result != null)
         {
-            var projects = await _pmClient.ProjectService.GetListByTeamIdAsync(query.Id);
+            var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(new List<Guid> { query.TeamId });
             query.Result = new TeamDto
             {
                 Id = result.Id,
@@ -35,7 +35,7 @@ public class QueryHandler
                 Description = result.Description,
                 //Admins = result.Admins.Select(ToUser).ToList(),
                 ProjectTotal = projects?.Count ?? 0,
-                CurrentAppId = query.Id
+                CurrentAppId = query.AppId
             };
 
             if (projects != null && projects.Any())
@@ -144,40 +144,38 @@ public class QueryHandler
     {
         var list = new List<int>();
         var result = new List<ProjectOverViewDto>();
-        foreach (var id in teamids)
+
+        var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(teamids);
+        if (projects == null || !projects.Any())
+            return result;
+        var apps = await _pmClient.AppService.GetListByProjectIdsAsync(projects.Select(p => p.Id).ToList());
+
+        foreach (var project in projects)
         {
-            var projects = await _pmClient.ProjectService.GetListByTeamIdAsync(id);
-            if (projects == null || !projects.Any())
+            if (list.Contains(project.Id))
                 continue;
-            var apps = await _pmClient.AppService.GetListByProjectIdsAsync(projects.Select(p => p.Id).ToList());
 
-            foreach (var project in projects)
+            var model = new ProjectOverViewDto
             {
-                if (list.Contains(project.Id))
-                    continue;
+                Id = project.Id.ToString(),
+                Description = project.Description,
+                Identity = project.Identity,
+                LabelName = project.LabelName,
+                Name = project.Name
+            };
 
-                var model = new ProjectOverViewDto
+            if (apps != null && apps.Any())
+            {
+                model.Apps = apps.Where(a => a.ProjectId == project.Id).Select(a => new AppDto
                 {
-                    Id = project.Id.ToString(),
-                    Description = project.Description,
-                    Identity = project.Identity,
-                    LabelName = project.LabelName,
-                    Name = project.Name
-                };
-
-                if (apps != null && apps.Any())
-                {
-                    model.Apps = apps.Where(a => a.ProjectId == project.Id).Select(a => new AppDto
-                    {
-                        Id = a.Id.ToString(),
-                        Identity = a.Identity,
-                        Name = a.Name,
-                        ServiceType = (ServiceTypes)((int)a.ServiceType)
-                    }).ToList();
-                }
-
-                result.Add(model);
+                    Id = a.Id.ToString(),
+                    Identity = a.Identity,
+                    Name = a.Name,
+                    ServiceType = (ServiceTypes)((int)a.ServiceType)
+                }).ToList();
             }
+
+            result.Add(model);
         }
 
         return result;

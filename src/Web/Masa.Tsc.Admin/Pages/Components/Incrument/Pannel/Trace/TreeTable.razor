@@ -1,6 +1,8 @@
 ﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
 @inherits TscComponentBase
 
+@if(!_isLoading)
+{
 <MSimpleTable>
     <thead>
         <tr>
@@ -49,6 +51,7 @@
         }
     </tbody>
 </MSimpleTable>
+}
 @code {
 
 }

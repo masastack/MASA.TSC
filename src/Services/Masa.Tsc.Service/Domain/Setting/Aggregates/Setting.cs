@@ -9,16 +9,16 @@ public class Setting : AggregateRoot<Guid>
 
     public string Language { get; set; }
 
-    public int Interval { get; set; }
+    public short Interval { get; set; }
 
     public bool IsEnable { get; set; }
 
-    public byte TimeZone { get; set; }
+    public short TimeZone { get; set; }
 
-    public int TimeZoneOffset { get; set; }
+    public short TimeZoneOffset { get; set; }
 
-    public void Update(string language, int interval, bool isEnable, byte timeZone, int timeZoneOffset)
-    {
+    public void Update(string language, short interval, bool isEnable, short timeZone, short timeZoneOffset)
+    {        
         Language = language;
         Interval = interval;
         IsEnable = isEnable;

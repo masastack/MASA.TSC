@@ -8,9 +8,7 @@ public partial class TscTraceSearch
     [Parameter]
     public Func<string, string, string, string, DateTime, DateTime, Task> OnSearchAsync { get; set; }
 
-    private string _timeStr = "";
     private bool _isLoading = false;
-
     private List<string> _services = default!;
     private List<string> _instances = default!;
     private List<string> _endpoints = default!;
@@ -19,24 +17,23 @@ public partial class TscTraceSearch
     private string _instance = default!;
     private string _endpoint = default!;
     private string _keyword = default!;
-    private DateTime _start = DateTime.Now.Date;
-    private DateTime _end = DateTime.Now;
-
+    private DateTime? _start;
+    private DateTime? _end;
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+        CheckTime();
         _services = (await ApiCaller.TraceService.GetAttrValuesAsync(new RequestAttrDataDto
         {
-            End = _end,
-            Start = _start,
+            End = TimeZoneInfo.ConvertTime(_end.Value, CurrentTimeZone),
+            Start = TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone),
             Name = "service.name",
             Max = 10
         })).ToList();
         _instances = new List<string>();
         _endpoints = new List<string>();
-        await base.OnInitializedAsync();
     }
-
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -55,11 +52,11 @@ public partial class TscTraceSearch
         }
 
         _isLoading = true;
-
+        CheckTime();
         var query = new RequestAttrDataDto
         {
-            End = _end,
-            Start = _start,
+            End = TimeZoneInfo.ConvertTime(_end.Value, CurrentTimeZone),
+            Start = TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone),
             Keyword = val,
             Max = 10
         };
@@ -101,11 +98,11 @@ public partial class TscTraceSearch
             return;
 
         _isLoading = true;
-
+        CheckTime();
         var query = new RequestAttrDataDto
         {
-            End = _end,
-            Start = _start,
+            End = TimeZoneInfo.ConvertTime(_end.Value, CurrentTimeZone),
+            Start = TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone),
             Max = 10
         };
         IEnumerable<string> data;
@@ -138,7 +135,18 @@ public partial class TscTraceSearch
     {
         if (OnSearchAsync is not null)
         {
-            await OnSearchAsync.Invoke(_service, _instance, _endpoint, _keyword, _start, _end);
+            CheckTime();
+            await OnSearchAsync.Invoke(_service, _instance, _endpoint, _keyword, TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone), TimeZoneInfo.ConvertTime(_end.Value, CurrentTimeZone));
+        }
+    }
+
+    private void CheckTime()
+    {
+        if (!_start.HasValue || !_end.HasValue)
+        {
+            var time = TimeZoneInfo.ConvertTime(DateTime.Now, CurrentTimeZone);
+            _start = time.Date;
+            _end = time;
         }
     }
 }

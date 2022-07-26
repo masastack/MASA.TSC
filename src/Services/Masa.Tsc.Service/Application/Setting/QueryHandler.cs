@@ -21,7 +21,7 @@ public class QueryHandler
             {
                 Interval = data.Interval,
                 IsEnable = data.IsEnable,
-                Langauge = data.Language,
+                Language = data.Language,
                 TimeZone = data.TimeZone,
                 TimeZoneOffset = data.TimeZoneOffset
             };

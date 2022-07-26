@@ -2,17 +2,14 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 using Masa.BuildingBlocks.Identity.IdentityModel;
-using Masa.Contrib.BasicAbility.Tsc;
 using Masa.Stack.Components;
+using Masa.Tsc.Admin.Rcl;
 using Masa.Tsc.Caller;
-using Masa.Tsc.Caller.Extensions;
+using Masa.Tsc.Contracts.Admin;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddObservable();
 
 // Add services to the container.
 builder.Services.AddScoped<TscCaller>();
@@ -33,52 +30,12 @@ builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
     options.Environment = "environment";
     options.UserName = "name";
     options.UserId = "sub";
-});
-builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", builder.Configuration["AuthServiceBaseAddress"]);
+})
+.AddMasaStackComponentsForServer("wwwroot/i18n", builder.Configuration["AuthServiceBaseAddress"], builder.Configuration["AuthServiceBaseAddress"])
 //builder.Services.AddMasaOpenIdConnect(builder.Configuration);
+;
 
-string otlpUri = builder.Configuration.GetSection("otlpUri").Value;
-var resources = ResourceBuilder.CreateDefault();
-resources.AddMasaService(builder.Configuration.GetSection("masa:tsc").Get<MasaObservableOptions>());
 
-//metrics
-builder.Services.AddMasaMetrics(builder =>
-{
-    builder.SetResourceBuilder(resources);
-    builder.AddOtlpExporter(option =>
-    {
-        option.Endpoint = new Uri(otlpUri);
-    });
-});
-
-//trcaing
-builder.Services.AddMasaTracing(configure =>
-{
-    configure.AspNetCoreInstrumentationOptions.AppendBlazorFilter(configure);
-    configure.BuildTraceCallback = builder =>
-    {
-        builder.SetResourceBuilder(resources);
-        builder.AddOtlpExporter(option =>
-        {
-            option.Endpoint = new Uri(otlpUri);
-        });
-    };
-});
-
-//logging
-builder.Logging.AddOpenTelemetry(builder =>
-{
-    builder.SetResourceBuilder(resources);
-    builder.IncludeScopes = true;
-    builder.IncludeFormattedMessage = true;
-    builder.ParseStateValues = true;
-    builder.AddOtlpExporter(option =>
-    {
-        option.Endpoint = new Uri(otlpUri);
-    });
-});
-
-builder.Services.AddTscApiCaller(builder.Configuration["masa:tsc:apiUrl"]);
 
 var app = builder.Build();
 

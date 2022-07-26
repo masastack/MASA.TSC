@@ -1,5 +1,104 @@
 ﻿@page "/setting"
+@inherits TscComponentBase
+
+<MCard>
+    <MCardTitle>Global Setting</MCardTitle>
+    <MCardText>
+        @if (Setting == null)
+        {
+            <span>Loading ...</span>
+        }
+        else
+        {
+            <MRow>
+                <MCol Cols="1" Class="my-2">Language:</MCol>
+                <MCol Cols="1"><MAutocomplete Dense Items="_langs" @bind-Value="Setting.Language" ItemValue="@(value=>value.Key)" ItemText="@(value=>value.Value)" TItem="KeyValuePair<string,string>" TValue=string TItemValue=string></MAutocomplete></MCol>
+            </MRow>
+            <MRow>
+                <MCol Cols="1" Class="my-2">TimeZone:</MCol>
+                <MCol Cols="2" Class="d-flex justify-start pa-0 ma-0">
+                    <MSelect Dense @bind-Value="Setting.TimeZone" Items="_timeZones" Class="ma-0 pa-0" ItemValue="@(value=>value.Key)" ItemText="@(value=>value.Value)" TValue="short" TItemValue="short" TItem="KeyValuePair<short,string>"></MSelect>
+                    <MSelect Dense @bind-Value="Setting.TimeZoneOffset" Items="_minites" Class="ma-0 pa-0" ItemValue="@(value=>value.Key)" ItemText="@(value=>value.Value.ToString())" TValue="short" TItemValue="short" TItem="KeyValuePair<short,int>"></MSelect>
+                </MCol>
+            </MRow>
+            <MRow>
+                <MCol Cols="1" Class="my-2">Refresh Time Interval:</MCol>
+                <MCol Cols="1">
+                    <MSelect @bind-Value="Setting.Interval" Items="_refreshTimes" ItemValue="@(value=>value.Key)" ItemText="@(value=>value.Value)" TValue="short" TItemValue="short" TItem="KeyValuePair<short,string>"></MSelect>
+                </MCol>
+            </MRow>
+            <MRow>
+                <MCol Cols="1" Class="my-2">Enable Auto Refresh:</MCol>
+                <MCol Cols="1">
+                    <MCheckbox Context="_autoReshText" @bind-Value="Setting.IsEnable" Label="@(Setting.IsEnable?"Enable":"Disable")"></MCheckbox>
+                </MCol>
+            </MRow>
+            <MRow>
+                <MCol Cols="2" Class="d-flex justify-center"><MButton OnClick="SaveAsync">Save</MButton></MCol>
+            </MRow>
+        }
+    </MCardText>
+</MCard>
 
 @code {
+    private List<KeyValuePair<short, string>> _timeZones = new List<KeyValuePair<short, string>>
+    {
+        KeyValuePair.Create((short)-11,"西11区"),
+        KeyValuePair.Create((short)-10,"西10区"),
+        KeyValuePair.Create((short)-9,"西9区"),
+        KeyValuePair.Create((short)-8,"西8区"),
+        KeyValuePair.Create((short)-7,"西7区"),
+        KeyValuePair.Create((short)-6,"西6区"),
+        KeyValuePair.Create((short)-5,"西5区"),
+        KeyValuePair.Create((short)-4,"西4区"),
+        KeyValuePair.Create((short)-3,"西3区"),
+        KeyValuePair.Create((short)-2,"西2区"),
+        KeyValuePair.Create((short)-1,"西1区"),
+        KeyValuePair.Create((short)0,"0区"),
+        KeyValuePair.Create((short)1,"东1区"),
+        KeyValuePair.Create((short)2,"东2区"),
+        KeyValuePair.Create((short)3,"东3区"),
+        KeyValuePair.Create((short)4,"东4区"),
+        KeyValuePair.Create((short)5,"东5区"),
+        KeyValuePair.Create((short)6,"东6区"),
+        KeyValuePair.Create((short)7,"东7区"),
+        KeyValuePair.Create((short)8,"东8区"),
+        KeyValuePair.Create((short)9,"东9区"),
+        KeyValuePair.Create((short)10,"东10区"),
+        KeyValuePair.Create((short)11,"东11区"),
+    };
 
+    private List<KeyValuePair<short, int>> _minites = new List<KeyValuePair<short, int>>
+    {
+        KeyValuePair.Create((short)0,0),
+        KeyValuePair.Create((short)5,5),
+        KeyValuePair.Create((short)10,10),
+        KeyValuePair.Create((short)15,15),
+        KeyValuePair.Create((short)20,20),
+        KeyValuePair.Create((short)25,25),
+        KeyValuePair.Create((short)30,30)
+    };
+
+    private List<KeyValuePair<short, string>> _refreshTimes = new List<KeyValuePair<short, string>>
+    {
+        KeyValuePair.Create((short)5,"5s"),
+        KeyValuePair.Create((short)10,"10s"),
+        KeyValuePair.Create((short)15,"15s"),
+        KeyValuePair.Create((short)30,"30s"),
+        KeyValuePair.Create((short)60,"1min"),
+        KeyValuePair.Create((short)300,"5min"),
+        KeyValuePair.Create((short)600,"10min")
+    };
+
+    private List<KeyValuePair<string, string>> _langs = new List<KeyValuePair<string, string>>
+    {
+        KeyValuePair.Create("zh-cn","Chinese Simaple"),
+        KeyValuePair.Create("en-us","English")
+    };
+
+    private async Task SaveAsync()
+    {
+        await ApiCaller.SettingService.SetAsync(Setting);
+        await PopupService.AlertAsync("Success", AlertTypes.Success);
+    }
 }

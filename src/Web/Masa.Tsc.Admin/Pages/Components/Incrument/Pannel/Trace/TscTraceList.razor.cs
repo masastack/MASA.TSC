@@ -1,11 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Components.Web;
-
 namespace Masa.Tsc.Admin.Rcl.Pages.Components;
 
-public partial class TscTraceList : Shared.TscComponentBase
+public partial class TscTraceList : TscComponentBase
 {
     [Parameter]
     public RequestTraceListDto Query { get; set; } = default!;
@@ -46,6 +44,11 @@ public partial class TscTraceList : Shared.TscComponentBase
         }
     };
 
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+
     private async Task OpenAsync(Dictionary<string, object> item)
     {
         _selectTraceId = GetDictionaryValue(item, "trace.id").ToString()!;
@@ -61,16 +64,6 @@ public partial class TscTraceList : Shared.TscComponentBase
             await QueryAsync();
         }
         await base.OnAfterRenderAsync(firstRender);
-    }
-
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-    }
-
-    protected override Task OnParametersSetAsync()
-    {
-        return base.OnParametersSetAsync();
     }
 
     private async Task OnUpdateOptionsAsync(DataOptions options)

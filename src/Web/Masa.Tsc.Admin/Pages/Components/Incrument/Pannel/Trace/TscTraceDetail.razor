@@ -30,7 +30,7 @@
         <MRow>
             <MCol Cols="12" Class="d-flex justify-start">
                 <MCard Class="yellow rounded-md-1 body-2 ml-2  pt-1 px-6 rounded-md-1 blue-grey darken-1 white-text" Height="28">起始点 </MCard>
-                <MCard Class="pl-2 pt-1 body-1" style="background:none" Height="28">@FormatDateTime(_overView.Start)</MCard>
+                <MCard Class="pl-2 pt-1 body-1" style="background:none" Height="28">@_overView.Start.Format(CurrentTimeZone)</MCard>
                 <MCard Class="yellow rounded-md-1 body-2 ml-2  pt-1 px-6 rounded-md-1 blue-grey darken-1 white-text" Height="28">时间</MCard>
                 <MCard Class="pl-2 pt-1 body-1" style="background:none" Height="28">@_overView.TimeUsString</MCard>
                 <MCard Class="yellow rounded-md-1 body-2 ml-2  pt-1 px-6 rounded-md-1 blue-grey darken-1 white-text" Height="28">跨度</MCard>

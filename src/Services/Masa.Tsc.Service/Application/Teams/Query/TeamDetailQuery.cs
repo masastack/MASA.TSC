@@ -4,11 +4,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Teams;
 
-public record TeamDetailQuery : Query<TeamDto>
+public record TeamDetailQuery(Guid TeamId, string AppId) : Query<TeamDto>
 {
-    public Guid Id { get; set; }
-
-    public string AppId { get; set; }
-
     public override TeamDto Result { get; set; }
 }

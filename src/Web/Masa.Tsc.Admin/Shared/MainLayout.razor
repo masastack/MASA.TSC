@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Components.Rendering
 @inherits LayoutComponentBase
 
+ <CascadingValue Value="I18n">
 <MApp>
     <MAppBar Elevation=0 App MaxHeight=60 Color="white" Class="m-bar--underline pl-2">
         <MSpacer></MSpacer>
@@ -72,6 +73,7 @@
         </MContainer>
     </MMain>
 </MApp>
+</CascadingValue>
 
 @*<Layout AppId="Masa-Pm-Web"
     UserCenterRoute="/user"
@@ -81,3 +83,9 @@
     @Body
     </MErrorHandler>
     </Layout>*@
+
+    @code
+    {
+         [Inject]
+         private BlazorComponent.I18n.I18n I18n { get; set; } = null!;
+    }

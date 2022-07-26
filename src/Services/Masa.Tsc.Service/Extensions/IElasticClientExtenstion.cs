@@ -7,7 +7,7 @@ namespace Masa.Tsc.Service.Admin;
 
 internal class IElasticClientExtenstion
 {
-    public static IAggregationContainer Aggregation(AggregationContainerDescriptor<object> aggContainer, IEnumerable<RequestFieldAggregationDto> FieldMaps, string? inertval = null, bool isDesc = true, string sortField = null)
+    public static IAggregationContainer Aggregation(AggregationContainerDescriptor<object> aggContainer, IEnumerable<RequestFieldAggregationDto> FieldMaps, string? inertval = null, bool isDesc = true, string? sortField = null)
     {
         if (FieldMaps == null || !FieldMaps.Any())
             return aggContainer;
@@ -39,7 +39,7 @@ internal class IElasticClientExtenstion
                     break;
                 case AggregationTypes.Histogram:
                     {
-                        aggContainer.Histogram(item.Alias, agg => agg.Field(item.Name).Interval(double.Parse(inertval)).Order(isDesc ? HistogramOrder.KeyDescending : HistogramOrder.KeyAscending));
+                        aggContainer.Histogram(item.Alias, agg => agg.Field(item.Name).Interval(Convert.ToDouble(inertval)).Order(isDesc ? HistogramOrder.KeyDescending : HistogramOrder.KeyAscending));
                     }
                     break;
                 case AggregationTypes.DateHistogram:

@@ -19,4 +19,10 @@ public static class DateTimeExtensions
             offset = DateTimeOffset.FromUnixTimeSeconds(timestamp);
         return offset.DateTime;
     }
+
+    public static string Format(this DateTime time, TimeZoneInfo timeZone, string fmt = "yyyy-MM-dd HH:mm:ss")
+    {
+        time = TimeZoneInfo.ConvertTime(time, timeZone);
+        return time.ToString(fmt);
+    }
 }

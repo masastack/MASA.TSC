@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 using Masa.Contrib.Data.Contracts.EF;
-using Masa.Contrib.Data.EntityFrameworkCore.SqlServer;
+using Masa.Tsc.Service.Admin;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,6 +87,13 @@ var app = builder.Services
                 .UseRepository<TscDbContext>();
      })
     .AddServices(builder);
+
+
+app.MigrateDbContext<TscDbContext>((context, services) =>
+{
+    //var logger = services.GetRequiredService<ILogger<TscDbContext>>();
+    //new AuthDbContextSeed().SeedAsync(context, logger).Wait();
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

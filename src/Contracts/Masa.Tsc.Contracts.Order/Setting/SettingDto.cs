@@ -5,15 +5,15 @@ namespace Masa.Tsc.Contracts.Admin;
 
 public class SettingDto
 {
-    public string Langauge { get; set; }
+    public string Language { get; set; }
 
     public bool IsEnable { get; set; }
 
-    public byte TimeZone { get; set; }
+    public short TimeZone { get; set; }
 
-    public int TimeZoneOffset { get; set; }
+    public short TimeZoneOffset { get; set; }
 
-    public int Interval { get; set; }
+    public short Interval { get; set; }
 
     public Guid UserId { get; set; }
 }

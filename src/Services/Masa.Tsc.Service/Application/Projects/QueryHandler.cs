@@ -28,27 +28,26 @@ public class QueryHandler
     {
         var result = new List<ProjectDto>();
         var list = new List<int>();
-        foreach (var id in teamIds)
-        {
-            var projects = await _pmClient.ProjectService.GetListByTeamIdAsync(id);
-            if (projects == null || !projects.Any())
-                continue;
-            foreach (var project in projects)
-            {
-                if (list.Contains(project.Id))
-                    continue;
 
-                list.Add(project.Id);
-                result.Add(new ProjectDto
-                {
-                    Id = project.Id.ToString(),
-                    Identity = project.Identity,
-                    Name = project.Name,
-                    Description = project.Description,
-                    LabelName = project.LabelName
-                });
-            }
+        var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(teamIds);
+        if (projects == null || !projects.Any())
+            return result;
+        foreach (var project in projects)
+        {
+            if (list.Contains(project.Id))
+                continue;
+
+            list.Add(project.Id);
+            result.Add(new ProjectDto
+            {
+                Id = project.Id.ToString(),
+                Identity = project.Identity,
+                Name = project.Name,
+                Description = project.Description,
+                LabelName = project.LabelName
+            });
         }
+
         return result;
     }
 

@@ -13,7 +13,7 @@ services:
     image: ${DOCKER_REGISTRY-}masapmserviceadmin
     build:
       context: .
-      dockerfile: src/Services/Masa.Tsc.Service.Admin/Dockerfile
+      dockerfile: src/Services/Masa.Tsc.Service/Dockerfile
 
   masa.tsc.ui.admin:
     image: ${DOCKER_REGISTRY-}masatscuiadmin

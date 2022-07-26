@@ -5,5 +5,4 @@ namespace Masa.Tsc.Service.Admin.Domain.Repositories;
 
 public interface ISettingRepository : IRepository<Setting>
 {
-
 }

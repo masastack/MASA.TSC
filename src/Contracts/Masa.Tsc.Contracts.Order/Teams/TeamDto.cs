@@ -21,6 +21,6 @@ public class TeamDto
 
     public ProjectDto CurrentProject { get; set; }
 
-    public Guid CurrentAppId { get; set; }
+    public string CurrentAppId { get; set; }
 }
 

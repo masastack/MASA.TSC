@@ -5,30 +5,25 @@ namespace Masa.Tsc.Caller;
 
 public class TscCaller
 {
-    private readonly ICallerProvider _caller;
-    private readonly AppService _appService;
-    private readonly ProjectService _projectService;
-    private readonly TeamService _teamService;
-    private readonly LogService _logService;
-    private readonly TraceService _traceService;
-
     public TscCaller(ICallerProvider caller)
     {
-        _caller = caller;
-        _appService = new AppService(caller);
-        _projectService = new ProjectService(caller);
-        _teamService = new TeamService(caller);
-        _logService = new LogService(caller);
-        _traceService=new TraceService(caller);
+        AppService = new AppService(caller);
+        ProjectService = new ProjectService(caller);
+        TeamService = new TeamService(caller);
+        LogService = new LogService(caller);
+        TraceService = new TraceService(caller);
+        SettingService = new SettingService(caller);
     }
 
-    public AppService AppService { get { return _appService; } }
+    public AppService AppService { get; private init; }
 
-    public ProjectService ProjectService { get { return _projectService; } }
+    public ProjectService ProjectService { get; private init; }
 
-    public TeamService TeamService { get { return _teamService; } }
+    public TeamService TeamService { get; private init; }
 
-    public LogService LogService { get { return _logService; } }
+    public LogService LogService { get; private init; }
 
-    public TraceService TraceService { get { return _traceService; } }
+    public TraceService TraceService { get; private init; }
+
+    public SettingService SettingService { get; private init; }
 }

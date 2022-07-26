@@ -12,25 +12,25 @@ public class CommandHandler
     }
 
     [EventHandler]
-    public async Task SetSettingAsync(SetSettingCommand command)
+    public async Task SetAsync(SetSettingCommand command)
     {
-        var find = await _settingRepository.FindAsync(m => m.UserId == command.Setting.UserId);
+        var find = await _settingRepository.FindAsync(m => m.UserId == command.UserId);
         if (find == null)
         {
             await _settingRepository.AddAsync(new Domain.Aggregates.Setting
             {
-                Interval = command.Setting.Interval,
-                IsEnable = command.Setting.IsEnable,
-                Language = command.Setting.Langauge,
-                TimeZone = command.Setting.TimeZone,
-                TimeZoneOffset = command.Setting.TimeZoneOffset,
-                UserId = command.Setting.UserId
+                Interval = command.Interval,
+                IsEnable = command.IsEnable,
+                Language = command.Language,
+                TimeZone = command.TimeZone,
+                TimeZoneOffset = command.TimeZoneOffset,
+                UserId = command.UserId
             });
         }
         else
         {
-            find.Update(command.Setting.Langauge, command.Setting.Interval, command.Setting.IsEnable, command.Setting.TimeZone, command.Setting.TimeZoneOffset);
+            find.Update(command.Language, command.Interval, command.IsEnable, command.TimeZone, command.TimeZoneOffset);
             await _settingRepository.UpdateAsync(find);
         }
-    }
+    }   
 }

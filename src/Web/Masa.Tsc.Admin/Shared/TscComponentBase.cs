@@ -15,17 +15,7 @@ public class TscComponentBase : ComponentBase
     public TscCaller ApiCaller { get; set; }
 
     [Parameter]
-    public SettingDto Setting { get; set; } = new()
-    {
-        IsEnable = false,
-        Langauge = "zh-cn",
-        TimeZone = (byte)8,
-        UserId = Guid.Empty
-    };
-
-    public Guid CurrentUserId { get; set; }
-
-    public TimeZoneInfo CurrentTimeZone { get; set; } = TimeZoneInfo.Utc;
+    public SettingDto Setting { get; set; }
 
     private static List<KeyValuePair<int, string>> _durations = new List<KeyValuePair<int, string>>
     {
@@ -42,14 +32,34 @@ public class TscComponentBase : ComponentBase
         KeyValuePair.Create(7*24*60,"最近1周"),
     };
 
-    public string FormatDateTime(DateTime? time, string fmt = "yyyy-MM-dd HH:mm:ss", bool isConvertTimeZone = true)
-    {
-        if (!time.HasValue)
-            return default!;
+    public Guid CurrentUserId { get; set; }
 
-        if (isConvertTimeZone)
-            time = TimeZoneInfo.ConvertTime(time.Value, CurrentTimeZone);
-        return time.Value.ToString(fmt);
+    public TimeZoneInfo CurrentTimeZone { get; set; }
+
+    protected virtual bool Loading { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Loading = true;
+        CurrentUserId = Guid.Parse("00000000-0000-0000-0000-000000000000");
+        Setting = await ApiCaller.SettingService.GetAsync(CurrentUserId);
+        if (string.IsNullOrEmpty(Setting.Language))
+        {
+            Setting = GetDefaultSetting(CurrentUserId);
+        }
+        else
+        {
+            Setting.UserId = CurrentUserId;
+        }
+        CurrentTimeZone = GetTimeZone();
+        Loading = false;
+        await base.OnInitializedAsync();
+    }
+
+    private TimeZoneInfo GetTimeZone()
+    {
+        string id = $"{Setting.TimeZone}:{Setting.TimeZoneOffset}", name = $"timeZone:{Setting.TimeZone},{id},lang:{Setting.Language}";
+        return TimeZoneInfo.CreateCustomTimeZone(id, new TimeSpan(Setting.TimeZone, Setting.TimeZoneOffset, 0), name, name);
     }
 
     public static object GetDictionaryValue(object obj, string path)
@@ -84,11 +94,28 @@ public class TscComponentBase : ComponentBase
         return obj;
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    private static SettingDto GetDefaultSetting(Guid userId)
     {
-        Logger.LogInformation("OnAfterRender");
+        var timeOffset = TimeZoneInfo.Local.BaseUtcOffset;
+        short timeZone = (short)timeOffset.Hours, minite = (short)timeOffset.Minutes;
+        return new SettingDto
+        {
+            UserId = userId,
+            TimeZone = timeZone,
+            Language = GetLangByTimeZone(timeZone, minite),
+            TimeZoneOffset = minite
+        };
+    }
 
-        base.OnAfterRender(firstRender);
+    private static string GetLangByTimeZone(int timeZone, int minite)
+    {
+        switch (timeZone)
+        {
+            case 8:
+                return "zh-cn";
+            default:
+                return "en-us";
+        }
     }
 
     public static List<KeyValuePair<int, string>> TimeSeries { get { return _durations; } }
