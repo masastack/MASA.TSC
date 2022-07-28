@@ -3,8 +3,10 @@
 
 namespace Masa.Tsc.Admin.Rcl.Data.Trace;
 
-public class TraceTableLineModel
+public class TraceTableLineModel : TraceTimeUsModel
 {
+    public TraceTableLineModel() : base(1) { }
+
     public string Id { get; set; }
 
     public string ParentId { get; set; }
@@ -16,8 +18,6 @@ public class TraceTableLineModel
     public string ServiceName { get; set; }
 
     public DateTime Time { get; set; }
-
-    public long Ms { get; set; }
 
     public string Left { get; set; }
 

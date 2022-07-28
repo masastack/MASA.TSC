@@ -3,9 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Projects;
 
-public record AppsQuery : Query<List<AppDto>>
+public record AppsQuery(string ProjectId) : Query<List<AppDto>>
 {
-    public string ProjectId { get; set; }
-
     public override List<AppDto> Result { get; set; }
 }

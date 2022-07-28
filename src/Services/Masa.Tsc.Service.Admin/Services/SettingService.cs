@@ -8,7 +8,7 @@ public class SettingService : ServiceBase
     public SettingService(IServiceCollection services) : base(services, "/api/setting")
     {
         App.MapGet($"{BaseUri}/{{userId}}", GetAsync);
-        App.MapPost($"{BaseUri}/", SetAsync);
+        App.MapPost($"{BaseUri}", SetAsync);
     }
 
     private async Task SetAsync([FromServices] IEventBus eventBus, [FromBody] SettingDto setting)

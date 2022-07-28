@@ -7,15 +7,12 @@ public class AppService : ServiceBase
 {
     public AppService(IServiceCollection services) : base(services, "/api/app")
     {
-        App.MapGet($"{BaseUri}", GetAppsAsync);
+        App.MapGet($"{BaseUri}/list{{projectId}}", GetListAsync);
     }
 
-    public async Task<List<AppDto>> GetAppsAsync([FromServices] IEventBus eventBus, [FromQuery] string projectId)
+    public async Task<List<AppDto>> GetListAsync([FromServices] IEventBus eventBus, string projectId)
     {
-        var query = new AppsQuery
-        {
-            ProjectId = projectId
-        };
+        var query = new AppsQuery(projectId);
         await eventBus.PublishAsync(query);
         return query.Result;
     }

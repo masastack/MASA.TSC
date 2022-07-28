@@ -14,6 +14,6 @@ public class SettingService : BaseService
 
     public async Task SetAsync(SettingDto model)
     {
-        await Caller.PostAsync($"{RootPath}/", model);
+        await Caller.PostAsync($"{RootPath}", model);
     }
 }

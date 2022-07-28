@@ -5,9 +5,11 @@ namespace Masa.Tsc.Service.Admin.Domain.Aggregates;
 
 public class Directory : AggregateRoot<Guid>
 {
+    public Guid UserId { get; set; }
+
     public string Name { get; set; }
 
     public int Sort { get; set; }
 
-    public Guid? ParentId { get; set; }
+    public Guid ParentId { get; set; } = Guid.Empty;
 }

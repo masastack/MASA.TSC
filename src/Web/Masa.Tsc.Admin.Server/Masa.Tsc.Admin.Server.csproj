@@ -3,6 +3,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>f6cdf028-3564-47a5-a4fb-662685680853</UserSecretsId>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Masa.Contrib.BasicAbility.Auth" Version="0.5.0-rc.3" />

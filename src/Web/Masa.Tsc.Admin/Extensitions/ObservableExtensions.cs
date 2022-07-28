@@ -7,7 +7,7 @@ public static class ObservableExtensions
 {
     public static void AddObservable(this WebApplicationBuilder builder)
     {
-        {
+        
             string otlpUri = builder.Configuration.GetSection("otlpUri").Value;
             var resources = ResourceBuilder.CreateDefault();
             resources.AddMasaService(builder.Configuration.GetSection("masa:tsc").Get<MasaObservableOptions>());
@@ -51,6 +51,6 @@ public static class ObservableExtensions
             });
 
             builder.Services.AddTscApiCaller(builder.Configuration["masa:tsc:apiUrl"]);
-        }
+        
     }
 }

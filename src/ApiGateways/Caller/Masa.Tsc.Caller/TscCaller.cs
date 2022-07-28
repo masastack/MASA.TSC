@@ -13,6 +13,7 @@ public class TscCaller
         LogService = new LogService(caller);
         TraceService = new TraceService(caller);
         SettingService = new SettingService(caller);
+        DirectoryService = new DirectoryService(caller);
     }
 
     public AppService AppService { get; private init; }
@@ -26,4 +27,6 @@ public class TscCaller
     public TraceService TraceService { get; private init; }
 
     public SettingService SettingService { get; private init; }
+
+    public DirectoryService DirectoryService { get; private init; }
 }

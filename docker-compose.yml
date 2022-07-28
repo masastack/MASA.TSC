@@ -8,18 +8,33 @@ services:
      environment:
       - SA_PASSWORD=P@ssw0rd
       - ACCEPT_EULA=Y
+     deploy:
+       resources:
+         limits: 
+           cpus: '0.5'
+           memory: 1G
 
   masa.tsc.service.admin:
     image: ${DOCKER_REGISTRY-}masapmserviceadmin
     build:
       context: .
-      dockerfile: src/Services/Masa.Tsc.Service/Dockerfile
+      dockerfile: src/Services/Masa.Tsc.Service.Admin/Dockerfile
+    deploy:
+       resources:
+         limits: 
+           cpus: '0.5'
+           memory: 500M
 
   masa.tsc.ui.admin:
     image: ${DOCKER_REGISTRY-}masatscuiadmin
     build:
       context: .
       dockerfile: src/Web/Masa.Tsc.Admin.Server/Dockerfile
+    deploy:
+       resources:
+         limits: 
+           cpus: '0.5'
+           memory: 500M
 
   dapr-placement:
     image: "daprio/dapr:1.7.1"

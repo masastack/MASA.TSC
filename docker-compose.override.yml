@@ -12,10 +12,10 @@ services:
   masa.tsc.service.admin:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:18011
     ports:
-      - "80"
-      - "443"
+      - "18011:18011"
+      - "18010:18010"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
@@ -24,7 +24,7 @@ services:
     image: "daprio/daprd:1.7.1"
     command: ["./daprd",
       "-app-id", "masa-tsc-service-admin",
-      "-app-port", "80",
+      "-app-port", "18011",
       "-components-path", "/components"
       ]
     depends_on:
@@ -36,8 +36,10 @@ services:
   masa.tsc.ui.admin:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:18013
     ports:
-      - "80"
+      - "18013:18013"
+      - "18012:18012"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
     depends_on:

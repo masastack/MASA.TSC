@@ -23,25 +23,9 @@ public partial class TscTraceSearch
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        CheckTime();
-        _services = (await ApiCaller.TraceService.GetAttrValuesAsync(new RequestAttrDataDto
-        {
-            End = TimeZoneInfo.ConvertTime(_end.Value, CurrentTimeZone),
-            Start = TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone),
-            Name = "service.name",
-            Max = 10
-        })).ToList();
         _instances = new List<string>();
         _endpoints = new List<string>();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await SearchAsync();
-        }
-        await base.OnAfterRenderAsync(firstRender);
+        await SearchAsync();
     }
 
     private async Task UpdateSearchInputAsync(int type, string val)
@@ -133,9 +117,17 @@ public partial class TscTraceSearch
 
     private async Task SearchAsync()
     {
+        CheckTime();
+        _services = (await ApiCaller.TraceService.GetAttrValuesAsync(new RequestAttrDataDto
+        {
+            End = TimeZoneInfo.ConvertTime(_end.Value, CurrentTimeZone),
+            Start = TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone),
+            Name = "service.name",
+            Max = 10
+        })).ToList();        
+
         if (OnSearchAsync is not null)
         {
-            CheckTime();
             await OnSearchAsync.Invoke(_service, _instance, _endpoint, _keyword, TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone), TimeZoneInfo.ConvertTime(_end.Value, CurrentTimeZone));
         }
     }

@@ -43,4 +43,8 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Components\Incrument\Pannel\Directory\" />
+  </ItemGroup>
+
 </Project>

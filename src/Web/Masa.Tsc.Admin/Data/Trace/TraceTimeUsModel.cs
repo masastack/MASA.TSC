@@ -16,31 +16,61 @@ public class TraceTimeUsModel
 
     public int Unit { get; private set; } = 1;
 
-    public long TimeUs { get; set; }
+    private long _timeUs;
+    public long TimeUs
+    {
+        get { return _timeUs; }
+        set
+        {
+            _timeUs = value;
+            SetDisplay();
+        }
+    }
 
+    private int _unit;
+    private string _unitStr;
 
     public string TimeUsString
     {
         get
         {
-            double duration = TimeUs * Unit;
-            double result = Math.Round(duration * 1.0 / MS, 3);
-            if (duration - 1 < 0)
-                return $"{duration}us";
-
-            duration = result;
-            result = Math.Round(duration * 1.0 / S, 3);
-            if (result - 1 < 0)
-                return $"{duration}ms";
-
-            duration = result;
-            result = Math.Round(duration * 1.0 / Min, 3);
-            if (result - 1 < 0)
-                return $"{duration}s";
-
-            //result = Math.Round(duration * 1.0 / Min, 3);
-            //if (result - MS < 0)
-            return $"{result}min";
+            double duration = TimeUs * Unit * 1.0 / _unit;
+            return $"{Math.Round(duration, FloorLength)}{_unitStr}";
         }
+    }
+
+    public int FloorLength { get; set; } = 3;
+
+    private void SetDisplay()
+    {
+        double duration = TimeUs * Unit;
+        double result = Math.Round(duration * 1.0 / MS, 3);
+        if (duration - 1 < 0)
+        {
+            _unitStr = "us";
+            _unit = 1;
+            return;
+        }
+
+        duration = result;
+        result = Math.Round(duration * 1.0 / S, 3);
+        if (result - 1 < 0)
+        {
+            _unitStr = "ms";
+            _unit = MS;
+            return;
+        }
+
+        duration = result;
+        result = Math.Round(duration * 1.0 / Min, 3);
+        if (result - 1 < 0)
+        {
+            _unitStr = "s";
+            _unit = S;
+            return;
+        }
+
+        _unitStr = "min";
+        _unit = Min;
     }
 }

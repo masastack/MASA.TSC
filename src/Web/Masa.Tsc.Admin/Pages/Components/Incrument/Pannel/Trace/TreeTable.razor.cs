@@ -46,9 +46,10 @@ public partial class TreeTable
         return DateTime.Parse(dic["@timestamp"].ToString()!);
     };
     private IEnumerable<object> _items;
-    private Dictionary<string, TraceTableLineModel> _keyDeeps = new Dictionary<string, TraceTableLineModel>();
-    private Dictionary<string, List<string>> _dicChild = new Dictionary<string, List<string>>();
-    private TraceOverViewModel _overView = new TraceOverViewModel();
+    private Dictionary<string, TraceTableLineModel> _keyDeeps = new();
+    private Dictionary<string, List<string>> _dicChild = new();
+    private TraceOverViewModel _overView = new();
+    private List<TraceTimeUsModel> _timeLines = new();
     private bool _isLoading = true;
 
     protected override async Task OnParametersSetAsync()
@@ -58,14 +59,15 @@ public partial class TreeTable
         var parentIds = _keyDeeps.Keys;
         var data = _keyDeeps.Where(item => item.Value.IsTransaction && !_keyDeeps.Keys.Contains(item.Value.ParentId)).ToList();
         DateTime start = data.Min(item => item.Value.Time);
-        long total = data.Sum(item => item.Value.Ms);
+        long total = data.Sum(item => item.Value.TimeUs);
 
         SetOverView();
+        SetTimeLine();
+        SetTreeLine();
         if (OnOverViewUpdate != null)
         {
             await OnOverViewUpdate(_overView);
         }
-        SetTreeLine();
         _isLoading = false;
         await base.OnParametersSetAsync();
     }
@@ -82,11 +84,11 @@ public partial class TreeTable
             if (item.Value.IsTransaction)
             {
                 if (last != null)
-                    t_total += last.Ms;
+                    t_total += last.TimeUs;
                 last = item.Value;
             }
 
-            if (item.Value.Ms - total == 0)
+            if (item.Value.TimeUs - total == 0)
             {
                 left = 0;
                 width = 1;
@@ -96,7 +98,7 @@ public partial class TreeTable
             {
                 var t1 = last != null ? Math.Round((item.Value.Time - last.Time).TotalMilliseconds * 1000, 0) + t_total : 0;
                 left = Math.Round(t1 * 1.0 / total, 4);
-                width = Math.Round(item.Value.Ms * 1.0 / total, 4);
+                width = Math.Round(item.Value.TimeUs * 1.0 / total, 4);
                 right = 1 - left - width;
             }
 
@@ -135,7 +137,7 @@ public partial class TreeTable
                 Deep = deep,
                 IsTransaction = isTransaction,
                 ServiceName = name,
-                Ms = us
+                TimeUs = us
             };
 
             if (string.IsNullOrEmpty(parentId))
@@ -166,7 +168,7 @@ public partial class TreeTable
         _overView.Total = _items.Count();
         var data = _keyDeeps.Where(item => item.Value.IsTransaction && !_keyDeeps.ContainsKey(item.Value.ParentId)).ToList();
         DateTime start = data.Min(item => item.Value.Time);
-        long total = data.Sum(item => item.Value.Ms);
+        long total = data.Sum(item => item.Value.TimeUs);
         _overView.Start = start;
         _overView.TimeUs = total;
         _overView.Name = GetDictionaryValue(_items.First(), "transaction.name").ToString()!;
@@ -202,5 +204,25 @@ public partial class TreeTable
     {
         if (OnRowClick != null)
             await OnRowClick(item);
+    }
+
+    private void SetTimeLine()
+    {
+        var total = _overView.Total;
+        _timeLines.Clear();
+        var last = new TraceTimeUsModel(1)
+        {
+            TimeUs = total,
+        };
+
+        var item = total / 6;
+        int count = 5;       
+        do
+        {
+            _timeLines.Add(new TraceTimeUsModel(1) { TimeUs = item, FloorLength = 0 });
+            item += item;
+        }
+        while (_timeLines.Count - count < 0);
+        _timeLines.Add(last);        
     }
 }

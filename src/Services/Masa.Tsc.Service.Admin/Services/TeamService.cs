@@ -7,10 +7,10 @@ public class TeamService : ServiceBase
 {
     public TeamService(IServiceCollection services) : base(services, "/api/team")
     {
-        App.MapGet($"{BaseUri}", GetTeamAsync);
+        App.MapGet($"{BaseUri}/{{teamId}}/{{appid}}", GetAsync);
     }
 
-    private async Task<TeamDto> GetTeamAsync([FromServices] IEventBus eventBus, [FromQuery] string appId)
+    private async Task<TeamDto> GetAsync([FromServices] IEventBus eventBus, Guid teamId, string appId)
     {
         var teamQuery = new TeamDetailQuery(Guid.Empty, appId);
         await eventBus.PublishAsync(teamQuery);
