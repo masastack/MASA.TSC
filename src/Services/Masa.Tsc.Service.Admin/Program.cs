@@ -44,7 +44,7 @@ builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
     options.UserName = "name";
     options.UserId = "sub";
 });
-builder.Services.AddAuthClient(builder.Configuration["AuthServiceBaseAddress"]);
+builder.Services.AddAuthClient(builder.Configuration["Masa:AuthUrl"]);
 builder.Services.AddPmClient(builder.Configuration["Masa:PmUrl"]);
 
 var app = builder.Services

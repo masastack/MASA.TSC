@@ -9,13 +9,21 @@ public class DirectoryService : ServiceBase
     {
         App.MapPost($"{BaseUri}", AddAsync);
         App.MapPut($"{BaseUri}", UpdateAsync);
-        App.MapDelete($"{BaseUri}/tree/{{id}}/{{userId}}", DeleteAsync);
-        App.MapGet($"{BaseUri}/tree/{{userId}}", GetTreeAsync);
+        App.MapDelete($"{BaseUri}/{{id}}/{{userId}}", DeleteAsync);
+        App.MapGet($"{BaseUri}/{{userId}}/{{id}}", GetAsync);
+        App.MapGet($"{BaseUri}/tree/{{userId}}/", GetTreeAsync);
     }
 
     public async Task<IEnumerable<DirectoryTreeDto>> GetTreeAsync([FromServices] IEventBus eventBus, Guid userId)
     {
         var query = new DirectoryTreeQuery(userId);
+        await eventBus.PublishAsync(query);
+        return query.Result;
+    }
+
+    public async Task<DirectoryDto> GetAsync([FromServices] IEventBus eventBus, Guid userId, Guid id)
+    {
+        var query = new DirectoryQuery(id, userId);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
@@ -32,7 +40,7 @@ public class DirectoryService : ServiceBase
         await eventBus.PublishAsync(query);
     }
 
-    public async Task DeleteAsync([FromServices] IEventBus eventBus, Guid id,Guid userId)
+    public async Task DeleteAsync([FromServices] IEventBus eventBus, Guid id, Guid userId)
     {
         var query = new RemoveDirectoryCommand(id, userId);
         await eventBus.PublishAsync(query);

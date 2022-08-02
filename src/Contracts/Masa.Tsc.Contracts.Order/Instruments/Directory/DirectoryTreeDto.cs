@@ -5,5 +5,11 @@ namespace Masa.Tsc.Contracts.Admin;
 
 public class DirectoryTreeDto : DirectoryDto
 {
-    public IEnumerable<DirectoryDto> Children { get; set; }
+    public DirectoryTypes DirectoryType { get; set; } = DirectoryTypes.Directory;
+
+    public bool Expand { get; set; }
+
+    public bool Selected { get; set; }
+
+    public IEnumerable<DirectoryTreeDto> Children { get; set; }
 }

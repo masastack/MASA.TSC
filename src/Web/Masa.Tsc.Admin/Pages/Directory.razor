@@ -1,0 +1,67 @@
+﻿@namespace Masa.Tsc.Admin.Rcl.Pages
+@inherits TscComponentBase
+@page "/dashbord/directory"
+
+<MContainer>
+    <MRow Class="mb-4 rounded-xl white">
+        <MCol Cols=8 Class="pa-2">
+            <MCardText Class="d-flex">
+                <SearchTextField @bind-Value="_keyword" Dense Outlined></SearchTextField>
+            </MCardText>
+        </MCol>
+        <MCol Cols=4 Class="d-flex justify-end mt-4">
+            <MButton OnClick="AddDirectory" Color="blue white--text"><MIcon Small Color="white--text">add</MIcon>Add Directory</MButton>
+            <MButton OnClick="AddInstrument" Class="blue white--text ml-2"><MIcon Small Color="text-white">add</MIcon>Add Instrument</MButton>
+            <MButton OnClick="LoadDataAsync" Class="ml-2 mr-4"><MIcon>autorenew</MIcon></MButton>
+        </MCol>
+    </MRow>
+    <MRow Class="rounded-xl white px-4 py-2">
+        <MCol Cols=12>
+            <MRow>
+                <MCol Cols=12>                   
+                    <MTabs ValueChanged="OnExpandChangeAsync">
+                        <MTab ActiveClass="gray" Class="gray--text white border-gray-thcik-all" Value="1"><MIcon Small>format_list_bulleted</MIcon> Expand</MTab>
+                        <MTab ActiveClass="gray" Class="gray--text white border-gray-thcik-all" Value="0"><MIcon Small>calendar_view_week</MIcon> Export</MTab>
+                    </MTabs>
+                </MCol>
+            </MRow>
+            <MRow>
+                <MCol Cols=12>
+                    @if (_isLoading)
+                    {
+                        @("Loading ...")
+                    }
+                    else
+                    {
+                        <TscDirectoryTreeTable Expand="_expand" Data="@(_searchData.Any()?_searchData:_data)"
+                                           OnUpdateAsync="OpenUpdateAsync" OnDeleteAsync="RemoveDirectoryAsync" OnRowSelected="OnRowSelectedAsync" />
+                    }
+                </MCol>
+            </MRow>
+        </MCol>
+    </MRow>
+
+</MContainer>
+
+<MDialog @bind-Value="_showDialog" Width="480">
+    <ChildContent>
+        <MCard>
+            <MCardTitle>
+                <MRow>
+                    <MCol Cols=9>@_title</MCol>
+                    <MCol Cols=3 Class="d-flex justify-end"><MIcon OnClick="()=>_showDialog=false" Class="justify-end">mdi-close</MIcon></MCol>
+                </MRow>
+            </MCardTitle>
+            <MCardText>
+                @if (_current.DirectoryType == DirectoryTypes.Directory)
+                {
+                    <DirectoryDetail Id="@(_isUpdate?_current.Id:Guid.Empty)" ParentId="@(_isUpdate?_current.ParentId:_current.Id)" ParentName="@GetParentName(_data)" SuccessFn="AddUpdateCallback"></DirectoryDetail>
+                }
+                else
+                {
+                    <DirectoryDetail Id="_current.Id" ParentId="_current.ParentId"></DirectoryDetail>
+                }
+            </MCardText>
+        </MCard>
+    </ChildContent>
+</MDialog>

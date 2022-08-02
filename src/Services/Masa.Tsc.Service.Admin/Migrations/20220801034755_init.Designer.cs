@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Masa.Tsc.Service.Admin.Migrations
 {
     [DbContext(typeof(TscDbContext))]
-    [Migration("20220726003638_init_02")]
-    partial class init_02
+    [Migration("20220801034755_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -75,6 +75,35 @@ namespace Masa.Tsc.Service.Admin.Migrations
                     b.ToTable("IntegrationEventLog", "tsc");
                 });
 
+            modelBuilder.Entity("Masa.Tsc.Service.Admin.Domain.Aggregates.Directory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Sort")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Directory", "tsc");
+                });
+
             modelBuilder.Entity("Masa.Tsc.Service.Admin.Domain.Aggregates.Setting", b =>
                 {
                     b.Property<Guid>("Id")
@@ -97,8 +126,8 @@ namespace Masa.Tsc.Service.Admin.Migrations
                     b.Property<short>("TimeZone")
                         .HasColumnType("smallint");
 
-                    b.Property<int>("TimeZoneOffset")
-                        .HasColumnType("int");
+                    b.Property<short>("TimeZoneOffset")
+                        .HasColumnType("smallint");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");

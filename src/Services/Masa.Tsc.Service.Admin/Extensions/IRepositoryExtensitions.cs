@@ -5,25 +5,25 @@ namespace Masa.BuildingBlocks.Ddd.Domain.Repositories;
 
 public static class IRepositoryExtensitions
 {
-    private static Dictionary<Type, PropertyInfo> _dic = new Dictionary<Type, PropertyInfo>();
+    private static Dictionary<Type, PropertyInfo> _dic = new();
 
     public static IQueryable<T> ToQueryable<T>(this IRepository<T> repository) where T : class, IEntity
     {
         var type = repository.GetType();
-        PropertyInfo property = default!;
+        PropertyInfo property;
         if (_dic.ContainsKey(type))
         {
-            property=_dic[type];
+            property = _dic[type];
         }
         else
         {
-            property = type.GetProperty("Context")!;
+            property = type.GetProperty("Context", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetProperty)!;
             _dic.Add(type, property);
         }
-        
+
         if (property != null)
         {
-            if (property.GetValue(repository, null) is DbContext dbContext)
+            if (property.GetValue(repository, default) is DbContext dbContext)
                 return dbContext.Set<T>().AsQueryable();
         }
 

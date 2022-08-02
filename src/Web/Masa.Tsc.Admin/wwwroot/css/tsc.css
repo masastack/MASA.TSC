@@ -76,6 +76,10 @@
     margin-left: 64px;
 }
 
+.border-gray-thcik-all {
+    border: solid 1px gray;
+}
+
 .border-gray-thcik {
     border:solid 1px gray;
     border-top:none
@@ -129,4 +133,8 @@
 
 .fa-file-check:before {
     content: '\f136'
+}
+
+.fa-plus:before {
+content:'\2b'
 }

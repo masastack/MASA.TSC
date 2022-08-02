@@ -11,12 +11,8 @@ public class TscDbContext : MasaDbContext
 
     protected override void OnModelCreatingExecuting(ModelBuilder builder)
     {
-
         builder.HasDefaultSchema("tsc");
-        builder.ApplyConfiguration(new SettingEntityTypeConfiguration());
-
-        builder.ApplyConfigurationsFromAssembly(Assembly.GetEntryAssembly()!);
-
+        builder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(typeof(TscDbContext))!);
         base.OnModelCreatingExecuting(builder);
     }
 }
