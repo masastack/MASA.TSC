@@ -3,8 +3,10 @@
 
 namespace Masa.Tsc.Service.Admin.Domain.Aggregates;
 
-public class Pannel:AggregateRoot<Guid>
+public class Pannel : AggregateRoot<Guid>
 {
+    public Instrument Instrument { get; set; }
+
     public Guid InstrumentId { get; set; }
 
     public string Title { get; set; }
@@ -27,7 +29,17 @@ public class Pannel:AggregateRoot<Guid>
 
     public Guid ParentId { get; set; }
 
+    public string ChartType { get; set; }
+
     public List<Pannel> Pannels { get; set; }
 
     public List<Metric> Metrics { get; set; }
+
+    public void AddPannel() { }
+
+    public void RemovePannel() { }
+
+    public void AddMetric() { }
+
+    public void RemoveMetric() { }
 }

@@ -5,6 +5,8 @@ namespace Masa.Tsc.Service.Admin.Domain.Aggregates;
 
 public class Metric : AggregateRoot<Guid>
 {
+    public Pannel Pannel { get; set; }
+
     public Guid PannelId { get; set; }
 
     public string Name { get; set; }
@@ -14,4 +16,6 @@ public class Metric : AggregateRoot<Guid>
     public string Unit { get; set; }
 
     public string Value { get; set; }
+
+    public int Sort { get; set; }
 }

@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Admin.Rcl.Shared;
 
-public class TscComponentBase : ComponentBase
+public class TscComponentBase : BComponentBase
 {
     [Inject]
     public ILogger<TscComponentBase> Logger { get; set; }

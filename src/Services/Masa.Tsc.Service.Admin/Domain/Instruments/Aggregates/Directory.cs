@@ -12,4 +12,6 @@ public class Directory : AggregateRoot<Guid>
     public int Sort { get; set; }
 
     public Guid ParentId { get; set; } = Guid.Empty;
+
+
 }

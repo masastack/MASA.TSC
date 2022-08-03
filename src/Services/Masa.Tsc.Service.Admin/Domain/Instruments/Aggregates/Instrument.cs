@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Domain.Aggregates;
 
-public class Instrument : AggregateRoot<Guid>
+public class Instrument : FullAggregateRoot<Guid, Guid>
 {
     public string Name { get; set; }
 
@@ -17,5 +17,11 @@ public class Instrument : AggregateRoot<Guid>
 
     public Guid DirectoryId { get; set; }
 
+    public bool IsGlobal { get; set; }
+
     public List<Pannel> Pannels { get; set; }
+
+    public void AddPannel() { }
+
+    public void RemovePannel() { }
 }
