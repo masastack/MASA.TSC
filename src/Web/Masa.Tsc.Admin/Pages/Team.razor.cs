@@ -40,7 +40,7 @@ public partial class Team
     }
 
     protected override async void OnAfterRender(bool firstRender)
-    {        
+    {
         if (_isLoad)
         {
             await LoadData();

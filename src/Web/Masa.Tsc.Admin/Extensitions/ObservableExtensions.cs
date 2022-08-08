@@ -7,50 +7,50 @@ public static class ObservableExtensions
 {
     public static void AddObservable(this WebApplicationBuilder builder)
     {
-        
-            string otlpUri = builder.Configuration.GetSection("otlpUri").Value;
-            var resources = ResourceBuilder.CreateDefault();
-            resources.AddMasaService(builder.Configuration.GetSection("masa:tsc").Get<MasaObservableOptions>());
-            var url = new Uri(otlpUri);
 
-            //metrics
-            builder.Services.AddMasaMetrics(builder =>
+        string otlpUri = builder.Configuration.GetSection("otlpUri").Value;
+        var resources = ResourceBuilder.CreateDefault();
+        resources.AddMasaService(builder.Configuration.GetSection("masa:tsc").Get<MasaObservableOptions>());
+        var url = new Uri(otlpUri);
+
+        //metrics
+        builder.Services.AddMasaMetrics(builder =>
+        {
+            builder.SetResourceBuilder(resources);
+            builder.AddOtlpExporter(option =>
+            {
+                option.Endpoint = url;
+            });
+        });
+
+        //trcaing
+        builder.Services.AddMasaTracing(configure =>
+        {
+            configure.AspNetCoreInstrumentationOptions.AppendBlazorFilter(configure);
+            configure.BuildTraceCallback = builder =>
             {
                 builder.SetResourceBuilder(resources);
                 builder.AddOtlpExporter(option =>
                 {
                     option.Endpoint = url;
                 });
-            });
+            };
+        });
 
-            //trcaing
-            builder.Services.AddMasaTracing(configure =>
+        //logging
+        builder.Logging.AddOpenTelemetry(builder =>
+        {
+            builder.SetResourceBuilder(resources);
+            builder.IncludeScopes = true;
+            builder.IncludeFormattedMessage = true;
+            builder.ParseStateValues = true;
+            builder.AddOtlpExporter(option =>
             {
-                configure.AspNetCoreInstrumentationOptions.AppendBlazorFilter(configure);
-                configure.BuildTraceCallback = builder =>
-                {
-                    builder.SetResourceBuilder(resources);
-                    builder.AddOtlpExporter(option =>
-                    {
-                        option.Endpoint = url;
-                    });
-                };
+                option.Endpoint = url;
             });
+        });
 
-            //logging
-            builder.Logging.AddOpenTelemetry(builder =>
-            {
-                builder.SetResourceBuilder(resources);
-                builder.IncludeScopes = true;
-                builder.IncludeFormattedMessage = true;
-                builder.ParseStateValues = true;
-                builder.AddOtlpExporter(option =>
-                {
-                    option.Endpoint = url;
-                });
-            });
+        builder.Services.AddTscApiCaller(builder.Configuration["masa:tsc:apiUrl"]);
 
-            builder.Services.AddTscApiCaller(builder.Configuration["masa:tsc:apiUrl"]);
-        
     }
 }

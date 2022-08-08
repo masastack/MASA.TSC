@@ -5,6 +5,6 @@ namespace Masa.Tsc.Contracts.Admin.Enums;
 
 public enum DirectoryTypes
 {
-    Directory=1,
+    Directory = 1,
     Instrument
 }

@@ -8,13 +8,13 @@ internal class MenuConfigs
     private static Dictionary<string, Tuple<string, string>> _menus = new();
 
     public static void Register()
-    { 
+    {
         //_menus.Add(new)
     }
 
     //public static void Register(string text, string url, string parent)
     //{
-    
+
     //}
 
     public static List<BreadcrumbItem> GetNavigations(string url)

@@ -11,7 +11,7 @@ public partial class TscTraceDetail
     private string _traceId = default!;
     private TraceDetailModel _selectItem;
     private TraceOverViewModel _overView = new TraceOverViewModel();
-    private List<TraceOverViewServiceModel> _services=new List<TraceOverViewServiceModel>();
+    private List<TraceOverViewServiceModel> _services = new List<TraceOverViewServiceModel>();
 
     [Parameter]
     public string TraceId { get { return _traceId; } set { _traceId = value; _tabIndex = "attr"; } }

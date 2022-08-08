@@ -3,6 +3,6 @@
 
 namespace Masa.Tsc.Service.Admin.Domain.Repositories;
 
-public interface IInstrumentRepository:IRepository<Instrument>
+public interface IInstrumentRepository : IRepository<Instrument>
 {
 }

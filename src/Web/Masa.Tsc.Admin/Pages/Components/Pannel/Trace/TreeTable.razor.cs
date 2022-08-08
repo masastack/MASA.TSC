@@ -216,13 +216,13 @@ public partial class TreeTable
         };
 
         var item = total / 6;
-        int count = 5;       
+        int count = 5;
         do
         {
             _timeLines.Add(new TraceTimeUsModel(1) { TimeUs = item, FloorLength = 0 });
             item += item;
         }
         while (_timeLines.Count - count < 0);
-        _timeLines.Add(last);        
+        _timeLines.Add(last);
     }
 }

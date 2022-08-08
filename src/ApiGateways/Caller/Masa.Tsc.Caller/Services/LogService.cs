@@ -24,6 +24,6 @@ public class LogService : BaseService
 
     public async Task<PaginationDto<object>> GetPageAsync(LogPageQueryDto param)
     {
-        return await Caller.GetAsync<PaginationDto<object>>($"{RootPath}/list",param) ?? default!;
+        return await Caller.GetAsync<PaginationDto<object>>($"{RootPath}/list", param) ?? default!;
     }
 }

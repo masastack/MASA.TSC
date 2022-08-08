@@ -8,7 +8,7 @@ public enum AggregationTypes
     Count = 1,
     Sum,
     Avg,
-    DistinctCount,    
+    DistinctCount,
     DateHistogram,
     Histogram
 }

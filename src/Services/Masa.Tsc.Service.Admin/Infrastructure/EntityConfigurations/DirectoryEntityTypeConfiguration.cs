@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Infrastructure.EntityConfigurations;
 
-public class DirectoryEntityTypeConfiguration:IEntityTypeConfiguration<Domain.Aggregates.Directory>
+public class DirectoryEntityTypeConfiguration : IEntityTypeConfiguration<Domain.Aggregates.Directory>
 {
     public void Configure(EntityTypeBuilder<Domain.Aggregates.Directory> builder)
     {

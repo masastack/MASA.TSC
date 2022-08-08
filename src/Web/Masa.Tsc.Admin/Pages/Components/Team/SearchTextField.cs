@@ -34,7 +34,7 @@ public class SearchTextField : MTextField<string>
             builder.CloseComponent();
         };
         await base.SetParametersAsync(parameters);
-    }    
+    }
 
     protected override void OnParametersSet()
     {

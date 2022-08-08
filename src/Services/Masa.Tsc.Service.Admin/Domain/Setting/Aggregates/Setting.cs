@@ -18,7 +18,7 @@ public class Setting : AggregateRoot<Guid>
     public short TimeZoneOffset { get; set; }
 
     public void Update(string language, short interval, bool isEnable, short timeZone, short timeZoneOffset)
-    {        
+    {
         Language = language;
         Interval = interval;
         IsEnable = isEnable;

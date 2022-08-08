@@ -32,5 +32,5 @@ public class CommandHandler
             find.Update(command.Language, command.Interval, command.IsEnable, command.TimeZone, command.TimeZoneOffset);
             await _settingRepository.UpdateAsync(find);
         }
-    }   
+    }
 }

@@ -57,4 +57,3 @@ global using OpenTelemetry.Resources;
 global using OpenTelemetry.Trace;
 global using System.Reflection;
 global using System.Text.Json;
-global using Elasticsearch = Nest;

@@ -3,4 +3,4 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 
-public record AddDirectoryCommand(string Name,int Sort,Guid ParentId,Guid UserId) : Command;
+public record AddDirectoryCommand(string Name, int Sort, Guid ParentId, Guid UserId) : Command;

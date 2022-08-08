@@ -6,7 +6,7 @@ namespace Masa.Tsc.Admin.Rcl.Shared;
 public class TscComponentBase : BComponentBase
 {
     [Inject]
-    public IUserContext UserContext { get;set; }
+    public IUserContext UserContext { get; set; }
 
     //[Inject]
     //public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
@@ -41,7 +41,7 @@ public class TscComponentBase : BComponentBase
         KeyValuePair.Create(7*24*60,"最近1周"),
     };
 
-    public Guid CurrentUserId { get;private set; }
+    public Guid CurrentUserId { get; private set; }
 
     public TimeZoneInfo CurrentTimeZone { get; private set; }
 

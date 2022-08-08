@@ -124,7 +124,7 @@ public partial class TscTraceSearch
             Start = TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone),
             Name = "service.name",
             Max = 10
-        })).ToList();        
+        })).ToList();
 
         if (OnSearchAsync is not null)
         {

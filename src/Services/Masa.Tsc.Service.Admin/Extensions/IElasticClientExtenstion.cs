@@ -79,7 +79,7 @@ internal class IElasticClientExtenstion
             {
                 foreach (DateHistogramBucket bucket in bucketAggregate.Items)
                 {
-                    result.Add(bucket.KeyAsString, (bucket.DocCount??0).ToString());
+                    result.Add(bucket.KeyAsString, (bucket.DocCount ?? 0).ToString());
                 }
             }
         }

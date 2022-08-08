@@ -17,7 +17,7 @@ public class DirectoryService : BaseService
         return (await Caller.GetAsync<IEnumerable<DirectoryTreeDto>>($"{RootPath}/tree/{userId}"))!;
     }
 
-    public async Task<DirectoryDto> GetAsync(Guid userId,Guid id)
+    public async Task<DirectoryDto> GetAsync(Guid userId, Guid id)
     {
         return (await Caller.GetAsync<DirectoryDto>($"{RootPath}/{userId}/{id}"))!;
     }

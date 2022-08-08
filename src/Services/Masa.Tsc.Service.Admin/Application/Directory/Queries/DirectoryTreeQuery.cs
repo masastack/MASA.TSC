@@ -4,6 +4,6 @@
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Queries;
 
 public record DirectoryTreeQuery(Guid UserId) : Query<IEnumerable<DirectoryTreeDto>>
-{ 
+{
     public override IEnumerable<DirectoryTreeDto> Result { get; set; }
 }

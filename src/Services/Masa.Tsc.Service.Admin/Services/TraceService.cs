@@ -35,7 +35,7 @@ public class TraceService : ServiceBase
         //    var t = await caller.CreateClient("lonsdi-ax").PostAsync("http://soa-dev.lonsid.cn/api/ax/customers/upsertcusttables", JsonSerializer.Deserialize<object>(text));
         //}
         //catch(Exception e) { 
-        
+
         //}
         ////
         var query = new TraceListQuery(model.Service, model.Instance, model.Endpoint, model.TraceId, model.Start, model.End, model.Page, model.PageSize);
@@ -43,7 +43,7 @@ public class TraceService : ServiceBase
         return query.Result;
     }
 
-    private async Task<IEnumerable<string>> GetAttrValuesAsync([FromServices] IEventBus eventBus, [FromBody]RequestAttrDataDto model)
+    private async Task<IEnumerable<string>> GetAttrValuesAsync([FromServices] IEventBus eventBus, [FromBody] RequestAttrDataDto model)
     {
         var query = new TraceAttrValuesQuery(model.Query, model.Name, model.Keyword, model.Start, model.End, model.Max);
         await eventBus.PublishAsync(query);

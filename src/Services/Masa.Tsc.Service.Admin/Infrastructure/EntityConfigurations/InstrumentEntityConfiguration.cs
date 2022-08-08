@@ -7,7 +7,7 @@ public class InstrumentEntityConfiguration
 {
     public void Configure(EntityTypeBuilder<Instrument> builder)
     {
-        builder.HasKey(x => x.Id);       
+        builder.HasKey(x => x.Id);
         builder.Property(x => x.Sort).HasDefaultValue(0);
         builder.Property(x => x.Name).HasMaxLength(200);
         builder.Property(x => x.Layer).HasMaxLength(40);

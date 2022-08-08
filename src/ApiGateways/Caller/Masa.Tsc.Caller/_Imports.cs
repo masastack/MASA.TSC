@@ -1,4 +1,7 @@
-﻿global using Masa.Tsc.Caller.Services;
+﻿// Copyright (c) MASA Stack All rights reserved.
+// Licensed under the MIT License. See LICENSE.txt in the project root for license information.
+
+global using Masa.Tsc.Caller.Services;
 global using Masa.Tsc.Contracts.Admin;
 global using Masa.Tsc.Contracts.Admin.Chart;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Dtos;

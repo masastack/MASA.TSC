@@ -4,6 +4,7 @@
 global using BlazorComponent;
 global using BlazorComponent.I18n;
 global using Masa.Blazor;
+global using Masa.BuildingBlocks.Identity.IdentityModel;
 global using Masa.Contrib.BasicAbility.Tsc;
 global using Masa.Stack.Components.Models;
 global using Masa.Tsc.Admin.Rcl.Data.Trace;
@@ -26,4 +27,3 @@ global using OpenTelemetry.Resources;
 global using OpenTelemetry.Trace;
 global using System;
 global using System.Text.Json;
-global using Masa.BuildingBlocks.Identity.IdentityModel;

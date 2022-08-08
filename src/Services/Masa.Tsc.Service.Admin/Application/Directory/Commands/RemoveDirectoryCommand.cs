@@ -3,4 +3,4 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 
-public record RemoveDirectoryCommand(Guid Id,Guid UserId) : Command;
+public record RemoveDirectoryCommand(Guid Id, Guid UserId) : Command;

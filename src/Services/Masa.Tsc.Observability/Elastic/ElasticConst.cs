@@ -24,7 +24,7 @@ public static class ElasticConst
 
     public const string TraceServiceName = "service.name";
     public const string TraceInstanceName = "service.node.name";
-    public const string TraceEndpointName = "transaction.name";    
+    public const string TraceEndpointName = "transaction.name";
 
     public static int MAX_DATA_COUNT = 10000;
 

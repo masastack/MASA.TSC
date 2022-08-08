@@ -10,6 +10,6 @@ public class MappingResponse
     public string DataType { get; set; }
 
     public bool? IsKeyword { get; set; }
-    
+
     public int? MaxLenth { get; set; }
 }

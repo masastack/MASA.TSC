@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Queries;
 
-public record DirectoryQuery(Guid Id,Guid UserId) : Query<DirectoryDto>
-{ 
+public record DirectoryQuery(Guid Id, Guid UserId) : Query<DirectoryDto>
+{
     public override DirectoryDto Result { get; set; }
 }
