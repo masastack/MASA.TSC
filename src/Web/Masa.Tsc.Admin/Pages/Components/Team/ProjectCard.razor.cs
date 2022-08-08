@@ -27,7 +27,7 @@ public partial class ProjectCard
         }
 
         var count = RowCount - total;
-        if (rowIndex % 2 == 1)
+        if (rowIndex % 2 == 0)
         {
             if ((RowCount + count) % 2 == 0)
                 return "hex-even";

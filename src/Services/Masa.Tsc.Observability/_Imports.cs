@@ -6,3 +6,4 @@ global using Masa.Utils.Caller.Core;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.Logging;
 global using System.Text.Json;
+global using System.Text.Json.Serialization;

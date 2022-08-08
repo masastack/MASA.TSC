@@ -1,5 +1,5 @@
-﻿/*scrollbar*/
-/*::-webkit-scrollbar-track {
+﻿scrollbar
+::-webkit-scrollbar-track {
     border-radius: 15px;
     margin: 5px 0;
 }
@@ -16,9 +16,9 @@
     background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.44, rgb(170 168 168)), color-stop(0.72, rgb(170 168 168)), color-stop(0.86, rgb(170 168 168)));
 }
 
-.border-b-solid {*/
-    /* 分割线/下 */
-    /*box-shadow: inset 0px -1px 0px #F0F3FA !important;
+.border-b-solid {
+     分割线/下 
+    box-shadow: inset 0px -1px 0px #F0F3FA !important;
 }
 
 .rounded-2 {
@@ -39,11 +39,11 @@
     border-bottom-right-radius: 5px !important;
 }
 
-.block-center {*/
-    /*flex 布局*/
-    /*display: flex;*/
-    /*实现垂直居中*/
-    /*align-items: center;
+.block-center {
+    flex 布局
+    display: flex;
+    实现垂直居中
+    align-items: center;
 }
 
 .block-between {
@@ -60,18 +60,18 @@
     box-sizing: border-box;
     border-radius: 10px;
     cursor: pointer;
-}*/
+}
 
-/*组件样式全局修改start*/
-/*.m-window {
+组件样式全局修改start
+.m-window {
     position: initial !important;
-}*/
+}
 
-/*.m-window__container {
+.m-window__container {
     position: initial !important;
-}*/
+}
 
-/*.small .m-input__control .m-input__slot fieldset {
+.small .m-input__control .m-input__slot fieldset {
     height: 40px !important;
 }
 
@@ -192,13 +192,13 @@
 
 .table-header-fill .m-data-table-header tr {
     background: #F6F8FD;
-}*/
+}
 
-/*
+
     temp
-*/
 
-/*.masa .h1 {
+
+.masa .h1 {
     font-size: 6rem !important;
     font-weight: 300 !important;
     line-height: 7rem !important;
@@ -415,10 +415,10 @@
 
     .search.m-text-field.m-text-field--solo.m-input--dense > .m-input__control {
         min-height: 38px;
-    }*/
+    }
 
-/* pagetabs */
-/*.m-page-tabs .m-slide-group__prev.m-slide-group__prev--disabled {
+ pagetabs 
+.m-page-tabs .m-slide-group__prev.m-slide-group__prev--disabled {
     flex: none !important;
     min-width: 0px !important;
 }
@@ -499,16 +499,16 @@
 
 .m-stepper__wrapper {
     height: 100% !important;
-}*/
+}
 
-/* pagetabs */
-/*组件样式全局修改end*/
+ pagetabs 
+组件样式全局修改end
 
-/*.m-text-field.m-input--dense:not(.m-text-field--outlined) .m-text-field__prefix, .m-text-field.m-input--dense:not(.m-text-field--outlined) .m-text-field__suffix, .m-text-field.m-input--dense:not(.m-text-field--outlined) input {
+.m-text-field.m-input--dense:not(.m-text-field--outlined) .m-text-field__prefix, .m-text-field.m-input--dense:not(.m-text-field--outlined) .m-text-field__suffix, .m-text-field.m-input--dense:not(.m-text-field--outlined) input {
     padding-top: 0;
 }
-*/
-/*.max-height {
+
+.max-height {
     height: 100% !important;
 }
 
@@ -591,18 +591,18 @@
 
 .pointer-events-none {
     pointer-events: none;
-}*/
+}
 
-/*.body2 .m-label {
+.body2 .m-label {
     color: #323D6F;
     font-family: Roboto;
     font-style: normal;
     font-weight: 500;
     font-size: 14px;
     line-height: 16px;
-}*/
+}
 
-/*.mtab-tab-linear-primary {
+.mtab-tab-linear-primary {
     background: linear-gradient(270deg, #4318FF 5.56%, rgba(67, 24, 255, 0) 100%);
 }
 
@@ -658,19 +658,19 @@
 }
 
 .hidden-webkit-scrollbar {
-    -ms-overflow-style: none;*/ /* for Internet Explorer, Edge */
-    /*overflow-y: scroll;
-}*/
+    -ms-overflow-style: none;  for Internet Explorer, Edge 
+    overflow-y: scroll;
+}
 
-/*.emphasis2--text .m-label {
+.emphasis2--text .m-label {
     color: #323D6F !important;
 }
 
 .regular3--text .m-label {
     color: #A3AED0 !important;
-}*/
+}
 
-/*.theme--light.m-text-field--outlined.regular3--text > .m-input__control > .m-input__slot fieldset {
+.theme--light.m-text-field--outlined.regular3--text > .m-input__control > .m-input__slot fieldset {
     color: #A3AED0 !important;
 }
 
@@ -792,9 +792,9 @@ input::-webkit-input-placeholder {
     font-weight: bold;
     font-size: 14px;
     line-height: 16px;
-    letter-spacing: 0.1px;*/
-    /* text/3-1次要 */
-    /*color: #A3AED0 !important;
+    letter-spacing: 0.1px;
+     text/3-1次要 
+    color: #A3AED0 !important;
     border-top-left-radius: 8px !important;
     border-top-right-radius: 8px !important;
 }
@@ -811,9 +811,9 @@ input::-webkit-input-placeholder {
     font-weight: bold;
     font-size: 14px;
     line-height: 16px;
-    letter-spacing: 0.1px;*/
-    /* text/1-1强调 */
-    /*color: #1B2559 !important;
+    letter-spacing: 0.1px;
+     text/1-1强调 
+    color: #1B2559 !important;
 }
 
     .m-page_tab_active > .m-icon {
@@ -866,18 +866,18 @@ input::-webkit-input-placeholder {
     font-weight: 700 !important;
     line-height: normal !important;
     letter-spacing: 0em !important;
-}*/
+}
 
-/*.masa-stack-components .m-input .m-text-field__slot input::placeholder {
+.masa-stack-components .m-input .m-text-field__slot input::placeholder {
     font-family: 'Roboto' !important;
     font-style: normal !important;
     font-weight: 400 !important;
     font-size: 14px !important;
     line-height: 21px !important;
     color: red !important;
-}*/
+}
 
-/*.m-data-table.table-space-v-4 > .m-data-table__wrapper > table {
+.m-data-table.table-space-v-4 > .m-data-table__wrapper > table {
     border-spacing: 0px 16px !important;
 }
 
@@ -905,10 +905,10 @@ input::-webkit-input-placeholder {
     display: flex;
     align-items: center;
     text-align: center;
-    letter-spacing: 0.1px;*/
-    /* text/1-2强调 */
+    letter-spacing: 0.1px;
+     text/1-2强调 
 
-    /*color: #323D6F;
+    color: #323D6F;
 }
 
 .elevation-tab .theme--light.m-btn--active:hover::before, .elevation-tab .theme--light.m-btn--active::before {
@@ -921,15 +921,15 @@ input::-webkit-input-placeholder {
     font-style: normal;
     font-weight: 500;
     font-size: 14px;
-    line-height: 21px;*/
-    /* identical to box height, or 150% */
+    line-height: 21px;
+     identical to box height, or 150% 
 
-    /*display: flex;
+    display: flex;
     align-items: center;
-    text-align: center;*/
-    /* text/2-2正文 */
+    text-align: center;
+     text/2-2正文 
 
-    /*color: #7681AB;
+    color: #7681AB;
 }
 
 .remover-hover.m-list-item:hover::before {
@@ -1071,9 +1071,9 @@ input::-webkit-input-placeholder {
     width: 100% !important;
 }
 
-.theme--light.m-btn--active:hover::before, .theme--light.m-btn--active::before {*/
-    /* opacity: 0.18; */
-    /*opacity: 0.00000000000000001 !important;
+.theme--light.m-btn--active:hover::before, .theme--light.m-btn--active::before {
+     opacity: 0.18; 
+    opacity: 0.00000000000000001 !important;
 }
 
 .masa-stack-components .m-input__control {
@@ -1108,4 +1108,4 @@ input::-webkit-input-placeholder {
     line-height: 0.9375rem !important;
     letter-spacing: 0 !important;
     text-transform: none !important;
-}*/
+}

@@ -15,14 +15,16 @@
     }    
 </div>
 
-<MButton OnClick=@(()=>Click(default!)) StopPropagation>
-    dialog
-</MButton>
-
-<MDialog @bind-Value=@isShow>
+<MDialog @bind-Value="isShow"
+         Fullscreen>
     <ChildContent>
-        <MCard>         
-            @*<Project Value=@Project AppId="sadasdas" Team=TeamData></Project>*@
+        <MCard>
+            <MCardTitle Class="d-flex justify-end">
+                <MIcon OnClick="()=>isShow=false" title="Close">mdi-close</MIcon>
+            </MCardTitle>
+            <MCardText>
+                <Project Value=@Project AppId="sadasdas" Team=TeamData></Project>
+            </MCardText>
         </MCard>
     </ChildContent>
 </MDialog>

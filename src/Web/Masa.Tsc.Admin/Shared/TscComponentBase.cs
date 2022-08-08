@@ -6,6 +6,15 @@ namespace Masa.Tsc.Admin.Rcl.Shared;
 public class TscComponentBase : BComponentBase
 {
     [Inject]
+    public IUserContext UserContext { get;set; }
+
+    //[Inject]
+    //public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    //[Inject]
+    //IHttpContextAccessor HttpContextAccessor { get; set; }
+
+    [Inject]
     public ILogger<TscComponentBase> Logger { get; set; }
 
     [Inject]
@@ -32,16 +41,16 @@ public class TscComponentBase : BComponentBase
         KeyValuePair.Create(7*24*60,"最近1周"),
     };
 
-    public Guid CurrentUserId { get; set; }
+    public Guid CurrentUserId { get;private set; }
 
-    public TimeZoneInfo CurrentTimeZone { get; set; }
+    public TimeZoneInfo CurrentTimeZone { get; private set; }
 
     protected virtual bool Loading { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         Loading = true;
-        CurrentUserId = Guid.Parse("00000000-0000-0000-0000-000000000000");
+        CurrentUserId = Guid.Parse(UserContext.UserId!);
         Setting = await ApiCaller.SettingService.GetAsync(CurrentUserId);
         if (string.IsNullOrEmpty(Setting.Language))
         {

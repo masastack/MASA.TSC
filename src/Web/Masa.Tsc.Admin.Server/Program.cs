@@ -5,7 +5,6 @@ using Masa.BuildingBlocks.Identity.IdentityModel;
 using Masa.Stack.Components;
 using Masa.Tsc.Admin.Rcl;
 using Masa.Tsc.Caller;
-using Masa.Tsc.Contracts.Admin;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using System.Security.Cryptography.X509Certificates;
 
@@ -20,7 +19,6 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<TscCaller>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-
 
 builder.WebHost.UseKestrel(option =>
 {

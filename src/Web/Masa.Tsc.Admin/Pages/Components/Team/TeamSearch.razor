@@ -1,18 +1,21 @@
 ﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
-
-<div class="d-flex d-block" style="background-color:#A3AED0">
-    <MTabs SliderColor="white" Class="flex-row ma-3 font-weight-bold  text-md-h4 col-3">
-        <MTab IsActive>All</MTab>
-        <MTab>Operator</MTab>
-        <MTab>Basic Ability</MTab>
-        <MTab>Data Factory</MTab>
-        <MTab>Data Factory2</MTab>
-    </MTabs>
-    <MAutocomplete Class="flex-row col-1" BackgroundColor="white" Items="Projects" TItem="ProjectDto" TValue="string" TItemValue="string" ItemValue="r=>r.Name" ItemText="r=>r.Identity">
-    </MAutocomplete>
-    <SearchTextField Class="flex-row col-5 mb-4 mt-4" BackgroundColor="white"></SearchTextField>
-    <MTextField TValue=string Class="flex-row col-3" BackgroundColor="white" Value="timeStr"></MTextField>
-</div>
+<MCard>
+    <MCardText Class="d-flex pa-0">
+        <MTabs SliderColor="white" Class="flex-row font-weight-bold  text-md-h4 col-3">
+            <MTab IsActive>All</MTab>
+            <MTab>Operator</MTab>
+            <MTab>Basic Ability</MTab>
+            <MTab>Data Factory</MTab>
+            <MTab>Data Factory2</MTab>
+        </MTabs>
+        <MAutocomplete Class="flex-row col-1 pa-0" BackgroundColor="white" Items="Projects"
+                       TItem="ProjectDto" TValue="string" TItemValue="string" ItemValue="r=>r.Name"
+                       ItemText="r=>r.Identity">
+        </MAutocomplete>
+        <SearchTextField Class="flex-row col-5 py-0" BackgroundColor="white"></SearchTextField>
+        <SDateTimeRangePicker @bind-StartTime="Start" @bind-EndTime="End" Class="ml-0 pl-0" />
+    </MCardText>
+</MCard>
 @code {
     private List<ProjectDto> Projects { get; set; } = new List<ProjectDto>
     {
@@ -33,13 +36,11 @@
         }
     };
 
-    private string timeStr = "2022/07/01 09:00:00~2022/07/01 10:00:00";
+    [Parameter]
+    public DateTime? Start { get; set; } = DateTime.Now.Date;
 
     [Parameter]
-    public DateTime Start { get; set; }
-
-    [Parameter]
-    public DateTime End { get; set; }
+    public DateTime? End { get; set; }= DateTime.Now;
 
     [Parameter]
     public string ProjectId { get; set; } = default!;

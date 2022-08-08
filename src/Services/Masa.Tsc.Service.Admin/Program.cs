@@ -1,12 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.BuildingBlocks.Configuration;
-using Masa.Contrib.BasicAbility.Dcc;
-using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
-using Masa.Contrib.Data.Contracts.EF;
-using Masa.Tsc.Service.Admin;
-
 var builder = WebApplication.CreateBuilder(args);
 
 var elasearchUrls = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<string[]>();

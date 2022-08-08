@@ -1,11 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using BlazorComponent.I18n;
-using Masa.Blazor;
-using Masa.Stack.Components.Models;
-using Microsoft.AspNetCore.Components.Rendering;
-
 namespace Masa.Tsc.Admin.Rcl.Pages.Components;
 
 public class SearchTextField : MTextField<string>
@@ -14,7 +9,7 @@ public class SearchTextField : MTextField<string>
     public I18n? I18n { get; set; }
 
     [Parameter]
-    public string IconClass { get; set; } = "mr-2 emphasis2--text";
+    public string IconClass { get; set; } = "mt-1 mr-1 emphasis2--text";
 
     [Parameter]
     public int IconSize { get; set; } = 16;

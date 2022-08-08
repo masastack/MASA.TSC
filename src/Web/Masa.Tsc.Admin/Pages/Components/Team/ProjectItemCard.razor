@@ -6,7 +6,7 @@
         <div class="text-center">@Project.Name</div>
         @foreach (var item in Project.Apps.Take(3))
         {
-            <div class="hex-span flow-col pb-1 ">@item.Name</div>
+            <div class="hex-span flow-col pb-1 text-no-wrap text-truncate">@item.Name</div>
         }
         @if (Project.Apps.Count - 2 > 0)
         {

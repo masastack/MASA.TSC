@@ -77,7 +77,7 @@ public class QueryHandler
     [EventHandler]
     public async Task GetTeamMonitorAysnc(TeamMonitorQuery query)
     {
-        var teams = new TeamDetailModel[0];// await _authClient.TeamService.GetUserTeamsAsync();
+        var teams = await _authClient.TeamService.GetUserTeamsAsync();
 
         if (teams == null || !teams.Any())
             return;

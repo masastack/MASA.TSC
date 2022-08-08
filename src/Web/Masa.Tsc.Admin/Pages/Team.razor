@@ -1,49 +1,8 @@
-﻿@using Masa.Tsc.Admin.Rcl.Pages.Components
+﻿@namespace Masa.Tsc.Admin.Rcl.Pages
 @page "/team"
 @inherits TscComponentBase
 
 <Navigation Href="/team"></Navigation>
 <TeamSearch @ref="_teamSearch"></TeamSearch>
 <MonitorCard Monitor=_monitor Error=_error Normal="_normal" Warn="_warn" />
-<ProjectCard Projects=_projects></ProjectCard>
-@code
-{
-    private List<ProjectOverViewDto> _projects = default!;
-    private TeamSearch _teamSearch = default!;
-    private int _error, _warn, _monitor, _normal;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await base.OnParametersSetAsync();
-    }
-
-    private async Task LoadData()
-    {
-        var data = await ApiCaller.ProjectService.OverViewAsync(new RequestTeamMonitorDto
-            {
-                EndTime = _teamSearch.End.ToUnixTimeSpan(),
-                StartTime = _teamSearch.Start.ToUnixTimeSpan(),
-                Keyword = _teamSearch.Keyword,
-                ProjectId = _teamSearch.ProjectId,
-                UserId = CurrentUserId
-            });
-
-        if (data != null)
-        {
-            _error = data.Monitor.Error;
-            _warn = data.Monitor.Warn;
-            _monitor = data.Monitor.Total;
-            _normal = data.Monitor.Normal;
-
-            _projects = data.Projects;
-
-        }
-
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        Logger.LogError("team.OnAfterRender");
-        base.OnAfterRender(firstRender);
-    }
-}
+<ProjectCard Projects=_projects RowCount=8></ProjectCard>

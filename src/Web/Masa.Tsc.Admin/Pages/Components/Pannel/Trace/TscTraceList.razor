@@ -14,8 +14,8 @@
         {
             <MIcon OnClick="@(()=>OpenAsync(context.Item))">mdi-view-headline</MIcon>
         }
-        else if(context.Header.Text=="Timestamp")
-        {            
+        else if (context.Header.Text == "Timestamp")
+        {
             @(DateTime.Parse(context.Item["@timestamp"].ToString()!).Format(CurrentTimeZone))
         }
         else
