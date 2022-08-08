@@ -5,8 +5,8 @@
     <MRow>
         <MCol Cols="12" Class="d-flex">
             <MCard Class="rounded-0" Height=38>
-                <MCardText Class="py-2">
-                    <DateTimeRangePicker @bind-StartTime="_start" @bind-EndTime="_end" />
+                <MCardText Class="py-2">                    
+                    <SDateTimeRangePicker @bind-StartTime="_start" @bind-EndTime="_end" />
                 </MCardText>
             </MCard>
             <MButton OnClick="QueryAsync" Height="38" Class="ml-4"><MIcon Size=20>fas fa-rotate</MIcon></MButton>

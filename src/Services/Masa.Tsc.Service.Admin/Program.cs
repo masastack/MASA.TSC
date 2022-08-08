@@ -1,6 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.Configuration;
+using Masa.Contrib.BasicAbility.Dcc;
+using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
 using Masa.Contrib.Data.Contracts.EF;
 using Masa.Tsc.Service.Admin;
 
@@ -23,6 +26,13 @@ builder.Services.AddElasticsearchClient("tsclog", elasearchUrls);
 builder.AddObservable();
 builder.Configuration.ConfigureElasticIndex();
 
+//#if DEBUG
+//builder.Services.AddDaprStarter(opt =>
+//{
+//    opt.DaprHttpPort = 3600;
+//    opt.DaprGrpcPort = 3601;
+//});
+//#endif
 builder.Services.AddDaprClient();
 builder.Services.AddPrometheusClient(builder.Configuration.GetSection("Masa:Prometheus").Value);
 builder.Services.AddAuthorization();
@@ -30,13 +40,15 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.Authority = "";
-    options.RequireHttpsMetadata = false;
-    options.Audience = "";
 });
+//.AddJwtBearer("Bearer", options =>
+//{
+//    options.Authority = builder.GetMasaConfiguration().ConfigurationApi.GetDefault().GetValue<string>("AppSettings:IdentityServerUrl");
+//    options.RequireHttpsMetadata = false;
+//    //options.Audience = "";
+//    options.TokenValidationParameters.ValidateAudience = false;
+//    options.MapInboundClaims = false;
+//});
 
 builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
 {
@@ -44,6 +56,14 @@ builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
     options.UserName = "name";
     options.UserId = "sub";
 });
+
+//builder.AddMasaConfiguration(configurationBuilder =>
+//{
+//    configurationBuilder.UseDcc();
+//});
+builder.Services.AddDccClient();
+
+
 builder.Services.AddAuthClient(builder.Configuration["Masa:AuthUrl"]);
 builder.Services.AddPmClient(builder.Configuration["Masa:PmUrl"]);
 

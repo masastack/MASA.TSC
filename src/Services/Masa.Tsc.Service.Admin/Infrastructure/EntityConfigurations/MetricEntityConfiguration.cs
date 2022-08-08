@@ -5,7 +5,7 @@ namespace Masa.Tsc.Service.Admin.Infrastructure.EntityConfigurations;
 
 public class MetricEntityConfiguration
 {
-    public void Configure(EntityTypeBuilder<Metric> builder)
+    public void Configure(EntityTypeBuilder<Domain.Aggregates.Metric> builder)
     {
         builder.HasKey(x => x.Id);
         //builder.Property(x => x.Title).HasMaxLength(200).IsRequired();

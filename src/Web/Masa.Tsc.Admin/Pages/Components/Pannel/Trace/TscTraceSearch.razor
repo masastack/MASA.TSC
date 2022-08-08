@@ -44,7 +44,7 @@
     <SearchTextField Label="TraceId/Search" @bind-Value="_keyword" Solo Dense Class="rounded-0 flex-column-4"></SearchTextField>
     <MCard Class="rounded-0" Height=38>
         <MCardText  Class="py-2">
-            <DateTimeRangePicker @bind-StartTime="_start" @bind-EndTime="_end" />
+            <SDateTimeRangePicker @bind-StartTime="_start" @bind-EndTime="_end" />
         </MCardText>
     </MCard>
     <MButton OnClick="async()=>await SearchAsync()" Class="rounded-0" Height="38">Query</MButton>

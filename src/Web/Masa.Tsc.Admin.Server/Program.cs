@@ -7,9 +7,14 @@ using Masa.Tsc.Admin.Rcl;
 using Masa.Tsc.Caller;
 using Masa.Tsc.Contracts.Admin;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddObservable();
+
+builder.Services.AddRazorPages();
+
+builder.Services.AddHttpContextAccessor();
 
 // Add services to the container.
 builder.Services.AddScoped<TscCaller>();
@@ -17,11 +22,11 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 
-//builder.WebHost.UseKestrel(option =>
-//{
-//    option.ConfigureHttpsDefaults(options =>
-//    options.ServerCertificate = new X509Certificate2(Path.Combine("Certificates", "7348307__lonsid.cn.pfx"), "cqUza0MN"));
-//});
+builder.WebHost.UseKestrel(option =>
+{
+    option.ConfigureHttpsDefaults(options =>
+    options.ServerCertificate = new X509Certificate2(Path.Combine("Certificates", "7348307__lonsid.cn.pfx"), "cqUza0MN"));
+});
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 
@@ -31,9 +36,8 @@ builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
     options.UserName = "name";
     options.UserId = "sub";
 })
-.AddMasaStackComponentsForServer("wwwroot/i18n", builder.Configuration["AuthServiceBaseAddress"], builder.Configuration["AuthServiceBaseAddress"])
-//builder.Services.AddMasaOpenIdConnect(builder.Configuration);
-;
+.AddMasaStackComponentsForServer("wwwroot/i18n", builder.Configuration["AuthServiceBaseAddress"], builder.Configuration["McServiceBaseAddress"])
+.AddMasaOpenIdConnect(builder.Configuration);
 
 
 

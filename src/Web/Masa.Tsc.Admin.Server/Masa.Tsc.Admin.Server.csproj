@@ -6,9 +6,9 @@
 		<UserSecretsId>f6cdf028-3564-47a5-a4fb-662685680853</UserSecretsId>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Masa.Contrib.BasicAbility.Auth" Version="0.5.0-rc.3" />
-		<PackageReference Include="Masa.Utils.Security.Authentication.OpenIdConnect" Version="0.5.0-rc.1" />		
-		<PackageReference Include="Masa.Contrib.Identity.IdentityModel" Version="0.5.0-rc.3" />
+		<PackageReference Include="Masa.Contrib.BasicAbility.Auth" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Utils.Security.Authentication.OpenIdConnect" Version="0.5.0" />		
+		<PackageReference Include="Masa.Contrib.Identity.IdentityModel" Version="0.6.0-preview.1" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Masa.Tsc.Admin\Masa.Tsc.Admin.Rcl.csproj" />
