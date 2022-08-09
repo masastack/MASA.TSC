@@ -7,7 +7,7 @@ public class ProjectService : ServiceBase
 {
     public ProjectService(IServiceCollection services) : base(services, "/api/project")
     {
-        App.MapGet($"{BaseUri}/over-view", OverViewAsync);
+        App.MapGet($"{BaseUri}/overview", OverViewAsync);
         App.MapGet($"{BaseUri}", GetProjectsAsync);
     }
 

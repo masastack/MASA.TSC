@@ -14,6 +14,6 @@ public class ProjectService : BaseService
 
     public async Task<TeamMonitorDto> OverViewAsync(RequestTeamMonitorDto model)
     {
-        return await Caller.GetAsync<TeamMonitorDto>($"{RootPath}/over-view", model) ?? default!;
+        return await Caller.GetAsync<TeamMonitorDto>($"{RootPath}/overview", model) ?? default!;
     }
 }

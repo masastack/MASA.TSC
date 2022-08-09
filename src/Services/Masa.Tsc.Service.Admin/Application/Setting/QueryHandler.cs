@@ -6,6 +6,7 @@ namespace Masa.Tsc.Service.Admin.Application.Setting;
 public class QueryHandler
 {
     private readonly ISettingRepository _settingRepository;
+
     public QueryHandler(ISettingRepository settingRepository)
     {
         _settingRepository = settingRepository;

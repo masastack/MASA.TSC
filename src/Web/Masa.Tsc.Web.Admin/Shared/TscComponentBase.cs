@@ -8,12 +8,6 @@ public class TscComponentBase : BComponentBase
     [Inject]
     public IUserContext UserContext { get; set; }
 
-    //[Inject]
-    //public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
-
-    //[Inject]
-    //IHttpContextAccessor HttpContextAccessor { get; set; }
-
     [Inject]
     public ILogger<TscComponentBase> Logger { get; set; }
 

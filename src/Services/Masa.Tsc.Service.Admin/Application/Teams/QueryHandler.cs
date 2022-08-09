@@ -187,15 +187,12 @@ public class QueryHandler
         return new List<string> { "service1", "service2" };
     }
 
-    private async Task<Dictionary<string, Tuple<int, int>>> GetErrorAndWarnAsync()
+    private async Task<Dictionary<string, ValueTuple<int, int>>> GetErrorAndWarnAsync()
     {
-        // _elasticClient.GetAggregationAsync(ElasticConst.LogIndex,)
-
-
         await Task.CompletedTask;
-        return new Dictionary<string, Tuple<int, int>> {
-            { "service1",Tuple.Create(5,20)},
-            { "service2",Tuple.Create(0,0)}
+        return new Dictionary<string, ValueTuple<int, int>> {
+            { "service1",ValueTuple.Create(5,20)},
+            { "service2",ValueTuple.Create(0,0)}
         };
     }
 

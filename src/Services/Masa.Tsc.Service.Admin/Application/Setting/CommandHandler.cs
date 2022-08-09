@@ -6,6 +6,7 @@ namespace Masa.Tsc.Service.Admin.Application.Setting.Commands;
 public class CommandHandler
 {
     private readonly ISettingRepository _settingRepository;
+
     public CommandHandler(ISettingRepository settingRepository)
     {
         _settingRepository = settingRepository;
