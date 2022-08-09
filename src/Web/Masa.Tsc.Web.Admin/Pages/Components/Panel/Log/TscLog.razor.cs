@@ -103,5 +103,4 @@ public partial class TscLog
             _end = time;
         }
     }
-
 }

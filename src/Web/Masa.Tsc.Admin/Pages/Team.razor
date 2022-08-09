@@ -1,8 +1,0 @@
-﻿@namespace Masa.Tsc.Admin.Rcl.Pages
-@page "/team"
-@inherits TscComponentBase
-
-<Navigation Href="/team"></Navigation>
-<TeamSearch @ref="_teamSearch"></TeamSearch>
-<MonitorCard Monitor=_monitor Error=_error Normal="_normal" Warn="_warn" />
-<ProjectCard Projects=_projects RowCount=8></ProjectCard>

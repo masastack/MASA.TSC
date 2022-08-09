@@ -6,7 +6,7 @@
     <ProjectGuid>952c33cd-4ad7-4234-8b7d-a08d9d773e4b</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
-    <DockerServiceName>masa.pm.service.admin</DockerServiceName>
+    <DockerServiceName>masa.tsc.service.admin</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">

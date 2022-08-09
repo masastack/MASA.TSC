@@ -3,9 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Projects;
 
-public record ProjectsQuery : Query<List<ProjectDto>>
+public record ProjectsQuery(Guid UserId) : Query<List<ProjectDto>>
 {
-    public Guid UserId { get; set; }
-
     public override List<ProjectDto> Result { get; set; }
 }

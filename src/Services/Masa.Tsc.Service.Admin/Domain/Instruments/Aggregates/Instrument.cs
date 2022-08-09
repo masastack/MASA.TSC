@@ -19,9 +19,9 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
 
     public bool IsGlobal { get; set; }
 
-    public List<Pannel> Pannels { get; set; }
+    public List<Panel> Panels { get; set; }
 
-    public void AddPannel() { }
+    public void AddPanel() { }
 
-    public void RemovePannel() { }
+    public void RemovePanel() { }
 }

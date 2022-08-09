@@ -22,19 +22,10 @@ public class QueryHandler
     public async Task GetDetailAsync(TraceDetailQuery query)
     {
         await _elasticClient.SearchAsync<object, TraceDetailQuery>($"{ElasticConst.TraceIndex},{ElasticConst.SpanIndex}", query,
-            queryFn: (container, q) =>
-            {
-                return container.Term(t => t.Field(ElasticConst.TraceId).Value(q.TraceId));
-            },
-            sortFn: (sort, q) =>
-            {
-                return sort.Ascending(ElasticConst.TraceTimestamp);
-            },
-            pageFn: () => Tuple.Create(false, 0, ElasticConst.MAX_DATA_COUNT - 1),
-            resultFn: (rep, q) =>
-            {
-                q.Result = rep.Documents!;
-            },
+            condition: (container, q) => container.Term(t => t.Field(ElasticConst.TRACE_ID).Value(q.TraceId)),
+            sort: (sort, q) => sort.Ascending(ElasticConst.TraceTimestamp),
+            pageration: () => ValueTuple.Create(false, 0, ElasticConst.MAX_DATA_COUNT - 1),
+            result: (rep, q) => q.Result = rep.Documents!,
             logger: _logger);
     }
 
@@ -42,38 +33,32 @@ public class QueryHandler
     public async Task GetListAsync(TraceListQuery query)
     {
         await _elasticClient.SearchAsync<object, TraceListQuery>($"{ElasticConst.TraceIndex}", query,
-            queryFn: (container, q) =>
+            condition: (container, q) =>
             {
                 var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
                 if (!string.IsNullOrEmpty(query.TraceId))
                 {
-                    list.Add(t => t.Term(f => f.Value(q.TraceId).Field(ElasticConst.TraceId)));
+                    list.Add(t => t.Term(f => f.Value(q.TraceId).Field(ElasticConst.TRACE_ID)));
                 }
                 if (!string.IsNullOrEmpty(q.Service))
                 {
-                    list.Add(t => t.Term(f => f.Value(q.Service).Field(ElasticConst.TraceServiceName)));
+                    list.Add(t => t.Term(f => f.Value(q.Service).Field(ElasticConst.TRACE_SERVICE_NAME)));
                 }
                 if (!string.IsNullOrEmpty(q.Instance))
                 {
-                    list.Add(t => t.Term(f => f.Value(q.Instance).Field(ElasticConst.TraceInstanceName)));
+                    list.Add(t => t.Term(f => f.Value(q.Instance).Field(ElasticConst.TRACE_INSTANCE_NAME)));
                 }
                 if (!string.IsNullOrEmpty(q.Service))
                 {
-                    list.Add(t => t.Term(f => f.Value(q.Endpoint).Field(ElasticConst.TraceEndpointName)));
+                    list.Add(t => t.Term(f => f.Value(q.Endpoint).Field(ElasticConst.TRACE_ENDPOINT_NAME)));
                 }
 
                 list.Add(t => t.DateRange(f => f.LessThan(q.End).GreaterThan(q.Start).Field(ElasticConst.TraceTimestamp)));
                 return container.Bool(t => t.Must(list));
             },
-            sortFn: (sort, q) =>
-            {
-                return sort.Ascending(ElasticConst.TraceTimestamp);
-            },
-            pageFn: () => Tuple.Create(true, query.Page, query.Size),
-            resultFn: (rep, q) =>
-            {
-                q.Result = new PaginationDto<object>(rep.Total, rep.Documents?.ToList()!);
-            },
+            sort: (sort, q) => sort.Ascending(ElasticConst.TraceTimestamp),
+            pageration: () => ValueTuple.Create(true, query.Page, query.Size),
+            result: (rep, q) => q.Result = new PaginationDto<object>(rep.Total, rep.Documents?.ToList()!),
             logger: _logger);
     }
 
@@ -81,7 +66,7 @@ public class QueryHandler
     public async Task GetAttrValuesAsync(TraceAttrValuesQuery query)
     {
         await _elasticClient.SearchAsync<object, TraceAttrValuesQuery>($"{ElasticConst.TraceIndex},{ElasticConst.SpanIndex}", query,
-            queryFn: (container, q) =>
+            condition: (container, q) =>
             {
                 var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
                 if (query.Queries != null)
@@ -99,19 +84,16 @@ public class QueryHandler
                 list.Add(t => t.DateRange(f => f.LessThan(q.End).GreaterThan(q.Start).Field(ElasticConst.TraceTimestamp)));
                 return container.Bool(t => t.Must(list));
             },
-            aggFn: (agg, q) =>
-            {
-                return agg.Terms(q.Name, f => f.Field(q.Name).Size(q.Limit));
-            },
-            sortFn: (sort, q) => sort.Ascending(q.Name),
-            resultFn: (rep, q) =>
+            aggregate: (agg, q) => agg.Terms(q.Name, f => f.Field(q.Name).Size(q.Limit)),
+            sort: (sort, q) => sort.Ascending(q.Name),
+            result: (rep, q) =>
             {
                 var bucket = (BucketAggregate)rep.Aggregations[q.Name];
                 var data = bucket.Items.Select(item => ((KeyedBucket<object>)item).Key.ToString()).ToList();
                 data.Sort();
                 q.Result = data!;
             },
-            pageFn: () => Tuple.Create(false, 0, query.Limit),
+            pageration: () => ValueTuple.Create(false, 0, query.Limit),
             logger: _logger);
     }
 
@@ -142,9 +124,8 @@ public class QueryHandler
             index = $"{ElasticConst.TraceIndex},{ElasticConst.SpanIndex}";
         }
 
-
         await _elasticClient.SearchAsync<object, TraceAggregationQuery>(index, query,
-            queryFn: (container, q) =>
+            condition: (container, q) =>
             {
                 var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
                 foreach (var item in q.Queries)
@@ -155,11 +136,8 @@ public class QueryHandler
                 list.Add(t => t.DateRange(f => f.LessThan(q.End).GreaterThan(q.Start).Field(ElasticConst.TraceTimestamp)));
                 return container.Bool(t => t.Must(list));
             },
-            sortFn: (sort, q) =>
-            {
-                return sort.Descending(ElasticConst.TraceTimestamp);
-            },
-            resultFn: (rep, q) =>
+            sort: (sort, q) => sort.Descending(ElasticConst.TraceTimestamp),
+            result: (rep, q) =>
             {
                 var data = IElasticClientExtenstion.AggResult(rep, q.Fields);
                 q.Result = new ChartLineDataDto<ChartPointDto>();
@@ -170,7 +148,7 @@ public class QueryHandler
                         Y = item.Value,
                     });
             },
-            aggFn: (agg, q) => IElasticClientExtenstion.Aggregation(agg, q.Fields, q.Interval),
+            aggregate: (agg, q) => IElasticClientExtenstion.Aggregation(agg, q.Fields, q.Interval),
             logger: _logger);
     }
 

@@ -83,8 +83,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Order\Masa.Tsc.Contracts.Admin.csproj" />
-		<ProjectReference Include="..\Masa.Tsc.Observability\Masa.Tsc.Observability.csproj" />
+		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
+		<ProjectReference Include="..\Masa.Tsc.Services.Observability\Masa.Tsc.Services.Observability.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

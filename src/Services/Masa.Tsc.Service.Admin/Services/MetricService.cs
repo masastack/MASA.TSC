@@ -14,35 +14,26 @@ public class MetricService : ServiceBase
 
     private async Task<IEnumerable<string>> GetNamesAsync([FromServices] IEventBus eventBus, [FromQuery] string? match)
     {
-        var query = new MetricQuery() { Match = match?.Split(',') ?? default! };
+        var query = new MetricQuery(match?.Split(',') ?? default!);
         await eventBus.PublishAsync(query);
         return query.Result ?? Array.Empty<string>();
     }
 
     private async Task<Dictionary<string, Dictionary<string, List<string>>>> GetLabelValuesAsync([FromServices] IEventBus eventBus, [FromBody] RequestLabelValuesDto param)
     {
-        var query = new LableValuesQuery
-        {
-            Start = param.Start,
-            End = param.End,
-            Match = param.Match
-        };
+        var query = new LableValuesQuery(param.Match, param.Start, param.End);
         await eventBus.PublishAsync(query);
         return query.Result ?? new Dictionary<string, Dictionary<string, List<string>>>();
     }
 
     private async Task<string> GetRangeValuesAsync([FromServices] IEventBus eventBus, [FromBody] RequestMetricAggDto param)
     {
-        var query = new RangeQuery()
-        {
-            Start = param.Start,
-            End = param.End,
-            Match = param.Match
-        };
         if (param.Labels != null && param.Labels.Any())
         {
-            query.Match = $"{param.Match}{{{string.Join(',', param.Labels)}}}";
+            param.Match = $"{param.Match}{{{string.Join(',', param.Labels)}}}";
         }
+
+        var query = new RangeQuery(param.Match, Step: string.Empty, param.Start, param.End);
 
         await eventBus.PublishAsync(query);
         return query.Result ?? string.Empty;

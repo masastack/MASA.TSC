@@ -9,8 +9,8 @@ public static class ObservableExtensions
     {
         var option = builder.Configuration.GetSection("masa:tsc").Get<MasaObservableOptions>();
         var resources = ResourceBuilder.CreateDefault().AddMasaService(option);
-        var opltUri = builder.Configuration.GetSection("masa:otlpUrl").Get<string>();
-        var uri = new Uri(opltUri);
+        var opltUrl = builder.Configuration.GetSection("masa:otlpUrl").Get<string>();
+        var uri = new Uri(opltUrl);
 
         builder.Services.AddMasaMetrics(builder =>
         {

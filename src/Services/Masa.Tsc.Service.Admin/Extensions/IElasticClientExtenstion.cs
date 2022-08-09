@@ -12,7 +12,6 @@ internal class IElasticClientExtenstion
         if (FieldMaps == null || !FieldMaps.Any())
             return aggContainer;
 
-
         foreach (var item in FieldMaps)
         {
             switch (item.AggegationType)
@@ -47,7 +46,6 @@ internal class IElasticClientExtenstion
                         aggContainer.DateHistogram(item.Alias, agg => agg.Field(item.Name).FixedInterval(new Time(inertval)).Order(isDesc ? HistogramOrder.KeyDescending : HistogramOrder.KeyAscending));
                     }
                     break;
-
             }
         }
         return aggContainer;
@@ -64,16 +62,16 @@ internal class IElasticClientExtenstion
             var find = FieldMaps.First(m => m.Alias == item.Key);
             if (find.AggegationType - AggregationTypes.DistinctCount <= 0 && item.Value is ValueAggregate value && value != null)
             {
-                string tem = default!;
+                string temp = default!;
                 if (!string.IsNullOrEmpty(value.ValueAsString))
-                    tem = value.ValueAsString;
+                    temp = value.ValueAsString;
                 else if (value.Value.HasValue)
-                    tem = value.Value.Value.ToString();
+                    temp = value.Value.Value.ToString();
 
-                if (string.IsNullOrEmpty(tem))
+                if (string.IsNullOrEmpty(temp))
                     continue;
 
-                result.Add(item.Key, tem);
+                result.Add(item.Key, temp);
             }
             else if (find.AggegationType == AggregationTypes.DateHistogram && item.Value is BucketAggregate bucketAggregate)
             {

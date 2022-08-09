@@ -23,9 +23,9 @@ public class QueryHandler
     [EventHandler]
     public async Task GetAggregationAsync(LogAggQuery query)
     {
-        await _elasticClient.SearchAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, queryFn: Filter,
-            aggFn: (agg, q) => IElasticClientExtenstion.Aggregation(agg, q.FieldMaps),
-            resultFn: (rep, q) => q.Result = IElasticClientExtenstion.AggResult(rep, q.FieldMaps)!,
+        await _elasticClient.SearchAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, condition: Filter,
+            aggregate: (agg, q) => IElasticClientExtenstion.Aggregation(agg, q.FieldMaps),
+            result: (rep, q) => q.Result = IElasticClientExtenstion.AggResult(rep, q.FieldMaps)!,
             logger: _logger);
     }
 
@@ -51,13 +51,13 @@ public class QueryHandler
     [EventHandler]
     public async Task GetLatestDataAsync(LatestLogQuery query)
     {
-        await _elasticClient.SearchAsync<object, LatestLogQuery>(ElasticConst.LogIndex, query, queryFn: Filter,
-           resultFn: (result, q) =>
+        await _elasticClient.SearchAsync<object, LatestLogQuery>(ElasticConst.LogIndex, query, condition: LastLogFilter,
+           result: (result, q) =>
            {
                query.Result = result.Documents.FirstOrDefault() ?? default(JsonElement);
            },
-           pageFn: () => Tuple.Create(true, 1, 1),
-           sortFn: (sort, q) =>
+           pageration: () => ValueTuple.Create(true, 1, 1),
+           sort: (sort, q) =>
            {
                if (q.IsDesc)
                    return sort.Descending(ElasticConst.LogTimestamp);
@@ -67,7 +67,7 @@ public class QueryHandler
            logger: _logger);
     }
 
-    private QueryContainer Filter(QueryContainerDescriptor<object> container, LatestLogQuery query)
+    private QueryContainer LastLogFilter(QueryContainerDescriptor<object> container, LatestLogQuery query)
     {
         var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
         if (!string.IsNullOrEmpty(query.Query))
@@ -110,20 +110,14 @@ public class QueryHandler
     [EventHandler]
     public async Task GetPageListAsync(LogsQuery query)
     {
-        await _elasticClient.SearchAsync<object, LogsQuery>(ElasticConst.LogIndex, query, queryFn: Filter,
-           resultFn: (result, q) =>
-         {
-             query.Result = new PaginationDto<object>(result.Total, result.Documents?.ToList() ?? default!);
-         },
-           pageFn: () => Tuple.Create(true, query.Page, query.Size),
-           sortFn: (sort, q) =>
-           {
-               return sort.Field(ElasticConst.LogTimestamp, query.Sort == "asc" ? SortOrder.Ascending : SortOrder.Descending);
-           },
+        await _elasticClient.SearchAsync<object, LogsQuery>(ElasticConst.LogIndex, query, condition: PageFilter,
+           result: (result, q) => query.Result = new PaginationDto<object>(result.Total, result.Documents?.ToList() ?? default!),
+           pageration: () => ValueTuple.Create(true, query.Page, query.Size),
+           sort: (sort, q) =>sort.Field(ElasticConst.LogTimestamp, query.Sort == "asc" ? SortOrder.Ascending : SortOrder.Descending),
            logger: _logger);
     }
 
-    private QueryContainer Filter(QueryContainerDescriptor<object> container, LogsQuery query)
+    private QueryContainer PageFilter(QueryContainerDescriptor<object> container, LogsQuery query)
     {
         var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
         if (!string.IsNullOrEmpty(query.Query))

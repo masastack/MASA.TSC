@@ -7,13 +7,13 @@ public class LogService : ServiceBase
 {
     public LogService(IServiceCollection services) : base(services, "/api/log")
     {
-        App.MapGet($"{BaseUri}/aggregation", AggegationAsync);
+        App.MapGet($"{BaseUri}/aggregate", AggregateAsync);
         App.MapGet($"{BaseUri}/latest", GetLatestAsync);
         App.MapGet($"{BaseUri}/mapping", GetMappingFieldAsync);
         App.MapGet($"{BaseUri}/list", GetPageAsync);
     }
 
-    private async Task<IEnumerable<KeyValuePair<string, string>>> AggegationAsync([FromServices] IEventBus eventBus, [FromBody] RequestAggregationDto param)
+    private async Task<IEnumerable<KeyValuePair<string, string>>> AggregateAsync([FromServices] IEventBus eventBus, [FromBody] RequestAggregationDto param)
     {
         var query = new LogAggQuery
         {

@@ -1,0 +1,116 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components
+@inherits TscComponentBase
+<MContainer>
+    @if (_isLoading)
+    {
+        <MRow>
+            <MCol>
+                Loading ...
+            </MCol>
+        </MRow>
+    }
+    else
+    {
+        <MRow>
+            <MCol Cols="12">
+                <MLabel>@_overView.Name</MLabel>
+            </MCol>
+        </MRow>
+        <MRow>
+            <MCol Class="py-0 my-0" Cols="2">
+                <MAutocomplete Items="_services"
+                           Dense
+                           TItem=TraceOverViewServiceModel
+                           TValue=string
+                           ItemValue="item=>item.Name"
+                           ItemText="item=>item.Name"
+                           TItemValue=string></MAutocomplete>
+            </MCol>
+        </MRow>
+        <MRow>
+            <MCol Cols="12" Class="d-flex justify-start">
+                <MCard Class="yellow rounded-md-1 body-2 ml-2  pt-1 px-6 rounded-md-1 blue-grey darken-1 white-text" Height="28">起始点 </MCard>
+                <MCard Class="pl-2 pt-1 body-1" style="background:none" Height="28">@_overView.Start.Format(CurrentTimeZone)</MCard>
+                <MCard Class="yellow rounded-md-1 body-2 ml-2  pt-1 px-6 rounded-md-1 blue-grey darken-1 white-text" Height="28">时间</MCard>
+                <MCard Class="pl-2 pt-1 body-1" style="background:none" Height="28">@_overView.TimeUsString</MCard>
+                <MCard Class="yellow rounded-md-1 body-2 ml-2  pt-1 px-6 rounded-md-1 blue-grey darken-1 white-text" Height="28">跨度</MCard>
+                <MCard Class="pl-2 pt-1 body-1" style="background:none" Height="28">@_overView.Total</MCard>
+            </MCol>
+        </MRow>
+        <MRow>
+            <MCol Cols="12" Class="d-flex justify-start">
+                @foreach(var item in _services)
+                {
+                    <MCard Class="mr-4 rounded-md-1" Style="@($"background-color:{item.Color}")"><MCardText><MIcon Size="2" Class="pr-1">fas fa-cirle</MIcon>@item.Name</MCardText></MCard>
+                }
+            </MCol>
+        </MRow>
+
+        <MRow>
+            <MCol Cols="8">
+                <TreeTable Expand=true
+                       KeyFunc="@(item=>{
+        var dic=(Dictionary<string,object>)item;
+        return (dic.ContainsKey("transaction")?GetDictionaryValue(dic,"transaction.id"):GetDictionaryValue(dic,"span.id")).ToString();
+    })"
+                       ParentFunc="@(item=>GetDictionaryValue((Dictionary<string,object>)item,"parent.id")?.ToString()??string.Empty)"
+                       Items="_items"
+                       OnRowClick="ChangeRecordAsync" OnOverViewUpdate="OverViewCompeleteAysnc"></TreeTable>
+            </MCol>
+            <MCol Cols="4">
+                <MContainer>
+                    <MRow>
+                        <MCol Cols=12>
+                            <MCard Class="rounded-0">
+                                <MCardText Class="pa-0 ma-0">
+                                    @foreach (var item in _selectItem.OverView)
+                                    {
+                                        <MListItem Style="min-height:24px">@item.Value</MListItem>
+                                    }
+                                </MCardText>
+                            </MCard>
+                        </MCol>
+                    </MRow>
+                    <MRow>
+                        <MCol Class="ma-0 py-0" Cols=12>
+                            <MCard Class="rounded-0">
+                                <MTabs SliderColor="gray" @bind-Value=_tabIndex>
+                                    <MTab Value="@("attr")">属性</MTab>
+                                    <MTab Value="@("resource")">资源</MTab>
+                                    <MTab Value="@("detail")">详情</MTab>
+                                    <MTab Value="@("log")">日志</MTab>
+                                </MTabs>
+                            </MCard>
+                        </MCol>
+                    </MRow>
+                    <MRow>
+                        <MCol Class="py-0" Cols=12>
+                            <MTabsItems Value=@_tabIndex Style="border:1px solid gray;">
+                                <MTabItem Value="@("attr")">
+                                    <MCol Class="overflow-auto">
+                                        <TscKeyValue Value="_selectItem.Attributes" WordBreak=true></TscKeyValue>
+                                    </MCol>
+                                </MTabItem>
+                                <MTabItem Value="@("resource")">
+                                    <MCol Class="overflow-auto">
+                                        <TscKeyValue Value="_selectItem.Resources" WordBreak=true></TscKeyValue>                                        
+                                    </MCol>
+                                </MTabItem>
+                                <MTabItem Value="@("detail")">
+                                    <MCol Class="overflow-auto">
+                                        <TscKeyValue Value="_selectItem.Current" WordBreak=true></TscKeyValue>
+                                    </MCol>
+                                </MTabItem>
+                                <MTabItem Value="@("log")">
+                                    <MCol Class="overflow-auto">
+                                        <TscKeyValue Value="_selectItem.Logs" WordBreak=true></TscKeyValue>
+                                    </MCol>
+                                </MTabItem>
+                            </MTabsItems>
+                        </MCol>
+                    </MRow>
+                </MContainer>
+            </MCol>
+        </MRow>
+    }
+</MContainer>

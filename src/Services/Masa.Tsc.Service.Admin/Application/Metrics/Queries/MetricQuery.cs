@@ -3,9 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Metrics;
 
-public record MetricQuery : Query<IEnumerable<string>>
+public record MetricQuery(IEnumerable<string> Match) : Query<IEnumerable<string>>
 {
-    public IEnumerable<string> Match { get; set; }
-
     public override IEnumerable<string> Result { get; set; }
 }

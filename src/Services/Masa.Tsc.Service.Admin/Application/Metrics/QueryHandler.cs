@@ -19,8 +19,8 @@ public class QueryHandler
     {
         var data = await _prometheusClient.QueryRangeAsync(new QueryRangeRequest
         {
-            End = query.End.ToUnixTimeSpan().ToString(),
-            Start = query.Start.ToUnixTimeSpan().ToString(),
+            End = query.End.ToUnixTimestamp().ToString(),
+            Start = query.Start.ToUnixTimestamp().ToString(),
             Query = query.Match,
             Step = ((int)Math.Ceiling((query.End - query.Start).TotalSeconds)).ToString()
         });
@@ -92,8 +92,8 @@ public class QueryHandler
         var data = await _prometheusClient.SeriesQueryAsync(new MetaDataQueryRequest
         {
             Match = query.Match,
-            End = query.End.ToUnixTimeSpan().ToString(),
-            Start = query.Start.ToUnixTimeSpan().ToString()
+            End = query.End.ToUnixTimestamp().ToString(),
+            Start = query.Start.ToUnixTimestamp().ToString()
         });
 
         if (data.Status == ResultStatuses.Success)
@@ -108,7 +108,7 @@ public class QueryHandler
         _logger.LogError("request failed {data.ErrorType} {data.Error}", data);
     }
 
-    private Dictionary<string, Dictionary<string, List<string>>> ConverToKeyValues(IEnumerable<IDictionary<string, string>> sources)
+    private static Dictionary<string, Dictionary<string, List<string>>> ConverToKeyValues(IEnumerable<IDictionary<string, string>> sources)
     {
         var result = new Dictionary<string, Dictionary<string, List<string>>>();
         string matchKey = "__name__";
@@ -135,7 +135,9 @@ public class QueryHandler
             foreach (var key in item.Keys)
             {
                 if (string.Equals(key, matchKey, StringComparison.CurrentCultureIgnoreCase))
+                {
                     continue;
+                }
                 else
                 {
                     if (dic.ContainsKey(key))

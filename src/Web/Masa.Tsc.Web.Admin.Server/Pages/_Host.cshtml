@@ -1,0 +1,10 @@
+﻿@page "/"
+@namespace Masa.Tsc.Admin.Pages
+@using Masa.Tsc.Web.Admin.Rcl
+@using Masa.Tsc.Admin.Server
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+}
+
+<component type="typeof(App)" render-mode="ServerPrerendered" />

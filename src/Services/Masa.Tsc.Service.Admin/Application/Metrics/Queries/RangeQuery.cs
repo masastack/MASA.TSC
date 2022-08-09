@@ -3,15 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Metrics;
 
-public record RangeQuery : Query<string>
+public record RangeQuery(string Match, string Step, DateTime Start, DateTime End) : Query<string>
 {
-    public string Match { get; set; }
-
-    public DateTime Start { get; set; }
-
-    public DateTime End { get; set; }
-
-    public string Step { get; set; }
-
     public override string Result { get; set; } = string.Empty;
 }

@@ -13,24 +13,14 @@ public class ProjectService : ServiceBase
 
     private async Task<List<ProjectDto>> GetProjectsAsync([FromServices] IEventBus eventBus, [FromQuery] Guid userId)
     {
-        var query = new ProjectsQuery
-        {
-            UserId = userId
-        };
+        var query = new ProjectsQuery(userId);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
     private async Task<TeamMonitorDto> OverViewAsync([FromServices] IEventBus eventBus, RequestTeamMonitorDto model)
     {
-        var teamQuery = new TeamMonitorQuery
-        {
-            EndTime = model.EndTime,
-            StartTime = model.StartTime,
-            Keyword = model.Keyword,
-            ProjectId = model.ProjectId,
-            UserId = model.UserId
-        };
+        var teamQuery = new TeamMonitorQuery(model.UserId, model.ProjectId, model.StartTime, model.EndTime, model.Keyword);
         await eventBus.PublishAsync(teamQuery);
         return teamQuery.Result;
     }

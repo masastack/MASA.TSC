@@ -3,13 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Metrics;
 
-public record LableValuesQuery : Query<Dictionary<string, Dictionary<string, List<string>>>>
+public record LableValuesQuery(IEnumerable<string> Match, DateTime Start, DateTime End) : Query<Dictionary<string, Dictionary<string, List<string>>>>
 {
-    public DateTime Start { get; set; }
-
-    public DateTime End { get; set; }
-
-    public IEnumerable<string> Match { get; set; }
-
     public override Dictionary<string, Dictionary<string, List<string>>> Result { get; set; }
 }

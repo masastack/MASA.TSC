@@ -3,9 +3,9 @@
 
 namespace Masa.Tsc.Service.Admin.Infrastructure.Repositories;
 
-public class PannelRepository : Repository<TscDbContext, Pannel, Guid>, IPannelRepository
+public class PanelRepository : Repository<TscDbContext, Panel, Guid>, IPanelRepository
 {
-    public PannelRepository(TscDbContext context, IUnitOfWork unitOfWork) : base(context, unitOfWork)
+    public PanelRepository(TscDbContext context, IUnitOfWork unitOfWork) : base(context, unitOfWork)
     {
     }
 }

@@ -3,6 +3,6 @@
 
 namespace Masa.Tsc.Service.Admin.Domain.Repositories;
 
-public interface IPannelRepository : IRepository<Pannel>
+public interface IPanelRepository : IRepository<Panel>
 {
 }

@@ -33,7 +33,7 @@ services:
       - "./dapr/components/:/components"
     network_mode: "service:masa.tsc.service.admin"
 
-  masa.tsc.ui.admin:
+  masa.tsc.web.admin:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:18013
@@ -43,7 +43,7 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
     depends_on:
-      - masa.tsc.service.admin
+      - masa.tsc.web.admin
 
   dapr-placement:
     command: ["./placement", "-port", "50000", "-log-level", "debug"]

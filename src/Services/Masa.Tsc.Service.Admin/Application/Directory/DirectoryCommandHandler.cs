@@ -16,7 +16,7 @@ public class DirectoryCommandHandler
     public async Task AddAsync(AddDirectoryCommand command)
     {
         if (await _directoryRepository.ToQueryable().AnyAsync(t => t.UserId == command.UserId && t.Name == command.Name))
-            throw new UserFriendlyException($"directory name \"{command.Name}\" is exists");
+            throw new UserFriendlyException($"Directory name \"{command.Name}\" is exists");
 
         await _directoryRepository.AddAsync(new Domain.Aggregates.Directory
         {
@@ -30,31 +30,31 @@ public class DirectoryCommandHandler
     [EventHandler]
     public async Task UpdateAsync(UpdateDirectoryCommand command)
     {
-        var find = await _directoryRepository.FindAsync(t => t.Id == command.Id && t.UserId == command.UserId);
-        if (find == null)
-            throw new UserFriendlyException($"directory \"{command.Id}\" is not exists");
+        var directory = await _directoryRepository.FindAsync(t => t.Id == command.Id && t.UserId == command.UserId);
+        if (directory == null)
+            throw new UserFriendlyException($"Directory \"{command.Id}\" is not exists");
 
-        if (command.Name == find.Name && command.Sort - find.Sort == 0)
+        if (command.Name == directory.Name && command.Sort - directory.Sort == 0)
             return;
 
         if (await _directoryRepository.ToQueryable().Where(t => t.UserId == command.UserId && t.Name == command.Name).AnyAsync(t => t.Id != command.Id))
-            throw new UserFriendlyException($"directory name \"{command.Name}\" is exists");
+            throw new UserFriendlyException($"Directory name \"{command.Name}\" is exists");
 
-        find.Name = command.Name;
-        find.Sort = command.Sort;
+        directory.Name = command.Name;
+        directory.Sort = command.Sort;
 
-        await _directoryRepository.UpdateAsync(find);
+        await _directoryRepository.UpdateAsync(directory);
     }
 
     [EventHandler]
     public async Task DeleteAsync(RemoveDirectoryCommand command)
     {
-        var find = await _directoryRepository.FindAsync(t => t.Id == command.Id);
-        if (find == null)
+        var directory = await _directoryRepository.FindAsync(t => t.Id == command.Id);
+        if (directory == null)
             return;
-        if (find.UserId != command.UserId)
-            throw new UserFriendlyException($"no permission");
+        if (directory.UserId != command.UserId)
+            throw new UserFriendlyException($"No permission");
 
-        await _directoryRepository.RemoveAsync(find);
+        await _directoryRepository.RemoveAsync(directory);
     }
 }
