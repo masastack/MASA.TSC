@@ -5,7 +5,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Data.Trace;
 
 public class TraceDetailModel : TraceTimeUsModel
 {
-    public Dictionary<string, string> OverView { get; set; } = new Dictionary<string, string>();
+    public Dictionary<string, string> Overview { get; set; } = new Dictionary<string, string>();
 
     public Dictionary<string, object> Current { get; set; }
 
@@ -24,7 +24,7 @@ public class TraceDetailModel : TraceTimeUsModel
     {
         Current = default!;
         Attributes = new Dictionary<string, object>();
-        OverView = new Dictionary<string, string>();
+        Overview = new Dictionary<string, string>();
         Resources = default!;
         Logs = default!;
     }
@@ -48,11 +48,11 @@ public class TraceDetailModel : TraceTimeUsModel
         else if (Current.ContainsKey("db"))
             Resources.Add("db", value["db"]);
 
-        OverView.Add("url", TscComponentBase.GetDictionaryValue(value, $"{name}.name").ToString()!);
+        Overview.Add("url", TscComponentBase.GetDictionaryValue(value, $"{name}.name").ToString()!);
         var model = new TraceTimeUsModel(1)
         {
             TimeUs = Convert.ToInt64(TscComponentBase.GetDictionaryValue(value, $"{name}.duration.us"))
         };
-        OverView.Add("duration", model.TimeUsString);
+        Overview.Add("duration", model.TimeUsString);
     }
 }

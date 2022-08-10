@@ -31,7 +31,7 @@ public partial class TreeTable
     public Func<object, Task> OnRowClick { get; set; }
 
     [Parameter]
-    public Func<TraceOverViewModel, Task> OnOverViewUpdate { get; set; }
+    public Func<TraceOverviewModel, Task> OnOverviewUpdate { get; set; }
 
     private Func<object, long> TimeUsFunc = obj =>
     {
@@ -48,7 +48,7 @@ public partial class TreeTable
     private IEnumerable<object> _items;
     private Dictionary<string, TraceTableLineModel> _keyDeeps = new();
     private Dictionary<string, List<string>> _dicChild = new();
-    private TraceOverViewModel _overView = new();
+    private TraceOverviewModel _overView = new();
     private List<TraceTimeUsModel> _timeLines = new();
     private bool _isLoading = true;
 
@@ -61,12 +61,12 @@ public partial class TreeTable
         DateTime start = data.Min(item => item.Value.Time);
         long total = data.Sum(item => item.Value.TimeUs);
 
-        SetOverView();
+        SetOverview();
         SetTimeLine();
         SetTreeLine();
-        if (OnOverViewUpdate != null)
+        if (OnOverviewUpdate != null)
         {
-            await OnOverViewUpdate(_overView);
+            await OnOverviewUpdate(_overView);
         }
         _isLoading = false;
         await base.OnParametersSetAsync();
@@ -163,7 +163,7 @@ public partial class TreeTable
         _items = list.OrderBy(item => sortIds.IndexOf(KeyFunc(item)));
     }
 
-    private void SetOverView()
+    private void SetOverview()
     {
         _overView.Total = _items.Count();
         var data = _keyDeeps.Where(item => item.Value.IsTransaction && !_keyDeeps.ContainsKey(item.Value.ParentId)).ToList();
@@ -172,7 +172,7 @@ public partial class TreeTable
         _overView.Start = start;
         _overView.TimeUs = total;
         _overView.Name = GetDictionaryValue(_items.First(), "transaction.name").ToString()!;
-        _overView.Services = _keyDeeps.Values.Select(item => item.ServiceName).Distinct().Select(item => new TraceOverViewServiceModel
+        _overView.Services = _keyDeeps.Values.Select(item => item.ServiceName).Distinct().Select(item => new TraceOverviewServiceModel
         {
             Name = item,
             Color = "green"

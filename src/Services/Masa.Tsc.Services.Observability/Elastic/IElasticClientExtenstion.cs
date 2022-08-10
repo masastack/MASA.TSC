@@ -4,25 +4,7 @@
 namespace Nest;
 
 public static class IElasticClientExtenstion
-{
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="TResult"></typeparam>
-    /// <typeparam name="TQuery"></typeparam>
-    /// <param name="client"></param>
-    /// <param name="indexName"></param>
-    /// <param name="query"></param>
-    /// <param name="condition"></param>
-    /// <param name="result"></param>
-    /// <param name="aggregate"></param>
-    /// <param name="pageration">result is <bool, int ,int> bool:true isEnable paging, second param is pageIndex,last int value is pageSize</param>
-    /// <param name="sort"></param>
-    /// <param name="includeFields"></param>
-    /// <param name="excludeFields"></param>
-    /// <param name="logger"></param>
-    /// <returns></returns>
-    /// <exception cref="UserFriendlyException"></exception>
+{    
     public static async Task SearchAsync<TResult, TQuery>(this IElasticClient client,
         string indexName,
         TQuery query,

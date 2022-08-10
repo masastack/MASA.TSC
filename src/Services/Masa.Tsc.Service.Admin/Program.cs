@@ -65,9 +65,7 @@ var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     .AddEndpointsApiExplorer()
     .AddSwaggerGen(options =>
-    {
-        //var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-        //options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+    {       
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
         {
             Name = "Authorization",
@@ -92,6 +90,7 @@ var app = builder.Services
             }
         });
     })
+    .AddTransient(typeof(IMiddleware<>), typeof(LogMiddleware<>))
      .AddIntegrationEventBus<IntegrationEventLogService>(options =>
      {
          options.UseDapr();

@@ -20,7 +20,7 @@
             <MCol Class="py-0 my-0" Cols="2">
                 <MAutocomplete Items="_services"
                            Dense
-                           TItem=TraceOverViewServiceModel
+                           TItem=TraceOverviewServiceModel
                            TValue=string
                            ItemValue="item=>item.Name"
                            ItemText="item=>item.Name"
@@ -55,7 +55,7 @@
     })"
                        ParentFunc="@(item=>GetDictionaryValue((Dictionary<string,object>)item,"parent.id")?.ToString()??string.Empty)"
                        Items="_items"
-                       OnRowClick="ChangeRecordAsync" OnOverViewUpdate="OverViewCompeleteAysnc"></TreeTable>
+                       OnRowClick="ChangeRecordAsync" OnOverviewUpdate="OverviewCompeleteAysnc"></TreeTable>
             </MCol>
             <MCol Cols="4">
                 <MContainer>
@@ -63,7 +63,7 @@
                         <MCol Cols=12>
                             <MCard Class="rounded-0">
                                 <MCardText Class="pa-0 ma-0">
-                                    @foreach (var item in _selectItem.OverView)
+                                    @foreach (var item in _selectItem.Overview)
                                     {
                                         <MListItem Style="min-height:24px">@item.Value</MListItem>
                                     }

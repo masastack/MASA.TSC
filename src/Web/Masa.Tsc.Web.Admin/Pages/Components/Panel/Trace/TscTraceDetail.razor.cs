@@ -10,13 +10,13 @@ public partial class TscTraceDetail
     private bool _isLoading = true;
     private string _traceId = default!;
     private TraceDetailModel _selectItem;
-    private TraceOverViewModel _overView = new TraceOverViewModel();
-    private List<TraceOverViewServiceModel> _services = new List<TraceOverViewServiceModel>();
+    private TraceOverviewModel _overView = new TraceOverviewModel();
+    private List<TraceOverviewServiceModel> _services = new List<TraceOverviewServiceModel>();
 
     [Parameter]
     public string TraceId { get { return _traceId; } set { _traceId = value; _tabIndex = "attr"; } }
 
-    private async Task OverViewCompeleteAysnc(TraceOverViewModel model)
+    private async Task OverviewCompeleteAysnc(TraceOverviewModel model)
     {
         _overView = model;
         _services = model.Services;

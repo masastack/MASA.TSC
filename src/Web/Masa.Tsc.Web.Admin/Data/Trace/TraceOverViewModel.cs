@@ -3,9 +3,9 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data.Trace;
 
-public class TraceOverViewModel : TraceTimeUsModel
+public class TraceOverviewModel : TraceTimeUsModel
 {
-    public TraceOverViewModel() : base(1) { }
+    public TraceOverviewModel() : base(1) { }
 
     public string Name { get; set; }
 
@@ -13,10 +13,10 @@ public class TraceOverViewModel : TraceTimeUsModel
 
     public DateTime Start { get; set; }
 
-    public List<TraceOverViewServiceModel> Services { get; set; } = new List<TraceOverViewServiceModel>();
+    public List<TraceOverviewServiceModel> Services { get; set; } = new List<TraceOverviewServiceModel>();
 }
 
-public class TraceOverViewServiceModel
+public class TraceOverviewServiceModel
 {
     public string Name { get; set; }
 

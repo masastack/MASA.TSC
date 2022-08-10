@@ -12,7 +12,7 @@ public class ProjectService : BaseService
         return await Caller.GetAsync<List<ProjectDto>>($"{RootPath}?userId={userId}") ?? default!;
     }
 
-    public async Task<TeamMonitorDto> OverViewAsync(RequestTeamMonitorDto model)
+    public async Task<TeamMonitorDto> OverviewAsync(RequestTeamMonitorDto model)
     {
         return await Caller.GetAsync<TeamMonitorDto>($"{RootPath}/overview", model) ?? default!;
     }

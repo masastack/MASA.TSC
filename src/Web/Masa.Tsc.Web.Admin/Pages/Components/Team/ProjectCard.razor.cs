@@ -83,7 +83,7 @@ public partial class ProjectCard
     public int RowCount { get; set; } = 3;
 
     [Parameter]
-    public List<ProjectOverViewDto> Projects { get; set; }
+    public List<ProjectOverviewDto> Projects { get; set; }
 
     private TeamDto TeamData = new TeamDto
     {

@@ -7,7 +7,7 @@ public class ProjectService : ServiceBase
 {
     public ProjectService(IServiceCollection services) : base(services, "/api/project")
     {
-        App.MapGet($"{BaseUri}/overview", OverViewAsync);
+        App.MapGet($"{BaseUri}/overview", OverviewAsync);
         App.MapGet($"{BaseUri}", GetProjectsAsync);
     }
 
@@ -18,7 +18,7 @@ public class ProjectService : ServiceBase
         return query.Result;
     }
 
-    private async Task<TeamMonitorDto> OverViewAsync([FromServices] IEventBus eventBus, RequestTeamMonitorDto model)
+    private async Task<TeamMonitorDto> OverviewAsync([FromServices] IEventBus eventBus, RequestTeamMonitorDto model)
     {
         var teamQuery = new TeamMonitorQuery(model.UserId, model.ProjectId, model.StartTime, model.EndTime, model.Keyword);
         await eventBus.PublishAsync(teamQuery);

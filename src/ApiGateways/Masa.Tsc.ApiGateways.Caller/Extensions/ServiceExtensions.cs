@@ -5,7 +5,7 @@ namespace Masa.Tsc.ApiGateways.Caller.Extensions;
 
 public static class ServiceExtensions
 {
-    private const string DEFAULT_CLIENT_NAME = "masa.stack.tsc.web.caller";
+    private const string DEFAULT_CLIENT_NAME = "masa.tsc.apigateways.caller";
 
     public static IServiceCollection AddTscApiCaller(this IServiceCollection services, string tscApiUrl)
     {

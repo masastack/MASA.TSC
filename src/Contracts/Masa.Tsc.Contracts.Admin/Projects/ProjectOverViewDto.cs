@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Contracts.Admin;
 
-public class ProjectOverViewDto : ProjectDto
+public class ProjectOverviewDto : ProjectDto
 {
     public MonitorStatuses Status { get; set; } = MonitorStatuses.Normal;
 }

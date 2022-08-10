@@ -5,7 +5,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages;
 
 public partial class Team
 {
-    private List<ProjectOverViewDto> _projects = default!;
+    private List<ProjectOverviewDto> _projects = default!;
     private TeamSearch _teamSearch = default!;
     private int _error, _warn, _monitor, _normal;
     private bool _isLoad = true;
@@ -17,7 +17,7 @@ public partial class Team
 
     private async Task LoadData()
     {
-        var data = await ApiCaller.ProjectService.OverViewAsync(new RequestTeamMonitorDto
+        var data = await ApiCaller.ProjectService.OverviewAsync(new RequestTeamMonitorDto
         {
             EndTime = _teamSearch.End.Value.ToUnixTimestamp(),
             StartTime = _teamSearch.Start.Value.ToUnixTimestamp(),

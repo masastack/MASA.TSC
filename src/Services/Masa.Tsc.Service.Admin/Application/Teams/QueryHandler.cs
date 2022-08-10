@@ -26,51 +26,59 @@ public class QueryHandler
         var result = await _authClient.TeamService.GetDetailAsync(query.TeamId);
         if (result != null)
         {
-            var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(new List<Guid> { query.TeamId });
             query.Result = new TeamDto
             {
                 Id = result.Id,
                 Name = result.Name,
                 Avatar = result.Avatar,
                 Description = result.Description,
-                //Admins = result.Admins.Select(ToUser).ToList(),
-                ProjectTotal = projects?.Count ?? 0,
+                Admins = result.Admins.Select(ToUser).ToList(),
                 CurrentAppId = query.AppId
             };
+            await SetProjectAsync(query);
+        }
+    }
 
-            if (projects != null && projects.Any())
+    private async Task SetProjectAsync(TeamDetailQuery query)
+    {
+        var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(new List<Guid> { query.TeamId });
+        if (projects != null && projects.Any())
+        {
+            query.Result.ProjectTotal = projects.Count;
+            await SetAppAsync(query, projects);
+        }
+    }
+
+    private async Task SetAppAsync(TeamDetailQuery query, List<Masa.BuildingBlocks.BasicAbility.Pm.Model.ProjectModel> projects)
+    {
+        var apps = await _pmClient.AppService.GetListByProjectIdsAsync(projects.Select(p => p.Id).ToList());
+        if (apps != null && apps.Any())
+        {
+            query.Result.AppTotal = apps.Count;
+            int appid = Convert.ToInt32(query.AppId);
+            var app = apps.FirstOrDefault(a => a.Id == appid);
+            if (app != null)
             {
-                var apps = await _pmClient.AppService.GetListByProjectIdsAsync(projects.Select(p => p.Id).ToList());
-                if (apps != null && apps.Any())
+                var project = projects.FirstOrDefault(p => p.Id == app.ProjectId);
+                if (project != null)
                 {
-                    query.Result.AppTotal = apps.Count;
-                    int appid = Convert.ToInt32(query.AppId);
-                    var app = apps.FirstOrDefault(a => a.Id == appid);
-                    if (app != null)
+                    query.Result.CurrentProject = new ProjectDto
                     {
-                        var project = projects.FirstOrDefault(p => p.Id == app.ProjectId);
-                        if (project != null)
+                        Apps = apps.Where(a => a.ProjectId == project.Id).Select(a => new AppDto
                         {
-                            query.Result.CurrentProject = new ProjectDto
-                            {
-                                Apps = apps.Where(a => a.ProjectId == project.Id).Select(a => new AppDto
-                                {
-                                    Id = a.Id.ToString(),
-                                    Name = a.Name,
-                                    Identity = a.Identity,
-                                    ServiceType = (ServiceTypes)((int)a.ServiceType)
-                                }).ToList(),
-                                Description = project.Description,
-                                Identity = project.Identity,
-                                Name = project.Name,
-                                LabelName = project.LabelName,
-                                Id = project.Id.ToString()
-                            };
-                        }
-                    }
+                            Id = a.Id.ToString(),
+                            Name = a.Name,
+                            Identity = a.Identity,
+                            ServiceType = (ServiceTypes)(int)a.ServiceType
+                        }).ToList(),
+                        Description = project.Description,
+                        Identity = project.Identity,
+                        Name = project.Name,
+                        LabelName = project.LabelName,
+                        Id = project.Id.ToString()
+                    };
                 }
             }
-
         }
     }
 
@@ -93,57 +101,75 @@ public class QueryHandler
         int error = 0, warn = 0, errorWarnAppCount = 0;
         if (errorWarns != null && errorWarns.Any())
         {
-            foreach (var project in query.Result.Projects)
-            {
-                bool isError = false, isWarn = false;
-                foreach (var app in project.Apps)
-                {
-                    if (errorWarns.ContainsKey(app.Identity))
-                    {
-                        var item = errorWarns[app.Identity];
-
-                        if (item.Item2 > 0)
-                        {
-                            if (!isError && !isWarn)
-                                isWarn = true;
-                            app.Status = MonitorStatuses.Warn;
-                            warn += item.Item2;
-                        }
-
-                        if (item.Item1 > 0)
-                        {
-                            if (!isError)
-                                error += item.Item1;
-                            app.Status = MonitorStatuses.Error;
-                        }
-                    }
-                }
-                if (isError)
-                    project.Status = MonitorStatuses.Error;
-                else if (isWarn)
-                    project.Status = MonitorStatuses.Warn;
-            }
-
+            SetProjectStatus(query, errorWarns, ref error, ref warn);
             errorWarnAppCount = errorWarns.Where(item => item.Value.Item1 > 0 || item.Value.Item2 > 0).Count();
         }
 
+        query.Result.Monitor.Error = error;
+        query.Result.Monitor.Warn = warn;
         if (monitors != null && monitors.Any())
         {
             query.Result.Monitor.Total = monitors.Count;
-            query.Result.Monitor.Error = error;
-            query.Result.Monitor.Warn = warn;
             if (monitors.Count - errorWarnAppCount > 0)
             {
                 query.Result.Monitor.Normal = monitors.Count - errorWarnAppCount;
             }
         }
-
     }
 
-    private async Task<List<ProjectOverViewDto>> GetAllProjects(List<Guid> teamids)
+    private static void SetProjectStatus(TeamMonitorQuery query, Dictionary<string, (int, int)> errorWarns, ref int error, ref int warn)
+    {
+        if (errorWarns == null || !errorWarns.Any())
+            return;
+
+        foreach (var project in query.Result.Projects)
+        {
+            bool isError = false, isWarn = false;
+            foreach (var app in project.Apps)
+            {
+                SetAppStatus(errorWarns, ref error, ref warn, isError, ref isWarn, app);
+            }
+            if (isError)
+                project.Status = MonitorStatuses.Error;
+            else if (isWarn)
+                project.Status = MonitorStatuses.Warn;
+        }
+    }
+
+    private static void SetAppStatus(Dictionary<string, (int, int)> errorWarns, ref int error, ref int warn, bool isError, ref bool isWarn, AppDto app)
+    {
+        if (errorWarns.ContainsKey(app.Identity))
+        {
+            var item = errorWarns[app.Identity];
+
+            if (item.Item2 > 0)
+            {
+                if (!isError && !isWarn)
+                {
+                    isWarn = true;
+                    app.Status = MonitorStatuses.Warn;
+                }
+                warn += item.Item2;
+            }
+
+            if (item.Item1 > 0)
+            {
+                if (!isError)
+                {
+                    isError = true;
+                    isWarn = false;
+                    app.Status = MonitorStatuses.Error;
+                }
+                error += item.Item1;
+
+            }
+        }
+    }
+
+    private async Task<List<ProjectOverviewDto>> GetAllProjects(List<Guid> teamids)
     {
         var list = new List<int>();
-        var result = new List<ProjectOverViewDto>();
+        var result = new List<ProjectOverviewDto>();
 
         var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(teamids);
         if (projects == null || !projects.Any())
@@ -155,7 +181,7 @@ public class QueryHandler
             if (list.Contains(project.Id))
                 continue;
 
-            var model = new ProjectOverViewDto
+            var model = new ProjectOverviewDto
             {
                 Id = project.Id.ToString(),
                 Description = project.Description,
