@@ -94,7 +94,7 @@ public partial class TscTraceChart
 
     public async Task LoadAsync()
     {
-        var data = await ApiCaller.TraceService.GetAggregateAsync(new RequestAggregationDto
+        var data = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
         {
             End = Query.End,
             Start = Query.Start,
@@ -109,7 +109,7 @@ public partial class TscTraceChart
             Interval = GetInterval(),
         });
 
-        var data2 = await ApiCaller.TraceService.GetAggregateAsync(new RequestAggregationDto
+        var data2 = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
         {
             End = Query.End,
             Start = Query.Start,

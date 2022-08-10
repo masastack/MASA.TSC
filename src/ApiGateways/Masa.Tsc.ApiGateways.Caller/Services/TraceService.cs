@@ -22,7 +22,7 @@ public class TraceService : BaseService
         return (await Caller.GetByBodyAsync<IEnumerable<string>>($"{RootPath}/attr-values", model))!;
     }
 
-    public async Task<ChartLineDataDto<ChartPointDto>> GetAggregateAsync(RequestAggregationDto model)
+    public async Task<ChartLineDataDto<ChartPointDto>> AggregateAsync(RequestAggregationDto model)
     {
         return (await Caller.GetByBodyAsync<ChartLineDataDto<ChartPointDto>>($"{RootPath}/aggregate", model))!;
     }
