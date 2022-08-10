@@ -5,6 +5,7 @@ global using Masa.BuildingBlocks.Identity.IdentityModel;
 global using Masa.Stack.Components;
 global using Masa.Tsc.ApiGateways.Caller;
 global using Masa.Tsc.Web.Admin.Rcl;
+global using Masa.Utils.Security.Authentication.OpenIdConnect;
 global using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.RazorPages;

@@ -24,7 +24,7 @@ public class QueryHandler
         await _elasticClient.SearchAsync<object, TraceDetailQuery>($"{ElasticConst.TraceIndex},{ElasticConst.SpanIndex}", query,
             condition: (container, q) => container.Term(t => t.Field(ElasticConst.TRACE_ID).Value(q.TraceId)),
             sort: (sort, q) => sort.Ascending(ElasticConst.TraceTimestamp),
-            pageration: () => ValueTuple.Create(false, 0, ElasticConst.MAX_DATA_COUNT - 1),
+            page: () => ValueTuple.Create(false, 0, ElasticConst.MAX_DATA_COUNT - 1),
             result: (rep, q) => q.Result = rep.Documents!,
             logger: _logger);
     }
@@ -57,7 +57,7 @@ public class QueryHandler
                 return container.Bool(t => t.Must(list));
             },
             sort: (sort, q) => sort.Ascending(ElasticConst.TraceTimestamp),
-            pageration: () => ValueTuple.Create(true, query.Page, query.Size),
+            page: () => ValueTuple.Create(true, query.Page, query.Size),
             result: (rep, q) => q.Result = new PaginationDto<object>(rep.Total, rep.Documents?.ToList()!),
             logger: _logger);
     }
@@ -93,7 +93,7 @@ public class QueryHandler
                 data.Sort();
                 q.Result = data!;
             },
-            pageration: () => ValueTuple.Create(false, 0, query.Limit),
+            page: () => ValueTuple.Create(false, 0, query.Limit),
             logger: _logger);
     }
 

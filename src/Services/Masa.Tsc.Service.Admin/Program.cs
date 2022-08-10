@@ -55,17 +55,16 @@ builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
 //{
 //    configurationBuilder.UseDcc();
 //});
-builder.Services.AddDccClient();
+//builder.Services.AddDccClient();
 
-
-builder.Services.AddAuthClient(builder.Configuration["Masa:AuthUrl"]);
-builder.Services.AddPmClient(builder.Configuration["Masa:PmUrl"]);
+builder.Services.AddAuthClient(builder.Configuration["Masa:Auth:ServiceBaseAddress"]);
+builder.Services.AddPmClient(builder.Configuration["Masa:Pm:ServiceBaseAddress"]);
 
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     .AddEndpointsApiExplorer()
     .AddSwaggerGen(options =>
-    {       
+    {
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
         {
             Name = "Authorization",
@@ -86,12 +85,12 @@ var app = builder.Services
                         Id = "Bearer"
                     }
                 },
-                new string[] {}
+                Array.Empty<string>()
             }
         });
     })
     .AddTransient(typeof(IMiddleware<>), typeof(LogMiddleware<>))
-     .AddIntegrationEventBus<IntegrationEventLogService>(options =>
+    .AddIntegrationEventBus<IntegrationEventLogService>(options =>
      {
          options.UseDapr();
          options.UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer().UseFilter())
@@ -101,12 +100,8 @@ var app = builder.Services
      })
     .AddServices(builder);
 
-
 app.MigrateDbContext<TscDbContext>((context, services) =>
-{
-    //var logger = services.GetRequiredService<ILogger<TscDbContext>>();
-    //new AuthDbContextSeed().SeedAsync(context, logger).Wait();
-});
+{ });
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

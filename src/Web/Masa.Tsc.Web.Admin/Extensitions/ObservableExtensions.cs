@@ -7,9 +7,9 @@ public static class ObservableExtensions
 {
     public static void AddObservable(this WebApplicationBuilder builder)
     {
-        string otlpUrl = builder.Configuration.GetSection("otlpUrl").Value;
+        string otlpUrl = builder.Configuration.GetSection("Masa:Observable:OtlpUrl").Value;
         var resources = ResourceBuilder.CreateDefault();
-        resources.AddMasaService(builder.Configuration.GetSection("masa:tsc").Get<MasaObservableOptions>());
+        resources.AddMasaService(builder.Configuration.GetSection("Masa:Observable").Get<MasaObservableOptions>());
         var url = new Uri(otlpUrl);
 
         //metrics
@@ -49,6 +49,6 @@ public static class ObservableExtensions
             });
         });
 
-        builder.Services.AddTscApiCaller(builder.Configuration["masa:tsc:apiUrl"]);
+        builder.Services.AddTscApiCaller(builder.Configuration["Masa:Tsc:ServiceBaseAddress"]);
     }
 }

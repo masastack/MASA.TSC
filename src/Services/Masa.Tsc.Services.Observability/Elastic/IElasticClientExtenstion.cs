@@ -11,7 +11,7 @@ public static class IElasticClientExtenstion
         Func<QueryContainerDescriptor<TResult>, TQuery, QueryContainer>? condition = null,
         Action<ISearchResponse<TResult>, TQuery>? result = null,
         Func<AggregationContainerDescriptor<TResult>, TQuery, IAggregationContainer>? aggregate = null,
-        Func<ValueTuple<bool, int, int>>? pageration = null,
+        Func<ValueTuple<bool, int, int>>? page = null,
         Func<SortDescriptor<TResult>, TQuery, SortDescriptor<TResult>>? sort = null,
         Func<string[]>? includeFields = null,
         Func<string[]>? excludeFields = null,
@@ -24,16 +24,16 @@ public static class IElasticClientExtenstion
             {
                 if (condition is not null)
                     searchDescriptor = searchDescriptor.Query(queryContainer => condition.Invoke(queryContainer, query));
-                int page = 0, pageSize = 0;
+                int curPage = 0, pageSize = 0;
                 bool hasPage = false;
-                if (pageration != null)
+                if (page != null)
                 {
-                    var pageData = pageration.Invoke();
+                    var pageData = page.Invoke();
                     hasPage = pageData.Item1;
-                    page = pageData.Item2;
+                    curPage = pageData.Item2;
                     pageSize = pageData.Item3;
                 }
-                searchDescriptor = SetPageSize(searchDescriptor, hasPage, page, pageSize);
+                searchDescriptor = SetPageSize(searchDescriptor, hasPage, curPage, pageSize);
                 if (sort != null)
                     searchDescriptor = searchDescriptor.Sort(sortDescriptor => sort(sortDescriptor, query));
                 if (includeFields != null || excludeFields != null)
@@ -147,19 +147,19 @@ public static class IElasticClientExtenstion
 
     private static string? GetType(JsonElement value)
     {
-        if (value.TryGetProperty(MappingConst.TYPE, out JsonElement find))
-            return find.ToString();
+        if (value.TryGetProperty(MappingConst.TYPE, out JsonElement element))
+            return element.ToString();
         return default;
     }
 
     private static void SetKeyword(JsonElement value, MappingResponse model)
     {
         if (value.TryGetProperty(MappingConst.FIELD, out JsonElement fields) &&
-       fields.TryGetProperty(MappingConst.KEYWORD, out JsonElement find))
+       fields.TryGetProperty(MappingConst.KEYWORD, out JsonElement element))
         {
-            if (find.TryGetProperty(MappingConst.TYPE, out JsonElement type) && type.ToString() == MappingConst.KEYWORD)
+            if (element.TryGetProperty(MappingConst.TYPE, out JsonElement type) && type.ToString() == MappingConst.KEYWORD)
                 model.IsKeyword = true;
-            if (find.TryGetProperty(MappingConst.MAXLENGTH, out JsonElement maxLength))
+            if (element.TryGetProperty(MappingConst.MAXLENGTH, out JsonElement maxLength))
                 model.MaxLenth = maxLength.GetInt32();
         }
     }

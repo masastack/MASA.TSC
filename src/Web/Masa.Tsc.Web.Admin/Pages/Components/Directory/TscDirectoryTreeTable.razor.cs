@@ -68,12 +68,12 @@ public partial class TscDirectoryTreeTable
             }
             else
             {
-                var find = FindSelect(Data, item.Id);
+                var selected = FindSelected(Data, item.Id);
                 item.Selected = true;
                 if (OnRowSelected is not null)
                 {
-                    if (find != null)
-                        await OnRowSelected.Invoke(find);
+                    if (selected != null)
+                        await OnRowSelected.Invoke(selected);
                     await OnRowSelected.Invoke(item);
                 }
             }
@@ -81,7 +81,7 @@ public partial class TscDirectoryTreeTable
         }
     }
 
-    private DirectoryTreeDto FindSelect(IEnumerable<DirectoryTreeDto> data, Guid id)
+    private DirectoryTreeDto FindSelected(IEnumerable<DirectoryTreeDto> data, Guid id)
     {
         if (data is null || !data.Any())
             return default!;
@@ -94,9 +94,9 @@ public partial class TscDirectoryTreeTable
             }
             else
             {
-                var find = FindSelect(item.Children, id);
-                if (find != null)
-                    return find;
+                var selected = FindSelected(item.Children, id);
+                if (selected != null)
+                    return selected;
             }
         }
         return default!;

@@ -27,8 +27,8 @@ builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
     options.UserName = "name";
     options.UserId = "sub";
 })
-.AddMasaStackComponentsForServer("wwwroot/i18n", builder.Configuration["AuthServiceBaseAddress"], builder.Configuration["McServiceBaseAddress"])
-.AddMasaOpenIdConnect(builder.Configuration);
+.AddMasaStackComponentsForServer("wwwroot/i18n", builder.Configuration["Masa:Auth:ServiceBaseAddress"], builder.Configuration["Masa:Mc:ServiceBaseAddress"])
+.AddMasaOpenIdConnect(builder.Configuration.GetSection("Masa:OIDC").Get<MasaOpenIdConnectOptions>());
 
 var app = builder.Build();
 

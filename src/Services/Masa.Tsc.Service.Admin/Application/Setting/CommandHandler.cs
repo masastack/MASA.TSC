@@ -15,8 +15,8 @@ public class CommandHandler
     [EventHandler]
     public async Task SetAsync(SetSettingCommand command)
     {
-        var find = await _settingRepository.FindAsync(m => m.UserId == command.UserId);
-        if (find == null)
+        var setting = await _settingRepository.FindAsync(m => m.UserId == command.UserId);
+        if (setting == null)
         {
             await _settingRepository.AddAsync(new Domain.Aggregates.Setting
             {
@@ -30,8 +30,8 @@ public class CommandHandler
         }
         else
         {
-            find.Update(command.Language, command.Interval, command.IsEnable, command.TimeZone, command.TimeZoneOffset);
-            await _settingRepository.UpdateAsync(find);
+            setting.Update(command.Language, command.Interval, command.IsEnable, command.TimeZone, command.TimeZoneOffset);
+            await _settingRepository.UpdateAsync(setting);
         }
     }
 }

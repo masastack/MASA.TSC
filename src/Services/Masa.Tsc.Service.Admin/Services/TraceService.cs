@@ -12,7 +12,7 @@ public class TraceService : ServiceBase
         App.MapGet($"{BaseUri}/{{traceId}}", GetAsync);
         App.MapGet($"{BaseUri}/list", GetListAsync);
         App.MapGet($"{BaseUri}/attr-values", GetAttrValuesAsync);
-        App.MapGet($"{BaseUri}/aggregate", GetAggregateAsync);
+        App.MapGet($"{BaseUri}/aggregate", AggregateAsync);
         serviceDescriptors = services;
     }
 
@@ -37,7 +37,7 @@ public class TraceService : ServiceBase
         return query.Result;
     }
 
-    private async Task<ChartLineDataDto<ChartPointDto>> GetAggregateAsync([FromServices] IEventBus eventBus, [FromBody] RequestAggregationDto param)
+    private async Task<ChartLineDataDto<ChartPointDto>> AggregateAsync([FromServices] IEventBus eventBus, [FromBody] RequestAggregationDto param)
     {
         var query = new TraceAggregationQuery(true, true, param.FieldMaps, param.Queries, param.Start, param.End, param.Interval);
         await eventBus.PublishAsync(query);

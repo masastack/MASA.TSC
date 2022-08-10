@@ -54,8 +54,8 @@ public partial class MonitorCard
 
     private void SetData(int value, int index)
     {
-        AppMonitorViewDto find = Data[index];
-        find.Total = value;
+        AppMonitorViewDto item = Data[index];
+        item.Total = value;
     }
 
     private int GetValue(int index)

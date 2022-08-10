@@ -15,16 +15,16 @@ public class DirectoryQueryHandler
     [EventHandler]
     public async Task GetAsync(DirectoryQuery query)
     {
-        var find = await _directoryRepository.FindAsync(t => t.Id == query.Id && t.UserId == query.UserId);
-        if (find == null)
+        var directory = await _directoryRepository.FindAsync(t => t.Id == query.Id && t.UserId == query.UserId);
+        if (directory == null)
             throw new UserFriendlyException($"directory \"{query.Id}\" is not exists");
 
         query.Result = new()
         {
-            Id = find.Id,
-            ParentId = find.ParentId,
-            Name = find.Name,
-            Sort = find.Sort
+            Id = directory.Id,
+            ParentId = directory.ParentId,
+            Name = directory.Name,
+            Sort = directory.Sort
         };
     }
 

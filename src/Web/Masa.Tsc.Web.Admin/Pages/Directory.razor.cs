@@ -176,9 +176,9 @@ public partial class Directory
                 return item.Name;
             if (item.Children != null && item.Children.Any())
             {
-                var find = GetParentName(item.Children);
-                if (!string.IsNullOrEmpty(find))
-                    return find;
+                var parentName = GetParentName(item.Children);
+                if (!string.IsNullOrEmpty(parentName))
+                    return parentName;
             }
         }
         return default!;

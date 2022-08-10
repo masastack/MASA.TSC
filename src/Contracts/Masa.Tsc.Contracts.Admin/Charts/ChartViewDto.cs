@@ -10,7 +10,7 @@ public class ChartViewDto
     public string ChartType { get; set; }
     
     /// <summary>
-    /// x value raw toString, like '8' 、'8.00'、'8.00%'
+    /// y value raw toString, like '8' 、'8.00'、'8.00%'
     /// </summary>
     public string[] Points { get; set; }
 }

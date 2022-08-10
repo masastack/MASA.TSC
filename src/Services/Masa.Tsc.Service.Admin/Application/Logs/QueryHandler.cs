@@ -54,7 +54,7 @@ public class QueryHandler
         await _elasticClient.SearchAsync<object, LatestLogQuery>(ElasticConst.LogIndex, queryData, condition: LastLogFilter,
            result: (result, query) => query.Result = result.Documents.FirstOrDefault() ?? default(JsonElement),
            //enable paging,first page ,page size:1
-           pageration: () => ValueTuple.Create(true, 1, 1),
+           page: () => ValueTuple.Create(true, 1, 1),
            sort: (sort, query) =>
            {
                if (query.IsDesc)
@@ -110,7 +110,7 @@ public class QueryHandler
     {
         await _elasticClient.SearchAsync<object, LogsQuery>(ElasticConst.LogIndex, queryData, condition: PageFilter,
            result: (result, query) => query.Result = new PaginationDto<object>(result.Total, result.Documents?.ToList() ?? default!),
-           pageration: () => ValueTuple.Create(true, queryData.Page, queryData.Size),
+           page: () => ValueTuple.Create(true, queryData.Page, queryData.Size),
            sort: (sort, query) => sort.Field(ElasticConst.LogTimestamp, query.Sort == "asc" ? SortOrder.Ascending : SortOrder.Descending),
            logger: _logger);
     }

@@ -59,8 +59,8 @@ internal class IElasticClientExtenstion
         var result = new Dictionary<string, string>();
         foreach (var item in response.Aggregations)
         {
-            var find = FieldMaps.First(m => m.Alias == item.Key);
-            if (find.AggegationType - AggregationTypes.DistinctCount <= 0 && item.Value is ValueAggregate value && value != null)
+            var requestField = FieldMaps.First(m => m.Alias == item.Key);
+            if (requestField.AggegationType - AggregationTypes.DistinctCount <= 0 && item.Value is ValueAggregate value && value != null)
             {
                 string temp = default!;
                 if (!string.IsNullOrEmpty(value.ValueAsString))
@@ -73,7 +73,7 @@ internal class IElasticClientExtenstion
 
                 result.Add(item.Key, temp);
             }
-            else if (find.AggegationType == AggregationTypes.DateHistogram && item.Value is BucketAggregate bucketAggregate)
+            else if (requestField.AggegationType == AggregationTypes.DateHistogram && item.Value is BucketAggregate bucketAggregate)
             {
                 foreach (DateHistogramBucket bucket in bucketAggregate.Items)
                 {

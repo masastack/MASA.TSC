@@ -7,7 +7,7 @@ public partial class TscTraceChart
 {
     private object _options = new object();
 
-    private void ConvertOption(string[] xPointes, IEnumerable<ChartViewDto> data)
+    private void ConvertOption(string[] xPoints, IEnumerable<ChartViewDto> data)
     {
         _options = new
         {
@@ -17,7 +17,7 @@ public partial class TscTraceChart
             },
             XAxis = new
             {
-                Data = xPointes
+                Data = xPoints
             },
             YAxis = new { },
             Series =
@@ -115,7 +115,7 @@ public partial class TscTraceChart
             Start = Query.Start,
             FieldMaps = new RequestFieldAggregationDto[] {
                 new RequestFieldAggregationDto{
-                     AggegationType= Contracts.Admin.Enums.AggregationTypes.DateHistogram,
+                     AggegationType= AggregationTypes.DateHistogram,
                      Name="@timestamp",
                      Alias="Trace Count",
                 }
@@ -125,7 +125,7 @@ public partial class TscTraceChart
         });
         if (data.Data == null || !data.Data.Any())
             return;
-        var xPointes = data.Data.Select(item => DateTime.Parse(item.X).Format(CurrentTimeZone, GetFormat())).ToArray();
+        var xPoints = data.Data.Select(item => DateTime.Parse(item.X).Format(CurrentTimeZone, GetFormat())).ToArray();
         List<ChartViewDto> list = new()
         {
             new ChartViewDto
@@ -142,7 +142,7 @@ public partial class TscTraceChart
             }
         };
 
-        ConvertOption(xPointes, list);
+        ConvertOption(xPoints, list);
         StateHasChanged();
         await Task.CompletedTask;
     }

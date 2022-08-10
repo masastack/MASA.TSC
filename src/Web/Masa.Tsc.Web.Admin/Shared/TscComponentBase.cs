@@ -85,10 +85,10 @@ public class TscComponentBase : BComponentBase
                 continue;
             }
 
-            var find = dic.Keys.FirstOrDefault(k => string.Equals(k, key, StringComparison.OrdinalIgnoreCase));
-            if (find != null)
+            var findKey = dic.Keys.FirstOrDefault(k => string.Equals(k, key, StringComparison.OrdinalIgnoreCase));
+            if (findKey != null)
             {
-                obj = dic[find];
+                obj = dic[findKey];
                 continue;
             }
             return default!;
