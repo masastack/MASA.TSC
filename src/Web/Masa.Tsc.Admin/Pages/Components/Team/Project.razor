@@ -1,0 +1,11 @@
+﻿@namespace Masa.Tsc.Admin.Rcl.Pages.Components
+@inherits TscComponentBase
+<MRow>
+    <MCol Cols=2>
+        <TeamDetail Value=_team></TeamDetail>
+        <ProjectDetail Value=_team.CurrentProject></ProjectDetail>
+    </MCol>
+    <MCol Cols=10>
+        <SearchBar AppId=@AppId Apps=_team.CurrentProject.Apps></SearchBar>
+    </MCol>
+</MRow>
