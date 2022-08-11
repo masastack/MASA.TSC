@@ -90,7 +90,7 @@ public class QueryHandler
         if (teams == null || !teams.Any())
             return;
         query.Result = new TeamMonitorDto
-        {
+        {            
             Projects = await GetAllProjects(teams.Select(t => t.Id).ToList()),
             Monitor = new AppMonitorDto()
         };
@@ -187,7 +187,8 @@ public class QueryHandler
                 Description = project.Description,
                 Identity = project.Identity,
                 LabelName = project.LabelName,
-                Name = project.Name
+                Name = project.Name,
+                TeamId=teamids.FirstOrDefault()
             };
 
             if (apps != null && apps.Any())

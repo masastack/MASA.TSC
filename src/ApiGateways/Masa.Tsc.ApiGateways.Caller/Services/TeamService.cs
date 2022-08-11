@@ -9,8 +9,8 @@ public class TeamService : BaseService
     {
     }
 
-    public async Task<TeamDto> GetTeamAsync(string appId)
+    public async Task<TeamDto> GetTeamAsync(Guid teamId,string appId)
     {
-        return await Caller.GetAsync<TeamDto>($"{RootPath}?appId={appId}") ?? default!;
+        return await Caller.GetAsync<TeamDto>($"{RootPath}/{teamId}/{appId}") ?? default!;
     }
 }

@@ -17,7 +17,7 @@ public class QueryHandler
     [EventHandler]
     public async Task GetProjectsAsync(ProjectsQuery query)
     {
-        var teams = Array.Empty<TeamDetailModel>();
+        var teams = await _authClient.TeamService.GetUserTeamsAsync();
         if (teams != null && teams.Any())
         {
             query.Result = await GetAllProjectsAsync(teams.Select(t => t.Id).ToList());

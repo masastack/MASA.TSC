@@ -1,21 +1,30 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components
 <MCard>
-    <MImage></MImage>
-    <MCardTitle>@Value.Name</MCardTitle>
-    <MListItemGroup>
-        @foreach(var item in @Value.Admins)
-        {
-            <MListItem>
-                <MImage Src="@item.Avatar" MaxHeight=100 MaxWidth=100/>
-                 @item.DisplayName
-            </MListItem>
-        }
-    </MListItemGroup>
-    <MListItemGroup>
-        <MListItem>监测项目：@Value.ProjectTotal</MListItem>
-        <MListItem>监测应用：@Value.AppTotal</MListItem>
-    </MListItemGroup>
-    <MLabel>@Value.Description</MLabel>
+    <MCardTitle Class="d-flex justify-center">
+        <MImage Class="flex-row" LazySrc="@Value.Avatar" Contain MaxHeight=80 MaxWidth=80></MImage>
+        <div class="flex-row px-8 py-2">@Value.Name</div>
+        <div class="flex-row">
+            <MListItemGroup>
+            @foreach (var item in @Value.Admins)
+            {
+                <MListItem Class="d-flex">
+                    <MImage LazySrc="@item.Avatar" MaxHeight=20 MaxWidth=20 />
+                    @item.DisplayName
+                </MListItem>
+            }
+        </MListItemGroup>
+        </div>
+        <MCard>
+            <MCardText>
+                <MListItem>监测项目：@Value.ProjectTotal</MListItem>
+            <MListItem>监测应用：@Value.AppTotal</MListItem>
+            </MCardText>
+        </MCard>       
+        <MLabel>@Value.Description</MLabel>
+    </MCardTitle>
+    <MCardText>
+        <MIcon>aaa</MIcon>
+    </MCardText>
 </MCard>
 
 @code {
