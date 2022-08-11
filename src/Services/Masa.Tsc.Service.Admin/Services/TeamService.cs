@@ -7,7 +7,7 @@ public class TeamService : ServiceBase
 {
     public TeamService(IServiceCollection services) : base(services, "/api/team")
     {
-        App.MapGet($"{BaseUri}/{{teamId}}/{{appid}}", GetAsync);
+        App.MapGet($"{BaseUri}/{{teamId}}/{{appId}}", GetAsync);
     }
 
     private async Task<TeamDto> GetAsync([FromServices] IEventBus eventBus, Guid teamId, string appId)

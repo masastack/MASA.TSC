@@ -24,7 +24,7 @@ public partial class Team
             Keyword = _teamSearch.Keyword,
             ProjectId = _teamSearch.ProjectId,
             UserId = CurrentUserId
-        });
+        });        
 
         if (data != null)
         {

@@ -26,5 +26,9 @@ public partial class SearchBar
         "5小时"
     };
 
-    private string TimeStr = "2022/07/01 09:00:00~2022/07/01 10:00:00";
+    public DateTime? Start { get; set; }
+
+    public DateTime? End { get; set; }
+
+    private string sasas { get; set; }
 }
