@@ -8,9 +8,6 @@ public class ChartViewDto
     public string Title { get; set; }
 
     public string ChartType { get; set; }
-
-    /// <summary>
-    /// Y-axis raw value toString, like '8' 、'8.00'、'8.00%'
-    /// </summary>
-    public string[] Points { get; set; }
+    
+    public string[] Data { get; set; }
 }

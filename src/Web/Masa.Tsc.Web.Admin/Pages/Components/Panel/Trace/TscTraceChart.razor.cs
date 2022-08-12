@@ -25,7 +25,7 @@ public partial class TscTraceChart
             {
                 Name = item.Title,
                 Type = item.ChartType,
-                Data = item.Points
+                Data = item.Data
             })
 
 
@@ -132,13 +132,13 @@ public partial class TscTraceChart
             {
                 Title = "Span Count",
                 ChartType = "bar",
-                Points = data.Data.Select(item => item.Y).ToArray(),
+                Data = data.Data.Select(item => item.Y).ToArray(),
             },
             new ChartViewDto
             {
                 Title = "Trace Count",
                 ChartType = "bar",
-                Points = data2.Data.Select(item => item.Y).ToArray(),
+                Data = data2.Data.Select(item => item.Y).ToArray(),
             }
         };
 
