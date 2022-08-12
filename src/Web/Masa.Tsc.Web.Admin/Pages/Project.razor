@@ -1,0 +1,21 @@
+﻿<div class="d-flex">
+    <div class="flex-row col-3">aasdasdasdasdasdadasdas
+        <TeamDetail Value=Team></TeamDetail>
+        <ProjectDetail Value=@Value></ProjectDetail>
+    </div>
+    <div class="flex-row col-9">
+        <SearchBar AppId=@AppId Apps=@Value.Apps></SearchBar>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public TeamDto Team { get; set; } = default!;
+
+    [Parameter]
+    public ProjectDto Value { get; set; } = default!;
+
+    [Parameter]
+    public string AppId { get; set; } = default!;
+
+}

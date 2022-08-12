@@ -1,0 +1,51 @@
+version: '3.4'
+
+services:
+  masa.tsc.database:
+     image: mcr.microsoft.com/mssql/server:2019-latest
+     ports:
+       - "1433:1433"
+     environment:
+      - SA_PASSWORD=P@ssw0rd
+      - ACCEPT_EULA=Y
+
+  masa.tsc.service.admin:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:18011
+    ports:
+      - "18011:18011"
+      - "18010:18010"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  masa.tsc.service.admin.dapr:
+    image: "daprio/daprd:1.7.1"
+    command: ["./daprd",
+      "-app-id", "masa-tsc-service-admin",
+      "-app-port", "18011",
+      "-components-path", "/components"
+      ]
+    depends_on:
+      - masa.tsc.service.admin
+    volumes:
+      - "./dapr/components/:/components"
+    network_mode: "service:masa.tsc.service.admin"
+
+  masa.tsc.web.admin:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:18013
+    ports:
+      - "18013:18013"
+      - "18012:18012"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    depends_on:
+      - masa.tsc.web.admin
+
+  dapr-placement:
+    command: ["./placement", "-port", "50000", "-log-level", "debug"]
+    ports:
+      - "50000:50000"

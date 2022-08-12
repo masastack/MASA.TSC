@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Instruments\Query\**" />
+	  <EmbeddedResource Remove="Instruments\Query\**" />
+	  <None Remove="Instruments\Query\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth.Contracts" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Pm" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Identity.IdentityModel" Version="0.6.0-preview.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+		<PackageReference Include="Util.Reflection" Version="1.0.3" />
+	</ItemGroup>
+
+</Project>

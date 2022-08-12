@@ -1,0 +1,44 @@
+﻿
+<Element Style="width:20%">
+    <MCard>
+       <MCardTitle></MCardTitle>
+       <MContainer>
+           <MRow>
+               <MCol>监测项目：</MCol>
+               <MCol>15</MCol>
+               <MCol>监测应用：</MCol>
+               <MCol>37</MCol>
+           </MRow>
+           <MRow>
+               <MCol>故障项目：</MCol>
+               <MCol Class="color-text-red">5</MCol>
+               <MCol>故障应用：</MCol>
+               <MCol Class="color-text-red">17</MCol>
+           </MRow>
+           <MRow>
+               <MCol>重启次数：</MCol>
+               <MCol Class="color-text-green">15</MCol>
+               <MCol>计划执行：</MCol>
+               <MCol Class="color-text-green">0</MCol>
+           </MRow>
+       </MContainer>
+    </MCard>
+
+    <MCard>
+        <MCardTitle>团队管理员</MCardTitle>
+        <MList>
+            <MListItem>张   三</MListItem>
+            <MListItem>张三丰</MListItem>
+            <MListItem>李   三</MListItem>
+            <MListItem>张君宝</MListItem>
+        </MList>
+    </MCard>
+</Element>
+<Element Style="width:79%">
+    <ProjectCard></ProjectCard>
+</Element>
+
+@code {
+    [Parameter]
+    public List<ProjectDto> Projects { get; set; } = default!;
+}

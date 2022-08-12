@@ -1,0 +1,95 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<UserSecretsId>f6cdf028-3564-47a5-a4fb-662685680853</UserSecretsId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Application\Apps\**" />
+		<Compile Remove="Domain\Instruments\Events\**" />
+		<Compile Remove="Domain\Instruments\Services\**" />
+		<Compile Remove="Domain\Projects\Events\**" />
+		<Compile Remove="Domain\Projects\Service\**" />
+		<Compile Remove="Domain\Teams\Events\**" />
+		<Compile Remove="Domain\Teams\Service\**" />
+		<Content Remove="Application\Apps\**" />
+		<Content Remove="Domain\Instruments\Events\**" />
+		<Content Remove="Domain\Instruments\Services\**" />
+		<Content Remove="Domain\Projects\Events\**" />
+		<Content Remove="Domain\Projects\Service\**" />
+		<Content Remove="Domain\Teams\Events\**" />
+		<Content Remove="Domain\Teams\Service\**" />
+		<EmbeddedResource Remove="Application\Apps\**" />
+		<EmbeddedResource Remove="Domain\Instruments\Events\**" />
+		<EmbeddedResource Remove="Domain\Instruments\Services\**" />
+		<EmbeddedResource Remove="Domain\Projects\Events\**" />
+		<EmbeddedResource Remove="Domain\Projects\Service\**" />
+		<EmbeddedResource Remove="Domain\Teams\Events\**" />
+		<EmbeddedResource Remove="Domain\Teams\Service\**" />
+		<None Remove="Application\Apps\**" />
+		<None Remove="Domain\Instruments\Events\**" />
+		<None Remove="Domain\Instruments\Services\**" />
+		<None Remove="Domain\Projects\Events\**" />
+		<None Remove="Domain\Projects\Service\**" />
+		<None Remove="Domain\Teams\Events\**" />
+		<None Remove="Domain\Teams\Service\**" />
+	</ItemGroup>
+
+	<ItemGroup>		
+		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.BuildingBlocks.Dispatcher.Events" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.BasicAbility.Auth" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.BasicAbility.Pm" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.BasicAbility.Tsc" Version="0.6.0-preview.1" />
+		<PackageReference Include="MASA.Contrib.Data.Contracts.EF" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Data.EntityFrameworkCore.SqlServer" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Configuration" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Configuration.ConfigurationApi.Dcc" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EF" Version="0.6.0-preview.1" />
+		<PackageReference Include="Dapr.AspNetCore" Version="1.7.0" />
+		<PackageReference Include="Masa.BuildingBlocks.Ddd.Domain" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.BasicAbility.Dcc" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Ddd.Domain" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Ddd.Domain.Repository.EF" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.ReadWriteSpliting.Cqrs" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Utils.Data.Elasticsearch" Version="0.5.0" />
+		<PackageReference Include="Masa.Utils.Data.Prometheus" Version="0.5.0" />		
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.5" />
+		<PackageReference Include="Masa.Contrib.Data.UoW.EF" Version="0.6.0-preview.1" />
+		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.Dapr" Version="0.6.0-preview.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.6" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.6">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.6">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Application\Instruments\Queries\" />
+		<Folder Include="Domain\Projects\Repositories\" />
+		<Folder Include="Domain\Teams\Repositories\" />
+		<Folder Include="Migrations\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
+		<ProjectReference Include="..\Masa.Tsc.Services.Observability\Masa.Tsc.Services.Observability.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Dockerfile">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+</Project>

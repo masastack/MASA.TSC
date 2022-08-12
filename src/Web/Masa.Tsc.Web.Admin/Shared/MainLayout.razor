@@ -1,0 +1,88 @@
+﻿@inherits LayoutComponentBase
+
+<CascadingValue Value="I18n">
+    <MApp>
+        <MAppBar Elevation=0 App MaxHeight=60 Color="white" Class="m-bar--underline pl-2">
+            <MSpacer></MSpacer>
+            <MButton Text>
+                <a href="https://blazor.masastack.com/">About</a>
+            </MButton>
+        </MAppBar>
+        <MNavigationDrawer Absolute Permanent App>
+            <div>
+                <h5 class="text-center my-3">Masa.Tsc</h5>
+            </div>
+            <MList Nav class="pt-0">
+                <MListItem Link Href="/team">
+                    <MListItemContent>
+                        <MListItemTitle>团队监控</MListItemTitle>
+                    </MListItemContent>
+                </MListItem>
+                <MListItem>
+                    <MListItemContent>
+                        <MListItemTitle>k8s</MListItemTitle>
+                        <MListItem Linkage Href="/k8s/cluster">
+                            <MListItemContent>
+                                <MListItemTitle>集群</MListItemTitle>
+                            </MListItemContent>
+                        </MListItem>
+                        <MListItem Linkage Href="/k8s/pod">
+                            <MListItemContent>
+                                <MListItemTitle>服务</MListItemTitle>
+                            </MListItemContent>
+                        </MListItem>
+                    </MListItemContent>
+                </MListItem>
+                <MListItem Link Href="/database">
+                    <MListItemContent>
+                        <MListItemTitle>数据库监测</MListItemTitle>
+                    </MListItemContent>
+                </MListItem>
+                <MListItem Link Href="/dashbord/directory">
+                    <MListItemContent>
+                        <MListItemTitle>仪表盘</MListItemTitle>
+                    </MListItemContent>
+                </MListItem>
+                <MListItem Link Href="/dashbord/log">
+                    <MListItemContent>
+                        <MListItemTitle>日志</MListItemTitle>
+                    </MListItemContent>
+                </MListItem>
+                <MListItem Link Href="/dashbord/trace">
+                    <MListItemContent>
+                        <MListItemTitle>追踪</MListItemTitle>
+                    </MListItemContent>
+                </MListItem>
+                <MListItem Link Href="/setting">
+                    <MListItemContent>
+                        <MListItemTitle>Setting</MListItemTitle>
+                    </MListItemContent>
+                </MListItem>
+            </MList>
+        </MNavigationDrawer>
+        <MMain>
+            <MContainer Fluid Class="grey lighten-4">
+                <CascadingValue Value="this">
+                    <MErrorHandler>
+                        @Body
+                    </MErrorHandler>
+                </CascadingValue>
+            </MContainer>
+        </MMain>
+    </MApp>
+</CascadingValue>
+
+@*<Layout AppId="Masa-Pm-Web"
+    UserCenterRoute="/user"
+    Logo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo-h-en.png"
+    MiniLogo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo.png">
+    <MErrorHandler ShowDetail=false>
+    @Body
+    </MErrorHandler>
+    </Layout>*@
+
+@code
+{
+    [Inject]
+    private BlazorComponent.I18n.I18n I18n { get; set; } = default!;
+}
