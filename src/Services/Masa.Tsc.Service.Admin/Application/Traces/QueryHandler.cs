@@ -98,7 +98,7 @@ public class QueryHandler
     }
 
     [EventHandler]
-    public async Task GetAggregationAsync(TraceAggregationQuery query)
+    public async Task AggregateAsync(TraceAggregationQuery query)
     {
         string index = string.Empty;
         var find = query.Queries.FirstOrDefault(item => string.Equals(item.Key, "isSpan", StringComparison.CurrentCultureIgnoreCase));

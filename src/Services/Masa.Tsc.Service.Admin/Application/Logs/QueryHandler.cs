@@ -21,7 +21,7 @@ public class QueryHandler
 
     #region agg query
     [EventHandler]
-    public async Task GetAggregationAsync(LogAggQuery query)
+    public async Task AggregateAsync(LogAggQuery query)
     {
         await _elasticClient.SearchAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, condition: Filter,
             aggregate: (agg, q) => IElasticClientExtenstion.Aggregation(agg, q.FieldMaps),
