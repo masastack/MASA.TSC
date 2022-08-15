@@ -17,8 +17,8 @@ public class TscComponentBase : BComponentBase
     [Inject]
     public TscCaller ApiCaller { get; set; }
 
-    [Parameter]
-    public SettingDto Setting { get; set; }
+    //[Parameter]
+    public SettingDto Setting { get; set; } = new SettingDto();
 
     private static List<KeyValuePair<int, string>> _durations = new List<KeyValuePair<int, string>>
     {
@@ -37,7 +37,7 @@ public class TscComponentBase : BComponentBase
 
     public Guid CurrentUserId { get; private set; }
 
-    public TimeZoneInfo CurrentTimeZone { get; private set; }
+    public TimeZoneInfo CurrentTimeZone { get; private set; } = TimeZoneInfo.Local;
 
     protected virtual bool Loading { get; set; }
 
@@ -45,16 +45,20 @@ public class TscComponentBase : BComponentBase
     {
         Loading = true;
         CurrentUserId = Guid.Parse(UserContext.UserId!);
-        Setting = await ApiCaller.SettingService.GetAsync(CurrentUserId);
-        if (string.IsNullOrEmpty(Setting.Language))
-        {
-            Setting = GetDefaultSetting(CurrentUserId);
-        }
-        else
-        {
-            Setting.UserId = CurrentUserId;
-        }
         CurrentTimeZone = GetTimeZone();
+        //if (Setting == null)
+        //{
+        //    Setting = await ApiCaller.SettingService.GetAsync(CurrentUserId);
+        //    if (string.IsNullOrEmpty(Setting.Language))
+        //    {
+        //        Setting = GetDefaultSetting(CurrentUserId);
+        //    }
+        //    else
+        //    {
+        //        //Setting.UserId = CurrentUserId;
+        //    }
+        //    CurrentTimeZone = GetTimeZone();
+        //}
         Loading = false;
         await base.OnInitializedAsync();
     }

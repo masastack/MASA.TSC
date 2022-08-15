@@ -1,33 +1,58 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components
-<MCard>
-    <MCardTitle Class="d-flex justify-center">
-        <MImage Class="flex-row" LazySrc="@Value.Avatar" Contain MaxHeight=80 MaxWidth=80></MImage>
-        <div class="flex-row px-8 py-2">@Value.Name</div>
-        <div class="flex-row">
+@inherits TscComponentBase
+
+<MContainer>
+    <MRow>
+        <MCol Cols=12 Class="d-flex justify-center pa-0">
+            <MImage LazySrc="@Value.Avatar" Contain MaxHeight=80 MaxWidth=80></MImage>
+        </MCol>
+    </MRow>
+    <MRow>
+        <MCol Cols=12 Class="d-flex justify-center text-h6">
+            @Value.Name
+        </MCol>
+    </MRow>
+    <MRow>
+        <MCol Cols=12 Class="d-flex justify-center">
+            admins:
             <MListItemGroup>
-            @foreach (var item in @Value.Admins)
-            {
-                <MListItem Class="d-flex">
-                    <MImage LazySrc="@item.Avatar" MaxHeight=20 MaxWidth=20 />
-                    @item.DisplayName
-                </MListItem>
-            }
-        </MListItemGroup>
-        </div>
-        <MCard>
-            <MCardText>
-                <MListItem>监测项目：@Value.ProjectTotal</MListItem>
-            <MListItem>监测应用：@Value.AppTotal</MListItem>
-            </MCardText>
-        </MCard>       
-        <MLabel>@Value.Description</MLabel>
-    </MCardTitle>
-    <MCardText>
-        <MIcon>aaa</MIcon>
-    </MCardText>
-</MCard>
+                @foreach (var item in @Value.Admins)
+                {
+                    <MListItem Class="d-flex">
+                        <MImage LazySrc="@item.Avatar" MaxHeight=20 MaxWidth=20 />
+                        @item.DisplayName
+                    </MListItem>
+                }
+            </MListItemGroup>
+        </MCol>
+    </MRow>
+    <MRow>
+        <MCol Cols=6 Class="pa-0 text-body-2">监测项目：@Value.ProjectTotal</MCol>
+        <MCol Cols=6 Class="pa-0 text-body-2">监测应用：@Value.AppTotal</MCol>
+    </MRow>
+    <MRow>
+        <MCol Cols=12 Class="pa-0 text-body-2">Description:@Value.Description</MCol>
+    </MRow>
+    <MRow>
+        <MCol Cols=12 Class="pa-0 d-flex justify-center">
+            <MIcon XSmall>@_upDownClass</MIcon>
+        </MCol>
+    </MRow>
+</MContainer>
 
 @code {
+    private bool _down = true;
+    private string _upDownClass = "fas fa-chevron-down";
+
     [Parameter]
     public TeamDto Value { get; set; } = default!;
+
+    private void UpDownTroggle()
+    {
+        _down = !_down;
+        if (_down)
+            _upDownClass = "fas fa-chevron-down";
+        else
+            _upDownClass = "fas fa-chevron-up";
+    }
 }

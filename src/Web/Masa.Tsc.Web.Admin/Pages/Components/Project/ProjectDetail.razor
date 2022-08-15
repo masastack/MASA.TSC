@@ -1,12 +1,23 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components
-<MCard>
-    <MCardTitle>@Value.Name</MCardTitle>
-    <MLabel>@Value.Identity</MLabel>
-    <MLabel>应用：@Value.Apps.Count</MLabel>
-    <MLabel>@Value.Description</MLabel>
-</MCard>
+@inherits TscComponentBase
+
+<MContainer>
+    <MRow>
+        <MCol Cols=12 Class="text-center">@Value.Name</MCol>
+    </MRow>
+    <MRow>
+        <MCol Cols=12 Class="text-center">@Value.Identity</MCol>
+    </MRow>
+    <MRow>
+        <MCol Cols=12 Class="text-center">应用：@Value.Apps.Count</MCol>
+    </MRow>
+    <MRow>
+        <MCol Cols=12>Description:@Value.Description</MCol>
+    </MRow>
+</MContainer>
 
 @code {
+    
     [Parameter]
     public ProjectDto Value { get; set; } = default!;
 }

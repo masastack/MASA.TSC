@@ -5,18 +5,25 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components;
 
 public partial class ProjectCard
 {
-    private int rows = 0;
-    private int currentRow = 0;
-    private ProjectDto Project;
-    private bool isShow = false;
+    [Parameter]
+    public int RowCount { get { return _rowSize; } set { _rowSize = value; SetTotalRows(); } }
 
-    private void Click(ProjectDto dto)
+    [Parameter]
+    public List<ProjectOverviewDto> Projects { get { return _projects; } set { _projects = value; SetTotalRows(); } }
+
+    private List<ProjectOverviewDto> _projects;
+    private int _rowSize = 3;
+    private int _totalRows = 0;
+    private ProjectDto _current;
+    private bool _showDialog = false;
+
+    private void OnItemClick(ProjectDto item)
     {
-        Project = dto;
-        isShow = true;
+        _current = item;
+        _showDialog = true;
     }
 
-    private string GetPardddd(int rowIndex, int total)
+    private string GetPaddingClass(int rowIndex, int total)
     {
         if (total - RowCount == 0)
         {
@@ -40,68 +47,13 @@ public partial class ProjectCard
         return "";
     }
 
-    protected override void OnParametersSet()
+    private void SetTotalRows()
     {
-        if (Projects != null)
+        if (Projects != null && Projects.Any())
         {
-            rows = Projects.Count / RowCount;
+            _totalRows = Projects.Count / RowCount;
             if (Projects.Count % RowCount > 0)
-                rows += 1;
-            currentRow = 0;
+                _totalRows += 1;
         }
-
-        base.OnParametersSet();
     }
-
-    private static List<AppDto> apps = new List<AppDto>
-    {
-        new AppDto
-       {
-           Id="1",
-            Name="masa-auth-web",
-             Identity="masa-auth-web",
-              ServiceType= BuildingBlocks.BasicAbility.Pm.Enum.ServiceTypes.WebApi,
-               Status= Contracts.Admin.Enums.MonitorStatuses.Normal
-       },new AppDto
-       {
-           Id="1",
-            Name="masa-auth-api",
-             Identity="masa-auth-api",
-              ServiceType= BuildingBlocks.BasicAbility.Pm.Enum.ServiceTypes.WebApi,
-               Status= Contracts.Admin.Enums.MonitorStatuses.Normal
-       },new AppDto
-       {
-           Id="1",
-            Name="masa-auth-gateway",
-             Identity="masa-auth-gateway",
-              ServiceType= BuildingBlocks.BasicAbility.Pm.Enum.ServiceTypes.WebApi,
-               Status= Contracts.Admin.Enums.MonitorStatuses.Normal
-       }
-    };
-
-    [Parameter]
-    public int RowCount { get; set; } = 3;
-
-    [Parameter]
-    public List<ProjectOverviewDto> Projects { get; set; }
-
-    private TeamDto TeamData = new TeamDto
-    {
-        Name = "Masa Stack Component Steam",
-        Avatar = "https://cdn.masastack.com/stack/images/website/masa-blazor/jack.png",
-        AppTotal = 20,
-        ProjectTotal = 50,
-        Description = "asdasdasdashujbnhsdfsfdbvx, dsifhsndi hj9idf sfgsdfsgbdfojkmopjm erfgsdvsdfsdfsdfsdfsd",
-        Admins = new List<UserDto>
-            {
-                new UserDto
-                {
-                    DisplayName="tdadd",
-                    Avatar="https://cdn.masastack.com/stack/images/website/masa-blazor/jack.png"
-
-                }
-
-            }
-
-    };
 }
