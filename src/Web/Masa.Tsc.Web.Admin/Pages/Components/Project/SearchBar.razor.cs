@@ -31,4 +31,16 @@ public partial class SearchBar
     public DateTime? End { get; set; }
 
     private string sasas { get; set; }
+
+    private string _searchIconClass= "fas fa-rotate";
+
+    private async Task SearchAsync()
+    {
+        _searchIconClass = "fas fa-circle-notch fa-spin";
+        StateHasChanged();
+        Thread.Sleep(500);
+        _searchIconClass = "fas fa-rotate";
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
 }

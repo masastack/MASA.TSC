@@ -32,8 +32,7 @@ public class QueryHandler
                 Name = result.Name,
                 Avatar = result.Avatar,
                 Description = result.Description,
-                Admins = result.Admins.Select(ToUser).ToList(),
-                CurrentAppId = query.AppId
+                Admins = result.Admins.Select(ToUser).ToList()               
             };
             await SetProjectAsync(query);
         }
@@ -45,7 +44,19 @@ public class QueryHandler
         if (projects != null && projects.Any())
         {
             query.Result.ProjectTotal = projects.Count;
-            await SetAppAsync(query, projects);
+            var project = projects.FirstOrDefault(p => p.Identity == query.ProjectId);
+            if (project != null)
+            {
+                query.Result.CurrentProject = new ProjectDto
+                {
+                    Description = project.Description,
+                    Identity = project.Identity,
+                    Name = project.Name,
+                    LabelName = project.LabelName,
+                    Id = project.Id.ToString()
+                };
+                await SetAppAsync(query, projects);
+            }
         }
     }
 
@@ -55,30 +66,13 @@ public class QueryHandler
         if (apps != null && apps.Any())
         {
             query.Result.AppTotal = apps.Count;
-            int appid = Convert.ToInt32(query.AppId);
-            var app = apps.FirstOrDefault(a => a.Id == appid);
-            if (app != null)
+            query.Result.CurrentProject.Apps = apps.Where(a => a.ProjectId == Convert.ToInt32(query.Result.CurrentProject.Id)).Select(a => new AppDto
             {
-                var project = projects.FirstOrDefault(p => p.Id == app.ProjectId);
-                if (project != null)
-                {
-                    query.Result.CurrentProject = new ProjectDto
-                    {
-                        Apps = apps.Where(a => a.ProjectId == project.Id).Select(a => new AppDto
-                        {
-                            Id = a.Id.ToString(),
-                            Name = a.Name,
-                            Identity = a.Identity,
-                            ServiceType = (ServiceTypes)(int)a.ServiceType
-                        }).ToList(),
-                        Description = project.Description,
-                        Identity = project.Identity,
-                        Name = project.Name,
-                        LabelName = project.LabelName,
-                        Id = project.Id.ToString()
-                    };
-                }
-            }
+                Id = a.Id.ToString(),
+                Name = a.Name,
+                Identity = a.Identity,
+                ServiceType = (ServiceTypes)(int)a.ServiceType
+            }).ToList();
         }
     }
 
@@ -90,7 +84,7 @@ public class QueryHandler
         if (teams == null || !teams.Any())
             return;
         query.Result = new TeamMonitorDto
-        {            
+        {
             Projects = await GetAllProjects(teams.Select(t => t.Id).ToList()),
             Monitor = new AppMonitorDto()
         };
@@ -188,7 +182,7 @@ public class QueryHandler
                 Identity = project.Identity,
                 LabelName = project.LabelName,
                 Name = project.Name,
-                TeamId=teamids.FirstOrDefault()
+                TeamId = teamids.FirstOrDefault()
             };
 
             if (apps != null && apps.Any())
