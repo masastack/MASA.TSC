@@ -15,7 +15,7 @@ ui-admin-docker-image-dev:
     - .values-dev-public-ui
     - .build-docker-image-dev
   rules:
-    - if: $CI_COMMIT_BRANCH == "feature/mobiletest"
+    - if: $CI_COMMIT_BRANCH == "develop"
       changes:
         - $PROJECT_PATH/**/*
         - .gitlab-ci.yml
