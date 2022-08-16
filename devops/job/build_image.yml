@@ -14,7 +14,7 @@
     - cd $PROJECT_PATH
     - pwd 
     - ls
-    - dotnet restore && dotnet publish  -c Release -o ./publish    > /dev/null
+    - dotnet restore && dotnet publish  -c Release -o ./publish 
     - docker build --force-rm -t $DOCKER_IMAGE_NAME .
     - docker push $DOCKER_IMAGE_NAME
   after_script:
