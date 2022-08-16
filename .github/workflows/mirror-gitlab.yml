@@ -1,10 +1,8 @@
 name: Mirror to Giltab
-on:
-  push:
-  delete:
-  create:
-  workflow_dispatch:
-  
+
+on: [push, delete, create]
+
+
 jobs:
   to_gitlab:
     runs-on: ubuntu-latest
@@ -15,6 +13,7 @@ jobs:
           REMOTE: '${{ secrets.GITLAB_ADDER }}/cicd/masa.tsc.git'
           GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
           GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+
 
 
           
