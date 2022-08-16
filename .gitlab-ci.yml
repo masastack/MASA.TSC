@@ -24,4 +24,3 @@ variables:
 
   K8S_IMAGEPULLSECRETSPULL: reg.lonsid.cn
   SECRET_TLS: lonsid-cn
-
