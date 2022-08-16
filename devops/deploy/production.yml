@@ -1,0 +1,31 @@
+
+service-admin-deploy-prd:
+  needs: ["service-admin-docker-image-prd"]
+  stage: deploy-prd
+  extends:
+    - .values-service-admin-prd
+    - .values-prd-public-service
+    - .deploy-service
+  only:
+    refs:
+      - main
+    changes:
+      - src/Services/Masa.Tsc.Service.Admin/**/*
+      - .gitlab-ci.yml
+  when: manual
+
+ui-admin-deploy-prd:
+  needs: ["ui-admin-docker-image-prd"]
+  stage: deploy-prd
+  extends:
+    - .values-ui-admin-prd
+    - .values-prd-public-ui
+    - .deploy-ui
+  only:
+    refs:
+      - main
+    changes:
+      - src/Web/Masa.Tsc.Web.Admin.Server/**/*
+      - .gitlab-ci.yml
+  when: manual
+

@@ -1,0 +1,51 @@
+.deploy-service:
+  tags:
+    - linux-shell
+  stage: deploy-dev
+  image: registry.cn-hangzhou.aliyuncs.com/masa/library:kubectl-shell-v1.21.1
+  script:
+    - echo $KUBECONFIG | base64 -d > ./config
+    - cat ./config
+    - echo $KUBECONFIG    $K8S_REPLICAS   $K8S_IMAGEPULLSECRETSPULL  $SECRET_TLS_DOMAIN_NAME   $PROJECT_PORT
+    - echo $DOCKER_IMAGE_NAME
+    - kubectl --kubeconfig ./config  version 
+    - ls 
+    - pwd 
+    - cat $K8S_FILE
+    - sed -i "s/DAPR_ID_PATH/${DAPR_ID_PATH}/g "  $K8S_FILE
+    - sed -i "s/PROJECT_NAME/${PROJECT_NAME}/g"  $K8S_FILE
+    - sed -i "s/SECRET_TLS/${SECRET_TLS}/g" $K8S_FILE
+    - sed -i "s/DOMAIN_NAME/${DOMAIN_NAME}/g" $K8S_FILE
+    - sed -i "s/PROJECT_PORT/${PROJECT_PORT}/g"  $K8S_FILE
+    - sed -i "s/K8S_REPLICAS/${K8S_REPLICAS}/g" $K8S_FILE
+    - sed -i "s@DOCKER_IMAGE_NAME@${DOCKER_IMAGE_NAME}@g" $K8S_FILE
+    - sed -i "s/K8S_IMAGEPULLSECRETSPULL/${K8S_IMAGEPULLSECRETSPULL}/g" $K8S_FILE
+    - cat $K8S_FILE
+    - kubectl --kubeconfig ./config apply -f $K8S_FILE  -n $NAMESPACE
+  retry: 1
+
+.deploy-ui:
+  tags:
+    - linux-shell
+  stage: deploy-dev
+  image: registry.cn-hangzhou.aliyuncs.com/masa/library:kubectl-shell-v1.21.1
+  script:
+    - echo $KUBECONFIG | base64 -d > ./config
+    - cat ./config
+    - echo $KUBECONFIG    $K8S_REPLICAS   $K8S_IMAGEPULLSECRETSPULL  $SECRET_TLS_DOMAIN_NAME  $PROJECT_PORT
+    - echo $DOCKER_IMAGE_NAME
+    - kubectl --kubeconfig ./config  version 
+    - ls 
+    - pwd 
+    - cat $K8S_FILE
+    - sed -i "s/DAPR_ID_PATH/${DAPR_ID_PATH}/g "  $K8S_FILE
+    - sed -i "s/PROJECT_NAME/${PROJECT_NAME}/g"  $K8S_FILE
+    - sed -i "s/SECRET_TLS/${SECRET_TLS}/g" $K8S_FILE
+    - sed -i "s/DOMAIN_NAME/${DOMAIN_NAME}/g" $K8S_FILE
+    - sed -i "s/PROJECT_PORT/${PROJECT_PORT}/g"  $K8S_FILE
+    - sed -i "s/K8S_REPLICAS/${K8S_REPLICAS}/g" $K8S_FILE
+    - sed -i "s@DOCKER_IMAGE_NAME@${DOCKER_IMAGE_NAME}@g" $K8S_FILE
+    - sed -i "s/K8S_IMAGEPULLSECRETSPULL/${K8S_IMAGEPULLSECRETSPULL}/g" $K8S_FILE
+    - cat $K8S_FILE
+    - kubectl --kubeconfig ./config apply -f $K8S_FILE  -n $NAMESPACE
+  retry: 1

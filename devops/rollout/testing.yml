@@ -1,0 +1,27 @@
+rollout-test-service-admin:
+  stage: rollout-test
+  extends:
+    - .values-service-admin-test
+    - .values-test-public-service
+    - .rollout
+  only:
+    refs:
+      - feature/mobiletest
+    changes:
+      - src/Services/Masa.Tsc.Service.Admin/**/*
+      - .gitlab-ci.yml
+  when: manual
+
+rollout-test-ui-admin:
+  stage: rollout-test
+  extends:
+    - .values-ui-admin-test
+    - .values-test-public-ui
+    - .rollout
+  only:
+    refs:
+      - feature/mobiletest
+    changes:
+      - src/Web/Masa.Tsc.Web.Admin.Server/**/*
+      - .gitlab-ci.yml
+  when: manual

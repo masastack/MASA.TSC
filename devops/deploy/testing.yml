@@ -1,0 +1,31 @@
+
+service-admin-deploy-test:
+  needs: ["service-admin-docker-image-dev"]
+  stage: deploy-test
+  extends:
+    - .values-service-admin-test
+    - .values-test-public-service
+    - .deploy-service
+  only:
+    refs:
+      - feature/mobiletest
+    changes:
+      - src/Services/Masa.Tsc.Service.Admin/**/*
+      - .gitlab-ci.yml
+  when: manual
+
+ui-admin-deploy-test:
+  needs: ["ui-admin-docker-image-dev"]
+  stage: deploy-test
+  extends:
+    - .values-ui-admin-test
+    - .values-test-public-ui
+    - .deploy-ui
+  only:
+    refs:
+      - feature/mobiletest
+    changes:
+      - src/Web/Masa.Tsc.Web.Admin.Server/**/*
+      - .gitlab-ci.yml
+  when: manual
+

@@ -1,0 +1,45 @@
+.build-docker-image-dev:
+  stage: build-docker-image-dev
+  tags:
+    - linux-shell
+  before_script:
+    # - docker login -u $CI_ALI_REGISTRY_USER -p $CI_ALI_REGISTRY_PASSWD $CI_ALI_REGISTRY_DOMAIN
+    - docker login -u admin -p $CI_REG_LONSID_CN_PASSWD $REGISTRY_URL
+  script:
+    - ls
+    - echo $CI_COMMIT_BRANCH
+    # - dotnet --version 
+    - docker version
+    - echo 'project:' + $PROJECT_PATH + 'project_name:'+ $PROJECT_NAME + 'docker tag:'  + $DOCKER_IMAGE_NAME
+    - cd $PROJECT_PATH
+    - pwd 
+    - ls
+    - dotnet restore && dotnet publish  -c Release -o ./publish    > /dev/null
+    - docker build --force-rm -t $DOCKER_IMAGE_NAME .
+    - docker push $DOCKER_IMAGE_NAME
+  after_script:
+    - docker rmi $DOCKER_IMAGE_NAME
+  retry: 1
+
+
+.build-docker-image-prd:
+  stage: build-docker-image-prd
+  tags:
+    - linux-shell
+  before_script:
+    # - docker login -u $CI_ALI_REGISTRY_USER -p $CI_ALI_REGISTRY_PASSWD $CI_ALI_REGISTRY_DOMAIN
+    - docker login -u admin -p $CI_REG_LONSID_CN_PASSWD $REGISTRY_URL
+  script:
+    - ls
+    - dotnet --version 
+    - docker version
+    - echo 'project:' + $PROJECT_PATH + 'project_name:'+ $PROJECT_NAME + 'docker tag:'  + $DOCKER_IMAGE_NAME
+    - cd $PROJECT_PATH
+    - pwd 
+    - ls
+    - dotnet restore && dotnet publish  -c Release -o ./publish    > /dev/null
+    - docker build --force-rm -t $DOCKER_IMAGE_NAME .
+    - docker push $DOCKER_IMAGE_NAME
+  after_script:
+    - docker rmi $DOCKER_IMAGE_NAME
+  retry: 1

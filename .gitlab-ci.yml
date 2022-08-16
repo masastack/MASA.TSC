@@ -1,0 +1,26 @@
+include: 'devops/**/*.yml'
+
+stages:
+  # - sornarqube
+  - build-docker-image-dev
+  - deploy-dev
+  - deploy-test
+  - rollout-dev
+  - rollout-test
+  - build-docker-image-prd
+  - deploy-staging
+  - rollout-staging
+  - deploy-prd
+  - rollout-prd
+
+variables: 
+  PRD_REPLICAS: 2
+
+  DEV_REPLICAS: 1
+
+  # REGISTRY_URL: registry.cn-hangzhou.aliyuncs.com
+  REGISTRY_URL: reg.lonsid.cn
+  REGISTRY_WAREHOUSE: masa
+
+  K8S_IMAGEPULLSECRETSPULL: reg.lonsid.cn
+  SECRET_TLS: lonsid-cn

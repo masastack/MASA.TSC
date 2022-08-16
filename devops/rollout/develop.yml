@@ -1,0 +1,27 @@
+rollout-dev-service-admin:
+  stage: rollout-dev
+  extends:
+    - .values-service-admin-dev
+    - .values-dev-public-service
+    - .rollout
+  only:
+    refs:
+      - feature/mobiletest
+    changes:
+      - src/Services/Masa.Tsc.Service.Admin/**/*
+      - .gitlab-ci.yml
+  when: manual
+
+rollout-dev-ui-admin:
+  stage: rollout-dev
+  extends:
+    - .values-ui-admin-dev
+    - .values-dev-public-ui
+    - .rollout
+  only:
+    refs:
+      - feature/mobiletest
+    changes:
+      - src/Web/Masa.Tsc.Web.Admin.Server/**/*
+      - .gitlab-ci.yml
+  when: manual
