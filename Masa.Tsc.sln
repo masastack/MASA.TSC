@@ -34,7 +34,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Tsc.ApiGateways.Caller
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Tsc.Contracts.Admin", "src\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj", "{D38D7297-FC98-4126-B320-1322B6F8CCFB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Tsc.Web.Admin.Rcl", "src\Web\Masa.Tsc.Web.Admin\Masa.Tsc.Web.Admin.Rcl.csproj", "{7248BEE3-7257-4735-B0F7-B3B4D8A2E073}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Tsc.Web.Admin.Rcl", "src\Web\Masa.Tsc.Web.Admin.Rcl\Masa.Tsc.Web.Admin.Rcl.csproj", "{7248BEE3-7257-4735-B0F7-B3B4D8A2E073}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Tsc.Web.Admin.Server", "src\Web\Masa.Tsc.Web.Admin.Server\Masa.Tsc.Web.Admin.Server.csproj", "{AD1AD4E4-5D65-4480-9A38-7B11FC367501}"
 EndProject
