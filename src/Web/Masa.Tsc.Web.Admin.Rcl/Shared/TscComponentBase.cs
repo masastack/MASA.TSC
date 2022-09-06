@@ -17,7 +17,6 @@ public class TscComponentBase : BComponentBase
     [Inject]
     public TscCaller ApiCaller { get; set; }
 
-    //[Parameter]
     public SettingDto Setting { get; set; } = new SettingDto();
 
     private static List<KeyValuePair<int, string>> _durations = new List<KeyValuePair<int, string>>

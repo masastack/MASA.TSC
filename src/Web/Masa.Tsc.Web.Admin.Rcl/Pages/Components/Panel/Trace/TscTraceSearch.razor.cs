@@ -39,8 +39,8 @@ public partial class TscTraceSearch
         CheckTime();
         var query = new RequestAttrDataDto
         {
-            End = TimeZoneInfo.ConvertTime(_end.Value, CurrentTimeZone),
-            Start = TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone),
+            End = TimeZoneInfo.ConvertTime(_end!.Value, CurrentTimeZone),
+            Start = TimeZoneInfo.ConvertTime(_start!.Value, CurrentTimeZone),
             Keyword = val,
             Max = 10
         };
@@ -85,8 +85,8 @@ public partial class TscTraceSearch
         CheckTime();
         var query = new RequestAttrDataDto
         {
-            End = TimeZoneInfo.ConvertTime(_end.Value, CurrentTimeZone),
-            Start = TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone),
+            End = TimeZoneInfo.ConvertTime(_end!.Value, CurrentTimeZone),
+            Start = TimeZoneInfo.ConvertTime(_start!.Value, CurrentTimeZone),
             Max = 10
         };
         IEnumerable<string> data;
@@ -120,8 +120,8 @@ public partial class TscTraceSearch
         CheckTime();
         _services = (await ApiCaller.TraceService.GetAttrValuesAsync(new RequestAttrDataDto
         {
-            End = TimeZoneInfo.ConvertTime(_end.Value, CurrentTimeZone),
-            Start = TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone),
+            End = TimeZoneInfo.ConvertTime(_end!.Value, CurrentTimeZone),
+            Start = TimeZoneInfo.ConvertTime(_start!.Value, CurrentTimeZone),
             Name = "service.name",
             Max = 10
         })).ToList();

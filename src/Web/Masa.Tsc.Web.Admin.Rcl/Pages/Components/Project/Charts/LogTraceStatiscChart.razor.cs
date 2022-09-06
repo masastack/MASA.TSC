@@ -5,23 +5,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components;
 
 public partial class LogTraceStatiscChart
 {
-    private EChartBarOption _options = new()
-    {
-        XAxis = new EChartOptionAxis
-        {
-            Type = "category"
-        },
-        YAxis = new EChartOptionAxis
-        {
-            Type = "value"
-        },
-        Series = new EChartOptionBarSeries[] {
-            new EChartOptionBarSeries{
-                Type="bar"
-            }
-        }
-    };
-
     [Parameter]
     public StringNumber Width { get; set; } = "100%";
 
@@ -42,6 +25,23 @@ public partial class LogTraceStatiscChart
 
     [Parameter]
     public bool Warn { get; set; }
+
+    private EChartBarOption _options = new()
+    {
+        XAxis = new EChartOptionAxis
+        {
+            Type = "category"
+        },
+        YAxis = new EChartOptionAxis
+        {
+            Type = "value"
+        },
+        Series = new EChartOptionBarSeries[] {
+            new EChartOptionBarSeries{
+                Type="bar"
+            }
+        }
+    };
 
     protected override async Task LoadAsync(Dictionary<string, object> queryParams)
     {

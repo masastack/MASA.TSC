@@ -28,8 +28,6 @@
 }
 @code
 {
-    private string _classs = "pa-0 ma-0 d-flex";
-
     [Parameter]
     public IEnumerable<KeyValuePair<string, object>> Value { get; set; } = default!;
 
@@ -38,4 +36,6 @@
 
     [Parameter]
     public bool WordBreak { get; set; }
+
+    private string _classs = "pa-0 ma-0 d-flex";
 }

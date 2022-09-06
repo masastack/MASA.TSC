@@ -3,8 +3,20 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components;
 
-public partial class ObstacleChart : TscEChartBase
+public partial class ObserveChart : TscEChartBase
 {
+    [Parameter]
+    public StringNumber Width { get; set; } = "100%";
+
+    [Parameter]
+    public StringNumber Height { get; set; } = 300;
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string SubText { get; set; }
+
     private EChartPieBorderRadiusOption _options = new()
     {
         Legend = new EChartOptionLegend
@@ -37,19 +49,7 @@ public partial class ObstacleChart : TscEChartBase
         }
     };
 
-    [Parameter]
-    public StringNumber Width { get; set; } = "100%";
-
-    [Parameter]
-    public StringNumber Height { get; set; } = 300;
-
-    [Parameter]
-    public string Title { get; set; }
-
     public int Total { get; set; } = 23;
-
-    [Parameter]
-    public string SubText { get; set; }
 
     protected override async Task LoadAsync(Dictionary<string, object> searchParams)
     {

@@ -10,8 +10,8 @@ public partial class ProjectCharts
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-        { 
-        
+        {
+
         }
         return base.OnAfterRenderAsync(firstRender);
     }

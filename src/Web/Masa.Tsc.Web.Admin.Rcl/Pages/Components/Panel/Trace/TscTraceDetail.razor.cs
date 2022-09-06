@@ -5,16 +5,16 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components;
 
 public partial class TscTraceDetail
 {
+    [Parameter]
+    public string TraceId { get { return _traceId; } set { _traceId = value; _tabIndex = "attr"; } }
+
     private StringNumber _tabIndex = "attr";
     private IEnumerable<object> _items = new List<object>();
     private bool _isLoading = true;
     private string _traceId = default!;
     private TraceDetailModel _selectItem;
     private TraceOverviewModel _overView = new TraceOverviewModel();
-    private List<TraceOverviewServiceModel> _services = new List<TraceOverviewServiceModel>();
-
-    [Parameter]
-    public string TraceId { get { return _traceId; } set { _traceId = value; _tabIndex = "attr"; } }
+    private List<TraceOverviewServiceModel> _services = new List<TraceOverviewServiceModel>();    
 
     private async Task OverviewCompeleteAysnc(TraceOverviewModel model)
     {

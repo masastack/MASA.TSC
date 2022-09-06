@@ -17,14 +17,19 @@ public partial class Team
 
     private async Task LoadData()
     {
+        long start = 0, end = 0;
+        if (_teamSearch.Start.HasValue)
+            start = _teamSearch.Start.Value.ToUnixTimestamp();
+        if (_teamSearch.End.HasValue)
+            end = _teamSearch.End.Value.ToUnixTimestamp();
         var data = await ApiCaller.ProjectService.OverviewAsync(new RequestTeamMonitorDto
         {
-            EndTime = _teamSearch.End.Value.ToUnixTimestamp(),
-            StartTime = _teamSearch.Start.Value.ToUnixTimestamp(),
+            EndTime = end,
+            StartTime = start,
             Keyword = _teamSearch.Keyword,
             ProjectId = _teamSearch.ProjectId,
             UserId = CurrentUserId
-        });        
+        });
 
         if (data != null)
         {
@@ -32,11 +37,8 @@ public partial class Team
             _warn = data.Monitor.Warn;
             _monitor = data.Monitor.Total;
             _normal = data.Monitor.Normal;
-
             _projects = data.Projects;
-
         }
-
     }
 
     protected override async void OnAfterRender(bool firstRender)

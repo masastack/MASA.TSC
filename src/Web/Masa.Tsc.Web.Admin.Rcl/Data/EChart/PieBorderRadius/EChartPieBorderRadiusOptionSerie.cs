@@ -32,7 +32,7 @@ public class EChartPieBorderRadiusOptionSerieItemSyle
 }
 
 public class EChartPieBorderRadiusOptionLable
-{ 
+{
     public bool Show { get; set; }
 
     public string Position { get; set; }
@@ -45,7 +45,7 @@ public class EChartPieBorderRadiusOptionLable
 }
 
 public class EChartPieBorderRadiusOptionEmphasis
-{ 
+{
     public EChartPieBorderRadiusOptionEmphasisLable Lable { get; set; }
 }
 

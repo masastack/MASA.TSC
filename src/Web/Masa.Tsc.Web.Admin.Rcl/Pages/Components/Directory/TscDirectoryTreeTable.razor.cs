@@ -23,7 +23,7 @@ public partial class TscDirectoryTreeTable
     [Parameter]
     public Func<DirectoryTreeDto, Task> OnRowSelected { get; set; }
 
-    private string _class;    
+    private string _class;
 
     protected override Task OnParametersSetAsync()
     {

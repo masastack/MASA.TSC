@@ -4,7 +4,7 @@
 namespace Nest;
 
 public static class IElasticClientExtenstion
-{    
+{
     public static async Task SearchAsync<TResult, TQuery>(this IElasticClient client,
         string indexName,
         TQuery query,

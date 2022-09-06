@@ -4,7 +4,6 @@
 global using Masa.BuildingBlocks.BasicAbility.Auth;
 global using Masa.BuildingBlocks.BasicAbility.Auth.Contracts.Model;
 global using Masa.BuildingBlocks.BasicAbility.Pm;
-global using Masa.BuildingBlocks.BasicAbility.Pm.Enum;
 global using Masa.BuildingBlocks.Data.UoW;
 global using Masa.BuildingBlocks.Ddd.Domain.Entities;
 global using Masa.BuildingBlocks.Ddd.Domain.Entities.Full;
@@ -13,7 +12,6 @@ global using Masa.BuildingBlocks.Dispatcher.Events;
 global using Masa.BuildingBlocks.Identity.IdentityModel;
 global using Masa.BuildingBlocks.ReadWriteSpliting.Cqrs.Commands;
 global using Masa.BuildingBlocks.ReadWriteSpliting.Cqrs.Queries;
-global using Masa.Contrib.BasicAbility.Dcc;
 global using Masa.Contrib.BasicAbility.Tsc;
 global using Masa.Contrib.Data.Contracts.EF;
 global using Masa.Contrib.Data.EntityFrameworkCore;
