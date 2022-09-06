@@ -32,7 +32,7 @@ public partial class SearchBar
 
     private string sasas { get; set; }
 
-    private string _searchIconClass= "fas fa-rotate";
+    private string _searchIconClass = "fas fa-rotate";
 
     private async Task SearchAsync()
     {

@@ -5,26 +5,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components;
 
 public partial class ErrorWarnChart
 {
-    private readonly EChartPieOption _options = new()
-    {
-        Legend = new EChartOptionLegend
-        {
-            Bottom = true,
-            Right = true,
-            Orient = EchartOrientTypes.horizontal
-        },
-        Series = new EChartOptionSerie[] {
-             new EChartOptionSerie{
-                 Type="pie",
-                 Radius="80%",
-                 Emphasis=new(),
-                 Label=new EChartPieBorderRadiusOptionLable{ 
-                    Show=false
-                 }                 
-             }            
-        }
-    };
-
     [Parameter]
     public StringNumber Width { get; set; } = 180;
 
@@ -38,12 +18,32 @@ public partial class ErrorWarnChart
     public bool Warn { get; set; }
 
     [Parameter]
-    public string Title { get; set; } 
-
-    public int Total { get; set; } = 23;
+    public string Title { get; set; }
 
     [Parameter]
-    public string SubText { get; set; } = "abcdfsafsdfsdf\r\nasaDASDASDASDASDASDA\r\nsdafsdfsdfsd\r\nasdasdasdas";
+    public string SubText { get; set; } = "先写死\r\n从数据库读取加载";
+
+    private readonly EChartPieOption _options = new()
+    {
+        Legend = new EChartOptionLegend
+        {
+            Bottom = true,
+            Right = true,
+            Orient = EchartOrientTypes.horizontal
+        },
+        Series = new EChartOptionSerie[] {
+             new EChartOptionSerie{
+                 Type="pie",
+                 Radius="80%",
+                 Emphasis=new(),
+                 Label=new EChartPieBorderRadiusOptionLable{
+                    Show=false
+                 }
+             }
+        }
+    };
+
+    public int Total { get; set; } = 23;
 
     protected override async Task LoadAsync(Dictionary<string, object> queryParams)
     {
@@ -96,20 +96,4 @@ public partial class ErrorWarnChart
     {
         return new EChartOptionSerieData { Name = isTrace ? "Tace" : "Log", Value = value };
     }
-
-    //private Dictionary<string, string> ConvertToQueries(bool isSpan = false, bool isTrace = false)
-    //{
-    //    var dic = new Dictionary<string, string>();
-    //    if (Query.Service != null)
-    //        dic.Add("service.name", Query.Service);
-    //    if (Query.Instance != null)
-    //        dic.Add("service.node", Query.Instance);
-    //    if (Query.Endpoint != null)
-    //        dic.Add("transaction.name", Query.Endpoint);
-
-    //    dic.Add("isTrace", isTrace.ToString().ToLower());
-    //    dic.Add("isSpan", isSpan.ToString().ToLower());
-
-    //    return dic;
-    //}
 }

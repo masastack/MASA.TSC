@@ -4,7 +4,16 @@
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components;
 
 public partial class TscTraceChart
-{
+{    
+    [Parameter]
+    public StringNumber Width { get; set; } = "100%";
+
+    [Parameter]
+    public StringNumber Height { get; set; } = 300;
+
+    [Parameter]
+    public RequestTraceListDto Query { get; set; } = default!;
+
     private object _options = new object();
 
     private void ConvertOption(string[] xPoints, IEnumerable<ChartViewDto> data)
@@ -47,14 +56,6 @@ public partial class TscTraceChart
         };
     }
 
-    [Parameter]
-    public StringNumber Width { get; set; } = "100%";
-
-    [Parameter]
-    public StringNumber Height { get; set; } = 300;
-
-    [Parameter]
-    public RequestTraceListDto Query { get; set; } = default!;
 
     //public async Task LoadAsync()
     //{

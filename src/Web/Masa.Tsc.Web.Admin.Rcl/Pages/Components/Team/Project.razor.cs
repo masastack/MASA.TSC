@@ -5,12 +5,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components;
 
 public partial class Project
 {
-    //[Parameter]
-    public TeamDto Team { get; set; } = new();
-
-    // [Parameter]
-    public ProjectDto Value { get; set; } = new();
-
     [Parameter]
     public string ProjectId { get; set; } = default!;
 
@@ -22,6 +16,10 @@ public partial class Project
 
     private bool _isLoading = true;
 
+    public TeamDto Team { get; set; } = new();
+
+    public ProjectDto Value { get; set; } = new();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (_isLoading)
@@ -30,7 +28,7 @@ public partial class Project
             Value = Team.CurrentProject;
             AppId = Team.CurrentProject.Apps?.FirstOrDefault()?.Identity!;
             _isLoading = false;
-            StateHasChanged();            
+            StateHasChanged();
         }
         await base.OnAfterRenderAsync(firstRender);
     }

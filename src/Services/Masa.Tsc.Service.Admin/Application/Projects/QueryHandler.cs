@@ -64,7 +64,7 @@ public class QueryHandler
                     Id = m.Id.ToString(),
                     Identity = m.Identity,
                     Name = m.Name,
-                    ServiceType = (ServiceTypes)((int)m.ServiceType)
+                    ServiceType = m.ServiceType
                 }).ToList();
             }
         }

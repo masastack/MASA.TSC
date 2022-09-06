@@ -5,6 +5,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
 public enum EchartOrientTypes
 {
-    vertical = 0,
+    vertical = 1,
     horizontal
 }

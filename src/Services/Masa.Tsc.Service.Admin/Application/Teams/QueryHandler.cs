@@ -32,7 +32,7 @@ public class QueryHandler
                 Name = result.Name,
                 Avatar = result.Avatar,
                 Description = result.Description,
-                Admins = result.Admins.Select(ToUser).ToList()               
+                Admins = result.Admins.Select(ToUser).ToList()
             };
             await SetProjectAsync(query);
         }
@@ -71,7 +71,7 @@ public class QueryHandler
                 Id = a.Id.ToString(),
                 Name = a.Name,
                 Identity = a.Identity,
-                ServiceType = (ServiceTypes)(int)a.ServiceType
+                ServiceType = a.ServiceType
             }).ToList();
         }
     }
@@ -192,7 +192,7 @@ public class QueryHandler
                     Id = a.Id.ToString(),
                     Identity = a.Identity,
                     Name = a.Name,
-                    ServiceType = (ServiceTypes)((int)a.ServiceType)
+                    ServiceType = a.ServiceType
                 }).ToList();
             }
 

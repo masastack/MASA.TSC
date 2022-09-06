@@ -5,15 +5,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components;
 
 public partial class LogTraceChart
 {
-    private EChartLineOption _options = new()
-    {
-        Legend = new EChartOptionLegend
-        {
-            Data = new string[] { "Errors", "Caculates" },
-            Left = true,
-            Top = true,
-        }
-    };
 
     [Parameter]
     public StringNumber Width { get; set; } = "100%";
@@ -30,8 +21,18 @@ public partial class LogTraceChart
     [Parameter]
     public string Title { get; set; }
 
-    protected override async Task LoadAsync(Dictionary<string,object> queryParams)
-    {       
+    private EChartLineOption _options = new()
+    {
+        Legend = new EChartOptionLegend
+        {
+            Data = new string[] { "Errors", "Caculates" },
+            Left = true,
+            Top = true,
+        }
+    };
+
+    protected override async Task LoadAsync(Dictionary<string, object> queryParams)
+    {
         //var data = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
         //{
         //    End = Query.End,

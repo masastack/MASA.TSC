@@ -7,6 +7,7 @@ public partial class TscTraceList : TscComponentBase
 {
     [Parameter]
     public RequestTraceListDto Query { get; set; } = default!;
+
     private IEnumerable<Dictionary<string, object>> _data = new List<Dictionary<string, object>>();
     private int _total = 0;
     private MDataTable<Dictionary<string, object>> _mDataTable = default!;

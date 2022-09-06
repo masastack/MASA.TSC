@@ -5,25 +5,23 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components;
 
 public partial class GrowthChart
 {
-    private EChartPieOption _options = new()
-    {
-    };
-
     [Parameter]
     public StringNumber Width { get; set; } = "100%";
 
     [Parameter]
-    public StringNumber Height { get; set; } = 300;    
+    public StringNumber Height { get; set; } = 300;
 
     [Parameter]
     public string Title { get; set; }
 
-    public int Total { get; set; } = 23;
-
     [Parameter]
     public string SubText { get; set; }
 
-    protected override async Task LoadAsync(Dictionary<string,object> queryParams)
+    private EChartPieOption _options = new();
+
+    public int Total { get; set; } = 23;
+
+    protected override async Task LoadAsync(Dictionary<string, object> queryParams)
     {
         //var data = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
         //{
@@ -64,7 +62,7 @@ public partial class GrowthChart
                    GetModel(true,data1),GetModel(false,data2)
                  }
             }
-        };      
+        };
         await Task.CompletedTask;
     }
 
