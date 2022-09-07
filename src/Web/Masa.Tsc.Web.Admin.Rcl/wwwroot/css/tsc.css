@@ -37,8 +37,7 @@
     height: 70px;
     width: 120px;
     margin: 0 8px 32px 0;
-    border-left: 2px solid green;
-    border-right: 2px solid green;
+    
     border-radius: 4px;
 }
 
@@ -53,21 +52,30 @@
 .top {
     content: '';
     transform: rotate(60deg);
-    border-left: 2px solid green;
-    border-right: 2px solid green;
 }
-
-
 
 .bottom {
     content: '';
     transform: rotate(-60deg);
-    border-left: 2px solid green;
-    border-right: 2px solid green;
 }
 
 .hex-span {
     font-size: 10px;
+}
+
+.hex-color-red, .hex-color-red > .top, .hex-color-red > .bottom {
+    border-left: 2px solid red;
+    border-right: 2px solid red;
+}
+
+.hex-color-green, .hex-color-green > .top, .hex-color-green > .bottom {
+    border-left: 2px solid green;
+    border-right: 2px solid green;
+}
+
+.hex-color-yellow, .hex-color-yellow > .top, .hex-color-yellow > .bottom {
+    border-left: 2px solid #C07401;
+    border-right: 2px solid #C07401;
 }
 
 

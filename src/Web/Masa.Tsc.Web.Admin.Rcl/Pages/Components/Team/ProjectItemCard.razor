@@ -1,12 +1,12 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Components
 @inherits TscComponentBase
 
-<Hexagon OnClick=OnClick>
+<Hexagon OnClick=OnClick Error="_error" Warn="_warn">
     <Child>
-        <div class="text-center">@Project.Name</div>
+        <div class="text-center mx-3 text-no-wrap overflow-hidden text-truncate">@Project.Name</div>
         @foreach (var item in Project.Apps.Take(3))
         {
-            <div class="hex-span flow-col pb-1 text-no-wrap text-truncate">@item.Name</div>
+            <div class="hex-span flow-col pt-1 text-no-wrap overflow-hidden text-truncate overflow-hidden">@item.Name</div>
         }
         @if (Project.Apps.Count - 2 > 0)
         {
@@ -27,4 +27,8 @@
 
     [Parameter]
     public ProjectDto Project { get; set; } = default!;
+
+    private bool _error =>Project.Name.Equals("Masa.Pm")||  Project.Apps.Any(t => t.Status == MonitorStatuses.Error);
+
+    private bool _warn=>Project.Name.Equals("Masa.Dcc")|| !_error&&Project.Apps.Any(t => t.Status == MonitorStatuses.Warn);
 }

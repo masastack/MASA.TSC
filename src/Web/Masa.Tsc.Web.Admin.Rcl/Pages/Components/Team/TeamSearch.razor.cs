@@ -17,6 +17,8 @@ public partial class TeamSearch
     [Parameter]
     public string Keyword { get; set; } = default!;
 
+    private string _bgColor = "#A3AED0";
+
     private List<ProjectDto> Projects { get; set; } = new List<ProjectDto>
     {
         new ProjectDto

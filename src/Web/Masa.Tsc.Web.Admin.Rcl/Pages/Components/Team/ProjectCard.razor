@@ -5,7 +5,7 @@
     @for (var rowIndex = 0; rowIndex < _totalRows; rowIndex++)
     {
         var data = Projects.Skip(rowIndex * RowCount).Take(RowCount);
-        <div class="d-flex  @GetPaddingClass(rowIndex,data.Count())">
+        <div class="d-flex @GetPaddingClass(rowIndex,data.Count())">
             @foreach (var item in data)
             {
                 <ProjectItemCard Project=item OnClick=@(()=>OnItemClick(item))></ProjectItemCard>
