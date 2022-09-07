@@ -25,12 +25,14 @@ public partial class ProjectCard
 
     private string GetPaddingClass(int rowIndex, int total)
     {
+        if (rowIndex % 2 == 1)
+            return "hex-even";
+        else
+            return "";
+
         if (total - RowCount == 0)
         {
-            if (rowIndex % 2 == 1)
-                return "hex-even";
-            else
-                return "";
+           
         }
 
         var count = RowCount - total;
