@@ -1,6 +1,13 @@
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
+FROM registry.cn-hangzhou.aliyuncs.com/masa/dotnet_sdk:6.0.100 AS publish
+WORKDIR /src
+COPY . .
+ENV CSPROJ="src/Web/Masa.Tsc.Web.Admin.Server/Masa.Tsc.Web.Admin.Server.csproj"
+RUN dotnet restore $CSPROJ && dotnet publish $CSPROJ -c Release -o /app/publish
+
+FROM registry.cn-hangzhou.aliyuncs.com/masa/dotnet_aspnet:6.0.0
 WORKDIR /app
-COPY ./publish .
-COPY ["src/Web/Masa.Tsc.Web.Admin.Rcl/wwwroot/i18n","wwwroot/i18n"]
-ENV ASPNETCORE_URLS=http://0.0.0.0:80
-ENTRYPOINT ["dotnet", "Masa.Tsc.Admin.Server.dll"]
+COPY --from=publish /app/publish .
+ENV ASPNETCORE_URLS=https://0.0.0.0:443
+EXPOSE 80
+EXPOSE 443
+ENTRYPOINT ["dotnet", "Masa.Tsc.Web.Admin.Server.dll"]
