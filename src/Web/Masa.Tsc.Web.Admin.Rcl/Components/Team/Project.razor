@@ -1,0 +1,22 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+@if (_isLoading)
+{
+    @("Loading ...")
+}
+else
+{
+    <MContainer>
+        <MRow>
+            <MCol Cols="2" Class="font-weight-bold">
+                <TeamDetail Value=@Team></TeamDetail>
+                <ProjectDetail Value=@Value></ProjectDetail>
+            </MCol>
+            <MCol Cols="10">
+                <SearchBar AppId=@AppId Apps=@Value.Apps></SearchBar>
+                <ProjectCharts></ProjectCharts>
+            </MCol>
+        </MRow>
+    </MContainer>
+}

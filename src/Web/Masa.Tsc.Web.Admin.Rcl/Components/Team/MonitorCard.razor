@@ -1,0 +1,9 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+<div class="d-flex justify-center pt-5">
+    @foreach (var item in Data)
+    {
+        <MonitorItemCard Value=@item />
+    }
+</div>
