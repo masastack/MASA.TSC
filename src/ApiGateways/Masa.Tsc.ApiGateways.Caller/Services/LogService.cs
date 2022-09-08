@@ -5,7 +5,7 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class LogService : BaseService
 {
-    public LogService(ICallerProvider caller) : base(caller, "/api/log") { }
+    public LogService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/log",tokenProvider) { }
 
     public async Task<IEnumerable<KeyValuePair<string, string>>> AggregateAsync(RequestAggregationDto param)
     {

@@ -5,7 +5,7 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class ProjectService : BaseService
 {
-    public ProjectService(ICallerProvider caller) : base(caller, "/api/project") { }
+    public ProjectService(ICaller caller,TokenProvider tokenProvider) : base(caller, "/api/project", tokenProvider) { }
 
     public async Task<List<ProjectDto>> GetProjectsAsync(Guid userId)
     {

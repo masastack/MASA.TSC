@@ -11,7 +11,7 @@ public static class ServiceExtensions
     {
         try
         {
-            var caller = services.BuildServiceProvider().GetRequiredService<ICallerFactory>().CreateClient(DEFAULT_CLIENT_NAME);
+            var caller = services.BuildServiceProvider().GetRequiredService<ICallerFactory>().Create(DEFAULT_CLIENT_NAME);
             if (caller != null)
                 return services;
         }
@@ -20,17 +20,16 @@ public static class ServiceExtensions
 
             services.AddCaller(builder =>
             {
-                builder.UseHttpClient(options =>
-                {
-                    options.BaseAddress = tscApiUrl;
-                    options.Name = DEFAULT_CLIENT_NAME;
-                });
+                builder.UseHttpClient(DEFAULT_CLIENT_NAME, options =>
+                 {
+                     options.BaseAddress = tscApiUrl;
+                 });
             });
 
             services.AddSingleton(serviceProvider =>
             {
-                var caller = serviceProvider.GetRequiredService<ICallerFactory>().CreateClient(DEFAULT_CLIENT_NAME);
-                var client = new TscCaller(caller);
+                var caller = serviceProvider.GetRequiredService<ICallerFactory>().Create(DEFAULT_CLIENT_NAME);
+                var client = new TscCaller(caller, serviceProvider.GetRequiredService<TokenProvider>());
                 return client;
             });
         }

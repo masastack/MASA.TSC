@@ -38,32 +38,42 @@
 		<None Remove="Domain\Teams\Service\**" />
 	</ItemGroup>
 
-	<ItemGroup>		
-		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth" Version="0.6.0-preview.1" />
-		<PackageReference Include="Masa.BuildingBlocks.Dispatcher.Events" Version="0.6.0-preview.9" />
-		<PackageReference Include="Masa.Contrib.BasicAbility.Auth" Version="0.6.0-preview.1" />
-		<PackageReference Include="Masa.Contrib.BasicAbility.Pm" Version="0.6.0-preview.1" />
-		<PackageReference Include="Masa.Contrib.BasicAbility.Tsc" Version="0.6.0-preview.1" />
-		<PackageReference Include="MASA.Contrib.Data.Contracts.EF" Version="0.6.0-preview.1" />
-		<PackageReference Include="Masa.Contrib.Data.EntityFrameworkCore.SqlServer" Version="0.6.0-preview.1" />
-		<PackageReference Include="Masa.Contrib.Configuration" Version="0.6.0-preview.9" />
-		<PackageReference Include="Masa.Contrib.Configuration.ConfigurationApi.Dcc" Version="0.6.0-preview.9" />
-		<PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="0.6.0-preview.9" />
-		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EF" Version="0.6.0-preview.1" />
-		<PackageReference Include="Dapr.AspNetCore" Version="1.7.0" />
-		<PackageReference Include="Masa.BuildingBlocks.Ddd.Domain" Version="0.6.0-preview.9" />
-		<PackageReference Include="Masa.Contrib.BasicAbility.Dcc" Version="0.6.0-preview.1" />
-		<PackageReference Include="Masa.Contrib.Ddd.Domain" Version="0.6.0-preview.9" />
-		<PackageReference Include="Masa.Contrib.Ddd.Domain.Repository.EF" Version="0.6.0-preview.1" />
-		<PackageReference Include="Masa.Contrib.ReadWriteSpliting.Cqrs" Version="0.6.0-preview.3" />
-		<PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="0.6.0-preview.9" />
-		<PackageReference Include="Masa.Utils.Data.Elasticsearch" Version="0.6.0-preview.9" />
-		<PackageReference Include="Masa.Utils.Data.Prometheus" Version="0.6.0-preview.9" />		
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.5" />
-		<PackageReference Include="Masa.Contrib.Data.UoW.EF" Version="0.6.0-preview.1" />
-		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.Dapr" Version="0.6.0-preview.9" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.6" />
+	<ItemGroup>
+
+		<PackageReference Include="Masa.BuildingBlocks.Dispatcher.Events" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Configuration" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Configuration.ConfigurationApi.Dcc" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.BuildingBlocks.Ddd.Domain" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Ddd.Domain" Version="$(MasaFrameworkPackageVersion)" />		
+		<PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Utils.Data.Elasticsearch" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Utils.Data.Prometheus" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Tsc" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.Dapr" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.ReadWriteSplitting.Cqrs" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Ddd.Domain.Repository.EFCore" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EFCore" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Data.EFCore.SqlServer" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Data.UoW.EFCore" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Isolation.UoW.EFCore" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Data.Contracts.EFCore" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Isolation.MultiEnvironment" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Authentication.Identity" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Utils.Caching.DistributedMemory" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Utils.Caching.Redis" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="MASA.Utils.Configuration.Json" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Utils.Development.Dapr.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Utils.Exceptions" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Utils.Extensions.Enums" Version="$(MasaFrameworkPackageVersion)" />	
+		
+		
+		
+		
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.6" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.6">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -73,6 +83,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Dapr.AspNetCore" Version="1.7.0" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -5,7 +5,7 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class TeamService : BaseService
 {
-    public TeamService(ICallerProvider caller) : base(caller, "/api/team")
+    public TeamService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/team",tokenProvider)
     {
     }
 
