@@ -1,6 +1,5 @@
 ﻿@inherits LayoutComponentBase
-
-<CascadingValue Value="I18n">
+@*<CascadingValue Value="I18n">
     <MApp>
         <MAppBar Elevation=0 App MaxHeight=60 Color="white" Class="m-bar--underline pl-2">
             <MSpacer></MSpacer>
@@ -70,19 +69,22 @@
             </MContainer>
         </MMain>
     </MApp>
-</CascadingValue>
+</CascadingValue>*@
 
-@*<Layout AppId="Masa-Pm-Web"
-    UserCenterRoute="/user"
-    Logo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo-h-en.png"
-    MiniLogo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo.png">
-    <MErrorHandler ShowDetail=false>
-    @Body
-    </MErrorHandler>
-    </Layout>*@
+<SLayout AppId="@MasaStackConsts.TSC_SYSTEM_WEB_APP_ID" OnErrorAsync="OnError"
+        Logo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo-h-en.png"
+        MiniLogo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo.png">
+        @Body
+</SLayout>
 
-@code
-{
+@code {
     [Inject]
-    private BlazorComponent.I18n.I18n I18n { get; set; } = default!;
+    public IPopupService PopupService { get; set; } = default!;
+
+    Task OnError(Exception exception)
+    {
+        PopupService.AlertAsync(exception.Message, AlertTypes.Error);
+        //GlobalConfig.Loading = false;
+        return Task.CompletedTask;
+    }
 }

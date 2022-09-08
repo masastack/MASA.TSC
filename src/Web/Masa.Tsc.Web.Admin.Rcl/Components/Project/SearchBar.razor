@@ -1,0 +1,19 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+<MRow>
+    <MCol Cols="6" Class="d-flex align-center">
+        <MAutocomplete @bind-Value=@AppId Items=Apps ItemText="r=>r.Name" ItemValue="r=>r.Identity" Class="flex-row col-4 pa-0" Dense Outlined SmallChips />
+        <MLabel Class="ml-4 pr-2 text-h6 rounded-lg" Color="white-text" Style="background-color:#5470c6">Service ID:</MLabel><MLabel>@AppId</MLabel>
+    </MCol>
+    <MCol Cols="6" Class="d-flex justify-end align-center">        
+        <SDateTimeRangePicker StartTime=@Start EndTime=@End></SDateTimeRangePicker>
+        <MSelect @bind-Value="@sasas" Class="col-2"
+                 Items="@_selectDataSource"
+                 ItemText="u => u"
+                 ItemValue="u => u" Dense Outlined SmallChips>
+        </MSelect>
+        <MIcon Class="px-2" OnClick="SearchAsync" Color="#5470c6">@_searchIconClass</MIcon>
+        <MButton Outlined Small>查看/详情</MButton>
+    </MCol>
+</MRow>

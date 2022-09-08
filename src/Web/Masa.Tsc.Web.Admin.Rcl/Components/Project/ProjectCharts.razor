@@ -1,0 +1,25 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+<MRow>
+    <MCol Class="d-flex justify-space-between" Style="border:solid 1px red">
+        <ErrorWarnChart Title="ERRORS" SubText="errors" Error />
+        <ErrorWarnChart Title="WARNS" SubText="warns" Warn />
+        <LogTraceChart Trace Title="@("Trace")"/>
+    </MCol>
+</MRow>
+<MRow>
+    <MCol Class="d-flex justify-space-between" Style="border:solid 1px red">
+        <ObserveChart  Title="OBSTACLES" />
+        <GrowthChart />
+        <LogTraceChart Trace Title="@("Log")"/>
+    </MCol>
+</MRow>
+<MRow>
+    <MCol Class="d-flex justify-space-between" Style="border:solid 1px red">
+       <LogTraceStatiscChart Trace Error/>
+        <LogTraceStatiscChart Trace Warn/>
+        <LogTraceStatiscChart Log Error/>
+        <LogTraceStatiscChart Log Warn/>
+    </MCol>
+</MRow>
