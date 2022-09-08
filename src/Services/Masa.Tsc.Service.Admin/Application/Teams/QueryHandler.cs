@@ -60,7 +60,7 @@ public class QueryHandler
         }
     }
 
-    private async Task SetAppAsync(TeamDetailQuery query, List<Masa.BuildingBlocks.BasicAbility.Pm.Model.ProjectModel> projects)
+    private async Task SetAppAsync(TeamDetailQuery query, List<Masa.BuildingBlocks.StackSdks.Pm.Model.ProjectModel> projects)
     {
         var apps = await _pmClient.AppService.GetListByProjectIdsAsync(projects.Select(p => p.Id).ToList());
         if (apps != null && apps.Any())
