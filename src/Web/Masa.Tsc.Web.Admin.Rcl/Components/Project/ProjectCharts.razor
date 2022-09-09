@@ -2,24 +2,24 @@
 @inherits TscComponentBase
 
 <MRow>
-    <MCol Class="d-flex justify-space-between" Style="border:solid 1px red">
+    <MCol Class="d-flex justify-space-between">
         <ErrorWarnChart Title="ERRORS" SubText="errors" Error />
         <ErrorWarnChart Title="WARNS" SubText="warns" Warn />
-        <LogTraceChart Trace Title="@("Trace")"/>
+        <LogTraceChart Trace Height="180" Title="@("Trace")" />
     </MCol>
 </MRow>
 <MRow>
-    <MCol Class="d-flex justify-space-between" Style="border:solid 1px red">
-        <ObserveChart  Title="OBSTACLES" />
-        <GrowthChart />
-        <LogTraceChart Trace Title="@("Log")"/>
+    <MCol Class="d-flex justify-space-between">
+        <ObserveChart Title="OBSTACLES" Height="230" />
+        <GrowthChart Title="Growth" Height="230" />
+        <LogTraceChart Trace Height="180" Title="@("Log")" />
     </MCol>
 </MRow>
 <MRow>
-    <MCol Class="d-flex justify-space-between" Style="border:solid 1px red">
-       <LogTraceStatiscChart Trace Error/>
-        <LogTraceStatiscChart Trace Warn/>
-        <LogTraceStatiscChart Log Error/>
-        <LogTraceStatiscChart Log Warn/>
+    <MCol Class="d-flex justify-space-between">
+        <LogTraceStatiscChart Trace Error Title="Tace Errors" />
+        <LogTraceStatiscChart Trace Warn Title="Tace Warns" />
+        <LogTraceStatiscChart Log Error Title="Log Errors" />
+        <LogTraceStatiscChart Log Warn Title="Log Warns" />
     </MCol>
 </MRow>

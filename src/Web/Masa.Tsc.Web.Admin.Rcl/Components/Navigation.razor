@@ -1,6 +1,6 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 <div class="d-block">
-    <MBreadcrumbs Items="_items" Linkage Divider="/" Class="text-md-body-2"></MBreadcrumbs>
+    <MBreadcrumbs Items="_items" Linkage Divider="/"></MBreadcrumbs>
 </div>
 @code {
     private List<BreadcrumbItem> _items = new();
@@ -11,7 +11,6 @@
     protected override void OnParametersSet()
     {
         _items = new List<BreadcrumbItem> {
-
                 new BreadcrumbItem
                 {
                      Text="Team",

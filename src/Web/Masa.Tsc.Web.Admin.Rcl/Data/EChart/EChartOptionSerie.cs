@@ -15,7 +15,7 @@ public class EChartOptionSerie
 
     public EChartOptionSerieEmphasis Emphasis { get; set; }
 
-    public EChartPieBorderRadiusOptionLable Label { get; set; }
+    public EChartPieBorderRadiusOptionLabel Label { get; set; }
 }
 
 public class EChartOptionSerieEmphasis

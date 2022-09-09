@@ -7,7 +7,9 @@ public class EChartOptionAxis
 {
     public string Type { get; set; }
 
-    public bool BoundaryGap { get; set; }
+    public bool Show { get; set; } = true;
+
+    public bool? BoundaryGap { get; set; }
 
     public IEnumerable<string> Data { get; set; }
 

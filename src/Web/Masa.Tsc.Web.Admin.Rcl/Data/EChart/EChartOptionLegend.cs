@@ -8,13 +8,13 @@ public class EChartOptionLegend
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public EchartOrientTypes? Orient { get; set; }
 
-    public bool? Left { get; set; }
+    public string Left { get; set; }
 
-    public bool? Right { get; set; }
+    public string Right { get; set; }
 
-    public bool? Top { get; set; }
+    public string Top { get; set; }
 
-    public bool? Bottom { get; set; }
+    public string Bottom { get; set; }
 
     public IEnumerable<string> Data { get; set; }
 }

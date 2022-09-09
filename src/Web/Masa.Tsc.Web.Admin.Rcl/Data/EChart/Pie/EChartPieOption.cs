@@ -7,7 +7,7 @@ public class EChartPieOption
 {
     public EChartPieOptionTitle Title { get; set; }
 
-    public object Tooltip => new { Trigger = "item" };
+    public object Tooltip { get; set; } = new { Trigger = "item" };
 
     public EChartOptionLegend Legend { get; set; }
 

@@ -2,17 +2,17 @@
 @inherits TscEChartBase
 
 <MCard Class="flex-col col-3">
-    <MCardTitle class="d-flex">
-        <span>@Title</span><MIcon>fas fa-info</MIcon>
+    <MCardTitle Class="d-flex justify-space-between mx-2 pa-0 ma-0" >
+        <span>@Title</span><MIcon XSmall>fas fa-info</MIcon>
     </MCardTitle>
-    <MCardText>
+    <MCardText Class="pa-0 ma-0">
         @if (_isLoading)
         {
             @("Loading ...")
         }
         else
         {
-            <MECharts Class="mt-4" Option="_options" Width="Width" Height="Height"></MECharts>
+            <MECharts Option="_options" Width="Width" Height="Height"></MECharts>
         }
     </MCardText>
 </MCard>

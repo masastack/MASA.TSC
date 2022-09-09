@@ -17,7 +17,25 @@ public partial class GrowthChart
     [Parameter]
     public string SubText { get; set; }
 
-    private EChartPieOption _options = new();
+    private EChartLineOption _options = new()
+    {
+        XAxis = new EChartOptionAxis
+        {
+            Type = "category",
+            Show=false            
+        },
+        YAxis = new EChartOptionAxis
+        {
+            Type = "value",
+            Show = false
+        },
+        Grid = new EChartOptionGrid
+        { 
+            Left="2%",
+            Right="3%",
+            Bottom="10%"
+        }
+    };
 
     public int Total { get; set; } = 23;
 
@@ -54,20 +72,74 @@ public partial class GrowthChart
         //});
         //if (data.Data == null || !data.Data.Any())
         //    return;
-        string data1 = "23";
-        string data2 = "34";
-        _options.Series = new EChartOptionSerie[1] {
-            new EChartOptionSerie{
-                 Data=new List<EChartOptionSerieData>{
-                   GetModel(true,data1),GetModel(false,data2)
-                 }
+
+        var data = new int[] { 20, 60, 80, 50 };
+
+        int rate = GetRate(data[data.Length - 2], data[data.Length - 1], data.Length, data.Max());
+        _options.XAxis.Data = new string[] { "8-1", "8-2", "8-3", "8-4" };
+        _options.Series = new EChartLineOptionSerie[1] {
+            new EChartLineOptionSerie{
+                Type="line",
+                Data=new object[] {
+                    new EChartLineDataSymbolOption {
+                    Value=data[0].ToString()
+                },
+                 new EChartLineDataSymbolOption {
+                    Value=data[1].ToString()
+                },
+                 new EChartLineDataSymbolOption {
+                    Value=data[2].ToString()
+                },
+                 new EChartLineDataSymbolOption {
+                    Value=data[3].ToString(),
+                    Symbol="arrow",
+                    SymbolSize=40,
+                    SymbolRotate=rate
+                }}
             }
         };
+        //_options.Series = new EChartOptionSerie[1] {
+        //    new EChartOptionSerie{
+        //         Data=new List<EChartOptionSerieData>{
+        //           GetModel(true,data1),GetModel(false,data2)
+        //         }
+        //    }
+        //};
+        var tt = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+        var str = JsonSerializer.Serialize(_options, tt);
         await Task.CompletedTask;
     }
 
     private static EChartOptionSerieData GetModel(bool isTrace, string value)
     {
         return new EChartOptionSerieData { Name = isTrace ? "Tace" : "Log", Value = value };
+    }
+
+    private int GetRate(int lastValue, int value, int count, int max)
+    {
+        int width = 300; int height = 180;
+        double x = width * 1.0 / count;
+        var temp = value - lastValue;
+        double y = temp * 1.0 / max * height;
+
+
+
+        if (temp > 0)
+            return (int)Math.Floor(y / x * 45);
+        else
+            return (int)Math.Floor(y / x * 45);
+
+        //(value-lastValue) / value*45
+
+        //var a = Math.Tan(1);
+        //var b = Math.Tanh(1);
+        //var c= Math.Tan(45);
+        //var d = Math.Tanh(45);
+
+        //return 0;
+        //double height = 100, width = 100;
+        //if(lastValue-value>0)
+        //    return Math.Tan((lastValue-value)/value)
     }
 }
