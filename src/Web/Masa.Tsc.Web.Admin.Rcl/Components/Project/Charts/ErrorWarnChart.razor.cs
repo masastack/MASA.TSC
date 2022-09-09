@@ -27,8 +27,8 @@ public partial class ErrorWarnChart
     {
         Legend = new EChartOptionLegend
         {
-            Bottom = true,
-            Right = true,
+            Bottom = "true",
+            Right = "true",
             Orient = EchartOrientTypes.horizontal
         },
         Series = new EChartOptionSerie[] {
@@ -36,7 +36,7 @@ public partial class ErrorWarnChart
                  Type="pie",
                  Radius="80%",
                  Emphasis=new(),
-                 Label=new EChartPieBorderRadiusOptionLable{
+                 Label=new EChartPieBorderRadiusOptionLabel{
                     Show=false
                  }
              }

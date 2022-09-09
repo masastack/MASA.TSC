@@ -14,14 +14,13 @@
     }
 </div>
 
-<MDialog @bind-Value="_showDialog"
-         Fullscreen>
+<MDialog @bind-Value="_showDialog" Fullscreen>
     <ChildContent>
         <MCard>
             <MCardTitle Class="d-flex justify-end">
                 <MIcon OnClick="()=>_showDialog=false" title="Close">mdi-close</MIcon>
             </MCardTitle>
-            <MCardText>
+            <MCardText>               
                 <Project ProjectId="@_current.Identity" TeamId=@_current.TeamId></Project>
             </MCardText>
         </MCard>

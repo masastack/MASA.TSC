@@ -12,5 +12,5 @@ public class EChartPieBorderRadiusOption
 
     public EChartOptionLegend Legend { get; set; }
 
-    public EChartPieBorderRadiusOptionSerie[] Series = new EChartPieBorderRadiusOptionSerie[1];
+    public EChartPieBorderRadiusOptionSerie[] Series { get; set; } = new EChartPieBorderRadiusOptionSerie[1];
 }

@@ -26,8 +26,15 @@ public partial class LogTraceChart
         Legend = new EChartOptionLegend
         {
             Data = new string[] { "Errors", "Caculates" },
-            Left = true,
-            Top = true,
+            Left = "true",
+            Orient= EchartOrientTypes.horizontal
+        },
+        Grid = new EChartOptionGrid
+        {
+            Left = "1%",
+            Right = "2%",
+            Top="20%",
+            ContainLabel = true
         }
     };
 
@@ -96,13 +103,13 @@ public partial class LogTraceChart
         _options.XAxis.Data = xPoints;
         _options.Series = new EChartLineOptionSerie[] {
             new EChartLineOptionSerie{
-                Name="ERRORS",
+                Name="Errors",
                  Data=data1.Data.Select(item=>item.Y),
                   Type="line",
                   Stack="Total"
             },
             new EChartLineOptionSerie{
-             Name="CACULATE",
+             Name="Caculates",
                  Data=data2.Data.Select(item=>item.Y),
                   Type="line",
                   Stack="Total"

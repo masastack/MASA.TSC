@@ -15,7 +15,7 @@ public class EChartPieBorderRadiusOptionSerie
 
     public EChartPieBorderRadiusOptionSerieItemSyle ItemStyle { get; set; }
 
-    public EChartPieBorderRadiusOptionLable Lable { get; set; }
+    public EChartPieBorderRadiusOptionLabel Label { get; set; }
 
     public EChartPieBorderRadiusOptionEmphasis Emphasis { get; set; }
 
@@ -31,7 +31,7 @@ public class EChartPieBorderRadiusOptionSerieItemSyle
     public int BorderWidth { get; set; }
 }
 
-public class EChartPieBorderRadiusOptionLable
+public class EChartPieBorderRadiusOptionLabel
 {
     public bool Show { get; set; }
 
@@ -46,10 +46,10 @@ public class EChartPieBorderRadiusOptionLable
 
 public class EChartPieBorderRadiusOptionEmphasis
 {
-    public EChartPieBorderRadiusOptionEmphasisLable Lable { get; set; }
+    public EChartPieBorderRadiusOptionEmphasisLabel Label { get; set; }
 }
 
-public class EChartPieBorderRadiusOptionEmphasisLable
+public class EChartPieBorderRadiusOptionEmphasisLabel
 {
     public bool Show { get; set; }
 

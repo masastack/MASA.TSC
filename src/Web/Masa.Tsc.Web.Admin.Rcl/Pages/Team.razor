@@ -3,6 +3,6 @@
 @inherits TscComponentBase
 
 <Navigation Href="/team"></Navigation>
-<TeamSearch @ref="_teamSearch"></TeamSearch>
+<TeamSearch OnValueChanged="OnSearch" OnLoadProjectsAsync="LoadProjectAsync"></TeamSearch>
 <MonitorCard Monitor=_monitor Error=_error Normal="_normal" Warn="_warn" />
 <ProjectCard Projects=_projects RowCount=4></ProjectCard>

@@ -21,18 +21,21 @@ public partial class ObserveChart : TscEChartBase
     {
         Legend = new EChartOptionLegend
         {
-            Data = new string[] { "Errors", "Warns", "Other" }
+            Bottom = "5%",
+            Left = "center",
+            Orient = EchartOrientTypes.horizontal
         },
+
         Series = new EChartPieBorderRadiusOptionSerie[] {
             new EChartPieBorderRadiusOptionSerie{
-                 AvoidLabelOverlap=true,
-                Lable=new EChartPieBorderRadiusOptionLable{
-                 Position="center"
+                 AvoidLabelOverlap=false,
+                Label=new EChartPieBorderRadiusOptionLabel{
+                 Position="center",
                 },
                  Emphasis=new EChartPieBorderRadiusOptionEmphasis{
-                     Lable=new EChartPieBorderRadiusOptionEmphasisLable{
+                     Label=new EChartPieBorderRadiusOptionEmphasisLabel{
                          Show=true,
-                          FontSize="36",
+                          FontSize="18",
                            FontWeight="bold",
                             Formatter="{b}"
                      }
@@ -40,7 +43,7 @@ public partial class ObserveChart : TscEChartBase
                   ItemStyle=new EChartPieBorderRadiusOptionSerieItemSyle
                   {
                      BorderColor="#fff",
-                     BorderRadius=10,
+                     BorderRadius=4,
                      BorderWidth=2
                   },
                   Type="pie",
@@ -90,6 +93,7 @@ public partial class ObserveChart : TscEChartBase
         _options.Series[0].Data = new EChartOptionSerieData[] {
             GetModel("Errors",data1),GetModel("Warns",data2),GetModel("Others",data3)
         };
+        
         await Task.CompletedTask;
     }
 
