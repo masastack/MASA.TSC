@@ -5,13 +5,11 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class ProjectCharts
 {
-    private string _borderStyle = "border";
-
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-        {
-
+        {           
+            //StateHasChanged();
         }
         return base.OnAfterRenderAsync(firstRender);
     }
@@ -19,5 +17,16 @@ public partial class ProjectCharts
     public async Task OnSearchAsync()
     {
         await Task.CompletedTask;
+    }
+
+    private ProjectAppSearchModel _query;
+
+    public async Task OnLoadDataAsyc(ProjectAppSearchModel query)
+    {
+        _query= query;
+        await Task.CompletedTask;
+        StateHasChanged();
+        //await Task.Delay(500);
+        //StateHasChanged();
     }
 }

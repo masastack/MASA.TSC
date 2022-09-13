@@ -9,7 +9,6 @@ using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
 using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
 using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
 using Masa.Contrib.Data.UoW.EFCore;
-using Masa.Contrib.Isolation.MultiEnvironment;
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.AddMasaConfiguration(configurationBuilder =>

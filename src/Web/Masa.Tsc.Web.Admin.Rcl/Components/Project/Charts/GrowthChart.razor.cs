@@ -114,7 +114,7 @@ public partial class GrowthChart
     private static EChartOptionSerieData GetModel(bool isTrace, string value)
     {
         return new EChartOptionSerieData { Name = isTrace ? "Tace" : "Log", Value = value };
-    }
+    }   
 
     private int GetRate(int lastValue, int value, int count, int max)
     {

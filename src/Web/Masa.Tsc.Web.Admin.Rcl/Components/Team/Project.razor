@@ -10,12 +10,12 @@ else
     <MContainer>
         <MRow>
             <MCol Cols="2" Class="font-weight-bold">
-                <TeamDetail Value=@Team></TeamDetail>
-                <ProjectDetail Value=@Value></ProjectDetail>
+                <TeamDetail Value=@_team></TeamDetail>
+                <ProjectDetail Value=@_project></ProjectDetail>
             </MCol>
             <MCol Cols="10">
-                <SearchBar AppId=@AppId Apps=@Value.Apps></SearchBar>
-                <ProjectCharts></ProjectCharts>
+                <SearchBar AppId=@_appId Apps=@_project.Apps OnSearch="async (data)=>{ if(_projectCharts!=null) await  _projectCharts.OnLoadDataAsyc(data);}"></SearchBar>
+                <ProjectCharts @ref="_projectCharts"></ProjectCharts>
             </MCol>
         </MRow>
     </MContainer>

@@ -3,16 +3,16 @@
 
 <MRow>
     <MCol Class="d-flex justify-space-between">
-        <ErrorWarnChart Title="ERRORS" SubText="errors" Error />
-        <ErrorWarnChart Title="WARNS" SubText="warns" Warn />
-        <LogTraceChart Trace Height="180" Title="@("Trace")" />
+        <ErrorWarnChart Title="ERRORS" SubText="errors" Error Query=_query />
+        <ErrorWarnChart Title="WARNS" SubText="warns" Warn Query=_query />
+        <LogTraceChart Trace Height="150" Title="@("Trace")" Query=_query />
     </MCol>
 </MRow>
 <MRow>
     <MCol Class="d-flex justify-space-between">
-        <ObserveChart Title="OBSTACLES" Height="230" />
-        <GrowthChart Title="Growth" Height="230" />
-        <LogTraceChart Trace Height="180" Title="@("Log")" />
+        <ObserveChart Title="OBSTACLES" Height="180" />
+        <GrowthChart Title="Growth" Height="180" />
+        <LogTraceChart Log Height="150" Title="@("Log")" Query=_query />
     </MCol>
 </MRow>
 <MRow>
