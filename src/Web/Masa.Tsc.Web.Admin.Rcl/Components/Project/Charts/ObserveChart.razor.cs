@@ -21,7 +21,7 @@ public partial class ObserveChart : TscEChartBase
     {
         Legend = new EChartOptionLegend
         {
-            Bottom = "5%",
+            Bottom = "1%",
             Left = "center",
             Orient = EchartOrientTypes.horizontal
         },

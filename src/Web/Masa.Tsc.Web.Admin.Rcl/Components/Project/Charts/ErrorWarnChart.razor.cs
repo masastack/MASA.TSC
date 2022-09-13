@@ -23,11 +23,14 @@ public partial class ErrorWarnChart
     [Parameter]
     public string SubText { get; set; } = "先写死\r\n从数据库读取加载";
 
+    [Parameter]
+    public ProjectAppSearchModel Query { get { return _query; } set { _query = value; _isLoading = true; } }
+
     private readonly EChartPieOption _options = new()
     {
         Legend = new EChartOptionLegend
         {
-            Bottom = "true",
+            Bottom = "1%",
             Right = "true",
             Orient = EchartOrientTypes.horizontal
         },
@@ -40,56 +43,86 @@ public partial class ErrorWarnChart
                     Show=false
                  }
              }
-        }
+        }       
     };
+    private ProjectAppSearchModel _query;
 
-    public int Total { get; set; } = 23;
+    private int _total { get; set; } = 0;
 
     protected override async Task LoadAsync(Dictionary<string, object> queryParams)
     {
-        //var data = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
-        //{
-        //    End = Query.End,
-        //    Start = Query.Start,
-        //    FieldMaps = new RequestFieldAggregationDto[] {
-        //        new RequestFieldAggregationDto{
-        //             AggegationType= Contracts.Admin.Enums.AggregationTypes.DateHistogram,
-        //             Name="@timestamp",
-        //             Alias="Span Count",
-        //        }
-        //    },
-        //    Queries = ConvertToQueries(isSpan: true),
-        //    Interval = GetInterval(),
-        //});
+        if (Query == null)
+            return;
+        DateTime start = DateTime.Now.Date;
+        DateTime end = DateTime.Now;
+        if (Query.Start.HasValue)
+            start = Query.Start.Value;
+        if (Query.End.HasValue)
+            end = Query.End.Value;
 
-        //var data2 = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
-        //{
-        //    End = Query.End,
-        //    Start = Query.Start,
-        //    FieldMaps = new RequestFieldAggregationDto[] {
-        //        new RequestFieldAggregationDto{
-        //             AggegationType= AggregationTypes.DateHistogram,
-        //             Name="@timestamp",
-        //             Alias="Trace Count",
-        //        }
-        //    },
-        //    Queries = ConvertToQueries(isTrace: true),
-        //    Interval = GetInterval(),
-        //});
-        //if (data.Data == null || !data.Data.Any())
-        //    return;
-        string data1 = "23";
-        string data2 = "34";
-        _options.Series[0].Data = new List<EChartOptionSerieData>{
-                   GetModel(true,data1),GetModel(false,data2)
-        };
-        var tt = new JsonSerializerOptions
+        var data1 = await ApiCaller.LogService.AggregateAsync(new RequestAggregationDto
         {
-            PropertyNameCaseInsensitive = true,
-        };
+            Start = start,
+            End = end,
+            FieldMaps = new RequestFieldAggregationDto[] {
+                new RequestFieldAggregationDto{
+                     AggegationType= AggregationTypes.Count,
+                     Name="@timestamp",
+                     Alias="Count",
+                }
+            },
+            Queries = ConvertToLogQueries(),
+            Interval = string.Empty,
+        });
 
-        var text = JsonSerializer.Serialize(_options, tt);
+        var data2 = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
+        {
+            Start = start,
+            End = end,
+            FieldMaps = new RequestFieldAggregationDto[] {
+                new RequestFieldAggregationDto{
+                     AggegationType= AggregationTypes.Count,
+                     Name="@timestamp",
+                     Alias="Count",
+                }
+            },
+            Queries = ConvertToTraceQueries(isTrace: true),
+            Interval = string.Empty,
+        });
+        _total += Convert.ToInt32(data1.First().Value);
+        _total += Convert.ToInt32(data2.Data.First().Y);
+        _options.Series[0].Data = new List<EChartOptionSerieData>{
+            GetModel(true,data1.First().Value),GetModel(false,data2.Data.First().Y)
+        };
         await Task.CompletedTask;
+    }
+
+    private Dictionary<string, string> ConvertToLogQueries()
+    {
+        var dic = new Dictionary<string, string>();
+        if (Query.AppId != null)
+            dic.Add("Resource.service.name", Query.AppId);
+        dic.Add("SeverityText", Warn ? "Warning" : "Error");
+        //if (Query.Interval != null)
+        //    dic.Add("transaction.name", Query.Interval);
+
+        return dic;
+    }
+
+    private Dictionary<string, string> ConvertToTraceQueries(bool isSpan = false, bool isTrace = false)
+    {
+        var dic = new Dictionary<string, string>();
+        //if (Query.ProjectId != null)
+        //    dic.Add("service.name", Query.ProjectId);
+        if (Query.AppId != null)
+            dic.Add("service.name", Query.AppId);
+        //if (Query.Interval != null)
+        //    dic.Add("transaction.name", Query.Interval);
+
+        dic.Add("isTrace", isTrace.ToString().ToLower());
+        dic.Add("isSpan", isSpan.ToString().ToLower());
+
+        return dic;
     }
 
     private static EChartOptionSerieData GetModel(bool isTrace, string value)

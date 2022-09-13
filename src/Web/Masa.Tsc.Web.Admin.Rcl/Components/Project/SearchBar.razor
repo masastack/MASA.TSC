@@ -3,13 +3,13 @@
 
 <MRow Class="ma-0 pa-0">
     <MCol Cols="6" Class="d-flex ma-0 pa-0 overflow-hidden" Style="height:44px">
-        <MAutocomplete @bind-Value=@AppId Items=Apps ItemText="r=>r.Name" ItemValue="r=>r.Identity" Class="flex-row col-4 pa-0" Outlined Dense />    
-            <MLabel Class="rounded-lg text-no-wrap ml-1 my-2 py-2 px-1" Color="white-text" Style="background-color:#5470c6">Service ID:</MLabel>
-            <MLabel Class="text-no-wrap ml-3 my-2 py-2">@AppId</MLabel>
+        <MAutocomplete @bind-Value=@Value.AppId Items=Apps ItemText="r=>r.Name" ItemValue="r=>r.Identity" Class="flex-row col-4 pa-0" Outlined Dense />
+        <MLabel Class="rounded-lg text-no-wrap ml-1 my-2 py-2 px-1" Color="white-text" Style="background-color:#5470c6">Service ID:</MLabel>
+        <MLabel Class="text-no-wrap ml-3 my-2 py-2">@AppId</MLabel>
     </MCol>
     <MCol Cols="6" Class="d-flex justify-end ma-0 pa-0 overflow-hidden" Style="height:44px">
-        <SDateTimeRangePicker StartTime=@Start EndTime=@End Class="ma-0 pa-0 pl-3 pt-2"></SDateTimeRangePicker>
-        <MSelect @bind-Value="@sasas" Class="col-2"
+        <SDateTimeRangePicker StartTime=@Value.Start EndTime=@Value.End Class="ma-0 pa-0 pl-3 pt-2"></SDateTimeRangePicker>
+        <MSelect @bind-Value=@Value.Interval Class="col-2"
                  Items="@_selectDataSource"
                  ItemText="u => u"
                  ItemValue="u => u" Dense Outlined SmallChips>

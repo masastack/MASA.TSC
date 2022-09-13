@@ -6,27 +6,34 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class Project
 {
     [Parameter]
-    public string ProjectId { get; set; } = default!;
-
-    [Parameter]
-    public string AppId { get; set; }
+    public string ProjectId { get; set; }
 
     [Parameter]
     public Guid TeamId { get; set; }
 
+    private ProjectCharts _projectCharts;
+
+    private string _appId { get; set; }    
+
     private bool _isLoading = true;
 
-    public TeamDto Team { get; set; } = new();
+    private TeamDto _team { get; set; }
 
-    public ProjectDto Value { get; set; } = new();
+    private ProjectDto _project { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _isLoading = true;
+        base.OnParametersSet();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (_isLoading)
         {
-            Team = await ApiCaller.TeamService.GetTeamAsync(TeamId, ProjectId);
-            Value = Team.CurrentProject;
-            AppId = Team.CurrentProject.Apps?.FirstOrDefault()?.Identity!;
+            _team = await ApiCaller.TeamService.GetTeamAsync(TeamId, ProjectId);
+            _project = _team.CurrentProject;
+            _appId = _team.CurrentProject.Apps?.FirstOrDefault()?.Identity!;
             _isLoading = false;
             StateHasChanged();
         }

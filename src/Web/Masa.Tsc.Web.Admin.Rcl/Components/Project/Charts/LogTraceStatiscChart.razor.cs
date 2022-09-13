@@ -39,8 +39,8 @@ public partial class LogTraceStatiscChart
         Series = new EChartOptionBarSeries[] {
             new EChartOptionBarSeries{
                 Type="bar"
-            }
-        }
+            }            
+        }               
     };
 
     protected override async Task LoadAsync(Dictionary<string, object> queryParams)

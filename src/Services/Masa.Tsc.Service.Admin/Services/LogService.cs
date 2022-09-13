@@ -15,13 +15,7 @@ public class LogService : ServiceBase
 
     private async Task<IEnumerable<KeyValuePair<string, string>>> AggregateAsync([FromServices] IEventBus eventBus, [FromBody] RequestAggregationDto param)
     {
-        var query = new LogAggQuery
-        {
-            Start = param.Start,
-            End = param.End,
-            Query = param.RawQuery,
-            FieldMaps = param.FieldMaps
-        };
+        var query = new LogAggQuery(param.FieldMaps, param.RawQuery, param.Start, param.End, param.Interval);        
         await eventBus.PublishAsync(query);
         return query.Result ?? Array.Empty<KeyValuePair<string, string>>();
     }

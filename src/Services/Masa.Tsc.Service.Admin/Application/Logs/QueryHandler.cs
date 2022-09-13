@@ -25,8 +25,8 @@ public class QueryHandler
     public async Task AggregateAsync(LogAggQuery query)
     {
         await _elasticClient.SearchAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, condition: Filter,
-            aggregate: (agg, q) => IElasticClientExtenstion.Aggregation(agg, q.FieldMaps),
-            result: (rep, q) => q.Result = IElasticClientExtenstion.AggResult(rep, q.FieldMaps)!,
+            aggregate: (agg, q) => IElasticClientExtenstion.Aggregation(agg, q.FieldMaps,q.Interval),
+            result: (rep, q) => q.Result = IElasticClientExtenstion.AggResult(rep, q.FieldMaps)!,            
             logger: _logger);
     }
 

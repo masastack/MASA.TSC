@@ -9,17 +9,13 @@ public partial class TscEChartBase : TscComponentBase
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
+        if(_isLoading)
             await OnLoadAsync(default!);
-        }
         await base.OnAfterRenderAsync(firstRender);
     }
 
     public async Task OnLoadAsync(Dictionary<string, object> queryParams)
     {
-        _isLoading = true;
-        StateHasChanged();
         await LoadAsync(queryParams);
         _isLoading = false;
         StateHasChanged();

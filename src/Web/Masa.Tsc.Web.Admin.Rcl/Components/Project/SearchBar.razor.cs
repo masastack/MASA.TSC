@@ -16,7 +16,57 @@ public partial class SearchBar
     };
 
     [Parameter]
-    public string AppId { get; set; }
+    public string AppId
+    {
+        get { return _value.AppId; }
+        set { _value.AppId = value; }
+    }
+
+    [Parameter]
+    public ProjectAppSearchModel Value
+    {
+        get { return _value; }
+        set
+        {
+            if (value != null)
+                _value = value;
+            else
+            {
+                _value.AppId = default!;
+                _value.Interval = default!;
+                _value.Start = null;
+                _value.End = null;
+            }
+        }
+    }
+
+    [Parameter]
+    public EventCallback<ProjectAppSearchModel> OnSearch { get; set; }
+
+    private string _searchIconClass = "fas fa-rotate";
+    private ProjectAppSearchModel _value = new();
+
+    private async Task SearchAsync()
+    {
+        _searchIconClass = "fas fa-circle-notch fa-spin";
+        StateHasChanged();
+        if (OnSearch.HasDelegate)
+            await OnSearch.InvokeAsync(Value);
+        Thread.Sleep(500);
+        _searchIconClass = "fas fa-rotate";
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (OnSearch.HasDelegate)
+                await OnSearch.InvokeAsync(Value);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
 
     private List<string> _selectDataSource = new List<string>
     {
@@ -25,22 +75,4 @@ public partial class SearchBar
         "1小时",
         "5小时"
     };
-
-    public DateTime? Start { get; set; }
-
-    public DateTime? End { get; set; }
-
-    private string sasas { get; set; }
-
-    private string _searchIconClass = "fas fa-rotate";
-
-    private async Task SearchAsync()
-    {
-        _searchIconClass = "fas fa-circle-notch fa-spin";
-        StateHasChanged();
-        Thread.Sleep(500);
-        _searchIconClass = "fas fa-rotate";
-        StateHasChanged();
-        await Task.CompletedTask;
-    }
 }
