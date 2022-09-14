@@ -21,8 +21,8 @@ public partial class LogTraceChart
     [Parameter]
     public string Title { get; set; }
 
-    [Parameter]
-    public ProjectAppSearchModel Query { get { return _query; } set { _query = value; _isLoading = true; } }
+    //[Parameter]
+    //public ProjectAppSearchModel Query { get { return _query; } set { _query = value; _isLoading = true; } }
 
     private EChartLineOption _options = new()
     {
@@ -40,18 +40,18 @@ public partial class LogTraceChart
             ContainLabel = true
         }
     };
-    private ProjectAppSearchModel _query;
+    //private ProjectAppSearchModel _query;
 
-    protected override async Task LoadAsync(Dictionary<string, object> queryParams)
+    protected override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        if (Query == null)
+        if (query == null)
             return;
         DateTime start = DateTime.Now.Date;
         DateTime end = DateTime.Now;
-        if (Query.Start.HasValue)
-            start = Query.Start.Value;
-        if (Query.End.HasValue)
-            end = Query.End.Value;
+        if (query.Start.HasValue)
+            start = query.Start.Value;
+        if (query.End.HasValue)
+            end = query.End.Value;
 
         string interval = GetInterval(start, end);
         if (Trace)
@@ -67,7 +67,7 @@ public partial class LogTraceChart
                      Alias="Count",
                 }
             },
-                Queries = ConvertToTraceQueries(isSpan: true),
+                Queries = ConvertToTraceQueries(query,isSpan: true),
                 Interval = interval,
             });
 
@@ -83,7 +83,7 @@ public partial class LogTraceChart
                      Alias="Count",
                 }
             },
-                Queries = ConvertToTraceQueries(isTrace: true),
+                Queries = ConvertToTraceQueries(query,isTrace: true),
                 Interval = interval,
             });
 
@@ -121,7 +121,7 @@ public partial class LogTraceChart
                      Alias="Count",
                 }
             },
-                Queries = ConvertToLogQueries(),
+                Queries = ConvertToLogQueries(query),
                 Interval = interval,
             });
 
@@ -136,7 +136,7 @@ public partial class LogTraceChart
                      Alias="Trace Count",
                 }
             },
-                Queries = ConvertToLogQueries(),
+                Queries = ConvertToLogQueries(query),
                 Interval = interval,
             });
 
@@ -222,19 +222,19 @@ public partial class LogTraceChart
         return "yy-MM";
     }
 
-    private Dictionary<string, string> ConvertToLogQueries()
+    private Dictionary<string, string> ConvertToLogQueries(ProjectAppSearchModel query)
     {
         var dic = new Dictionary<string, string>();
-        if (Query.AppId != null)
-            dic.Add("service.name", Query.AppId);
+        if (query.AppId != null)
+            dic.Add("service.name", query.AppId);
         return dic;
     }
 
-    private Dictionary<string, string> ConvertToTraceQueries(bool isSpan = false, bool isTrace = false)
+    private Dictionary<string, string> ConvertToTraceQueries(ProjectAppSearchModel query,bool isSpan = false, bool isTrace = false)
     {
         var dic = new Dictionary<string, string>();
-        if (Query.AppId != null)
-            dic.Add("service.name", Query.AppId);
+        if (query.AppId != null)
+            dic.Add("service.name", query.AppId);
 
         dic.Add("isTrace", isTrace.ToString().ToLower());
         dic.Add("isSpan", isSpan.ToString().ToLower());
