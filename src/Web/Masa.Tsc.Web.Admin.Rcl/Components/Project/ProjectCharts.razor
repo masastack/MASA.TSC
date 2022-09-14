@@ -3,23 +3,23 @@
 
 <MRow>
     <MCol Class="d-flex justify-space-between">
-        <ErrorWarnChart Title="ERRORS" SubText="errors" Error Query=_query />
-        <ErrorWarnChart Title="WARNS" SubText="warns" Warn Query=_query />
-        <LogTraceChart Trace Height="150" Title="@("Trace")" Query=_query />
+        <ErrorWarnChart Title="ERRORS" SubText="errors" Error @ref="_errorWarnChart" />
+        <ErrorWarnChart Title="WARNS" SubText="warns" Warn @ref="_warnErrorChart"/>
+        <LogTraceChart Trace Height="150" Title="@("Trace")" @ref="_traceLogChart"/>
     </MCol>
 </MRow>
 <MRow>
     <MCol Class="d-flex justify-space-between">
-        <ObserveChart Title="OBSTACLES" Height="180" />
-        <GrowthChart Title="Growth" Height="180" />
-        <LogTraceChart Log Height="150" Title="@("Log")" Query=_query />
+        <ObserveChart Title="OBSTACLES" Height="180" @ref="_observeChart"/>
+        <GrowthChart Title="Growth" Height="180" @ref="_growthChart"/>
+        <LogTraceChart Log Height="150" Title="@("Log")" @ref="_logTraceChart"/>
     </MCol>
 </MRow>
 <MRow>
     <MCol Class="d-flex justify-space-between">
-        <LogTraceStatiscChart Trace Error Title="Tace Errors" />
-        <LogTraceStatiscChart Trace Warn Title="Tace Warns" />
-        <LogTraceStatiscChart Log Error Title="Log Errors" />
-        <LogTraceStatiscChart Log Warn Title="Log Warns" />
+        <LogTraceStatiscChart Trace Error Title="Tace Errors" @ref="_traceErrorChart"/>
+        <LogTraceStatiscChart Trace Warn Title="Tace Warns" @ref="_traceWarnChart"/>
+        <LogTraceStatiscChart Log Error Title="Log Errors" @ref="_logErrorChart"/>
+        <LogTraceStatiscChart Log Warn Title="Log Warns" @ref="_logWarnChart"/>
     </MCol>
 </MRow>

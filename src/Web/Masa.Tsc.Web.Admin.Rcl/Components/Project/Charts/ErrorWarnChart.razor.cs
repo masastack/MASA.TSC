@@ -23,9 +23,6 @@ public partial class ErrorWarnChart
     [Parameter]
     public string SubText { get; set; } = "先写死\r\n从数据库读取加载";
 
-    [Parameter]
-    public ProjectAppSearchModel Query { get { return _query; } set { _query = value; _isLoading = true; } }
-
     private readonly EChartPieOption _options = new()
     {
         Legend = new EChartOptionLegend
@@ -45,20 +42,20 @@ public partial class ErrorWarnChart
              }
         }       
     };
-    private ProjectAppSearchModel _query;
 
-    private int _total { get; set; } = 0;
+    private int _total { get; set; }
 
-    protected override async Task LoadAsync(Dictionary<string, object> queryParams)
+    protected override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        if (Query == null)
+        _total = 0;
+        if (query == null)
             return;
         DateTime start = DateTime.Now.Date;
         DateTime end = DateTime.Now;
-        if (Query.Start.HasValue)
-            start = Query.Start.Value;
-        if (Query.End.HasValue)
-            end = Query.End.Value;
+        if (query.Start.HasValue)
+            start = query.Start.Value;
+        if (query.End.HasValue)
+            end = query.End.Value;
 
         var data1 = await ApiCaller.LogService.AggregateAsync(new RequestAggregationDto
         {
@@ -71,7 +68,7 @@ public partial class ErrorWarnChart
                      Alias="Count",
                 }
             },
-            Queries = ConvertToLogQueries(),
+            Queries = ConvertToLogQueries(query),
             Interval = string.Empty,
         });
 
@@ -86,7 +83,7 @@ public partial class ErrorWarnChart
                      Alias="Count",
                 }
             },
-            Queries = ConvertToTraceQueries(isTrace: true),
+            Queries = ConvertToTraceQueries(query,isTrace: true),
             Interval = string.Empty,
         });
         _total += Convert.ToInt32(data1.First().Value);
@@ -97,11 +94,11 @@ public partial class ErrorWarnChart
         await Task.CompletedTask;
     }
 
-    private Dictionary<string, string> ConvertToLogQueries()
+    private Dictionary<string, string> ConvertToLogQueries(ProjectAppSearchModel query)
     {
         var dic = new Dictionary<string, string>();
-        if (Query.AppId != null)
-            dic.Add("Resource.service.name", Query.AppId);
+        if (query.AppId != null)
+            dic.Add("Resource.service.name", query.AppId);
         dic.Add("SeverityText", Warn ? "Warning" : "Error");
         //if (Query.Interval != null)
         //    dic.Add("transaction.name", Query.Interval);
@@ -109,13 +106,11 @@ public partial class ErrorWarnChart
         return dic;
     }
 
-    private Dictionary<string, string> ConvertToTraceQueries(bool isSpan = false, bool isTrace = false)
+    private Dictionary<string, string> ConvertToTraceQueries(ProjectAppSearchModel query,bool isSpan = false, bool isTrace = false)
     {
         var dic = new Dictionary<string, string>();
-        //if (Query.ProjectId != null)
-        //    dic.Add("service.name", Query.ProjectId);
-        if (Query.AppId != null)
-            dic.Add("service.name", Query.AppId);
+        if (query.AppId != null)
+            dic.Add("service.name", query.AppId);
         //if (Query.Interval != null)
         //    dic.Add("transaction.name", Query.Interval);
 

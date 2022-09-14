@@ -39,7 +39,7 @@ public partial class GrowthChart
 
     public int Total { get; set; } = 23;
 
-    protected override async Task LoadAsync(Dictionary<string, object> queryParams)
+    protected override async Task LoadAsync(ProjectAppSearchModel query)
     {
         //var data = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
         //{

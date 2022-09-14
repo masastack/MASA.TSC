@@ -3,7 +3,7 @@
 
 <MRow Class="ma-0 pa-0">
     <MCol Cols="6" Class="d-flex ma-0 pa-0 overflow-hidden" Style="height:44px">
-        <MAutocomplete @bind-Value=@Value.AppId Items=Apps ItemText="r=>r.Name" ItemValue="r=>r.Identity" Class="flex-row col-4 pa-0" Outlined Dense />
+        <MAutocomplete TItem="AppDto" TItemValue=string TValue=string @bind-Value=@Value.AppId Items=Apps ItemText="r=>r.Name" ItemValue="r=>r.Identity" Class="flex-row col-4 pa-0" Outlined Dense />
         <MLabel Class="rounded-lg text-no-wrap ml-1 my-2 py-2 px-1" Color="white-text" Style="background-color:#5470c6">Service ID:</MLabel>
         <MLabel Class="text-no-wrap ml-3 my-2 py-2">@AppId</MLabel>
     </MCol>

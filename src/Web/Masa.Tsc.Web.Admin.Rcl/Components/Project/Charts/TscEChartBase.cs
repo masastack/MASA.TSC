@@ -7,21 +7,14 @@ public partial class TscEChartBase : TscComponentBase
 {
     protected bool _isLoading = true;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    public async Task OnLoadAsync(ProjectAppSearchModel query)
     {
-        if(_isLoading)
-            await OnLoadAsync(default!);
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
-    public async Task OnLoadAsync(Dictionary<string, object> queryParams)
-    {
-        await LoadAsync(queryParams);
+        await LoadAsync(query);
         _isLoading = false;
         StateHasChanged();
     }
 
-    protected virtual async Task LoadAsync(Dictionary<string, object> queryParams)
+    protected virtual async Task LoadAsync(ProjectAppSearchModel query)
     {
         Thread.Sleep(200);
         await Task.CompletedTask;
