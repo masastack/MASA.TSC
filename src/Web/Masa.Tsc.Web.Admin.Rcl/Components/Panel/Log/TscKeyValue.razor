@@ -7,11 +7,13 @@
     {
         <MRow Class="d-block ma-0 pa-0">
             <MCol Cols="12" Class="@($"{_classs} {Class}")">
-                <MLabel Class="blue-grey lighten-3 text-subtitle-2 text-no-wrap">@item.Key : </MLabel>
+                <MLabel Class="bg-color-E9EDF7 text-subtitle-2 text-no-wrap pl-1">@item.Key : </MLabel>
                 @if (@item.Value is IEnumerable<KeyValuePair<string, object>> obj)
                 {
-                    <MCard Class="d-flex-inline rounded-0">
-                        <TscKeyValue Value=obj />
+                    <MCard Class="d-flex-inline rounded-0" Style="box-shadow:none">
+                        <MCardText Class="ma-0 pa-0">
+                            <TscKeyValue Value=obj Root=false />
+                        </MCardText>
                     </MCard>
                 }
                 else if (@item.Value is IEnumerable<object> objs)
@@ -37,5 +39,8 @@
     [Parameter]
     public bool WordBreak { get; set; }
 
-    private string _classs = "pa-0 ma-0 d-flex";
+    [Parameter]
+    public bool Root { get; set; } = true;
+
+    private string _classs => $"pa-0 ma-0 d-flex{(Root ? " pt-1" : "")}";
 }

@@ -18,13 +18,13 @@
         </MRow>
         <MRow>
             <MCol Class="py-0 my-0" Cols="2">
-                <MAutocomplete Items="_services"
+                <MAutocomplete Items="_overView.Services"
                            Dense
                            TItem=TraceOverviewServiceModel
                            TValue=string
                            ItemValue="item=>item.Name"
                            ItemText="item=>item.Name"
-                           TItemValue=string></MAutocomplete>
+                           TItemValue=string @bind-Value="_overView.SearchName"></MAutocomplete>
             </MCol>
         </MRow>
         <MRow>
@@ -38,24 +38,17 @@
             </MCol>
         </MRow>
         <MRow>
-            <MCol Cols="12" Class="d-flex justify-start">
-                @foreach(var item in _services)
+            <MCol Cols="12" Class="d-flex flex-wrap">
+                @foreach (var item in _overView.Services)
                 {
-                    <MCard Class="mr-4 rounded-md-1" Style="@($"background-color:{item.Color}")"><MCardText><MIcon Size="2" Class="pr-1">fas fa-cirle</MIcon>@item.Name</MCardText></MCard>
+                    <MLabel Class="pa-2 mr-2 mb-2 rounded-lg" Style="@($"border:solid 1px {item.Color};color:{item.Color}")"><MIcon Class="pr-1" Color="@item.Color" XSmall>fas fa-cirle</MIcon>@item.Name</MLabel>
                 }
             </MCol>
         </MRow>
 
         <MRow>
             <MCol Cols="8">
-                <TreeTable Expand=true
-                       KeyFunc="@(item=>{
-        var dic=(Dictionary<string,object>)item;
-        return (dic.ContainsKey("transaction")?GetDictionaryValue(dic,"transaction.id"):GetDictionaryValue(dic,"span.id")).ToString();
-    })"
-                       ParentFunc="@(item=>GetDictionaryValue((Dictionary<string,object>)item,"parent.id")?.ToString()??string.Empty)"
-                       Items="_items"
-                       OnRowClick="ChangeRecordAsync" OnOverviewUpdate="OverviewCompeleteAysnc"></TreeTable>
+                <TreeTable Expand=true KeyFunc=@_keyFunc ParentFunc=@_parentFunc Items="_items" OnRowClick="OnChangeRecordAsync" OverViewData="_overView"></TreeTable>
             </MCol>
             <MCol Cols="4">
                 <MContainer>
@@ -87,24 +80,32 @@
                         <MCol Class="py-0" Cols=12>
                             <MTabsItems Value=@_tabIndex Style="border:1px solid gray;">
                                 <MTabItem Value="@("attr")">
-                                    <MCol Class="overflow-auto">
-                                        <TscKeyValue Value="_selectItem.Attributes" WordBreak=true></TscKeyValue>
-                                    </MCol>
+                                    <MCard>
+                                        <MCardText Class="overflow-y-auto" Style="max-height:400px;">
+                                            <TscKeyValue Value="_selectItem.Attributes" WordBreak=true></TscKeyValue>
+                                        </MCardText>
+                                    </MCard>
                                 </MTabItem>
                                 <MTabItem Value="@("resource")">
-                                    <MCol Class="overflow-auto">
-                                        <TscKeyValue Value="_selectItem.Resources" WordBreak=true></TscKeyValue>                                        
-                                    </MCol>
+                                    <MCard>
+                                        <MCardText Class="overflow-y-auto" Style="max-height:400px;">
+                                            <TscKeyValue Value="_selectItem.Resources" WordBreak=true></TscKeyValue>
+                                        </MCardText>
+                                    </MCard>
                                 </MTabItem>
                                 <MTabItem Value="@("detail")">
-                                    <MCol Class="overflow-auto">
-                                        <TscKeyValue Value="_selectItem.Current" WordBreak=true></TscKeyValue>
-                                    </MCol>
+                                    <MCard>
+                                        <MCardText Class="overflow-y-auto" Style="max-height:400px;">
+                                            <TscKeyValue Value="_selectItem.Current" WordBreak=true></TscKeyValue>
+                                        </MCardText>
+                                    </MCard>
                                 </MTabItem>
                                 <MTabItem Value="@("log")">
-                                    <MCol Class="overflow-auto">
-                                        <TscKeyValue Value="_selectItem.Logs" WordBreak=true></TscKeyValue>
-                                    </MCol>
+                                    <MCard>
+                                        <MCardText Class="overflow-y-auto" Style="max-height:400px;">
+                                            <TscKeyValue Value="_selectItem.Logs" WordBreak=true></TscKeyValue>
+                                        </MCardText>
+                                    </MCard>
                                 </MTabItem>
                             </MTabsItems>
                         </MCol>

@@ -23,6 +23,8 @@ public static class DateTimeExtensions
     public static string Format(this DateTime time, TimeZoneInfo timeZone, string fmt = "yyyy-MM-dd HH:mm:ss")
     {
         time = TimeZoneInfo.ConvertTime(time, timeZone);
+        if (time == DateTime.MinValue || time == DateTime.MaxValue)
+            return "";
         return time.ToString(fmt);
     }
 }

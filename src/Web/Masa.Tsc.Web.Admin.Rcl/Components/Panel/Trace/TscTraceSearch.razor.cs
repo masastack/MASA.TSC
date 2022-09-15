@@ -93,14 +93,17 @@ public partial class TscTraceSearch
         switch (type)
         {
             case 1:
-                query.Query = new Dictionary<string, string> {
+            case 2:
+                if (type == 1)
+                {
+                    query.Query = new Dictionary<string, string> {
                     {"service.name",_service}
                 };
-                query.Name = "service.node.name";
-                data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
-                _instances = data.ToList();
-                break;
-            case 2:
+                    query.Name = "service.node.name";
+                    data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
+                    _instances = data.ToList();
+                }
+
                 query.Query = new Dictionary<string, string> {
                     {"service.name",_service},
                     {"service.node.name",_instance}
