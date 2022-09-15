@@ -78,7 +78,7 @@ public static class JsonElementExtensions
         return list;
     }
 
-    public static DateTime? GetTimestamp(this JsonElement value, string timeSpanKey = "@timestamp")
+    public static DateTime GetTimestamp(this JsonElement value, string timeSpanKey = "@timestamp")
     {
         if (value.ValueKind == JsonValueKind.Object)
         {
@@ -94,6 +94,6 @@ public static class JsonElementExtensions
             }
         }
 
-        return default;
+        return DateTime.MinValue;
     }
 }

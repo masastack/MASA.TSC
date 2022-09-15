@@ -14,6 +14,12 @@ public class TraceOverviewModel : TraceTimeUsModel
     public DateTime Start { get; set; }
 
     public List<TraceOverviewServiceModel> Services { get; set; } = new List<TraceOverviewServiceModel>();
+    
+    public Dictionary<string, TraceTableLineModel> SpansDeeps = new();
+    
+    public Dictionary<string, List<string>> SpanChildren = new();
+
+    public string SearchName { get; set; }
 }
 
 public class TraceOverviewServiceModel

@@ -14,7 +14,15 @@ public partial class TscTraceChart
     [Parameter]
     public RequestTraceListDto Query { get; set; } = default!;
 
+    private List<ValueTuple<string, string,int>> _chartOptions = new List<ValueTuple<string, string,int>> {
+        ValueTuple.Create("Histogram","mdi-table-of-contents",1),
+        ValueTuple.Create("Statistics","mdi-poll",2),
+        ValueTuple.Create("Table","mdi-view-week-outline",3)
+    };
+
+
     private object _options = new object();
+    private int _chartIndex = 1;
 
     private void ConvertOption(string[] xPoints, IEnumerable<ChartViewDto> data)
     {
@@ -56,6 +64,11 @@ public partial class TscTraceChart
         };
     }
 
+    private async Task OnChartSwtich(int index)
+    { 
+        _chartIndex = index;
+        StateHasChanged();
+    }
 
     //public async Task LoadAsync()
     //{
@@ -101,7 +114,7 @@ public partial class TscTraceChart
             Start = Query.Start,
             FieldMaps = new RequestFieldAggregationDto[] {
                 new RequestFieldAggregationDto{
-                     AggegationType= Contracts.Admin.Enums.AggregationTypes.DateHistogram,
+                     AggegationType= AggregationTypes.DateHistogram,
                      Name="@timestamp",
                      Alias="Span Count",
                 }

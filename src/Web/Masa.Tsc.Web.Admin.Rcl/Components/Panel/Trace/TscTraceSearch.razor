@@ -42,10 +42,6 @@
                    Dense
                    Class="rounded-0"></MAutocomplete>
     <SearchTextField Label="TraceId/Search" @bind-Value="_keyword" Solo Dense Class="rounded-0 flex-column-4"></SearchTextField>
-    <MCard Class="rounded-0" Height=38>
-        <MCardText  Class="py-2">
-            <SDateTimeRangePicker @bind-StartTime="_start" @bind-EndTime="_end" />
-        </MCardText>
-    </MCard>
-    <MButton OnClick="async()=>await SearchAsync()" Class="rounded-0" Height="38">Query</MButton>
+   <SDateTimeRangePicker Class="ma-0 pa-0 pt-2 pl-2" @bind-StartTime="_start" @bind-EndTime="_end" />        
+    <MButton OnClick="async()=>await SearchAsync()" Class="rounded-0">Query</MButton>
 </MRow>

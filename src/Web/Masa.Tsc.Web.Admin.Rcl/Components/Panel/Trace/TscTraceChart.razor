@@ -5,19 +5,16 @@
     <MCol Class="d-flex justify-start ma-0 pa-0">
         <MLabel Class="pa-0 mt-3 ml-4">Trace</MLabel>
     </MCol>
-    <MCol Class="d-flex justify-end ma-0 pa-0">
-        <MButton Class="text-subtitle-1 text-blue blue lighten-3 rounded-0" IsActive ActiveClass="text-white  blue lighten-3 rounded-0">
-            <MIcon Size=18 Color="white">fas fa-chart-bar</MIcon>
-            Histogram
-        </MButton>
-        <MButton Class="text-subtitle-1 text-blue blue lighten-3 rounded-0" ActiveClass="text-white  blue lighten-3 rounded-0">
-            <MIcon Size=18 Color="white">fas fa-chart-column</MIcon>
-            Statistics
-        </MButton>
-        <MButton Class="text-subtitle-1 text-blue blue lighten-3 rounded-0" ActiveClass="text-white  blue lighten-3 rounded-0">
-            <MIcon Size=18 Color="white">fas fa-table</MIcon>
-            Table
-        </MButton>
+    <MCol Class="d-flex justify-end ma-0 pa-0 pt-1">
+        @foreach (var item in _chartOptions)
+        {
+            bool isActive = item.Item3 == _chartIndex;
+
+            <MButton Class="trace-chart-btn rounded-0" Small IsActive=isActive ActiveClass="trace-chart-btn-active" OnClick="async ()=>await OnChartSwtich(item.Item3)">
+                <MIcon Size=18 Color="trace-chart-btn">@item.Item2</MIcon>
+                @item.Item1
+            </MButton>
+        }
     </MCol>
 </MRow>
 <MRow>

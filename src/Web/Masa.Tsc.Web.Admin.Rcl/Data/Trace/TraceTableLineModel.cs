@@ -24,4 +24,6 @@ public class TraceTableLineModel : TraceTimeUsModel
     public string Width { get; set; }
 
     public string Right { get; set; }
+
+    public string Color { get; set; }
 }
