@@ -12,12 +12,13 @@ stages:
   - rollout-staging
   - deploy-prd
   - rollout-prd
-
+  
+  
 variables: 
   PRD_REPLICAS: 2
 
   DEV_REPLICAS: 1
-
+  
   REGISTRY_URL: registry.cn-hangzhou.aliyuncs.com
   #REGISTRY_URL: reg.lonsid.cn
   REGISTRY_WAREHOUSE: masa
