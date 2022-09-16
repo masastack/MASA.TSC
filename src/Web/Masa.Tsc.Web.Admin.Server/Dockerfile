@@ -11,9 +11,4 @@ WORKDIR /app
 COPY ./publish .
 ENV ASPNETCORE_URLS=http://0.0.0.0:80
 EXPOSE 80
-# WORKDIR /app
-# COPY --from=publish /app/publish .
-# ENV ASPNETCORE_URLS=https://0.0.0.0:443
-# EXPOSE 80
-# EXPOSE 443
 ENTRYPOINT ["dotnet", "Masa.Tsc.Web.Admin.Server.dll"]
