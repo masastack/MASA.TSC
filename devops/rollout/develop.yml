@@ -6,7 +6,7 @@ rollout-dev-service-admin:
     - .rollout
   only:
     refs:
-      - feature/mobiletest
+      - develop
     changes:
       - src/Services/Masa.Tsc.Service.Admin/**/*
       - .gitlab-ci.yml
@@ -20,7 +20,7 @@ rollout-dev-ui-admin:
     - .rollout
   only:
     refs:
-      - feature/mobiletest
+      - develop
     changes:
       - src/Web/Masa.Tsc.Web.Admin.Server/**/*
       - .gitlab-ci.yml

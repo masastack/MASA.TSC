@@ -1,0 +1,23 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+<div class="d-block">
+    <MBreadcrumbs Items="_items" Linkage Divider="/"></MBreadcrumbs>
+</div>
+@code {
+    private List<BreadcrumbItem> _items = new();
+
+    [Parameter]
+    public string Href { get; set; } = default!;
+
+    protected override void OnParametersSet()
+    {
+        _items = new List<BreadcrumbItem> {
+                new BreadcrumbItem
+                {
+                     Text="Team",
+                     Linkage=true,
+                      Href="/team"
+                }
+            };
+        base.OnParametersSet();
+    }
+}

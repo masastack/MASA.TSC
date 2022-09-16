@@ -1,0 +1,42 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+<div class="@($"hex flex-col {GetClass()}")" @onclick=@Handle style="cursor:pointer">
+    <div class="common top"></div>
+    <div class="common bottom"></div>
+    <div class="pt-0 mt-n4 pl-1 pr-1 justify-md-center">@Child</div>
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public RenderFragment HeaderChild { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment Child { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment TailChild { get; set; } = default!;
+
+    [Parameter]
+    public bool Error { get; set; }
+
+    [Parameter]
+    public bool Warn { get; set; }
+
+    private void Handle()
+    {
+        if (OnClick.HasDelegate)
+            OnClick.InvokeAsync();
+    }
+
+    private string GetClass()
+    {
+        if (Error)
+            return "hex-color-red";
+        if (Warn)
+            return "hex-color-yellow";
+        return "hex-color-green";
+    }
+}

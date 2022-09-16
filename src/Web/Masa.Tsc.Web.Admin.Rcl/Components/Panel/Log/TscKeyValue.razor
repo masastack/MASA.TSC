@@ -1,0 +1,46 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+@if (Value != null)
+{
+    @foreach (var item in Value)
+    {
+        <MRow Class="d-block ma-0 pa-0">
+            <MCol Cols="12" Class="@($"{_classs} {Class}")">
+                <MLabel Class="bg-color-E9EDF7 text-subtitle-2 text-no-wrap pl-1">@item.Key : </MLabel>
+                @if (@item.Value is IEnumerable<KeyValuePair<string, object>> obj)
+                {
+                    <MCard Class="d-flex-inline rounded-0" Style="box-shadow:none">
+                        <MCardText Class="ma-0 pa-0">
+                            <TscKeyValue Value=obj Root=false />
+                        </MCardText>
+                    </MCard>
+                }
+                else if (@item.Value is IEnumerable<object> objs)
+                {
+                    <TscValueArray Value=objs />
+                }
+                else
+                {
+                    <MLabel Class="@($"text{(WordBreak?"-":"-no-")}wrap text-body-1")">@item.Value</MLabel>
+                }
+            </MCol>
+        </MRow>
+    }
+}
+@code
+{
+    [Parameter]
+    public IEnumerable<KeyValuePair<string, object>> Value { get; set; } = default!;
+
+    [Parameter]
+    public string Class { get; set; } = default!;
+
+    [Parameter]
+    public bool WordBreak { get; set; }
+
+    [Parameter]
+    public bool Root { get; set; } = true;
+
+    private string _classs => $"pa-0 ma-0 d-flex{(Root ? " pt-1" : "")}";
+}

@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <MasaFrameworkPackageVersion>0.6.0-preview.9</MasaFrameworkPackageVersion>
+  </PropertyGroup>  
+</Project>

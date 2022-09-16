@@ -5,7 +5,7 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class DirectoryService : BaseService
 {
-    public DirectoryService(ICallerProvider caller) : base(caller, "/api/Instrument/directory") { }
+    public DirectoryService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/Instrument/directory",tokenProvider) { }
 
     public async Task<IEnumerable<KeyValuePair<string, string>>> AggregateAsync(RequestAggregationDto param)
     {

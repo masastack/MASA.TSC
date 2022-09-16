@@ -8,7 +8,7 @@ service-admin-deploy-test:
     - .deploy-service
   only:
     refs:
-      - feature/mobiletest
+      - develop
     changes:
       - src/Services/Masa.Tsc.Service.Admin/**/*
       - .gitlab-ci.yml
@@ -23,7 +23,7 @@ ui-admin-deploy-test:
     - .deploy-ui
   only:
     refs:
-      - feature/mobiletest
+      - develop
     changes:
       - src/Web/Masa.Tsc.Web.Admin.Server/**/*
       - .gitlab-ci.yml

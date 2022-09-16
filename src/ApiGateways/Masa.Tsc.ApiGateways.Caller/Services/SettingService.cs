@@ -5,7 +5,7 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class SettingService : BaseService
 {
-    public SettingService(ICallerProvider caller) : base(caller, "/api/setting") { }
+    public SettingService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/setting",tokenProvider) { }
 
     public async Task<SettingDto> GetAsync(Guid userId)
     {

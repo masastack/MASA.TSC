@@ -5,7 +5,7 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class AppService : BaseService
 {
-    public AppService(ICallerProvider caller) : base(caller, "/api/app") { }
+    public AppService(ICaller caller,TokenProvider tokenProvider) : base(caller, "/api/app", tokenProvider) { }
 
     public async Task<List<AppDto>> GetAppsAsync(string projectId)
     {

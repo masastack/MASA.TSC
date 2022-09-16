@@ -19,7 +19,7 @@ services:
     image: ${DOCKER_REGISTRY-}masatscwebadmin
     build:
       context: .
-      dockerfile: src/Web/Masa.Tsc.Admin.Server/Dockerfile    
+      dockerfile: src/Web/Masa.Tsc.Web.Admin.Server/Dockerfile    
 
   dapr-placement:
     image: "daprio/dapr:1.7.1"

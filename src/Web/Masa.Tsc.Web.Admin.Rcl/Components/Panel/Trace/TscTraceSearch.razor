@@ -1,0 +1,47 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+<MRow Class="d-flex">
+    <MAutocomplete Label="Service"
+                   Items="_services"
+                   @bind-Value="_service"
+                   TItem=string
+                   TValue=string
+                   ItemText="item=>item"
+                   ItemValue="item=>item"
+                   TItemValue=string
+                   Solo
+                   Dense
+                   Class="rounded-0"
+                   OnSearchInputUpdate="@(async item=>await UpdateSearchInputAsync(1,item))"
+                   OnSelectedItemUpdate="@(async item=>await UpdateItemAsync(1,item))"></MAutocomplete>
+    <MAutocomplete Label="Instance"
+                   Items="_instances" @bind-Value="_instance"
+                   TItem=string
+                   TValue=string
+                   ItemText="item=>item"
+                   ItemValue="item=>item"
+                   TItemValue=string
+                   Solo
+                   Dense
+                   Class="rounded-0"
+                   OnSearchInputUpdate="@(async item=>await UpdateSearchInputAsync(2,item))"
+                   OnSelectedItemUpdate="@(async item=>await UpdateItemAsync(2,item))"></MAutocomplete>
+    <MAutocomplete Label="Endpoint"
+                   Loading="_isLoading"
+                   Items="_endpoints"
+                   @bind-Value="_endpoint"
+                   TItem=string
+                   TValue=string
+                   ItemText="item=>item"
+                   ItemValue="item=>item"
+                   TItemValue=string
+                   OnSearchInputUpdate="@(async item=>await UpdateSearchInputAsync(3,item))"
+                   OnSelectedItemUpdate="@(async item=>await UpdateItemAsync(3,item))"
+                   Solo
+                   Dense
+                   Class="rounded-0"></MAutocomplete>
+    <SearchTextField Label="TraceId/Search" @bind-Value="_keyword" Solo Dense Class="rounded-0 flex-column-4"></SearchTextField>
+   <SDateTimeRangePicker Class="ma-0 pa-0 pt-2 pl-2" @bind-StartTime="_start" @bind-EndTime="_end" />        
+    <MButton OnClick="async()=>await SearchAsync()" Class="rounded-0">Query</MButton>
+</MRow>

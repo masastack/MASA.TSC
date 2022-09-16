@@ -1,0 +1,18 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscEChartBase
+
+<MCard Class="flex-col col-3 ma-1">
+    <MCardTitle Class="d-flex justify-space-between mx-2 pa-0 ma-0" >
+        <span>@Title</span><MIcon XSmall>fas fa-info</MIcon>
+    </MCardTitle>
+    <MCardText Class="pa-0 ma-0">
+        @if (_isLoading)
+        {
+            @("Loading ...")
+        }
+        else
+        {
+            <MECharts Option="_options" Width="Width" Height="Height"></MECharts>
+        }
+    </MCardText>
+</MCard>

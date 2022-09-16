@@ -5,7 +5,7 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class TraceService : BaseService
 {
-    public TraceService(ICallerProvider caller) : base(caller, "/api/trace") { }
+    public TraceService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/trace",tokenProvider) { }
 
     public async Task<IEnumerable<object>> GetAsync(string traceId)
     {

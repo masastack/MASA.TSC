@@ -4,7 +4,7 @@
 namespace Nest;
 
 public static class IElasticClientExtenstion
-{    
+{
     public static async Task SearchAsync<TResult, TQuery>(this IElasticClient client,
         string indexName,
         TQuery query,
@@ -88,7 +88,7 @@ public static class IElasticClientExtenstion
     /// <param name="indexName"></param>                    
     /// <param name="token"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<MappingResponse>?> GetMappingAsync(this ICallerProvider caller, string indexName, CancellationToken token = default)
+    public static async Task<IEnumerable<MappingResponse>?> GetMappingAsync(this ICaller caller, string indexName, CancellationToken token = default)
     {
         ArgumentNullException.ThrowIfNull(indexName, nameof(indexName));
         var path = $"/{indexName}/_mapping";

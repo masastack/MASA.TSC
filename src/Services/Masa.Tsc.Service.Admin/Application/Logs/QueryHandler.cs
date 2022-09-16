@@ -1,5 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
+
 using Nest;
 
 namespace Masa.Tsc.Service.Admin.Application.Logs;
@@ -9,14 +10,14 @@ public class QueryHandler
     private readonly IElasticClient _elasticClient;
     private readonly IServiceProvider _provider;
     private readonly ILogger _logger;
-    private readonly ICallerProvider _caller;
+    private readonly ICaller _caller;
 
     public QueryHandler(IServiceProvider provider, IElasticClient elasticClient, ILogger<QueryHandler> logger)
     {
         _provider = provider;
         _elasticClient = elasticClient;
         _logger = logger;
-        _caller = _provider.GetRequiredService<ICallerFactory>().CreateClient(ElasticConst.ES_HTTP_CLIENT_NAME);
+        _caller = _provider.GetRequiredService<ICallerFactory>().Create(ElasticConst.ES_HTTP_CLIENT_NAME);
     }
 
     #region agg query
@@ -24,8 +25,8 @@ public class QueryHandler
     public async Task AggregateAsync(LogAggQuery query)
     {
         await _elasticClient.SearchAsync<object, LogAggQuery>(ElasticConst.LogIndex, query, condition: Filter,
-            aggregate: (agg, q) => IElasticClientExtenstion.Aggregation(agg, q.FieldMaps),
-            result: (rep, q) => q.Result = IElasticClientExtenstion.AggResult(rep, q.FieldMaps)!,
+            aggregate: (agg, q) => IElasticClientExtenstion.Aggregation(agg, q.FieldMaps,q.Interval),
+            result: (rep, q) => q.Result = IElasticClientExtenstion.AggResult(rep, q.FieldMaps)!,            
             logger: _logger);
     }
 

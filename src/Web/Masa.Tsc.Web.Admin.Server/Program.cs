@@ -1,15 +1,14 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.Configuration;
+using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
+using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
+using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.AddObservable();
 
-builder.Services.AddRazorPages();
-
-builder.Services.AddHttpContextAccessor();
-
-// Add services to the container.
-builder.Services.AddScoped<TscCaller>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
@@ -19,17 +18,21 @@ builder.WebHost.UseKestrel(option =>
     options.ServerCertificate = new X509Certificate2(Path.Combine("Certificates", "7348307__lonsid.cn.pfx"), "cqUza0MN"));
 });
 
-StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
-
-builder.Services.AddMasaIdentityModel(IdentityType.MultiEnvironment, options =>
+builder.AddMasaConfiguration(configurationBuilder =>
 {
-    options.Environment = "environment";
-    options.UserName = "name";
-    options.UserId = "sub";
-})
-.AddMasaStackComponentsForServer("wwwroot/i18n", builder.Configuration["Masa:Auth:ServiceBaseAddress"], builder.Configuration["Masa:Mc:ServiceBaseAddress"])
-.AddMasaOpenIdConnect(builder.Configuration.GetSection("Masa:OIDC").Get<MasaOpenIdConnectOptions>());
+    configurationBuilder.UseDcc(builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>(), default, default);
+});
 
+var publicConfiguration = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
+var oidc = builder.GetMasaConfiguration().Local.GetSection("Masa:Oidc").Get<MasaOpenIdConnectOptions>();
+string authUrl = builder.GetMasaConfiguration().Local.GetValue<string>("Masa:Auth:ServiceBaseAddress");
+string mcUrl = publicConfiguration.GetValue<string>("$public.AppSettings:McClient:Url");
+builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl).AddMasaOpenIdConnect(oidc);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<TokenProvider>();
+builder.Services.AddScoped<TscCaller>();
+
+StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

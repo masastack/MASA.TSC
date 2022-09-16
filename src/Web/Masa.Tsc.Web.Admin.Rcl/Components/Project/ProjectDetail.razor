@@ -1,0 +1,25 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+<MCard Class="py-0 my-0" Style="box-shadow:none">
+    <MCardText Class="py-0 my-0">
+        <MRow Class="py-0 my-0">
+            <MCol Cols=12 Class="text-center text-h6 font-weight-bold py-0 my-0 pt-1">@Value.Name</MCol>
+        </MRow>
+        <MRow Class="py-0 my-0">
+            <MCol Cols=12 Class="text-center text-h6 font-weight-bold py-0 my-0 pt-1">@Value.Identity</MCol>
+        </MRow>
+        <MRow Class="py-0 my-0">
+            <MCol Cols=12 Class="text-center py-0 my-0 pt-1">应用：@Value.Apps.Count</MCol>
+        </MRow>
+        <MRow Class="py-0 my-0">
+            <MCol Cols=12 Class="py-0 my-0 pt-1">Description:@Value.Description</MCol>
+        </MRow>
+    </MCardText>
+</MCard>
+
+@code {
+
+    [Parameter]
+    public ProjectDto Value { get; set; } = default!;
+}
