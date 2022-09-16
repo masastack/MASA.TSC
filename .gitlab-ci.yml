@@ -23,6 +23,7 @@ variables:
   #REGISTRY_URL: reg.lonsid.cn
   REGISTRY_WAREHOUSE: masa
 
-  K8S_IMAGEPULLSECRETSPULL: reg.lonsid.cn
+  #K8S_IMAGEPULLSECRETSPULL: reg.lonsid.cn
+  K8S_IMAGEPULLSECRETSPULL: aliregistry
   SECRET_TLS: lonsid-cn
   
