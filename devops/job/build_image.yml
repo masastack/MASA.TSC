@@ -3,8 +3,8 @@
   tags:
     - linux-shell
   before_script:
-    # - docker login -u $CI_ALI_REGISTRY_USER -p $CI_ALI_REGISTRY_PASSWD $CI_ALI_REGISTRY_DOMAIN
-    - docker login -u admin -p $CI_REG_LONSID_CN_PASSWD $REGISTRY_URL
+    - docker login -u $CI_ALI_REGISTRY_USER -p $CI_ALI_REGISTRY_PASSWD $CI_ALI_REGISTRY_DOMAIN
+    # - docker login -u admin -p $CI_REG_LONSID_CN_PASSWD $REGISTRY_URL
   script:
     - ls
     - echo $CI_COMMIT_BRANCH
@@ -27,8 +27,8 @@
   tags:
     - linux-shell
   before_script:
-    # - docker login -u $CI_ALI_REGISTRY_USER -p $CI_ALI_REGISTRY_PASSWD $CI_ALI_REGISTRY_DOMAIN
-    - docker login -u admin -p $CI_REG_LONSID_CN_PASSWD $REGISTRY_URL
+    - docker login -u $CI_ALI_REGISTRY_USER -p $CI_ALI_REGISTRY_PASSWD $CI_ALI_REGISTRY_DOMAIN
+    # - docker login -u admin -p $CI_REG_LONSID_CN_PASSWD $REGISTRY_URL
   script:
     - ls
     - dotnet --version 
