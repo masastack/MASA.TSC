@@ -30,9 +30,12 @@ public class DirectoryCommandHandler
     [EventHandler]
     public async Task UpdateAsync(UpdateDirectoryCommand command)
     {
-        var directory = await _directoryRepository.FindAsync(t => t.Id == command.Id && t.UserId == command.UserId);
+        var directory = await _directoryRepository.FindAsync(t => t.Id == command.Id);
         if (directory == null)
             throw new UserFriendlyException($"Directory \"{command.Id}\" is not exists");
+
+        if (directory.UserId != command.UserId)
+            throw new UserFriendlyException($"No permission");
 
         if (command.Name == directory.Name && command.Sort - directory.Sort == 0)
             return;

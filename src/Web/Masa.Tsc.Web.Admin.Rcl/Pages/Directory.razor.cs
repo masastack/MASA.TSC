@@ -16,15 +16,17 @@ public partial class Directory
     private IEnumerable<DirectoryTreeDto> _searchData;
 
     protected override async Task OnInitializedAsync()
-    {
-        _isLoading = true;
-        await LoadDataAsync();
-        _isLoading = false;
+    {        
+        
         await base.OnInitializedAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            await LoadDataAsync();
+        }
         await base.OnAfterRenderAsync(firstRender);
     }
 
@@ -48,9 +50,12 @@ public partial class Directory
 
     private async Task LoadDataAsync()
     {
+        _isLoading = true;
         _data = await ApiCaller.DirectoryService.GetTreeAsync(CurrentUserId);
         SetExpand(_data);
         _searchData = Array.Empty<DirectoryTreeDto>();
+        _isLoading = false;
+        StateHasChanged();
     }
 
     private void SetSeachData()

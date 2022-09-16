@@ -108,6 +108,8 @@ var app = builder.Services
     })
     .AddServices(builder);
 
+app.UseMasaExceptionHandler();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -125,5 +127,6 @@ app.UseEndpoints(endpoints =>
     endpoints.MapSubscribeHandler();
 });
 app.UseHttpsRedirection();
+
 
 app.Run();

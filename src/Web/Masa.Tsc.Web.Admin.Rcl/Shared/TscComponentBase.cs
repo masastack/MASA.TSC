@@ -43,8 +43,10 @@ public class TscComponentBase : BComponentBase
     protected override async Task OnInitializedAsync()
     {
         Loading = true;
-        CurrentUserId = Guid.Parse(UserContext.UserId!);
+        if (UserContext != null && !string.IsNullOrEmpty(UserContext.UserId))
+            CurrentUserId = Guid.Parse(UserContext.UserId);
         CurrentTimeZone = GetTimeZone();
+
         //if (Setting == null)
         //{
         //    Setting = await ApiCaller.SettingService.GetAsync(CurrentUserId);

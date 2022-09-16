@@ -15,9 +15,12 @@ public class DirectoryQueryHandler
     [EventHandler]
     public async Task GetAsync(DirectoryQuery query)
     {
-        var directory = await _directoryRepository.FindAsync(t => t.Id == query.Id && t.UserId == query.UserId);
+        var directory = await _directoryRepository.FindAsync(t => t.Id == query.Id);
         if (directory == null)
             throw new UserFriendlyException($"directory \"{query.Id}\" is not exists");
+
+        if (directory.UserId != Guid.Empty && directory.UserId != query.UserId)
+            throw new UserFriendlyException($"directory \"{query.Id}\" is denied");
 
         query.Result = new()
         {
@@ -31,7 +34,7 @@ public class DirectoryQueryHandler
     [EventHandler]
     public async Task GetTreeAsync(DirectoryTreeQuery query)
     {
-        var list = await _directoryRepository.ToQueryable().Where(t => t.UserId == query.UserId).ToListAsync();
+        var list = await _directoryRepository.ToQueryable().Where(t => t.UserId == Guid.Empty || t.UserId == query.UserId).ToListAsync();
         if (list == null || !list.Any())
         {
             query.Result = Array.Empty<DirectoryTreeDto>();
