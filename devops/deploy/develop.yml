@@ -5,11 +5,17 @@ service-admin-deploy-dev:
     - .values-service-admin-dev
     - .values-dev-public-service
     - .deploy-service
-  rules:
-    - if: $CI_COMMIT_BRANCH == "develop"
-      changes:
-        - $PROJECT_PATH/**/*
-        - .gitlab-ci.yml
+  only:
+    refs:
+      - develop
+    changes:
+      - src/Services/Masa.Tsc.Service.Admin/**/*
+      - .gitlab-ci.yml
+  # rules:
+  #   - if: $CI_COMMIT_BRANCH == "develop"
+  #     changes:
+  #       - $PROJECT_PATH/**/*
+  #       - .gitlab-ci.yml
 
 ui-admin-deploy-dev:
   needs: ["ui-admin-docker-image-dev"]
@@ -18,8 +24,14 @@ ui-admin-deploy-dev:
     - .values-ui-admin-dev
     - .values-dev-public-ui
     - .deploy-ui
-  rules:
-    - if: $CI_COMMIT_BRANCH == "develop"
-      changes:
-        - $PROJECT_PATH/**/*
-        - .gitlab-ci.yml
+  only:
+    refs:
+      - develop
+    changes:
+      - src/Web/Masa.Tsc.Web.Admin.Server/**/*
+      - .gitlab-ci.yml
+  # rules:
+  #   - if: $CI_COMMIT_BRANCH == "develop"
+  #     changes:
+  #       - $PROJECT_PATH/**/*
+  #       - .gitlab-ci.yml
