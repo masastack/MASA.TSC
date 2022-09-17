@@ -23,10 +23,10 @@ builder.AddMasaConfiguration(configurationBuilder =>
     configurationBuilder.UseDcc(builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>(), default, default);
 });
 
-var publicConfiguration = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
+//var publicConfiguration = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
 var oidc = builder.GetMasaConfiguration().Local.GetSection("Masa:Oidc").Get<MasaOpenIdConnectOptions>();
 string authUrl = builder.GetMasaConfiguration().Local.GetValue<string>("Masa:Auth:ServiceBaseAddress");
-string mcUrl = publicConfiguration.GetValue<string>("$public.AppSettings:McClient:Url");
+string mcUrl = builder.GetMasaConfiguration().Local.GetValue<string>("Masa:Mc:ServiceBaseAddress");
 builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl).AddMasaOpenIdConnect(oidc);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<TokenProvider>();
