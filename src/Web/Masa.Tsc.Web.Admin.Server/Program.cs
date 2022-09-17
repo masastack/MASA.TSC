@@ -20,10 +20,10 @@ builder.WebHost.UseKestrel(option =>
 
 builder.AddMasaConfiguration(configurationBuilder =>
 {
-    configurationBuilder.UseDcc(builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>(), default, default);
+    configurationBuilder.UseDcc(sectionName: "Masa:Dcc");
 });
 
-//var publicConfiguration = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
+var publicConfiguration = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
 var oidc = builder.GetMasaConfiguration().Local.GetSection("Masa:Oidc").Get<MasaOpenIdConnectOptions>();
 string authUrl = builder.GetMasaConfiguration().Local.GetValue<string>("Masa:Auth:ServiceBaseAddress");
 string mcUrl = builder.GetMasaConfiguration().Local.GetValue<string>("Masa:Mc:ServiceBaseAddress");

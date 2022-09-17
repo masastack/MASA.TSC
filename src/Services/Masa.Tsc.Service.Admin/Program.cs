@@ -31,7 +31,7 @@ builder.AddObservable();
 
 builder.AddMasaConfiguration(configurationBuilder =>
 {
-    configurationBuilder.UseDcc(builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>(), default, default);
+    configurationBuilder.UseDcc(sectionName: "Masa:Dcc");
 });
 //#if DEBUG
 //builder.Services.AddDaprStarter(opt =>
