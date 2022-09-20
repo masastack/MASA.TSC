@@ -1,23 +1,29 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
+<MRow>
+    <MCol Class="d-flex justify-end">
+        <MButton OnClick="()=>_showDialog=true">添加</MButton>
+        <MButton OnClick="OnCloseAsync">Close</MButton>
+    </MCol>
+</MRow>
 <MCard>
-    <MStepper>
-        <MStepperHeader>
-            <MStepperStep Step=1>input name</MStepperStep>
-            <MStepperStep Step=2>choose layer</MStepperStep>
-            <MStepperStep Step=3>choose entity</MStepperStep>
-        </MStepperHeader>
-        <MStepperItems>
-            <MStepperContent>
+    <MCardText>
 
-
-            </MStepperContent>
-            <MStepperContent></MStepperContent>
-            <MStepperContent></MStepperContent>
-        </MStepperItems>
-    </MStepper>
+    </MCardText>
 </MCard>
 
-@code {
-
-}
+<TscDialog @bind-Value="_showDialog" Persistent Width="600">
+    <ChildContent>
+        <MCard>
+            <MCardTitle>
+                <MRow>
+                    <MCol Cols=9>添加</MCol>
+                    <MCol Cols=3 Class="d-flex justify-end"><MIcon OnClick="()=>_showDialog=false" Class="justify-end">mdi-close</MIcon></MCol>
+                </MRow>
+            </MCardTitle>
+            <MCardText>
+                <TscInstrumentPannels></TscInstrumentPannels>
+            </MCardText>
+        </MCard>
+    </ChildContent>
+</TscDialog>

@@ -1,0 +1,41 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+<MStepper @bind-Value="_step">
+    <MStepperHeader>
+        <MStepperStep Step="1" Complete="_step>1">选择</MStepperStep>
+        <MDivider></MDivider>
+        <MStepperStep Step="2"></MStepperStep>
+    </MStepperHeader>
+    <MStepperItems>
+        <MStepperContent Step="1">
+            <MRow>
+                <MCol>
+                    <MListItemGroup ValueChanged="ValueChange">
+                    @foreach(var item in _types)
+                        {                            
+                            <MListItem Value="item.Key">
+                                <ItemContent>
+                                    <MListItemAction>
+                                        <MCheckbox Value="@context.Active"></MCheckbox>
+                                    </MListItemAction>
+                                    <MListItemContent>
+                                        <MListItemTitle>@item.Name</MListItemTitle>
+                                    </MListItemContent>
+                                </ItemContent>
+                            </MListItem>
+                        }                        
+                    </MListItemGroup>
+
+                    <MButton OnClick="()=>_step=2">确认</MButton>
+                </MCol>
+                <MCol>
+
+                </MCol>
+            </MRow>
+        </MStepperContent>
+        <MStepperContent Step="2">
+            <TscInstrumentPannelDetail Type="_widgetType"></TscInstrumentPannelDetail>
+        </MStepperContent>
+    </MStepperItems>
+</MStepper>

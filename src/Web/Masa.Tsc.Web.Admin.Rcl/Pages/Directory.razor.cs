@@ -3,21 +3,27 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages;
 
-public partial class Directory
+public partial class Directory : IDisposable
 {
     private bool _isLoading = true;
     private string _keyword;
     private bool _expand = true;
-    private bool _showDialog = false;
-    private string _title;
-    private bool _isUpdate = false;
+
     private DirectoryTreeDto _current = new();
     private IEnumerable<DirectoryTreeDto> _data;
     private IEnumerable<DirectoryTreeDto> _searchData;
 
+    private bool _showDialog = false;
+    private string _title;
+    private bool _isUpdate = false;
+    private bool _fullScreen = false;
+    private StringNumber _dialogWidth = 480;
+
+    [Inject]
+    public AddInstrumentsDto _addDto { get; set; }
+
     protected override async Task OnInitializedAsync()
-    {        
-        
+    {
         await base.OnInitializedAsync();
     }
 
@@ -90,6 +96,22 @@ public partial class Directory
         _current.DirectoryType = DirectoryTypes.Instrument;
         _isUpdate = false;
         _showDialog = true;
+    }
+
+    private async void OnAddInstrument(AddInstrumentsDto model)
+    {
+        _addDto = model;
+        _fullScreen = true;
+        _dialogWidth = "100%";
+        StateHasChanged();
+    }
+
+    private async Task OnClose()
+    {
+        _showDialog = false;
+        _addDto = null;
+        _dialogWidth = 480;
+        _fullScreen = false;
     }
 
     private async Task OpenUpdateAsync(DirectoryTreeDto item)
@@ -187,5 +209,10 @@ public partial class Directory
             }
         }
         return default!;
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
     }
 }

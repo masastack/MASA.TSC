@@ -5,6 +5,7 @@ using Masa.BuildingBlocks.Configuration;
 using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
 using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
 using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
+using Masa.Tsc.Contracts.Admin.Instruments;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddObservable();
@@ -32,6 +33,7 @@ builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl)
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<TscCaller>();
+builder.Services.AddTransient<AddInstrumentsDto>();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 var app = builder.Build();
