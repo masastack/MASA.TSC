@@ -7,13 +7,19 @@ public class AddInstrumentsDto
 {
     public Guid UserId { get; set; }
 
+    [Required]
     public string Name { get; set; }
 
-    public string Layer { get; set; }
+    [Required]
+    public string Layer{ get; set; }
 
+    [Required]
     public string Model { get; set; }
 
     public int Sort { get; set; }
+
+    [Required]
+    public Guid? DirectoryId { get; set; }
 
     public List<AddPanelDto> Panels { get; set; }
 }

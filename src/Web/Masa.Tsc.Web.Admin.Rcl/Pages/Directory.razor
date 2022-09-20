@@ -18,7 +18,7 @@
     <MRow Class="rounded-xl white px-4 py-2">
         <MCol Cols=12>
             <MRow>
-                <MCol Cols=12>                   
+                <MCol Cols=12>
                     <MTabs ValueChanged="OnExpandChangeAsync">
                         <MTab ActiveClass="gray" Class="gray--text white border-gray-thcik-all" Value="1"><MIcon Small>format_list_bulleted</MIcon> Expand</MTab>
                         <MTab ActiveClass="gray" Class="gray--text white border-gray-thcik-all" Value="0"><MIcon Small>calendar_view_week</MIcon> Export</MTab>
@@ -40,28 +40,35 @@
             </MRow>
         </MCol>
     </MRow>
-
 </MContainer>
 
-<MDialog @bind-Value="_showDialog" Width="480">
+
+<TscDialog @bind-Value="_showDialog" Persistent Width="_dialogWidth" Fullscreen="_fullScreen" >
     <ChildContent>
         <MCard>
-            <MCardTitle>
-                <MRow>
+            @if (_addDto.Name == null)
+            {
+                <MCardTitle>
+                    <MRow>
                     <MCol Cols=9>@_title</MCol>
                     <MCol Cols=3 Class="d-flex justify-end"><MIcon OnClick="()=>_showDialog=false" Class="justify-end">mdi-close</MIcon></MCol>
                 </MRow>
             </MCardTitle>
+            }
             <MCardText>
                 @if (_current.DirectoryType == DirectoryTypes.Directory)
                 {
                     <DirectoryDetail Id="@(_isUpdate?_current.Id:Guid.Empty)" ParentId="@(_isUpdate?_current.ParentId:_current.Id)" ParentName="@GetParentName(_data)" SuccessFn="AddUpdateCallback"></DirectoryDetail>
                 }
+                else if (_addDto.Name == null)
+                {
+                    <TscInstrumentAdd OnSuccess="OnAddInstrument"></TscInstrumentAdd>
+                }
                 else
                 {
-                    <DirectoryDetail Id="_current.Id" ParentId="_current.ParentId"></DirectoryDetail>
+                    <TscInstrumentDetail OnClose="OnClose"></TscInstrumentDetail>
                 }
             </MCardText>
         </MCard>
     </ChildContent>
-</MDialog>
+</TscDialog>
