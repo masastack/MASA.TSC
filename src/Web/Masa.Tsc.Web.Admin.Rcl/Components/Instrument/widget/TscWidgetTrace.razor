@@ -1,3 +1,13 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscWidgetBase
-<TscTrace/>
+<TscTrace />
+
+@code {
+    public override AddPanelDto ToPannel()
+    {
+        return new AddPanelDto
+            {
+                Type = InstrumentTypes.Trace
+            };
+    }
+}

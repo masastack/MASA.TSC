@@ -22,4 +22,22 @@ public partial class TscWidgetBase : TscComponentBase
 
     [Parameter]
     public bool ReadOnly { get; set; }
+    
+    [Parameter]
+    public Dictionary<string, object> Values { get; set; }
+
+    public virtual AddPanelDto ToPannel()
+    {
+        return default!;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        SetParameters();
+        await base.OnParametersSetAsync();
+    }
+
+    protected virtual void SetParameters()
+    {
+    }
 }

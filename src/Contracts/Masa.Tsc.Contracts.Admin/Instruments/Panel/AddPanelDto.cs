@@ -5,6 +5,8 @@ namespace Masa.Tsc.Contracts.Admin.Instruments;
 
 public class AddPanelDto
 {
+    public Guid Id { get; set; }=Guid.NewGuid();
+
     public int Width { get; set; }
 
     public int Height { get; set; }
@@ -18,6 +20,10 @@ public class AddPanelDto
     public string XName { get; set; }
 
     public string YName { get; set; }
+
+    public InstrumentTypes Type { get; set; }
+
+    public Dictionary<string, object> Attributes { get; set; }
 
     public List<AddPanelDto> Panels { get; set; }
 

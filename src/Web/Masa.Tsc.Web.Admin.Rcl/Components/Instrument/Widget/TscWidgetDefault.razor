@@ -1,0 +1,11 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscWidgetBase
+
+<MCard>
+    <MCardTitle>Not Support widget: @Type.ToString()</MCardTitle>
+</MCard>
+
+@code{
+    [Parameter]
+    public InstrumentTypes Type { get; set; }
+}

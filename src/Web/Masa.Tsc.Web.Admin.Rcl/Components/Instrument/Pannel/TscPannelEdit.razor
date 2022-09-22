@@ -1,0 +1,31 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+<Element Class="rounded-lg" Style="border:solid 2px #BBDEFB">
+    <div class="overflow-auto" style="resize:both">
+        <div class="d-flex justify-end">
+            <MButton XSmall OnClick="OnDelete">Delete</MButton>
+            <MButton XSmall OnClick="OnEdit">Edit</MButton>
+        </div>
+        <TscInstrumentPannelView Item=Item Readonly/>
+    </div>
+</Element>
+
+@code {
+
+    [Parameter]
+    public AddPanelDto Item { get; set; }
+
+    private async Task OnDelete()
+    {
+        if (!await PopupService.ConfirmAsync("删除", "确认要移除该pannel吗"))
+            return;
+
+        await CallParent("remove", Item);
+    }
+
+    private async Task OnEdit()
+    {
+        await CallParent("edit", Item);
+    }
+}

@@ -15,12 +15,11 @@ public partial class ProjectCard
     private int _rowSize = 3;
     private int _totalRows = 0;
     private ProjectDto _current;
-    private bool _showDialog = false;
 
     private void OnItemClick(ProjectDto item)
     {
         _current = item;
-        _showDialog = true;
+        OpenDialog();
     }
 
     private string GetPaddingClass(int rowIndex, int total)

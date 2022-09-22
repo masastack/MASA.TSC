@@ -25,6 +25,7 @@ public partial class TscInstrumentPannelDetail
 
     private async Task OnSubmitAsync()
     {
-        await PopupService.AlertAsync("Success", AlertTypes.Success);
+        var pannel = _widget.ToPannel();
+        await CallParent("save", pannel);
     }
 }

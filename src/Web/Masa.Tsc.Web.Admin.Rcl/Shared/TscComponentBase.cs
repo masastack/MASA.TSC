@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Shared;
 
-public class TscComponentBase : BComponentBase
+public partial class TscComponentBase : BComponentBase
 {
     [Inject]
     public IUserContext UserContext { get; set; }
@@ -15,7 +15,7 @@ public class TscComponentBase : BComponentBase
     public IPopupService PopupService { get; set; }
 
     [Inject]
-    public TscCaller ApiCaller { get; set; }
+    public TscCaller ApiCaller { get; set; }    
 
     public SettingDto Setting { get; set; } = new SettingDto();
 
@@ -100,7 +100,7 @@ public class TscComponentBase : BComponentBase
         }
 
         return obj;
-    }
+    }    
 
     private static SettingDto GetDefaultSetting(Guid userId)
     {

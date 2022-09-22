@@ -1,37 +1,49 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
+
 @switch (Type)
 {
     case InstrumentTypes.Text:
         {
-            <TscWidgetText @ref="_widget"></TscWidgetText>
+            <TscWidgetText @ref="_widget" />
         }
         break;
     case InstrumentTypes.Card:
         {
-            <TscWidgetText @ref="_widget"></TscWidgetText>
+            <TscWidgetCard @ref="_widget" />
         }
         break;
     case InstrumentTypes.Widget:
         {
-            <TscWidgetText @ref="_widget"></TscWidgetText>
+            <TscWidgetChart @ref="_widget" />
         }
         break;
     case InstrumentTypes.Log:
         {
-            <TscWidgetText @ref="_widget"></TscWidgetText>
+            <TscWidgetLog @ref="_widget" />
         }
         break;
     case InstrumentTypes.Trace:
         {
-            <TscWidgetText @ref="_widget"></TscWidgetText>
+            <TscWidgetTrace @ref="_widget" />
+        }
+        break;
+    case InstrumentTypes.Tabs:
+        {
+            <TscWidgetTabs @ref="_widget" />
+        }
+        break;
+    case InstrumentTypes.Table:
+        {
+            <TscWidgetTable @ref="_widget" />
         }
         break;
     default:
         {
-            <MCard>
-                <MCardTitle>Not Support widget: @Type.ToString()</MCardTitle>
-            </MCard>
+            <TscWidgetDefault @ref="_widget" Type="Type" />
         }
         break;
 }
+
+<MButton OnClick="OnSubmitAsync">确认</MButton>
+<MButton OnClick="@(async ()=>await CallParent("back"))">返回</MButton>
