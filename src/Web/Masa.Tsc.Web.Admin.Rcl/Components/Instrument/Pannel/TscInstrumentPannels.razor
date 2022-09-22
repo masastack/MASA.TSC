@@ -3,7 +3,7 @@
 
 <MStepper @bind-Value="_step">
     <MStepperHeader>
-        <MStepperStep Step="1" Complete="_step>1">选择</MStepperStep>
+        <MStepperStep Step="1" Complete="_step>1" OnClick="()=>_step=1">选择</MStepperStep>
         <MDivider></MDivider>
         <MStepperStep Step="2"></MStepperStep>
     </MStepperHeader>
@@ -12,8 +12,8 @@
             <MRow>
                 <MCol>
                     <MListItemGroup ValueChanged="ValueChange">
-                    @foreach(var item in _types)
-                        {                            
+                        @foreach (var item in _types)
+                        {
                             <MListItem Value="item.Key">
                                 <ItemContent>
                                     <MListItemAction>
@@ -24,9 +24,8 @@
                                     </MListItemContent>
                                 </ItemContent>
                             </MListItem>
-                        }                        
+                        }
                     </MListItemGroup>
-
                     <MButton OnClick="()=>_step=2">确认</MButton>
                 </MCol>
                 <MCol>
@@ -35,7 +34,7 @@
             </MRow>
         </MStepperContent>
         <MStepperContent Step="2">
-            <TscInstrumentPannelDetail Type="_widgetType"></TscInstrumentPannelDetail>
+            <TscInstrumentPannelDetail Type="_widgetType" OnCallParent="ChildCallHandler"></TscInstrumentPannelDetail>
         </MStepperContent>
     </MStepperItems>
 </MStepper>

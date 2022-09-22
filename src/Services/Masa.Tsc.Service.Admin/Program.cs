@@ -1,10 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-//using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
-//using MASA.BuildingBlocks.Dispatcher.Events;
-//using MASA.Utils.Data.Elasticsearch;
-
+using Masa.BuildingBlocks.Configuration;
 using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
 using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
 using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
@@ -29,9 +26,10 @@ builder.Services.AddCaller(option =>
 builder.Services.AddElasticsearchClient("tsclog", elasearchUrls);
 builder.AddObservable();
 
+var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
 builder.AddMasaConfiguration(configurationBuilder =>
 {
-    configurationBuilder.UseDcc(sectionName: "Masa:Dcc");
+    configurationBuilder.UseDcc(dccConfig, default, default);
 });
 //#if DEBUG
 //builder.Services.AddDaprStarter(opt =>
@@ -57,7 +55,7 @@ builder.Services.AddAuthentication(options =>
     options.MapInboundClaims = false;
 });
 
-builder.Services.AddMasaIdentityModel(options =>
+builder.Services.AddMasaIdentity(options =>
 {
     options.Environment = "environment";
     options.UserName = "name";
@@ -65,8 +63,9 @@ builder.Services.AddMasaIdentityModel(options =>
 });
 
 builder.Services.AddScoped<TokenProvider>();
-builder.Services.AddAuthClient(builder.GetMasaConfiguration().Local["Masa:Auth:ServiceBaseAddress"]);
-builder.Services.AddPmClient(builder.GetMasaConfiguration().Local["Masa:Pm:ServiceBaseAddress"]);
+var dccPublicConfig = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
+builder.Services.AddAuthClient(dccPublicConfig["$public.AppSettings:AuthClient:LocalUrl"], dccConfig.RedisOptions).
+AddPmClient(dccPublicConfig["$public.AppSettings:PmClient:Url"]);
 
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

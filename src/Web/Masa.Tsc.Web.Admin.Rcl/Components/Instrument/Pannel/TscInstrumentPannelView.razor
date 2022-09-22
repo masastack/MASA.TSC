@@ -1,0 +1,55 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+@if (!Readonly)
+{
+<MCardTitle>
+    <MButton OnClick="SaveAsync">save</MButton>
+    <MButton OnClick="@(async()=>await CallParent("close"))">Close</MButton>
+</MCardTitle>       
+
+}
+
+@switch (Item.Type)
+{
+    case InstrumentTypes.Text:
+        {
+            <TscWidgetText @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+        }
+        break;
+    case InstrumentTypes.Card:
+        {
+            <TscWidgetCard @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+        }
+        break;
+    case InstrumentTypes.Widget:
+        {
+            <TscWidgetChart @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+        }
+        break;
+    case InstrumentTypes.Log:
+        {
+            <TscWidgetLog @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+        }
+        break;
+    case InstrumentTypes.Trace:
+        {
+            <TscWidgetTrace @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+        }
+        break;
+    case InstrumentTypes.Tabs:
+        {
+            <TscWidgetTabs @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+        }
+        break;
+    case InstrumentTypes.Table:
+        {
+            <TscWidgetTable @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+        }
+        break;
+    default:
+        {
+            <TscWidgetDefault @ref="_widget" />
+        }
+        break;
+}

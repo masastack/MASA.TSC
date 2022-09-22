@@ -5,6 +5,8 @@ using Masa.BuildingBlocks.Configuration;
 using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
 using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
 using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
+using Masa.Stack.Components.Models;
+using Masa.Stack.Components.UserCenters.Models;
 using Masa.Tsc.Contracts.Admin.Instruments;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,21 +21,26 @@ builder.WebHost.UseKestrel(option =>
     options.ServerCertificate = new X509Certificate2(Path.Combine("Certificates", "7348307__lonsid.cn.pfx"), "cqUza0MN"));
 });
 
+var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
 builder.AddMasaConfiguration(configurationBuilder =>
 {
-    configurationBuilder.UseDcc(sectionName: "Masa:Dcc");
+    configurationBuilder.UseDcc(dccConfig, default, default);
 });
 
 var publicConfiguration = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
 var oidc = builder.GetMasaConfiguration().Local.GetSection("Masa:Oidc").Get<MasaOpenIdConnectOptions>();
-string authUrl = builder.GetMasaConfiguration().Local.GetValue<string>("Masa:Auth:ServiceBaseAddress");
-string mcUrl = builder.GetMasaConfiguration().Local.GetValue<string>("Masa:Mc:ServiceBaseAddress");
-builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl)
-    .AddMasaOpenIdConnect(oidc);
+string authUrl = publicConfiguration.GetValue<string>("$public.AppSettings:AuthClient:Url"); // //builder.GetMasaConfiguration().Local.GetValue<string>("Masa:Auth:ServiceBaseAddress");
+string mcUrl = publicConfiguration.GetValue<string>("$public.AppSettings:McClient:Url");// publicConfiguration.GetValue<string>("$public.AppSettings:McClient:Url");
+//builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl).AddMasaOpenIdConnect(oidc);
+builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl,
+    publicConfiguration.GetSection("$public.OSS").Get<OssOptions>(),
+    publicConfiguration.GetSection("$public.ES.UserAutoComplete").Get<UserAutoCompleteOptions>(),
+    dccConfig.RedisOptions
+    ).AddMasaOpenIdConnect(oidc);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<TscCaller>();
-builder.Services.AddTransient<AddInstrumentsDto>();
+builder.Services.AddScoped<AddInstrumentsDto>();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 var app = builder.Build();

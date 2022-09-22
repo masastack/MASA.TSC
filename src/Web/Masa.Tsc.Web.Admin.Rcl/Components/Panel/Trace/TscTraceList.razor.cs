@@ -12,8 +12,7 @@ public partial class TscTraceList : TscComponentBase
     private int _total = 0;
     private MDataTable<Dictionary<string, object>> _mDataTable = default!;
     private bool _isLoading = true;
-    private string _selectTraceId = default!;
-    private bool _showDialog = false;
+    private string _selectTraceId = default!;    
     private List<DataTableHeader<Dictionary<string, object>>> _headers = new()
     {
         new("Service", item => ((Dictionary<string, object>)item["service"])["name"])
@@ -53,7 +52,7 @@ public partial class TscTraceList : TscComponentBase
     private async Task OpenAsync(Dictionary<string, object> item)
     {
         _selectTraceId = GetDictionaryValue(item, "trace.id").ToString()!;
-        _showDialog = true;
+        OpenDialog();
         await Task.CompletedTask;
     }
 

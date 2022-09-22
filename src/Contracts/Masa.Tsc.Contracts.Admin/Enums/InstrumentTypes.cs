@@ -10,5 +10,7 @@ public enum InstrumentTypes
     Table,
     Widget,
     Trace,
-    Log
+    Log,
+    Tabs,
+    Topology
 }

@@ -11,11 +11,10 @@ public partial class TscInstrumentDetail
     [Inject]
     public AddInstrumentsDto Data { get; set; }
 
-    [Parameter]
-    public EventCallback OnClose { get; set; }
+    private List<BDragItem> _items = new();
+    private AddPanelDto? _editPannel = default;
 
-    private bool _showDialog = false;
-
+    private MDragZone _mDragZone;
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,13 +41,87 @@ public partial class TscInstrumentDetail
         {
 
         }
-
         return base.OnAfterRenderAsync(firstRender);
     }
 
-    private async Task OnCloseAsync()
+    protected override async Task ChildCallHandler(params object[] values)
     {
-        if (OnClose.HasDelegate)
-            await OnClose.InvokeAsync();
+        if (values != null && values.Length - 2 >= 0)
+        {
+            var cmd = values[0] as string;
+            if (values[1] is AddPanelDto pannel)
+            {
+                var find = _mDragZone.Items.FirstOrDefault(x => (Guid)x.Attributes["key"] == pannel.Id);
+                switch (cmd)
+                {
+                    case "save":
+                        if (find == null)
+                        {
+                            _items.Add(ToDragItem(pannel));
+                            if (Data.Panels == null)
+                                Data.Panels = new List<AddPanelDto> { pannel };
+                            else
+                                Data.Panels.Add(pannel);
+                        }
+                        else
+                        {
+                            var findPannel = Data.Panels.FirstOrDefault(m => m.Id == pannel.Id);
+                            findPannel = pannel;
+
+                            var index = _items.IndexOf(find);
+                            _items.Remove(find);
+                            _items.Insert(index, ToDragItem(pannel));
+                        }
+                        values = new[] { "close" };
+                        break;
+                    case "edit":
+                        await ShowEdit(pannel);
+                        values = null;
+                        break;
+
+                    case "remove":
+                        if (find != null)
+                        {
+                            _items.Remove(find);
+                            Data.Panels.RemoveAll(m => m.Id == pannel.Id);
+                            find.Dispose();
+                        }
+                        values = new[] { "close" };
+                        break;
+                }
+            }
+        }
+
+        if (values != null)
+            _editPannel = null;
+        await base.ChildCallHandler(values);
+    }
+
+    private BDragItem ToDragItem(AddPanelDto pannel)
+    {
+        return new BDragItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Attributes = new Dictionary<string, object> { { "key", pannel.Id } },
+            ChildContent = builder =>
+            {
+                builder.OpenComponent<TscPannelEdit>(0);
+                builder.AddAttribute(1, "Item", pannel);
+                builder.AddAttribute(2, "OnCallParent", new EventCallback<object[]>(this, ChildCallHandler));
+                builder.CloseComponent();
+            }
+        };
+    }
+
+    private async Task ShowEdit(AddPanelDto pannel)
+    {
+        _editPannel = pannel;
+        OpenDialog();
+        await Task.CompletedTask;
+    }
+
+    private async Task SaveAsync()
+    {
+        await Task.CompletedTask;
     }
 }

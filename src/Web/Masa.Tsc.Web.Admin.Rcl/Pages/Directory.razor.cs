@@ -13,7 +13,6 @@ public partial class Directory : IDisposable
     private IEnumerable<DirectoryTreeDto> _data;
     private IEnumerable<DirectoryTreeDto> _searchData;
 
-    private bool _showDialog = false;
     private string _title;
     private bool _isUpdate = false;
     private bool _fullScreen = false;
@@ -85,9 +84,10 @@ public partial class Directory : IDisposable
     private void AddDirectory()
     {
         _title = "Add Directory";
+        _fullScreen = false;
         _current.DirectoryType = DirectoryTypes.Directory;
         _isUpdate = false;
-        _showDialog = true;
+        OpenDialog();
     }
 
     private void AddInstrument()
@@ -95,7 +95,8 @@ public partial class Directory : IDisposable
         _title = "Add Instrument";
         _current.DirectoryType = DirectoryTypes.Instrument;
         _isUpdate = false;
-        _showDialog = true;
+        _addDto = new();
+        OpenDialog();
     }
 
     private async void OnAddInstrument(AddInstrumentsDto model)
@@ -104,14 +105,16 @@ public partial class Directory : IDisposable
         _fullScreen = true;
         _dialogWidth = "100%";
         StateHasChanged();
+        await Task.CompletedTask;
     }
 
     private async Task OnClose()
     {
-        _showDialog = false;
-        _addDto = null;
+        CloseDialog();
+        _addDto = new();
         _dialogWidth = 480;
         _fullScreen = false;
+        await Task.CompletedTask;
     }
 
     private async Task OpenUpdateAsync(DirectoryTreeDto item)
@@ -126,7 +129,7 @@ public partial class Directory : IDisposable
         }
         _isUpdate = true;
         _current = item;
-        _showDialog = true;
+        OpenDialog();
         StateHasChanged();
         await Task.CompletedTask;
     }
@@ -173,7 +176,7 @@ public partial class Directory : IDisposable
 
     private async Task AddUpdateCallback(DirectoryDto dto)
     {
-        _showDialog = false;
+        CloseDialog();
         StateHasChanged();
         await PopupService.ToastAsync("Oprate Success", AlertTypes.Success);
         await Task.CompletedTask;

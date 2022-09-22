@@ -1,29 +1,44 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
-<MRow>
-    <MCol Class="d-flex justify-end">
-        <MButton OnClick="()=>_showDialog=true">添加</MButton>
-        <MButton OnClick="OnCloseAsync">Close</MButton>
-    </MCol>
-</MRow>
+<MCard>
+    <MCardText Class="d-flex justify-end">
+        <MButton OnClick="OpenDialog">添加</MButton>
+        <MButton OnClick="SaveAsync">Save</MButton>
+        <MButton OnClick="@(async()=>await CallParent("close"))">Close</MButton>
+    </MCardText>
+</MCard>
 <MCard>
     <MCardText>
-
+        <MDragZone @ref="_mDragZone" Items="_items" Class="d-flex"></MDragZone>
     </MCardText>
 </MCard>
 
-<TscDialog @bind-Value="_showDialog" Persistent Width="600">
+<TscDialog @bind-Value="_showDialog" Persistent Fullscreen>
     <ChildContent>
         <MCard>
-            <MCardTitle>
-                <MRow>
-                    <MCol Cols=9>添加</MCol>
-                    <MCol Cols=3 Class="d-flex justify-end"><MIcon OnClick="()=>_showDialog=false" Class="justify-end">mdi-close</MIcon></MCol>
-                </MRow>
-            </MCardTitle>
-            <MCardText>
-                <TscInstrumentPannels></TscInstrumentPannels>
-            </MCardText>
+            @if (_editPannel == null)
+            {
+                <MCardTitle>
+                    <MRow>
+                        <MCol Cols=9>添加</MCol>
+                        <MCol Cols=3 Class="d-flex justify-end">
+                            <MIcon OnClick="CloseDialog" Class="justify-end">mdi-close</MIcon>
+                        </MCol>
+                    </MRow>
+                </MCardTitle>
+            }
+
+            @if (_editPannel == null)
+            {
+                <MCardText>
+                    <TscInstrumentPannels OnCallParent="ChildCallHandler"></TscInstrumentPannels>
+                </MCardText>
+            }
+            else
+            {
+                <TscInstrumentPannelView Item="_editPannel" OnCallParent="ChildCallHandler"/>
+            }
+
         </MCard>
     </ChildContent>
 </TscDialog>

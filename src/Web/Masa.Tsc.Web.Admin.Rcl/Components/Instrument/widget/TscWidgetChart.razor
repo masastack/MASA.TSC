@@ -1,6 +1,13 @@
-﻿@inherits TscWidgetBase
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscWidgetBase
 <h3>TscWidgetChart</h3>
 
 @code {
-
+    public override AddPanelDto ToPannel()
+    {
+        return new AddPanelDto
+            {
+                Type = InstrumentTypes.Widget
+            };
+    }
 }

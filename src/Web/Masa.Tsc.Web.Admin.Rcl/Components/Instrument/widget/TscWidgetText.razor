@@ -1,11 +1,8 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscWidgetBase
-<MCard>
-    <MCardText>
-        <MEditor Class=@Class Style=@Style @bind-Value=_value>
-        </MEditor>
-    </MCardText>
-</MCard>
+
+<MEditor Class="@Class"  Style="@Style" ValueChanged="OnValueChange" Value="@Value" Theme="@_theme" ReadOnly=ReadOnly></MEditor>
+
 @code
 {
     [Parameter]
@@ -13,8 +10,27 @@
 
     private string _value;
 
+    private string _theme => ReadOnly ? "bubble" : "snow";
+
     private void OnValueChange(string value)
     {
         Value = value;
+    }
+
+    public override AddPanelDto ToPannel()
+    {
+        return new AddPanelDto
+            {
+                Type = InstrumentTypes.Text,
+                Attributes = new Dictionary<string, object> { { nameof(Value), Value } }
+            };
+    }
+
+    protected override void SetParameters()
+    {
+        if (Values != null && Values.Any() && Values.ContainsKey(nameof(Value)))
+        {
+            Value = (string)Values[nameof(Value)];
+        }
     }
 }

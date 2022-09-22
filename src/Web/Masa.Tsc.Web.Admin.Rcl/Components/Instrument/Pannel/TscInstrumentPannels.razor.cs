@@ -38,14 +38,29 @@ public partial class TscInstrumentPannels
         await PopupService.AlertAsync("Success", AlertTypes.Success);
     }
 
-    private async Task ValueChange(StringNumber value)
+    private void ValueChange(StringNumber value)
     {
-        _widgetType = Enum.Parse<InstrumentTypes>(value.Value.ToString());
+        if (value != null)
+            _widgetType = Enum.Parse<InstrumentTypes>(value.Value.ToString());
+        else
+            _widgetType = 0;
     }
 
-    private async Task ValuesChange(List<StringNumber> values)
+    protected override async Task ChildCallHandler(params object[] values)
     {
-        var find = _types.FirstOrDefault(m => string.Equals(m.Key.Value,values[0].Value));
-        find.Checked = true;
+        if (values != null && values.Length == 1 && values[0] is string str)
+        {
+            switch (str)
+            {
+                case "back":
+                    _step = 1;
+                    break;
+                case "close":
+                    await CallParent("close");
+                    break;
+            }
+        }
+
+        await CallParent(values);
     }
 }
