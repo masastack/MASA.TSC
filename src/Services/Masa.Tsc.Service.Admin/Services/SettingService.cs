@@ -5,7 +5,7 @@ namespace Masa.Tsc.Service.Admin.Services;
 
 public class SettingService : ServiceBase
 {
-    public SettingService(IServiceCollection services) : base(services, "/api/setting")
+    public SettingService() : base("/api/setting")
     {
         App.MapGet($"{BaseUri}/{{userId}}", GetAsync);
         App.MapPost($"{BaseUri}", SetAsync);

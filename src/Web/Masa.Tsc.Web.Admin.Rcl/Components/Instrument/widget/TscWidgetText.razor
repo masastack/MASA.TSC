@@ -8,8 +8,6 @@
     [Parameter]
     public string Value { get; set; }
 
-    private string _value;
-
     private string _theme => ReadOnly ? "bubble" : "snow";
 
     private void OnValueChange(string value)
@@ -17,7 +15,7 @@
         Value = value;
     }
 
-    public override AddPanelDto ToPannel()
+    public override AddPanelDto ToPanel()
     {
         return new AddPanelDto
             {

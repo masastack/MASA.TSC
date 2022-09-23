@@ -16,7 +16,7 @@
 <TscDialog @bind-Value="_showDialog" Persistent Fullscreen>
     <ChildContent>
         <MCard>
-            @if (_editPannel == null)
+            @if (_editPanel == null)
             {
                 <MCardTitle>
                     <MRow>
@@ -28,15 +28,15 @@
                 </MCardTitle>
             }
 
-            @if (_editPannel == null)
+            @if (_editPanel == null)
             {
                 <MCardText>
-                    <TscInstrumentPannels OnCallParent="ChildCallHandler"></TscInstrumentPannels>
+                    <TscInstrumentPanels OnCallParent="ChildCallHandler"></TscInstrumentPanels>
                 </MCardText>
             }
             else
             {
-                <TscInstrumentPannelView Item="_editPannel" OnCallParent="ChildCallHandler"/>
+                <TscInstrumentPanelView Item="_editPanel" OnCallParent="ChildCallHandler"/>
             }
 
         </MCard>

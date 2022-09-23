@@ -3,13 +3,13 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-public partial class TscInstrumentPannelDetail
+public partial class TscInstrumentPanelDetail
 {
     [Parameter]
     public InstrumentTypes Type { get; set; }
 
     [Inject]
-    public AddInstrumentsDto _model { get; set; }
+    public AddInstrumentDto _model { get; set; }
 
     private TscWidgetBase _widget = default!;
 
@@ -25,7 +25,7 @@ public partial class TscInstrumentPannelDetail
 
     private async Task OnSubmitAsync()
     {
-        var pannel = _widget.ToPannel();
-        await CallParent("save", pannel);
+        var panel = _widget.ToPanel();
+        await CallParent("save", panel);
     }
 }

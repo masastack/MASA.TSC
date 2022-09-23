@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Contracts.Admin.Instruments;
 
-public class UpdateMetricDto : AddMetricDto
+public class UpdatePanelMetricDto : AddPanelMetricDto
 {
     public Guid Id { get; set; }
 }

@@ -6,4 +6,22 @@ namespace Masa.Tsc.Contracts.Admin.Instruments;
 public class UpdatePanelDto
 {
     public Guid Id { get; set; }
+
+    public Guid InstrumentId { get; set; }
+
+    public int Width { get; set; }
+
+    public int Height { get; set; }
+
+    public string Name { get; set; }
+
+    public string Description { get; set; }
+
+    public int Sort { get; set; }    
+
+    public Dictionary<string, object> Attributes { get; set; }
+
+    public List<AddPanelDto> Panels { get; set; }
+
+    public List<AddPanelMetricDto> Metrics { get; set; }
 }

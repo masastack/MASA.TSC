@@ -2,12 +2,12 @@
 @inherits TscComponentBase
 <MCard>
     <MCardText>
-        <MForm Model="_model" EnableValidation OnValidSubmit="OnSubmitAsync">
-            <MTextField TValue="string" Outlined Label="Name" Placeholder="name" @bind-Value="_model.Name" />
-            <MTextField TValue="string" Outlined Label="Layer" Placeholder="layer" @bind-Value="_model.Layer" />
-            <MTextField TValue="string" Outlined Label="Type" Placeholder="type" @bind-Value="_model.Model" />
-            <MTextField TValue="Guid?" Outlined Label="Folder" Placeholder="Folder" @bind-Value="_model.DirectoryId" />
-            <MTextField TValue="int" Outlined Label="Sort" Placeholder="sort" @bind-Value="_model.Sort" />
+        <MForm Model="Item" EnableValidation OnValidSubmit="OnSubmitAsync">
+            <MTextField TValue="string" Outlined Label="Name" Placeholder="name" @bind-Value="Item.Name" />
+            <MTextField TValue="string" Outlined Label="Layer" Placeholder="layer" @bind-Value="Item.Layer" />
+            <MTextField TValue="string" Outlined Label="Type" Placeholder="type" @bind-Value="Item.Model" />
+            <MTextField TValue="Guid" Outlined Label="Folder" Placeholder="Folder" @bind-Value="Item.DirectoryId" />
+            <MTextField TValue="int" Outlined Label="Sort" Placeholder="sort" @bind-Value="Item.Sort" />
             <MRow>
                 <MCol><MCheckbox Label="Set Root"></MCheckbox></MCol>
                 <MCol><MButton Type="submit">Save</MButton></MCol>

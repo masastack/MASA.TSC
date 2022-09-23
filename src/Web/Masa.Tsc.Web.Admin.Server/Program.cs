@@ -1,14 +1,6 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.BuildingBlocks.Configuration;
-using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
-using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
-using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
-using Masa.Stack.Components.Models;
-using Masa.Stack.Components.UserCenters.Models;
-using Masa.Tsc.Contracts.Admin.Instruments;
-
 var builder = WebApplication.CreateBuilder(args);
 builder.AddObservable();
 
@@ -40,7 +32,7 @@ builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl,
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<TscCaller>();
-builder.Services.AddScoped<AddInstrumentsDto>();
+builder.Services.AddScoped<AddInstrumentDto>();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 var app = builder.Build();

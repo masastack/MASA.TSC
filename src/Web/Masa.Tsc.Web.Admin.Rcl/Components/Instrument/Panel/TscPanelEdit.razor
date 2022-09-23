@@ -7,7 +7,7 @@
             <MButton XSmall OnClick="OnDelete">Delete</MButton>
             <MButton XSmall OnClick="OnEdit">Edit</MButton>
         </div>
-        <TscInstrumentPannelView Item=Item Readonly/>
+        <TscInstrumentPanelView Item=Item Readonly/>
     </div>
 </Element>
 
@@ -18,7 +18,7 @@
 
     private async Task OnDelete()
     {
-        if (!await PopupService.ConfirmAsync("删除", "确认要移除该pannel吗"))
+        if (!await PopupService.ConfirmAsync("删除", "确认要移除该panel吗"))
             return;
 
         await CallParent("remove", Item);

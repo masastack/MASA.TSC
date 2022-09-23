@@ -5,7 +5,7 @@ namespace Masa.Tsc.Service.Admin.Services;
 
 public class ProjectService : ServiceBase
 {
-    public ProjectService(IServiceCollection services) : base(services, "/api/project")
+    public ProjectService() : base("/api/project")
     {
         App.MapGet($"{BaseUri}/overview", OverviewAsync);
         App.MapGet($"{BaseUri}", GetProjectsAsync);

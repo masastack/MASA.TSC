@@ -3,27 +3,27 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-public partial class TscInstrumentPannels
+public partial class TscInstrumentPanels
 {
     [Inject]
-    public AddInstrumentsDto _model { get; set; }
-    private static List<PannelTypeDto> _types = new List<PannelTypeDto> {
-        new PannelTypeDto(){
+    public AddInstrumentDto _model { get; set; }
+    private static List<PanelTypeDto> _types = new List<PanelTypeDto> {
+        new PanelTypeDto(){
             Index=1,
             Name="Text",
             Key=InstrumentTypes.Text.ToString()
         },
-        new PannelTypeDto(){
+        new PanelTypeDto(){
             Index=2,
             Name="Widget",
             Key=InstrumentTypes.Widget.ToString()
         },
-        new PannelTypeDto(){
+        new PanelTypeDto(){
             Index =3,
             Name="Log",
             Key =InstrumentTypes.Log.ToString()
         },
-        new PannelTypeDto(){
+        new PanelTypeDto(){
          Index =4,
             Name="Trace",
             Key =InstrumentTypes.Trace.ToString()

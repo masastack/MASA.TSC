@@ -15,31 +15,34 @@ public class Panel : AggregateRoot<Guid>
 
     public int Index { get; set; }
 
+    public InstrumentTypes Type { get; set; }
+
     public string UiType { get; set; }
 
-    public string XName { get; set; }
+    //public string XName { get; set; }
 
-    public string YName { get; set; }
-
-    public string Color { get; set; }
-
-    public string XDisplayName { get; set; }
-
-    public string YDisplayName { get; set; }
-
-    public Guid ParentId { get; set; }
+    //public string YName { get; set; }
 
     public string ChartType { get; set; }
 
+    public Guid ParentId { get; set; }
+
     public List<Panel> Panels { get; set; }
 
-    public List<Metric> Metrics { get; set; }
+    public List<PanelMetric> Metrics { get; set; }
 
-    public void AddPanel() { }
+    public void Remove()
+    {
 
-    public void RemovePanel() { }
+    }
 
-    public void AddMetric() { }
+    public void Update(UpdatePanelDto panel)
+    {
+        Title = panel.Name;
+        Description = panel.Description;
+        Index = panel.Sort;
+        //Metrics = panel.Metrics;
 
-    public void RemoveMetric() { }
+
+    }
 }

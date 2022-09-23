@@ -5,7 +5,7 @@ namespace Masa.Tsc.Service.Admin.Services;
 
 public class DirectoryService : ServiceBase
 {
-    public DirectoryService(IServiceCollection services) : base(services, "/api/Instrument/directory")
+    public DirectoryService() : base("/api/Instrument/directory")
     {
         App.MapPost($"{BaseUri}", AddAsync);
         App.MapPut($"{BaseUri}", UpdateAsync);

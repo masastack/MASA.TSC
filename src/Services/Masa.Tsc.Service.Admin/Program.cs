@@ -1,12 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.BuildingBlocks.Configuration;
-using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
-using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
-using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
-using Masa.Contrib.Data.UoW.EFCore;
-
 var builder = WebApplication.CreateBuilder(args);
 //builder.AddMasaConfiguration(configurationBuilder =>
 //{

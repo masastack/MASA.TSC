@@ -3,8 +3,10 @@
 
 namespace Masa.Tsc.Contracts.Admin.Instruments;
 
-public class AddInstrumentsDto
+public class AddInstrumentDto
 {
+    public Guid Id { get; set; }
+
     public Guid UserId { get; set; }
 
     [Required]
@@ -18,8 +20,10 @@ public class AddInstrumentsDto
 
     public int Sort { get; set; }
 
-    [Required]
-    public Guid? DirectoryId { get; set; }
+    public bool IsGlobal { get; set; }
 
-    public List<AddPanelDto> Panels { get; set; }
+    public bool IsRoot { get; set; }    
+
+    [Required]
+    public Guid DirectoryId { get; set; }    
 }

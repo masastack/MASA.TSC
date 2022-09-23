@@ -5,7 +5,7 @@ namespace Masa.Tsc.Service.Admin.Services;
 
 public class AppService : ServiceBase
 {
-    public AppService(IServiceCollection services) : base(services, "/api/app")
+    public AppService() : base("/api/app")
     {
         App.MapGet($"{BaseUri}/list{{projectId}}", GetListAsync);
     }

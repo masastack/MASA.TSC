@@ -5,7 +5,7 @@ namespace Masa.Tsc.Service.Admin.Services;
 
 public class MetricService : ServiceBase
 {
-    public MetricService(IServiceCollection services) : base(services, "/api/metric")
+    public MetricService() : base("/api/metric")
     {
         App.MapGet($"{BaseUri}/names", GetNamesAsync);
         App.MapGet($"{BaseUri}/label-values", GetLabelValuesAsync);

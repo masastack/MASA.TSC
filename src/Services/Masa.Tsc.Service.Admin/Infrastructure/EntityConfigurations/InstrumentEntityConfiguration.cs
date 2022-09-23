@@ -11,6 +11,6 @@ public class InstrumentEntityConfiguration
         builder.Property(x => x.Sort).HasDefaultValue(0);
         builder.Property(x => x.Name).HasMaxLength(200);
         builder.Property(x => x.Layer).HasMaxLength(40);
-        builder.Property(x => x.Entity).HasMaxLength(40);
+        builder.Property(x => x.Model).HasMaxLength(40);
     }
 }
