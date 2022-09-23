@@ -68,6 +68,7 @@ public partial class TscTraceChart
     { 
         _chartIndex = index;
         StateHasChanged();
+        await Task.CompletedTask;
     }
 
     //public async Task LoadAsync()

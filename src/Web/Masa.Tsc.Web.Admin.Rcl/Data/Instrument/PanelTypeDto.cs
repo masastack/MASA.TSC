@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data.Instrument;
 
-internal class PannelTypeDto
+internal class PanelTypeDto
 {
     public string Name { get; set; }
 

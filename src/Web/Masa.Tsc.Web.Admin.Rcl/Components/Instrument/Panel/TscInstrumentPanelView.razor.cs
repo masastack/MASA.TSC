@@ -3,10 +3,10 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-public partial class TscInstrumentPannelView
+public partial class TscInstrumentPanelView
 {
     [Inject]
-    public AddInstrumentsDto _model { get; set; }
+    public AddInstrumentDto _model { get; set; }
 
     [Parameter]
     public AddPanelDto Item { get; set; }
@@ -18,7 +18,7 @@ public partial class TscInstrumentPannelView
 
     private async Task SaveAsync()
     { 
-        var item=_widget.ToPannel();
+        var item=_widget.ToPanel();
         item.Id = Item.Id;
         await CallParent("save", item);
     }

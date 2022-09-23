@@ -26,7 +26,7 @@ public partial class TscWidgetBase : TscComponentBase
     [Parameter]
     public Dictionary<string, object> Values { get; set; }
 
-    public virtual AddPanelDto ToPannel()
+    public virtual AddPanelDto ToPanel()
     {
         return default!;
     }

@@ -19,7 +19,7 @@ public partial class Directory : IDisposable
     private StringNumber _dialogWidth = 480;
 
     [Inject]
-    public AddInstrumentsDto _addDto { get; set; }
+    public AddInstrumentDto _addDto { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -99,7 +99,7 @@ public partial class Directory : IDisposable
         OpenDialog();
     }
 
-    private async void OnAddInstrument(AddInstrumentsDto model)
+    private async Task OnAddInstrument(AddInstrumentDto model)
     {
         _addDto = model;
         _fullScreen = true;

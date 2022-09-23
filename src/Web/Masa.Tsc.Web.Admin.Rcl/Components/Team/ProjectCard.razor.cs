@@ -29,10 +29,10 @@ public partial class ProjectCard
         else
             return "";
 
-        if (total - RowCount == 0)
-        {
+        //if (total - RowCount == 0)
+        //{
            
-        }
+        //}
 
         var count = RowCount - total;
         if (rowIndex % 2 == 0)

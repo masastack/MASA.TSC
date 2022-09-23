@@ -5,15 +5,12 @@ namespace Masa.Tsc.Service.Admin.Services;
 
 public class TraceService : ServiceBase
 {
-    private IServiceCollection serviceDescriptors;
-
-    public TraceService(IServiceCollection services) : base(services, "/api/trace")
+    public TraceService() : base("/api/trace")
     {
         App.MapGet($"{BaseUri}/{{traceId}}", GetAsync);
         App.MapGet($"{BaseUri}/list", GetListAsync);
         App.MapGet($"{BaseUri}/attr-values", GetAttrValuesAsync);
         App.MapGet($"{BaseUri}/aggregate", AggregateAsync);
-        serviceDescriptors = services;
     }
 
     private async Task<IEnumerable<object>> GetAsync([FromServices] IEventBus eventBus, [FromRoute] string traceId)

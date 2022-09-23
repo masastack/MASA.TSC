@@ -7,4 +7,3 @@ public record LogFieldQuery : Query<IEnumerable<Contracts.Admin.MappingResponse>
 {
     public override IEnumerable<Contracts.Admin.MappingResponse> Result { get; set; }
 }
-

@@ -9,7 +9,7 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
 
     public string Layer { get; set; }
 
-    public string Entity { get; set; }
+    public string Model { get; set; }
 
     public int Sort { get; set; }
 
@@ -21,7 +21,9 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
 
     public List<Panel> Panels { get; set; }
 
-    public void AddPanel() { }
+    public void Update(UpdateInstrumentDto pannel) {  }
 
-    public void RemovePanel() { }
+    public void Save() { }
+
+    public void RemovePanel(params Guid[] values) { }
 }

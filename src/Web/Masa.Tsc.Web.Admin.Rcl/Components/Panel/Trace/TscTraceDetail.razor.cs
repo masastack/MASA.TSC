@@ -30,7 +30,7 @@ public partial class TscTraceDetail
     private Func<object, string> _keyFunc { get; set; } = item =>
     {
         var dic = (Dictionary<string, object>)item;
-        return (dic.ContainsKey("transaction") ? GetDictionaryValue(dic, "transaction.id") : GetDictionaryValue(dic, "span.id")).ToString();
+        return (dic.ContainsKey("transaction") ? GetDictionaryValue(dic, "transaction.id") : GetDictionaryValue(dic, "span.id")).ToString()!;
     };
     private Func<object, string> _parentFunc { get; set; } = item => GetDictionaryValue((Dictionary<string, object>)item, "parent.id")?.ToString() ?? string.Empty;     
 

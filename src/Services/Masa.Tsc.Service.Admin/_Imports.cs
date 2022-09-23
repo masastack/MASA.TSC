@@ -1,6 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+global using Masa.BuildingBlocks.Configuration;
 global using Masa.BuildingBlocks.Data.UoW;
 global using Masa.BuildingBlocks.Ddd.Domain.Entities;
 global using Masa.BuildingBlocks.Ddd.Domain.Entities.Full;
@@ -11,14 +12,16 @@ global using Masa.BuildingBlocks.ReadWriteSplitting.Cqrs.Queries;
 global using Masa.BuildingBlocks.Service.Caller;
 global using Masa.BuildingBlocks.StackSdks.Auth;
 global using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Model;
+global using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
 global using Masa.BuildingBlocks.StackSdks.Pm;
+global using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
+global using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
 global using Masa.Contrib.Data.Contracts.EFCore;
+global using Masa.Contrib.Data.UoW.EFCore;
 global using Masa.Contrib.Ddd.Domain.Repository.EFCore;
 global using Masa.Contrib.Dispatcher.Events;
-global using Masa.Contrib.Dispatcher.IntegrationEvents;
 global using Masa.Contrib.Dispatcher.IntegrationEvents.Dapr;
 global using Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EFCore;
-global using Masa.Contrib.Isolation.UoW.EFCore;
 global using Masa.Contrib.Service.Caller;
 global using Masa.Contrib.Service.Caller.HttpClient;
 global using Masa.Contrib.StackSdks.Tsc;
@@ -26,6 +29,8 @@ global using Masa.Tsc.Contracts.Admin;
 global using Masa.Tsc.Contracts.Admin.Charts;
 global using Masa.Tsc.Contracts.Admin.Enums;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Dtos;
+global using Masa.Tsc.Contracts.Admin.Instruments;
+global using Masa.Tsc.Contracts.Admin.Instruments.Panel;
 global using Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 global using Masa.Tsc.Service.Admin.Application.Instruments.Queries;
 global using Masa.Tsc.Service.Admin.Application.Logs;
@@ -52,5 +57,6 @@ global using OpenTelemetry.Logs;
 global using OpenTelemetry.Metrics;
 global using OpenTelemetry.Resources;
 global using OpenTelemetry.Trace;
+global using System.Linq.Expressions;
 global using System.Reflection;
 global using System.Text.Json;
