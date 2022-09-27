@@ -5,9 +5,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscInstrumentPanelView
 {
-    [Inject]
-    public AddInstrumentDto _model { get; set; }
-
     [Parameter]
     public AddPanelDto Item { get; set; }
 
@@ -17,9 +14,24 @@ public partial class TscInstrumentPanelView
     private TscWidgetBase _widget = default!;
 
     private async Task SaveAsync()
-    { 
-        var item=_widget.ToPanel();
-        item.Id = Item.Id;
+    {
+        var item = _widget.Item;
+        var sendData = new UpdatePanelDto
+        {
+            Id = item.Id,
+            Description = item.Description ?? string.Empty,
+            Height = item.Height,
+            Width = item.Width,
+            InstrumentId = item.InstrumentId,
+            Name = item.Title,
+            Sort = item.Sort
+        };
+
+        if (item.Type == InstrumentTypes.Widget)
+        {
+            //sendData.Metrics =;
+        }
+        await ApiCaller.PanelService.UpdateAsync(sendData);
         await CallParent("save", item);
     }
 }

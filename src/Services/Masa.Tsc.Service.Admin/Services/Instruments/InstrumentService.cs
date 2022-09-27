@@ -7,24 +7,21 @@ public class InstrumentService : ServiceBase
 {
     public InstrumentService() : base("/api/Instrument")
     {
-        App.MapPost($"{BaseUri}", AddAsync);
-        App.MapPut($"{BaseUri}", UpdateAsync);
-        App.MapDelete($"{BaseUri}", DeleteAsync);
         App.MapGet($"{BaseUri}/{{userId}}/{{id}}", GetAsync);
         App.MapGet($"{BaseUri}/list/{{userId}}/{{page}}/{{size}}/{{keyword}}", ListAsync);
     }
 
-    private async Task AddAsync([FromServices] IEventBus eventBus, [FromBody] AddInstrumentDto model)
+    public async Task AddAsync([FromServices] IEventBus eventBus, [FromBody] AddInstrumentDto model)
     {
         await eventBus.PublishAsync(new AddInstrumentCommand(model));
     }
 
-    private async Task UpdateAsync([FromServices] IEventBus eventBus, [FromBody] UpdateInstrumentDto model)
+    public async Task UpdateAsync([FromServices] IEventBus eventBus, [FromBody] UpdateInstrumentDto model)
     {
         await eventBus.PublishAsync(new UpdateInstrumentCommand(model));
     }
 
-    private async Task DeleteAsync([FromServices] IEventBus eventBus, [FromBody] CommonRemoveDto<Guid> model)
+    public async Task DeleteAsync([FromServices] IEventBus eventBus, [FromBody] CommonRemoveDto<Guid> model)
     {
         await eventBus.PublishAsync(new RemoveInstrumentCommand(model.UserId, model.Ids.ToArray()));
     }
@@ -36,7 +33,7 @@ public class InstrumentService : ServiceBase
         return query.Result;
     }
 
-    public async Task<InstrumentDetailDto> GetAsync([FromServices] IEventBus eventBus, Guid userId, Guid id)
+    private async Task<InstrumentDetailDto> GetAsync([FromServices] IEventBus eventBus, Guid userId, Guid id)
     {
         var query = new InstrumentDetailQuery(userId, id);
         await eventBus.PublishAsync(query);

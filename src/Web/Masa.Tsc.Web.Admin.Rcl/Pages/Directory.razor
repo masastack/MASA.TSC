@@ -43,30 +43,36 @@
 </MContainer>
 
 
-<TscDialog @bind-Value="_showDialog" Persistent Width="_dialogWidth" Fullscreen="_fullScreen" >
+<TscDialog @bind-Value="_showDialog" Persistent Width="_dialogWidth" Fullscreen="_fullScreen">
     <ChildContent>
         <MCard>
             @if (string.IsNullOrEmpty(_addDto.Name))
             {
                 <MCardTitle>
                     <MRow>
-                    <MCol Cols=9>@_title</MCol>
-                    <MCol Cols=3 Class="d-flex justify-end"><MIcon OnClick="CloseDialog" Class="justify-end">mdi-close</MIcon></MCol>
-                </MRow>
-            </MCardTitle>
+                        <MCol Cols=9>@_title</MCol>
+                        <MCol Cols=3 Class="d-flex justify-end"><MIcon OnClick="CloseDialog" Class="justify-end">mdi-close</MIcon></MCol>
+                    </MRow>
+                </MCardTitle>
             }
             <MCardText>
-                @if (_current.DirectoryType == DirectoryTypes.Directory)
+                @if (_opType == DirectoryTypes.Directory)
                 {
-                    <DirectoryDetail Id="@(_isUpdate?_current.Id:Guid.Empty)" ParentId="@(_isUpdate?_current.ParentId:_current.Id)" ParentName="@GetParentName(_data)" SuccessFn="AddUpdateCallback"></DirectoryDetail>
-                }
-                else if (_addDto.Name == null)
-                {
-                    <TscInstrumentAdd OnSuccess="OnAddInstrument"></TscInstrumentAdd>
+                    <DirectoryDetail Id="@(_isUpdate?_current.Id:Guid.Empty)"
+                                 ParentId="@(_isUpdate?_current.ParentId:_current.Id)"
+                                 ParentName="@GetParentName(_data)"
+                                 SuccessFn="AddUpdateCallback"></DirectoryDetail>
                 }
                 else
                 {
-                    <TscInstrumentDetail OnCallParent="ChildCallHandler"></TscInstrumentDetail>
+                    if (_isUpdate)
+                    {
+                        <TscInstrumentDetail Id="@_addDto.Id" OnCallParent="ChildCallHandler"></TscInstrumentDetail>
+                    }
+                    else
+                    {
+                        <TscInstrumentAdd DirectoryName="@_current.Name" Item="_addDto" OnCallParent="ChildCallHandler"></TscInstrumentAdd>
+                    }
                 }
             </MCardText>
         </MCard>

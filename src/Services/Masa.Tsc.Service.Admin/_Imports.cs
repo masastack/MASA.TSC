@@ -30,7 +30,6 @@ global using Masa.Tsc.Contracts.Admin.Charts;
 global using Masa.Tsc.Contracts.Admin.Enums;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Dtos;
 global using Masa.Tsc.Contracts.Admin.Instruments;
-global using Masa.Tsc.Contracts.Admin.Instruments.Panel;
 global using Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 global using Masa.Tsc.Service.Admin.Application.Instruments.Queries;
 global using Masa.Tsc.Service.Admin.Application.Logs;

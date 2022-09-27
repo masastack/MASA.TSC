@@ -3,48 +3,47 @@
 
 @if (!Readonly)
 {
-<MCardTitle>
-    <MButton OnClick="SaveAsync">save</MButton>
-    <MButton OnClick="@(async()=>await CallParent("close"))">Close</MButton>
-</MCardTitle>       
-
+    <MCardTitle>
+        <MButton OnClick="SaveAsync">save</MButton>
+        <MButton OnClick="@(async()=>await CallParent("close"))">Close</MButton>
+    </MCardTitle>
 }
 
 @switch (Item.Type)
 {
     case InstrumentTypes.Text:
         {
-            <TscWidgetText @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+            <TscWidgetText @ref="_widget" Item="Item" ReadOnly="Readonly" />
         }
         break;
     case InstrumentTypes.Card:
         {
-            <TscWidgetCard @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+            <TscWidgetCard @ref="_widget" Item="Item" ReadOnly="Readonly" />
         }
         break;
     case InstrumentTypes.Widget:
         {
-            <TscWidgetChart @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+            <TscWidgetChart @ref="_widget" Item="Item" ReadOnly="Readonly" />
         }
         break;
     case InstrumentTypes.Log:
         {
-            <TscWidgetLog @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+            <TscWidgetLog @ref="_widget" Item="Item" ReadOnly="Readonly" />
         }
         break;
     case InstrumentTypes.Trace:
         {
-            <TscWidgetTrace @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+            <TscWidgetTrace @ref="_widget" Item="Item" ReadOnly="Readonly" />
         }
         break;
     case InstrumentTypes.Tabs:
         {
-            <TscWidgetTabs @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+            <TscWidgetTabs @ref="_widget" Item="Item" ReadOnly="Readonly" />
         }
         break;
     case InstrumentTypes.Table:
         {
-            <TscWidgetTable @ref="_widget" Values="@Item.Attributes" ReadOnly="Readonly"/>
+            <TscWidgetTable @ref="_widget" Item="Item" ReadOnly="Readonly" />
         }
         break;
     default:

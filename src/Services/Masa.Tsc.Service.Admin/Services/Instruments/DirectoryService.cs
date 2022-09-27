@@ -7,16 +7,14 @@ public class DirectoryService : ServiceBase
 {
     public DirectoryService() : base("/api/Instrument/directory")
     {
-        App.MapPost($"{BaseUri}", AddAsync);
-        App.MapPut($"{BaseUri}", UpdateAsync);
         App.MapDelete($"{BaseUri}/{{id}}/{{userId}}", DeleteAsync);
         App.MapGet($"{BaseUri}/{{userId}}/{{id}}", GetAsync);
-        App.MapGet($"{BaseUri}/tree/{{userId}}/", GetTreeAsync);
+        App.MapGet($"{BaseUri}/tree/{{userId}}/{{isContainsInstrument}}", GetTreeAsync);
     }
 
-    public async Task<IEnumerable<DirectoryTreeDto>> GetTreeAsync([FromServices] IEventBus eventBus, Guid userId)
+    public async Task<IEnumerable<DirectoryTreeDto>> GetTreeAsync([FromServices] IEventBus eventBus, Guid userId, bool isContainsInstrument)
     {
-        var query = new DirectoryTreeQuery(userId);
+        var query = new DirectoryTreeQuery(userId, isContainsInstrument);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
@@ -28,13 +26,13 @@ public class DirectoryService : ServiceBase
         return query.Result;
     }
 
-    public async Task AddAsync([FromServices] IEventBus eventBus, AddDirectoryDto param)
+    public async Task AddAsync([FromServices] IEventBus eventBus, [FromBody] AddDirectoryDto param)
     {
         var query = new AddDirectoryCommand(param.Name, param.Sort, param.ParentId, param.UserId);
         await eventBus.PublishAsync(query);
     }
 
-    public async Task UpdateAsync([FromServices] IEventBus eventBus, UpdateDirectoryDto param)
+    public async Task UpdateAsync([FromServices] IEventBus eventBus, [FromBody] UpdateDirectoryDto param)
     {
         var query = new UpdateDirectoryCommand(param.Id, param.Name, param.Sort, param.UserId);
         await eventBus.PublishAsync(query);

@@ -12,25 +12,26 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly IPanelRepository _panelRepository;
         private readonly IMetricReposity _metricReposity;
-        private readonly IDomainEventBus _domainEventBus;
+        //private readonly IDomainEventBus _domainEventBus;
 
         public InstrumentCommandHandler(IDirectoryRepository directoryRepository,
         IInstrumentRepository instrumentRepository,
         IPanelRepository panelRepository,
-        IMetricReposity metricReposity,
-        IDomainEventBus domainEventBus)
+        IMetricReposity metricReposity
+        //IDomainEventBus domainEventBus
+            )
         {
             _directoryRepository = directoryRepository;
             _instrumentRepository = instrumentRepository;
             _panelRepository = panelRepository;
             _metricReposity = metricReposity;
-            _domainEventBus = domainEventBus;
+            //_domainEventBus = domainEventBus;
         }
 
         [EventHandler]
-        private async Task AddInstrumentAsync(AddInstrumentCommand command)
+        public async Task AddInstrumentAsync(AddInstrumentCommand command)
         {
-            var model = new Instrument
+            var model = new Instrument(command.Data.Id)
             {
                 Name = command.Data.Name,
                 IsGlobal = command.Data.IsGlobal,
@@ -44,7 +45,7 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
         }
 
         [EventHandler]
-        private async Task UpdateInstrumentAsync(UpdateInstrumentCommand command)
+        public async Task UpdateInstrumentAsync(UpdateInstrumentCommand command)
         {
             var entry = await _instrumentRepository.FindAsync(m => m.Id == command.Data.Id);
             if (entry == null)
@@ -54,7 +55,7 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
         }
 
         [EventHandler]
-        private async Task RemoveInstrumentAsync(RemoveInstrumentCommand command)
+        public async Task RemoveInstrumentAsync(RemoveInstrumentCommand command)
         {
             var list = await _instrumentRepository.GetListAsync(m => m.Creator == command.UserId && command.InstrumentIds.Contains(m.Id));
             if (list == null || !list.Any())
@@ -66,36 +67,36 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
         }
 
         [EventHandler]
-        private async Task AddPanelAsync(AddPanelCommand command)
+        public async Task AddPanelAsync(AddPanelCommand command)
         {
-            var entity = new Panel
+            var entity = new Panel(command.Data.Id)
             {
                 Type = command.Data.Type,
-                Title = command.Data.Name,
+                Title = command.Data.Title,
                 Description = command.Data.Description,
-                Index = command.Data.Sort,
+                Sort = command.Data.Sort,
                 InstrumentId = command.Data.InstrumentId,
                 ParentId = command.Data.ParentId
             };
             await _panelRepository.AddAsync(entity);
-            if (command.Data.Metrics != null && command.Data.Metrics.Any())
-            {
-                var list = command.Data.Metrics.Select(x => new PanelMetric
-                {
-                    DisplayName = x.Name,
-                    Name = x.Name,
-                    PanelId = entity.Id,
-                    Sort = x.Sort,
-                    Unit = x.Unit,
-                    Value = x.Value
-                });
+            //if (command.Data.Metrics != null && command.Data.Metrics.Any())
+            //{
+            //    var list = command.Data.Metrics.Select(x => new PanelMetric
+            //    {
+            //        DisplayName = x.Name,
+            //        Name = x.Name,
+            //        PanelId = entity.Id,
+            //        Sort = x.Sort,
+            //        Unit = x.Unit,
+            //        Value = x.Value
+            //    });
 
-                await _metricReposity.AddRangeAsync(list);
-            }
+            //    await _metricReposity.AddRangeAsync(list);
+            //}
         }
 
         [EventHandler]
-        private async Task UpdatePanelAsync(UpdatePanelCommand command)
+        public async Task UpdatePanelAsync(UpdatePanelCommand command)
         {
             var panel = await _panelRepository.FindAsync(item => item.Id == command.Data.Id);
             if (panel == null)
@@ -105,7 +106,7 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
         }
 
         [EventHandler]
-        private async Task RemovePanelAsync(RemovePanelCommand command)
+        public async Task RemovePanelAsync(RemovePanelCommand command)
         {
             await RemovePanelsByIdAsync(command.PannelId);
         }
@@ -178,7 +179,7 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
             if (panels == null || !panels.Any())
                 return default!;
 
-            var list = panels.Where(item => item.Id == parentId).ToList();
+            var list = panels.Where(item => item.ParentId == parentId).ToList();
             if (!list.Any())
                 return default!;
 

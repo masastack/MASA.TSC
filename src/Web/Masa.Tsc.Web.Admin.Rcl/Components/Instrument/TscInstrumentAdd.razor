@@ -6,10 +6,11 @@
             <MTextField TValue="string" Outlined Label="Name" Placeholder="name" @bind-Value="Item.Name" />
             <MTextField TValue="string" Outlined Label="Layer" Placeholder="layer" @bind-Value="Item.Layer" />
             <MTextField TValue="string" Outlined Label="Type" Placeholder="type" @bind-Value="Item.Model" />
-            <MTextField TValue="Guid" Outlined Label="Folder" Placeholder="Folder" @bind-Value="Item.DirectoryId" />
+            <MTextField TValue="string" Outlined Label="Folder" Placeholder="Folder" Value="@DirectoryName" Readonly />
             <MTextField TValue="int" Outlined Label="Sort" Placeholder="sort" @bind-Value="Item.Sort" />
+            <MCheckbox Label="Set Global" @bind-Value="Item.IsGlobal"></MCheckbox>
             <MRow>
-                <MCol><MCheckbox Label="Set Root"></MCheckbox></MCol>
+                <MCol><MCheckbox Label="Set Root" @bind-Value="Item.IsRoot"></MCheckbox></MCol>
                 <MCol><MButton Type="submit">Save</MButton></MCol>
             </MRow>
         </MForm>

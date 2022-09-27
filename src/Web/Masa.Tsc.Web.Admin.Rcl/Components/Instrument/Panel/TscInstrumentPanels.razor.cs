@@ -5,8 +5,12 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscInstrumentPanels
 {
-    [Inject]
-    public AddInstrumentDto _model { get; set; }
+    [Parameter]
+    public Guid InstrumentId { get; set; }
+
+    [Parameter]
+    public Guid ParentId { get; set; }
+
     private static List<PanelTypeDto> _types = new List<PanelTypeDto> {
         new PanelTypeDto(){
             Index=1,
@@ -41,7 +45,7 @@ public partial class TscInstrumentPanels
     private void ValueChange(StringNumber value)
     {
         if (value != null)
-            _widgetType = Enum.Parse<InstrumentTypes>(value.Value.ToString());
+            _widgetType = Enum.Parse<InstrumentTypes>(value.Value.ToString()!);
         else
             _widgetType = 0;
     }
@@ -61,6 +65,6 @@ public partial class TscInstrumentPanels
             }
         }
 
-        await CallParent(values);
+        await CallParent(values!);
     }
 }
