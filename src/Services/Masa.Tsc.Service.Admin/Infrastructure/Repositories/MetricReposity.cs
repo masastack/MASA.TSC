@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Infrastructure.Repositories;
 
-public class MetricReposity : Repository<TscDbContext, Domain.Aggregates.PanelMetric, Guid>, IMetricReposity
+public class MetricReposity : Repository<TscDbContext, PanelMetric, Guid>, IMetricReposity
 {
     public MetricReposity(TscDbContext context, IUnitOfWork unitOfWork) : base(context, unitOfWork)
     {

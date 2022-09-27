@@ -22,9 +22,19 @@ public partial class TscWidgetBase : TscComponentBase
 
     [Parameter]
     public bool ReadOnly { get; set; }
-    
+
     [Parameter]
-    public Dictionary<string, object> Values { get; set; }
+    public virtual AddPanelDto Item { get; set; }
+    
+    protected Dictionary<string, object> Values { get; set; } = new();
+
+    protected void SetValue(string key, object value)
+    {
+        if (Values.ContainsKey(key))
+            Values[key] = value;
+        else
+            Values.Add(key, value);
+    }
 
     public virtual AddPanelDto ToPanel()
     {

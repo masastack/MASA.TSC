@@ -5,9 +5,7 @@ namespace Masa.Tsc.Contracts.Admin.Instruments;
 
 public class AddInstrumentDto
 {
-    public Guid Id { get; set; }
-
-    public Guid UserId { get; set; }
+    public Guid Id { get; set; }=Guid.NewGuid();    
 
     [Required]
     public string Name { get; set; }
@@ -25,5 +23,5 @@ public class AddInstrumentDto
     public bool IsRoot { get; set; }    
 
     [Required]
-    public Guid DirectoryId { get; set; }    
+    public Guid DirectoryId { get; set; }
 }

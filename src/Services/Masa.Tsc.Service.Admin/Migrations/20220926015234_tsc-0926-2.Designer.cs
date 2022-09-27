@@ -4,6 +4,7 @@ using Masa.Tsc.Service.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Masa.Tsc.Service.Admin.Migrations
 {
     [DbContext(typeof(TscDbContext))]
-    partial class TscDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220926015234_tsc-0926-2")]
+    partial class tsc09262
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,8 +156,6 @@ namespace Masa.Tsc.Service.Admin.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DirectoryId");
-
                     b.ToTable("Instrument", "tsc");
                 });
 
@@ -174,18 +174,17 @@ namespace Masa.Tsc.Service.Admin.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Height")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Index")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("InstrumentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ParentId")
+                    b.Property<Guid?>("PanelId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Sort")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -200,13 +199,11 @@ namespace Masa.Tsc.Service.Admin.Migrations
                         .HasMaxLength(40)
                         .HasColumnType("nvarchar(40)");
 
-                    b.Property<string>("Width")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("InstrumentId");
+
+                    b.HasIndex("PanelId");
 
                     b.ToTable("Panel", "tsc");
                 });
@@ -288,17 +285,6 @@ namespace Masa.Tsc.Service.Admin.Migrations
                     b.ToTable("Setting", "tsc");
                 });
 
-            modelBuilder.Entity("Masa.Tsc.Service.Admin.Domain.Aggregates.Instrument", b =>
-                {
-                    b.HasOne("Masa.Tsc.Service.Admin.Domain.Aggregates.Directory", "Directory")
-                        .WithMany("Instruments")
-                        .HasForeignKey("DirectoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Directory");
-                });
-
             modelBuilder.Entity("Masa.Tsc.Service.Admin.Domain.Aggregates.Panel", b =>
                 {
                     b.HasOne("Masa.Tsc.Service.Admin.Domain.Aggregates.Instrument", "Instrument")
@@ -306,6 +292,10 @@ namespace Masa.Tsc.Service.Admin.Migrations
                         .HasForeignKey("InstrumentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Masa.Tsc.Service.Admin.Domain.Aggregates.Panel", null)
+                        .WithMany("Panels")
+                        .HasForeignKey("PanelId");
 
                     b.Navigation("Instrument");
                 });
@@ -321,11 +311,6 @@ namespace Masa.Tsc.Service.Admin.Migrations
                     b.Navigation("Panel");
                 });
 
-            modelBuilder.Entity("Masa.Tsc.Service.Admin.Domain.Aggregates.Directory", b =>
-                {
-                    b.Navigation("Instruments");
-                });
-
             modelBuilder.Entity("Masa.Tsc.Service.Admin.Domain.Aggregates.Instrument", b =>
                 {
                     b.Navigation("Panels");
@@ -334,6 +319,8 @@ namespace Masa.Tsc.Service.Admin.Migrations
             modelBuilder.Entity("Masa.Tsc.Service.Admin.Domain.Aggregates.Panel", b =>
                 {
                     b.Navigation("Metrics");
+
+                    b.Navigation("Panels");
                 });
 #pragma warning restore 612, 618
         }

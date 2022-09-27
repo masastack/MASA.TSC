@@ -4,23 +4,21 @@
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscInstrumentAdd
-{
+{    
     [Parameter]
-    public EventCallback<AddInstrumentDto> OnSuccess { get; set; }
-
-    [Inject]
     public AddInstrumentDto Item { get; set; }
+
+    [Parameter]
+    public string DirectoryName { get; set; }
 
     protected override void OnInitialized()
     {
-        Item.DirectoryId = Guid.NewGuid();
         base.OnInitialized();
     }
 
     private async Task OnSubmitAsync()
     {
-        if (OnSuccess.HasDelegate)
-            await OnSuccess.InvokeAsync(Item);
-        //await PopupService.AlertAsync("Success", AlertTypes.Success);
+        await ApiCaller.InstrumentService.AddAsync(Item);
+        await CallParent("add","instrument",Item);        
     }
 }

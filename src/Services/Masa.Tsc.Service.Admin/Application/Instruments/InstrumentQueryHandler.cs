@@ -46,9 +46,48 @@ public class InstrumentQueryHandler
     }
 
     [EventHandler]
+    public async Task Detail(InstrumentDetailQuery query)
+    {
+        var dto = await _instrumentRepository.GetAsync(query.Id, query.UserId);
+
+        query.Result = new InstrumentDetailDto
+        {
+            Id = dto.Id,
+            Name = dto.Name,
+            DirecotryId = dto.DirectoryId,
+            IsGlobal = dto.IsGlobal,
+            IsRoot = dto.IsRoot,
+            Layer = dto.Layer,
+            Model = dto.Model,
+            Sort = dto.Sort,
+            Panels = ConvertPanels(dto.Panels, Guid.Empty)
+        };
+    }
+
+    private List<PanelDto> ConvertPanels(List<Panel> panels, Guid parentId)
+    {
+        var children = panels.Where(m => m.ParentId == parentId).ToList();
+        panels.RemoveAll(m => m.ParentId == parentId);
+        if (!children.Any())
+            return default!;
+
+        var result = new List<PanelDto>();
+        foreach (var item in children)
+        {
+            var panel = item.Type.ToModel(item);
+            if (item.Type == InstrumentTypes.Tabs)
+            {
+                ((TabsPanelDto)(panel)).Tabs = ConvertPanels(panels, panel.Id);
+            }
+            result.Add(panel);
+        }
+        return result;
+    }
+
+    [EventHandler]
     public async Task QueryPanels(PanelQuery query)
     {
-        var result = await _panelRepository.GetListAsync(t => t.InstrumentId == query.InstrumentId, nameof(Panel.Index), false);
+        var result = await _panelRepository.GetListAsync(t => t.InstrumentId == query.InstrumentId, nameof(Panel.Sort), false);
         if (result != null && result.Any())
             query.Result = result.Select(item => new PanelDto { }).ToList();
         else

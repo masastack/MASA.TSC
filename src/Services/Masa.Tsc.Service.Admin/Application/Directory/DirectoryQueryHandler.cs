@@ -6,10 +6,12 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments;
 public class DirectoryQueryHandler
 {
     private readonly IDirectoryRepository _directoryRepository;
+    private readonly IInstrumentRepository _instrumentRepository;
 
-    public DirectoryQueryHandler(IDirectoryRepository directoryRepository)
+    public DirectoryQueryHandler(IDirectoryRepository directoryRepository, IInstrumentRepository instrumentRepository)
     {
         _directoryRepository = directoryRepository;
+        _instrumentRepository = instrumentRepository;
     }
 
     [EventHandler]
@@ -40,9 +42,31 @@ public class DirectoryQueryHandler
             query.Result = Array.Empty<DirectoryTreeDto>();
             return;
         }
-
         list = list.OrderBy(t => t.ParentId).ThenBy(t => t.Sort).ToList();
         query.Result = ToTree(list, Guid.Empty);
+        if (query.IsContainsInstrument)
+        {
+            var instruments = await _instrumentRepository.ToQueryable().Where(t => t.Creator == Guid.Empty || t.Creator == query.UserId).ToListAsync();
+            if (instruments != null && instruments.Any())
+            {
+                var dic = instruments.GroupBy(item => item.DirectoryId).Select(item => new
+                {
+                    Key = item.Key,
+                    Values = item.Select(it => new DirectoryTreeDto
+                    {
+                        Name = it.Name,
+                        DirectoryType = DirectoryTypes.Instrument,
+                        Id = it.Id,
+                        ParentId = item.Key,
+                        Sort = it.Sort
+                    }).ToList()
+                }).ToDictionary(item => item.Key, item => item.Values);
+                foreach (var item in query.Result)
+                {
+                    AppendTree(item, dic);
+                }
+            }
+        }
     }
 
     private IEnumerable<DirectoryTreeDto> ToTree(List<Domain.Aggregates.Directory> directories, Guid parentId)
@@ -60,11 +84,34 @@ public class DirectoryQueryHandler
                 ParentId = parentId,
                 Name = item.Name,
                 Sort = item.Sort,
+                DirectoryType = DirectoryTypes.Directory,
                 Children = ToTree(directories, item.Id)
             };
             result.Add(model);
         }
 
         return result;
+    }
+
+    private void AppendTree(DirectoryTreeDto directory, Dictionary<Guid, List<DirectoryTreeDto>> instruments)
+    {
+        var children = directory.Children;
+        var hasChild = children != null && children.Any();
+
+        var key = directory.Id;
+        if (instruments.ContainsKey(key))
+        {
+            var values = instruments[key];
+            instruments.Remove(key);
+            if (hasChild)
+                values.InsertRange(0, children!);
+            directory.Children = values;
+        }
+
+        if (!hasChild) return;
+        foreach (var item in children!)
+        {
+            AppendTree(item, instruments);
+        }
     }
 }

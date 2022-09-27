@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Contracts.Admin.Instruments;
 
-public class PanelDto: AddPanelDto
+public class TabsPanelDto : PanelDto
 {
-    
+    public List<PanelDto> Tabs { get; set; }
 }

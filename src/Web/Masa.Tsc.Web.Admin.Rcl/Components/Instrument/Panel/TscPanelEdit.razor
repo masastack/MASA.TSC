@@ -1,4 +1,5 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@using System.Diagnostics
 @inherits TscComponentBase
 
 <Element Class="rounded-lg" Style="border:solid 2px #BBDEFB">
@@ -16,11 +17,24 @@
     [Parameter]
     public AddPanelDto Item { get; set; }
 
+    protected override Task OnParametersSetAsync()
+    {
+        if (Item != null)
+            Debug.Print($"OnParametersSetAsync id:{Item.Id}");
+        return base.OnParametersSetAsync();
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        Debug.Print($"OnAfterRenderAsync id:{Item.Id}");
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
     private async Task OnDelete()
     {
         if (!await PopupService.ConfirmAsync("删除", "确认要移除该panel吗"))
             return;
-
+        await ApiCaller.PanelService.DeleteAsync(CurrentUserId, Item.InstrumentId, Item.Id);
         await CallParent("remove", Item);
     }
 

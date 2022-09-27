@@ -42,7 +42,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer("Bearer", options =>
 {
-    options.Authority = builder.GetMasaConfiguration().Local.GetValue<string>("IdentityServerUrl");
+    options.Authority = builder.GetMasaConfiguration().ConfigurationApi.GetPublic().GetValue<string>("$public.AppSettings:IdentityServerUrl");
     options.RequireHttpsMetadata = false;
     //options.Audience = "";
     options.TokenValidationParameters.ValidateAudience = false;
@@ -58,7 +58,7 @@ builder.Services.AddMasaIdentity(options =>
 
 builder.Services.AddScoped<TokenProvider>();
 var dccPublicConfig = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
-builder.Services.AddAuthClient(dccPublicConfig["$public.AppSettings:AuthClient:LocalUrl"], dccConfig.RedisOptions).
+builder.Services.AddAuthClient(dccPublicConfig["$public.AppSettings:AuthClient:Url"], dccConfig.RedisOptions).
 AddPmClient(dccPublicConfig["$public.AppSettings:PmClient:Url"]);
 
 var app = builder.Services

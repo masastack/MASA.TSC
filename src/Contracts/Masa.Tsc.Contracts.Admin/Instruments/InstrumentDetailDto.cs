@@ -5,4 +5,21 @@ namespace Masa.Tsc.Contracts.Admin.Instruments;
 
 public class InstrumentDetailDto
 {
+    public Guid Id { get; set; }
+
+    public string Name { get; set; }
+
+    public Guid DirecotryId { get; set; }
+
+    public string Layer { get; set; }
+
+    public string Model { get; set; }
+
+    public int Sort { get; set; }
+
+    public bool IsGlobal { get; set; }
+
+    public bool IsRoot { get; set; }
+
+    public List<PanelDto> Panels { get; set; }
 }

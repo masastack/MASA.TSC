@@ -5,15 +5,17 @@ namespace Masa.Tsc.ApiGateways.Caller;
 
 public class TscCaller
 {
-    public TscCaller(ICaller caller,TokenProvider tokenProvider)
+    public TscCaller(ICaller caller, TokenProvider tokenProvider)
     {
-        AppService = new AppService(caller,tokenProvider);
+        AppService = new AppService(caller, tokenProvider);
         ProjectService = new ProjectService(caller, tokenProvider);
         TeamService = new TeamService(caller, tokenProvider);
         LogService = new LogService(caller, tokenProvider);
         TraceService = new TraceService(caller, tokenProvider);
         SettingService = new SettingService(caller, tokenProvider);
         DirectoryService = new DirectoryService(caller, tokenProvider);
+        InstrumentService = new InstrumentService(caller, tokenProvider);
+        PanelService = new PanelService(caller, tokenProvider);
     }
 
     public AppService AppService { get; private init; }
@@ -29,4 +31,8 @@ public class TscCaller
     public SettingService SettingService { get; private init; }
 
     public DirectoryService DirectoryService { get; private init; }
+
+    public InstrumentService InstrumentService { get; private init; }
+
+    public PanelService PanelService { get; private init; }
 }

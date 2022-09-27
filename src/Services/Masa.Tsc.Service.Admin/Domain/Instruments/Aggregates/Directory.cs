@@ -13,5 +13,5 @@ public class Directory : AggregateRoot<Guid>
 
     public Guid ParentId { get; set; } = Guid.Empty;
 
-
+    public List<Instrument> Instruments { get; set; }
 }

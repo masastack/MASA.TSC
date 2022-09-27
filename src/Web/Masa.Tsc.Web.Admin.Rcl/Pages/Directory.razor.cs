@@ -8,6 +8,7 @@ public partial class Directory : IDisposable
     private bool _isLoading = true;
     private string _keyword;
     private bool _expand = true;
+    private DirectoryTypes _opType = DirectoryTypes.Directory;
 
     private DirectoryTreeDto _current = new();
     private IEnumerable<DirectoryTreeDto> _data;
@@ -18,8 +19,7 @@ public partial class Directory : IDisposable
     private bool _fullScreen = false;
     private StringNumber _dialogWidth = 480;
 
-    [Inject]
-    public AddInstrumentDto _addDto { get; set; }
+    public AddInstrumentDto _addDto = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -85,24 +85,42 @@ public partial class Directory : IDisposable
     {
         _title = "Add Directory";
         _fullScreen = false;
-        _current.DirectoryType = DirectoryTypes.Directory;
+        _opType = DirectoryTypes.Directory;
         _isUpdate = false;
         OpenDialog();
     }
 
-    private void AddInstrument()
+    private async void AddInstrument()
     {
+        if (_current == null || _current.Id == Guid.Empty || _current.DirectoryType != DirectoryTypes.Directory)
+        {
+            await PopupService.AlertAsync("请选择目录", AlertTypes.Warning);
+            return;
+        }
+        _opType = DirectoryTypes.Instrument;
         _title = "Add Instrument";
-        _current.DirectoryType = DirectoryTypes.Instrument;
+        _addDto = new() { DirectoryId = _current.Id };
         _isUpdate = false;
-        _addDto = new();
+        _dialogWidth = 480;
+        _fullScreen = false;
         OpenDialog();
     }
 
     private async Task OnAddInstrument(AddInstrumentDto model)
     {
+        var list = _current.Children?.ToList() ?? new();
+        list.Add(new DirectoryTreeDto
+        {
+            ParentId = _current.Id,
+            DirectoryType = DirectoryTypes.Instrument,
+            Id = model.Id,
+            Name = model.Name,
+            Sort = model.Sort,
+        });
+        _current.Children = list;
         _addDto = model;
         _fullScreen = true;
+        _isUpdate = true;
         _dialogWidth = "100%";
         StateHasChanged();
         await Task.CompletedTask;
@@ -122,11 +140,18 @@ public partial class Directory : IDisposable
         if (item.DirectoryType == DirectoryTypes.Directory)
         {
             _title = "Update Directory";
+            _dialogWidth = 480;
+            _fullScreen = false;
+            _addDto = new();
         }
         else
         {
+            _fullScreen = true;
+            _dialogWidth = "100%";
             _title = "Update Instrument";
+            _addDto.Id = item.Id;
         }
+        _opType = item.DirectoryType;
         _isUpdate = true;
         _current = item;
         OpenDialog();
@@ -165,13 +190,15 @@ public partial class Directory : IDisposable
         }
         else
         {
-            //_title = "Update Instrument";
-            //_currentParentId = item.ParentId;
+            await ApiCaller.InstrumentService.DeleteAsync(new CommonRemoveDto<Guid>
+            {
+                Ids = new Guid[] { item.Id },
+                UserId = CurrentUserId
+            });
         }
 
-        item.Id = Guid.Empty;
-        item.ParentId = Guid.Empty;
-        item.DirectoryType = DirectoryTypes.Directory;
+        await PopupService.ToastAsync("delete success", AlertTypes.Success);
+        await LoadDataAsync();
     }
 
     private async Task AddUpdateCallback(DirectoryDto dto)
@@ -212,6 +239,24 @@ public partial class Directory : IDisposable
             }
         }
         return default!;
+    }
+
+    protected override async Task ChildCallHandler(params object[] values)
+    {
+        //add instruments success
+        if (values != null && values.Length == 3)
+        {
+            if (values[0] is string op && values[1] is string type)
+            {
+                if (op == "add" && type == "instrument")
+                {
+                    await OnAddInstrument((AddInstrumentDto)values[2]);
+                }
+            }
+        }
+
+
+        await base.ChildCallHandler(values!);
     }
 
     public override void Dispose()

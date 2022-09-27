@@ -8,14 +8,28 @@ public partial class TscInstrumentPanelDetail
     [Parameter]
     public InstrumentTypes Type { get; set; }
 
-    [Inject]
-    public AddInstrumentDto _model { get; set; }
+    [Parameter]
+    public Guid InstrumentId { get; set; }
+
+    [Parameter]
+    public Guid ParentId { get; set; }
+
+    private AddPanelDto _panel { get; set; } = new();
 
     private TscWidgetBase _widget = default!;
 
-    protected override Task OnParametersSetAsync()
+    protected override Task OnInitializedAsync()
     {
-        return base.OnParametersSetAsync();
+        if (_panel.InstrumentId != InstrumentId || _panel.ParentId != ParentId)
+        {
+            _panel = new AddPanelDto
+            {
+                InstrumentId = InstrumentId,
+                ParentId = ParentId,
+                Id = Guid.NewGuid(),
+            };
+        }
+        return base.OnInitializedAsync();
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -25,7 +39,12 @@ public partial class TscInstrumentPanelDetail
 
     private async Task OnSubmitAsync()
     {
-        var panel = _widget.ToPanel();
-        await CallParent("save", panel);
+        var item = _widget.Item;
+        if (item.Type == InstrumentTypes.Widget)
+        {
+            //sendData.Metrics =;
+        }
+        await ApiCaller.PanelService.AddAsync(item);
+        await CallParent("save", item);
     }
 }

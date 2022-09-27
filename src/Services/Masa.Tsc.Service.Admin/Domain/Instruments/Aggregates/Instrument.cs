@@ -5,6 +5,8 @@ namespace Masa.Tsc.Service.Admin.Domain.Aggregates;
 
 public class Instrument : FullAggregateRoot<Guid, Guid>
 {
+    public Aggregates.Directory Directory { get; set; }
+
     public string Name { get; set; }
 
     public string Layer { get; set; }
@@ -21,7 +23,11 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
 
     public List<Panel> Panels { get; set; }
 
-    public void Update(UpdateInstrumentDto pannel) {  }
+    public Instrument(Guid Id) : base(Id) { }
+
+    public Instrument() { }
+
+    public void Update(UpdateInstrumentDto pannel) { }
 
     public void Save() { }
 

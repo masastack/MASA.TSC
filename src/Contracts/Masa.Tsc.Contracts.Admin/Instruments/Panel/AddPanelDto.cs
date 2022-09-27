@@ -4,26 +4,24 @@
 namespace Masa.Tsc.Contracts.Admin.Instruments;
 
 public class AddPanelDto
-{ 
-    public Guid Id { get; set; }=Guid.NewGuid();
+{
+    public Guid Id { get; set; }
 
     public Guid ParentId { get; set; }
 
     public Guid InstrumentId { get; set; }
 
-    public int Width { get; set; }
+    public string Width { get; set; }
 
-    public int Height { get; set; }
+    public string Height { get; set; }
 
-    public string Name { get; set; }
+    public string Title { get; set; }
 
-    public string Description { get; set; }
+    public string Description { get; set; }=string.Empty;
 
     public int Sort { get; set; }
 
-    public InstrumentTypes Type { get; set; }
-
-    public Dictionary<string, object> Attributes { get; set; }
+    public virtual InstrumentTypes Type { get; set; }
 
     public List<AddPanelMetricDto> Metrics { get; set; }
 }

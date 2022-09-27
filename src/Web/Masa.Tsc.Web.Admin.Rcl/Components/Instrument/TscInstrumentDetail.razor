@@ -3,7 +3,7 @@
 <MCard>
     <MCardText Class="d-flex justify-end">
         <MButton OnClick="OpenDialog">添加</MButton>
-        <MButton OnClick="SaveAsync">Save</MButton>
+        @*<MButton OnClick="SaveAsync">Save</MButton>*@
         <MButton OnClick="@(async()=>await CallParent("close"))">Close</MButton>
     </MCardText>
 </MCard>
@@ -31,12 +31,12 @@
             @if (_editPanel == null)
             {
                 <MCardText>
-                    <TscInstrumentPanels OnCallParent="ChildCallHandler"></TscInstrumentPanels>
+                    <TscInstrumentPanels  InstrumentId="Id" OnCallParent="ChildCallHandler" />
                 </MCardText>
             }
             else
             {
-                <TscInstrumentPanelView Item="_editPanel" OnCallParent="ChildCallHandler"/>
+                <TscInstrumentPanelView Item="_editPanel" OnCallParent="ChildCallHandler" />
             }
 
         </MCard>

@@ -11,25 +11,31 @@ public class Panel : AggregateRoot<Guid>
 
     public string Title { get; set; }
 
-    public string Description { get; set; }
+    public string Description { get; set; }=string.Empty;
 
-    public int Index { get; set; }
+    public int Sort { get; set; }
 
     public InstrumentTypes Type { get; set; }
 
-    public string UiType { get; set; }
+    public string UiType { get; set; }=string.Empty;
+
+    public string Height { get; set; } = string.Empty;
+
+    public string Width { get; set; } = string.Empty;
 
     //public string XName { get; set; }
 
     //public string YName { get; set; }
 
-    public string ChartType { get; set; }
+    public string ChartType { get; set; } = string.Empty;
 
     public Guid ParentId { get; set; }
 
-    public List<Panel> Panels { get; set; }
-
     public List<PanelMetric> Metrics { get; set; }
+
+    public Panel(Guid Id) : base(Id) { }
+
+    public Panel() { }
 
     public void Remove()
     {
@@ -40,7 +46,7 @@ public class Panel : AggregateRoot<Guid>
     {
         Title = panel.Name;
         Description = panel.Description;
-        Index = panel.Sort;
+        Sort = panel.Sort;
         //Metrics = panel.Metrics;
 
 

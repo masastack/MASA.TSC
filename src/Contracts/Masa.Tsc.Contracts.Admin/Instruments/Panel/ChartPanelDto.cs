@@ -3,7 +3,9 @@
 
 namespace Masa.Tsc.Contracts.Admin.Instruments;
 
-public class PanelDto: AddPanelDto
+public class ChartPanelDto : PanelDto
 {
-    
+    public string ChartType { get; set; }
+
+    public List<PanelMetricDto> Metrics { get; set; }
 }

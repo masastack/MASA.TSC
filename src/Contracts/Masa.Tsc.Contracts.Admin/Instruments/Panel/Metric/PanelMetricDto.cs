@@ -5,4 +5,9 @@ namespace Masa.Tsc.Contracts.Admin.Instruments;
 
 public class PanelMetricDto
 {
+    public string Name { get; set; }
+
+    public string Caculate { get; set; }
+
+    public string DisplayName { get; set; }
 }

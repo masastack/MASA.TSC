@@ -48,7 +48,7 @@ public partial class SearchBar
     public EventCallback<ProjectAppSearchModel> OnSearch { get; set; }
 
     private string _searchIconClass = "fas fa-rotate";
-    private bool _loading = false;
+    //private bool _loading = false;
     private ProjectAppSearchModel _value = new();
     private string _defaultAppId;
     private List<string> _selectDataSource = new List<string>
@@ -63,10 +63,10 @@ public partial class SearchBar
     {
         //_searchIconClass = "fas fa-circle-notch fa-spin";
         //StateHasChanged();
-        _loading = true;
+        //_loading = true;
         if (OnSearch.HasDelegate)
             await OnSearch.InvokeAsync(Value);
-        _loading = false;
+        //_loading = false;
         //Thread.Sleep(500);
         //_searchIconClass = "fas fa-rotate";
         //StateHasChanged();
