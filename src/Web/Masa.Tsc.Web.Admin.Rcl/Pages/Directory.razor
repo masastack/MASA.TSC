@@ -33,8 +33,8 @@
                     }
                     else
                     {
-                        <TscDirectoryTreeTable Expand="_expand" Data="@(_searchData.Any()?_searchData:_data)"
-                                           OnUpdateAsync="OpenUpdateAsync" OnDeleteAsync="RemoveDirectoryAsync" OnRowSelected="OnRowSelectedAsync" />
+                        <TscDirectoryTreeTable Expand="_expand" Data="@(_searchData.Any()?_searchData:_data)" OnCallParent="ChildCallHandler"
+                                           OnRowSelected="OnRowSelectedAsync" />
                     }
                 </MCol>
             </MRow>
@@ -67,11 +67,11 @@
                 {
                     if (_isUpdate)
                     {
-                        <TscInstrumentDetail Id="@_addDto.Id" OnCallParent="ChildCallHandler"></TscInstrumentDetail>
+                        <TscInstrumentDetail Id="@_addDto.Id" ReadOnly="_readonly" OnCallParent="ChildCallHandler" />
                     }
                     else
                     {
-                        <TscInstrumentAdd DirectoryName="@_current.Name" Item="_addDto" OnCallParent="ChildCallHandler"></TscInstrumentAdd>
+                        <TscInstrumentAdd DirectoryName="@_current.Name" Item="_addDto" OnCallParent="ChildCallHandler" />
                     }
                 }
             </MCardText>

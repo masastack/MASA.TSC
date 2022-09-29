@@ -4,10 +4,15 @@
 {
     <MRow Class="@($"{_class} {(item.Selected?"blue":"")}")" @onclick="@(async()=>await RowSelectAsync(item))">
         <MCol Cols="11">
-            <MIcon>@(item.DirectoryType== DirectoryTypes.Directory?"folder":"fa-file")</MIcon>@item.Name
+            <MIcon>@(item.DirectoryType== DirectoryTypes.Directory?"folder":"fa-file")</MIcon>
+            @item.Name
         </MCol>
         <MCol Cols="1" @onclick:stopPropagation>
-            <MIcon Color="blue" OnClick="@(async ()=> await UpdateAsync(item))">edit</MIcon>
+            @if (item.DirectoryType == DirectoryTypes.Instrument)
+            {
+                <MIcon OnClick="@(async ()=> await ViewAsync(item))">mdi-eye</MIcon>
+            }
+            <MIcon Color="@(item.Selected?"white":"blue")" OnClick="@(async ()=> await UpdateAsync(item))">edit</MIcon>
             <MIcon Color="red" Class="ml-2" OnClick="@(async ()=> await DeleteAsync(item))">delete</MIcon>
             @if (item.Children != null && item.Children.Any())
             {
@@ -17,6 +22,6 @@
     </MRow>
     @if (item.Expand && item.Children != null && item.Children.Any())
     {
-        <TscDirectoryTreeTable Data=item.Children Deep=Deep+1 Expand=Expand OnDeleteAsync=OnDeleteAsync OnUpdateAsync=OnUpdateAsync OnRowSelected=RowSelectAsync></TscDirectoryTreeTable>
+        <TscDirectoryTreeTable Data=item.Children Deep=Deep+1 Expand=Expand OnCallParent="ChildCallHandler" OnRowSelected=RowSelectAsync></TscDirectoryTreeTable>
     }
 }

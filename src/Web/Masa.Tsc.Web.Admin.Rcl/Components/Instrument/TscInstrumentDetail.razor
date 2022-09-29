@@ -1,13 +1,13 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 <MCard>
-    <MCardText Class="d-flex justify-end">
-        <MButton OnClick="OpenDialog">添加</MButton>
-        @*<MButton OnClick="SaveAsync">Save</MButton>*@
-        <MButton OnClick="@(async()=>await CallParent("close"))">Close</MButton>
-    </MCardText>
-</MCard>
-<MCard>
+    @if (!ReadOnly)
+    {
+        <MCardTitle Class="d-flex justify-end">
+            <MButton OnClick="OpenDialog">添加</MButton>
+            <MButton OnClick="@(async ()=> await CallParent(OperateCommand.Close))">Close</MButton>
+        </MCardTitle>
+    }
     <MCardText>
         <MDragZone @ref="_mDragZone" Items="_items" Class="d-flex"></MDragZone>
     </MCardText>
@@ -26,19 +26,14 @@
                         </MCol>
                     </MRow>
                 </MCardTitle>
-            }
-
-            @if (_editPanel == null)
-            {
                 <MCardText>
-                    <TscInstrumentPanels  InstrumentId="Id" OnCallParent="ChildCallHandler" />
+                    <TscInstrumentPanels InstrumentId="Id" OnCallParent="ChildCallHandler" />
                 </MCardText>
             }
             else
             {
-                <TscInstrumentPanelView Item="_editPanel" OnCallParent="ChildCallHandler" />
+                <TscInstrumentPanelView Item="_editPanel" Readonly="ReadOnly" OnCallParent="ChildCallHandler" />
             }
-
         </MCard>
     </ChildContent>
 </TscDialog>

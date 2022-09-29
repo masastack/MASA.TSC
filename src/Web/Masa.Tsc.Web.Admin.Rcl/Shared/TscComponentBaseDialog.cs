@@ -21,16 +21,26 @@ public partial class TscComponentBase
 
     protected virtual async Task ChildCallHandler(params object[] values)
     {
-        if (values != null && values.Length >= 1 && values[0] is string str)
-        {
-            switch (str)
-            {
-                case "close":
-                    _showDialog = false;
-                    break;
-            }
-        }
+        if (values == null || !values.Any())
+            return;
 
+        if (values[0] is not OperateCommand command)
+            return;
+
+        await ExecuteCommondAsync(command, values[1..]);
+        await CallParent(values);
+    }
+
+    protected virtual async Task ExecuteCommondAsync(OperateCommand command, object[] values)
+    {
+        if (command == OperateCommand.Close)
+        {
+            CloseDialog();
+        }
+        else if (command == OperateCommand.Open)
+        {
+            OpenDialog();
+        }
         await Task.CompletedTask;
     }
 
