@@ -9,6 +9,7 @@ public partial class Directory : IDisposable
     private string _keyword;
     private bool _expand = true;
     private DirectoryTypes _opType = DirectoryTypes.Directory;
+    private bool _readonly = true;
 
     private DirectoryTreeDto _current = new();
     private IEnumerable<DirectoryTreeDto> _data;
@@ -121,6 +122,7 @@ public partial class Directory : IDisposable
         _addDto = model;
         _fullScreen = true;
         _isUpdate = true;
+        _readonly = false;
         _dialogWidth = "100%";
         StateHasChanged();
         await Task.CompletedTask;
@@ -241,22 +243,43 @@ public partial class Directory : IDisposable
         return default!;
     }
 
-    protected override async Task ChildCallHandler(params object[] values)
+    protected override async Task ExecuteCommondAsync(OperateCommand command, params object[] values)
     {
-        //add instruments success
-        if (values != null && values.Length == 3)
+        if (command == OperateCommand.Add)
         {
-            if (values[0] is string op && values[1] is string type)
+            if (values != null && values.Length > 0 && values[0] is string type)
             {
-                if (op == "add" && type == "instrument")
-                {
-                    await OnAddInstrument((AddInstrumentDto)values[2]);
-                }
+                if (type == "instrument")
+                    await OnAddInstrument((AddInstrumentDto)values[1]);
+            }
+        }
+        else if (command == OperateCommand.Update)
+        {
+            if (values != null && values.Length > 0 && values[0] is DirectoryTreeDto item)
+            {
+                _readonly = false;
+                await OpenUpdateAsync(item);
             }
         }
 
+        else if (command == OperateCommand.Remove)
+        {
+            if (values != null && values.Length > 0 && values[0] is DirectoryTreeDto item)
+            {
+                await RemoveDirectoryAsync(item);
+            }
+        }
 
-        await base.ChildCallHandler(values!);
+        else if (command == OperateCommand.View)
+        {
+            if (values != null && values.Length > 0 && values[0] is DirectoryTreeDto item)
+            {
+                _readonly = true;
+                await OpenUpdateAsync(item);
+            }
+        }
+
+        await base.ExecuteCommondAsync(command, values!);
     }
 
     public override void Dispose()

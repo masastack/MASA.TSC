@@ -14,11 +14,11 @@ public partial class TscDirectoryTreeTable
     [Parameter]
     public bool Expand { get; set; }
 
-    [Parameter]
-    public Func<DirectoryTreeDto, Task> OnUpdateAsync { get; set; }
+    //[Parameter]
+    //public Func<DirectoryTreeDto, Task> OnUpdateAsync { get; set; }
 
-    [Parameter]
-    public Func<DirectoryTreeDto, Task> OnDeleteAsync { get; set; }
+    //[Parameter]
+    //public Func<DirectoryTreeDto, Task> OnDeleteAsync { get; set; }
 
     [Parameter]
     public Func<DirectoryTreeDto, Task> OnRowSelected { get; set; }
@@ -40,14 +40,23 @@ public partial class TscDirectoryTreeTable
 
     private async Task UpdateAsync(DirectoryTreeDto item)
     {
-        if (OnUpdateAsync is not null)
-            await OnUpdateAsync.Invoke(item);
+        await CallParent(OperateCommand.Update, item);
+        //if (OnUpdateAsync is not null)
+        //    await OnUpdateAsync.Invoke(item);
+    }
+
+    private async Task ViewAsync(DirectoryTreeDto item)
+    {
+        await CallParent(OperateCommand.View, item);
+        //if (OnUpdateAsync is not null)
+        //    await OnUpdateAsync.Invoke(item);
     }
 
     private async Task DeleteAsync(DirectoryTreeDto item)
     {
-        if (OnDeleteAsync is not null)
-            await OnDeleteAsync.Invoke(item);
+        await CallParent(OperateCommand.Remove, item);
+        //if (OnDeleteAsync is not null)
+        //    await OnDeleteAsync.Invoke(item);
     }
 
     private async Task RowSelectAsync(DirectoryTreeDto item)

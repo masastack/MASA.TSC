@@ -5,7 +5,7 @@
 {
     <MCardTitle>
         <MButton OnClick="SaveAsync">save</MButton>
-        <MButton OnClick="@(async()=>await CallParent("close"))">Close</MButton>
+        <MButton OnClick="@(async()=>await CallParent(OperateCommand.Close))">Close</MButton>
     </MCardTitle>
 }
 

@@ -11,16 +11,13 @@ public partial class TscInstrumentDetail
     [Parameter]
     public List<AddPanelDto> Panels { get; set; } = new();
 
-    public InstrumentDetailDto Data { get; set; }
+    [Parameter]
+    public bool ReadOnly { get; set; }
 
+    public InstrumentDetailDto Data { get; set; }
     private List<BDragItem> _items = new();
     private AddPanelDto? _editPanel = default;
     private MDragZone _mDragZone;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -68,54 +65,48 @@ public partial class TscInstrumentDetail
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    protected override async Task ChildCallHandler(params object[] values)
+    protected override async Task ExecuteCommondAsync(OperateCommand command, params object[] values)
     {
-        if (values != null && values.Length - 2 >= 0)
+        if (values != null && values.Length > 0 && values[0] is AddPanelDto panel)
         {
-            var cmd = values[0] as string;
-            if (values[1] is AddPanelDto panel)
+            var find = _mDragZone.Items.FirstOrDefault(x => (Guid)x.Attributes["key"] == panel.Id);
+            if (command == OperateCommand.Success)
             {
-                var find = _mDragZone.Items.FirstOrDefault(x => (Guid)x.Attributes["key"] == panel.Id);
-                switch (cmd)
+                if (find == null)
                 {
-                    case "save":
-                        if (find == null)
-                        {
-                            _items.Add(ToDragItem(panel));
-                            Panels.Add(panel);
-                        }
-                        else
-                        {
-                            var findPanel = Panels.FirstOrDefault(m => m.Id == panel.Id);
-                            findPanel = panel;
+                    _items.Add(ToDragItem(panel));
+                    Panels.Add(panel);
+                }
+                else
+                {
+                    var findPanel = Panels.FirstOrDefault(m => m.Id == panel.Id);
+                    findPanel = panel;
 
-                            var index = _items.IndexOf(find);
-                            _items.Remove(find);
-                            _items.Insert(index, ToDragItem(panel));
-                        }
-                        values = new[] { "close" };
-                        break;
-                    case "edit":
-                        await ShowEdit(panel);
-                        values = default!;
-                        break;
-
-                    case "remove":
-                        if (find != null)
-                        {
-                            _items.Remove(find);
-                            Panels.RemoveAll(m => m.Id == panel.Id);
-                            find.Dispose();
-                        }
-                        values = new[] { "close" };
-                        break;
+                    var index = _items.IndexOf(find);
+                    _items.Remove(find);
+                    _items.Insert(index, ToDragItem(panel));
+                }
+                CloseDialog();
+            }
+            else if (command == OperateCommand.Update)
+            {
+                ReadOnly = false;
+                await ShowEdit(panel);
+            }
+            else if (command == OperateCommand.Remove)
+            {
+                if (find != null)
+                {
+                    _items.Remove(find);
+                    Panels.RemoveAll(m => m.Id == panel.Id);
+                    find.Dispose();
+                    CloseDialog();
                 }
             }
         }
 
         if (values != null)
             _editPanel = null;
-        await base.ChildCallHandler(values!);
     }
 
     private BDragItem ToDragItem(AddPanelDto panel)
@@ -128,7 +119,8 @@ public partial class TscInstrumentDetail
             {
                 builder.OpenComponent<TscPanelEdit>(0);
                 builder.AddAttribute(1, "Item", panel);
-                builder.AddAttribute(2, "OnCallParent", new EventCallback<object[]>(this, ChildCallHandler));
+                builder.AddAttribute(2, "ReadOnly", ReadOnly);
+                builder.AddAttribute(3, "OnCallParent", new EventCallback<object[]>(this, ChildCallHandler));
                 builder.CloseComponent();
             }
         };

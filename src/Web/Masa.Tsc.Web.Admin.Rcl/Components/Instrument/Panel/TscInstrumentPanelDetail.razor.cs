@@ -45,6 +45,6 @@ public partial class TscInstrumentPanelDetail
             //sendData.Metrics =;
         }
         await ApiCaller.PanelService.AddAsync(item);
-        await CallParent("save", item);
+        await CallParent(OperateCommand.Success, item);
     }
 }

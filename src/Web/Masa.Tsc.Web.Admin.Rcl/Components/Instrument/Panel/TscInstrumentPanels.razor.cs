@@ -50,21 +50,15 @@ public partial class TscInstrumentPanels
             _widgetType = 0;
     }
 
-    protected override async Task ChildCallHandler(params object[] values)
+    protected override async Task ExecuteCommondAsync(OperateCommand command,params object[] values)
     {
-        if (values != null && values.Length == 1 && values[0] is string str)
+        if (command == OperateCommand.Back)
         {
-            switch (str)
-            {
-                case "back":
-                    _step = 1;
-                    break;
-                case "close":
-                    await CallParent("close");
-                    break;
-            }
+            _step = 1;
         }
-
-        await CallParent(values!);
+        else if (command == OperateCommand.Close)
+        {
+           await CallParent(command);
+        }       
     }
 }
