@@ -11,60 +11,51 @@ internal static class InstrumentTypeExtensions
         {
             case InstrumentTypes.Text:
                 return GetTextPanel(panel);
+            case InstrumentTypes.Tabs:
+                return GetTabsPanel(panel);
+            case InstrumentTypes.TabItem:
+                return GetTabItemPanel(panel);
             default:
-                return default!;
+                return GetDefault(panel);
         }
+    }
+
+    private static PanelDto GetDefault(Panel panel, PanelDto? result = null)
+    {
+        if (result == null)
+            result = new PanelDto()
+            {
+                Type = panel.Type,
+            };
+        result.Id = panel.Id;
+        result.Title = panel.Title;
+        result.ParentId = panel.ParentId;
+        result.Height = panel.Height;
+        result.Width = panel.Width;
+        result.InstrumentId = panel.InstrumentId;
+        result.Sort = panel.Sort;
+        result.Type = panel.Type;
+        result.Description = panel.Description;
+        return result;
     }
 
     private static PanelDto GetTextPanel(Panel panel)
     {
-        return new TextPanelDto
-        {
-            Title = panel.Title,
-            Id = panel.Id,
-            ParentId = panel.ParentId,
-            Height = panel.Height,
-            Width = panel.Width,
-            InstrumentId = panel.InstrumentId,
-            Sort = panel.Sort,
-            Type = panel.Type,
-            Description = panel.Description
-        };
+        return GetDefault(panel, new TextPanelDto());
     }
 
     private static PanelDto GetChartPanel(Panel panel)
     {
-        return new ChartPanelDto
-        {
-            ChartType = panel.ChartType,
-            Id = panel.Id,
-            Description = panel.Description,
-            Height = panel.Height,
-            InstrumentId = panel.InstrumentId,
-            ParentId = panel.ParentId,
-            Sort = panel.Sort,
-            Title = panel.Title,
-            Type = panel.Type,
-            Width = panel.Width,
-            //Metrics =panel.Metrics
-        };
+        return GetDefault(panel, new ChartPanelDto());
     }
 
     private static PanelDto GetTabsPanel(Panel panel)
     {
-        return new TabsPanelDto
-        {
-            Id = panel.Id,
-            Description = panel.Description,
-            Height = panel.Height,
-            InstrumentId = panel.InstrumentId,
-            ParentId = panel.ParentId,
-            Sort = panel.Sort,
-            Title = panel.Title,
-            Type = panel.Type,
-            Width = panel.Width,
-            //Tabs = 
-            //Metrics =panel.Metrics
-        };
+        return GetDefault(panel, new TabsPanelDto());
+    }
+
+    private static PanelDto GetTabItemPanel(Panel panel)
+    {
+        return GetDefault(panel, new TabItemPanelDto());
     }
 }

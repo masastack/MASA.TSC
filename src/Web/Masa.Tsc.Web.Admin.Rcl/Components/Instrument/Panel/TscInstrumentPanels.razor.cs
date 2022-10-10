@@ -20,7 +20,12 @@ public partial class TscInstrumentPanels
         new PanelTypeDto(){
             Index=2,
             Name="Widget",
-            Key=InstrumentTypes.Widget.ToString()
+            Key=InstrumentTypes.Chart.ToString()
+        },
+        new PanelTypeDto(){
+            Index=5,
+            Name="Tabs",
+            Key=InstrumentTypes.Tabs.ToString()
         },
         new PanelTypeDto(){
             Index =3,
@@ -36,6 +41,11 @@ public partial class TscInstrumentPanels
 
     private int _step = 1;
     private InstrumentTypes _widgetType;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        return base.OnAfterRenderAsync(firstRender);
+    }
 
     private async Task OnSubmitAsync()
     {

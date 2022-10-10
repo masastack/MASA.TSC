@@ -17,7 +17,6 @@ public static class ServiceExtensions
         }
         catch
         {
-
             services.AddCaller(builder =>
             {
                 builder.UseHttpClient(DEFAULT_CLIENT_NAME, options =>

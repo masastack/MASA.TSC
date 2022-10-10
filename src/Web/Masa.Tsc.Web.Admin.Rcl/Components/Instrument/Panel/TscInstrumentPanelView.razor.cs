@@ -27,9 +27,14 @@ public partial class TscInstrumentPanelView
             Sort = item.Sort
         };
 
-        if (item.Type == InstrumentTypes.Widget)
+        if (item.Type == InstrumentTypes.Chart)
         {
             //sendData.Metrics =;
+        }
+        else if (item.Type == InstrumentTypes.Tabs)
+        {
+            //await ApiCaller.PanelService.AddAsync
+            
         }
         await ApiCaller.PanelService.UpdateAsync(sendData);
         await CallParent(OperateCommand.Success, item);

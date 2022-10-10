@@ -24,7 +24,17 @@ public class InstrumentService : BaseService
 
     public async Task<InstrumentDetailDto> GetAsync(Guid userId, Guid id)
     {
-        return (await Caller.GetAsync<InstrumentDetailDto>($"{RootPath}/{userId}/{id}"))!;
+        var text = (await Caller.GetAsync<string>($"{RootPath}/{userId}/{id}"))!;
+        if (!string.IsNullOrEmpty(text))
+        {
+            var options = new System.Text.Json.JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+            };
+            options.Converters.Add(new Contracts.Admin.Extensions.PanelDtoConverter());
+            return System.Text.Json.JsonSerializer.Deserialize<InstrumentDetailDto>(text, options)!;
+        }
+        return new();
     }
 
     public async Task<PaginationDto<InstrumentListDto>> ListAsync(Guid userId,int page,int size,string keyword)

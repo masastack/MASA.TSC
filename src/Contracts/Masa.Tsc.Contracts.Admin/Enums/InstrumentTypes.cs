@@ -8,9 +8,10 @@ public enum InstrumentTypes
     Text=1,
     Card,
     Table,
-    Widget,
+    Chart,
     Trace,
     Log,
     Tabs,
+    TabItem,
     Topology
 }
