@@ -5,7 +5,5 @@ namespace Masa.Tsc.Contracts.Admin.Instruments;
 
 public class TextPanelDto : PanelDto
 {
-    public string Value => Title;
-
     public override InstrumentTypes Type => InstrumentTypes.Text;
 }

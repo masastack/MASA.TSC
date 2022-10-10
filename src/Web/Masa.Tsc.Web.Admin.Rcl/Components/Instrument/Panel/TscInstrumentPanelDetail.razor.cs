@@ -18,7 +18,7 @@ public partial class TscInstrumentPanelDetail
 
     private TscWidgetBase _widget = default!;
 
-    protected override Task OnInitializedAsync()
+    protected override void OnParametersSet()
     {
         if (_panel.InstrumentId != InstrumentId || _panel.ParentId != ParentId)
         {
@@ -29,7 +29,7 @@ public partial class TscInstrumentPanelDetail
                 Id = Guid.NewGuid(),
             };
         }
-        return base.OnInitializedAsync();
+        base.OnParametersSet();
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -40,11 +40,18 @@ public partial class TscInstrumentPanelDetail
     private async Task OnSubmitAsync()
     {
         var item = _widget.Item;
-        if (item.Type == InstrumentTypes.Widget)
-        {
-            //sendData.Metrics =;
-        }
         await ApiCaller.PanelService.AddAsync(item);
+        if (item.Type == InstrumentTypes.Tabs)
+        {
+            var tabs = ((TabsPanelDto)item).Tabs;
+            foreach (var tab in tabs)
+            {
+                tab.ParentId = item.Id;
+                await ApiCaller.PanelService.AddAsync(tab);
+            }
+        }
+
+        _panel.Id = Guid.NewGuid();
         await CallParent(OperateCommand.Success, item);
     }
 }

@@ -1,7 +1,19 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscWidgetBase
-<h3>TscWidgetTabs</h3>
 
-@code {
+<MTabs @bind-Value="_value">
+    @foreach (var item in _panelValue.Tabs)
+    {
+        <TscWidgetTabItem Item="item" ReadOnly="ReadOnly" OnCallParent="ChildCallHandler" />
+    }
+    <MTab Class="mx-0 px-0" Style="min-width:20px"><MIcon Small OnClick="AddTab">mdi-plus</MIcon></MTab>
+</MTabs>
 
-}
+<MTabsItems Value="_value">
+    @foreach (var item in _panelValue.Tabs)
+    {
+        <MTabItem Value="@item.Id.ToString()">
+            <TscInstrumentDetail ParentId="item.Id" Id="item.InstrumentId" OnCallParent="ChildCallHandler" ReadOnly="ReadOnly" />
+        </MTabItem>
+    }
+</MTabsItems>

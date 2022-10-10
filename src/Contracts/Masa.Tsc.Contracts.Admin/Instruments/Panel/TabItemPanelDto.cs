@@ -3,9 +3,7 @@
 
 namespace Masa.Tsc.Contracts.Admin.Instruments;
 
-public class TabsPanelDto : PanelDto
+public class TabItemPanelDto : PanelDto
 {
-    public List<PanelDto> Tabs { get; set; }
-
-    public override InstrumentTypes Type => InstrumentTypes.Tabs;
+    public override InstrumentTypes Type => InstrumentTypes.TabItem;
 }

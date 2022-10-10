@@ -5,7 +5,6 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class PanelService : BaseService
 {
-
     public PanelService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/Instrument/panel", tokenProvider) { }
 
     public async Task AddAsync(AddPanelDto param)
@@ -25,6 +24,15 @@ public class PanelService : BaseService
 
     public async Task<List<PanelDto>> ListAsync(Guid userId, Guid instrumentId, Guid id)
     {
-        return (await Caller.GetAsync<List<PanelDto>>($"{RootPath}/{userId}/{instrumentId}/{id}", default))!;
+        var text= (await Caller.GetAsync<string>($"{RootPath}/{userId}/{instrumentId}/{id}", default))!;
+        if (!string.IsNullOrEmpty(text))
+        {
+            var options = new System.Text.Json.JsonSerializerOptions() {
+                 PropertyNamingPolicy= System.Text.Json.JsonNamingPolicy.CamelCase
+            };
+            options.Converters.Add(new Contracts.Admin.Extensions.PanelDtoConverter());
+            return System.Text.Json.JsonSerializer.Deserialize<List<PanelDto>>(text, options)!;
+        }
+        return new();
     }
 }
