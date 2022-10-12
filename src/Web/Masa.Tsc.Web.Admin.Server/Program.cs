@@ -13,22 +13,26 @@ builder.WebHost.UseKestrel(option =>
     options.ServerCertificate = new X509Certificate2(Path.Combine("Certificates", "7348307__lonsid.cn.pfx"), "cqUza0MN"));
 });
 
-var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
-builder.AddMasaConfiguration(configurationBuilder =>
-{
-    configurationBuilder.UseDcc(dccConfig, default, default);
-});
-
+builder.AddMasaStackComponentsForServer();
 var publicConfiguration = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
-var oidc = builder.GetMasaConfiguration().Local.GetSection("Masa:Oidc").Get<MasaOpenIdConnectOptions>();
-string authUrl = publicConfiguration.GetValue<string>("$public.AppSettings:AuthClient:Url"); // //builder.GetMasaConfiguration().Local.GetValue<string>("Masa:Auth:ServiceBaseAddress");
-string mcUrl = publicConfiguration.GetValue<string>("$public.AppSettings:McClient:Url");// publicConfiguration.GetValue<string>("$public.AppSettings:McClient:Url");
-//builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl).AddMasaOpenIdConnect(oidc);
-builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl,
-    publicConfiguration.GetSection("$public.OSS").Get<OssOptions>(),
-    publicConfiguration.GetSection("$public.ES.UserAutoComplete").Get<UserAutoCompleteOptions>(),
-    dccConfig.RedisOptions
-    ).AddMasaOpenIdConnect(oidc);
+builder.Services.AddMasaOpenIdConnect(publicConfiguration);
+
+//var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
+//builder.AddMasaConfiguration(configurationBuilder =>
+//{
+//    configurationBuilder.UseDcc(dccConfig, default, default);
+//});
+
+//var publicConfiguration = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
+//var oidc = builder.GetMasaConfiguration().Local.GetSection("Masa:Oidc").Get<MasaOpenIdConnectOptions>();
+//string authUrl = publicConfiguration.GetValue<string>("$public.AppSettings:AuthClient:Url"); // //builder.GetMasaConfiguration().Local.GetValue<string>("Masa:Auth:ServiceBaseAddress");
+//string mcUrl = publicConfiguration.GetValue<string>("$public.AppSettings:McClient:Url");// publicConfiguration.GetValue<string>("$public.AppSettings:McClient:Url");
+////builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl).AddMasaOpenIdConnect(oidc);
+//builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl,
+//    publicConfiguration.GetSection("$public.OSS").Get<OssOptions>(),
+//    publicConfiguration.GetSection("$public.ES.UserAutoComplete").Get<UserAutoCompleteOptions>(),
+//    dccConfig.RedisOptions
+//    ).AddMasaOpenIdConnect(oidc);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<TscCaller>();
