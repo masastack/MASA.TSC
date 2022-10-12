@@ -1,0 +1,64 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+<div class="rounded-md-4 border-gray-thcik d-flex">
+    <div class="mr-2" style="min-width:160px">@Value.Timestamp.Format(CurrentTimeZone)</div>
+    <div class="my-1">
+        <MRow Class="d-block ma-0 pa-0">
+            <MCol Cols="12" Class="@($"{_classs} {Class}")">
+                <MLabel Class="bg-color-E9EDF7 text-subtitle-2 text-no-wrap pl-1">traceId : </MLabel>
+                <MLabel Class="@($"text{(WordBreak?"-":"-no-")}wrap text-body-1")">@Value.TraceId</MLabel>
+            </MCol>
+        </MRow>
+        <MRow Class="d-block ma-0 pa-0">
+            <MCol Cols="12" Class="@($"{_classs} {Class}")">
+                <MLabel Class="bg-color-E9EDF7 text-subtitle-2 text-no-wrap pl-1">spanId : </MLabel>
+                <MLabel Class="@($"text{(WordBreak?"-":"-no-")}wrap text-body-1")">@Value.SpanId</MLabel>
+            </MCol>
+        </MRow>
+        <MRow Class="d-block ma-0 pa-0">
+            <MCol Cols="12" Class="@($"{_classs} {Class}")">
+                <MLabel Class="bg-color-E9EDF7 text-subtitle-2 text-no-wrap pl-1">severityText : </MLabel>
+                <MLabel Class="@($"text{(WordBreak?"-":"-no-")}wrap text-body-1")">@Value.SeverityText</MLabel>
+            </MCol>
+        </MRow>
+        <MRow Class="d-block ma-0 pa-0">
+            <MCol Cols="12" Class="@($"{_classs} {Class}")">
+                <MLabel Class="bg-color-E9EDF7 text-subtitle-2 text-no-wrap pl-1">severityNumber : </MLabel>
+                <MLabel Class="@($"text{(WordBreak?"-":"-no-")}wrap text-body-1")">@Value.SeverityNumber</MLabel>
+            </MCol>
+        </MRow>
+        <MRow Class="d-block ma-0 pa-0">
+            <MCol Cols="12" Class="@($"{_classs} {Class}")">
+                <MLabel Class="bg-color-E9EDF7 text-subtitle-2 text-no-wrap pl-1">traceFlags : </MLabel>
+                <MLabel Class="@($"text{(WordBreak?"-":"-no-")}wrap text-body-1")">@Value.TraceFlags</MLabel>
+            </MCol>
+        </MRow>
+        <MRow Class="d-block ma-0 pa-0">
+            <MCol Cols="12" Class="@($"{_classs} {Class}")">
+                <MLabel Class="bg-color-E9EDF7 text-subtitle-2 text-no-wrap pl-1">attributes : </MLabel>
+                <TscKeyValue Value="Value.Attributes" WordBreak="WordBreak" Root=false />
+            </MCol>
+        </MRow>
+        <MRow Class="d-block ma-0 pa-0">
+            <MCol Cols="12" Class="@($"{_classs} {Class}")">
+                <MLabel Class="bg-color-E9EDF7 text-subtitle-2 text-no-wrap pl-1">resource : </MLabel>
+                <TscKeyValue Value="Value.Resource" WordBreak="WordBreak" Root=false />
+            </MCol>
+        </MRow>
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public LogDto Value { get; set; } = default!;
+
+    [Parameter]
+    public string Class { get; set; } = default!;
+
+    [Parameter]
+    public bool WordBreak { get; set; }   
+
+    private string _classs => $"pa-0 ma-0 d-flex pt-1";
+}
