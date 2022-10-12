@@ -7,14 +7,14 @@ public class TraceService : BaseService
 {
     public TraceService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/trace",tokenProvider) { }
 
-    public async Task<IEnumerable<object>> GetAsync(string traceId)
+    public async Task<IEnumerable<TraceDto>> GetAsync(string traceId)
     {
-        return (await Caller.GetAsync<IEnumerable<object>>($"{RootPath}/{traceId}"))!;
+        return (await Caller.GetAsync<IEnumerable<TraceDto>>($"{RootPath}/{traceId}"))!;
     }
 
-    public async Task<PaginationDto<object>> GetListAsync(RequestTraceListDto model)
+    public async Task<PaginationDto<TraceDto>> GetListAsync(RequestTraceListDto model)
     {
-        return (await Caller.GetAsync<PaginationDto<object>>($"{RootPath}/list", model))!;
+        return (await Caller.GetAsync<PaginationDto<TraceDto>>($"{RootPath}/list", model))!;
     }
 
     public async Task<IEnumerable<string>> GetAttrValuesAsync(RequestAttrDataDto model)

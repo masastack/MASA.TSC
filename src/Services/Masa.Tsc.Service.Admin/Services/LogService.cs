@@ -20,15 +20,9 @@ public class LogService : ServiceBase
         return query.Result ?? Array.Empty<KeyValuePair<string, string>>();
     }
 
-    private async Task<object> GetLatestAsync([FromServices] IEventBus eventBus, [FromBody] RequestLogLatestDto param)
+    private async Task<LogDto> GetLatestAsync([FromServices] IEventBus eventBus, [FromBody] RequestLogLatestDto param)
     {
-        var query = new LatestLogQuery
-        {
-            Start = param.Start,
-            End = param.End,
-            Query = param.Query,
-            IsDesc = param.IsDesc
-        };
+        var query = new LatestLogQuery(param.Start, param.End, param.Query, param.IsDesc);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
@@ -40,7 +34,7 @@ public class LogService : ServiceBase
         return query.Result;
     }
 
-    private async Task<PaginationDto<object>> GetPageAsync([FromServices] IEventBus eventBus, LogPageQueryDto param)
+    private async Task<PaginationDto<LogDto>> GetPageAsync([FromServices] IEventBus eventBus, LogPageQueryDto param)
     {
         var query = new LogsQuery(param.Query, param.Start, param.End, param.Page, param.PageSize, param.Sorting);
         await eventBus.PublishAsync(query);

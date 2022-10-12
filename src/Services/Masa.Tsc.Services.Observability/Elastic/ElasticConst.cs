@@ -11,17 +11,17 @@ public static class ElasticConst
     public static string LogTimestamp { get; private set; } = "@timestamp";
 
     public static string TraceIndex { get; private set; } = "trace";
-    public static string SpanIndex { get; private set; } = "span";
+    //public static string SpanIndex { get; private set; } = "span";
     public static string TraceTimestamp { get; private set; } = "@timestamp";
 
-    public const string TRACE_ID = "trace.id";
-    public const string PARENT_ID = "parent.id";
-    public const string SPAN_ID = "span.id";
-    public const string TRANSACTION_ID = "transaction.id";
+    public const string TRACE_ID = "TraceId";
+    public const string PARENT_ID = "ParentSpanId";
+    public const string SPAN_ID = "SpanId";
+    //public const string TRANSACTION_ID = "transaction.id";
 
-    public const string TRACE_SERVICE_NAME = "service.name";
-    public const string TRACE_INSTANCE_NAME = "service.node.name";
-    public const string TRACE_ENDPOINT_NAME = "transaction.name";
+    public const string TRACE_SERVICE_NAME = "Resource.service.name";
+    public const string TRACE_INSTANCE_NAME = "Resource.service.instance.id";
+    public const string TRACE_ENDPOINT_NAME = "Attributes.http.target";
 
     public static int MAX_DATA_COUNT = 10000;
 
@@ -35,8 +35,8 @@ public static class ElasticConst
         if (!string.IsNullOrEmpty(str))
             TraceIndex = str;
 
-        str = configuration.GetSection("masa:elastic:spanIndex").Value;
-        if (!string.IsNullOrEmpty(str))
-            SpanIndex = str;
+        //str = configuration.GetSection("masa:elastic:spanIndex").Value;
+        //if (!string.IsNullOrEmpty(str))
+        //    SpanIndex = str;
     }
 }

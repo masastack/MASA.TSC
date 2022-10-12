@@ -49,24 +49,24 @@ public partial class TscTraceSearch
         switch (type)
         {
             case 1:
-                query.Name = "service.name";
+                query.Name = "Resource.service.name";
                 data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
                 _services = data.ToList();
                 break;
             case 2:
                 query.Query = new Dictionary<string, string> {
-                    {"service.name",_service}
+                    {"Resource.service.name",_service}
                 };
-                query.Name = "service.node.name";
+                query.Name = "Resource.service.instance.id";
                 data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
                 _instances = data.ToList();
                 break;
             case 3:
                 query.Query = new Dictionary<string, string> {
-                    {"service.name",_service},
-                    {"service.node.name",_instance}
+                    {"Resource.service.name",_service},
+                    {"Resource.service.instance.id",_instance}
                 };
-                query.Name = "transaction.name";
+                query.Name = "Attributes.http.target";
                 data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
                 _endpoints = data.ToList();
                 break;
@@ -94,21 +94,23 @@ public partial class TscTraceSearch
         {
             case 1:
             case 2:
+                _endpoint = null;
                 if (type == 1)
                 {
+                    _instance = null;                    
                     query.Query = new Dictionary<string, string> {
-                    {"service.name",_service}
+                    {"Resource.service.name",_service}
                 };
-                    query.Name = "service.node.name";
+                    query.Name = "Resource.service.instance.id";
                     data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
                     _instances = data.ToList();
                 }
 
                 query.Query = new Dictionary<string, string> {
-                    {"service.name",_service},
-                    {"service.node.name",_instance}
+                    {"Resource.service.name",_service},
+                    {"Resource.service.instance.id",_instance}
                 };
-                query.Name = "transaction.name";
+                query.Name = "Attributes.http.target";
                 data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
                 _endpoints = data.ToList();
                 break;
@@ -125,7 +127,7 @@ public partial class TscTraceSearch
         {
             End = TimeZoneInfo.ConvertTime(_end!.Value, CurrentTimeZone),
             Start = TimeZoneInfo.ConvertTime(_start!.Value, CurrentTimeZone),
-            Name = "service.name",
+            Name = "Resource.service.name",
             Max = 10
         })).ToList();
 

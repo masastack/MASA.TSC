@@ -96,7 +96,7 @@
                                 <MTabItem Value="@("detail")">
                                     <MCard>
                                         <MCardText Class="overflow-y-auto" Style="max-height:400px;">
-                                            <TscKeyValue Value="_selectItem.Current" WordBreak=true></TscKeyValue>
+                                            <TscKeyValue Value="JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(_selectItem.Current)).ToKeyValuePairs()" WordBreak=true></TscKeyValue>
                                         </MCardText>
                                     </MCard>
                                 </MTabItem>

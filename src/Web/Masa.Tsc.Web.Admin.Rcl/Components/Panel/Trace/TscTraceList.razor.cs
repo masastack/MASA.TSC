@@ -8,34 +8,34 @@ public partial class TscTraceList : TscComponentBase
     [Parameter]
     public RequestTraceListDto Query { get; set; } = default!;
 
-    private IEnumerable<Dictionary<string, object>> _data = new List<Dictionary<string, object>>();
+    private IEnumerable<TraceDto> _data = new List<TraceDto>();
     private int _total = 0;
-    private MDataTable<Dictionary<string, object>> _mDataTable = default!;
+    private MDataTable<TraceDto> _mDataTable = default!;
     private bool _isLoading = true;
     private string _selectTraceId = default!;    
-    private List<DataTableHeader<Dictionary<string, object>>> _headers = new()
+    private List<DataTableHeader<TraceDto>> _headers = new()
     {
-        new("Service", item => ((Dictionary<string, object>)item["service"])["name"])
+        new("Service", item =>item.Resource["service.name"])
         {
             Align = "start",
             Sortable = false
         },
-        new("Endpoint", item => ((Dictionary<string, object>)item["transaction"])["name"])
+        new("Endpoint", item => item.IsHttp(out var traceHttpDto)? traceHttpDto.Target:item.Name)
         {
             Align = "start",
             Sortable = false
         },
-        new("Duration (ms)", item => ((Dictionary<string, object>)((Dictionary<string, object>)item["transaction"])["duration"])["us"])
+        new("Duration (ms)", item =>item.GetDuration())
         {
             Align = "start",
             Sortable = false
         },
-        new("Timestamp", item => item["@timestamp"])
+        new("Timestamp", item =>item.Timestamp)
         {
             Align = "start",
             Sortable = false
         },
-        new DataTableHeader<Dictionary<string, object>>
+        new DataTableHeader<TraceDto>
         {
             Text = "Operate",
             Value = "Operate",
@@ -49,9 +49,9 @@ public partial class TscTraceList : TscComponentBase
         return base.OnInitializedAsync();
     }
 
-    private async Task OpenAsync(Dictionary<string, object> item)
+    private async Task OpenAsync(TraceDto item)
     {
-        _selectTraceId = GetDictionaryValue(item, "trace.id").ToString()!;
+        _selectTraceId = item.TraceId;
         OpenDialog();
         await Task.CompletedTask;
     }
@@ -73,7 +73,7 @@ public partial class TscTraceList : TscComponentBase
         await QueryAsync(false);
     }
 
-    private void OnItemSelect(Dictionary<string, object> item, bool selected)
+    private void OnItemSelect(TraceDto item, bool selected)
     {
         OpenAsync(item).Wait();
     }
@@ -90,7 +90,7 @@ public partial class TscTraceList : TscComponentBase
         _isLoading = true;
         var data = await ApiCaller.TraceService.GetListAsync(Query);
         _total = (int)data.Total;
-        _data = data.Items.Select(item => ((Dictionary<string, object>)((JsonElement)item).ToKeyValuePairs()!)).ToList();
+        _data = data.Items;
         _isLoading = false;
         if (isStateChange)
             StateHasChanged();

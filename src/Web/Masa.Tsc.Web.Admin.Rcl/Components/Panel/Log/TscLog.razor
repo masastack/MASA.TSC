@@ -50,15 +50,9 @@
         else
         {
            <MCol Class="pa-0 ma-0">
-                <MVirtualScroll TItem="JsonElement" Items="_data" Class="border-gray-thcik border-gray-thcik-top overflow-y-auto overflow-x-hidden" Style="height:600px">
-                    <ItemContent>
-                        @{
-                            var keyValues = context.ToKeyValuePairs();
-                            <div class="rounded-md-4 border-gray-thcik d-flex">
-                                <div class="mr-2" style="min-width:160px">@context.GetTimestamp().Format(CurrentTimeZone)</div>
-                                <div class="my-1"><TscKeyValue Value=keyValues WordBreak="_isWordBreak"></TscKeyValue></div>
-                            </div>
-                        }
+                <MVirtualScroll TItem="LogDto" Items="_data" Class="border-gray-thcik border-gray-thcik-top overflow-y-auto overflow-x-hidden" Style="height:600px">
+                    <ItemContent>                        
+                        <TscLogDetail WordBreak="_isWordBreak" Value="context" ></TscLogDetail>                        
                     </ItemContent>
                 </MVirtualScroll>
            </MCol>

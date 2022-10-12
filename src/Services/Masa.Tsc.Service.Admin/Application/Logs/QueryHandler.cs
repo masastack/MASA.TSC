@@ -53,16 +53,16 @@ public class QueryHandler
     public async Task GetLatestDataAsync(LatestLogQuery queryData)
     {
         await _elasticClient.SearchAsync<object, LatestLogQuery>(ElasticConst.LogIndex, queryData, condition: LastLogFilter,
-           result: (result, query) => query.Result = result.Documents.FirstOrDefault() ?? default(JsonElement),
+           result: (result, query) => {
+
+               var options = new JsonSerializerOptions();
+               options.Converters.Add(new LogDtoConverter());
+               var text = JsonSerializer.Serialize(result.Documents);
+               query.Result = JsonSerializer.Deserialize<List<LogDto>>(text, options)?.FirstOrDefault()!;
+           },
            //enable paging,first page ,page size:1
            page: () => ValueTuple.Create(true, 1, 1),
-           sort: (sort, query) =>
-           {
-               if (query.IsDesc)
-                   return sort.Descending(ElasticConst.LogTimestamp);
-               else
-                   return sort.Ascending(ElasticConst.LogTimestamp);
-           },
+           sort: (sort, query) => sort.Field(ElasticConst.LogTimestamp, query.IsDesc ? SortOrder.Descending : SortOrder.Ascending),
            logger: _logger);
     }
 
@@ -110,9 +110,16 @@ public class QueryHandler
     public async Task GetPageListAsync(LogsQuery queryData)
     {
         await _elasticClient.SearchAsync<object, LogsQuery>(ElasticConst.LogIndex, queryData, condition: PageFilter,
-           result: (result, query) => query.Result = new PaginationDto<object>(result.Total, result.Documents?.ToList() ?? default!),
+           result: (result, query) => {
+               var options = new JsonSerializerOptions();
+               options.Converters.Add(new LogDtoConverter());
+               var text = JsonSerializer.Serialize(result.Documents);
+
+               query.Result = new PaginationDto<LogDto>(result.Total, JsonSerializer.Deserialize<List<LogDto>>(text, options)!);
+               
+               },
            page: () => ValueTuple.Create(true, queryData.Page, queryData.Size),
-           sort: (sort, query) => sort.Field(ElasticConst.LogTimestamp, query.Sort == "asc" ? SortOrder.Ascending : SortOrder.Descending),
+           sort: (sort, query) =>  sort.Field(ElasticConst.LogTimestamp,query.Sort=="asc"?SortOrder.Ascending:SortOrder.Descending),
            logger: _logger);
     }
 
