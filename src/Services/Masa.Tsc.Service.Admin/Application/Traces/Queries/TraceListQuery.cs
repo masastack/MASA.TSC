@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Traces;
 
-public record TraceListQuery(string Service, string Instance, string Endpoint, string TraceId, DateTime Start, DateTime End, int Page, int Size) : Query<PaginationDto<object>>
+public record TraceListQuery(string Service, string Instance, string Endpoint, string TraceId, DateTime Start, DateTime End, int Page, int Size) : Query<PaginationDto<TraceDto>>
 {
-    public override PaginationDto<object> Result { get; set; }
+    public override PaginationDto<TraceDto> Result { get; set; }
 }

@@ -6,7 +6,7 @@
             ServerItemsLength=_total
             ItemsPerPage="10"
             Items=_data
-            TItem="Dictionary<string,object>"
+            TItem="TraceDto"
             Loading="_isLoading"
             @ref="_mDataTable">
     <ItemColContent>
@@ -16,7 +16,7 @@
         }
         else if (context.Header.Text == "Timestamp")
         {
-            @(DateTime.Parse(context.Item["@timestamp"].ToString()!).Format(CurrentTimeZone))
+            @(context.Item.Timestamp.Format(CurrentTimeZone))
         }
         else
         {

@@ -3,7 +3,6 @@
 
 namespace Masa.Tsc.Contracts.Admin;
 
-//OpenTelemetry.Logs.LogRecord
 public class LogDto
 {
     [JsonPropertyName("@timestamp")]
@@ -13,7 +12,7 @@ public class LogDto
 
     public string SpanId { get; set; }
 
-    public bool TraceFlags { get; set; }
+    public int TraceFlags { get; set; }
 
     public string SeverityText { get; set; }
 

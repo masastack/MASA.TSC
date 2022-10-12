@@ -9,11 +9,11 @@ public partial class TscTraceDetail
     public string TraceId { get { return _traceId; } set { _traceId = value; _tabIndex = "attr"; } }
 
     private StringNumber _tabIndex = "attr";
-    private IEnumerable<object> _items = new List<object>();
+    private IEnumerable<TraceDto> _items = new List<TraceDto>();
     private bool _isLoading = true;
     private string _traceId = default!;
     private TraceDetailModel _selectItem;
-    private TraceOverviewModel _overView = new TraceOverviewModel();
+    private TraceOverviewModel _overView = new();
 
     private Func<object, long> _timeUsFunc = obj =>
     {
@@ -32,7 +32,7 @@ public partial class TscTraceDetail
         var dic = (Dictionary<string, object>)item;
         return (dic.ContainsKey("transaction") ? GetDictionaryValue(dic, "transaction.id") : GetDictionaryValue(dic, "span.id")).ToString()!;
     };
-    private Func<object, string> _parentFunc { get; set; } = item => GetDictionaryValue((Dictionary<string, object>)item, "parent.id")?.ToString() ?? string.Empty;     
+    private Func<object, string> _parentFunc { get; set; } = item => GetDictionaryValue((Dictionary<string, object>)item, "parent.id")?.ToString() ?? string.Empty;
 
     private List<DataTableHeader<Dictionary<string, object>>> _headers = new()
     {
@@ -70,7 +70,7 @@ public partial class TscTraceDetail
         if (data == null)
             return;
 
-        _items = data.Select(item => (object)((JsonElement)item).ToKeyValuePairs()!);
+        _items = data;
         SetDeeep();
         SetOverview();
         await OnChangeRecordAsync(_items.FirstOrDefault()!);
@@ -78,9 +78,9 @@ public partial class TscTraceDetail
         _isLoading = false;
     }
 
-    private async Task OnChangeRecordAsync(object item)
+    private async Task OnChangeRecordAsync(TraceDto item)
     {
-        _selectItem = new TraceDetailModel((Dictionary<string, object>)item);
+        _selectItem = new TraceDetailModel(item);
         StateHasChanged();
         await Task.CompletedTask;
     }
@@ -105,19 +105,19 @@ public partial class TscTraceDetail
         _overView.SpansDeeps.Clear();
         _overView.SpanChildren.Clear();
 
-        var list = new List<object>();
+        var list = new List<TraceDto>();
         foreach (var item in _items)
         {
-            string id = _keyFunc(item), parentId = _parentFunc(item);
-            long us = _timeUsFunc(item);
-            DateTime time = _timeFunc(item);
+            string id = item.SpanId, parentId = item.ParentSpanId ?? String.Empty;
+            long us = (long)Math.Floor((item.EndTimestamp - item.Timestamp).TotalMilliseconds);
+            DateTime time = item.Timestamp;
 
             if (_overView.SpansDeeps.ContainsKey(id))
                 continue;
             list.Add(item);
             int deep = 0;
-            bool isTransaction = ((Dictionary<string, object>)item).ContainsKey("transaction");
-            string name = GetDictionaryValue(item, "service.name").ToString()!;
+            bool isTransaction = string.IsNullOrEmpty(item.ParentSpanId) || !_items.Any(t => t.SpanId == item.ParentSpanId);
+            string name = item.Resource["service.name"].ToString()!;
 
             var add = new TraceTableLineModel
             {
@@ -150,7 +150,7 @@ public partial class TscTraceDetail
         }
 
         var sortIds = _overView.SpansDeeps.Values.OrderBy(item => item.Time).ThenBy(item => item.Deep).Select(item => item.Id).ToList();
-        _items = list.OrderBy(item => sortIds.IndexOf(_keyFunc(item)));
+        _items = list.OrderBy(item => sortIds.IndexOf(item.SpanId));
     }
 
     private void SetOverview()
@@ -162,7 +162,7 @@ public partial class TscTraceDetail
         long total = data.Sum(item => item.Value.TimeUs);
         _overView.Start = start;
         _overView.TimeUs = total;
-        _overView.Name = GetDictionaryValue(_items.First(), "transaction.name").ToString()!;        
+        _overView.Name = _items.First().Name;
         _overView.Services = _overView.SpansDeeps.Values.Select(item => item.ServiceName).Distinct().Select(item => new TraceOverviewServiceModel
         {
             Name = item,

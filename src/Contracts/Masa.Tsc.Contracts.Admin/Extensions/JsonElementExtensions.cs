@@ -13,7 +13,7 @@ public static class JsonElementExtensions
         return GetObject(value);
     }
 
-    private static object? GetValue(JsonElement value)
+    public static object? GetValue(this JsonElement value)
     {
         switch (value.ValueKind)
         {

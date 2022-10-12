@@ -21,11 +21,17 @@ public class QueryHandler
     [EventHandler]
     public async Task GetDetailAsync(TraceDetailQuery query)
     {
-        await _elasticClient.SearchAsync<object, TraceDetailQuery>($"{ElasticConst.TraceIndex},{ElasticConst.SpanIndex}", query,
+        await _elasticClient.SearchAsync<object, TraceDetailQuery>($"{ElasticConst.TraceIndex}", query,
             condition: (container, q) => container.Term(t => t.Field(ElasticConst.TRACE_ID).Value(q.TraceId)),
             sort: (sort, q) => sort.Ascending(ElasticConst.TraceTimestamp),
             page: () => ValueTuple.Create(false, 0, ElasticConst.MAX_DATA_COUNT - 1),
-            result: (rep, q) => q.Result = rep.Documents!,
+            result: (rep, q) =>
+            {
+                var options = new JsonSerializerOptions { };
+                options.Converters.Add(new TraceDtoConverter());
+                var text = JsonSerializer.Serialize(rep.Documents);
+                q.Result = JsonSerializer.Deserialize<List<TraceDto>>(text, options)!;
+            },
             logger: _logger);
     }
 
@@ -36,21 +42,24 @@ public class QueryHandler
             condition: (container, q) =>
             {
                 var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
+
+                //list.Add(t => t.Exists(f => f.Field(ElasticConst.PARENT_ID)) && t.Wildcard(f => f.Field(ElasticConst.PARENT_ID).Value("*")));
+
                 if (!string.IsNullOrEmpty(query.TraceId))
                 {
                     list.Add(t => t.Term(f => f.Value(q.TraceId).Field(ElasticConst.TRACE_ID)));
                 }
                 if (!string.IsNullOrEmpty(q.Service))
                 {
-                    list.Add(t => t.Term(f => f.Value(q.Service).Field(ElasticConst.TRACE_SERVICE_NAME)));
+                    list.Add(t => t.Term(f => f.Value(q.Service).Field($"{ElasticConst.TRACE_SERVICE_NAME}.keyword")));
                 }
                 if (!string.IsNullOrEmpty(q.Instance))
                 {
-                    list.Add(t => t.Term(f => f.Value(q.Instance).Field(ElasticConst.TRACE_INSTANCE_NAME)));
+                    list.Add(t => t.Term(f => f.Value(q.Instance).Field($"{ElasticConst.TRACE_INSTANCE_NAME}.keyword")));
                 }
-                if (!string.IsNullOrEmpty(q.Service))
+                if (!string.IsNullOrEmpty(q.Endpoint))
                 {
-                    list.Add(t => t.Term(f => f.Value(q.Endpoint).Field(ElasticConst.TRACE_ENDPOINT_NAME)));
+                    list.Add(t => t.Term(f => f.Value(q.Endpoint).Field($"{ElasticConst.TRACE_ENDPOINT_NAME}.keyword")));
                 }
 
                 list.Add(t => t.DateRange(f => f.LessThan(q.End).GreaterThan(q.Start).Field(ElasticConst.TraceTimestamp)));
@@ -58,14 +67,21 @@ public class QueryHandler
             },
             sort: (sort, q) => sort.Ascending(ElasticConst.TraceTimestamp),
             page: () => ValueTuple.Create(true, query.Page, query.Size),
-            result: (rep, q) => q.Result = new PaginationDto<object>(rep.Total, rep.Documents?.ToList()!),
+            result: (rep, q) =>
+            {
+                var options = new JsonSerializerOptions { };
+                options.Converters.Add(new TraceDtoConverter());
+                var text = JsonSerializer.Serialize(rep.Documents);
+
+                q.Result = new PaginationDto<TraceDto>(rep.Total, JsonSerializer.Deserialize<List<TraceDto>>(text, options)!);
+            },
             logger: _logger);
     }
 
     [EventHandler]
     public async Task GetAttrValuesAsync(TraceAttrValuesQuery query)
     {
-        await _elasticClient.SearchAsync<object, TraceAttrValuesQuery>($"{ElasticConst.TraceIndex},{ElasticConst.SpanIndex}", query,
+        await _elasticClient.SearchAsync<object, TraceAttrValuesQuery>($"{ElasticConst.TraceIndex}", query,
             condition: (container, q) =>
             {
                 var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
@@ -73,7 +89,7 @@ public class QueryHandler
                 {
                     foreach (var item in q.Queries)
                     {
-                        list.Add(t => t.Term(f => f.Value(item.Value).Field(item.Key)));
+                        list.Add(t => t.Term(f => f.Value(item.Value).Field($"{item.Key}.keyword")));
                     }
                 }
                 if (!string.IsNullOrEmpty(query.Keyword))
@@ -81,11 +97,10 @@ public class QueryHandler
                     list.Add(t => t.Wildcard(f => f.Value($"{q.Keyword}*").Field(q.Name)));
                 }
 
-                list.Add(t => t.DateRange(f => f.LessThan(q.End).GreaterThan(q.Start).Field(ElasticConst.TraceTimestamp)));
                 return container.Bool(t => t.Must(list));
             },
-            aggregate: (agg, q) => agg.Terms(q.Name, f => f.Field(q.Name).Size(q.Limit)),
-            sort: (sort, q) => sort.Ascending(q.Name),
+            aggregate: (agg, q) => agg.Terms(q.Name, f => f.Size(q.Limit).Field($"{q.Name}.keyword")),
+            sort: (sort, q) => sort.Ascending($"{q.Name}.keyword"),
             result: (rep, q) =>
             {
                 var bucket = (BucketAggregate)rep.Aggregations[q.Name];
@@ -100,29 +115,29 @@ public class QueryHandler
     [EventHandler]
     public async Task AggregateAsync(TraceAggregationQuery query)
     {
-        string index = string.Empty;
-        var find = query.Queries.FirstOrDefault(item => string.Equals(item.Key, "isSpan", StringComparison.CurrentCultureIgnoreCase));
-        if (!string.IsNullOrEmpty(find.Key))
-        {
-            if (bool.Parse(find.Value))
-                index += $",{ElasticConst.SpanIndex}";
-            query.Queries.Remove(find.Key);
-        }
-        find = query.Queries.FirstOrDefault(item => string.Equals(item.Key, "isTrace", StringComparison.CurrentCultureIgnoreCase));
-        if (!string.IsNullOrEmpty(find.Key))
-        {
-            if (bool.Parse(find.Value))
-                index += $",{ElasticConst.SpanIndex}";
-            query.Queries.Remove(find.Key);
-        }
-        if (index.Length > 0)
-        {
-            index = index[1..];
-        }
-        else
-        {
-            index = $"{ElasticConst.TraceIndex},{ElasticConst.SpanIndex}";
-        }
+        string index = ElasticConst.TraceIndex;
+        //var find = query.Queries.FirstOrDefault(item => string.Equals(item.Key, "isSpan", StringComparison.CurrentCultureIgnoreCase));
+        //if (!string.IsNullOrEmpty(find.Key))
+        //{
+        //    if (bool.Parse(find.Value))
+        //        index += $",{ElasticConst.SpanIndex}";
+        //    query.Queries.Remove(find.Key);
+        //}
+        //find = query.Queries.FirstOrDefault(item => string.Equals(item.Key, "isTrace", StringComparison.CurrentCultureIgnoreCase));
+        //if (!string.IsNullOrEmpty(find.Key))
+        //{
+        //    if (bool.Parse(find.Value))
+        //        index += $",{ElasticConst.SpanIndex}";
+        //    query.Queries.Remove(find.Key);
+        //}
+        //if (index.Length > 0)
+        //{
+        //    index = index[1..];
+        //}
+        //else
+        //{
+        //    index = $"{ElasticConst.TraceIndex},{ElasticConst.SpanIndex}";
+        //}
 
         await _elasticClient.SearchAsync<object, TraceAggregationQuery>(index, query,
             condition: (container, q) =>
@@ -151,5 +166,4 @@ public class QueryHandler
             aggregate: (agg, q) => IElasticClientExtenstion.Aggregation(agg, q.Fields, q.Interval),
             logger: _logger);
     }
-
 }

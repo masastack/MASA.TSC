@@ -13,14 +13,14 @@ public class TraceService : ServiceBase
         App.MapGet($"{BaseUri}/aggregate", AggregateAsync);
     }
 
-    private async Task<IEnumerable<object>> GetAsync([FromServices] IEventBus eventBus, [FromRoute] string traceId)
+    private async Task<IEnumerable<TraceDto>> GetAsync([FromServices] IEventBus eventBus, [FromRoute] string traceId)
     {
         var query = new TraceDetailQuery(traceId);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
-    private async Task<PaginationDto<object>> GetListAsync([FromServices] IEventBus eventBus, RequestTraceListDto model)
+    private async Task<PaginationDto<TraceDto>> GetListAsync([FromServices] IEventBus eventBus, RequestTraceListDto model)
     {
         var query = new TraceListQuery(model.Service, model.Instance, model.Endpoint, model.TraceId, model.Start, model.End, model.Page, model.PageSize);
         await eventBus.PublishAsync(query);

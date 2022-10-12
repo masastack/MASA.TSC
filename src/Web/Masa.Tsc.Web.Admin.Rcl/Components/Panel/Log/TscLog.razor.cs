@@ -7,7 +7,7 @@ public partial class TscLog
 {
     private int _lastedDuration = 1;
     private List<KeyValuePair<int, string>> _dicDurations = TimeSeries;
-    private List<JsonElement> _data = default!;
+    private List<LogDto> _data = default!;
     private int _totalPage = 1;
     private bool _isWordBreak = false;
     private bool _isDesc = true;
@@ -82,12 +82,12 @@ public partial class TscLog
         var pageData = await ApiCaller.LogService.GetPageAsync(query);
         if (pageData.Items != null && pageData.Items.Any())
         {
-            _data = pageData.Items.Select(item => (JsonElement)item).ToList();
+            _data = pageData.Items;
         }
         else
         {
             _data = default!;
-        }
+        }        
         var num = pageData.Total % query.PageSize;
         _totalPage = (int)(pageData.Total / query.PageSize) + (num > 0 ? 1 : 0);
         StateHasChanged();

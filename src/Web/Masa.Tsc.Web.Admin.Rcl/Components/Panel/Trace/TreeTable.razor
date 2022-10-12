@@ -9,7 +9,7 @@
                 <th class="text-left col-md-3 mx-0 px-0">
                     Name
                 </th>
-                <th class="text-left col-md-9 mx-4">
+                <th class="text-left col-md-9 mx-0 px-3">
                     <MRow Class="px-0 text-right rounded-0" Style="border-bottom:solid 4px green">
                         <MCol Class="px-0 mx-0 col-2">
                             <MRow>
@@ -31,7 +31,7 @@
             {
                 foreach (var item in Items)
                 {
-                    var id = KeyFunc(item);
+                    var id = item.SpanId;
                     var dicItem = OverViewData.SpansDeeps[id];
                     if (!string.IsNullOrEmpty(OverViewData.SearchName) && dicItem.ServiceName != OverViewData.SearchName)
                         continue;
@@ -40,7 +40,7 @@
                     <tr @key="item" @onclick="@(async()=>await OnRowClickAync(item))">
                         <td style="@GetPadding(item)" class="col-md-3">
                             <MIcon>fsa fa-folder-closed</MIcon>
-                            @(GetDictionaryValue(item,"transaction.name")??GetDictionaryValue(item,"span.name"))
+                            @item.Name
                             @dicItem.TimeUsString
                         </td>
                         <td class="col-md-9 mx-0 px-0">
