@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Contracts.Admin.Extensions;
+
 namespace Masa.Tsc.Contracts.Admin.Instruments;
 
 public class InstrumentDetailDto
@@ -21,5 +23,6 @@ public class InstrumentDetailDto
 
     public bool IsRoot { get; set; }
 
+    [JsonConverter(typeof(PanelDtoEnumerableConverter))]
     public List<PanelDto> Panels { get; set; }
 }

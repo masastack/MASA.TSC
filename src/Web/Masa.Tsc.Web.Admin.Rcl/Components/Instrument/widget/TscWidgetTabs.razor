@@ -13,7 +13,7 @@
     @foreach (var item in _panelValue.Tabs)
     {
         <MTabItem Value="@item.Id.ToString()">
-            <TscInstrumentDetail ParentId="item.Id" Id="item.InstrumentId" OnCallParent="ChildCallHandler" ReadOnly="ReadOnly" />
+            <TscInstrumentDetail ParentId="item.Id" Id="item.InstrumentId" Panels="item.Tabs"  OnCallParent="ChildCallHandler" ReadOnly="ReadOnly" />
         </MTabItem>
     }
 </MTabsItems>

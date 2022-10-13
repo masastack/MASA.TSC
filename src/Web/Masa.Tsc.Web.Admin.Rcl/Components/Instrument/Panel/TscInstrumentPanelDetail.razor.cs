@@ -14,7 +14,7 @@ public partial class TscInstrumentPanelDetail
     [Parameter]
     public Guid ParentId { get; set; }
 
-    private AddPanelDto _panel { get; set; } = new();
+    private PanelDto _panel { get; set; } = new();
 
     private TscWidgetBase _widget = default!;
 
@@ -22,7 +22,7 @@ public partial class TscInstrumentPanelDetail
     {
         if (_panel.InstrumentId != InstrumentId || _panel.ParentId != ParentId)
         {
-            _panel = new AddPanelDto
+            _panel = new PanelDto
             {
                 InstrumentId = InstrumentId,
                 ParentId = ParentId,
@@ -47,6 +47,7 @@ public partial class TscInstrumentPanelDetail
             foreach (var tab in tabs)
             {
                 tab.ParentId = item.Id;
+                tab.Type = InstrumentTypes.TabItem;
                 await ApiCaller.PanelService.AddAsync(tab);
             }
         }

@@ -13,12 +13,22 @@ public partial class TscComponentBase
 
     protected bool _showDialog = false;
 
+    /// <summary>
+    /// 传递使用
+    /// </summary>
+    /// <param name="values"></param>
+    /// <returns></returns>
     protected async Task CallParent(params object[] values)
     {
         if (OnCallParent.HasDelegate)
             await OnCallParent.InvokeAsync(values);
     }
 
+    /// <summary>
+    /// 当前父组件调用实现
+    /// </summary>
+    /// <param name="values"></param>
+    /// <returns></returns>
     protected virtual async Task ChildCallHandler(params object[] values)
     {
         if (values == null || !values.Any())
@@ -27,21 +37,25 @@ public partial class TscComponentBase
         if (values[0] is not OperateCommand command)
             return;
 
-        await ExecuteCommondAsync(command, values[1..]);
-        await CallParent(values);
+        //await CallParent(values);
+        if(!await ExecuteCommondAsync(command, values[1..]))
+            await CallParent(values);
     }
 
-    protected virtual async Task ExecuteCommondAsync(OperateCommand command, object[] values)
+    protected virtual async Task<bool> ExecuteCommondAsync(OperateCommand command, object[] values)
     {
         if (command == OperateCommand.Close)
         {
             CloseDialog();
+            return true;
         }
         else if (command == OperateCommand.Open)
         {
             OpenDialog();
+            return true;
         }
         await Task.CompletedTask;
+        return false;
     }
 
     protected void CloseDialog() => _showDialog = false;

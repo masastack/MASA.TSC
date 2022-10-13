@@ -7,7 +7,7 @@ public partial class TscWidgetTabItem
 {
     private TabItemPanelDto _panelValue = new() { Title = "tabs" };
 
-    public override AddPanelDto Item
+    public override PanelDto Item
     {
         get => _panelValue;
         set
@@ -16,12 +16,14 @@ public partial class TscWidgetTabItem
             {
                 Title = "tabItem"
             };
-            else if (value is TabItemPanelDto) _panelValue = (TabItemPanelDto)value;
+            else if (value is TabItemPanelDto dto) _panelValue = dto;
             else
             {
                 _panelValue.Id = value.Id;
                 _panelValue.ParentId = value.ParentId;
                 _panelValue.InstrumentId = value.InstrumentId;
+                _panelValue.Sort = value.Sort;
+                _panelValue.Title = value.Title;
             }
         }
     }
@@ -29,14 +31,15 @@ public partial class TscWidgetTabItem
     private async Task OnNameChange(string value)
     {
         if (_panelValue.Title != value)
-        {
+        {            
             await ApiCaller.PanelService.UpdateAsync(new UpdatePanelDto
             {
                 Id = _panelValue.Id,
                 InstrumentId = _panelValue.InstrumentId,
-                Name = _panelValue.Title,
+                Name = value,
                 Sort = _panelValue.Sort
             });
+            _panelValue.Title = value;
         }
     }
 
@@ -45,6 +48,6 @@ public partial class TscWidgetTabItem
         if (!await PopupService.ConfirmAsync("Remove Confirm", "Remove this Tab Item?"))
             return;
         await ApiCaller.PanelService.DeleteAsync(CurrentUserId, _panelValue.InstrumentId, _panelValue.Id);
-        await CallParent(OperateCommand.Remove,_panelValue.Id.ToString());
+        await CallParent(OperateCommand.Remove, _panelValue.Id.ToString());
     }
 }
