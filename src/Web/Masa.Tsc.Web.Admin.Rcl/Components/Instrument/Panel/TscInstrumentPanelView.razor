@@ -4,8 +4,8 @@
 @if (!Readonly)
 {
     <MCardTitle>
-        <MButton OnClick="SaveAsync">save</MButton>
-        <MButton OnClick="@(async()=>await CallParent(OperateCommand.Close))">Close</MButton>
+        <MButton OnClick="@(async()=>await SaveAsync(true))">save</MButton>
+        <MButton OnClick="@(async()=>await SaveAsync(false))">Close</MButton>
     </MCardTitle>
 }
 
@@ -48,7 +48,7 @@
         break;
     default:
         {
-            <TscWidgetDefault @ref="_widget" />
+            <TscWidgetDefault @ref="_widget" Item="Item"/>
         }
         break;
 }

@@ -72,8 +72,8 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
             var entity = new Panel(command.Data.Id)
             {
                 Type = command.Data.Type,
-                Title = command.Data.Title,
-                Description = command.Data.Description,
+                Title = command.Data.Title ?? string.Empty,
+                Description = command.Data.Description ?? string.Empty,
                 Sort = command.Data.Sort,
                 InstrumentId = command.Data.InstrumentId,
                 ParentId = command.Data.ParentId

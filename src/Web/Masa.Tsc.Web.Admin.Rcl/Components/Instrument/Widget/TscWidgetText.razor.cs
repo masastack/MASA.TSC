@@ -5,13 +5,13 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscWidgetText
 {
-    public override AddPanelDto Item
+    public override PanelDto Item
     {
         get => _panelValue;
         set
         {
             if (value is null) _panelValue = new();
-            else if (value is TextPanelDto) _panelValue = (TextPanelDto)value;
+            else if (value is TextPanelDto dto) _panelValue = dto;
             else
             {
                 _panelValue.Id = value.Id;
@@ -30,28 +30,4 @@ public partial class TscWidgetText
         _panelValue.Title = value;
     }
 
-    public override AddPanelDto ToPanel()
-    {
-        return _panelValue;
-    }
-
-    //protected override void SetParameters()
-    //{
-    //    if (Item != null)
-    //    {
-    //        _panelValue = new TextPanelDto
-    //            {
-    //                Type = InstrumentTypes.Text,
-    //                Title = Item.Title,
-    //                Height = Height?.ToString()!,
-    //                Width = Width?.ToString()!,
-    //                Id = Item.Id
-    //            };
-    //    }
-    //    else
-    //    {
-    //        _panelValue = new();
-    //    }
-    //    SetValue(nameof(_panelValue.Value), _panelValue.Value);
-    //}
 }

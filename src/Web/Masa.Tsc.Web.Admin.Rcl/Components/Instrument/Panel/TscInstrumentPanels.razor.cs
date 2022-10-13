@@ -60,7 +60,7 @@ public partial class TscInstrumentPanels
             _widgetType = 0;
     }
 
-    protected override async Task ExecuteCommondAsync(OperateCommand command,params object[] values)
+    protected override async Task<bool> ExecuteCommondAsync(OperateCommand command, params object[] values)
     {
         if (command == OperateCommand.Back)
         {
@@ -68,7 +68,9 @@ public partial class TscInstrumentPanels
         }
         else if (command == OperateCommand.Close)
         {
-           await CallParent(command);
-        }       
+            await CallParent(command);
+            return true;
+        }
+        return false;
     }
 }

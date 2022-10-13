@@ -11,13 +11,13 @@ public class Panel : AggregateRoot<Guid>
 
     public string Title { get; set; }
 
-    public string Description { get; set; }=string.Empty;
+    public string Description { get; set; } = string.Empty;
 
     public int Sort { get; set; }
 
     public InstrumentTypes Type { get; set; }
 
-    public string UiType { get; set; }=string.Empty;
+    public string UiType { get; set; } = string.Empty;
 
     public string Height { get; set; } = string.Empty;
 
@@ -45,10 +45,7 @@ public class Panel : AggregateRoot<Guid>
     public void Update(UpdatePanelDto panel)
     {
         Title = panel.Name;
-        Description = panel.Description;
+        Description = panel.Description ?? string.Empty;
         Sort = panel.Sort;
-        //Metrics = panel.Metrics;
-
-
     }
 }

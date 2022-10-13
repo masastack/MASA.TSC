@@ -243,14 +243,16 @@ public partial class Directory : IDisposable
         return default!;
     }
 
-    protected override async Task ExecuteCommondAsync(OperateCommand command, params object[] values)
+    protected override async Task<bool> ExecuteCommondAsync(OperateCommand command, params object[] values)
     {
         if (command == OperateCommand.Add)
         {
             if (values != null && values.Length > 0 && values[0] is string type)
             {
                 if (type == "instrument")
+                {
                     await OnAddInstrument((AddInstrumentDto)values[1]);
+                }
             }
         }
         else if (command == OperateCommand.Update)
@@ -258,6 +260,7 @@ public partial class Directory : IDisposable
             if (values != null && values.Length > 0 && values[0] is DirectoryTreeDto item)
             {
                 _readonly = false;
+                _isUpdate = true;
                 await OpenUpdateAsync(item);
             }
         }
@@ -279,7 +282,7 @@ public partial class Directory : IDisposable
             }
         }
 
-        await base.ExecuteCommondAsync(command, values!);
+        return await base.ExecuteCommondAsync(command, values!);
     }
 
     public override void Dispose()

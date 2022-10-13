@@ -24,8 +24,8 @@ public partial class TscWidgetBase : TscComponentBase
     public bool ReadOnly { get; set; }
 
     [Parameter]
-    public virtual AddPanelDto Item { get; set; }
-    
+    public virtual PanelDto Item { get; set; }
+
     protected Dictionary<string, object> Values { get; set; } = new();
 
     protected void SetValue(string key, object value)
@@ -36,18 +36,15 @@ public partial class TscWidgetBase : TscComponentBase
             Values.Add(key, value);
     }
 
-    public virtual AddPanelDto ToPanel()
+    protected static T CreateDefault<T>() where T : PanelDto, new()
     {
-        return default!;
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        SetParameters();
-        await base.OnParametersSetAsync();
-    }
-
-    protected virtual void SetParameters()
-    {
+        var result = new T()
+        {
+            Title = string.Empty,
+            Description = string.Empty,
+            Height = string.Empty,
+            Width = string.Empty
+        };
+        return result;
     }
 }

@@ -6,7 +6,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TscPanelEdit
 {
     [Parameter]
-    public AddPanelDto Item { get; set; }
+    public PanelDto Item { get; set; }
 
     [Parameter]
     public bool ReadOnly { get; set; }

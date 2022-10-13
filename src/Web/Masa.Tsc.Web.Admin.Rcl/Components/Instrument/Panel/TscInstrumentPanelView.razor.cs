@@ -6,14 +6,14 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TscInstrumentPanelView
 {
     [Parameter]
-    public AddPanelDto Item { get; set; }
+    public PanelDto Item { get; set; }
 
     [Parameter]
     public bool Readonly { get; set; }
 
     private TscWidgetBase _widget = default!;
 
-    private async Task SaveAsync()
+    private async Task SaveAsync(bool isSave)
     {
         var item = _widget.Item;
         var sendData = new UpdatePanelDto
@@ -36,7 +36,8 @@ public partial class TscInstrumentPanelView
             //await ApiCaller.PanelService.AddAsync
             
         }
-        await ApiCaller.PanelService.UpdateAsync(sendData);
+        if(isSave)
+            await ApiCaller.PanelService.UpdateAsync(sendData);
         await CallParent(OperateCommand.Success, item);
     }
 }

@@ -46,7 +46,7 @@
 <TscDialog @bind-Value="_showDialog" Persistent Width="_dialogWidth" Fullscreen="_fullScreen">
     <ChildContent>
         <MCard>
-            @if (string.IsNullOrEmpty(_addDto.Name))
+            @if (!_isUpdate)
             {
                 <MCardTitle>
                     <MRow>

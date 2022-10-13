@@ -77,7 +77,11 @@ public class InstrumentQueryHandler
             var panel = item.Type.ToModel(item);
             if (item.Type == InstrumentTypes.Tabs)
             {
-                ((TabsPanelDto)(panel)).Tabs = ConvertPanels(panels, panel.Id);
+                ((TabsPanelDto)(panel)).Tabs = ConvertPanels(panels, panel.Id)?.Select(item => (TabItemPanelDto)item)?.ToList()!;
+            }
+            else if (item.Type == InstrumentTypes.TabItem)
+            {
+                ((TabItemPanelDto)(panel)).Tabs = ConvertPanels(panels, panel.Id);
             }
             result.Add(panel);
         }

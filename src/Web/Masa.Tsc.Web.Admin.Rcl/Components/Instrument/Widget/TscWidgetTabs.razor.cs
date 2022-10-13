@@ -6,15 +6,16 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TscWidgetTabs
 {
     private StringNumber _value;
-    private TabsPanelDto _panelValue = new() { Title = "tabs" };    
+    private TabsPanelDto _panelValue = new() { Title = "tabs" };
 
-    private void AddTab()
+    private async void AddTab()
     {
-        var add = new PanelDto { Title = "tabnew", Id = Guid.NewGuid(), InstrumentId = _panelValue.InstrumentId, Sort = _panelValue.Tabs.Count + 1, ParentId = _panelValue.ParentId, Type = InstrumentTypes.Tabs };
+        var add = new TabItemPanelDto { Title = "tabnew", Id = Guid.NewGuid(), InstrumentId = _panelValue.InstrumentId, Sort = _panelValue.Tabs.Count + 1, ParentId = _panelValue.ParentId, Type = InstrumentTypes.TabItem };
+        await ApiCaller.PanelService.AddAsync(add);
         _panelValue.Tabs.Add(add);
     }
 
-    public override AddPanelDto Item
+    public override PanelDto Item
     {
         get => _panelValue;
         set
@@ -23,7 +24,7 @@ public partial class TscWidgetTabs
             {
                 Title = "tabs"
             };
-            else if (value is TabsPanelDto) _panelValue = (TabsPanelDto)value;
+            else if (value is TabsPanelDto dto) _panelValue = dto;
             else
             {
                 _panelValue.Id = value.Id;
@@ -32,19 +33,18 @@ public partial class TscWidgetTabs
             }
             if (_panelValue.Tabs == null || !_panelValue.Tabs.Any())
             {
-                _panelValue.Tabs = new List<PanelDto>
+                _panelValue.Tabs = new List<TabItemPanelDto>
                     {
-                        new PanelDto{ Id=Guid.NewGuid(),Title="tab1",InstrumentId=_panelValue.InstrumentId },
-                        new PanelDto{ Id=Guid.NewGuid(),Title="tab2",InstrumentId=_panelValue.InstrumentId },
-                        new PanelDto{Id=Guid.NewGuid(),Title="tab3",InstrumentId=_panelValue.InstrumentId }
+                        new TabItemPanelDto{ Id=Guid.NewGuid(),Title="tab1",InstrumentId=_panelValue.InstrumentId,Sort=1 },
+                        new TabItemPanelDto{ Id=Guid.NewGuid(),Title="tab2",InstrumentId=_panelValue.InstrumentId,Sort=2 },
+                        new TabItemPanelDto{Id=Guid.NewGuid(),Title="tab3",InstrumentId=_panelValue.InstrumentId,Sort=3 }
                     };
             }
             _value = _panelValue.Tabs[0].Id.ToString();
-            //SetValue(nameof(_panelValue.Value), _panelValue.Value);
         }
     }
 
-    protected override async Task ExecuteCommondAsync(OperateCommand command, object[] values)
+    protected override async Task<bool> ExecuteCommondAsync(OperateCommand command, object[] values)
     {
         if (command == OperateCommand.Remove)
         {
@@ -54,10 +54,10 @@ public partial class TscWidgetTabs
                 var item = _panelValue.Tabs.FirstOrDefault(t => t.Id == guid);
                 if (item != null)
                     _panelValue.Tabs.Remove(item);
-                return;
             }
         }
 
         await Task.CompletedTask;
+        return false;
     }
 }

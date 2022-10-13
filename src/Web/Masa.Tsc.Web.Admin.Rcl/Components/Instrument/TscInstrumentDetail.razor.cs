@@ -15,46 +15,47 @@ public partial class TscInstrumentDetail
     public bool ReadOnly { get; set; }
 
     [Parameter]
-    public List<AddPanelDto> Panels { get; set; } = new();
+    public List<PanelDto> Panels { get; set; } = new();
 
     private List<BDragItem> _items = new();
-    private AddPanelDto? _editPanel = default;
+    private PanelDto? _editPanel = default;
     private MDragZone _mDragZone;
 
-    private bool _reload = false;
-
-    //public override Task SetParametersAsync(ParameterView parameters)
-    //{
-    //    if (parameters.TryGetValue(nameof(Id), out Guid id) && parameters.TryGetValue(nameof(ParentId), out Guid parentId))
-    //    {
-    //        if (parameters.TryGetValue(nameof(Panels), out List<AddPanelDto> panels))
-    //        {
-    //            _reload = true;
-    //        }
-    //        else
-    //        {
-    //            if (id != Id)
-    //                _reload = true;
-    //        }
-    //    }
-
-    //    return base.SetParametersAsync(parameters);
-    //}
-
+    private Guid _id;
+    private Guid _parentId;
 
     protected override async Task OnParametersSetAsync()
     {
         //tab item
-        if (ParentId != Guid.Empty)
+        if (ParentId != Guid.Empty && ParentId != _parentId)
         {
+            if (Panels == null)
+                Panels = new();
+            _items.Clear();
+            foreach (var item in Panels)
+            {
+                //var panel = new TextPanelDto
+                //{
+                //    ParentId = item.ParentId,
+                //    Description = item.Description,
+                //    Height = item.Height,
+                //    Id = item.Id,
+                //    InstrumentId = dto.Id,
+                //    Sort = item.Sort,
+                //    Title = item.Title,
+                //    Type = item.Type,
+                //    Width = item.Width
+                //};
+                _items.Add(ToDragItem(item));
+            }
+            _parentId = ParentId;
             StateHasChanged();
-            //if(Panels)
-        }//
+        }
         else if (Id == Guid.Empty)
         {
             await PopupService.AlertAsync("Id must set", AlertTypes.Error);
-        }
-        if (ParentId == Guid.Empty)
+        }       
+        if (ParentId == Guid.Empty && Id != _id)
         {
             var dto = await ApiCaller.InstrumentService.GetAsync(CurrentUserId, Id);
             if (dto != null)
@@ -87,24 +88,21 @@ public partial class TscInstrumentDetail
             {
                 await PopupService.AlertAsync("Id or Data must set", AlertTypes.Error);
             }
-            _reload = false;
+            //_reload = false;
         }
+        _id = Id;
         await base.OnParametersSetAsync();
     }
 
-
-
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    protected override async Task ExecuteCommondAsync(OperateCommand command, params object[] values)
+    protected override async Task<bool> ExecuteCommondAsync(OperateCommand command, params object[] values)
     {
         _editPanel = null;
-        if (values != null && values.Length > 0 && values[0] is AddPanelDto panel)
+        if (values != null && values.Length > 0 && values[0] is PanelDto panel)
         {
             var find = _mDragZone.Items.FirstOrDefault(x => (Guid)x.Attributes["key"] == panel.Id);
             if (command == OperateCommand.Success)
@@ -124,12 +122,14 @@ public partial class TscInstrumentDetail
                     _items.Insert(index, ToDragItem(panel));
                 }
                 CloseDialog();
+                return true;
             }
             else if (command == OperateCommand.Update)
             {
                 ReadOnly = false;
                 //_editPanel = panel;
                 await ShowEdit(panel);
+                return true;
             }
             else if (command == OperateCommand.Remove)
             {
@@ -139,12 +139,14 @@ public partial class TscInstrumentDetail
                     Panels.RemoveAll(m => m.Id == panel.Id);
                     find.Dispose();
                     CloseDialog();
+                    return true;
                 }
             }
         }
+        return false;
     }
 
-    private BDragItem ToDragItem(AddPanelDto panel)
+    private BDragItem ToDragItem(PanelDto panel)
     {
         return new BDragItem
         {
@@ -161,7 +163,7 @@ public partial class TscInstrumentDetail
         };
     }
 
-    private async Task ShowEdit(AddPanelDto panel)
+    private async Task ShowEdit(PanelDto panel)
     {
         _editPanel = panel;
         OpenDialog();
