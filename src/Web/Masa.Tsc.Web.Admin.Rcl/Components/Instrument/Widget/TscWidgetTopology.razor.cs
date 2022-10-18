@@ -9,7 +9,7 @@ public partial class TscWidgetTopology : TscWidgetBase
 
     protected override void OnInitialized()
     {
-        _panelValue.Type = InstrumentTypes.Topology;
+        _panelValue.Type = PanelTypes.Topology;
         base.OnInitialized();
     }
 
@@ -21,7 +21,7 @@ public partial class TscWidgetTopology : TscWidgetBase
             if (value == null)
             {
                 value = CreateDefault<PanelDto>();
-                value.Type = InstrumentTypes.Topology;
+                value.Type = PanelTypes.Topology;
             }
 
             if (value.Id != _panelValue.Id || value.Sort != _panelValue.Sort)

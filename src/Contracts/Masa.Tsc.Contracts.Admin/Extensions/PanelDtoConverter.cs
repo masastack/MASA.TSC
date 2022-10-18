@@ -12,20 +12,20 @@ public class PanelDtoConverter : JsonConverter<PanelDto>
         if (JsonDocument.TryParseValue(ref reader, out var doc))
         {
             var jsonObject = doc.RootElement;
-            if (doc.RootElement.TryGetProperty(TYPE_KEY, out var propertyValue) && Enum.TryParse(propertyValue.GetRawText(), out InstrumentTypes type))
+            if (doc.RootElement.TryGetProperty(TYPE_KEY, out var propertyValue) && Enum.TryParse(propertyValue.GetRawText(), out PanelTypes type))
             {
                 var rootText = jsonObject.GetRawText();
                 switch (type)
                 {
-                    case InstrumentTypes.Text:
+                    case PanelTypes.Text:
                         return JsonSerializer.Deserialize<TextPanelDto>(rootText, options);
-                    case InstrumentTypes.Table:
+                    case PanelTypes.Table:
                         return JsonSerializer.Deserialize<TablePanelDto>(rootText, options);
-                    case InstrumentTypes.Tabs:
+                    case PanelTypes.Tabs:
                         return JsonSerializer.Deserialize<TabsPanelDto>(rootText, options);
-                    case InstrumentTypes.TabItem:
+                    case PanelTypes.TabItem:
                         return JsonSerializer.Deserialize<TabItemPanelDto>(rootText, options);
-                    case InstrumentTypes.Chart:
+                    case PanelTypes.Chart:
                         return JsonSerializer.Deserialize<ChartPanelDto>(rootText, options);
                     default:
                         return JsonSerializer.Deserialize<PanelDto>(rootText, options);
@@ -53,24 +53,24 @@ public class PanelDtoEnumerableConverter : JsonConverter<List<PanelDto>>
             var result = new List<PanelDto>();
             foreach (var item in doc.RootElement.EnumerateArray())
             {
-                if (item.ValueKind == JsonValueKind.Object && item.TryGetProperty(TYPE_KEY, out var propertyValue) && Enum.TryParse(propertyValue.GetRawText(), out InstrumentTypes type))
+                if (item.ValueKind == JsonValueKind.Object && item.TryGetProperty(TYPE_KEY, out var propertyValue) && Enum.TryParse(propertyValue.GetRawText(), out PanelTypes type))
                 {
                     var itemText = item.GetRawText();
                     switch (type)
                     {
-                        case InstrumentTypes.Text:
+                        case PanelTypes.Text:
                             result.Add(JsonSerializer.Deserialize<TextPanelDto>(itemText, options)!);
                             break;
-                        case InstrumentTypes.Table:
+                        case PanelTypes.Table:
                             result.Add(JsonSerializer.Deserialize<TablePanelDto>(itemText, options)!);
                             break;
-                        case InstrumentTypes.Tabs:
+                        case PanelTypes.Tabs:
                             result.Add(JsonSerializer.Deserialize<TabsPanelDto>(itemText, options)!);
                             break;
-                        case InstrumentTypes.TabItem:
+                        case PanelTypes.TabItem:
                             result.Add(JsonSerializer.Deserialize<TabItemPanelDto>(itemText, options)!);
                             break;
-                        case InstrumentTypes.Chart:
+                        case PanelTypes.Chart:
                             result.Add(JsonSerializer.Deserialize<ChartPanelDto>(itemText, options)!);
                             break;
                         default:

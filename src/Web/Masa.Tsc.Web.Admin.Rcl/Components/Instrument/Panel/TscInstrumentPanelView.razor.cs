@@ -30,11 +30,11 @@ public partial class TscInstrumentPanelView
             Sort = item.Sort
         };
 
-        if (item.Type == InstrumentTypes.Chart)
+        if (item.Type == PanelTypes.Chart)
         {
             //sendData.Metrics =;
         }
-        else if (item.Type == InstrumentTypes.Tabs)
+        else if (item.Type == PanelTypes.Tabs)
         {
             //await ApiCaller.PanelService.AddAsync
 

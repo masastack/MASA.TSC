@@ -15,32 +15,32 @@ public partial class TscInstrumentPanels
         new PanelTypeDto(){
             Index=1,
             Name="Text",
-            Key=InstrumentTypes.Text.ToString()
+            Key=PanelTypes.Text.ToString()
         },
         new PanelTypeDto(){
             Index=2,
             Name="Widget",
-            Key=InstrumentTypes.Chart.ToString()
+            Key=PanelTypes.Chart.ToString()
         },
         new PanelTypeDto(){
             Index=5,
             Name="Tabs",
-            Key=InstrumentTypes.Tabs.ToString()
+            Key=PanelTypes.Tabs.ToString()
         },
         new PanelTypeDto(){
             Index =3,
             Name="Log",
-            Key =InstrumentTypes.Log.ToString()
+            Key =PanelTypes.Log.ToString()
         },
         new PanelTypeDto(){
          Index =4,
             Name="Trace",
-            Key =InstrumentTypes.Trace.ToString()
+            Key =PanelTypes.Trace.ToString()
         }
     };
 
     private int _step = 1;
-    private InstrumentTypes _widgetType;
+    private PanelTypes _widgetType;
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -55,7 +55,7 @@ public partial class TscInstrumentPanels
     private void ValueChange(StringNumber value)
     {
         if (value != null)
-            _widgetType = Enum.Parse<InstrumentTypes>(value.Value.ToString()!);
+            _widgetType = Enum.Parse<PanelTypes>(value.Value.ToString()!);
         else
             _widgetType = 0;
     }

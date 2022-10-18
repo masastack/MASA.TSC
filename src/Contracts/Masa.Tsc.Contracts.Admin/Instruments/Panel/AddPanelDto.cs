@@ -21,7 +21,7 @@ public class AddPanelDto
 
     public int Sort { get; set; }
 
-    public virtual InstrumentTypes Type { get; set; }
+    public virtual PanelTypes Type { get; set; }
 
     //public List<AddPanelMetricDto> Metrics { get; set; }
 }

@@ -10,7 +10,7 @@ public partial class TscWidgetTabs
 
     private async void AddTab()
     {
-        var add = new TabItemPanelDto { Title = "tabnew", Id = Guid.NewGuid(), InstrumentId = _panelValue.InstrumentId, Sort = _panelValue.Tabs.Count + 1, ParentId = _panelValue.ParentId, Type = InstrumentTypes.TabItem };
+        var add = new TabItemPanelDto { Title = "tabnew", Id = Guid.NewGuid(), InstrumentId = _panelValue.InstrumentId, Sort = _panelValue.Tabs.Count + 1, ParentId = _panelValue.ParentId, Type = PanelTypes.TabItem };
         await ApiCaller.PanelService.AddAsync(add);
         _panelValue.Tabs.Add(add);
     }

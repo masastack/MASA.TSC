@@ -5,15 +5,15 @@ namespace Masa.Tsc.Contracts.Admin.Enums;
 
 internal static class InstrumentTypeExtensions
 {
-    public static PanelDto ToModel(this InstrumentTypes type, Panel panel)
+    public static PanelDto ToModel(this PanelTypes type, Panel panel)
     {
         switch (type)
         {
-            case InstrumentTypes.Text:
+            case PanelTypes.Text:
                 return GetTextPanel(panel);
-            case InstrumentTypes.Tabs:
+            case PanelTypes.Tabs:
                 return GetTabsPanel(panel);
-            case InstrumentTypes.TabItem:
+            case PanelTypes.TabItem:
                 return GetTabItemPanel(panel);
             default:
                 return GetDefault(panel);

@@ -11,37 +11,37 @@
 
 @switch (Value.Type)
 {
-    case InstrumentTypes.Text:
+    case PanelTypes.Text:
         {
             <TscWidgetText @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
         break;
-    case InstrumentTypes.Card:
+    case PanelTypes.Card:
         {
             <TscWidgetCard @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
         break;
-    case InstrumentTypes.Chart:
+    case PanelTypes.Chart:
         {
             <TscWidgetChart @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
         break;
-    case InstrumentTypes.Log:
+    case PanelTypes.Log:
         {
             <TscWidgetLog @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
         break;
-    case InstrumentTypes.Trace:
+    case PanelTypes.Trace:
         {
             <TscWidgetTrace @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
         break;
-    case InstrumentTypes.Tabs:
+    case PanelTypes.Tabs:
         {
             <TscWidgetTabs @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
         break;
-    case InstrumentTypes.Table:
+    case PanelTypes.Table:
         {
             <TscWidgetTable @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
