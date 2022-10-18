@@ -7,7 +7,7 @@ public partial class TscWidgetTabItem
 {
     private TabItemPanelDto _panelValue = new() { Title = "tabs" };
 
-    public override PanelDto Item
+    public override PanelDto Value
     {
         get => _panelValue;
         set

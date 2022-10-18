@@ -5,7 +5,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscWidgetText
 {
-    public override PanelDto Item
+    public override PanelDto Value
     {
         get => _panelValue;
         set

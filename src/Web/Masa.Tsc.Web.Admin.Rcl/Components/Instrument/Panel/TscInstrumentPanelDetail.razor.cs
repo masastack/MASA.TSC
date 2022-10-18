@@ -39,7 +39,7 @@ public partial class TscInstrumentPanelDetail
 
     private async Task OnSubmitAsync()
     {
-        var item = _widget.Item;
+        var item = _widget.Value;
         await ApiCaller.PanelService.AddAsync(item);
         if (item.Type == InstrumentTypes.Tabs)
         {

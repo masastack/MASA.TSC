@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Shared;
 
-public partial class TscComponentBase : BComponentBase
+public partial class TscComponentBase : BDomComponentBase
 {
     [Inject]
     public IUserContext UserContext { get; set; }

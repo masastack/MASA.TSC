@@ -6,7 +6,10 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TscInstrumentPanelView
 {
     [Parameter]
-    public PanelDto Item { get; set; }
+    public PanelDto Value { get; set; }
+
+    [Parameter]
+    public EventCallback<PanelDto> ValueChanged { get; set; }
 
     [Parameter]
     public bool Readonly { get; set; }
@@ -15,7 +18,7 @@ public partial class TscInstrumentPanelView
 
     private async Task SaveAsync(bool isSave)
     {
-        var item = _widget.Item;
+        var item = _widget.Value;
         var sendData = new UpdatePanelDto
         {
             Id = item.Id,
@@ -34,10 +37,11 @@ public partial class TscInstrumentPanelView
         else if (item.Type == InstrumentTypes.Tabs)
         {
             //await ApiCaller.PanelService.AddAsync
-            
+
         }
-        if(isSave)
+        if (isSave)
             await ApiCaller.PanelService.UpdateAsync(sendData);
-        await CallParent(OperateCommand.Success, item);
+        Value = item;
+        await CallParent(OperateCommand.Success, Value);
     }
 }

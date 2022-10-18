@@ -58,7 +58,7 @@
             <MCardText>
                 @if (_opType == DirectoryTypes.Directory)
                 {
-                    <DirectoryDetail Id="@(_isUpdate?_current.Id:Guid.Empty)"
+                    <DirectoryDetail DirectoryId="@(_isUpdate?_current.Id:Guid.Empty)"
                                  ParentId="@(_isUpdate?_current.ParentId:_current.Id)"
                                  ParentName="@GetParentName(_data)"
                                  SuccessFn="AddUpdateCallback"></DirectoryDetail>
@@ -67,7 +67,7 @@
                 {
                     if (_isUpdate)
                     {
-                        <TscInstrumentDetail Id="@_addDto.Id" ReadOnly="_readonly" OnCallParent="ChildCallHandler" />
+                        <TscInstrumentDetail InstrumentId="@_addDto.Id" ReadOnly="_readonly" OnCallParent="ChildCallHandler" />
                     }
                     else
                     {

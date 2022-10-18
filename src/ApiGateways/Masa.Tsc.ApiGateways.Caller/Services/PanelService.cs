@@ -26,4 +26,19 @@ public class PanelService : BaseService
     {
         return (await Caller.GetAsync<List<PanelDto>>($"{RootPath}/{userId}/{instrumentId}/{id}", default))!;
     }
+
+    public async Task UpdateParentAsync(Guid panelId,Guid parentId,Guid userId)
+    {
+        await Caller.PutAsync($"{RootPath}/{userId}/{panelId}/{parentId}",default);
+    }
+
+    public async Task UpdateWidthHeightAsync(Guid panelId, Guid userId,string width, string height)
+    {
+        await Caller.PutAsync($"{RootPath}/{userId}/{panelId}/{width}/{height}", default);
+    }
+
+    public async Task UpdateSortAsync(Guid userId,UpdatePanelsSortDto param)
+    {
+        await Caller.PutAsync($"{RootPath}/{userId}", param);
+    }
 }

@@ -2,18 +2,28 @@
 @inherits TscWidgetBase
 
 <MTabs @bind-Value="_value">
-    @foreach (var item in _panelValue.Tabs)
-    {
-        <TscWidgetTabItem Item="item" ReadOnly="ReadOnly" OnCallParent="ChildCallHandler" />
+    @{
+        var index = 0;
+        do
+        {
+            var item = (PanelDto)_panelValue.Tabs[index++];
+            <TscWidgetTabItem Value="item" ReadOnly="ReadOnly" OnCallParent="ChildCallHandler" />
+        }
+        while (_panelValue.Tabs.Count - index > 0);
     }
     <MTab Class="mx-0 px-0" Style="min-width:20px"><MIcon Small OnClick="AddTab">mdi-plus</MIcon></MTab>
 </MTabs>
 
 <MTabsItems Value="_value">
-    @foreach (var item in _panelValue.Tabs)
-    {
-        <MTabItem Value="@item.Id.ToString()">
-            <TscInstrumentDetail ParentId="item.Id" Id="item.InstrumentId" Panels="item.Tabs"  OnCallParent="ChildCallHandler" ReadOnly="ReadOnly" />
-        </MTabItem>
+    @{
+        var index = 0;
+        do
+        {
+            var item =_panelValue.Tabs[index++];
+            <MTabItem Value="item.Id.ToString()">
+                <TscInstrumentDetail ParentId="item.Id" Id="item.InstrumentId" @bind-Panels="item.Tabs" OnCallParent="ChildCallHandler" ReadOnly="ReadOnly" />
+            </MTabItem>
+        }
+        while (_panelValue.Tabs.Count - index > 0);
     }
 </MTabsItems>

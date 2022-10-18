@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-public partial class TscWidgetTrace: TscWidgetBase
+public partial class TscWidgetTrace : TscWidgetBase
 {
     private PanelDto _panelValue = CreateDefault<PanelDto>();
 
@@ -13,7 +13,7 @@ public partial class TscWidgetTrace: TscWidgetBase
         base.OnInitialized();
     }
 
-    public override PanelDto Item
+    public override PanelDto Value
     {
         get { return _panelValue; }
         set

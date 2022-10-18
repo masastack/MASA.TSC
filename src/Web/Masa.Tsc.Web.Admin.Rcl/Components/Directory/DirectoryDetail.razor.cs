@@ -6,7 +6,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class DirectoryDetail
 {
     [Parameter]
-    public Guid Id { get; set; } = Guid.Empty;
+    public Guid DirectoryId { get; set; } = Guid.Empty;
 
     [Parameter]
     public Guid ParentId { get; set; } = Guid.Empty;
@@ -26,14 +26,14 @@ public partial class DirectoryDetail
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Id != Guid.Empty)
+        if (DirectoryId != Guid.Empty)
         {
-            if (_model.Id != Id)
+            if (_model.Id != DirectoryId)
             {
-                var data = await ApiCaller.DirectoryService.GetAsync(CurrentUserId, Id);
+                var data = await ApiCaller.DirectoryService.GetAsync(CurrentUserId, DirectoryId);
                 if (data != null)
                 {
-                    _model.Id = Id;
+                    _model.Id = DirectoryId;
                     _model.ParentId = data.ParentId;
                     _model.Name = data.Name;
                     _model.Sort = data.Sort;
@@ -41,13 +41,13 @@ public partial class DirectoryDetail
                 }
                 else
                 {
-                    await PopupService.AlertAsync($"${Id} is not exists", AlertTypes.Error);
+                    await PopupService.AlertAsync($"${DirectoryId} is not exists", AlertTypes.Error);
                 }
             }
         }
         else
         {
-            _model.Id = Id;
+            _model.Id = DirectoryId;
             _model.ParentId = ParentId;
             _model.UserId = CurrentUserId;
             _model.Name = default!;

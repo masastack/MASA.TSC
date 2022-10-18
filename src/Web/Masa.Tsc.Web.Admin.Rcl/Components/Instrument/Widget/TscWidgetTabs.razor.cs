@@ -15,7 +15,7 @@ public partial class TscWidgetTabs
         _panelValue.Tabs.Add(add);
     }
 
-    public override PanelDto Item
+    public override PanelDto Value
     {
         get => _panelValue;
         set

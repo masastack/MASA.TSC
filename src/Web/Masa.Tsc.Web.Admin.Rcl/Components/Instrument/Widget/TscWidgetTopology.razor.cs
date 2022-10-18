@@ -13,7 +13,7 @@ public partial class TscWidgetTopology : TscWidgetBase
         base.OnInitialized();
     }
 
-    public override PanelDto Item
+    public override PanelDto Value
     {
         get { return _panelValue; }
         set

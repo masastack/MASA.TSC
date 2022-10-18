@@ -5,42 +5,42 @@
 {
     case InstrumentTypes.Text:
         {
-            <TscWidgetText Item="_panel" @ref="_widget" />
+            <TscWidgetText @bind-Value="_panel" @ref="_widget" />
         }
         break;
     case InstrumentTypes.Card:
         {
-            <TscWidgetCard Item="_panel" @ref="_widget" />
+            <TscWidgetCard @bind-Value="_panel" @ref="_widget" />
         }
         break;
     case InstrumentTypes.Chart:
         {
-            <TscWidgetChart Item="_panel" @ref="_widget" />
+            <TscWidgetChart @bind-Value="_panel" @ref="_widget" />
         }
         break;
     case InstrumentTypes.Log:
         {
-            <TscWidgetLog Item="_panel" @ref="_widget" />
+            <TscWidgetLog @bind-Value="_panel" @ref="_widget" />
         }
         break;
     case InstrumentTypes.Trace:
         {
-            <TscWidgetTrace Item="_panel" @ref="_widget" />
+            <TscWidgetTrace @bind-Value="_panel" @ref="_widget" />
         }
         break;
     case InstrumentTypes.Tabs:
         {
-            <TscWidgetTabs Item="_panel" @ref="_widget" />
+            <TscWidgetTabs @bind-Value="_panel" @ref="_widget" />
         }
         break;
     case InstrumentTypes.Table:
         {
-            <TscWidgetTable Item="_panel" @ref="_widget" />
+            <TscWidgetTable @bind-Value="_panel" @ref="_widget" />
         }
         break;
     default:
         {
-            <TscWidgetDefault Item="_panel" @ref="_widget" />
+            <TscWidgetDefault @bind-Value="_panel" @ref="_widget" />
         }
         break;
 }

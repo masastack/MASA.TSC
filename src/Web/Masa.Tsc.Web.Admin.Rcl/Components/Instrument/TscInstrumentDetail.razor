@@ -9,7 +9,7 @@
         </MCardTitle>
     }
     <MCardText>
-        <MDragZone @ref="_mDragZone" Items="_items" Class="d-flex"></MDragZone>
+        <MDragZone @ref="_mDragZone" Options="asdasdasd" Class="d-flex"></MDragZone>
     </MCardText>
 </MCard>
 
@@ -27,12 +27,12 @@
                     </MRow>
                 </MCardTitle>
                 <MCardText>
-                    <TscInstrumentPanels InstrumentId="Id" ParentId="ParentId" OnCallParent="ChildCallHandler" />
+                    <TscInstrumentPanels InstrumentId="InstrumentId" ParentId="ParentId" OnCallParent="ChildCallHandler" />
                 </MCardText>
             }
             else
             {
-                <TscInstrumentPanelView Item="_editPanel" Readonly="ReadOnly" OnCallParent="ChildCallHandler" />
+                <TscInstrumentPanelView @bind-Value="_editPanel" Readonly="ReadOnly" OnCallParent="ChildCallHandler" />
             }
         </MCard>
     </ChildContent>
