@@ -14,19 +14,26 @@ builder.WebHost.UseKestrel(option =>
 });
 
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
-builder.AddMasaConfiguration(configurationBuilder =>
+IConfiguration config;
+if (builder.Environment.EnvironmentName == "Development")
 {
-    configurationBuilder.UseDcc(dccConfig, default, default);
-});
+    builder.AddMasaConfiguration(configurationBuilder =>
+    {
+        configurationBuilder.UseDcc(dccConfig, default, default);
+    });
+    config = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
+}
+else
+{
+    config = builder.Configuration;
+}
 
-var publicConfiguration = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
-var oidc = publicConfiguration.GetSection("$public.OIDC").Get<MasaOpenIdConnectOptions>(); //builder.GetMasaConfiguration().Local.GetSection("Masa:Oidc").Get<MasaOpenIdConnectOptions>();
-string authUrl = publicConfiguration.GetValue<string>("$public.AppSettings:AuthClient:Url"); // //builder.GetMasaConfiguration().Local.GetValue<string>("Masa:Auth:ServiceBaseAddress");
-string mcUrl = publicConfiguration.GetValue<string>("$public.AppSettings:McClient:Url");// publicConfiguration.GetValue<string>("$public.AppSettings:McClient:Url");
-//builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl).AddMasaOpenIdConnect(oidc);
+var oidc = config.GetSection("$public.OIDC").Get<MasaOpenIdConnectOptions>();
+string authUrl = config.GetValue<string>("$public.AppSettings:AuthClient:Url");
+string mcUrl = config.GetValue<string>("$public.AppSettings:McClient:Url");
 builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl,
-    publicConfiguration.GetSection("$public.OSS").Get<OssOptions>(),
-    publicConfiguration.GetSection("$public.ES.UserAutoComplete").Get<UserAutoCompleteOptions>(),
+    config.GetSection("$public.OSS").Get<OssOptions>(),
+    config.GetSection("$public.ES.UserAutoComplete").Get<UserAutoCompleteOptions>(),
     dccConfig.RedisOptions
     ).AddMasaOpenIdConnect(oidc);
 builder.Services.AddHttpContextAccessor();

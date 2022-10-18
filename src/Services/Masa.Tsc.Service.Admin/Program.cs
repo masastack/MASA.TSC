@@ -19,12 +19,23 @@ builder.Services.AddCaller(option =>
 });
 builder.Services.AddElasticsearchClient("tsclog", elasearchUrls);
 builder.AddObservable();
+builder.Services.AddDaprClient();
+builder.Services.AddPrometheusClient(builder.Configuration.GetSection("Masa:Prometheus").Value);
 
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
-builder.AddMasaConfiguration(configurationBuilder =>
+IConfiguration config;
+if (builder.Environment.EnvironmentName == "Development")
 {
-    configurationBuilder.UseDcc(dccConfig, default, default);
-});
+    builder.AddMasaConfiguration(configurationBuilder =>
+    {
+        configurationBuilder.UseDcc(dccConfig, default, default);
+    });
+    config = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();   
+}
+else
+{
+    config = builder.Configuration;
+}
 //#if DEBUG
 //builder.Services.AddDaprStarter(opt =>
 //{
@@ -32,8 +43,7 @@ builder.AddMasaConfiguration(configurationBuilder =>
 //    opt.DaprGrpcPort = 3601;
 //});
 //#endif
-builder.Services.AddDaprClient();
-builder.Services.AddPrometheusClient(builder.GetMasaConfiguration().Local.GetSection("Masa:Prometheus").Value);
+
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(options =>
 {
@@ -42,7 +52,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer("Bearer", options =>
 {
-    options.Authority = builder.GetMasaConfiguration().ConfigurationApi.GetPublic().GetValue<string>("$public.AppSettings:IdentityServerUrl");
+    options.Authority = config.GetValue<string>("$public.AppSettings:IdentityServerUrl");
     options.RequireHttpsMetadata = false;
     //options.Audience = "";
     options.TokenValidationParameters.ValidateAudience = false;
@@ -57,9 +67,8 @@ builder.Services.AddMasaIdentity(options =>
 });
 
 builder.Services.AddScoped<TokenProvider>();
-var dccPublicConfig = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
-builder.Services.AddAuthClient(dccPublicConfig["$public.AppSettings:AuthClient:Url"], dccConfig.RedisOptions).
-AddPmClient(dccPublicConfig["$public.AppSettings:PmClient:Url"]);
+builder.Services.AddAuthClient(config["$public.AppSettings:AuthClient:Url"], dccConfig.RedisOptions).
+AddPmClient(config["$public.AppSettings:PmClient:Url"]);
 
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -120,6 +129,5 @@ app.UseEndpoints(endpoints =>
     endpoints.MapSubscribeHandler();
 });
 app.UseHttpsRedirection();
-
 
 app.Run();
