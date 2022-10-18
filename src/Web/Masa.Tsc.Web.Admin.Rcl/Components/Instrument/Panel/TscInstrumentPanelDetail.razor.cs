@@ -6,7 +6,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TscInstrumentPanelDetail
 {
     [Parameter]
-    public InstrumentTypes Type { get; set; }
+    public PanelTypes Type { get; set; }
 
     [Parameter]
     public Guid InstrumentId { get; set; }
@@ -41,13 +41,13 @@ public partial class TscInstrumentPanelDetail
     {
         var item = _widget.Value;
         await ApiCaller.PanelService.AddAsync(item);
-        if (item.Type == InstrumentTypes.Tabs)
+        if (item.Type == PanelTypes.Tabs)
         {
             var tabs = ((TabsPanelDto)item).Tabs;
             foreach (var tab in tabs)
             {
                 tab.ParentId = item.Id;
-                tab.Type = InstrumentTypes.TabItem;
+                tab.Type = PanelTypes.TabItem;
                 await ApiCaller.PanelService.AddAsync(tab);
             }
         }

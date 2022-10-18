@@ -3,11 +3,15 @@
 
 namespace Masa.Tsc.Contracts.Admin.Enums;
 
-public enum InstrumentTypes
+public enum PanelTypes
 {
-    System=1,
-    K8s,
-    K8sService,
-    DataBase,
-    Service
+    Text=1,
+    Card,
+    Table,
+    Chart,
+    Trace,
+    Log,
+    Tabs,
+    TabItem,
+    Topology
 }

@@ -3,11 +3,13 @@
 
 namespace Masa.Tsc.Contracts.Admin.Enums;
 
-public enum InstrumentTypes
+public enum InstrumentModelTypes
 {
-    System=1,
-    K8s,
-    K8sService,
-    DataBase,
-    Service
+    All=1,
+    Service,
+    ServiceInstance,
+    Endpoint,
+    ServiceInstanceRelation,
+    ServiceRelation,
+    EndpointRelation
 }

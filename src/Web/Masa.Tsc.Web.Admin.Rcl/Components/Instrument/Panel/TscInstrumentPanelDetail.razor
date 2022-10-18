@@ -3,37 +3,37 @@
 
 @switch (Type)
 {
-    case InstrumentTypes.Text:
+    case PanelTypes.Text:
         {
             <TscWidgetText @bind-Value="_panel" @ref="_widget" />
         }
         break;
-    case InstrumentTypes.Card:
+    case PanelTypes.Card:
         {
             <TscWidgetCard @bind-Value="_panel" @ref="_widget" />
         }
         break;
-    case InstrumentTypes.Chart:
+    case PanelTypes.Chart:
         {
             <TscWidgetChart @bind-Value="_panel" @ref="_widget" />
         }
         break;
-    case InstrumentTypes.Log:
+    case PanelTypes.Log:
         {
             <TscWidgetLog @bind-Value="_panel" @ref="_widget" />
         }
         break;
-    case InstrumentTypes.Trace:
+    case PanelTypes.Trace:
         {
             <TscWidgetTrace @bind-Value="_panel" @ref="_widget" />
         }
         break;
-    case InstrumentTypes.Tabs:
+    case PanelTypes.Tabs:
         {
             <TscWidgetTabs @bind-Value="_panel" @ref="_widget" />
         }
         break;
-    case InstrumentTypes.Table:
+    case PanelTypes.Table:
         {
             <TscWidgetTable @bind-Value="_panel" @ref="_widget" />
         }

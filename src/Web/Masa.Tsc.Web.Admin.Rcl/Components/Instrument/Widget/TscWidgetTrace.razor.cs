@@ -9,7 +9,7 @@ public partial class TscWidgetTrace : TscWidgetBase
 
     protected override void OnInitialized()
     {
-        _panelValue.Type = InstrumentTypes.Trace;
+        _panelValue.Type = PanelTypes.Trace;
         base.OnInitialized();
     }
 
@@ -21,7 +21,7 @@ public partial class TscWidgetTrace : TscWidgetBase
             if (value == null)
             {
                 value = CreateDefault<PanelDto>();
-                value.Type = InstrumentTypes.Trace;
+                value.Type = PanelTypes.Trace;
             }
 
             if (value.Id != _panelValue.Id || value.Sort != _panelValue.Sort)

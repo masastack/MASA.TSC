@@ -9,7 +9,7 @@ public partial class TscWidgetLog : TscWidgetBase
 
     protected override void OnInitialized()
     {
-        _panelValue.Type = InstrumentTypes.Log;
+        _panelValue.Type = PanelTypes.Log;
         base.OnInitialized();
     }
 
@@ -21,7 +21,7 @@ public partial class TscWidgetLog : TscWidgetBase
             if (value == null)
             {
                 value = CreateDefault<PanelDto>();
-                value.Type = InstrumentTypes.Log;
+                value.Type = PanelTypes.Log;
             }
 
             if (value.Id != _panelValue.Id || value.Sort != _panelValue.Sort)

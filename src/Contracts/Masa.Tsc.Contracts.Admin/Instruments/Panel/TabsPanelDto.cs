@@ -10,5 +10,5 @@ public class TabsPanelDto : PanelDto
     //[JsonConverter(typeof(PanelDtoEnumerableConverter))]
     public List<TabItemPanelDto> Tabs { get; set; }
 
-    public override InstrumentTypes Type => InstrumentTypes.Tabs;
+    public override PanelTypes Type => PanelTypes.Tabs;
 }

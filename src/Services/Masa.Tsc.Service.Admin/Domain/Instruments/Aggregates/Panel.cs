@@ -15,7 +15,7 @@ public class Panel : AggregateRoot<Guid>
 
     public int Sort { get; set; }
 
-    public InstrumentTypes Type { get; set; }
+    public PanelTypes Type { get; set; }
 
     public string UiType { get; set; } = string.Empty;
 
