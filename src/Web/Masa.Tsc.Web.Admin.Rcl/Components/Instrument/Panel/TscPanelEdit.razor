@@ -10,7 +10,7 @@
             <MButton XSmall OnClick="OnEdit">Edit</MButton>
         </div>
     }
-    <div class="overflow-auto" style="@_style">
-        <TscInstrumentPanelView Item="Item" Readonly />
+    <div class="overflow-auto" style="@_style" @ref="_div">
+        <TscInstrumentPanelView @bind-Value="Value" Readonly />
     </div>
 </Element>

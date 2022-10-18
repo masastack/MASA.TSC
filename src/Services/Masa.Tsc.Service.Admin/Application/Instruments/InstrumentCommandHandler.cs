@@ -106,6 +106,48 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
         }
 
         [EventHandler]
+        public async Task UpdatePanelParentIdAsync(UpdatePanelParentCommond commond)
+        {
+            var panel = await _panelRepository.FindAsync(item => item.Id == commond.Id);
+            if (panel == null)
+                throw new UserFriendlyException("数据不存在");
+            panel.UpdateParentId(commond.ParentId);
+            await _panelRepository.UpdateAsync(panel);
+        }
+
+        [EventHandler]
+        public async Task UpdatePanelWidthHeightAsync(UpdatePanelWidthHeightCommond commond)
+        {
+            var panel = await _panelRepository.FindAsync(item => item.Id == commond.Id);
+            if (panel == null)
+                throw new UserFriendlyException("数据不存在");
+            panel.UpdateWidthHeight(commond.Width, commond.Height);
+            await _panelRepository.UpdateAsync(panel);
+        }
+
+        [EventHandler]
+        public async Task UpdatePanelSortAsync(UpdatePanelsSortCommand commond)
+        {
+            var list = await _panelRepository.GetListAsync(t => t.InstrumentId == commond.Id && t.ParentId == commond.ParentId);
+            if (list == null)
+                throw new UserFriendlyException("数据不存在");
+            var index = 1;
+            var updateList = new List<Panel>();
+            foreach (var id in commond.PanelIds)
+            {
+                var panel = list.FirstOrDefault(x => x.Id == id);
+                if (panel != null && panel.Sort - index != 0)
+                {
+                    panel.Sort = index;
+                    updateList.Add(panel);
+                }
+                index++;
+            }
+            if (updateList.Any())
+                await _panelRepository.UpdateRangeAsync(updateList);
+        }
+
+        [EventHandler]
         public async Task RemovePanelAsync(RemovePanelCommand command)
         {
             await RemovePanelsByIdAsync(command.PannelId);

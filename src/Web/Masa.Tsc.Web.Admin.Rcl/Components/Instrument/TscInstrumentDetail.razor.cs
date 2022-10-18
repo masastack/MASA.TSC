@@ -6,7 +6,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TscInstrumentDetail
 {
     [Parameter]
-    public Guid Id { get; set; }
+    public Guid InstrumentId { get; set; }
 
     [Parameter]
     public Guid ParentId { get; set; }
@@ -15,23 +15,60 @@ public partial class TscInstrumentDetail
     public bool ReadOnly { get; set; }
 
     [Parameter]
-    public List<PanelDto> Panels { get; set; } = new();
+    public List<PanelDto> Panels
+    {
+        get { return _panels; }
+        set
+        {
+            if (value == null || !value.Any())
+            {
+                _panels.Clear();
+            }
+            else
+                _panels = value;
+        }
+    }
 
-    private List<BDragItem> _items = new();
+    [Parameter]
+    public EventCallback<List<PanelDto>> PanelsChanged { get; set; }
+
+
+    private List<PanelDto> _panels = new();
+
+    private List<BDragItem> _items => _mDragZone?.Items;
     private PanelDto? _editPanel = default;
     private MDragZone _mDragZone;
+
+    //private SorttableOptions _sorttableOptions;
 
     private Guid _id;
     private Guid _parentId;
 
+    //protected override void OnInitialized()
+    //{
+    //    _sorttableOptions = new SorttableOptions
+    //    {
+    //        OnAdd = OnDragAdd,
+    //        OnRemove = OnDragRemove,
+    //    };
+    //    base.OnInitialized();
+    //}
+
+
+    void asdasdasd(SorttableOptions option)
+    {
+        option.OnAdd = OnDragAdd;
+        option.OnRemove = OnDragRemove;
+    }
+
     protected override async Task OnParametersSetAsync()
     {
+        /*
         //tab item
         if (ParentId != Guid.Empty && ParentId != _parentId)
         {
-            if (Panels == null)
-                Panels = new();
-            _items.Clear();
+            if (_mDragZone != null)
+                _items.Clear();
             foreach (var item in Panels)
             {
                 //var panel = new TextPanelDto
@@ -46,7 +83,8 @@ public partial class TscInstrumentDetail
                 //    Type = item.Type,
                 //    Width = item.Width
                 //};
-                _items.Add(ToDragItem(item));
+                _mDragZone.Add(ToDragItem(item));
+                //_items.Add(ToDragItem(item));
             }
             _parentId = ParentId;
             StateHasChanged();
@@ -54,14 +92,15 @@ public partial class TscInstrumentDetail
         else if (Id == Guid.Empty)
         {
             await PopupService.AlertAsync("Id must set", AlertTypes.Error);
-        }       
+        }
         if (ParentId == Guid.Empty && Id != _id)
         {
             var dto = await ApiCaller.InstrumentService.GetAsync(CurrentUserId, Id);
             if (dto != null)
             {
                 Panels.Clear();
-                _items.Clear();
+                if (_mDragZone != null)
+                    _items.Clear();
                 if (dto.Panels != null)
                 {
                     foreach (var item in dto.Panels)
@@ -78,7 +117,8 @@ public partial class TscInstrumentDetail
                         //    Type = item.Type,
                         //    Width = item.Width
                         //};
-                        _items.Add(ToDragItem(item));
+                        _mDragZone.Add(ToDragItem(item));
+                        //_items.Add(ToDragItem(item));
                         Panels.Add(item);
                     }
                 }
@@ -91,11 +131,52 @@ public partial class TscInstrumentDetail
             //_reload = false;
         }
         _id = Id;
+
+        */
         await base.OnParametersSetAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        bool _reload = false;
+        if (_parentId != ParentId)
+        {
+            _parentId = ParentId;
+            _reload = true;
+        }
+        if (ParentId == Guid.Empty && _id != InstrumentId)
+        {
+            var dto = await ApiCaller.InstrumentService.GetAsync(CurrentUserId, InstrumentId);
+            if (dto != null && dto.Panels != null)
+                Panels = dto.Panels;
+            _id = InstrumentId;
+            _reload = true;
+        }
+        if (_reload)
+        {
+            if (_items.Any())
+                _mDragZone.Clear();
+            foreach (var item in Panels)
+            {
+                //var panel = new TextPanelDto
+                //{
+                //    ParentId = item.ParentId,
+                //    Description = item.Description,
+                //    Height = item.Height,
+                //    Id = item.Id,
+                //    InstrumentId = dto.Id,
+                //    Sort = item.Sort,
+                //    Title = item.Title,
+                //    Type = item.Type,
+                //    Width = item.Width
+                //};
+                _mDragZone.Add(ToDragItem(item));
+                //_items.Add(ToDragItem(item));
+                //Panels.Add(item);
+            }
+            StateHasChanged();
+        }
+
         await base.OnAfterRenderAsync(firstRender);
     }
 
@@ -105,6 +186,7 @@ public partial class TscInstrumentDetail
         if (values != null && values.Length > 0 && values[0] is PanelDto panel)
         {
             var find = _mDragZone.Items.FirstOrDefault(x => (Guid)x.Attributes["key"] == panel.Id);
+            //SetItems();
             if (command == OperateCommand.Success)
             {
                 if (find == null)
@@ -117,9 +199,11 @@ public partial class TscInstrumentDetail
                     var findPanel = Panels.FirstOrDefault(m => m.Id == panel.Id);
                     findPanel = panel;
 
-                    var index = _items.IndexOf(find);
-                    _items.Remove(find);
-                    _items.Insert(index, ToDragItem(panel));
+                    var index = _mDragZone.GetIndex(find);
+                    _mDragZone.Remove(find);
+                    _mDragZone.Add(ToDragItem(panel), index);
+                    //_items.Remove(find);
+                    //_items.Insert(index, ToDragItem(panel));
                 }
                 CloseDialog();
                 return true;
@@ -155,9 +239,10 @@ public partial class TscInstrumentDetail
             ChildContent = builder =>
             {
                 builder.OpenComponent<TscPanelEdit>(0);
-                builder.AddAttribute(1, "Item", panel);
+                builder.AddAttribute(1, "Value", panel);
                 builder.AddAttribute(2, "ReadOnly", ReadOnly);
                 builder.AddAttribute(3, "OnCallParent", new EventCallback<object[]>(this, ChildCallHandler));
+                builder.AddAttribute(4, "ValueChanged", new EventCallback<PanelDto>(this, (PanelDto dto) => { panel = dto; }));
                 builder.CloseComponent();
             }
         };
@@ -168,5 +253,64 @@ public partial class TscInstrumentDetail
         _editPanel = panel;
         OpenDialog();
         await Task.CompletedTask;
+    }
+
+    private async void OnDragAdd(SorttableEventArgs sorttableEventArgs)
+    {
+        var item = _mDragZone.DragDropService.DragItem;
+        var panel = ((PanelDto)((dynamic)item.ChildContent.Target!).panel)!;
+        var id = (Guid)item.Attributes["key"];
+
+        //_items = _mDragZone.Items;
+        //_items.Insert(sorttableEventArgs.NewIndex, item);
+        //var index = _mDragZone.GetIndex(item);       
+        Panels.Insert(sorttableEventArgs.NewIndex, panel);
+        var newItem = ToDragItem(panel);
+        newItem.Id = item.Id;
+        _mDragZone.Items.Insert(sorttableEventArgs.NewIndex, newItem);
+
+        await ApiCaller.PanelService.UpdateParentAsync(panel.Id, ParentId, CurrentUserId);
+        await ApiCaller.PanelService.UpdateSortAsync(CurrentUserId, new UpdatePanelsSortDto { 
+             InstrumentId = InstrumentId,
+            ParentId = ParentId,
+            PanelIds=Panels.Select(t=>t.Id).ToList()
+        });
+
+        //var item = _items.FirstOrDefault(t => t.Id == sorttableEventArgs.ItemId);
+        //if (item != null)
+        //{
+        //    var id = (Guid)item.Attributes["key"];
+        //    var panel = Panels.FirstOrDefault(t => t.Id == id);
+        //    _items.Remove(item);
+        //    if (panel != null)
+        //        Panels.Remove(panel);
+        //}
+    }
+
+    private async void OnDragRemove(SorttableEventArgs sorttableEventArgs)
+    {
+        var item = _mDragZone.DragDropService?.DragItem;
+        if (item != null)
+        {
+            var id = (Guid)item.Attributes["key"];
+            var panel = Panels.FirstOrDefault(t => t.Id == id);
+            //_items = _mDragZone.Items;
+            //_items.Remove(item);
+            if (panel != null)
+                Panels.Remove(panel);
+
+            await ApiCaller.PanelService.UpdateSortAsync(CurrentUserId, new UpdatePanelsSortDto
+            {
+                InstrumentId = InstrumentId,
+                ParentId = ParentId,
+                PanelIds = Panels.Select(t => t.Id).ToList()
+            });
+        }
+    }
+
+    private void SetItems()
+    {
+        //if (_mDragZone != null)
+        //    _items = _mDragZone.Items;
     }
 }

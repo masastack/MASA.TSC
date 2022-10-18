@@ -9,6 +9,9 @@ public class PanelService : ServiceBase
     {
         App.MapDelete($"{BaseUri}/{{instrumentId}}/{{id}}/{{userId}}", DeleteAsync);
         App.MapGet($"{BaseUri}/{{userId}}/{{instrumentId}}/{{id}}", ListAsync);
+        App.MapPut($"{BaseUri}/{{userId}}/{{id}}/{{parentId}}", UpdateParentIdAsync);
+        App.MapPut($"{BaseUri}/{{userId}}/{{id}}/{{width}}/{{height}}", UpdateWidthHeightAsync);
+        App.MapPut($"{BaseUri}/{{userId}}", UpdateSortAsync);
     }
 
     public async Task AddAsync([FromServices] IEventBus eventBus, [FromBody] AddPanelDto model)
@@ -31,5 +34,20 @@ public class PanelService : ServiceBase
         var query = new PanelQuery(instrumentId);
         await eventBus.PublishAsync(query);
         return query.Result;
+    }
+
+    public async Task UpdateParentIdAsync([FromServices] IEventBus eventBus, Guid userId, Guid id, Guid parentId)
+    {
+        await eventBus.PublishAsync(new UpdatePanelParentCommond(id, parentId));
+    }
+
+    public async Task UpdateWidthHeightAsync([FromServices] IEventBus eventBus, Guid userId, Guid id, string width, string height)
+    {
+        await eventBus.PublishAsync(new UpdatePanelWidthHeightCommond(id, height, width));
+    }
+
+    public async Task UpdateSortAsync([FromServices] IEventBus eventBus, Guid userId, [FromBody] UpdatePanelsSortDto model)
+    {
+        await eventBus.PublishAsync(new UpdatePanelsSortCommand(model.InstrumentId, model.ParentId, model.PanelIds));
     }
 }

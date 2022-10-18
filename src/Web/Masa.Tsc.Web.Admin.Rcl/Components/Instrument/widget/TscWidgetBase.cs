@@ -5,26 +5,29 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscWidgetBase : TscComponentBase
 {
-    [Parameter]
-    public int Index { get; set; }
+    //[Parameter]
+    //public int Index { get; set; }
 
-    [Parameter]
-    public StringNumber Height { get; set; }
+    //[Parameter]
+    //public StringNumber Height { get; set; }
 
-    [Parameter]
-    public StringNumber Width { get; set; }
+    //[Parameter]
+    //public StringNumber Width { get; set; }
 
-    [Parameter]
-    public string Style { get; set; }
+    //[Parameter]
+    //public string Style { get; set; }
 
-    [Parameter]
-    public string Class { get; set; }
+    //[Parameter]
+    //public string Class { get; set; }
 
     [Parameter]
     public bool ReadOnly { get; set; }
 
     [Parameter]
-    public virtual PanelDto Item { get; set; }
+    public virtual PanelDto Value { get; set; }
+
+    [Parameter]
+    public EventCallback<PanelDto> ValueChanged { get; set; }
 
     protected Dictionary<string, object> Values { get; set; } = new();
 

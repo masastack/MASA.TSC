@@ -9,46 +9,46 @@
     </MCardTitle>
 }
 
-@switch (Item.Type)
+@switch (Value.Type)
 {
     case InstrumentTypes.Text:
         {
-            <TscWidgetText @ref="_widget" Item="Item" ReadOnly="Readonly" />
+            <TscWidgetText @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
         break;
     case InstrumentTypes.Card:
         {
-            <TscWidgetCard @ref="_widget" Item="Item" ReadOnly="Readonly" />
+            <TscWidgetCard @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
         break;
     case InstrumentTypes.Chart:
         {
-            <TscWidgetChart @ref="_widget" Item="Item" ReadOnly="Readonly" />
+            <TscWidgetChart @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
         break;
     case InstrumentTypes.Log:
         {
-            <TscWidgetLog @ref="_widget" Item="Item" ReadOnly="Readonly" />
+            <TscWidgetLog @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
         break;
     case InstrumentTypes.Trace:
         {
-            <TscWidgetTrace @ref="_widget" Item="Item" ReadOnly="Readonly" />
+            <TscWidgetTrace @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
         break;
     case InstrumentTypes.Tabs:
         {
-            <TscWidgetTabs @ref="_widget" Item="Item" ReadOnly="Readonly" />
+            <TscWidgetTabs @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
         break;
     case InstrumentTypes.Table:
         {
-            <TscWidgetTable @ref="_widget" Item="Item" ReadOnly="Readonly" />
+            <TscWidgetTable @ref="_widget" @bind-Value="Value" ReadOnly="Readonly" />
         }
         break;
     default:
         {
-            <TscWidgetDefault @ref="_widget" Item="Item"/>
+            <TscWidgetDefault @ref="_widget" @bind-Value="Value"/>
         }
         break;
 }

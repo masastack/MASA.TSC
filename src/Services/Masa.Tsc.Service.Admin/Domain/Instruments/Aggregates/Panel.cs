@@ -48,4 +48,15 @@ public class Panel : AggregateRoot<Guid>
         Description = panel.Description ?? string.Empty;
         Sort = panel.Sort;
     }
+
+    public void UpdateParentId(Guid parentId)
+    {
+        ParentId = parentId;
+    }
+
+    public void UpdateWidthHeight(string height, string width)
+    { 
+        Width = width??string.Empty;
+        Height = height ?? string.Empty;
+    }
 }
