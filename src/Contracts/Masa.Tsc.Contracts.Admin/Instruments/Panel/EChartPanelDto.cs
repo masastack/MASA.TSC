@@ -3,9 +3,11 @@
 
 namespace Masa.Tsc.Contracts.Admin.Instruments;
 
-public class ChartPanelDto : PanelDto
+public class EChartPanelDto : PanelDto
 {
     public string ChartType { get; set; }
+
+    public override PanelTypes Type => PanelTypes.Chart;
 
     public List<PanelMetricDto> Metrics { get; set; }
 }

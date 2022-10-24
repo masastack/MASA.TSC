@@ -16,6 +16,7 @@ public class TscCaller
         DirectoryService = new DirectoryService(caller, tokenProvider);
         InstrumentService = new InstrumentService(caller, tokenProvider);
         PanelService = new PanelService(caller, tokenProvider);
+        MetricService = new MetricService(caller, tokenProvider);
     }
 
     public AppService AppService { get; private init; }
@@ -35,4 +36,6 @@ public class TscCaller
     public InstrumentService InstrumentService { get; private init; }
 
     public PanelService PanelService { get; private init; }
+
+    public MetricService MetricService { get; private init; }
 }

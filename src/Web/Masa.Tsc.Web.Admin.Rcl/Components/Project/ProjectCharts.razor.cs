@@ -32,7 +32,7 @@ public partial class ProjectCharts
 
     private ProjectAppSearchModel _query;
 
-    public async Task OnLoadDataAsyc(ProjectAppSearchModel query)
+    internal async Task OnLoadDataAsyc(ProjectAppSearchModel query)
     {
         _query= query;
         var tasks=new List<Task>();

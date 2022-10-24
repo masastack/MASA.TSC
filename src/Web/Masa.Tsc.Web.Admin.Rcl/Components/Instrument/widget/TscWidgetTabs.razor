@@ -7,7 +7,7 @@
         do
         {
             var item = (PanelDto)_panelValue.Tabs[index++];
-            <TscWidgetTabItem Value="item" ReadOnly="ReadOnly" OnCallParent="ChildCallHandler" />
+            <TscWidgetTabItem Value="item" ReadOnly="ReadOnly" CallParent="ChildCallHandler" />
         }
         while (_panelValue.Tabs.Count - index > 0);
     }
@@ -21,7 +21,7 @@
         {
             var item =_panelValue.Tabs[index++];
             <MTabItem Value="item.Id.ToString()">
-                <TscInstrumentDetail ParentId="item.Id" Id="item.InstrumentId" @bind-Panels="item.Tabs" OnCallParent="ChildCallHandler" ReadOnly="ReadOnly" />
+                <TscInstrumentDetail ParentId="item.Id" Id="item.InstrumentId" @bind-Panels="item.Tabs" CallParent="ChildCallHandler" ReadOnly="ReadOnly" />
             </MTabItem>
         }
         while (_panelValue.Tabs.Count - index > 0);

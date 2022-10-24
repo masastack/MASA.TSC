@@ -53,6 +53,6 @@ public partial class TscInstrumentPanelDetail
         }
 
         _panel.Id = Guid.NewGuid();
-        await CallParent(OperateCommand.Success, item);
+        await OnCallParent(OperateCommand.Success, item);
     }
 }

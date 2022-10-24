@@ -16,6 +16,7 @@ global using Masa.Tsc.Contracts.Admin.Infrastructure.Command;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Const;
 global using Masa.Tsc.Contracts.Admin.Instruments;
 global using Masa.Tsc.Web.Admin.Rcl.Data;
+global using Masa.Tsc.Web.Admin.Rcl.Data.EChart;
 global using Masa.Tsc.Web.Admin.Rcl.Data.Instrument;
 global using Masa.Tsc.Web.Admin.Rcl.Data.Team;
 global using Masa.Tsc.Web.Admin.Rcl.Data.Trace;

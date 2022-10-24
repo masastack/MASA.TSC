@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
-public class EChartOptionAxis
+internal class EChartOptionAxis
 {
     public string Type { get; set; }
 

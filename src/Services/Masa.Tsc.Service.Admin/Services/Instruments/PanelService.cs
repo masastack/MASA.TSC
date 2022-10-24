@@ -14,7 +14,7 @@ public class PanelService : ServiceBase
         App.MapPut($"{BaseUri}/{{userId}}", UpdateSortAsync);
     }
 
-    public async Task AddAsync([FromServices] IEventBus eventBus, [FromBody] AddPanelDto model)
+    public async Task AddAsync([FromServices] IEventBus eventBus, PanelDto model)
     {
         await eventBus.PublishAsync(new AddPanelCommand(model));
     }

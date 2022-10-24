@@ -22,7 +22,7 @@ public partial class GrowthChart
         XAxis = new EChartOptionAxis
         {
             Type = "category",
-            Show=false            
+            Show = false
         },
         YAxis = new EChartOptionAxis
         {
@@ -30,16 +30,16 @@ public partial class GrowthChart
             Show = false
         },
         Grid = new EChartOptionGrid
-        { 
-            Left="2%",
-            Right="3%",
-            Bottom="10%"
+        {
+            Left = "2%",
+            Right = "3%",
+            Bottom = "10%"
         }
     };
 
     public int Total { get; set; } = 23;
 
-    protected override async Task LoadAsync(ProjectAppSearchModel query)
+    internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         //var data = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
         //{
@@ -114,7 +114,7 @@ public partial class GrowthChart
     private static EChartOptionSerieData GetModel(bool isTrace, string value)
     {
         return new EChartOptionSerieData { Name = isTrace ? "Tace" : "Log", Value = value };
-    }   
+    }
 
     private int GetRate(int lastValue, int value, int count, int max)
     {

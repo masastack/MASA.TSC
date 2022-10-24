@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
-public class EChartOptionAxisLine
+internal class EChartOptionAxisLine
 {
     public bool? Show { get; set; }
 }

@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
-public class EChartLineDataSymbolOption
+internal class EChartLineDataSymbolOption
 {
     /// <summary>
     /// last element must has value "arrow"

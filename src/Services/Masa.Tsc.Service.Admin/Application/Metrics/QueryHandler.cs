@@ -15,7 +15,7 @@ public class QueryHandler
     }
 
     [EventHandler]
-    public async Task GetRangeValuesAsync(RangeQuery query)
+    public async Task GetRangeValuesAsync(RangeValueQuery query)
     {
         var data = await _prometheusClient.QueryRangeAsync(new QueryRangeRequest
         {
@@ -64,6 +64,38 @@ public class QueryHandler
         }
 
         _logger.LogError("request failed {data.ErrorType} {data.Error}", data);
+    }
+
+    [EventHandler]
+    public async Task GetQueryRangeAsync(RangeQuery query)
+    {
+        var data = await _prometheusClient.QueryRangeAsync(new QueryRangeRequest
+        {
+            End = query.End.ToUnixTimestamp().ToString(),
+            Start = query.Start.ToUnixTimestamp().ToString(),
+            Query = query.Match,
+            Step = query.Step,
+        });
+
+        if (data.Status == ResultStatuses.Error)
+            _logger.LogError("request failed {data.ErrorType} {data.Error}", data);
+
+        query.Result = data.Data!;
+    }
+
+    [EventHandler]
+    public async Task GetQueryAsync(InstantQuery query)
+    {
+        var data = await _prometheusClient.QueryAsync(new QueryRequest
+        {
+            Query = query.Match,
+            Time = query.Time.ToUnixTimestamp().ToString()
+        });
+        query.Result = data.Data!;
+        if (data.Status != ResultStatuses.Success)
+        {
+            _logger.LogError("request failed {data.ErrorType} {data.Error}", data);
+        }
     }
 
     [EventHandler]

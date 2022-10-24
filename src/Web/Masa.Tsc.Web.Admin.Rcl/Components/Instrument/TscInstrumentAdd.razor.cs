@@ -19,6 +19,6 @@ public partial class TscInstrumentAdd
     private async Task OnSubmitAsync()
     {
         await ApiCaller.InstrumentService.AddAsync(Item);
-        await CallParent(OperateCommand.Add, "instrument",Item);        
+        await OnCallParent(OperateCommand.Add, "instrument",Item);        
     }
 }

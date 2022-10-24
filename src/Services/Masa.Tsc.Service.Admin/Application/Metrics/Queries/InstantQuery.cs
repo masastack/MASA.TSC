@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Metrics;
 
-public record InstantQuery(string Match, DateTime Time) : Query<object>
+public record InstantQuery(string Match, DateTime Time) : Query<QueryResultDataResponse>
 {
-    public override object Result { get; set; }
+    public override QueryResultDataResponse Result { get; set; }
 }

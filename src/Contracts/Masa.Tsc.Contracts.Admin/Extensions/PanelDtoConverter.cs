@@ -12,7 +12,7 @@ public class PanelDtoConverter : JsonConverter<PanelDto>
         if (JsonDocument.TryParseValue(ref reader, out var doc))
         {
             var jsonObject = doc.RootElement;
-            if (doc.RootElement.TryGetProperty(TYPE_KEY, out var propertyValue) && Enum.TryParse(propertyValue.GetRawText(), out PanelTypes type))
+            if (jsonObject.TryGetProperty(TYPE_KEY, out var propertyValue) && Enum.TryParse(propertyValue.GetRawText(), out PanelTypes type))
             {
                 var rootText = jsonObject.GetRawText();
                 switch (type)
@@ -26,7 +26,7 @@ public class PanelDtoConverter : JsonConverter<PanelDto>
                     case PanelTypes.TabItem:
                         return JsonSerializer.Deserialize<TabItemPanelDto>(rootText, options);
                     case PanelTypes.Chart:
-                        return JsonSerializer.Deserialize<ChartPanelDto>(rootText, options);
+                        return JsonSerializer.Deserialize<EChartPanelDto>(rootText, options);
                     default:
                         return JsonSerializer.Deserialize<PanelDto>(rootText, options);
                 }
@@ -71,7 +71,7 @@ public class PanelDtoEnumerableConverter : JsonConverter<List<PanelDto>>
                             result.Add(JsonSerializer.Deserialize<TabItemPanelDto>(itemText, options)!);
                             break;
                         case PanelTypes.Chart:
-                            result.Add(JsonSerializer.Deserialize<ChartPanelDto>(itemText, options)!);
+                            result.Add(JsonSerializer.Deserialize<EChartPanelDto>(itemText, options)!);
                             break;
                         default:
                             result.Add(JsonSerializer.Deserialize<PanelDto>(itemText, options)!);

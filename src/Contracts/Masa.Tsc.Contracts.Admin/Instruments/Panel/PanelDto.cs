@@ -5,7 +5,7 @@ using Masa.Tsc.Contracts.Admin.Extensions;
 
 namespace Masa.Tsc.Contracts.Admin.Instruments;
 
-//[JsonConverter(typeof(PanelDtoConverter))]
+[JsonConverter(typeof(PanelDtoConverter))]
 public class PanelDto: AddPanelDto
 {
     

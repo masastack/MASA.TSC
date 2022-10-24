@@ -42,6 +42,6 @@ public partial class TscInstrumentPanelView
         if (isSave)
             await ApiCaller.PanelService.UpdateAsync(sendData);
         Value = item;
-        await CallParent(OperateCommand.Success, Value);
+        await OnCallParent(OperateCommand.Success, Value);
     }
 }

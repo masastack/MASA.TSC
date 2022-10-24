@@ -19,7 +19,7 @@ public partial class TscInstrumentPanels
         },
         new PanelTypeDto(){
             Index=2,
-            Name="Widget",
+            Name="Chart",
             Key=PanelTypes.Chart.ToString()
         },
         new PanelTypeDto(){
@@ -68,7 +68,7 @@ public partial class TscInstrumentPanels
         }
         else if (command == OperateCommand.Close)
         {
-            await CallParent(command);
+            await OnCallParent(command);
             return true;
         }
         return false;

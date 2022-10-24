@@ -5,7 +5,7 @@
     {
         <MCardTitle Class="d-flex justify-end">
             <MButton OnClick="OpenDialog">添加</MButton>
-            <MButton OnClick="@(async ()=> await CallParent(OperateCommand.Close))">Close</MButton>
+            <MButton OnClick="@(async ()=> await OnCallParent(OperateCommand.Close))">Close</MButton>
         </MCardTitle>
     }
     <MCardText>
@@ -27,12 +27,12 @@
                     </MRow>
                 </MCardTitle>
                 <MCardText>
-                    <TscInstrumentPanels InstrumentId="InstrumentId" ParentId="ParentId" OnCallParent="ChildCallHandler" />
+                    <TscInstrumentPanels InstrumentId="InstrumentId" ParentId="ParentId" CallParent="ChildCallHandler" />
                 </MCardText>
             }
             else
             {
-                <TscInstrumentPanelView @bind-Value="_editPanel" Readonly="ReadOnly" OnCallParent="ChildCallHandler" />
+                <TscInstrumentPanelView @bind-Value="_editPanel" Readonly="ReadOnly" CallParent="ChildCallHandler" />
             }
         </MCard>
     </ChildContent>

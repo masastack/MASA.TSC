@@ -22,6 +22,6 @@
     </MRow>
     @if (item.Expand && item.Children != null && item.Children.Any())
     {
-        <TscDirectoryTreeTable Data=item.Children Deep=Deep+1 Expand=Expand OnCallParent="ChildCallHandler" OnRowSelected=RowSelectAsync></TscDirectoryTreeTable>
+        <TscDirectoryTreeTable Data=item.Children Deep=Deep+1 Expand=Expand CallParent="ChildCallHandler" OnRowSelected=RowSelectAsync></TscDirectoryTreeTable>
     }
 }

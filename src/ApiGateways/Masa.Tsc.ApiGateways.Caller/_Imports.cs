@@ -10,6 +10,7 @@ global using Masa.Tsc.Contracts.Admin;
 global using Masa.Tsc.Contracts.Admin.Charts;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Dtos;
 global using Masa.Tsc.Contracts.Admin.Instruments;
+global using Masa.Utils.Data.Prometheus.Model;
 global using Microsoft.Extensions.DependencyInjection;
 global using System.Net.Http.Headers;
 global using System.Text;

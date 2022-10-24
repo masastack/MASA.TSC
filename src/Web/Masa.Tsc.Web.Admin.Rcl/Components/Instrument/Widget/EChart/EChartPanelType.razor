@@ -1,0 +1,34 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+
+@{
+    var index = 0;
+    do
+    {
+        var first = Items[index++];
+        var sencond = Items.Count - index > 0 ? Items[index++] : default(EChartPanelTypeModel);
+        bool selectedF = first.Type == Value, selectedS = sencond?.Type == Value;
+        
+        <MRow>
+            <MCol Cols="6">
+                <MCard OnClick="@(async ()=>await OnSelected(first))"  Style="@(selectedF?"border-color:blue-grey":"")">
+                    <MImage Src="@first.Src"/>
+                </MCard>
+            </MCol>
+            @if (sencond != null)
+            {
+                <MCol Cols="6">
+                    <MCard OnClick="@(async ()=>await OnSelected(sencond))" Style="@(selectedS?"border-color:blue-grey":"")">
+                        <MImage Src="@sencond.Src" />
+                    </MCard>
+                </MCol>
+            }
+        </MRow>
+        @if (Items.Count - index <= 0)
+            break;
+        else
+        {
+
+        }
+    }
+    while (true);
+}
