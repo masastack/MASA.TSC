@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
-public class EChartOptionSerie
+internal class EChartOptionSerie
 {
     public string Name { get; set; }
 
@@ -18,7 +18,7 @@ public class EChartOptionSerie
     public EChartPieBorderRadiusOptionLabel Label { get; set; }
 }
 
-public class EChartOptionSerieEmphasis
+internal class EChartOptionSerieEmphasis
 {
     public EChartOptionItemStyle ItemStyle { get; set; } = new EChartOptionItemStyle
     {

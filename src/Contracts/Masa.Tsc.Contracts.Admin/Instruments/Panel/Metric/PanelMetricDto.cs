@@ -10,4 +10,8 @@ public class PanelMetricDto
     public string Caculate { get; set; }
 
     public string DisplayName { get; set; }
+
+    public string Unit { get; set; }
+
+    public string Color { get; set; }
 }

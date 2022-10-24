@@ -48,6 +48,6 @@ public partial class TscWidgetTabItem
         if (!await PopupService.ConfirmAsync("Remove Confirm", "Remove this Tab Item?"))
             return;
         await ApiCaller.PanelService.DeleteAsync(CurrentUserId, _panelValue.InstrumentId, _panelValue.Id);
-        await CallParent(OperateCommand.Remove, _panelValue.Id.ToString());
+        await OnCallParent(OperateCommand.Remove, _panelValue.Id.ToString());
     }
 }

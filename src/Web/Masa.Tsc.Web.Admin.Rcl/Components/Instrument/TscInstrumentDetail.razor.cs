@@ -241,7 +241,7 @@ public partial class TscInstrumentDetail
                 builder.OpenComponent<TscPanelEdit>(0);
                 builder.AddAttribute(1, "Value", panel);
                 builder.AddAttribute(2, "ReadOnly", ReadOnly);
-                builder.AddAttribute(3, "OnCallParent", new EventCallback<object[]>(this, ChildCallHandler));
+                builder.AddAttribute(3, "CallParent", new EventCallback<object[]>(this, ChildCallHandler));
                 builder.AddAttribute(4, "ValueChanged", new EventCallback<PanelDto>(this, (PanelDto dto) => { panel = dto; }));
                 builder.CloseComponent();
             }

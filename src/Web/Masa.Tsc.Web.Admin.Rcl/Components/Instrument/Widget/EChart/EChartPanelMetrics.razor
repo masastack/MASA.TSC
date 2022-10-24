@@ -1,0 +1,24 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+<MCard Class="d-flex">
+@{
+    int index = 0;
+    if (Items != null)
+    {
+        while (Items.Count - index > 0)
+        {
+            var item = Items[index++];
+            <EChartPanelMetricItem @bind-Value="item" Names="_names" />
+        }
+    }
+    if (!ReadOnly)
+    {
+        <MCard OnClick="Add">
+            <MCardText>
+                <MIcon XLarge>mdi-plus</MIcon>
+            </MCardText>
+        </MCard>
+    }
+}
+</MCard>

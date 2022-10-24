@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data.Trace;
 
-public class TraceDetailModel : TraceTimeUsModel
+internal class TraceDetailModel : TraceTimeUsModel
 {
     public Dictionary<string, string> Overview { get; set; } = new Dictionary<string, string>();
 

@@ -10,6 +10,8 @@ public class MetricService : ServiceBase
         App.MapGet($"{BaseUri}/names", GetNamesAsync);
         App.MapGet($"{BaseUri}/label-values", GetLabelValuesAsync);
         App.MapGet($"{BaseUri}/range-values", GetRangeValuesAsync);
+        App.MapGet($"{BaseUri}/query", GetQueryAsync);
+        App.MapGet($"{BaseUri}/query-range", GetQueryRangeAsync);
     }
 
     private async Task<IEnumerable<string>> GetNamesAsync([FromServices] IEventBus eventBus, [FromQuery] string? match)
@@ -28,14 +30,23 @@ public class MetricService : ServiceBase
 
     private async Task<string> GetRangeValuesAsync([FromServices] IEventBus eventBus, [FromBody] RequestMetricAggDto param)
     {
-        if (param.Labels != null && param.Labels.Any())
-        {
-            param.Match = $"{param.Match}{{{string.Join(',', param.Labels)}}}";
-        }
-
-        var query = new RangeQuery(param.Match, Step: string.Empty, param.Start, param.End);
+        var query = new RangeValueQuery(param.Match, param.Start, param.End);
 
         await eventBus.PublishAsync(query);
         return query.Result ?? string.Empty;
+    }
+
+    private async Task<QueryResultDataResponse> GetQueryAsync([FromServices] IEventBus eventBus, [FromQuery] string query, [FromQuery] DateTime time)
+    {
+        var result = new InstantQuery(query, time);
+        await eventBus.PublishAsync(result);
+        return result.Result;
+    }
+
+    private async Task<QueryResultDataResponse> GetQueryRangeAsync([FromServices] IEventBus eventBus, [FromBody] RequestMetricAggDto param)
+    {
+        var query = new RangeQuery(param.Match, param.Step, param.Start, param.End);
+        await eventBus.PublishAsync(query);
+        return query.Result;
     }
 }

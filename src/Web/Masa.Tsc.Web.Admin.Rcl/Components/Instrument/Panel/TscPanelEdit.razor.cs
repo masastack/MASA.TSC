@@ -83,12 +83,12 @@ public partial class TscPanelEdit : IDisposable
         if (!await PopupService.ConfirmAsync("删除", "确认要移除该panel吗"))
             return;
         await ApiCaller.PanelService.DeleteAsync(CurrentUserId, Value.InstrumentId, Value.Id);
-        await CallParent(OperateCommand.Remove, Value);
+        await OnCallParent(OperateCommand.Remove, Value);
     }
 
     private async Task OnEdit()
     {
-        await CallParent(OperateCommand.Update, Value);
+        await OnCallParent(OperateCommand.Update, Value);
     }
 
     public override void Dispose()

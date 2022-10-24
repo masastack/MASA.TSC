@@ -40,21 +40,21 @@ public partial class TscDirectoryTreeTable
 
     private async Task UpdateAsync(DirectoryTreeDto item)
     {
-        await CallParent(OperateCommand.Update, item);
+        await OnCallParent(OperateCommand.Update, item);
         //if (OnUpdateAsync is not null)
         //    await OnUpdateAsync.Invoke(item);
     }
 
     private async Task ViewAsync(DirectoryTreeDto item)
     {
-        await CallParent(OperateCommand.View, item);
+        await OnCallParent(OperateCommand.View, item);
         //if (OnUpdateAsync is not null)
         //    await OnUpdateAsync.Invoke(item);
     }
 
     private async Task DeleteAsync(DirectoryTreeDto item)
     {
-        await CallParent(OperateCommand.Remove, item);
+        await OnCallParent(OperateCommand.Remove, item);
         //if (OnDeleteAsync is not null)
         //    await OnDeleteAsync.Invoke(item);
     }

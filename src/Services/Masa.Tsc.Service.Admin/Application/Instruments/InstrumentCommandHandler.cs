@@ -79,20 +79,19 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
                 ParentId = command.Data.ParentId
             };
             await _panelRepository.AddAsync(entity);
-            //if (command.Data.Metrics != null && command.Data.Metrics.Any())
-            //{
-            //    var list = command.Data.Metrics.Select(x => new PanelMetric
-            //    {
-            //        DisplayName = x.Name,
-            //        Name = x.Name,
-            //        PanelId = entity.Id,
-            //        Sort = x.Sort,
-            //        Unit = x.Unit,
-            //        Value = x.Value
-            //    });
+            if (command.Data is EChartPanelDto chartDto && chartDto.Metrics != null && chartDto.Metrics.Any())
+            {
+                var list = chartDto.Metrics.Select(x => new PanelMetric
+                {
+                    DisplayName = x.Name,
+                    Name = x.Caculate,
+                    PanelId = entity.Id,
+                    Unit = x.Unit,
+                    Value=x.Name,                     
+                });
 
-            //    await _metricReposity.AddRangeAsync(list);
-            //}
+                await _metricReposity.AddRangeAsync(list);
+            }
         }
 
         [EventHandler]

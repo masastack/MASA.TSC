@@ -43,7 +43,7 @@ public partial class LogTraceStatiscChart
         }               
     };
 
-    protected override async Task LoadAsync(ProjectAppSearchModel query)
+    internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         //var data = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
         //{

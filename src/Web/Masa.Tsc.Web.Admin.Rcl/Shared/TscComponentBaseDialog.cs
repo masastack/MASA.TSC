@@ -9,7 +9,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Shared;
 public partial class TscComponentBase
 {
     [Parameter]
-    public EventCallback<object[]> OnCallParent { get; set; }
+    public EventCallback<object[]> CallParent { get; set; }
 
     protected bool _showDialog = false;
 
@@ -18,10 +18,10 @@ public partial class TscComponentBase
     /// </summary>
     /// <param name="values"></param>
     /// <returns></returns>
-    protected async Task CallParent(params object[] values)
+    protected async Task OnCallParent(params object[] values)
     {
-        if (OnCallParent.HasDelegate)
-            await OnCallParent.InvokeAsync(values);
+        if (CallParent.HasDelegate)
+            await CallParent.InvokeAsync(values);
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ public partial class TscComponentBase
 
         //await CallParent(values);
         if(!await ExecuteCommondAsync(command, values[1..]))
-            await CallParent(values);
+            await OnCallParent(values);
     }
 
     protected virtual async Task<bool> ExecuteCommondAsync(OperateCommand command, object[] values)

@@ -1,0 +1,23 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+<MCard Width="240">
+    <MContainer>
+        <MRow>
+            <MTextField @bind-Value="Value.Name" Placeholder="指标名称" />
+        </MRow>
+        <MRow>
+            <MTextField TValue="string" Placeholder="取值范围" />
+        </MRow>
+        <MRow>
+            <MTextField @bind-Value="Value.Caculate" Placeholder="计算规则" />
+        </MRow>
+        <MRow>
+            <MTextField @bind-Value="Value.Unit" Placeholder="单位" />
+        </MRow>
+    </MContainer>
+    <MCardActions>
+        <MButton OnClick="@(()=>{})"><MIcon Color="@Value.Color">mdi-circle</MIcon></MButton>
+        <MButton OnClick="OnDeleteAsync"><MIcon>mdi-delete</MIcon></MButton>
+    </MCardActions>
+</MCard>

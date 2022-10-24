@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
-public class EChartOptionLegend
+internal class EChartOptionLegend
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public EchartOrientTypes? Orient { get; set; }

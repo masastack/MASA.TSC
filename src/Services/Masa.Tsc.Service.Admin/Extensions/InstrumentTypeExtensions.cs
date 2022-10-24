@@ -46,7 +46,7 @@ internal static class InstrumentTypeExtensions
 
     private static PanelDto GetChartPanel(Panel panel)
     {
-        return GetDefault(panel, new ChartPanelDto());
+        return GetDefault(panel, new EChartPanelDto());
     }
 
     private static PanelDto GetTabsPanel(Panel panel)

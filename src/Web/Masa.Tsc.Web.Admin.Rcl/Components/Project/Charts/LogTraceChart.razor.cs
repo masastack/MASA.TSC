@@ -42,7 +42,7 @@ public partial class LogTraceChart
     };
     //private ProjectAppSearchModel _query;
 
-    protected override async Task LoadAsync(ProjectAppSearchModel query)
+    internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         if (query == null)
             return;
@@ -67,7 +67,7 @@ public partial class LogTraceChart
                      Alias="Count",
                 }
             },
-                Queries = ConvertToTraceQueries(query,isSpan: true),
+                Queries = ConvertToTraceQueries(query, isSpan: true),
                 Interval = interval,
             });
 
@@ -83,13 +83,13 @@ public partial class LogTraceChart
                      Alias="Count",
                 }
             },
-                Queries = ConvertToTraceQueries(query,isTrace: true),
+                Queries = ConvertToTraceQueries(query, isTrace: true),
                 Interval = interval,
             });
 
             if (data1.Data == null || !data1.Data.Any())
                 return;
-            var xPoints = data1.Data.Select(item => DateTime.Parse(item.X).Format(CurrentTimeZone, GetFormat(start,end))).ToArray();
+            var xPoints = data1.Data.Select(item => DateTime.Parse(item.X).Format(CurrentTimeZone, GetFormat(start, end))).ToArray();
 
             //_options.Legend.Data= new string[] {"","" };
             _options.XAxis.Data = xPoints;
@@ -142,7 +142,7 @@ public partial class LogTraceChart
 
             if (data1 == null || !data1.Any())
                 return;
-            var xPoints = data1.Select(item => DateTime.Parse(item.Key).Format(CurrentTimeZone, GetFormat(start,end))).ToArray();
+            var xPoints = data1.Select(item => DateTime.Parse(item.Key).Format(CurrentTimeZone, GetFormat(start, end))).ToArray();
 
             _options.XAxis.Data = xPoints;
             _options.Series = new EChartLineOptionSerie[] {
@@ -230,7 +230,7 @@ public partial class LogTraceChart
         return dic;
     }
 
-    private Dictionary<string, string> ConvertToTraceQueries(ProjectAppSearchModel query,bool isSpan = false, bool isTrace = false)
+    private Dictionary<string, string> ConvertToTraceQueries(ProjectAppSearchModel query, bool isSpan = false, bool isTrace = false)
     {
         var dic = new Dictionary<string, string>();
         if (query.AppId != null)

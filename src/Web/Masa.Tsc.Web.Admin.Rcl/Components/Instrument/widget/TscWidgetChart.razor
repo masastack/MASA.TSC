@@ -1,6 +1,40 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscWidgetBase
-<h3>TscWidgetChart</h3>
 
-@code {
+@if (ReadOnly)
+{
+    <MECharts Option="_options" Width="@("100%")" Height="@("100%")"></MECharts>
+}
+else
+{
+    <MRow>
+        <MCol Cols="8">
+            <MECharts Option="_options" />
+            <MCard><MTextField @bind-Value="_panelValue.Title" Placeholder="" /></MCard>
+            <MCard><MTextarea @bind-Value="_panelValue.Description" Placeholder="" /></MCard>
+            <EChartPanelMetrics ReadOnly="ReadOnly" @bind-Items="_metrics"></EChartPanelMetrics>
+        </MCol>
+        <MCol Cols="4">
+            <MExpansionPanels Values="new (){1,2,3}" Multiple>
+                <MExpansionPanel Value="1">
+                    <MExpansionPanelHeader>Visualization</MExpansionPanelHeader>
+                    <MExpansionPanelContent>
+                        <EChartPanelType Value="_type.Type" ValueChanged="OnTypeChange"/>
+                    </MExpansionPanelContent>
+                </MExpansionPanel>
+                <MExpansionPanel Value="2">
+                    <MExpansionPanelHeader>Display</MExpansionPanelHeader>
+                    <MExpansionPanelContent>
+                        <EChartPanelDisplay />
+                    </MExpansionPanelContent>
+                </MExpansionPanel>
+                <MExpansionPanel Value="3">
+                    <MExpansionPanelHeader>Configration</MExpansionPanelHeader>
+                    <MExpansionPanelContent>
+                        <EChartPanelOther />
+                    </MExpansionPanelContent>
+                </MExpansionPanel>
+            </MExpansionPanels>
+        </MCol>
+    </MRow>
 }
