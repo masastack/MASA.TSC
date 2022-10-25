@@ -14,6 +14,15 @@ public class ProjectService : BaseService
 
     public async Task<TeamMonitorDto> OverviewAsync(RequestTeamMonitorDto model)
     {
-        return await Caller.GetAsync<TeamMonitorDto>($"{RootPath}/overview", model) ?? default!;
+        try
+        {
+            return await Caller.GetAsync<TeamMonitorDto>($"{RootPath}/overview", model) ?? default!;
+        }
+        catch (Exception ex)
+        { 
+        
+        }
+
+        return default!;
     }
 }

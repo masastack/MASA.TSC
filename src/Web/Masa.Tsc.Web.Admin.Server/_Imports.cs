@@ -2,9 +2,9 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 global using Masa.BuildingBlocks.Configuration;
-global using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
-global using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
 global using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
+global using Masa.Contrib.Service.Caller.Authentication.OpenIdConnect;
+//global using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
 global using Masa.Stack.Components;
 global using Masa.Stack.Components.Models;
 global using Masa.Stack.Components.UserCenters.Models;

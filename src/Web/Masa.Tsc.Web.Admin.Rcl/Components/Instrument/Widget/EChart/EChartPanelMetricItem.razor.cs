@@ -18,18 +18,7 @@ public partial class EChartPanelMetricItem
     {
         if (ValueChanged.HasDelegate)
             await ValueChanged.InvokeAsync(Value);
-    }
-
-    protected override Task OnInitializedAsync()
-    {
-        return base.OnInitializedAsync();
-    }
-
-    protected override void OnWatcherInitialized()
-    {
-        base.OnWatcherInitialized();
-        //Watcher.Watch(Value, OnValueChanged)
-    }
+    }    
 
     private async Task OnDeleteAsync()
     {

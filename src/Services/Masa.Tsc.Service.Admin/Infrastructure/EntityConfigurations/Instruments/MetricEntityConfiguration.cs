@@ -9,9 +9,9 @@ public class MetricEntityConfiguration: IEntityTypeConfiguration<PanelMetric>
     {
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Name).HasMaxLength(200).IsRequired();
-        builder.Property(x => x.DisplayName).HasMaxLength(200);
+        builder.Property(x => x.Caculate).HasMaxLength(200);
         builder.Property(x => x.Unit).HasMaxLength(20).HasDefaultValue(string.Empty);
-        builder.Property(x => x.Value).HasMaxLength(200).IsRequired();
+        //builder.Property(x => x.Sort).HasMaxLength(200).IsRequired();
 
         builder.HasOne(x => x.Panel).WithMany(p => p.Metrics).HasForeignKey(x => new { x.PanelId });
     }

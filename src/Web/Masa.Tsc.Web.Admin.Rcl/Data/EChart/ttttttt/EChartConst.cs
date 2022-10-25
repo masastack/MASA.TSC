@@ -1,189 +1,187 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using System.Text.Json.Nodes;
-using System.Text.RegularExpressions;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Data.EChart;
 
 internal static class EChartConst
 {
     #region init json
-    private const string BarBasicJson = @"xAxis: {
-    type: 'category',
-    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    private const string BarBasicJson = @"{
+""xAxis"": {
+    ""type"": ""category"",
+    ""data"": [""Mon"", ""Tue"", ""Wed"", ""Thu"", ""Fri"", ""Sat"", ""Sun""]
   },
-  yAxis: {
-    type: 'value'
+  ""yAxis"": {
+    ""type"": ""value""
   },
-  series: [
+  ""series"": [
     {
-      data: [120, 200, 150, 80, 70, 110, 130],
-      type: 'bar'
+      ""data"": [120, 200, 150, 80, 70, 110, 130],
+      ""type"": ""bar""
     }
   ]
 }";
     private const string LineBasicJson = @"{
-  xAxis: {
-    type: 'category',
-    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  ""xAxis"": {
+    ""type"": ""category"",
+    ""data"": [""Mon"", ""Tue"", ""Wed"", ""Thu"", ""Fri"", ""Sat"", ""Sun""]
   },
-  yAxis: {
-    type: 'value'
+  ""yAxis"": {
+    ""type"": ""value""
   },
-  series: [
+  ""series"": [
     {
-      data: [150, 230, 224, 218, 135, 147, 260],
-      type: 'line'
+      ""data"": [150, 230, 224, 218, 135, 147, 260],
+      ""type"": ""line""
     }
   ]
 }";
     private const string LineAreaBasicJson = @"{
-  title: {
-    text: 'Stacked Area Chart'
+  ""title"": {
+    ""text"": ""Stacked Area Chart""
   },
-  tooltip: {
-    trigger: 'axis',
-    axisPointer: {
-      type: 'cross',
-      label: {
-        backgroundColor: '#6a7985'
+  ""tooltip"": {
+    ""trigger"": ""axis"",
+    ""axisPointer"": {
+      ""type"": ""cross"",
+      ""label"": {
+        ""backgroundColor"": ""#6a7985""
       }
     }
   },
-  legend: {
-    data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
+  ""legend"": {
+    ""data"": [""Email"", ""Union Ads"", ""Video Ads"", ""Direct"", ""Search Engine""]
   },
-  toolbox: {
-    feature: {
-      saveAsImage: {}
+  ""toolbox"": {
+    ""feature"": {
+      ""saveAsImage"": {}
     }
   },
-  grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '3%',
-    containLabel: true
+  ""grid"": {
+    ""left"": ""3%"",
+    ""right"": ""4%"",
+    ""bottom"": ""3%"",
+    ""containLabel"": true
   },
-  xAxis: [
+  ""xAxis"": [
     {
-      type: 'category',
-      boundaryGap: false,
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    }
-  ],
-  yAxis: [
-    {
-      type: 'value'
+      ""type"": ""category"",
+      ""boundaryGap"": false,
+      ""data"": [""Mon"", ""Tue"", ""Wed"", ""Thu"", ""Fri"", ""Sat"", ""Sun""]
     }
   ],
-  series: [
+  ""yAxis"": [
     {
-      name: 'Email',
-      type: 'line',
-      stack: 'Total',
-      areaStyle: {},
-      emphasis: {
-        focus: 'series'
+      ""type"": ""value""
+    }
+  ],
+  ""series"": [
+    {
+      ""name"": ""Email"",
+      ""type"": ""line"",
+      ""stack"": ""Total"",
+      ""areaStyle"": {},
+      ""emphasis"": {
+        ""focus"": ""series""
       },
-      data: [120, 132, 101, 134, 90, 230, 210]
+      ""data"": [120, 132, 101, 134, 90, 230, 210]
     },
     {
-      name: 'Union Ads',
-      type: 'line',
-      stack: 'Total',
-      areaStyle: {},
-      emphasis: {
-        focus: 'series'
+      ""name"": ""Union Ads"",
+      ""type"": ""line"",
+      ""stack"": ""Total"",
+      ""areaStyle"": {},
+      ""emphasis"": {
+        ""focus"": ""series""
       },
-      data: [220, 182, 191, 234, 290, 330, 310]
+      ""data"": [220, 182, 191, 234, 290, 330, 310]
     },
     {
-      name: 'Video Ads',
-      type: 'line',
-      stack: 'Total',
-      areaStyle: {},
-      emphasis: {
-        focus: 'series'
+      ""name"": ""Video Ads"",
+      ""type"": ""line"",
+      ""stack"": ""Total"",
+      ""areaStyle"": {},
+      ""emphasis"": {
+        ""focus"": ""series""
       },
-      data: [150, 232, 201, 154, 190, 330, 410]
+      ""data"": [150, 232, 201, 154, 190, 330, 410]
     },
     {
-      name: 'Direct',
-      type: 'line',
-      stack: 'Total',
-      areaStyle: {},
-      emphasis: {
-        focus: 'series'
+      ""name"": ""Direct"",
+      ""type"": ""line"",
+      ""stack"": ""Total"",
+      ""areaStyle"": {},
+      ""emphasis"": {
+        ""focus"": ""series""
       },
-      data: [320, 332, 301, 334, 390, 330, 320]
+      ""data"": [320, 332, 301, 334, 390, 330, 320]
     },
     {
-      name: 'Search Engine',
-      type: 'line',
-      stack: 'Total',
-      label: {
-        show: true,
-        position: 'top'
+      ""name"": ""Search Engine"",
+      ""type"": ""line"",
+      ""stack"": ""Total"",
+      ""label"": {
+        ""show"": true,
+        ""position"": ""top""
       },
-      areaStyle: {},
-      emphasis: {
-        focus: 'series'
+      ""areaStyle"": {},
+      ""emphasis"": {
+        ""focus"": ""series""
       },
-      data: [820, 932, 901, 934, 1290, 1330, 1320]
+      ""data"": [820, 932, 901, 934, 1290, 1330, 1320]
     }
   ]
 }";
     private const string PieBasicJson = @"{
-  title: {
-    text: 'Referer of a Website',
-    subtext: 'Fake Data',
-    left: 'center'
+  ""title"": {
+    ""text"": ""Referer of a Website"",
+    ""subtext"": ""Fake Data"",
+    ""left"": ""center""
   },
-  tooltip: {
-    trigger: 'item'
+  ""tooltip"": {
+    ""trigger"": ""item""
   },
-  legend: {
-    orient: 'vertical',
-    left: 'left'
+  ""legend"": {
+    ""orient"": ""vertical"",
+    ""left"": ""left""
   },
-  series: [
+  ""series"": [
     {
-      name: 'Access From',
-      type: 'pie',
-      radius: '50%',
-      data: [
-        { value: 1048, name: 'Search Engine' },
-        { value: 735, name: 'Direct' },
-        { value: 580, name: 'Email' },
-        { value: 484, name: 'Union Ads' },
-        { value: 300, name: 'Video Ads' }
+      ""name"": ""Access From"",
+      ""type"": ""pie"",
+      ""radius"": ""50%"",
+      ""data"": [
+        { ""value"": 1048, ""name"": ""Search Engine"" },
+        { ""value"": 735, ""name"": ""Direct"" },
+        { ""value"": 580, ""name"": ""Email"" },
+        { ""value"": 484, ""name"": ""Union Ads"" },
+        { ""value"": 300, ""name"": ""Video Ads"" }
       ],
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)'
+      ""emphasis"": {
+        ""itemStyle"": {
+          ""shadowBlur"": 10,
+          ""shadowOffsetX"": 0,
+          ""shadowColor"": ""rgba(0, 0, 0, 0.5)""
         }
       }
     }
   ]
 }";
     private const string GaugeBasicJson = @"{
-  tooltip: {
-    formatter: '{a} <br/>{b} : {c}%'
+  ""tooltip"": {
+    ""formatter"": ""{a} <br/>{b} : {c}%""
   },
-  series: [
+  ""series"": [
     {
-      name: 'Pressure',
-      type: 'gauge',
-      detail: {
-        formatter: '{value}'
+      ""name"": ""Pressure"",
+      ""type"": ""gauge"",
+      ""detail"": {
+        ""formatter"": ""{value}""
       },
-      data: [
+      ""data"": [
         {
-          value: 50,
-          name: 'SCORE'
+          ""value"": 50,
+          ""name"": ""SCORE""
         }
       ]
     }
@@ -214,6 +212,14 @@ internal class EChartType
     {
         Name = name;
         Src = src;
+        //try
+        //{
+        _json = JsonNode.Parse(Regex.Replace(json, @"\s", ""))!;
+        //}
+        //catch (Exception ex)
+        //{ 
+
+        //}
     }
 
     public string Name { get; private set; }
@@ -225,7 +231,7 @@ internal class EChartType
         get { return _json; }
     }
 
-    private readonly JsonNode _json = JsonNode.Parse("{}")!;
+    private readonly JsonNode _json;
 
     public void SetValue(string path, object value)
     {

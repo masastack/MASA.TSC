@@ -1,6 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
+using Masa.Contrib.Data.Contracts.EFCore;
+
 var builder = WebApplication.CreateBuilder(args);
 //builder.AddMasaConfiguration(configurationBuilder =>
 //{
@@ -66,7 +69,11 @@ builder.Services.AddMasaIdentity(options =>
     options.UserId = "sub";
 });
 
-builder.Services.AddScoped<TokenProvider>();
+builder.Services.AddScoped(service => {
+   var content=service.GetRequiredService<IHttpContextAccessor>();
+    var value = content.HttpContext.Request.Headers.Authorization.ToString();
+    return new TokenProvider { AccessToken = value };
+});
 builder.Services.AddAuthClient(config["$public.AppSettings:AuthClient:Url"], dccConfig.RedisOptions).
 AddPmClient(config["$public.AppSettings:PmClient:Url"]);
 

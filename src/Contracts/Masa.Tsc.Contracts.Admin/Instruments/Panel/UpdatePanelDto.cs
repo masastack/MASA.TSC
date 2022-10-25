@@ -17,9 +17,7 @@ public class UpdatePanelDto
 
     public string Description { get; set; }
 
-    public int Sort { get; set; }
+    public int Sort { get; set; }    
 
-    //public List<AddPanelDto> Panels { get; set; }
-
-    public List<AddPanelMetricDto> Metrics { get; set; }
+    public List<PanelMetricDto> Metrics { get; set; }
 }

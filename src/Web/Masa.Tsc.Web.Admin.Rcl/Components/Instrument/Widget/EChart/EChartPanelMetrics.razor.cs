@@ -24,12 +24,25 @@ public partial class EChartPanelMetrics
 
     protected override async Task OnInitializedAsync()
     {
-        _names= await ApiCaller.MetricService.GetNamesAsync();
+        _names = await ApiCaller.MetricService.GetNamesAsync();
         await base.OnInitializedAsync();
     }
 
     private void Add()
     {
         Items.Add(new EChartPanelMetricItemModel { });
+    }
+
+    protected override async Task<bool> ExecuteCommondAsync(OperateCommand command, object[] values)
+    {
+        if (command == OperateCommand.Remove)
+        {
+            var item = (EChartPanelMetricItemModel)values[0];
+            Items.Remove(item);
+            StateHasChanged();
+            await OnItemsChange();
+            return true;
+        }
+        return false;
     }
 }
