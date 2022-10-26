@@ -3,6 +3,7 @@
 
 using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
 using Masa.Contrib.Data.Contracts.EFCore;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.AddMasaConfiguration(configurationBuilder =>
@@ -33,7 +34,7 @@ if (builder.Environment.EnvironmentName == "Development")
     {
         configurationBuilder.UseDcc(dccConfig, default, default);
     });
-    config = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();   
+    config = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
 }
 else
 {
@@ -69,10 +70,11 @@ builder.Services.AddMasaIdentity(options =>
     options.UserId = "sub";
 });
 
-builder.Services.AddScoped(service => {
-   var content=service.GetRequiredService<IHttpContextAccessor>();
-    var value = content.HttpContext.Request.Headers.Authorization.ToString();
-    return new TokenProvider { AccessToken = value };
+builder.Services.AddScoped(service =>
+{
+    var content = service.GetRequiredService<IHttpContextAccessor>();
+    AuthenticationHeaderValue.TryParse(content.HttpContext.Request.Headers.Authorization.ToString(), out var auth);
+    return new TokenProvider { AccessToken = auth?.Parameter };
 });
 builder.Services.AddAuthClient(config["$public.AppSettings:AuthClient:Url"], dccConfig.RedisOptions).
 AddPmClient(config["$public.AppSettings:PmClient:Url"]);
