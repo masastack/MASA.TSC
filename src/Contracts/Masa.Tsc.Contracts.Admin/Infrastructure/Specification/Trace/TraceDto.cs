@@ -31,4 +31,41 @@ public class TraceDto
     {
         return (long)Math.Floor((EndTimestamp - Timestamp).TotalMilliseconds);
     }
+
+    public static string GetDispalyName(TraceDto dto)
+    {
+        if (dto.IsHttp(out var traceHttpDto))
+        {
+            if (dto.Kind == TraceDtoKind.SPAN_KIND_SERVER)
+                return traceHttpDto.Target;
+            return traceHttpDto.Url;
+        }
+        else if (dto.IsDatabase(out var databaseDto))
+        {
+            return databaseDto.Name;
+        }
+        else if (dto.IsException(out TraceExceptionDto exceptionDto))
+        {
+            return exceptionDto.Type ?? exceptionDto.Message;
+        }
+        else
+            return dto.Name;
+    }
+}
+
+public sealed class TraceDtoKind
+{
+    private TraceDtoKind() { }
+
+    public const string SPAN_KIND_SERVER = nameof(SPAN_KIND_SERVER);
+
+    public const string SPAN_KIND_CLIENT = nameof(SPAN_KIND_CLIENT);
+}
+
+public sealed class TraceDtoType
+{
+    private TraceDtoType() { }
+
+    public const string Http = nameof(Http);
+    public const string Database = nameof(Database);
 }

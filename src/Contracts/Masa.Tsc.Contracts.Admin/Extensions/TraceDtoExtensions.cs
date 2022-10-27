@@ -17,18 +17,17 @@ public static class TraceDtoExtensions
             return false;
         result = data.Attributes.Deserialize<TraceHttpDto>();
 
-        result.RequestHeaders = data.Attributes.ConvertDic("http.request.header.", asdasdasd);
-        result.ReponseHeaders = data.Attributes.ConvertDic("http.response.header.", asdasdasd);
+        result.RequestHeaders = data.Attributes.ConvertDic("http.request.header.", ToStringEnumerable);
+        result.ReponseHeaders = data.Attributes.ConvertDic("http.response.header.", ToStringEnumerable);
 
         result.Name = data.Name;
         result.Status = data.TraceStatus;
         return true;
     }
 
-    private static IEnumerable<string> asdasdasd(object obj)
+    private static IEnumerable<string> ToStringEnumerable(object obj)
     {
         var value = (JsonElement)obj;
-
 
         if (value.ValueKind == JsonValueKind.Array)
         {
