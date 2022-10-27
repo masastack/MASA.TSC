@@ -7,7 +7,7 @@ namespace Masa.Tsc.Contracts.Admin.Instruments;
 
 public class TabItemPanelDto : PanelDto
 {
-    [JsonConverter(typeof(PanelDtoEnumerableConverter))]
+    //[JsonConverter(typeof(PanelDtoEnumerableConverter))]
     public List<PanelDto> Tabs { get; set; }
 
     public override PanelTypes Type => PanelTypes.TabItem;

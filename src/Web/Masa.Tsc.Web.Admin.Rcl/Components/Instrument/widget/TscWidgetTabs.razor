@@ -21,7 +21,7 @@
         {
             var item =_panelValue.Tabs[index++];
             <MTabItem Value="item.Id.ToString()">
-                <TscInstrumentDetail ParentId="item.Id" Id="item.InstrumentId" @bind-Panels="item.Tabs" CallParent="ChildCallHandler" ReadOnly="ReadOnly" />
+                <TscInstrumentDetail ParentId="item.Id" InstrumentId="item.InstrumentId" @bind-Panels="item.Tabs" CallParent="ChildCallHandler" ReadOnly="ReadOnly" />
             </MTabItem>
         }
         while (_panelValue.Tabs.Count - index > 0);

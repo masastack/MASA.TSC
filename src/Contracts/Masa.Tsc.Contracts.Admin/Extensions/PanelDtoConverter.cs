@@ -7,6 +7,11 @@ public class PanelDtoConverter : JsonConverter<PanelDto>
 {
     private static readonly string TYPE_KEY = nameof(PanelDto.Type).ToLower();
 
+    //public override bool CanConvert(Type typeToConvert)
+    //{
+    //    return typeToConvert.IsAssignableFrom(typeof(PanelDto));
+    //}
+
     public override PanelDto? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (JsonDocument.TryParseValue(ref reader, out var doc))
@@ -38,7 +43,28 @@ public class PanelDtoConverter : JsonConverter<PanelDto>
 
     public override void Write(Utf8JsonWriter writer, PanelDto value, JsonSerializerOptions options)
     {
-        JsonSerializer.Serialize(writer, value, value.GetType(), options);
+        var panel = (PanelDto)value;
+        switch (panel.Type)
+        {
+            case PanelTypes.Text:
+                JsonSerializer.Serialize(writer, (TextPanelDto)panel, options);
+                break;
+            case PanelTypes.Table:
+                JsonSerializer.Serialize(writer, (TablePanelDto)panel, options);
+                break;
+            case PanelTypes.Tabs:
+                JsonSerializer.Serialize(writer, (TabsPanelDto)panel, options);
+                break;
+            case PanelTypes.TabItem:
+                JsonSerializer.Serialize(writer, (TabItemPanelDto)panel, options);
+                break;
+            case PanelTypes.Chart:
+                JsonSerializer.Serialize(writer, (EChartPanelDto)panel, options);
+                break;
+            default:
+                JsonSerializer.Serialize(writer, panel, options);
+                break;
+        }
     }
 }
 

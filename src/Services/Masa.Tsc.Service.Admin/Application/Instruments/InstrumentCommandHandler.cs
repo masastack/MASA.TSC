@@ -75,20 +75,11 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
                 InstrumentId = command.Data.InstrumentId,
                 ParentId = command.Data.ParentId
             };
-            await _panelRepository.AddAsync(entity);
-            if (command.Data is EChartPanelDto chartDto && chartDto.Metrics != null && chartDto.Metrics.Any())
+            if (command.Data.Type == PanelTypes.Chart)
             {
-                var list = chartDto.Metrics.Select(x => new PanelMetric(x.Id)
-                {
-                    Name = x.Name,
-                    Caculate = x.Caculate,
-                    PanelId = entity.Id,
-                    Unit = x.Unit,
-                    Sort = x.Sort
-                });
-
-                await _metricReposity.AddRangeAsync(list);
+                entity.ChartType = ((EChartPanelDto)command.Data).ChartType;
             }
+            await _panelRepository.AddAsync(entity);            
         }
 
         [EventHandler(1)]
@@ -126,9 +117,10 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
             var panel = await _panelRepository.FindAsync(item => item.Id == command.Data.Id);
             if (panel != null && panel.Type == PanelTypes.Chart)
             {
+                var echartPanel = ((EChartPanelDto)command.Data);
                 var metrics = await _metricReposity.ToQueryable().Where(x => x.PanelId == panel.Id).OrderBy(x => x.Sort).ToListAsync();
                 var adds = new List<PanelMetric>();
-                foreach (var item in command.Data.Metrics)
+                foreach (var item in echartPanel.Metrics)
                 {
                     var find = metrics.FirstOrDefault(x => x.Id == item.Id);
                     if (find == null)
@@ -150,7 +142,7 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
                         find.Caculate = item.Caculate;
                     }
                 }
-                var removes = metrics.Where(x => !command.Data.Metrics.Any(t => t.Id == x.Id)).ToList();
+                var removes = metrics.Where(x => !echartPanel.Metrics.Any(t => t.Id == x.Id)).ToList();
 
                 while (adds.Any() && removes.Any())
                 {

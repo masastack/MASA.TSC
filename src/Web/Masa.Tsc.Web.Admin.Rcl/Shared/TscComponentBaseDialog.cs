@@ -42,7 +42,7 @@ public partial class TscComponentBase
             await OnCallParent(values);
     }
 
-    protected virtual async Task<bool> ExecuteCommondAsync(OperateCommand command, object[] values)
+    protected virtual async Task<bool> ExecuteCommondAsync(OperateCommand command, params object[] values)
     {
         if (command == OperateCommand.Close)
         {

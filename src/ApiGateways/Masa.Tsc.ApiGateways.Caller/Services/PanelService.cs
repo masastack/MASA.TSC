@@ -7,12 +7,12 @@ public class PanelService : BaseService
 {
     public PanelService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/Instrument/panel", tokenProvider) { }
 
-    public async Task AddAsync(AddPanelDto param)
+    public async Task AddAsync(PanelDto param)
     {
         await Caller.PostAsync($"{RootPath}", param);
     }
 
-    public async Task UpdateAsync(UpdatePanelDto param)
+    public async Task UpdateAsync(PanelDto param)
     {
         await Caller.PutAsync($"{RootPath}", param);
     }

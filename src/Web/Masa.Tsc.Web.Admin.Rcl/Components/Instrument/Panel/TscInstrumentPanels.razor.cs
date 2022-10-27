@@ -11,6 +11,9 @@ public partial class TscInstrumentPanels
     [Parameter]
     public Guid ParentId { get; set; }
 
+    [Parameter]
+    public int Index { get; set; }
+
     private static List<PanelTypeDto> _types = new List<PanelTypeDto> {
         new PanelTypeDto(){
             Index=1,

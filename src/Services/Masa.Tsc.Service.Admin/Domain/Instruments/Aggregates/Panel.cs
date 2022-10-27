@@ -42,9 +42,13 @@ public class Panel : AggregateRoot<Guid>
 
     }
 
-    public void Update(UpdatePanelDto panel)
+    public void Update(PanelDto panel)
     {
-        Title = panel.Name;
+        if (panel.Type == PanelTypes.Chart)
+        {
+            ChartType = ((EChartPanelDto)panel).ChartType;
+        }
+        Title = panel.Title;
         Description = panel.Description ?? string.Empty;
         Sort = panel.Sort;
     }
@@ -55,8 +59,8 @@ public class Panel : AggregateRoot<Guid>
     }
 
     public void UpdateWidthHeight(string height, string width)
-    { 
-        Width = width??string.Empty;
+    {
+        Width = width ?? string.Empty;
         Height = height ?? string.Empty;
     }
 }

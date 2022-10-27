@@ -14,6 +14,9 @@ public partial class TscInstrumentPanelDetail
     [Parameter]
     public Guid ParentId { get; set; }
 
+    [Parameter]
+    public int Index { get; set; }
+
     private PanelDto _panel { get; set; } = new();
 
     private TscWidgetBase _widget = default!;
@@ -32,20 +35,18 @@ public partial class TscInstrumentPanelDetail
         base.OnParametersSet();
     }
 
-    protected override void OnAfterRender(bool firstRender)
-    {
-        base.OnAfterRender(firstRender);
-    }
-
     private async Task OnSubmitAsync()
     {
         var item = _widget.Value;
+        item.Sort = Index;
         await ApiCaller.PanelService.AddAsync(item);
         if (item.Type == PanelTypes.Tabs)
         {
             var tabs = ((TabsPanelDto)item).Tabs;
+            int sort = 1;
             foreach (var tab in tabs)
             {
+                tab.Sort = sort++;
                 tab.ParentId = item.Id;
                 tab.Type = PanelTypes.TabItem;
                 await ApiCaller.PanelService.AddAsync(tab);

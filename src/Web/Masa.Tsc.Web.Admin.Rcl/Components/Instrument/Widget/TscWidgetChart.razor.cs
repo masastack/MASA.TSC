@@ -55,20 +55,6 @@ public partial class TscWidgetChart : TscWidgetBase
     {
         if (_panelValue.Metrics == null)
             _panelValue.Metrics = new();
-
-        //_panelValue.Metrics.Add(new PanelMetricDto
-        //{
-        //    Caculate = "sum by(job) (rate (process_resident_memory_bytes[30s]))/(2^20)",
-        //    DisplayName = "process_resident_memory_bytes",
-        //    Unit = ""
-
-        //});
-        //_panelValue.Metrics.Add(new PanelMetricDto
-        //{
-        //    Caculate = "sum(up)",
-        //    DisplayName = "s_upname",
-        //    Unit = ""
-        //});
         await SetChartType(_panelValue.ChartType, LoadDataAsync);
         await base.OnInitializedAsync();
     }
@@ -194,6 +180,7 @@ public partial class TscWidgetChart : TscWidgetBase
         {
             _panelValue.Metrics.Add(new PanelMetricDto
             {
+                Id = item.Id,
                 Caculate = item.Caculate,
                 Color = item.Color,
                 Name = item.Name,

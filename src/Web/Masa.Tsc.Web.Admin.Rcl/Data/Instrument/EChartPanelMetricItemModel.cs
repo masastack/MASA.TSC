@@ -5,6 +5,8 @@ namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
 public class EChartPanelMetricItemModel
 {
+    public Guid Id { get; set; }=Guid.NewGuid();
+
     public string Color { get; set; }
 
     public string Name { get; set; }

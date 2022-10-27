@@ -19,28 +19,28 @@ public partial class TscInstrumentPanelView
     private async Task SaveAsync(bool isSave)
     {
         var item = _widget.Value;
-        var sendData = new UpdatePanelDto
-        {
-            Id = item.Id,
-            Description = item.Description ?? string.Empty,
-            Height = item.Height,
-            Width = item.Width,
-            InstrumentId = item.InstrumentId,
-            Name = item.Title,
-            Sort = item.Sort
-        };
+        //var sendData = new UpdatePanelDto
+        //{
+        //    Id = item.Id,
+        //    Description = item.Description ?? string.Empty,
+        //    Height = item.Height,
+        //    Width = item.Width,
+        //    InstrumentId = item.InstrumentId,
+        //    Name = item.Title,
+        //    Sort = item.Sort
+        //};
 
-        if (item.Type == PanelTypes.Chart)
-        {
-            //sendData.Metrics =;
-        }
-        else if (item.Type == PanelTypes.Tabs)
-        {
-            //await ApiCaller.PanelService.AddAsync
+        //if (item.Type == PanelTypes.Chart)
+        //{
+        //    sendData.Metrics = ((EChartPanelDto)item).Metrics;
+        //}
+        //else if (item.Type == PanelTypes.Tabs)
+        //{
+        //    //await ApiCaller.PanelService.AddAsync
 
-        }
+        //}
         if (isSave)
-            await ApiCaller.PanelService.UpdateAsync(sendData);
+            await ApiCaller.PanelService.UpdateAsync(item);
         Value = item;
         await OnCallParent(OperateCommand.Success, Value);
     }
