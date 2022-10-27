@@ -12,25 +12,25 @@ public partial class TscTraceList : TscComponentBase
     private int _total = 0;
     private MDataTable<TraceDto> _mDataTable = default!;
     private bool _isLoading = true;
-    private string _selectTraceId = default!;    
+    private string _selectTraceId = default!;
     private List<DataTableHeader<TraceDto>> _headers = new()
     {
-        new("Service", item =>item.Resource["service.name"])
+        new("Service", item => item.Resource["service.name"])
+        {
+            Align = "start",
+            Sortable = false
+        },        
+        new("Endpoint", item =>TraceDto.GetDispalyName(item))
         {
             Align = "start",
             Sortable = false
         },
-        new("Endpoint", item => item.IsHttp(out var traceHttpDto)? traceHttpDto.Target:item.Name)
+        new("Duration (ms)", item => item.GetDuration())
         {
             Align = "start",
             Sortable = false
         },
-        new("Duration (ms)", item =>item.GetDuration())
-        {
-            Align = "start",
-            Sortable = false
-        },
-        new("Timestamp", item =>item.Timestamp)
+        new("Timestamp", item => item.Timestamp)
         {
             Align = "start",
             Sortable = false

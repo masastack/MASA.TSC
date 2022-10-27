@@ -40,7 +40,7 @@
                     <tr @key="item" @onclick="@(async()=>await OnRowClickAync(item))">
                         <td style="@GetPadding(item)" class="col-md-3">
                             <MIcon>fsa fa-folder-closed</MIcon>
-                            @item.Name
+                            @TraceDto.GetDispalyName(item)
                             @dicItem.TimeUsString
                         </td>
                         <td class="col-md-9 mx-0 px-0">
