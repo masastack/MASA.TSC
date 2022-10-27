@@ -14,7 +14,9 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
 
     public async Task<Instrument> GetAsync(Guid Id, Guid userId)
     {
-        return await _context.Set<Instrument>().Where(item => item.Id == Id && (item.IsGlobal || item.Creator == userId)).Include(d => d.Panels).ThenInclude(d => d.Metrics).FirstOrDefaultAsync()
+        return await _context.Set<Instrument>().Where(item => item.Id == Id && (item.IsGlobal || item.Creator == userId))
+            .Include(d => d.Panels.OrderBy(d => d.Sort))
+            .ThenInclude(d => d.Metrics.OrderBy(d => d.Sort)).FirstOrDefaultAsync()
             ?? throw new UserFriendlyException("no data");
     }
 }

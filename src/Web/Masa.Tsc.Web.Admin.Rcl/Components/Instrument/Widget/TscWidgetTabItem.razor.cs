@@ -32,13 +32,7 @@ public partial class TscWidgetTabItem
     {
         if (_panelValue.Title != value)
         {            
-            await ApiCaller.PanelService.UpdateAsync(new UpdatePanelDto
-            {
-                Id = _panelValue.Id,
-                InstrumentId = _panelValue.InstrumentId,
-                Name = value,
-                Sort = _panelValue.Sort
-            });
+            await ApiCaller.PanelService.UpdateAsync(_panelValue);
             _panelValue.Title = value;
         }
     }

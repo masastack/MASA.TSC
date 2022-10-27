@@ -20,6 +20,8 @@ public class PanelMetric : AggregateRoot<Guid>
 
     public string Caculate { get; set; }
 
+    public string Color { get; set; }=string.Empty;
+
     public string Unit { get; set; }    
 
     public int Sort { get; set; }

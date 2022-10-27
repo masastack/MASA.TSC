@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Contracts.Admin.Extensions;
+
 namespace Masa.Tsc.Service.Admin.Services.Instruments;
 
 public class PanelService : ServiceBase
@@ -14,12 +16,12 @@ public class PanelService : ServiceBase
         App.MapPut($"{BaseUri}/{{userId}}", UpdateSortAsync);
     }
 
-    public async Task AddAsync([FromServices] IEventBus eventBus, PanelDto model)
+    public async Task AddAsync([FromServices] IEventBus eventBus, [FromBody] PanelDto model)
     {
         await eventBus.PublishAsync(new AddPanelCommand(model));
     }
 
-    public async Task UpdateAsync([FromServices] IEventBus eventBus, [FromBody] UpdatePanelDto model)
+    public async Task UpdateAsync([FromServices] IEventBus eventBus, [FromBody] PanelDto model)
     {
         await eventBus.PublishAsync(new UpdatePanelCommand(model));
     }

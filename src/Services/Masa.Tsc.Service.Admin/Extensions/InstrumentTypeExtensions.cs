@@ -15,6 +15,8 @@ internal static class InstrumentTypeExtensions
                 return GetTabsPanel(panel);
             case PanelTypes.TabItem:
                 return GetTabItemPanel(panel);
+            case PanelTypes.Chart:
+                return GetChartPanel(panel);
             default:
                 return GetDefault(panel);
         }
@@ -46,7 +48,17 @@ internal static class InstrumentTypeExtensions
 
     private static PanelDto GetChartPanel(Panel panel)
     {
-        return GetDefault(panel, new EChartPanelDto());
+        var result = GetDefault(panel, new EChartPanelDto { ChartType = panel.ChartType });
+        ((EChartPanelDto)result).Metrics = panel.Metrics.Select(item => new PanelMetricDto
+        {
+            Caculate = item.Caculate,
+            Color = item.Color,
+            Id = item.Id,
+            Name = item.Name,
+            Sort = item.Sort,
+            Unit = item.Unit,
+        }).ToList();
+        return result;
     }
 
     private static PanelDto GetTabsPanel(Panel panel)

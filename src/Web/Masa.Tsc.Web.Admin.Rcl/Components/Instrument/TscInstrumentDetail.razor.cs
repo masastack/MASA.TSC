@@ -32,28 +32,14 @@ public partial class TscInstrumentDetail
     [Parameter]
     public EventCallback<List<PanelDto>> PanelsChanged { get; set; }
 
-
     private List<PanelDto> _panels = new();
 
     private List<BDragItem> _items => _mDragZone?.Items;
     private PanelDto? _editPanel = default;
     private MDragZone _mDragZone;
 
-    //private SorttableOptions _sorttableOptions;
-
     private Guid _id;
     private Guid _parentId;
-
-    //protected override void OnInitialized()
-    //{
-    //    _sorttableOptions = new SorttableOptions
-    //    {
-    //        OnAdd = OnDragAdd,
-    //        OnRemove = OnDragRemove,
-    //    };
-    //    base.OnInitialized();
-    //}
-
 
     void asdasdasd(SorttableOptions option)
     {
@@ -185,8 +171,7 @@ public partial class TscInstrumentDetail
         _editPanel = null;
         if (values != null && values.Length > 0 && values[0] is PanelDto panel)
         {
-            var find = _mDragZone.Items.FirstOrDefault(x => (Guid)x.Attributes["key"] == panel.Id);
-            //SetItems();
+            var find = _mDragZone.Items.FirstOrDefault(x => (Guid)x.Attributes["key"] == panel.Id);           
             if (command == OperateCommand.Success)
             {
                 if (find == null)
@@ -196,8 +181,8 @@ public partial class TscInstrumentDetail
                 }
                 else
                 {
-                    var findPanel = Panels.FirstOrDefault(m => m.Id == panel.Id);
-                    findPanel = panel;
+                    //var findPanel = Panels.FirstOrDefault(m => m.Id == panel.Id);
+                    //findPanel = panel;
 
                     var index = _mDragZone.GetIndex(find);
                     _mDragZone.Remove(find);

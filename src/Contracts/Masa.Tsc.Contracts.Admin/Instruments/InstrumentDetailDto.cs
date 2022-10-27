@@ -23,6 +23,6 @@ public class InstrumentDetailDto
 
     public bool IsRoot { get; set; }
 
-    [JsonConverter(typeof(PanelDtoEnumerableConverter))]
+    //[JsonConverter(typeof(PanelDtoEnumerableConverter))]
     public List<PanelDto> Panels { get; set; }
 }
