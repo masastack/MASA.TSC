@@ -1,0 +1,28 @@
+﻿@inherits BDomComponentBase
+@page "/datav/example1"
+@using Masa.Tsc.Web.Admin.Rcl.Pages.DataV.Modules.LinkTrackingTopologys
+<div class="d-inline-flex">
+    <SSelect Small @bind-Value="_depth"
+             Items="_depthItems"
+             Label="深度选择"
+             ItemText="@(item => item.ToString())"
+             ItemValue="item => item"
+             Dense
+             Solo
+             HideDetails="@("auto")"
+             TItem="int"
+             TItemValue="int"
+             TValue="int"
+             Class="fill-card body2"
+             Style="width:163px"
+             OnSelectedItemUpdate="DepthChange">
+    </SSelect>
+    <div @onclick="Refresh" class="ml-6 d-flex button fill">
+        <SIcon Class="ma-auto" Color="emphasis2" Size=20>
+            mdi-autorenew
+        </SIcon>
+    </div>
+
+</div>
+
+<LinkTrackingTopology Value="Data"></LinkTrackingTopology>
