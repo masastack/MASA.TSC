@@ -28,7 +28,6 @@ public partial class TscTrace
         _query.Start = start;
         _query.End = end;
         await _list.QueryAsync();
-        await _chart.LoadAsync();
-        await Task.CompletedTask;
+        //await _chart.LoadAsync();
     }
 }

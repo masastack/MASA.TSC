@@ -91,7 +91,7 @@ public partial class TscPanelEdit : IDisposable
         await OnCallParent(OperateCommand.Update, Value);
     }
 
-    public override void Dispose()
+    public new void Dispose()
     {
         Window.OnResize -= OnResize;
     }

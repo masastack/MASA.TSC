@@ -285,7 +285,7 @@ public partial class Directory : IDisposable
         return await base.ExecuteCommondAsync(command, values!);
     }
 
-    public override void Dispose()
+    public new void Dispose()
     {
         base.Dispose();
     }
