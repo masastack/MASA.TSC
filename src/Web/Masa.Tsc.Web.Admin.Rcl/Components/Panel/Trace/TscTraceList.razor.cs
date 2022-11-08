@@ -11,7 +11,7 @@ public partial class TscTraceList : TscComponentBase
     private IEnumerable<TraceDto> _data = new List<TraceDto>();
     private int _total = 0;
     private MDataTable<TraceDto> _mDataTable = default!;
-    private bool _isLoading = true;
+    private bool _isLoading = false;
     private string _selectTraceId = default!;
     private List<DataTableHeader<TraceDto>> _headers = new()
     {
@@ -19,8 +19,8 @@ public partial class TscTraceList : TscComponentBase
         {
             Align = "start",
             Sortable = false
-        },        
-        new("Endpoint", item =>TraceDto.GetDispalyName(item))
+        },
+        new("Endpoint", item => TraceDto.GetDispalyName(item))
         {
             Align = "start",
             Sortable = false
@@ -43,11 +43,7 @@ public partial class TscTraceList : TscComponentBase
             Sortable = false
         }
     };
-
-    protected override Task OnInitializedAsync()
-    {
-        return base.OnInitializedAsync();
-    }
+    private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
     private async Task OpenAsync(TraceDto item)
     {
@@ -60,8 +56,8 @@ public partial class TscTraceList : TscComponentBase
     {
         if (firstRender)
         {
-            _isLoading = false;
-            await QueryAsync();
+            //_isLoading = false;
+            //await QueryAsync();
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -80,19 +76,53 @@ public partial class TscTraceList : TscComponentBase
 
     public async Task QueryAsync(bool isStateChange = true)
     {
-        if (isStateChange)
-        {
-            _mDataTable.Options.Page = 1;
-            Query.Page = 1;
-        }
+        //_isLoading = true;
+        //StateHasChanged();
+        //await Task.Delay(1000);
+        //_isLoading = false;
+        //StateHasChanged();
 
-        if (_isLoading) return;
-        _isLoading = true;
-        var data = await ApiCaller.TraceService.GetListAsync(Query);
-        _total = (int)data.Total;
-        _data = data.Items;
-        _isLoading = false;
-        if (isStateChange)
+        try
+        {
+            //if (isStateChange)
+            //{
+            //    _mDataTable.Options.Page = 1;
+            //    Query.Page = 1;
+            //}
+
+            if (_isLoading) return;
+            _isLoading = true;
             StateHasChanged();
+            var data = await ApiCaller.TraceService.GetListAsync(Query, _cancellationTokenSource.Token);
+            if (data != null)
+            {
+                _total = (int)data.Total;
+                _data = data.Items ?? new();
+            }
+            else
+            {
+                _total = 0;
+                _data = Array.Empty<TraceDto>();
+            }
+            _isLoading = false;
+            if (isStateChange)
+                StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"message:{ex.Message}");
+            Console.WriteLine($"trace: {ex.StackTrace}");
+        }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _mDataTable.Dispose();
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+        }
+        base.Dispose(disposing);
     }
 }

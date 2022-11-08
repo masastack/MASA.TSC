@@ -9,6 +9,9 @@ public partial class TscComponentBase : BDomComponentBase
     public IUserContext UserContext { get; set; }
 
     [Inject]
+    public TokenProvider TokenProvider { get; set; }
+
+    [Inject]
     public ILogger<TscComponentBase> Logger { get; set; }
 
     [Inject]

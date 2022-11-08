@@ -3,12 +3,13 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-public partial class TscTraceSearch
+public partial class TscTraceSearch : IDisposable
 {
     [Parameter]
     public Func<string, string, string, string, DateTime, DateTime, Task> OnSearchAsync { get; set; }
 
     private bool _isLoading = false;
+    private bool _isSearching = false;
     private List<string> _services = default!;
     private List<string> _instances = default!;
     private List<string> _endpoints = default!;
@@ -19,6 +20,8 @@ public partial class TscTraceSearch
     private string _keyword = default!;
     private DateTime? _start;
     private DateTime? _end;
+    private bool hasChange = true;
+    private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
     protected override async Task OnInitializedAsync()
     {
@@ -36,11 +39,12 @@ public partial class TscTraceSearch
         }
 
         _isLoading = true;
+        StateHasChanged();
         CheckTime();
         var query = new RequestAttrDataDto
         {
-            End = TimeZoneInfo.ConvertTime(_end!.Value, CurrentTimeZone),
-            Start = TimeZoneInfo.ConvertTime(_start!.Value, CurrentTimeZone),
+            End = _end!.Value,
+            Start = _start!.Value,
             Keyword = val,
             Max = 10
         };
@@ -50,8 +54,11 @@ public partial class TscTraceSearch
         {
             case 1:
                 query.Name = "Resource.service.name";
-                data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
-                _services = data.ToList();
+                data = await ApiCaller.TraceService.GetAttrValuesAsync(query)!;
+                if (data != null && data.Any())
+                    _services = data.ToList();
+                else
+                    _services.Clear();
                 break;
             case 2:
                 query.Query = new Dictionary<string, string> {
@@ -71,9 +78,8 @@ public partial class TscTraceSearch
                 _endpoints = data.ToList();
                 break;
         }
-        //StateHasChanged();
         _isLoading = false;
-        await Task.CompletedTask;
+        StateHasChanged();
     }
 
     private async Task UpdateItemAsync(int type, string value)
@@ -82,11 +88,14 @@ public partial class TscTraceSearch
             return;
 
         _isLoading = true;
+        StateHasChanged();
         CheckTime();
+        hasChange = true;
+
         var query = new RequestAttrDataDto
         {
-            End = TimeZoneInfo.ConvertTime(_end!.Value, CurrentTimeZone),
-            Start = TimeZoneInfo.ConvertTime(_start!.Value, CurrentTimeZone),
+            End = _end!.Value,
+            Start = _start!.Value,
             Max = 10
         };
         IEnumerable<string> data;
@@ -97,13 +106,21 @@ public partial class TscTraceSearch
                 _endpoint = null;
                 if (type == 1)
                 {
-                    _instance = null;                    
+                    _instance = null;
+                    _instance = value;
                     query.Query = new Dictionary<string, string> {
-                    {"Resource.service.name",_service}
-                };
+                        {"Resource.service.name",_service}
+                    };
                     query.Name = "Resource.service.instance.id";
-                    data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
-                    _instances = data.ToList();
+                    data = await ApiCaller.TraceService.GetAttrValuesAsync(query);
+                    if (data != null && data.Any())
+                        _instances = data.ToList();
+                    else
+                        _instances.Clear();
+                }
+                else
+                {
+                    _instance = value;
                 }
 
                 query.Query = new Dictionary<string, string> {
@@ -111,39 +128,93 @@ public partial class TscTraceSearch
                     {"Resource.service.instance.id",_instance}
                 };
                 query.Name = "Attributes.http.target";
-                data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
-                _endpoints = data.ToList();
+                data = await ApiCaller.TraceService.GetAttrValuesAsync(query);
+                if (data != null && data.Any())
+                    _endpoints = data.ToList();
+                else
+                    _endpoints.Clear();
+                break;
+            case 3:
+                _endpoint = value;
                 break;
         }
 
         _isLoading = false;
-        await Task.CompletedTask;
+        StateHasChanged();
     }
 
     private async Task SearchAsync()
     {
-        CheckTime();
-        _services = (await ApiCaller.TraceService.GetAttrValuesAsync(new RequestAttrDataDto
+        if (_isSearching)
+            return;
+        _isSearching = true;
+        StateHasChanged();
+        try
         {
-            End = TimeZoneInfo.ConvertTime(_end!.Value, CurrentTimeZone),
-            Start = TimeZoneInfo.ConvertTime(_start!.Value, CurrentTimeZone),
-            Name = "Resource.service.name",
-            Max = 10
-        })).ToList();
+            if (hasChange)
+            {
+                CheckTime();
+                var list = await ApiCaller.TraceService.GetAttrValuesAsync(new RequestAttrDataDto
+                {
+                    End = _end!.Value,
+                    Start = _start!.Value,
+                    Name = "Resource.service.name",
+                    Max = 10
+                });
+                _services = list?.ToList() ?? new();
 
-        if (OnSearchAsync is not null)
-        {
-            await OnSearchAsync.Invoke(_service, _instance, _endpoint, _keyword, TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone), TimeZoneInfo.ConvertTime(_end.Value, CurrentTimeZone));
+                if (OnSearchAsync != null)
+                {
+                    await OnSearchAsync.Invoke(_service, _instance, _endpoint, _keyword, _start.Value, _end.Value);
+                }
+            }
         }
+        finally
+        {
+            hasChange = false;
+            _isSearching = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ValueChange(string name, object value)
+    {
+        hasChange = true;
+        switch (name)
+        {
+            case "keyword":
+                _keyword = value.ToString();
+                break;
+            case "start":
+                _start = (DateTime?)value;
+                break;
+            case "end":
+                _end = (DateTime?)value;
+                break;
+            default:
+                hasChange = false;
+                break;
+        }
+        if (hasChange)
+            StateHasChanged();
     }
 
     private void CheckTime()
     {
         if (!_start.HasValue || !_end.HasValue)
         {
-            var time = TimeZoneInfo.ConvertTime(DateTime.Now, CurrentTimeZone);
-            _start = time.Date;
-            _end = time;
+            _end = TimeZoneInfo.ConvertTime(DateTime.UtcNow, CurrentTimeZone);
+            _start = TimeZoneInfo.ConvertTime(DateTime.UtcNow.Date, CurrentTimeZone);
         }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+        }
+        base.Dispose(disposing);
     }
 }

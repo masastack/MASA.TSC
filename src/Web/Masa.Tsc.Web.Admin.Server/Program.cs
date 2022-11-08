@@ -40,12 +40,7 @@ var oidc = config.GetSection("$public.OIDC").Get<MasaOpenIdConnectOptions>();
 string authUrl = config.GetValue<string>("$public.AppSettings:AuthClient:Url");
 string mcUrl = config.GetValue<string>("$public.AppSettings:McClient:Url");
 string pmUrl = config.GetValue<string>("$public.AppSettings:PmClient:Url");
-builder.Services.AddMasaStackComponentsForServer(
-"wwwroot/i18n", authUrl, mcUrl, pmUrl,
-config.GetSection("$public.OSS").Get<OssOptions>(),
-config.GetSection("$public.ES.UserAutoComplete").Get<UserAutoCompleteOptions>(),
-dccConfig.RedisOptions
-).AddMasaOpenIdConnect(oidc);
+builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl, pmUrl).AddMasaOpenIdConnect(oidc);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<TokenProvider>();

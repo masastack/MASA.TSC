@@ -15,7 +15,7 @@ public partial class TscLog
     private int _pageSize = 10;
     private string _queryStr = default!;
     private string _msg = "Loading ...";
-    private DateTime? _start = DateTime.Now.Date, _end = DateTime.Now;
+    private DateTime? _start = DateTime.UtcNow.Date, _end = DateTime.UtcNow;
 
     protected override async Task OnInitializedAsync()
     {
@@ -72,8 +72,8 @@ public partial class TscLog
         var query = new LogPageQueryDto
         {
             PageSize = _pageSize,
-            Start = TimeZoneInfo.ConvertTime(_start!.Value, CurrentTimeZone),
-            End = TimeZoneInfo.ConvertTime(_end!.Value, CurrentTimeZone),
+            Start = _start!.Value,
+            End = _end!.Value,
             Page = _currentPage,
             Duration = _lastedDuration.ToString(),
             Sorting = !_isDesc ? "asc" : "desc",
@@ -87,7 +87,7 @@ public partial class TscLog
         else
         {
             _data = default!;
-        }        
+        }
         var num = pageData.Total % query.PageSize;
         _totalPage = (int)(pageData.Total / query.PageSize) + (num > 0 ? 1 : 0);
         StateHasChanged();
@@ -97,9 +97,8 @@ public partial class TscLog
     {
         if (!_start.HasValue || !_end.HasValue)
         {
-            var time = TimeZoneInfo.ConvertTime(DateTime.Now, CurrentTimeZone);
-            _start = time.Date;
-            _end = time;
+            _end = TimeZoneInfo.ConvertTime(DateTime.UtcNow, CurrentTimeZone);
+            _start = TimeZoneInfo.ConvertTime(DateTime.UtcNow.Date, CurrentTimeZone);
         }
     }
 }
