@@ -21,7 +21,6 @@ global using Masa.Contrib.Dispatcher.IntegrationEvents.Dapr;
 global using Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EFCore;
 global using Masa.Contrib.Service.Caller;
 global using Masa.Contrib.Service.Caller.Authentication.OpenIdConnect;
-//global using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
 global using Masa.Contrib.Service.Caller.HttpClient;
 global using Masa.Contrib.StackSdks.Tsc;
 global using Masa.Tsc.Contracts.Admin;

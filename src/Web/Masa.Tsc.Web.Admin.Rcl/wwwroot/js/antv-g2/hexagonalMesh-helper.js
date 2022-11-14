@@ -27,26 +27,26 @@ const getStroke = (state) => {
 export function addPolygon(domRef, d) {
     let newData = handleData(d);
     let chart = domRef.chart;
-    var dv = new DataSet.View().source(newData, {
+    let dv = new DataSet.View().source(newData, {
         type: 'hex',
-        width: 120,
-        height: 120,
+        width: 80,
+        height: 80,
     });
 
-    var bgView = chart.view();
+    let bgView = chart.view();
     bgView.source(dv);
     bgView.polygon().position('x*y').color('#FFFFFF').opacity(0.5).style('state', {
         stroke: (state) => {
             return getStroke(state)
         },
-        lineWidth: 2,
+        lineWidth: 3,
     }).label('key', {
         htmlTemplate: function formatter(text, item, index) {
             let d = item._origin;
-            var html = `<p class="h5 default--text text-center">${d.name}</p>`;
-            let items = d.items.slice(0.3);
+            let html = `<p class="h5 default--text text-center">${d.name}</p>`;
+            let items = d.items.slice(0,3);
             items.forEach(e => {
-                html += `<p class="pa-1 body fill--text regular3 rounded-sm" style='width: max-content;'>${e.name}</p>`
+                html += `<p class="pa-1 body fill--text regular3 rounded-sm" style='width: max-content;background:${getStroke(e.status)}'>${e.name}</p>`
             });
             return html;
         }
@@ -55,7 +55,7 @@ export function addPolygon(domRef, d) {
 }
 
 
-export function init(domRef, data) {
+export function init(domRef, data) {    
     let chart = new G2.Chart({
         container: domRef,
         forceFit: true,
@@ -79,8 +79,16 @@ export function init(domRef, data) {
 
     chart.tooltip({
         showTitle: false,
-        itemTpl: `<div>MASA Project B<br/>YDD2834190407104<br/>应用：12<br/>members to your team to start collaborating. Click here to edit this<div>`
+        itemTpl: `<div>{value}<br/>{key}<br/>应用：{findByName(value)}<br/>members to your team to start collaborating. Click here to edit this<div>`
     });
+
+    function findByName(name) {
+        for (let item in data) {
+            if (item.name === name)
+                return item;
+        }
+        return null;
+    }
 }
 
 export function render(domRef) {

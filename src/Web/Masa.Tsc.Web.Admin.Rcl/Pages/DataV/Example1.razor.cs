@@ -83,7 +83,7 @@ public partial class Example1 : BDomComponentBase
                 Id="0",
                 Label="EShop-Order",
                 Depth=0,
-                State=LinkTrackingTopologyStatuses.Normal,
+                State=MonitorStatuses.Normal,
                 X=0,
                 Y=0
             },
@@ -91,7 +91,7 @@ public partial class Example1 : BDomComponentBase
                 Id="1",
                 Label="EShop-ApI",
                 Depth=1,
-                State=LinkTrackingTopologyStatuses.Normal,
+                State=MonitorStatuses.Normal,
                 X=-200,
                 Y=0
             },
@@ -99,7 +99,7 @@ public partial class Example1 : BDomComponentBase
                 Id="2",
                 Label="EShop-Product",
                 Depth=1,
-                State=LinkTrackingTopologyStatuses.Normal,
+                State=MonitorStatuses.Normal,
                 X=200,
                 Y=100
             },
@@ -107,7 +107,7 @@ public partial class Example1 : BDomComponentBase
                 Id="3",
                 Label="EShop-Sql",
                 Depth=1,
-                State=LinkTrackingTopologyStatuses.Normal,
+                State=MonitorStatuses.Normal,
                 X=300,
                 Y=-150
             },
@@ -115,7 +115,7 @@ public partial class Example1 : BDomComponentBase
                 Id="4",
                 Label="EShop-Payment",
                 Depth=1,
-                State=LinkTrackingTopologyStatuses.Alarm,
+                State=MonitorStatuses.Warn,
                 X=200,
                 Y=50
             },
@@ -123,7 +123,7 @@ public partial class Example1 : BDomComponentBase
                 Id="5",
                 Label="Api-gateway",
                 Depth=2,
-                State=LinkTrackingTopologyStatuses.Error,
+                State=MonitorStatuses.Error,
                 X=-300,
                 Y=50
             },
@@ -131,7 +131,7 @@ public partial class Example1 : BDomComponentBase
                 Id="6",
                 Label="EShop-Yun",
                 Depth=2,
-                State=LinkTrackingTopologyStatuses.Error,
+                State=MonitorStatuses.Error,
                 X=500,
                 Y=50
             },
@@ -139,7 +139,7 @@ public partial class Example1 : BDomComponentBase
                 Id="7",
                 Label="EShop-App",
                 Depth=3,
-                State=LinkTrackingTopologyStatuses.Normal,
+                State=MonitorStatuses.Normal,
                 X=-500,
                 Y=-50
             },

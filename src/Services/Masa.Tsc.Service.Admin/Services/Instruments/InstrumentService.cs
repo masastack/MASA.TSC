@@ -1,6 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.Authentication.Identity;
+using Masa.Contrib.Authentication.Identity;
+
 namespace Masa.Tsc.Service.Admin.Services.Instruments;
 
 public class InstrumentService : ServiceBase
