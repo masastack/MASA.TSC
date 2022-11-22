@@ -20,19 +20,11 @@ builder.WebHost.UseKestrel(option =>
 });
 
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
-IConfiguration config;
-if (builder.Environment.EnvironmentName == "Development")
+builder.Services.AddMasaConfiguration(configurationBuilder =>
 {
-    builder.Services.AddMasaConfiguration(configurationBuilder =>
-    {
-        configurationBuilder.UseDcc(dccConfig, default, default);
-    });
-    config = builder.Services.GetMasaConfiguration().ConfigurationApi.GetPublic();
-}
-else
-{
-    config = builder.Configuration;
-}
+    configurationBuilder.UseDcc(dccConfig, default, default);
+});
+IConfiguration config = builder.Services.GetMasaConfiguration().ConfigurationApi.GetPublic();
 
 var oidc = config.GetSection("$public.OIDC").Get<MasaOpenIdConnectOptions>();
 string authUrl = config.GetValue<string>("$public.AppSettings:AuthClient:Url");
