@@ -48,7 +48,7 @@
     <SearchTextField Label="TraceId/Search" Value="@_keyword" Solo Dense Class="rounded-0 flex-column-4"
                      ValueChanged="@((value)=>ValueChange("keyword",value))"></SearchTextField>
     <SDateTimeRangePicker Class="ma-0 pa-0 pt-2 pl-2" StartTime="_start" EndTime="_end"
-                          StartTimeChanged="@((value)=>ValueChange("start",value))"
-                          EndTimeChanged="@((value)=>ValueChange("end",value))" />
+                          StartTimeChanged="@((value)=>ValueChange("start",value!))"
+                          EndTimeChanged="@((value)=>ValueChange("end",value!))" />
     <MButton OnClick="SearchAsync" Loading="_isSearching" Class="rounded-0">Query</MButton>
 </MRow>

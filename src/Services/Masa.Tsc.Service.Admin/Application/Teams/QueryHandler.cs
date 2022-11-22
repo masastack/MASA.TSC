@@ -13,7 +13,7 @@ public class QueryHandler
     private readonly IMasaPrometheusClient _prometheusClient;
     private readonly TokenProvider _tokenProvider;
 
-    public QueryHandler(IPmClient pmClient, IAuthClient authClient, IElasticClient elasticClient, IMasaPrometheusClient prometheusClient,TokenProvider token)
+    public QueryHandler(IPmClient pmClient, IAuthClient authClient, IElasticClient elasticClient, IMasaPrometheusClient prometheusClient, TokenProvider token)
     {
         _authClient = authClient;
         _pmClient = pmClient;
@@ -81,42 +81,35 @@ public class QueryHandler
     [EventHandler]
     public async Task GetTeamMonitorAysnc(TeamMonitorQuery query)
     {
-        try
+        var teams = await _authClient.TeamService.GetUserTeamsAsync();
+
+        if (teams == null || !teams.Any())
+            return;
+        query.Result = new TeamMonitorDto
         {
-            var teams = await _authClient.TeamService.GetUserTeamsAsync();
+            Projects = await GetAllProjects(teams.Select(t => t.Id).ToList()),
+            Monitor = new AppMonitorDto()
+        };
 
-            if (teams == null || !teams.Any())
-                return;
-            query.Result = new TeamMonitorDto
-            {
-                Projects = await GetAllProjects(teams.Select(t => t.Id).ToList()),
-                Monitor = new AppMonitorDto()
-            };
+        var monitors = await GetAllMonitorAsync();
+        var errorWarns = await GetErrorAndWarnAsync();
 
-            var monitors = await GetAllMonitorAsync();
-            var errorWarns = await GetErrorAndWarnAsync();
-
-            int error = 0, warn = 0, errorWarnAppCount = 0;
-            if (errorWarns != null && errorWarns.Any())
-            {
-                SetProjectStatus(query, errorWarns, ref error, ref warn);
-                errorWarnAppCount = errorWarns.Where(item => item.Value.Item1 > 0 || item.Value.Item2 > 0).Count();
-            }
-
-            query.Result.Monitor.Error = error;
-            query.Result.Monitor.Warn = warn;
-            if (monitors != null && monitors.Any())
-            {
-                query.Result.Monitor.Total = monitors.Count;
-                if (monitors.Count - errorWarnAppCount > 0)
-                {
-                    query.Result.Monitor.Normal = monitors.Count - errorWarnAppCount;
-                }
-            }
+        int error = 0, warn = 0, errorWarnAppCount = 0;
+        if (errorWarns != null && errorWarns.Any())
+        {
+            SetProjectStatus(query, errorWarns, ref error, ref warn);
+            errorWarnAppCount = errorWarns?.Where(item => item.Value.Item1 > 0 || item.Value.Item2 > 0)?.Count() ?? 0;
         }
-        catch (Exception ex)
-        { 
-        
+
+        query.Result.Monitor.Error = error;
+        query.Result.Monitor.Warn = warn;
+        if (monitors != null && monitors.Any())
+        {
+            query.Result.Monitor.Total = monitors.Count;
+            if (monitors.Count - errorWarnAppCount > 0)
+            {
+                query.Result.Monitor.Normal = monitors.Count - errorWarnAppCount;
+            }
         }
     }
 

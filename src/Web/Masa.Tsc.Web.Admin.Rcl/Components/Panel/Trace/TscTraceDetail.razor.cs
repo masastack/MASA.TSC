@@ -9,7 +9,7 @@ public partial class TscTraceDetail
     public string TraceId { get { return _traceId; } set { _traceId = value; _tabIndex = "attr"; } }
 
     private StringNumber _tabIndex = "attr";
-    private IEnumerable<TraceDto> _items = new List<TraceDto>();
+    private IEnumerable<TraceResponseDto> _items = new List<TraceResponseDto>();
     private bool _isLoading = true;
     private string _traceId = default!;
     private TraceDetailModel _selectItem;
@@ -38,27 +38,27 @@ public partial class TscTraceDetail
     {
         new("Service", item => ((Dictionary<string, object>)item["service"])["name"])
         {
-            Align = "start",
+            Align = DataTableHeaderAlign.Start,
             Sortable = false
         },
         new("Endpoint", item => ((Dictionary<string, object>)item["transaction"])["name"])
         {
-            Align = "start",
+            Align = DataTableHeaderAlign.Start,
             Sortable = false
         },
         new("Duration (ms)", item => ((Dictionary<string, object>)((Dictionary<string, object>)item["transaction"])["duration"])["us"])
         {
-            Align = "start",
+            Align = DataTableHeaderAlign.Start,
             Sortable = false
         },
         new("Timestamp", item => item["@timestamp"])
         {
-            Align = "start",
+            Align = DataTableHeaderAlign.Start,
             Sortable = false
         },
         new("EndTime", item => ((Dictionary<string, object>)item["transaction"])["name"])
         {
-            Align = "start",
+            Align = DataTableHeaderAlign.Start,
             Sortable = false
         }
     };
@@ -78,7 +78,7 @@ public partial class TscTraceDetail
         _isLoading = false;
     }
 
-    private async Task OnChangeRecordAsync(TraceDto item)
+    private async Task OnChangeRecordAsync(TraceResponseDto item)
     {
         _selectItem = new TraceDetailModel(item);
         StateHasChanged();
@@ -105,7 +105,7 @@ public partial class TscTraceDetail
         _overView.SpansDeeps.Clear();
         _overView.SpanChildren.Clear();
 
-        var list = new List<TraceDto>();
+        var list = new List<TraceResponseDto>();
         foreach (var item in _items)
         {
             string id = item.SpanId, parentId = item.ParentSpanId ?? String.Empty;

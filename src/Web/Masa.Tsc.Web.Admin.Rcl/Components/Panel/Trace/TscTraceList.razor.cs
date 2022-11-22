@@ -8,44 +8,44 @@ public partial class TscTraceList : TscComponentBase
     [Parameter]
     public RequestTraceListDto Query { get; set; } = default!;
 
-    private IEnumerable<TraceDto> _data = new List<TraceDto>();
+    private IEnumerable<TraceResponseDto> _data = new List<TraceResponseDto>();
     private int _total = 0;
-    private MDataTable<TraceDto> _mDataTable = default!;
+    private MDataTable<TraceResponseDto> _mDataTable = default!;
     private bool _isLoading = false;
     private string _selectTraceId = default!;
-    private List<DataTableHeader<TraceDto>> _headers = new()
+    private List<DataTableHeader<TraceResponseDto>> _headers = new()
     {
         new("Service", item => item.Resource["service.name"])
         {
-            Align = "start",
+            Align = DataTableHeaderAlign.Start,
             Sortable = false
         },
-        new("Endpoint", item => TraceDto.GetDispalyName(item))
+        new("Endpoint", item => item.GetDispalyName())
         {
-            Align = "start",
+            Align= DataTableHeaderAlign.Start,
             Sortable = false
         },
-        new("Duration (ms)", item => item.GetDuration())
+        new("Duration (ms)", item => item.Duration)
         {
-            Align = "start",
+            Align = DataTableHeaderAlign.Start,
             Sortable = false
         },
         new("Timestamp", item => item.Timestamp)
         {
-            Align = "start",
+            Align = DataTableHeaderAlign.Start,
             Sortable = false
         },
-        new DataTableHeader<TraceDto>
+        new DataTableHeader<TraceResponseDto>
         {
             Text = "Operate",
             Value = "Operate",
-            Align = "start",
+            Align = DataTableHeaderAlign.Start,
             Sortable = false
         }
     };
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-    private async Task OpenAsync(TraceDto item)
+    private async Task OpenAsync(TraceResponseDto item)
     {
         _selectTraceId = item.TraceId;
         OpenDialog();
@@ -69,7 +69,7 @@ public partial class TscTraceList : TscComponentBase
         await QueryAsync(false);
     }
 
-    private void OnItemSelect(TraceDto item, bool selected)
+    private void OnItemSelect(TraceResponseDto item, bool selected)
     {
         OpenAsync(item).Wait();
     }
@@ -97,12 +97,12 @@ public partial class TscTraceList : TscComponentBase
             if (data != null)
             {
                 _total = (int)data.Total;
-                _data = data.Items ?? new();
+                _data = data.Result ?? new();
             }
             else
             {
                 _total = 0;
-                _data = Array.Empty<TraceDto>();
+                _data = Array.Empty<TraceResponseDto>();
             }
             _isLoading = false;
             if (isStateChange)

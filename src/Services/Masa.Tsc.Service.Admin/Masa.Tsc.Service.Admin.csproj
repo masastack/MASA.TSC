@@ -36,8 +36,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Masa.BuildingBlocks.Dispatcher.Events" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.Configuration" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.Configuration.ConfigurationApi.Dcc" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Configuration" Version="$(MasaFrameworkPackageVersion)" />		
 		<PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.BuildingBlocks.Ddd.Domain" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Ddd.Domain" Version="$(MasaFrameworkPackageVersion)" />		
@@ -45,6 +44,7 @@
 		<PackageReference Include="Masa.Utils.Data.Elasticsearch" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Utils.Data.Prometheus" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Tsc" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.Elasticseach" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.Dapr" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.ReadWriteSplitting.Cqrs" Version="$(MasaFrameworkPackageVersion)" />
@@ -58,8 +58,7 @@
 		<PackageReference Include="Masa.Contrib.Development.DaprStarter.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Utils.Caching.DistributedMemory" Version="0.6.0-preview.13" />
 		<PackageReference Include="Masa.Utils.Caching.Redis" Version="0.6.0-preview.13" />
-		<PackageReference Include="MASA.Utils.Configuration.Json" Version="$(MasaFrameworkPackageVersion)" />		
-		<PackageReference Include="Masa.Utils.Exceptions" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="MASA.Utils.Configuration.Json" Version="$(MasaFrameworkPackageVersion)" />	
 		<PackageReference Include="Masa.Utils.Extensions.Enums" Version="$(MasaFrameworkPackageVersion)" />	
 		
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
@@ -86,7 +85,7 @@
 	<ItemGroup>
 		<!--<ProjectReference Include="..\..\..\..\MASA.Framework\src\Contrib\Authentication\Identity\Masa.Contrib.Authentication.Identity\Masa.Contrib.Authentication.Identity.csproj" />-->
 		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
-		<ProjectReference Include="..\Masa.Tsc.Services.Observability\Masa.Tsc.Services.Observability.csproj" />
+		<!--<ProjectReference Include="..\Masa.Tsc.Services.Observability\Masa.Tsc.Services.Observability.csproj" />-->
 	</ItemGroup>
 
 	<ItemGroup>

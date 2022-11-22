@@ -16,21 +16,20 @@
 }
 
 @code {
+    [Parameter]
+    public IEnumerable<UserListDto>? Users { get; set; }
 
     [Parameter]
-    public IEnumerable<UserListDto> Users { get; set; }
+    public StringNumber? MaxHeight { get; set; }
 
     [Parameter]
-    public StringNumber MaxHeight { get; set; }
-
-    [Parameter]
-    public StringNumber MaxWidth { get; set; }
+    public StringNumber? MaxWidth { get; set; }
 
 
     public class UserListDto
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
-        public string ImgUrl { get; set; }
+        public string ImgUrl { get; set; } = default!;
     }
 }

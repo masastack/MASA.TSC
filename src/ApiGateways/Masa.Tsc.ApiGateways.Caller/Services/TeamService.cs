@@ -5,21 +5,7 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class TeamService : BaseService
 {
-    public TeamService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/team",tokenProvider)
-    {
-    }
+    public TeamService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/team", tokenProvider) { }
 
-    public async Task<TeamDto> GetTeamAsync(Guid teamId, string projectId)
-    {
-        try
-        {
-            return await Caller.GetAsync<TeamDto>($"{RootPath}/{teamId}/{projectId}") ?? default!;
-        }
-        catch (Exception ex)
-        { 
-        
-        }
-
-        return default!;
-    }
+    public async Task<TeamDto> GetTeamAsync(Guid teamId, string projectId) => (await Caller.GetAsync<TeamDto>($"{RootPath}/{teamId}/{projectId}"))!;
 }

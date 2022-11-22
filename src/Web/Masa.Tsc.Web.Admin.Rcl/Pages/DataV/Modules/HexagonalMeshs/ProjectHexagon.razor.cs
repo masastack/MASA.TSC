@@ -67,8 +67,6 @@ public partial class ProjectHexagon : IAsyncDisposable
             await AddPolygon();
             await Render();
         }
-
-        
     }
 
     public async Task InitChart()
@@ -105,38 +103,13 @@ public partial class ProjectHexagon : IAsyncDisposable
     [JSInvokable]
     public void OnItemClick(string projectId)
     {
-        _current = _projects?.FirstOrDefault(p => p.Identity == projectId);
-        if (_current != null)
+        var find = _projects.FirstOrDefault(p => p.Identity == projectId);
+        if (find != null)
         {
+            _current = find;
             OpenDialog();
         }
-    }
-
-    private string GetPaddingClass(int rowIndex, int total)
-    {
-        if (rowIndex % 2 == 1)
-            return "hex-even";
-        else
-            return "";
-
-        //if (total - RowCount == 0)
-        //{
-
-        //}
-
-        //var count = RowCount - total;
-        //if (rowIndex % 2 == 0)
-        //{
-        //    if ((RowCount + count) % 2 == 0)
-        //        return "hex-even";
-        //}
-        //else if ((RowCount + count) % 2 == 1)
-        //{
-        //    return "hex-even";
-        //}
-
-        //return "";
-    }
+    }    
 
     private void SetTotalRows()
     {

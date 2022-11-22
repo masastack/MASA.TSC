@@ -13,30 +13,30 @@ public class TraceService : ServiceBase
         App.MapGet($"{BaseUri}/aggregate", AggregateAsync);
     }
 
-    private async Task<IEnumerable<TraceDto>> GetAsync([FromServices] IEventBus eventBus, [FromRoute] string traceId)
+    private async Task<IEnumerable<TraceResponseDto>> GetAsync([FromServices] IEventBus eventBus, [FromRoute] string traceId)
     {
         var query = new TraceDetailQuery(traceId);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
-    private async Task<PaginationDto<TraceDto>> GetListAsync([FromServices] IEventBus eventBus, RequestTraceListDto model)
+    private async Task<PaginatedListBase<TraceResponseDto>> GetListAsync([FromServices] IEventBus eventBus, RequestTraceListDto model)
     {
         var query = new TraceListQuery(model.Service, model.Instance, model.Endpoint, model.TraceId, model.Start, model.End, model.Page, model.PageSize);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
-    private async Task<IEnumerable<string>> GetAttrValuesAsync([FromServices] IEventBus eventBus, [FromBody] RequestAttrDataDto model)
+    private async Task<IEnumerable<string>> GetAttrValuesAsync([FromServices] IEventBus eventBus, [FromBody] SimpleAggregateRequestDto model)
     {
-        var query = new TraceAttrValuesQuery(model.Query, model.Name, model.Keyword, model.Start, model.End, model.Max);
+        var query = new TraceAttrValuesQuery(model);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
-    private async Task<ChartLineDataDto<ChartPointDto>> AggregateAsync([FromServices] IEventBus eventBus, [FromBody] RequestAggregationDto param)
+    private async Task<object> AggregateAsync([FromServices] IEventBus eventBus, [FromBody] SimpleAggregateRequestDto param)
     {
-        var query = new TraceAggregationQuery(true, true, param.FieldMaps, param.Queries, param.Start, param.End, param.Interval);
+        var query = new TraceAggregationQuery(param);
         await eventBus.PublishAsync(query);
         return query.Result!;
     }

@@ -1,11 +1,11 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.ApiGateways.Caller.Extensions;
+namespace Masa.Tsc.ApiGateways.Caller;
 
 public static class ServiceExtensions
 {
-    private const string DEFAULT_CLIENT_NAME = "masa.tsc.apigateways.caller";
+    internal const string DEFAULT_CLIENT_NAME = "masa.tsc.apigateways.caller";
 
     public static IServiceCollection AddTscApiCaller(this IServiceCollection services, string tscApiUrl)
     {

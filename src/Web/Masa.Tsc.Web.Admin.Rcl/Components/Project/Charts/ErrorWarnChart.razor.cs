@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Web.Admin.Rcl.Data.EChart;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class ErrorWarnChart
@@ -62,67 +60,39 @@ public partial class ErrorWarnChart
         if (query.End.HasValue)
             end = query.End.Value;
 
-        var data1 = await ApiCaller.LogService.AggregateAsync(new RequestAggregationDto
-        {
-            Start = start,
-            End = end,
-            FieldMaps = new RequestFieldAggregationDto[] {
-                new RequestFieldAggregationDto{
-                     AggegationType= AggregationTypes.Count,
-                     Name="@timestamp",
-                     Alias="Count",
-                }
-            },
-            Queries = ConvertToLogQueries(query),
-            Interval = string.Empty,
-        });
+        var data1 = await ApiCaller.LogService.AggregateAsync<int>(
+            new SimpleAggregateRequestDto
+            {
+                Start = start,
+                End = end,
+                Name = "@timestamp",
+                Alias = "Count",
+                Type = AggregateTypes.Count,
+                Service = query.AppId,
+                Conditions = new FieldConditionDto[] { new FieldConditionDto {
+                   Name="SeverityText",
+                   Value=Warn ? "Warning" : "Error"
+                } }
+            });
 
-        var data2 = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
-        {
-            Start = start,
-            End = end,
-            FieldMaps = new RequestFieldAggregationDto[] {
-                new RequestFieldAggregationDto{
-                     AggegationType= AggregationTypes.Count,
-                     Name="@timestamp",
-                     Alias="Count",
-                }
-            },
-            Queries = ConvertToTraceQueries(query, isTrace: true),
-            Interval = string.Empty,
-        });
-        _total += Convert.ToInt32(data1.First().Value);
-        _total += Convert.ToInt32(data2.Data.First().Y);
+        var data2 = await ApiCaller.TraceService.AggregateAsync<int>(
+            new SimpleAggregateRequestDto
+            {
+                Start = start,
+                End = end,
+                Name= "@timestamp",
+                Alias= "Count",
+                Type=  AggregateTypes.Count,
+                Service=query.AppId
+            });        
+        _total += data1;
+        _total += data2;
 
-        _options.SetValue("series[0].data", new object[] {GetModel(true,data1.First().Value),
-            GetModel(false,data2.Data.First().Y) });
-        
-        await Task.CompletedTask;
+        _options.SetValue("series[0].data", new object[] {GetModel(true,data1),
+            GetModel(false,data2) });
     }
 
-    private Dictionary<string, string> ConvertToLogQueries(ProjectAppSearchModel query)
-    {
-        var dic = new Dictionary<string, string>();
-        if (query.AppId != null)
-            dic.Add("Resource.service.name", query.AppId);
-        dic.Add("SeverityText", Warn ? "Warning" : "Error");
-
-        return dic;
-    }
-
-    private Dictionary<string, string> ConvertToTraceQueries(ProjectAppSearchModel query, bool isSpan = false, bool isTrace = false)
-    {
-        var dic = new Dictionary<string, string>();
-        if (query.AppId != null)
-            dic.Add("service.name", query.AppId);        
-
-        dic.Add("isTrace", isTrace.ToString().ToLower());
-        dic.Add("isSpan", isSpan.ToString().ToLower());
-
-        return dic;
-    }
-
-    private static object GetModel(bool isTrace, string value)
+    private static object GetModel(bool isTrace, int value)
     {
         return new { name = isTrace ? "Tace" : "Log", value = value };
     }

@@ -7,7 +7,7 @@ internal class TraceDetailModel : TraceTimeUsModel
 {
     public Dictionary<string, string> Overview { get; set; } = new Dictionary<string, string>();
 
-    public TraceDto Current { get; set; }
+    public TraceResponseDto Current { get; set; }
 
     public Dictionary<string, object> Attributes { get; set; } = default!;
 
@@ -15,7 +15,7 @@ internal class TraceDetailModel : TraceTimeUsModel
 
     public Dictionary<string, object> Logs { get; set; } = default!;
 
-    public TraceDetailModel(TraceDto value) : base(1)
+    public TraceDetailModel(TraceResponseDto value) : base(1)
     {
         SetValue(value);
     }
@@ -29,7 +29,7 @@ internal class TraceDetailModel : TraceTimeUsModel
         Logs = default!;
     }
 
-    public void SetValue(TraceDto value)
+    public void SetValue(TraceResponseDto value)
     {
         if (value == null)
         {

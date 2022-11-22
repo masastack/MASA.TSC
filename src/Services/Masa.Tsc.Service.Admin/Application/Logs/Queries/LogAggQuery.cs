@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Logs;
 
-public record LogAggQuery(IEnumerable<RequestFieldAggregationDto> FieldMaps, string Query, DateTime Start, DateTime End,string Interval) : Query<IEnumerable<KeyValuePair<string, string>>>
+public record LogAggQuery(SimpleAggregateRequestDto Data) : Query<object>
 {
-    public override IEnumerable<KeyValuePair<string, string>> Result { get; set; }
+    public override object Result { get; set; }
 }

@@ -1,11 +1,9 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
-using Masa.Tsc.Contracts.Admin.Extensions;
-
 var builder = WebApplication.CreateBuilder(args);
-builder.AddObservable();
+builder.Services.AddObservable(builder.Logging, builder.Configuration, true);
+string tscUrl = builder.Configuration["Masa:Tsc:ServiceBaseAddress"];
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -43,9 +41,8 @@ string pmUrl = config.GetValue<string>("$public.AppSettings:PmClient:Url");
 builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl, pmUrl).AddMasaOpenIdConnect(oidc);
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<TokenProvider>();
-builder.Services.AddScoped<TscCaller>();
-//builder.Services.AddScoped<AddInstrumentDto>();
+builder.Services.AddSingleton<TokenProvider>();
+builder.Services.AddTscApiCaller(tscUrl);
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 var app = builder.Build();

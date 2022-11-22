@@ -80,47 +80,14 @@ public partial class TscWidgetChart : TscWidgetBase
         return default!;
     }
 
-    private IEnumerable<ValueTuple<string, IEnumerable<double>, IEnumerable<string>>> asdasdasd(QueryResultDataResponse data, PanelMetricDto metricSetting)
+    private static string GetLabelName(object o)
     {
-        List<ValueTuple<string, IEnumerable<double>, IEnumerable<string>>> result = new();
-        switch (data.ResultType)
-        {
-            case ResultTypes.Matrix:
-                {
-                    var matrixDatas = data.Result.Select(item => (QueryResultMatrixRangeResponse)item).ToArray();
-                    foreach (var item in matrixDatas)
-                    {
-                        result.Add(ValueTuple.Create(GetLabelName(item.Metric,default!), item.Values.Select(it => (double)it[0]).ToArray(), item.Values.Select(it => (string)it[1]).ToArray()));
-                    }
-                }
-                break;
-            case ResultTypes.Vector:
-                {
-                    //var instantData = data.Result.Select(item => (QueryResultInstantVectorResponse)item).ToArray();
-                    //foreach (var item in instantData)
-                    //{
-                    //    result.Add(ValueTuple.Create( String.Empty, instantData.Select(item => (double)item.Value[0]).ToArray(), instantData.Select(item => (string)item.Value[1]).ToArray()));
-                    //}                    
-                }
-                break;
-            default:
-                {
-                    //result.Add(ValueTuple.Create(metricSetting.DisplayName, data.Result.Select(item => (double)((object[])item)[0]).ToArray(), data.Result.Select(item => (string)((object[])item)[1]).ToArray()));
-                }
-                break;
-        }
-        return result;
-    }
-
-    private string GetLabelName(object o, string defaultName)
-    {
-        var t = o as IDictionary<string, object>;
-        if (!t.Any())
+        if (o is not IDictionary<string, object> dic || !dic.Any())
             return string.Empty;
         StringBuilder text = new StringBuilder();
-        foreach (var key in t.Keys)
+        foreach (var key in dic.Keys)
         {
-            text.Append($"{key}:{t[key]},");
+            text.Append($"{key}:{dic[key]},");
         }
 
         return text.Remove(text.Length - 1, 1).ToString();
@@ -192,7 +159,7 @@ public partial class TscWidgetChart : TscWidgetBase
             await SetChartType(_panelValue.ChartType, LoadDataAsync);
     }
 
-    private bool HasMetricChange(List<EChartPanelMetricItemModel> data1, List<EChartPanelMetricItemModel> data2)
+    private static bool HasMetricChange(List<EChartPanelMetricItemModel> data1, List<EChartPanelMetricItemModel> data2)
     {
         if (data1 == null || data2 == null)
             return true;
@@ -218,12 +185,14 @@ public partial class TscWidgetChart : TscWidgetBase
 
         foreach (var item in data)
         {
+            if (item.Result == null || !item.Result.Any())
+                continue;
             var matrixDatas = item.Result.Select(item => (QueryResultMatrixRangeResponse)item).ToArray();
             foreach (var sss in matrixDatas)
             {
-                var title = GetLabelName(sss.Metric, default!);
-                var timeSpans = sss.Values.Select(it => (double)it[0]).ToArray();
-                var values = sss.Values.Select(it => (string)it[1]).ToArray();
+                var title = GetLabelName(sss.Metric!);
+                var timeSpans = sss.Values!.Select(it => (double)it[0]).ToArray();
+                var values = sss.Values!.Select(it => (string)it[1]).ToArray();
                 titles.Add(title);
                 if (!xPoints.Any())
                 {
@@ -256,16 +225,18 @@ public partial class TscWidgetChart : TscWidgetBase
 
         foreach (var item in data)
         {
+            if (item.Result == null || !item.Result.Any())
+                continue;
             var matrixDatas = item.Result.Select(item => (QueryResultMatrixRangeResponse)item).ToArray();
             foreach (var sss in matrixDatas)
             {
-                var title = GetLabelName(sss.Metric, default!);
-                var timeSpans = sss.Values.Select(it => (double)it[0]).ToArray();
+                var title = GetLabelName(sss.Metric!);
+                var timeSpans = sss.Values!.Select(it => (double)it[0]).ToArray();
                 if (timeSpans.Length - 20 <= 0)
                 {
                     //考虑柱状分组
                 }
-                var values = sss.Values.Select(it => (string)it[1]).Last();
+                var values = sss.Values!.Select(it => (string)it[1]).Last();
                 titles.Add(title);
                 list.Add(values);
             }
@@ -291,17 +262,19 @@ public partial class TscWidgetChart : TscWidgetBase
 
         foreach (var item in data)
         {
+            if (item.Result == null || !item.Result.Any())
+                continue;
             var matrixDatas = item.Result.Select(item => (QueryResultMatrixRangeResponse)item).ToArray();
 
             foreach (var sss in matrixDatas)
             {
-                var title = GetLabelName(sss.Metric, default!);
+                var title = GetLabelName(sss.Metric!);
                 //var timeSpans = sss.Values.Select(it => (double)it[0]).ToArray();
                 //if (timeSpans.Length - 20 <= 0)
                 //{
                 //    //考虑柱状分组
                 //}
-                var value = sss.Values.Select(it => (string)it[1]).Last();
+                var value = sss.Values!.Select(it => (string)it[1]).Last();
                 list.Add(new { value, name = title });
             }
         }
@@ -323,12 +296,14 @@ public partial class TscWidgetChart : TscWidgetBase
 
         foreach (var item in data)
         {
+            if (item.Result == null || !item.Result.Any())
+                continue;
             var matrixDatas = item.Result.Select(item => (QueryResultMatrixRangeResponse)item).ToArray();
 
             foreach (var sss in matrixDatas)
             {
-                var title = GetLabelName(sss.Metric, default!);
-                var value = sss.Values.Select(it => (string)it[1]).Last();
+                var title = GetLabelName(sss.Metric!);
+                var value = sss.Values!.Select(it => (string)it[1]).Last();
                 _type.SetValue("series[0].data[0]", new { name = title, value });
                 break;
             }
@@ -355,12 +330,14 @@ public partial class TscWidgetChart : TscWidgetBase
 
         foreach (var item in data)
         {
+            if (item.Result == null || !item.Result.Any())
+                continue;
             var matrixDatas = item.Result.Select(item => (QueryResultMatrixRangeResponse)item).ToArray();
             foreach (var sss in matrixDatas)
             {
-                var title = GetLabelName(sss.Metric, default!);
-                var timeSpans = sss.Values.Select(it => (double)it[0]).ToArray();
-                var values = sss.Values.Select(it => (string)it[1]).ToArray();
+                var title = GetLabelName(sss.Metric!);
+                var timeSpans = sss.Values!.Select(it => (double)it[0]).ToArray();
+                var values = sss.Values!.Select(it => (string)it[1]).ToArray();
                 titles.Add(title);
                 if (!xPoints.Any())
                 {

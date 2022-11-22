@@ -10,7 +10,7 @@ internal static class ICallerExtensions
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         if (body != null)
         {
-            request.Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
+            request.Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
         }
         return (await caller.SendAsync<TResult>(request, default)) ?? default!;
     }

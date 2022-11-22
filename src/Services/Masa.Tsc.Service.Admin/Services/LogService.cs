@@ -13,30 +13,30 @@ public class LogService : ServiceBase
         App.MapGet($"{BaseUri}/list", GetPageAsync);
     }
 
-    private async Task<IEnumerable<KeyValuePair<string, string>>> AggregateAsync([FromServices] IEventBus eventBus, [FromBody] RequestAggregationDto param)
+    private async Task<object> AggregateAsync([FromServices] IEventBus eventBus, [FromBody] SimpleAggregateRequestDto param)
     {
-        var query = new LogAggQuery(param.FieldMaps, param.RawQuery, param.Start, param.End, param.Interval);
+        var query = new LogAggQuery(param);
         await eventBus.PublishAsync(query);
-        return query.Result ?? Array.Empty<KeyValuePair<string, string>>();
+        return query.Result;
     }
 
-    private async Task<LogDto> GetLatestAsync([FromServices] IEventBus eventBus, [FromBody] RequestLogLatestDto param)
+    private async Task<LogResponseDto> GetLatestAsync([FromServices] IEventBus eventBus, [FromBody] RequestLogLatestDto param)
     {
         var query = new LatestLogQuery(param.Start, param.End, param.Query, param.IsDesc);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
-    private async Task<IEnumerable<Contracts.Admin.MappingResponse>> GetMappingFieldAsync([FromServices] IEventBus eventBus)
+    private async Task<IEnumerable<MappingResponseDto>> GetMappingFieldAsync([FromServices] IEventBus eventBus)
     {
         var query = new LogFieldQuery();
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
-    private async Task<PaginationDto<LogDto>> GetPageAsync([FromServices] IEventBus eventBus, LogPageQueryDto param)
+    private async Task<PaginatedListBase<LogResponseDto>> GetPageAsync([FromServices] IEventBus eventBus, LogPageQueryDto param)
     {
-        var query = new LogsQuery(param.Query, param.Start, param.End, param.Page, param.PageSize, param.Sorting);
+        var query = new LogsQuery(param.Query, param.Start, param.End, param.Page, param.PageSize, param.IsAsc);
         await eventBus.PublishAsync(query);
         return query.Result;
     }

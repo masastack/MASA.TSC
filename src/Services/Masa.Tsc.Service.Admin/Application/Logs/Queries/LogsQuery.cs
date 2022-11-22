@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Logs;
 
-public record LogsQuery(string Query, DateTime Start, DateTime End, int Page = 1, int Size = 10, string Sort = "desc", string Duration = "15m") : Query<PaginationDto<LogDto>>
+public record LogsQuery(string Query, DateTime Start, DateTime End, int Page = 1, int Size = 10, bool IsDesc = true, string Duration = "15m") : Query<PaginatedListBase<LogResponseDto>>
 {
-    public override PaginationDto<LogDto> Result { get; set; }
+    public override PaginatedListBase<LogResponseDto> Result { get; set; }
 }
