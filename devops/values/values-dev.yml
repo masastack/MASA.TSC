@@ -24,10 +24,12 @@
   variables:
     PROJECT_NAME: masa-tsc-service-admin
     PROJECT_PATH: "src/Services/Masa.Tsc.Service.Admin"
-    DOMAIN_NAME: tsc-service-develop.lonsid.cn
+    DOMAIN_NAME: tsc-service-develop.masastack.com
+
 
 .values-ui-admin-dev:
   variables:
     PROJECT_NAME: masa-tsc-ui-admin
     PROJECT_PATH: "src/Web/Masa.Tsc.Web.Admin.Server"
-    DOMAIN_NAME: tsc-develop.lonsid.cn
+    DOMAIN_NAME: tsc-develop.masastack.com
+
