@@ -34,7 +34,7 @@ public partial class TscInstrumentDetail
 
     private List<PanelDto> _panels = new();
 
-    private List<BDragItem> _items => _mDragZone?.Items;
+    private List<BDragItem> _items => _mDragZone?.Items!;
     private PanelDto? _editPanel = default;
     private MDragZone _mDragZone;
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Model;
+
 namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class InstrumentService : BaseService
@@ -27,8 +29,8 @@ public class InstrumentService : BaseService
         return (await Caller.GetAsync<InstrumentDetailDto>($"{RootPath}/{userId}/{id}"))!;
     }
 
-    public async Task<PaginationDto<InstrumentListDto>> ListAsync(Guid userId, int page, int size, string keyword)
+    public async Task<PaginatedListBase<InstrumentListDto>> ListAsync(Guid userId, int page, int size, string keyword)
     {
-        return (await Caller.GetAsync<PaginationDto<InstrumentListDto>>($"{RootPath}/list/{userId}/{page}/{size}/{keyword}"))!;
+        return (await Caller.GetAsync<PaginatedListBase<InstrumentListDto>>($"{RootPath}/list/{userId}/{page}/{size}/{keyword}"))!;
     }
 }

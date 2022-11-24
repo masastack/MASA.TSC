@@ -33,27 +33,28 @@ public partial class TscTraceSearch : IDisposable
 
     private async Task UpdateSearchInputAsync(int type, string val)
     {
-        if (_isLoading || string.IsNullOrEmpty(val))
+        if (_isLoading || string.IsNullOrEmpty(val) || _keyword == val)
         {
             return;
         }
 
+        _keyword = val;
         _isLoading = true;
         StateHasChanged();
         CheckTime();
-        var query = new RequestAttrDataDto
+        var query = new SimpleAggregateRequestDto
         {
             End = _end!.Value,
             Start = _start!.Value,
-            Keyword = val,
-            Max = 10
+            Keyword = _keyword,
+            MaxCount = 10,
+            Type = AggregateTypes.GroupBy,
         };
 
         IEnumerable<string> data;
         switch (type)
         {
             case 1:
-                query.Name = "Resource.service.name";
                 data = await ApiCaller.TraceService.GetAttrValuesAsync(query)!;
                 if (data != null && data.Any())
                     _services = data.ToList();
@@ -61,19 +62,13 @@ public partial class TscTraceSearch : IDisposable
                     _services.Clear();
                 break;
             case 2:
-                query.Query = new Dictionary<string, string> {
-                    {"Resource.service.name",_service}
-                };
-                query.Name = "Resource.service.instance.id";
+                query.Service = _service;
                 data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
                 _instances = data.ToList();
                 break;
             case 3:
-                query.Query = new Dictionary<string, string> {
-                    {"Resource.service.name",_service},
-                    {"Resource.service.instance.id",_instance}
-                };
-                query.Name = "Attributes.http.target";
+                query.Service = _service;
+                query.Instance = _instance;
                 data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
                 _endpoints = data.ToList();
                 break;
@@ -92,26 +87,25 @@ public partial class TscTraceSearch : IDisposable
         CheckTime();
         hasChange = true;
 
-        var query = new RequestAttrDataDto
+        var query = new SimpleAggregateRequestDto
         {
             End = _end!.Value,
             Start = _start!.Value,
-            Max = 10
+            Keyword = _keyword,
+            MaxCount = 10,
+            Type = AggregateTypes.GroupBy,
         };
         IEnumerable<string> data;
         switch (type)
         {
             case 1:
             case 2:
-                _endpoint = null;
+                _endpoint = default!;
                 if (type == 1)
                 {
-                    _instance = null;
+                    _instance = default!;
                     _instance = value;
-                    query.Query = new Dictionary<string, string> {
-                        {"Resource.service.name",_service}
-                    };
-                    query.Name = "Resource.service.instance.id";
+                    query.Service = _service;
                     data = await ApiCaller.TraceService.GetAttrValuesAsync(query);
                     if (data != null && data.Any())
                         _instances = data.ToList();
@@ -123,11 +117,7 @@ public partial class TscTraceSearch : IDisposable
                     _instance = value;
                 }
 
-                query.Query = new Dictionary<string, string> {
-                    {"Resource.service.name",_service},
-                    {"Resource.service.instance.id",_instance}
-                };
-                query.Name = "Attributes.http.target";
+                query.Instance = _instance;
                 data = await ApiCaller.TraceService.GetAttrValuesAsync(query);
                 if (data != null && data.Any())
                     _endpoints = data.ToList();
@@ -154,13 +144,15 @@ public partial class TscTraceSearch : IDisposable
             if (hasChange)
             {
                 CheckTime();
-                var list = await ApiCaller.TraceService.GetAttrValuesAsync(new RequestAttrDataDto
+                var query = new SimpleAggregateRequestDto
                 {
                     End = _end!.Value,
                     Start = _start!.Value,
-                    Name = "Resource.service.name",
-                    Max = 10
-                });
+                    Keyword = _keyword,
+                    MaxCount = 10,
+                    Type = AggregateTypes.GroupBy,
+                };
+                var list = await ApiCaller.TraceService.GetAttrValuesAsync(query);
                 _services = list?.ToList() ?? new();
 
                 if (OnSearchAsync != null)
@@ -183,7 +175,7 @@ public partial class TscTraceSearch : IDisposable
         switch (name)
         {
             case "keyword":
-                _keyword = value.ToString();
+                _keyword = value.ToString()!;
                 break;
             case "start":
                 _start = (DateTime?)value;

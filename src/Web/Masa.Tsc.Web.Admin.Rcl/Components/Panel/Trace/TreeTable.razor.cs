@@ -14,8 +14,9 @@ public partial class TreeTable
     [Parameter]
     public Func<object, string> ParentFunc { get; set; }
 
+    
     [Parameter]
-    public IEnumerable<TraceDto> Items
+    public IEnumerable<TraceResponseDto> Items
     {
         get
         {
@@ -28,7 +29,7 @@ public partial class TreeTable
     }
 
     [Parameter]
-    public Func<TraceDto, Task> OnRowClick { get; set; }
+    public Func<TraceResponseDto, Task> OnRowClick { get; set; }
 
     [Parameter]
     public Func<TraceOverviewModel, Task> OnOverviewUpdate { get; set; }
@@ -36,8 +37,7 @@ public partial class TreeTable
     [Parameter]
     public TraceOverviewModel OverViewData { get; set; }
 
-    private IEnumerable<TraceDto> _items;    
-    
+    private IEnumerable<TraceResponseDto> _items;
     private List<TraceTimeUsModel> _timeLines = new();
     private bool _isLoading = true;
 
@@ -90,7 +90,7 @@ public partial class TreeTable
         }
     }    
 
-    private string GetPadding(TraceDto item)
+    private string GetPadding(TraceResponseDto item)
     {
         string id = item.SpanId, parentId = item.ParentSpanId ?? string.Empty;
         int deep = OverViewData.SpansDeeps[id].Deep;
@@ -111,7 +111,7 @@ public partial class TreeTable
         return $"padding-left:{deep * 20}px";
     }
 
-    private async Task OnRowClickAync(TraceDto item)
+    private async Task OnRowClickAync(TraceResponseDto item)
     {
         if (OnRowClick != null)
             await OnRowClick(item);

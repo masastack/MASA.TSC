@@ -29,7 +29,7 @@ public class InstrumentService : ServiceBase
         await eventBus.PublishAsync(new RemoveInstrumentCommand(model.UserId, model.Ids.ToArray()));
     }
 
-    public async Task<PaginationDto<InstrumentListDto>> ListAsync([FromServices] IEventBus eventBus, Guid userId, int page, int size, string keyword)
+    public async Task<PaginatedListBase<InstrumentListDto>> ListAsync([FromServices] IEventBus eventBus, Guid userId, int page, int size, string keyword)
     {
         var query = new InstrumentQuery(userId, keyword, page, size);
         await eventBus.PublishAsync(query);

@@ -7,10 +7,10 @@ public class DirectoryService : BaseService
 {
     public DirectoryService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/Instrument/directory", tokenProvider) { }
 
-    public async Task<IEnumerable<KeyValuePair<string, string>>> AggregateAsync(RequestAggregationDto param)
-    {
-        return (await Caller.GetByBodyAsync<IEnumerable<KeyValuePair<string, string>>>($"{RootPath}/aggregate", param))!;
-    }
+    //public async Task<IEnumerable<KeyValuePair<string, string>>> AggregateAsync(RequestAggregationDto param)
+    //{
+    //    return (await Caller.GetByBodyAsync<IEnumerable<KeyValuePair<string, string>>>($"{RootPath}/aggregate", param))!;
+    //}
 
     public async Task<IEnumerable<DirectoryTreeDto>> GetTreeAsync(Guid userId, bool isContainsInstrument = true)
     {

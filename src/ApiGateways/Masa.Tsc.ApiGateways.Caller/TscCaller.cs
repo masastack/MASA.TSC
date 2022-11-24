@@ -5,7 +5,7 @@ namespace Masa.Tsc.ApiGateways.Caller;
 
 public class TscCaller
 {
-    public TscCaller(ICaller caller, TokenProvider tokenProvider)
+    internal TscCaller(ICaller caller, TokenProvider tokenProvider)
     {
         AppService = new AppService(caller, tokenProvider);
         ProjectService = new ProjectService(caller, tokenProvider);

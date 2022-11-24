@@ -1,10 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Utils.Data.Prometheus.Enums;
-using Masa.Utils.Data.Prometheus.Model;
-
-namespace Masa.Tsc.Contracts.Admin.Extensions;
+namespace Masa.Tsc.Contracts.Admin.Converters;
 
 public class QueryResultDataResponseConverter : JsonConverter<QueryResultDataResponse>
 {
@@ -26,23 +23,29 @@ public class QueryResultDataResponseConverter : JsonConverter<QueryResultDataRes
                         case ResultTypes.Matrix:
                             {
                                 var model = JsonSerializer.Deserialize<QueryResultMatrixRangeResponse>(json.GetRawText(), options);
-                                foreach (var key in model.Metric.Keys)
+                                if (model != null && model.Metric != null)
                                 {
-                                    model.Metric[key] = ((JsonElement)model.Metric[key]).GetString();
+                                    foreach (var key in model.Metric.Keys)
+                                    {
+                                        model.Metric[key] = ((JsonElement)model.Metric[key]).GetString()!;
+                                    }
+                                    model.Values = model.Values?.Select(ConvertObject)?.ToArray();
+                                    dataList.Add(model);
                                 }
-                                model.Values = model.Values.Select(ConvertObject).ToArray();
-                                dataList.Add(model);
                             }
                             break;
                         case ResultTypes.Vector:
                             {
-                                var model = JsonSerializer.Deserialize<QueryResultInstantVectorResponse>(json.GetRawText(), options)!;
-                                foreach (var key in model.Metric.Keys)
+                                var model = JsonSerializer.Deserialize<QueryResultInstantVectorResponse>(json.GetRawText(), options);
+                                if (model != null && model.Metric != null)
                                 {
-                                    model.Metric[key] = ((JsonElement)model.Metric[key]).GetString();
+                                    foreach (var key in model.Metric.Keys)
+                                    {
+                                        model.Metric[key] = ((JsonElement)model.Metric[key]).GetString()!;
+                                    }
+                                    model.Value = ConvertObject(model.Value!);
+                                    dataList.Add(model);
                                 }
-                                model.Value = ConvertObject(model.Value!);
-                                dataList.Add(model);
                             }
                             break;
                         default:

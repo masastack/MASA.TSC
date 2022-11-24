@@ -56,53 +56,36 @@ public partial class LogTraceChart
         string interval = GetInterval(start, end);
         if (Trace)
         {
-            var data1 = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
+            var queryModel = new SimpleAggregateRequestDto
             {
                 End = end,
                 Start = start,
-                FieldMaps = new RequestFieldAggregationDto[] {
-                new RequestFieldAggregationDto{
-                     AggegationType= AggregationTypes.DateHistogram,
-                     Name="@timestamp",
-                     Alias="Count",
-                }
-            },
-                Queries = ConvertToTraceQueries(query, isSpan: true),
+                Service = query.AppId,
+                Type = AggregateTypes.DateHistogram,
+                Name ="@timestamp",
+                Alias = "Count",
                 Interval = interval,
-            });
+            };
+            var data1 = await ApiCaller.TraceService.AggregateAsync<IEnumerable<KeyValuePair<string,string>>>(queryModel);
 
-            var data2 = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
-            {
-                End = end,
-                Start = start,
-                OrderField = "@timestamp",
-                FieldMaps = new RequestFieldAggregationDto[] {
-                new RequestFieldAggregationDto{
-                     AggegationType= AggregationTypes.Avg,
-                     Name="@timestamp",
-                     Alias="Count",
-                }
-            },
-                Queries = ConvertToTraceQueries(query, isTrace: true),
-                Interval = interval,
-            });
+            queryModel.Type = AggregateTypes.Avg;
+            var data2 = await ApiCaller.TraceService.AggregateAsync<IEnumerable<KeyValuePair<string, string>>>(queryModel);
 
-            if (data1.Data == null || !data1.Data.Any())
+            if (data1 == null || !data1.Any())
                 return;
-            var xPoints = data1.Data.Select(item => DateTime.Parse(item.X).Format(CurrentTimeZone, GetFormat(start, end))).ToArray();
-
-            //_options.Legend.Data= new string[] {"","" };
+            var xPoints = data1.Select(item => DateTime.Parse(item.Key).Format(CurrentTimeZone, GetFormat(start, end))).ToArray();
+            
             _options.XAxis.Data = xPoints;
             _options.Series = new EChartLineOptionSerie[] {
             new EChartLineOptionSerie{
                 Name="Errors",
-                 Data=data1.Data.Select(item=>item.Y),
+                 Data=data1.Select(item=>item.Value),
                   Type="line",
                   Stack="Total"
             },
             new EChartLineOptionSerie{
              Name="Caculates",
-                 Data=data2.Data.Select(item=>item.Y),
+                 Data=data2.Select(item=>item.Value),
                   Type="line",
                   Stack="Total"
             }
@@ -110,35 +93,20 @@ public partial class LogTraceChart
         }
         else
         {
-            var data1 = await ApiCaller.LogService.AggregateAsync(new RequestAggregationDto
+            var queryModel = new SimpleAggregateRequestDto
             {
                 End = end,
                 Start = start,
-                FieldMaps = new RequestFieldAggregationDto[] {
-                new RequestFieldAggregationDto{
-                     AggegationType= AggregationTypes.DateHistogram,
-                     Name="@timestamp",
-                     Alias="Count",
-                }
-            },
-                Queries = ConvertToLogQueries(query),
+                Service = query.AppId,
+                Type = AggregateTypes.DateHistogram,
+                Name = "@timestamp",
+                Alias = "Count",
                 Interval = interval,
-            });
+            };
+            var data1 = await ApiCaller.LogService.AggregateAsync<IEnumerable<KeyValuePair<string,string>>>(queryModel);
 
-            var data2 = await ApiCaller.LogService.AggregateAsync(new RequestAggregationDto
-            {
-                End = end,
-                Start = start,
-                FieldMaps = new RequestFieldAggregationDto[] {
-                new RequestFieldAggregationDto{
-                     AggegationType= AggregationTypes.DistinctCount,
-                     Name="@timestamp",
-                     Alias="Trace Count",
-                }
-            },
-                Queries = ConvertToLogQueries(query),
-                Interval = interval,
-            });
+            queryModel.Type = AggregateTypes.DistinctCount;
+            var data2 = await ApiCaller.LogService.AggregateAsync<IEnumerable<KeyValuePair<string, string>>>(queryModel);
 
             if (data1 == null || !data1.Any())
                 return;

@@ -5,15 +5,15 @@ namespace System;
 
 public static class JsonElementExtensions
 {
-    public static IEnumerable<KeyValuePair<string, object>>? ToKeyValuePairs(this JsonElement value)
+    public static IEnumerable<KeyValuePair<string, object>> ToKeyValuePairs(this JsonElement value)
     {
         if (value.ValueKind != JsonValueKind.Object)
-            return null;
+            return default!;
 
         return GetObject(value);
     }
 
-    public static object? GetValue(this JsonElement value)
+    public static object GetValue(this JsonElement value)
     {
         switch (value.ValueKind)
         {
@@ -22,14 +22,14 @@ public static class JsonElementExtensions
             case JsonValueKind.Array:
                 return GetArray(value);
             case JsonValueKind.String:
-                return value.GetString();
+                return value.GetString()!;
             case JsonValueKind.Number:
                 return GetNumber(value);
             case JsonValueKind.True:
             case JsonValueKind.False:
                 return value.GetBoolean();
             default:
-                return null;
+                return default!;
         }
     }
 
@@ -49,7 +49,7 @@ public static class JsonElementExtensions
         }
     }
 
-    private static IEnumerable<KeyValuePair<string, object>>? GetObject(JsonElement value)
+    private static IEnumerable<KeyValuePair<string, object>> GetObject(JsonElement value)
     {
         var result = new Dictionary<string, object>();
         foreach (var item in value.EnumerateObject())
@@ -61,15 +61,15 @@ public static class JsonElementExtensions
         }
         if (result.Any())
             return result;
-        return null;
+        return default!;
     }
 
-    private static IEnumerable<object?> GetArray(JsonElement value)
+    private static IEnumerable<object> GetArray(JsonElement value)
     {
         var temp = value.EnumerateArray();
-        if (temp.Any())
+        if (!temp.Any())
             return default!;
-        var list = new List<object?>();
+        var list = new List<object>();
         foreach (var item in temp)
         {
             var v = GetValue(item);

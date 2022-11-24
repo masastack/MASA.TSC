@@ -7,7 +7,7 @@ public partial class TscLog
 {
     private int _lastedDuration = 1;
     private List<KeyValuePair<int, string>> _dicDurations = TimeSeries;
-    private List<LogDto> _data = default!;
+    private List<LogResponseDto> _data = default!;
     private int _totalPage = 1;
     private bool _isWordBreak = false;
     private bool _isDesc = true;
@@ -76,13 +76,13 @@ public partial class TscLog
             End = _end!.Value,
             Page = _currentPage,
             Duration = _lastedDuration.ToString(),
-            Sorting = !_isDesc ? "asc" : "desc",
+            IsAsc = !_isDesc,
             Query = _queryStr
         };
         var pageData = await ApiCaller.LogService.GetPageAsync(query);
-        if (pageData.Items != null && pageData.Items.Any())
+        if (pageData.Result != null && pageData.Result.Any())
         {
-            _data = pageData.Items;
+            _data = pageData.Result;
         }
         else
         {

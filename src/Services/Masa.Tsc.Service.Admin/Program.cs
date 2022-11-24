@@ -1,24 +1,14 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.BuildingBlocks.StackSdks.Auth.Contracts;
-using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Consts;
-using System.Net.Http.Headers;
-
 var builder = WebApplication.CreateBuilder(args);
 
 var elasearchUrls = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<string[]>();
-builder.Configuration.ConfigureElasticIndex();
+builder.Services.AddElasticClientLogAndTrace(elasearchUrls, builder.Configuration.GetSection("Masa:Elastic:logIndex").Get<string>(), builder.Configuration.GetSection("Masa:Elastic:traceIndex").Get<string>());
 
-builder.Services.AddCaller(option =>
-{
-    option.UseHttpClient(ElasticConst.ES_HTTP_CLIENT_NAME, builder =>
-     {
-         builder.BaseAddress = elasearchUrls[0];
-     });
-});
-builder.Services.AddElasticsearchClient("tsclog", elasearchUrls);
-builder.AddObservable();
+builder.Services.AddObservable(builder.Logging, builder.Configuration, false);
+builder.Services.AddDaprClient();
+builder.Services.AddPrometheusClient(builder.Configuration.GetSection("Masa:Prometheus").Value);
 
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
 
@@ -112,7 +102,7 @@ var app = builder.Services
     })
     .AddServices(builder);
 
-app.UseMasaExceptionHandler();
+//app.UseMasaExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

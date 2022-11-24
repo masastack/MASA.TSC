@@ -5,7 +5,6 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments;
 
 public class InstrumentQueryHandler
 {
-    private readonly IDirectoryRepository _directoryRepository;
     private readonly IInstrumentRepository _instrumentRepository;
     private readonly IPanelRepository _panelRepository;
     private readonly IMetricReposity _metricReposity;
@@ -22,21 +21,26 @@ public class InstrumentQueryHandler
     [EventHandler]
     public async Task Query(InstrumentQuery query)
     {
-        var skip = (query.Page - 1) * query.Size;
         var result = await _instrumentRepository.GetPaginatedListAsync(Predicate(query), new PaginatedOptions
         {
-
+            Page = query.Page,
+            PageSize = query.Size
         });
-        query.Result = new PaginationDto<InstrumentListDto>(result?.Total ?? 0,
-            result?.Result?.Select(item => new InstrumentListDto
-            {
+        query.Result = new PaginatedListBase<InstrumentListDto>();
+        if (result != null)
+        {
+            query.Result.Total = result.Total;
+            if (result.Result != null)
+                query.Result.Result = result.Result.Select(item => new InstrumentListDto
+                {
 
-            })?.ToList() ?? new());
+                }).ToList();
+        }
     }
 
-    private Expression<Func<Instrument, bool>> Predicate(InstrumentQuery query)
+    private static Expression<Func<Instrument, bool>> Predicate(InstrumentQuery query)
     {
-        Expression<Func<Instrument, bool>> condition = entity => true;
+        Expression<Func<Instrument, bool>> condition;
 
         if (string.IsNullOrEmpty(query.Keyword))
             condition = item => item.IsGlobal || item.Creator == query.UserId;

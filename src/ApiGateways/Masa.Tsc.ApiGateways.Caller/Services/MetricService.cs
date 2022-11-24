@@ -36,11 +36,10 @@ public class MetricService : BaseService
 
     private QueryResultDataResponse ConvertResult(QueryResultDataResponse result)
     {
-        var options = new System.Text.Json.JsonSerializerOptions {
-            PropertyNamingPolicy= System.Text.Json.JsonNamingPolicy.CamelCase
+        var options = new JsonSerializerOptions {
+            PropertyNamingPolicy=JsonNamingPolicy.CamelCase
         };
-        options.Converters.Add(new Contracts.Admin.Extensions.QueryResultDataResponseConverter());
-        return System.Text.Json.JsonSerializer.Deserialize<QueryResultDataResponse>(System.Text.Json.JsonSerializer.Serialize(result), options);
-
+        options.Converters.Add(new QueryResultDataResponseConverter());
+        return JsonSerializer.Deserialize<QueryResultDataResponse>(JsonSerializer.Serialize(result), options)!;
     }
 }
