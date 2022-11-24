@@ -11,7 +11,7 @@ public class LinkTrackingTopologyNodeViewModel
 
     public int Depth { get; set; }
 
-    public LinkTrackingTopologyStatuses State { get; set; }
+    public MonitorStatuses State { get; set; }
 
     public int X { get; set; }
 

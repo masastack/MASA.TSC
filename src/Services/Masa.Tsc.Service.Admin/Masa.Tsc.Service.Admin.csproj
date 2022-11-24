@@ -55,7 +55,6 @@
 		<PackageReference Include="Masa.Contrib.Isolation.UoW.EFCore" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Data.Contracts.EFCore" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Isolation.MultiEnvironment" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.Authentication.Identity" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Development.DaprStarter.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Utils.Caching.DistributedMemory" Version="0.6.0-preview.13" />
 		<PackageReference Include="Masa.Utils.Caching.Redis" Version="0.6.0-preview.13" />
@@ -85,6 +84,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!--<ProjectReference Include="..\..\..\..\MASA.Framework\src\Contrib\Authentication\Identity\Masa.Contrib.Authentication.Identity\Masa.Contrib.Authentication.Identity.csproj" />-->
 		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
 		<ProjectReference Include="..\Masa.Tsc.Services.Observability\Masa.Tsc.Services.Observability.csproj" />
 	</ItemGroup>

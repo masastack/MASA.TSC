@@ -5,12 +5,9 @@ namespace Masa.Tsc.Service.Admin.Domain.Aggregates;
 
 public class PanelMetric : AggregateRoot<Guid>
 {
-    public PanelMetric() { }
+    public PanelMetric():base() { }
 
-    public PanelMetric(Guid id)
-    {
-        Id = id;
-    }
+    public PanelMetric(Guid id):base(id) { }
 
     public Panel Panel { get; set; }
 

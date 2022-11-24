@@ -1,9 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.BuildingBlocks.Ddd.Domain.Events;
-using Masa.Tsc.Service.Admin.Domain.Instruments.Events;
-
 namespace Masa.Tsc.Service.Admin.Application.Instruments
 {
     public class InstrumentCommandHandler
@@ -79,7 +76,7 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
             {
                 entity.ChartType = ((EChartPanelDto)command.Data).ChartType;
             }
-            await _panelRepository.AddAsync(entity);            
+            await _panelRepository.AddAsync(entity);
         }
 
         [EventHandler(1)]

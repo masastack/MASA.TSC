@@ -10,8 +10,7 @@
 		<PackageReference Include="Masa.Contrib.Configuration" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.7" />
 	</ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="Masa.Contrib.Configuration" Version="$(MasaFrameworkPackageVersion)" />
+	<ItemGroup>		
 		<ProjectReference Include="..\..\ApiGateways\Masa.Tsc.ApiGateways.Caller\Masa.Tsc.ApiGateways.Caller.csproj" />
 		<ProjectReference Include="..\Masa.Tsc.Web.Admin.Rcl\Masa.Tsc.Web.Admin.Rcl.csproj" />
 	</ItemGroup>

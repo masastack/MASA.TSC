@@ -3,7 +3,7 @@
 
 using Microsoft.JSInterop;
 
-namespace Masa.Tsc.Web.Admin.Rcl.Pages.DataV.Modules.HexagonalMeshs;
+namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class HexagonalMesh : BDomComponentBase
 {

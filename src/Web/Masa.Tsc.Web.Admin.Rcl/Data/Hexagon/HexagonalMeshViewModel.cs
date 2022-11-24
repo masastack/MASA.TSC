@@ -1,21 +1,25 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Web.Admin.Rcl.Pages.DataV.Modules.LinkTrackingTopologys;
-
-namespace Masa.Tsc.Web.Admin.Rcl.Pages.DataV.Modules.HexagonalMeshs;
+namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
 public class HexagonalMeshViewModel
 {
     public string Key { get; set; } = default!;
 
+    /// <summary>
+    /// column num ,start width 0,the left is 0
+    /// </summary>
     public int Q { get; set; }
 
+    /// <summary>
+    /// row position,start with -1,the first row number is largest,the last row number is -1
+    /// </summary>
     public int R { get; set; }
 
     public string Name { get; set; } = default!;
 
-    public LinkTrackingTopologyStatuses State { get; set; }
+    public MonitorStatuses State { get; set; }
 
-    public List<HexagonalMeshItemViewModel> Items { get; set; } = new();
+    public List<AppDto> Items { get; set; } = new();
 }

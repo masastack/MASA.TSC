@@ -1,15 +1,11 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
-using Masa.Contrib.Data.Contracts.EFCore;
+using Masa.BuildingBlocks.StackSdks.Auth.Contracts;
+using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Consts;
 using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
-//builder.AddMasaConfiguration(configurationBuilder =>
-//{
-//    configurationBuilder.UseDcc();
-//});
 
 var elasearchUrls = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<string[]>();
 builder.Configuration.ConfigureElasticIndex();
@@ -25,10 +21,14 @@ builder.Services.AddElasticsearchClient("tsclog", elasearchUrls);
 builder.AddObservable();
 
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
-builder.AddMasaConfiguration(configurationBuilder =>
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddMasaConfiguration(configurationBuilder =>
 {
     configurationBuilder.UseDcc(dccConfig, default, default);
 });
+IConfiguration config = builder.Services.GetMasaConfiguration().ConfigurationApi.GetPublic();
+
 //#if DEBUG
 //builder.Services.AddDaprStarter(opt =>
 //{
@@ -53,18 +53,21 @@ builder.Services.AddAuthentication(options =>
     options.MapInboundClaims = false;
 });
 
-builder.Services.AddMasaIdentity(options =>
-{
+builder.Services.AddMasaIdentity(options => {
     options.Environment = "environment";
     options.UserName = "name";
     options.UserId = "sub";
+    options.Mapping(nameof(MasaUser.CurrentTeamId), IdentityClaimConsts.CURRENT_TEAM);
+    options.Mapping(nameof(MasaUser.StaffId), IdentityClaimConsts.STAFF);
+    options.Mapping(nameof(MasaUser.Account), IdentityClaimConsts.ACCOUNT);
 });
 
 builder.Services.AddScoped(service =>
 {
     var content = service.GetRequiredService<IHttpContextAccessor>();
-    AuthenticationHeaderValue.TryParse(content.HttpContext.Request.Headers.Authorization.ToString(), out var auth);
-    return new TokenProvider { AccessToken = auth?.Parameter };
+    if (content.HttpContext != null && AuthenticationHeaderValue.TryParse(content.HttpContext.Request.Headers.Authorization.ToString(), out var auth) && auth != null)
+        return new TokenProvider { AccessToken = auth?.Parameter };
+    return default!;
 });
 builder.Services.AddAuthClient(config["$public.AppSettings:AuthClient:Url"], dccConfig.RedisOptions).
 AddPmClient(config["$public.AppSettings:PmClient:Url"]);
