@@ -1,6 +1,7 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
 using Masa.Tsc.Contracts.Admin.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +10,8 @@ builder.AddObservable();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.Configure<JsonOptions>(option => {
+builder.Services.Configure<JsonOptions>(option =>
+{
     option.JsonSerializerOptions.Converters.Add(new QueryResultDataResponseConverter());
 });
 
@@ -20,21 +22,31 @@ builder.WebHost.UseKestrel(option =>
 });
 
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
-builder.AddMasaConfiguration(configurationBuilder =>
+IConfiguration config;
+if (builder.Environment.EnvironmentName == "Development")
 {
-    configurationBuilder.UseDcc(dccConfig, default, default);
-});
+    builder.Services.AddMasaConfiguration(configurationBuilder =>
+    {
+        configurationBuilder.UseDcc(dccConfig, default, default);
+    });
+    config = builder.Services.GetMasaConfiguration().ConfigurationApi.GetPublic();
+}
+else
+{
+    config = builder.Configuration;
+}
 
-var publicConfiguration = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
-var oidc = publicConfiguration.GetSection("$public.OIDC").Get<MasaOpenIdConnectOptions>(); //builder.GetMasaConfiguration().Local.GetSection("Masa:Oidc").Get<MasaOpenIdConnectOptions>();
-string authUrl = publicConfiguration.GetValue<string>("$public.AppSettings:AuthClient:Url"); // //builder.GetMasaConfiguration().Local.GetValue<string>("Masa:Auth:ServiceBaseAddress");
-string mcUrl = publicConfiguration.GetValue<string>("$public.AppSettings:McClient:Url");// publicConfiguration.GetValue<string>("$public.AppSettings:McClient:Url");
-//builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl).AddMasaOpenIdConnect(oidc);
-builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl,
-    publicConfiguration.GetSection("$public.OSS").Get<OssOptions>(),
-    publicConfiguration.GetSection("$public.ES.UserAutoComplete").Get<UserAutoCompleteOptions>(),
-    dccConfig.RedisOptions
-    ).AddMasaOpenIdConnect(oidc);
+var oidc = config.GetSection("$public.OIDC").Get<MasaOpenIdConnectOptions>();
+string authUrl = config.GetValue<string>("$public.AppSettings:AuthClient:Url");
+string mcUrl = config.GetValue<string>("$public.AppSettings:McClient:Url");
+string pmUrl = config.GetValue<string>("$public.AppSettings:PmClient:Url");
+builder.Services.AddMasaStackComponentsForServer(
+"wwwroot/i18n", authUrl, mcUrl, pmUrl,
+config.GetSection("$public.OSS").Get<OssOptions>(),
+config.GetSection("$public.ES.UserAutoComplete").Get<UserAutoCompleteOptions>(),
+dccConfig.RedisOptions
+).AddMasaOpenIdConnect(oidc);
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<TscCaller>();

@@ -5,13 +5,15 @@ namespace Masa.Tsc.Contracts.Admin.Instruments;
 
 public class PanelMetricDto
 {
+    public Guid Id { get; set; }
+
     public string Name { get; set; }
 
     public string Caculate { get; set; }
 
-    public string DisplayName { get; set; }
-
     public string Unit { get; set; }
 
     public string Color { get; set; }
+
+    public int Sort { get; set; }
 }

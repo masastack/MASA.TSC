@@ -25,5 +25,5 @@ public class AddPanelDto
 
     public virtual PanelTypes Type { get; set; }
 
-    //public List<AddPanelMetricDto> Metrics { get; set; }
+    public List<PanelMetricDto> Metrics { get; set; }
 }

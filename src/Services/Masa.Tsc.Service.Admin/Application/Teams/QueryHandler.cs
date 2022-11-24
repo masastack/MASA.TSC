@@ -11,13 +11,15 @@ public class QueryHandler
     private readonly IPmClient _pmClient;
     private readonly IElasticClient _elasticClient;
     private readonly IMasaPrometheusClient _prometheusClient;
+    private readonly TokenProvider _tokenProvider;
 
-    public QueryHandler(IPmClient pmClient, IAuthClient authClient, IElasticClient elasticClient, IMasaPrometheusClient prometheusClient)
+    public QueryHandler(IPmClient pmClient, IAuthClient authClient, IElasticClient elasticClient, IMasaPrometheusClient prometheusClient,TokenProvider token)
     {
         _authClient = authClient;
         _pmClient = pmClient;
         _elasticClient = elasticClient;
         _prometheusClient = prometheusClient;
+        _tokenProvider = token;
     }
 
     [EventHandler]

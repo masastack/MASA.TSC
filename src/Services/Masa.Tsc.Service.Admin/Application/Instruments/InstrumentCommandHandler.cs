@@ -12,20 +12,17 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly IPanelRepository _panelRepository;
         private readonly IMetricReposity _metricReposity;
-        //private readonly IDomainEventBus _domainEventBus;
 
         public InstrumentCommandHandler(IDirectoryRepository directoryRepository,
         IInstrumentRepository instrumentRepository,
         IPanelRepository panelRepository,
         IMetricReposity metricReposity
-        //IDomainEventBus domainEventBus
             )
         {
             _directoryRepository = directoryRepository;
             _instrumentRepository = instrumentRepository;
             _panelRepository = panelRepository;
             _metricReposity = metricReposity;
-            //_domainEventBus = domainEventBus;
         }
 
         [EventHandler]
@@ -66,7 +63,7 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
             await _instrumentRepository.RemoveRangeAsync(list);
         }
 
-        [EventHandler]
+        [EventHandler(0)]
         public async Task AddPanelAsync(AddPanelCommand command)
         {
             var entity = new Panel(command.Data.Id)
@@ -81,20 +78,39 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
             await _panelRepository.AddAsync(entity);
             if (command.Data is EChartPanelDto chartDto && chartDto.Metrics != null && chartDto.Metrics.Any())
             {
-                var list = chartDto.Metrics.Select(x => new PanelMetric
+                var list = chartDto.Metrics.Select(x => new PanelMetric(x.Id)
                 {
-                    DisplayName = x.Name,
-                    Name = x.Caculate,
+                    Name = x.Name,
+                    Caculate = x.Caculate,
                     PanelId = entity.Id,
                     Unit = x.Unit,
-                    Value=x.Name,                     
+                    Sort = x.Sort
                 });
 
                 await _metricReposity.AddRangeAsync(list);
             }
         }
 
-        [EventHandler]
+        [EventHandler(1)]
+        public async Task AddPanelMetricAsync(AddPanelCommand command)
+        {
+            if (command.Data is EChartPanelDto chartDto && chartDto.Metrics != null && chartDto.Metrics.Any())
+            {
+                var list = chartDto.Metrics.Select(x => new PanelMetric(x.Id)
+                {
+                    Name = x.Name,
+                    Caculate = x.Caculate,
+                    PanelId = command.Data.Id,
+                    Sort = command.Data.Sort,
+                    Unit = x.Unit
+                });
+
+                await _metricReposity.AddRangeAsync(list);
+            }
+        }
+
+
+        [EventHandler(0)]
         public async Task UpdatePanelAsync(UpdatePanelCommand command)
         {
             var panel = await _panelRepository.FindAsync(item => item.Id == command.Data.Id);
@@ -102,6 +118,62 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments
                 throw new UserFriendlyException("数据不存在");
             panel.Update(command.Data);
             await _panelRepository.UpdateAsync(panel);
+        }
+
+        [EventHandler(1)]
+        public async Task UpdatePanelMetricAsync(UpdatePanelCommand command)
+        {
+            var panel = await _panelRepository.FindAsync(item => item.Id == command.Data.Id);
+            if (panel != null && panel.Type == PanelTypes.Chart)
+            {
+                var metrics = await _metricReposity.ToQueryable().Where(x => x.PanelId == panel.Id).OrderBy(x => x.Sort).ToListAsync();
+                var adds = new List<PanelMetric>();
+                foreach (var item in command.Data.Metrics)
+                {
+                    var find = metrics.FirstOrDefault(x => x.Id == item.Id);
+                    if (find == null)
+                    {
+                        adds.Add(new PanelMetric(item.Id)
+                        {
+                            Caculate = item.Caculate,
+                            Name = item.Name,
+                            PanelId = panel.Id,
+                            Sort = item.Sort,
+                            Unit = item.Unit,
+                        });
+                    }
+                    else
+                    {
+                        find.Name = item.Name;
+                        find.Unit = item.Unit;
+                        find.Sort = item.Sort;
+                        find.Caculate = item.Caculate;
+                    }
+                }
+                var removes = metrics.Where(x => !command.Data.Metrics.Any(t => t.Id == x.Id)).ToList();
+
+                while (adds.Any() && removes.Any())
+                {
+                    var add = adds[0];
+                    var remove = removes[0];
+                    remove.Name = add.Name;
+                    remove.Unit = add.Unit;
+                    remove.Sort = add.Sort;
+                    remove.Caculate = add.Caculate;
+                    adds.Remove(add);
+                    removes.Remove(remove);
+                }
+
+                if (removes.Any())
+                    metrics.RemoveAll(x => removes.Any(item => item.Id == x.Id));
+
+                if (removes.Any())
+                    await _metricReposity.RemoveRangeAsync(removes);
+                if (adds.Any())
+                    await _metricReposity.AddRangeAsync(adds);
+                if (metrics.Any())
+                    await _metricReposity.UpdateRangeAsync(metrics);
+            }
         }
 
         [EventHandler]

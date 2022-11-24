@@ -11,6 +11,15 @@ public class TeamService : BaseService
 
     public async Task<TeamDto> GetTeamAsync(Guid teamId, string projectId)
     {
-        return await Caller.GetAsync<TeamDto>($"{RootPath}/{teamId}/{projectId}") ?? default!;
+        try
+        {
+            return await Caller.GetAsync<TeamDto>($"{RootPath}/{teamId}/{projectId}") ?? default!;
+        }
+        catch (Exception ex)
+        { 
+        
+        }
+
+        return default!;
     }
 }

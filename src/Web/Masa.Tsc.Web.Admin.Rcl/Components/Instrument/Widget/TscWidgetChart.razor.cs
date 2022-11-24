@@ -1,9 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Utils.Data.Prometheus.Enums;
-using Masa.Utils.Data.Prometheus.Model;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscWidgetChart : TscWidgetBase
@@ -16,24 +13,6 @@ public partial class TscWidgetChart : TscWidgetBase
 
     private EChartType _type;
 
-    private EChartLineOption _options1 = new()
-    {
-        Legend = new EChartOptionLegend
-        {
-            Data = new string[0],
-            Orient = EchartOrientTypes.horizontal,
-            Bottom = "1%"
-        },
-        Grid = new EChartOptionGrid
-        {
-            Left = "1%",
-            Right = "2%",
-            Top = "2%",
-            Bottom = "20%",
-            ContainLabel = true
-        }
-    };
-
     public override PanelDto Value
     {
         get => _panelValue;
@@ -41,7 +20,9 @@ public partial class TscWidgetChart : TscWidgetBase
         {
             if (value is null) _panelValue = new()
             {
-                Title = "tabs"
+                Title = "EChart",
+                Description = string.Empty,
+                ChartType = "line"
             };
             else if (value is EChartPanelDto dto) _panelValue = dto;
             else
@@ -67,16 +48,6 @@ public partial class TscWidgetChart : TscWidgetBase
                 else
                     _metrics.Clear();
             }
-            //if (_panelValue.Tabs == null || !_panelValue.Tabs.Any())
-            //{
-            //    _panelValue.Tabs = new List<TabItemPanelDto>
-            //        {
-            //            new TabItemPanelDto{ Id=Guid.NewGuid(),Title="tab1",InstrumentId=_panelValue.InstrumentId,Sort=1 },
-            //            new TabItemPanelDto{ Id=Guid.NewGuid(),Title="tab2",InstrumentId=_panelValue.InstrumentId,Sort=2 },
-            //            new TabItemPanelDto{Id=Guid.NewGuid(),Title="tab3",InstrumentId=_panelValue.InstrumentId,Sort=3 }
-            //        };
-            //}
-            //_value = _panelValue.Tabs[0].Id.ToString();
         }
     }
 
@@ -85,33 +56,29 @@ public partial class TscWidgetChart : TscWidgetBase
         if (_panelValue.Metrics == null)
             _panelValue.Metrics = new();
 
-        _panelValue.Metrics.Add(new PanelMetricDto
-        {
-            Caculate = "sum by(job) (rate (process_resident_memory_bytes[30s]))/(2^20)",
-            DisplayName = "process_resident_memory_bytes",
-            Unit = ""
+        //_panelValue.Metrics.Add(new PanelMetricDto
+        //{
+        //    Caculate = "sum by(job) (rate (process_resident_memory_bytes[30s]))/(2^20)",
+        //    DisplayName = "process_resident_memory_bytes",
+        //    Unit = ""
 
-        });
-        _panelValue.Metrics.Add(new PanelMetricDto
-        {
-            Caculate = "sum(up)",
-            DisplayName = "s_upname",
-            Unit = ""
-        });
-        SetChartType(_panelValue.ChartType);
-        await LoadDataAsync();
+        //});
+        //_panelValue.Metrics.Add(new PanelMetricDto
+        //{
+        //    Caculate = "sum(up)",
+        //    DisplayName = "s_upname",
+        //    Unit = ""
+        //});
+        await SetChartType(_panelValue.ChartType, LoadDataAsync);
         await base.OnInitializedAsync();
     }
 
-    private async Task LoadDataAsync()
+    private async Task<QueryResultDataResponse[]> LoadDataAsync()
     {
-        if (_panelValue.Metrics != null && _panelValue.Metrics.Any())
+        if (_metrics != null && _metrics.Any())
         {
-            List<EChartLineOptionSerie> ddddd = new();
-            int index = 0;
-            bool hasX = false;
-            List<string> names = new List<string>();
-            foreach (var metric in _panelValue.Metrics)
+            var requestData = new List<QueryResultDataResponse>();
+            foreach (var metric in _metrics)
             {
                 var data = await ApiCaller.MetricService.GetQueryRangeAsync(new RequestMetricAggDto
                 {
@@ -120,43 +87,11 @@ public partial class TscWidgetChart : TscWidgetBase
                     End = DateTime.Now,
                     Step = "5m"
                 });
-                var convertData = asdasdasd(data, metric);
-                foreach (var item in convertData)
-                {
-                    var name = string.IsNullOrEmpty(item.Item1) ? metric.DisplayName : item.Item1;
-                    ddddd.Add(new EChartLineOptionSerie
-                    {
-                        Name = name,
-                        Type = "line",
-                        Stack = "Total",
-                        Data = item.Item3
-                    });
-                    names.Add(name);
-                    if (!hasX)
-                    {
-                        _options1.XAxis.Data = item.Item2.Select(item => new DateTime((long)Math.Floor(item * 1000)).Format(CurrentTimeZone, "HH:mm:ss")).ToArray();
-                    }
-                }
-
-                //ddddd[index++] = new EChartLineOptionSerie
-                //{
-                //    Name = metric.DisplayName,
-                //    Type = "line",
-                //    Stack = metric.DisplayName,
-                //    Data = convertData.Item2
-                //};
-
+                requestData.Add(data);
             }
-            _options1.Legend.Data = names;
-            _options1.Series = ddddd.ToArray();
-            _options = _options1;
-            var tt = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-            var t = JsonSerializer.Serialize(_options, tt);
+            return requestData.ToArray();
         }
-        StateHasChanged();
+        return default!;
     }
 
     private IEnumerable<ValueTuple<string, IEnumerable<double>, IEnumerable<string>>> asdasdasd(QueryResultDataResponse data, PanelMetricDto metricSetting)
@@ -169,7 +104,7 @@ public partial class TscWidgetChart : TscWidgetBase
                     var matrixDatas = data.Result.Select(item => (QueryResultMatrixRangeResponse)item).ToArray();
                     foreach (var item in matrixDatas)
                     {
-                        result.Add(ValueTuple.Create(GetLabelName(item.Metric, metricSetting.DisplayName), item.Values.Select(it => (double)it[0]).ToArray(), item.Values.Select(it => (string)it[1]).ToArray()));
+                        result.Add(ValueTuple.Create(GetLabelName(item.Metric,default!), item.Values.Select(it => (double)it[0]).ToArray(), item.Values.Select(it => (string)it[1]).ToArray()));
                     }
                 }
                 break;
@@ -205,53 +140,78 @@ public partial class TscWidgetChart : TscWidgetBase
         return text.Remove(text.Length - 1, 1).ToString();
     }
 
-    private EChartType Get(string type)
-    {
-        switch (type)
-        {
-            case "line":
-                return EChartConst.Line;
-            default:
-                return default!;
-        }
-    }
-
-    private void SetChartType(string type)
+    private async Task SetChartType(string type, Func<Task<QueryResultDataResponse[]>> dataFn)
     {
         switch (type)
         {
             case "line":
                 _type = EChartConst.Line;
-                InitLine();
+                InitLine(await dataFn());
                 break;
             case "bar":
                 _type = EChartConst.Bar;
-                InitBar();
+                InitBar(await dataFn());
                 break;
             case "pie":
                 _type = EChartConst.Pie;
-                InitPie();
+                InitPie(await dataFn());
                 break;
             case "gauge":
                 _type = EChartConst.Gauge;
-                InitGauge();
+                InitGauge(await dataFn());
                 break;
             case "heartmap":
                 _type = EChartConst.Heatmap;
                 InitHeatmap();
                 break;
-            case "linearea":
+            case "line-area":
                 _type = EChartConst.LineArea;
-                InitLineArea();
+                InitLineArea(await dataFn());
                 break;
+            default:
+                {
+                    _options = new();
+                    StateHasChanged();
+                    break;
+                }
         }
+        StateHasChanged();
     }
 
     private async void OnTypeChange(string type)
     {
         _panelValue.ChartType = type;
-        SetChartType(type);
-        await LoadDataAsync();
+        await SetChartType(type, LoadDataAsync);
+    }
+
+    private async Task OnItemsChange(List<EChartPanelMetricItemModel> data)
+    {
+        bool hasChange = HasMetricChange(_metrics, data);
+        _metrics = data;
+        var index = 1;
+        _panelValue.Metrics.Clear();
+        foreach (var item in _metrics)
+        {
+            _panelValue.Metrics.Add(new PanelMetricDto
+            {
+                Caculate = item.Caculate,
+                Color = item.Color,
+                Name = item.Name,
+                Unit = item.Unit,
+                Sort = index++
+            });
+        }
+        if (hasChange)
+            await SetChartType(_panelValue.ChartType, LoadDataAsync);
+    }
+
+    private bool HasMetricChange(List<EChartPanelMetricItemModel> data1, List<EChartPanelMetricItemModel> data2)
+    {
+        if (data1 == null || data2 == null)
+            return true;
+        if (data1.Count - data2.Count != 0)
+            return true;
+        return string.Join(',', data1.Select(item => item.Caculate)) != string.Join(',', data2.Select(item => item.Caculate));
     }
 
     private void InitLine(params QueryResultDataResponse[] data)
@@ -277,19 +237,169 @@ public partial class TscWidgetChart : TscWidgetBase
                 var title = GetLabelName(sss.Metric, default!);
                 var timeSpans = sss.Values.Select(it => (double)it[0]).ToArray();
                 var values = sss.Values.Select(it => (string)it[1]).ToArray();
-
                 titles.Add(title);
+                if (!xPoints.Any())
+                {
+                    xPoints = FmtTimespan(timeSpans);
+                    _type.SetValue("xAxis.data", xPoints);
+                }
 
+                list.Add(new { name = title, type = "line", stack = "Total", data = values });
             }
         }
 
-
-        //_type.SetValue("", null);
+        _type.SetValue("legend.data", titles);
+        _type.SetValue("series", list);
+        _options = _type.Option;
     }
 
-    private void InitBar() { }
-    private void InitPie() { }
-    private void InitGauge() { }
-    private void InitHeatmap() { }
-    private void InitLineArea() { }
+    private void InitBar(params QueryResultDataResponse[] data)
+    {
+        if (data == null || !data.Any())
+        {
+            return;
+        }
+        if (data.Any(t => t.ResultType != ResultTypes.Matrix))
+        {
+            //数据格式不支持
+        }
+
+        var list = new List<string>();
+        var titles = new List<string>();
+
+        foreach (var item in data)
+        {
+            var matrixDatas = item.Result.Select(item => (QueryResultMatrixRangeResponse)item).ToArray();
+            foreach (var sss in matrixDatas)
+            {
+                var title = GetLabelName(sss.Metric, default!);
+                var timeSpans = sss.Values.Select(it => (double)it[0]).ToArray();
+                if (timeSpans.Length - 20 <= 0)
+                {
+                    //考虑柱状分组
+                }
+                var values = sss.Values.Select(it => (string)it[1]).Last();
+                titles.Add(title);
+                list.Add(values);
+            }
+        }
+
+        _type.SetValue("xAxis.data", titles);
+        _type.SetValue("series[0].data", list);
+        _options = _type.Option;
+    }
+
+    private void InitPie(params QueryResultDataResponse[] data)
+    {
+        if (data == null || !data.Any())
+        {
+            return;
+        }
+        if (data.Any(t => t.ResultType != ResultTypes.Matrix))
+        {
+            //数据格式不支持
+        }
+
+        var list = new List<object>();
+
+        foreach (var item in data)
+        {
+            var matrixDatas = item.Result.Select(item => (QueryResultMatrixRangeResponse)item).ToArray();
+
+            foreach (var sss in matrixDatas)
+            {
+                var title = GetLabelName(sss.Metric, default!);
+                //var timeSpans = sss.Values.Select(it => (double)it[0]).ToArray();
+                //if (timeSpans.Length - 20 <= 0)
+                //{
+                //    //考虑柱状分组
+                //}
+                var value = sss.Values.Select(it => (string)it[1]).Last();
+                list.Add(new { value, name = title });
+            }
+        }
+        _type.SetValue("series[0].data", list);
+        _options = _type.Option;
+    }
+    private void InitGauge(params QueryResultDataResponse[] data)
+    {
+        if (data == null || !data.Any())
+        {
+            return;
+        }
+        if (data.Any(t => t.ResultType != ResultTypes.Matrix))
+        {
+            //数据格式不支持
+        }
+
+        var list = new List<object>();
+
+        foreach (var item in data)
+        {
+            var matrixDatas = item.Result.Select(item => (QueryResultMatrixRangeResponse)item).ToArray();
+
+            foreach (var sss in matrixDatas)
+            {
+                var title = GetLabelName(sss.Metric, default!);
+                var value = sss.Values.Select(it => (string)it[1]).Last();
+                _type.SetValue("series[0].data[0]", new { name = title, value });
+                break;
+            }
+            break;
+        }
+
+        _options = _type.Option;
+    }
+    private void InitHeatmap(params QueryResultDataResponse[] data) { }
+    private void InitLineArea(params QueryResultDataResponse[] data)
+    {
+        if (data == null || !data.Any())
+        {
+            return;
+        }
+        if (data.Any(t => t.ResultType != ResultTypes.Matrix))
+        {
+            //数据格式不支持
+        }
+
+        var list = new List<object>();
+        var titles = new List<string>();
+        var xPoints = new List<string>();
+
+        foreach (var item in data)
+        {
+            var matrixDatas = item.Result.Select(item => (QueryResultMatrixRangeResponse)item).ToArray();
+            foreach (var sss in matrixDatas)
+            {
+                var title = GetLabelName(sss.Metric, default!);
+                var timeSpans = sss.Values.Select(it => (double)it[0]).ToArray();
+                var values = sss.Values.Select(it => (string)it[1]).ToArray();
+                titles.Add(title);
+                if (!xPoints.Any())
+                {
+                    xPoints = FmtTimespan(timeSpans);
+                    _type.SetValue("xAxis.data", xPoints);
+                }
+
+                list.Add(new { name = title, type = "line", stack = "Total", areaStyle = new { }, emphasis = new { focus = "series" }, data = values });
+            }
+        }
+        _type.SetValue("legend.data", titles);
+        _type.SetValue("series", list);
+        _options = _type.Option;
+    }
+
+    private List<string> FmtTimespan(double[] timeSpans)
+    {
+        var step = timeSpans[1] - timeSpans[0];
+        int level = GetLevel((int)Math.Floor(step));
+        var fmt = "HH:mm:ss";
+
+        return timeSpans.Select(item => new DateTime((long)Math.Floor(item * 1000)).Format(CurrentTimeZone, fmt)).ToList();
+    }
+
+    private int GetLevel(int seconds)
+    {
+        return 0;
+    }
 }

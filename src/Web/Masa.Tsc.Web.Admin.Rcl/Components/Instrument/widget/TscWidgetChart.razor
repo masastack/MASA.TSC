@@ -12,7 +12,7 @@ else
             <MECharts Option="_options" />
             <MCard><MTextField @bind-Value="_panelValue.Title" Placeholder="" /></MCard>
             <MCard><MTextarea @bind-Value="_panelValue.Description" Placeholder="" /></MCard>
-            <EChartPanelMetrics ReadOnly="ReadOnly" @bind-Items="_metrics"></EChartPanelMetrics>
+            <EChartPanelMetrics ReadOnly="ReadOnly" Items="_metrics" ItemsChanged="OnItemsChange"></EChartPanelMetrics>
         </MCol>
         <MCol Cols="4">
             <MExpansionPanels Values="new (){1,2,3}" Multiple>

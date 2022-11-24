@@ -2,23 +2,23 @@
 @inherits TscComponentBase
 
 <MCard Class="d-flex">
-@{
-    int index = 0;
-    if (Items != null)
-    {
-        while (Items.Count - index > 0)
+    @{
+        int index = 0;
+        if (Items != null)
         {
-            var item = Items[index++];
-            <EChartPanelMetricItem @bind-Value="item" Names="_names" />
+            while (Items.Count - index > 0)
+            {
+                var item = Items[index++];
+                <EChartPanelMetricItem Value="item" ValueChanged=@(async(value)=>{item=value;await OnItemsChange();}) Names="_names" CallParent="ChildCallHandler" />
+            }
+        }
+        if (!ReadOnly)
+        {
+            <MCard OnClick="Add">
+                <MCardText>
+                    <MIcon XLarge>mdi-plus</MIcon>
+                </MCardText>
+            </MCard>
         }
     }
-    if (!ReadOnly)
-    {
-        <MCard OnClick="Add">
-            <MCardText>
-                <MIcon XLarge>mdi-plus</MIcon>
-            </MCardText>
-        </MCard>
-    }
-}
 </MCard>

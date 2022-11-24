@@ -4,16 +4,16 @@
 <MCard Width="240">
     <MContainer>
         <MRow>
-            <MTextField @bind-Value="Value.Name" Placeholder="指标名称" />
+            <MTextField Value="Value.Name" OnChange=@(async (string value)=>{Value.Name=value;await OnValueChanged();}) Placeholder="指标名称" />
         </MRow>
         <MRow>
             <MTextField TValue="string" Placeholder="取值范围" />
         </MRow>
         <MRow>
-            <MTextField @bind-Value="Value.Caculate" Placeholder="计算规则" />
+            <MTextField Value="Value.Caculate" OnChange=@(async (string value)=>{Value.Caculate=value;await OnValueChanged();}) Placeholder="计算规则" />
         </MRow>
         <MRow>
-            <MTextField @bind-Value="Value.Unit" Placeholder="单位" />
+            <MTextField Value="Value.Unit" Placeholder="单位" OnChange=@(async (string value)=>{Value.Unit=value;await OnValueChanged();}) />
         </MRow>
     </MContainer>
     <MCardActions>

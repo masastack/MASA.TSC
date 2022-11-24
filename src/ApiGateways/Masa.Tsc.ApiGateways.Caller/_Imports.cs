@@ -2,8 +2,9 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 global using Masa.BuildingBlocks.Service.Caller;
-global using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
 global using Masa.Contrib.Service.Caller;
+global using Masa.Contrib.Service.Caller.Authentication.OpenIdConnect;
+//global using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
 global using Masa.Contrib.Service.Caller.HttpClient;
 global using Masa.Tsc.ApiGateways.Caller.Services;
 global using Masa.Tsc.Contracts.Admin;
