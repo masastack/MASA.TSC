@@ -81,35 +81,42 @@ public class QueryHandler
     [EventHandler]
     public async Task GetTeamMonitorAysnc(TeamMonitorQuery query)
     {
-        var teams = await _authClient.TeamService.GetUserTeamsAsync();
-
-        if (teams == null || !teams.Any())
-            return;
-        query.Result = new TeamMonitorDto
+        try
         {
-            Projects = await GetAllProjects(teams.Select(t => t.Id).ToList()),
-            Monitor = new AppMonitorDto()
-        };
+            var teams = await _authClient.TeamService.GetUserTeamsAsync();
 
-        var monitors = await GetAllMonitorAsync();
-        var errorWarns = await GetErrorAndWarnAsync();
-
-        int error = 0, warn = 0, errorWarnAppCount = 0;
-        if (errorWarns != null && errorWarns.Any())
-        {
-            SetProjectStatus(query, errorWarns, ref error, ref warn);
-            errorWarnAppCount = errorWarns.Where(item => item.Value.Item1 > 0 || item.Value.Item2 > 0).Count();
-        }
-
-        query.Result.Monitor.Error = error;
-        query.Result.Monitor.Warn = warn;
-        if (monitors != null && monitors.Any())
-        {
-            query.Result.Monitor.Total = monitors.Count;
-            if (monitors.Count - errorWarnAppCount > 0)
+            if (teams == null || !teams.Any())
+                return;
+            query.Result = new TeamMonitorDto
             {
-                query.Result.Monitor.Normal = monitors.Count - errorWarnAppCount;
+                Projects = await GetAllProjects(teams.Select(t => t.Id).ToList()),
+                Monitor = new AppMonitorDto()
+            };
+
+            var monitors = await GetAllMonitorAsync();
+            var errorWarns = await GetErrorAndWarnAsync();
+
+            int error = 0, warn = 0, errorWarnAppCount = 0;
+            if (errorWarns != null && errorWarns.Any())
+            {
+                SetProjectStatus(query, errorWarns, ref error, ref warn);
+                errorWarnAppCount = errorWarns.Where(item => item.Value.Item1 > 0 || item.Value.Item2 > 0).Count();
             }
+
+            query.Result.Monitor.Error = error;
+            query.Result.Monitor.Warn = warn;
+            if (monitors != null && monitors.Any())
+            {
+                query.Result.Monitor.Total = monitors.Count;
+                if (monitors.Count - errorWarnAppCount > 0)
+                {
+                    query.Result.Monitor.Normal = monitors.Count - errorWarnAppCount;
+                }
+            }
+        }
+        catch (Exception ex)
+        { 
+        
         }
     }
 
