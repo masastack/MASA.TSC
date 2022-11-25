@@ -27,7 +27,7 @@ IConfiguration config = builder.Services.GetMasaConfiguration().ConfigurationApi
 //});
 //#endif
 builder.Services.AddDaprClient();
-builder.Services.AddPrometheusClient(builder.GetMasaConfiguration().Local.GetSection("Masa:Prometheus").Value);
+builder.Services.AddPrometheusClient(builder.Services.GetMasaConfiguration().Local.GetSection("Masa:Prometheus").Value);
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(options =>
 {
@@ -36,14 +36,15 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer("Bearer", options =>
 {
-    options.Authority = builder.GetMasaConfiguration().ConfigurationApi.GetPublic().GetValue<string>("$public.AppSettings:IdentityServerUrl");
+    options.Authority = builder.Services.GetMasaConfiguration().ConfigurationApi.GetPublic().GetValue<string>("$public.AppSettings:IdentityServerUrl");
     options.RequireHttpsMetadata = false;
     //options.Audience = "";
     options.TokenValidationParameters.ValidateAudience = false;
     options.MapInboundClaims = false;
 });
 
-builder.Services.AddMasaIdentity(options => {
+builder.Services.AddMasaIdentity(options =>
+{
     options.Environment = "environment";
     options.UserName = "name";
     options.UserId = "sub";
