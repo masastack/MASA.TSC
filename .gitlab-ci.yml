@@ -25,5 +25,5 @@ variables:
 
   #K8S_IMAGEPULLSECRETSPULL: reg.lonsid.cn
   K8S_IMAGEPULLSECRETSPULL: aliregistry
-  SECRET_TLS: lonsid-cn
+  SECRET_TLS: masastack
   
