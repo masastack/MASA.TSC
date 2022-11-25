@@ -3,7 +3,7 @@
   variables:
     DOCKER_TAG: prd
     NAMESPACE: masa-tsc-staging
-    KUBECONFIG: $KUBECONFIG_MASA_DEV_YDY
+    KUBECONFIG: $KUBE_CONFIG_DEV_YDY
     DAPR_ID_PATH: "-staging"
     K8S_REPLICAS: $DEV_REPLICAS
     K8S_FILE: 'devops/k8s.yaml'
@@ -14,7 +14,7 @@
   variables:
     DOCKER_TAG: prd
     NAMESPACE: masa-tsc-staging
-    KUBECONFIG: $KUBECONFIG_MASA_DEV_YDY
+    KUBECONFIG: $KUBE_CONFIG_DEV_YDY
     DAPR_ID_PATH: "-staging"
     K8S_REPLICAS: $DEV_REPLICAS
     K8S_FILE: 'devops/k8s-web.yaml'
