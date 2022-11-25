@@ -4,45 +4,37 @@
 var builder = WebApplication.CreateBuilder(args);
 
 var elasearchUrls = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<string[]>();
-builder.Services.AddElasticClientLogAndTrace(elasearchUrls, builder.Configuration.GetSection("Masa:Elastic:logIndex").Get<string>(), builder.Configuration.GetSection("Masa:Elastic:traceIndex").Get<string>());
-
-builder.Services.AddObservable(builder.Logging, builder.Configuration, false);
+builder.Services.AddElasticClientLogAndTrace(elasearchUrls, builder.Configuration.GetSection("Masa:Elastic:logIndex").Get<string>(), builder.Configuration.GetSection("Masa:Elastic:traceIndex").Get<string>())
+    .AddObservable(builder.Logging, builder.Configuration, false)
+    .AddPrometheusClient(builder.Configuration.GetSection("Masa:Prometheus").Value);
 builder.Services.AddDaprClient();
-builder.Services.AddPrometheusClient(builder.Configuration.GetSection("Masa:Prometheus").Value);
-
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
 
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddMasaConfiguration(configurationBuilder =>
-{
-    configurationBuilder.UseDcc(dccConfig, default, default);
-});
+builder.Services.AddHttpContextAccessor()
+    .AddMasaConfiguration(configurationBuilder => configurationBuilder.UseDcc(dccConfig, default, default));
 IConfiguration config = builder.Services.GetMasaConfiguration().ConfigurationApi.GetPublic();
 
-//#if DEBUG
-//builder.Services.AddDaprStarter(opt =>
-//{
-//    opt.DaprHttpPort = 3600;
-//    opt.DaprGrpcPort = 3601;
-//});
-//#endif
-builder.Services.AddDaprClient();
-builder.Services.AddPrometheusClient(builder.Services.GetMasaConfiguration().Local.GetSection("Masa:Prometheus").Value);
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication(options =>
+#if DEBUG
+builder.Services.AddDaprStarter(opt =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer("Bearer", options =>
-{
-    options.Authority = builder.Services.GetMasaConfiguration().ConfigurationApi.GetPublic().GetValue<string>("$public.AppSettings:IdentityServerUrl");
-    options.RequireHttpsMetadata = false;
-    //options.Audience = "";
-    options.TokenValidationParameters.ValidateAudience = false;
-    options.MapInboundClaims = false;
+    opt.DaprHttpPort = 3600;
+    opt.DaprGrpcPort = 3601;
 });
+#endif
 
+builder.Services.AddAuthorization()
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = config.GetValue<string>("$public.AppSettings:IdentityServerUrl");
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters.ValidateAudience = false;
+        options.MapInboundClaims = false;
+    });
 builder.Services.AddMasaIdentity(options =>
 {
     options.Environment = "environment";
@@ -51,17 +43,22 @@ builder.Services.AddMasaIdentity(options =>
     options.Mapping(nameof(MasaUser.CurrentTeamId), IdentityClaimConsts.CURRENT_TEAM);
     options.Mapping(nameof(MasaUser.StaffId), IdentityClaimConsts.STAFF);
     options.Mapping(nameof(MasaUser.Account), IdentityClaimConsts.ACCOUNT);
-});
-
-builder.Services.AddScoped(service =>
-{
-    var content = service.GetRequiredService<IHttpContextAccessor>();
-    if (content.HttpContext != null && AuthenticationHeaderValue.TryParse(content.HttpContext.Request.Headers.Authorization.ToString(), out var auth) && auth != null)
-        return new TokenProvider { AccessToken = auth?.Parameter };
-    return default!;
-});
-builder.Services.AddAuthClient(config["$public.AppSettings:AuthClient:Url"], dccConfig.RedisOptions).
-AddPmClient(config["$public.AppSettings:PmClient:Url"]);
+})
+    .AddScoped(service =>
+    {
+        var content = service.GetRequiredService<IHttpContextAccessor>();
+        if (content.HttpContext != null && AuthenticationHeaderValue.TryParse(content.HttpContext.Request.Headers.Authorization.ToString(), out var auth) && auth != null)
+            return new TokenProvider { AccessToken = auth?.Parameter };
+        return default!;
+    })
+    .AddAuthClient(config["$public.AppSettings:AuthClient:Url"], dccConfig.RedisOptions)
+    .AddPmClient(config["$public.AppSettings:PmClient:Url"])
+    .AddMultilevelCache(distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(dccConfig.RedisOptions)
+    , multilevelCacheOptions =>
+    {
+        multilevelCacheOptions.SubscribeKeyPrefix = MasaStackConsts.TSC_SYSTEM_ID;
+        multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
+    });
 
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -103,7 +100,7 @@ var app = builder.Services
     })
     .AddServices(builder);
 
-//app.UseMasaExceptionHandler();
+app.UseMasaExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

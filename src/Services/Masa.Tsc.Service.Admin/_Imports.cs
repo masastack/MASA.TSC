@@ -1,6 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+global using Masa.BuildingBlocks.Caching;
 global using Masa.BuildingBlocks.Configuration;
 global using Masa.BuildingBlocks.Data;
 global using Masa.BuildingBlocks.Data.UoW;
@@ -31,6 +32,7 @@ global using Masa.Contrib.Service.Caller.Authentication.OpenIdConnect;
 global using Masa.Contrib.StackSdks.Tsc.Elasticsearch.Constants;
 global using Masa.Tsc.Contracts.Admin;
 global using Masa.Tsc.Contracts.Admin.Enums;
+global using Masa.Tsc.Contracts.Admin.Infrastructure.Const;
 global using Masa.Tsc.Contracts.Admin.Instruments;
 global using Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 global using Masa.Tsc.Service.Admin.Application.Instruments.Queries;
