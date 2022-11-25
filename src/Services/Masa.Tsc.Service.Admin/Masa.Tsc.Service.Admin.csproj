@@ -90,7 +90,7 @@
 
 	<ItemGroup>
 		<None Update="Dockerfile">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 </Project>
