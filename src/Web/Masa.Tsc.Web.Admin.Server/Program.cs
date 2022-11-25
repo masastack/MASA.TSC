@@ -20,7 +20,6 @@ builder.WebHost.UseKestrel(option =>
 });
 
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
-Console.WriteLine("dcc"+System.Text.Json.JsonSerializer.Serialize(dccConfig));
 builder.Services.AddMasaConfiguration(configurationBuilder =>
 {
     configurationBuilder.UseDcc(dccConfig, default, default);

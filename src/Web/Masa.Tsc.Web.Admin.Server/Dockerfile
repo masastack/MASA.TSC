@@ -9,6 +9,6 @@
 FROM registry.cn-hangzhou.aliyuncs.com/masa/dotnet_aspnet:6.0.0
 WORKDIR /app
 COPY ./publish .
-ENV ASPNETCORE_URLS=http://0.0.0.0:80
-EXPOSE 80
+ENV ASPNETCORE_URLS=https://0.0.0.0:443
+EXPOSE 443
 ENTRYPOINT ["dotnet", "Masa.Tsc.Web.Admin.Server.dll"]
