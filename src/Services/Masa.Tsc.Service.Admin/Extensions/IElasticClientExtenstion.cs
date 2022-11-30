@@ -1,86 +1,93 @@
-﻿//// Copyright (c) MASA Stack All rights reserved.
-//// Licensed under the MIT License. See LICENSE.txt in the project root for license information.
+﻿// Copyright (c) MASA Stack All rights reserved.
+// Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-//using Nest;
+namespace Nest;
 
-//namespace Masa.Tsc.Service.Admin;
+internal static class IElasticClientExtenstion
+{
+    /// <summary>
+    /// 批量数据插入
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="client"></param>
+    /// <param name="data"></param>
+    /// <param name="indexName"></param>
+    /// <param name="logger"></param>
+    /// <returns></returns>
+    public static async Task BulkAllAsync<T>(this IElasticClient client, IEnumerable<T> data, string indexName, ILogger logger) where T : class
+    {
+        int numberOfSlices = Environment.ProcessorCount;
+        int size = 1000;
+        var bulkAllObservable = client.BulkAll(data, buk => buk.Index(indexName)
+         .Size(size)
+         .MaxDegreeOfParallelism(numberOfSlices)
+         .BackOffRetries(3)
+         .BackOffTime(TimeSpan.FromSeconds(10))
+         .RefreshOnCompleted()
+         .BufferToBulk((r, buffer) => r.IndexMany(buffer)));
 
-//internal class IElasticClientExtenstion
-//{
-//    public static IAggregationContainer Aggregation(AggregationContainerDescriptor<object> aggContainer, IEnumerable<RequestFieldAggregationDto> FieldMaps, string? inertval = null, bool isDesc = true, string? sortField = null)
-//    {
-//        if (FieldMaps == null || !FieldMaps.Any())
-//            return aggContainer;
+        var name = typeof(T).Name;
+        var waitHandle = new ManualResetEvent(false);
+        ExceptionDispatchInfo? info = null;
 
-//        foreach (var item in FieldMaps)
-//        {
-//            switch (item.AggegationType)
-//            {
-//                case AggregationTypes.Count:
-//                    {
-//                        aggContainer.ValueCount(item.Alias, agg => agg.Field(item.Name));
-//                    }
-//                    break;
-//                case AggregationTypes.Sum:
-//                    {
-//                        aggContainer.Sum(item.Alias, agg => agg.Field(item.Name));
-//                    }
-//                    break;
-//                case AggregationTypes.Avg:
-//                    {
-//                        aggContainer.Average(item.Alias, agg => agg.Field(item.Name));
-//                    }
-//                    break;
-//                case AggregationTypes.DistinctCount:
-//                    {
-//                        aggContainer.Cardinality(item.Alias, agg => agg.Field(item.Name));
-//                    }
-//                    break;
-//                case AggregationTypes.Histogram:
-//                    {
-//                        aggContainer.Histogram(item.Alias, agg => agg.Field(item.Name).Interval(Convert.ToDouble(inertval)).Order(isDesc ? HistogramOrder.KeyDescending : HistogramOrder.KeyAscending));
-//                    }
-//                    break;
-//                case AggregationTypes.DateHistogram:
-//                    {
-//                        aggContainer.DateHistogram(item.Alias, agg => agg.Field(item.Name).FixedInterval(new Time(inertval)).Order(isDesc ? HistogramOrder.KeyDescending : HistogramOrder.KeyAscending));
-//                    }
-//                    break;
-//            }
-//        }
-//        return aggContainer;
-//    }
+        var scrollAllObserver = new BulkAllObserver(
+            onNext: response =>
+            {
+                logger.LogInformation($"{name} bulk insert: Indexed {response.Page * size} with {response.Retries} retries");
+            },
+            onError: ex =>
+            {
+                logger.LogError($"{name} bulk all Error : {0}", ex);
+                info = ExceptionDispatchInfo.Capture(ex);
+                waitHandle.Set();
+            },
+            onCompleted: () =>
+            {
+                logger.LogInformation($"{name} bulk all successed.");
+                waitHandle.Set();
+            }
+        );
 
-//    public static Dictionary<string, string>? AggResult(ISearchResponse<object> response, IEnumerable<RequestFieldAggregationDto> FieldMaps)
-//    {
-//        if (response.Aggregations == null || !response.Aggregations.Any())
-//            return null;
+        bulkAllObservable.Subscribe(scrollAllObserver);
+        waitHandle.WaitOne();
+        info?.Throw();
+        await Task.CompletedTask;
+    }
 
-//        var result = new Dictionary<string, string>();
-//        foreach (var item in response.Aggregations)
-//        {
-//            var requestField = FieldMaps.First(m => m.Alias == item.Key);
-//            if (requestField.AggegationType - AggregationTypes.DistinctCount <= 0 && item.Value is ValueAggregate value && value != null)
-//            {
-//                string temp = default!;
-//                if (!string.IsNullOrEmpty(value.ValueAsString))
-//                    temp = value.ValueAsString;
-//                else if (value.Value.HasValue)
-//                    temp = value.Value.Value.ToString();
+    /// <summary>
+    /// 数据量少量情况下可使用，量较多时禁用
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="client"></param>
+    /// <param name="indexName"></param>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<T>> ScrollAllAsync<T>(this IElasticClient client, string indexName, string scroll) where T : class
+    {
+        int numberOfSlices = Environment.ProcessorCount;
+        var scrollAllObservable = client.ScrollAll<T>(scroll, numberOfSlices, sc => sc
+           .MaxDegreeOfParallelism(numberOfSlices)
+           .Search(s => s.Index(indexName))
+       );
 
-//                if (string.IsNullOrEmpty(temp))
-//                    continue;
+        var waitHandle = new ManualResetEvent(false);
+        ExceptionDispatchInfo? info = null;
 
-//                result.Add(item.Key, temp);
-//            }
-//            else if (requestField.AggegationType == AggregationTypes.DateHistogram && item.Value is BucketAggregate bucketAggregate)
-//            {
-//                foreach (DateHistogramBucket bucket in bucketAggregate.Items)
-//                {
-//                    result.Add(bucket.KeyAsString, (bucket.DocCount ?? 0).ToString());
-//                }
-//            }
-//        }
-//        return result;
-//    }
-//}
+        var result = new List<T>();
+        var scrollAllObserver = new ScrollAllObserver<T>(
+            onNext: response => result.AddRange(response.SearchResponse.Documents),
+            onError: e =>
+            {
+                info = ExceptionDispatchInfo.Capture(e);
+                waitHandle.Set();
+            },
+            onCompleted: () => waitHandle.Set()
+        );
+
+        scrollAllObservable.Subscribe(scrollAllObserver);
+        waitHandle.WaitOne();
+        info?.Throw();
+        await Task.CompletedTask;
+        return result;
+    }
+}
