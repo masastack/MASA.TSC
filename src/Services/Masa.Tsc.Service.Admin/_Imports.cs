@@ -28,7 +28,7 @@ global using Masa.Contrib.Dispatcher.Events;
 global using Masa.Contrib.Dispatcher.IntegrationEvents.Dapr;
 global using Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EFCore;
 global using Masa.Contrib.Service.Caller.Authentication.OpenIdConnect;
-global using Masa.Contrib.StackSdks.Tsc.Elasticseach.Constants;
+global using Masa.Contrib.StackSdks.Tsc.Elasticsearch.Constants;
 global using Masa.Tsc.Contracts.Admin;
 global using Masa.Tsc.Contracts.Admin.Enums;
 global using Masa.Tsc.Contracts.Admin.Instruments;
