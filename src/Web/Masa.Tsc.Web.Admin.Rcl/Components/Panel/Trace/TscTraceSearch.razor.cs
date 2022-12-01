@@ -104,20 +104,22 @@ public partial class TscTraceSearch : IDisposable
                 if (type == 1)
                 {
                     _instance = default!;
-                    _instance = value;
+                    _service = value;
                     query.Service = _service;
                     data = await ApiCaller.TraceService.GetAttrValuesAsync(query);
                     if (data != null && data.Any())
                         _instances = data.ToList();
                     else
                         _instances.Clear();
+                    query.Instance = string.Empty;
                 }
                 else
                 {
                     _instance = value;
+                    query.Service = _service;
+                    query.Instance = _instance;
                 }
 
-                query.Instance = _instance;
                 data = await ApiCaller.TraceService.GetAttrValuesAsync(query);
                 if (data != null && data.Any())
                     _endpoints = data.ToList();

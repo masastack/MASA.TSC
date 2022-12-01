@@ -23,10 +23,10 @@ public class QueryHandler
     [EventHandler]
     public async Task GetListAsync(TraceListQuery query)
     {
-        query.Result = await _traceService.ListAsync(new BaseRequestDto
+        var queryDto = new BaseRequestDto
         {
             End = query.End,
-            Endpoint = query.Endpoint,
+            //Endpoint = query.Endpoint,
             Instance = query.Instance,
             Page = query.Page,
             Service = query.Service,
@@ -34,7 +34,29 @@ public class QueryHandler
             Start = query.Start,
             TraceId = query.TraceId,
             Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = false }
-        });
+        };
+        if (!string.IsNullOrEmpty(query.Endpoint))
+        {
+            var tttt = new FieldConditionDto
+            {
+                Name = "Attributes.http.url",
+                Type = ConditionTypes.Equal,
+                Value = query.Endpoint
+            };
+
+            if (queryDto.Conditions == null)
+                queryDto.Conditions = new FieldConditionDto[] {
+                    tttt
+                };
+            else
+            {
+                var list = queryDto.Conditions.ToList();
+                list.Add(tttt);
+                queryDto.Conditions=list;
+            }
+        }
+
+        query.Result = await _traceService.ListAsync(queryDto);
         if (query.Result == null)
             query.Result = new PaginatedListBase<TraceResponseDto>();
     }
@@ -42,18 +64,17 @@ public class QueryHandler
     [EventHandler]
     public async Task GetAttrValuesAsync(TraceAttrValuesQuery query)
     {
-
         if (string.IsNullOrEmpty(query.Data.Service))
         {
             query.Data.Name = ElasticConstant.ServiceName;
         }
-        else if (string.IsNullOrEmpty(query.Data.Instance))
+        else if (query.Data.Instance == null)
         {
             query.Data.Name = ElasticConstant.ServiceInstance;
         }
         else
         {
-            query.Data.Name = ElasticConstant.Endpoint;
+            query.Data.Name = "Attributes.http.url";// ElasticConstant.Endpoint;
         }
 
         query.Result = (IEnumerable<string>)await _traceService.AggregateAsync(query.Data);

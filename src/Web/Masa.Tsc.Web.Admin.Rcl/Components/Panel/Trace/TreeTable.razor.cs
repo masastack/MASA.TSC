@@ -14,7 +14,7 @@ public partial class TreeTable
     [Parameter]
     public Func<object, string> ParentFunc { get; set; }
 
-    
+
     [Parameter]
     public IEnumerable<TraceResponseDto> Items
     {
@@ -52,7 +52,7 @@ public partial class TreeTable
         }
         _isLoading = false;
         await base.OnParametersSetAsync();
-    }    
+    }
 
     private void SetTreeLine()
     {
@@ -88,7 +88,7 @@ public partial class TreeTable
             item.Value.Width = width.ToString("0.####%");
             item.Value.Right = right.ToString("0.####%");
         }
-    }    
+    }
 
     private string GetPadding(TraceResponseDto item)
     {
@@ -135,5 +135,16 @@ public partial class TreeTable
         }
         while (_timeLines.Count - count < 0);
         _timeLines.Add(last);
+    }
+
+    private string GetDisplayName(TraceResponseDto traceDto)
+    {
+        if(traceDto.Attributes.ContainsKey("db.system"))
+            return $"{traceDto.Attributes["db.system"]} {traceDto.Attributes["db.name"]},{traceDto.Attributes["peer.service"]}";
+
+        if(traceDto.Attributes.ContainsKey("http.method"))
+            return $"{traceDto.Attributes["http.url"]}";
+
+        return traceDto.Name;
     }
 }
