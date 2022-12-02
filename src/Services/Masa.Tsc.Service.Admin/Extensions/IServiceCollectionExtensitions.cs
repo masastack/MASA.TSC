@@ -28,4 +28,14 @@ public static class IServiceCollectionExtensitions
 
         return services;
     }
+
+    public static IServiceCollection AddTopologyRepository(this IServiceCollection services)
+    {
+        services.AddSingleton<ITraceServiceNodeRepository, TraceServiceNodeRepository>()
+                    .AddSingleton<ITraceServiceRelationRepository, TraceServiceRelationRepository>()
+                    .AddSingleton<ITraceServiceStateRepository, TraceServiceStateRepository>();
+        //load data to cache
+
+        return services;
+    }
 }

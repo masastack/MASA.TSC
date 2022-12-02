@@ -1,9 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Contrib.Caching.Distributed.StackExchangeRedis;
-using Masa.Tsc.Service.Admin.Infrastructure.Repositories.Topologies;
-
 var builder = WebApplication.CreateBuilder(args);
 
 var elasearchUrls = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<string[]>();
@@ -104,9 +101,7 @@ var app = builder.Services
         .UseEventBus()
         .UseRepository<TscDbContext>();
     })
-    .AddScoped<ITraceServiceNodeRepository, TraceServiceNodeRepository>()
-    .AddScoped<ITraceServiceRelationRepository, TraceServiceRelationRepository>()
-    .AddScoped<ITraceServiceStateRepository, TraceServiceStateRepository>()
+    .AddTopologyRepository()
     .AddServices(builder);
 
 app.UseMasaExceptionHandler();
