@@ -1,9 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Contrib.StackSdks.Tsc.Elasticsearch.Model;
-using Masa.Tsc.Service.Admin.Application.Topologies.Commands;
-
 namespace Masa.Tsc.Service.Admin.Application.Topologies;
 
 public class CommandHandler
@@ -16,6 +13,8 @@ public class CommandHandler
 
     private static List<TraceServiceCache> addNodes = new List<TraceServiceCache>();
     private static List<TraceServiceRelation> addRestions = new List<TraceServiceRelation>();
+    private static ConcurrentQueue<TraceNodeCache> traceNodeQueue = new();
+    private static bool _readComplete = false;
 
     public CommandHandler(ITraceService traceService,
         IMultilevelCacheClient multilevelCacheClient,
@@ -79,7 +78,7 @@ public class CommandHandler
             Page = 1,
             PageSize = 9999,
             Scroll = "5m",
-            TraceId = "af80d6fad26ec71def203d489e82f7fc"
+            //TraceId = "af80d6fad26ec71def203d489e82f7fc"
         };
         var conditions = new List<FieldConditionDto>();
 
@@ -97,25 +96,29 @@ public class CommandHandler
             Value = taskRunState.End,
         });
 
-        //获取数据
-        _traceService.GetAll(query, SaveTraceCache);
+        Task<List<string>> task;
+        try
+        {
+            _readComplete = false;
+            task = SaveTraceCacheAsync();
+            _traceService.GetAll(query, SetTraceQueue);
+        }
+        finally
+        {
+            _readComplete = true;
+        }
 
-        await Task.CompletedTask;
+        var traceKeys = await task;
+        await AnalysisTrace(traceKeys);
     }
 
-    private void SaveTraceCache(IEnumerable<TraceResponseDto> result)
+    private void SetTraceQueue(IEnumerable<TraceResponseDto> result)
     {
         if (result == null || !result.Any())
             return;
 
-        Dictionary<string, List<TraceNodeCache>> dicValues = new();
-
-        var traceIds = new List<string>();
-
         foreach (var item in result)
         {
-            var traceId = item.TraceId;
-            var key = string.Format(TopologyConstants.TOPOLOGY_TRACE_KEY, traceId);
             var type = item.GetServiceType();
             string service = item.Resource["service.name"].ToString()!, instance = item.Resource["service.instance.id"].ToString()!;
             string endpoint = "";
@@ -148,26 +151,45 @@ public class CommandHandler
                 IsSuccess = isSuccess,
                 Type = type,
             };
-            if (dicValues.ContainsKey(key))
+            traceNodeQueue.Enqueue(traceNode);
+        }
+    }
+
+    private async Task<List<TraceNodeCache>> GetCacheTraceAsync(string key, TraceNodeCache addItem)
+    {
+        var values = await _multilevelCacheClient.GetAsync<List<TraceNodeCache>>(key);
+        if (values != null)
+            values.Add(addItem);
+        else
+            values = new List<TraceNodeCache>() { addItem };
+
+        return values;
+    }
+
+    private async Task<List<string>> SaveTraceCacheAsync()
+    {
+        var dicValues = new Dictionary<string, List<TraceNodeCache>>();
+        do
+        {
+            var hasData = traceNodeQueue.TryDequeue(out var traceCacheItem);
+            if (!hasData)
             {
-                dicValues[key].Add(traceNode);
+                if (_readComplete)
+                    break;
+                else
+                    await Task.Delay(1000);
             }
             else
             {
-                //var values = _multilevelCacheClient.Get<List<TraceNodeCache>>(key);
-                //if (values != null)
-                //{
-                //    values.Add(traceNode);
-                //}
-                //else
-                {
-                    var values = new List<TraceNodeCache>() { traceNode };
-                    traceIds.Add(traceId);
-                    dicValues.Add(key, values);
-                }
-                //dicValues.Add(key, values);
+                if (traceCacheItem is null)
+                    continue;
+                var key = string.Format(TopologyConstants.TOPOLOGY_TRACE_KEY, traceCacheItem.TraceId);
+                if (dicValues.ContainsKey(key))
+                    dicValues[key].Add(traceCacheItem);
+                else
+                    dicValues.Add(key, await GetCacheTraceAsync(key, traceCacheItem));
             }
-        }
+        } while (true);
 
         //保存trace数据
         if (dicValues.Any())
@@ -185,7 +207,7 @@ public class CommandHandler
             while (total - start > 0);
         }
 
-        AnalysisTrace(dicValues.Keys.ToList()).Wait();
+        return dicValues.Keys.ToList();
     }
 
     private async Task AnalysisTrace(List<string> traceIds)
@@ -237,21 +259,24 @@ public class CommandHandler
             {
                 if (!string.IsNullOrEmpty(traceNode.ParentId) && dicNodes.ContainsKey(traceNode.ParentId))
                 {
-                    traceNode.DestServiceId = dicNodes[traceNode.ParentId];
+                    traceNode.CallServiceId = dicNodes[traceNode.ParentId];
                 }
             }
 
             //没有一条有效关系依赖关系，全部为自我依赖
-            if (!traces.Any(node => !string.IsNullOrEmpty(node.ServiceId) && !string.IsNullOrEmpty(node.DestServiceId)))// && node.ServiceId != node.DestServiceId))
+            if (!traces.Any(node => node.IsServer
+                                    && !string.IsNullOrEmpty(node.ServiceId)
+                                    && !string.IsNullOrEmpty(node.CallServiceId)
+                                    && node.ServiceId != node.CallServiceId))
                 continue;
 
             var serviceRelations = (await _multilevelCacheClient.GetAsync<List<TraceServiceRelation>>(TopologyConstants.TOPOLOGY_SERVICES_RELATIONS_KEY)) ?? new();
             var addStateList = new List<TraceServiceState>();
             foreach (var trace in traces)
             {
-                if (string.IsNullOrEmpty(trace.ServiceId) || string.IsNullOrEmpty(trace.DestServiceId))// || trace.ServiceId == trace.DestServiceId)
+                if (!trace.IsServer || string.IsNullOrEmpty(trace.ServiceId) || string.IsNullOrEmpty(trace.CallServiceId) || trace.ServiceId == trace.CallServiceId)
                     continue;
-                var relation = new TraceServiceRelation { ServiceId = trace.ServiceId, DestServiceId = trace.DestServiceId };
+                var relation = new TraceServiceRelation { ServiceId = trace.CallServiceId, DestServiceId = trace.ServiceId };
                 if (!serviceRelations.Any(r => r.ServiceId == relation.ServiceId && r.DestServiceId == relation.DestServiceId))
                 {
                     lock (addRestions)
@@ -263,20 +288,21 @@ public class CommandHandler
                     }
                 }
 
-                var destTrace = traces.FirstOrDefault(s => s.SpanId == trace.ParentId);
-                if (destTrace != null)
+                var CallTrace = traces.FirstOrDefault(s => !s.IsServer && s.SpanId == trace.ParentId);
+                if (CallTrace != null)
                     addStateList.Add(new TraceServiceState
                     {
-                        ServiceId = relation.ServiceId,
-                        ServiceName = trace.Service,
-                        Instance = trace.Instance,
-                        DestServiceId = trace.DestServiceId,
-                        DestEndpint = destTrace.EndPoint,
-                        DestInstance = destTrace.DestServiceId,
-                        DestServiceName = destTrace.Service,
+                        ServiceId = CallTrace.ServiceId,
+                        ServiceName = CallTrace.Service,
+                        Instance = CallTrace.Instance,
+                        Timestamp = CallTrace.Start,
+
+                        DestServiceId = trace.ServiceId,
+                        DestEndpint = trace.EndPoint,
+                        DestInstance = trace.Instance,
+                        DestServiceName = trace.Service,
                         IsSuccess = trace.IsSuccess,
-                        Latency = destTrace.Duration,
-                        Timestamp = destTrace.Start
+                        Latency = trace.Duration,
                     });
             }
 

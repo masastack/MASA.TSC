@@ -39,7 +39,8 @@ public class QueryHandler
             Type = item.Type
         }).ToList();
         result.Relations = relations.Select(item => new TopologyServiceRelationDto { CurrentId = item.ServiceId, DestId = item.DestServiceId }).ToList();
-        result.Data = await _traceServiceStateRepository.GetServiceTermsDataAsync(query.Data.Start, query.Data.End, serviceIds.ToArray());
+        if (serviceIds.Any())
+            result.Data = await _traceServiceStateRepository.GetServiceTermsDataAsync(query.Data.Start, query.Data.End, serviceIds.ToArray());
         query.Result = result;
     }
 

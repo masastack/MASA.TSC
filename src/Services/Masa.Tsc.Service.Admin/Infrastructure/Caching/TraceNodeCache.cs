@@ -7,7 +7,7 @@ internal class TraceNodeCache
 {
     public string ServiceId { get; set; }
 
-    public string DestServiceId { get; set; }
+    public string CallServiceId { get; set; }
 
     public string TraceId { get; set; }
 
