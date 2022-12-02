@@ -15,3 +15,6 @@ global using System.ComponentModel.DataAnnotations;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using System.Text.RegularExpressions;
+global using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
+global using FluentValidation;
+global using Masa.Tsc.Contracts.Admin.Infrastructure.Options.Utils;

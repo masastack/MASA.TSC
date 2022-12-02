@@ -186,3 +186,35 @@
 .fa-chevron-up:before {
     content: '\f077'
 }
+
+.search {
+    width: 340px;
+}
+
+.full-height {
+    height: 100% !important;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    word-break: break-all;
+}
+
+.hidden-webkit-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hidden-webkit-scrollbar {
+    -ms-overflow-style: none; /* for Internet Explorer, Edge */
+    overflow-y: scroll;
+}
+
+.overflow-y {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.overflow-auto {
+    overflow: auto;
+}

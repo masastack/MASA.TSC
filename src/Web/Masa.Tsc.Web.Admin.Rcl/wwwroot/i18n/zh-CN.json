@@ -51,5 +51,29 @@
   "Project": "项目",
   "Admin": "管理员",
   "Members": "成员",
-  "Tips": "提示"
+  "Tips": "提示",
+  "Rows per page": "每页行数",
+  "Total": "共",
+  "Item": "条",
+  "Name": "名称",
+  "Close": "关闭",
+  "Refresh": "刷新",
+  "Order": "排序",
+  "Layer": "层",
+  "Model": "模型",
+  "Type": "类型",
+  "Folder": "目录",
+  "Action success": "操作成功",
+  "DashboardBlock": {
+    "Add folder": "新建目录",
+    "Add dashboard": "新建仪表盘",
+    "Not set as root": "不设置为根",
+    "Set as root": "设置为根",
+    "Refresh data success": "刷新数据成功",
+    "Add dashboard data success": "新建仪表盘数据成功",
+    "Update dashboard data success": "编辑仪表盘数据成功",
+    "Delete dashboard data success": "删除仪表盘数据成功",
+    "Delete Dashboard": "删除仪表盘",
+    "Are you sure delete dashboard \"{0}\"?": "确定删除仪表盘\"{0}\"吗"
+  }
 }
