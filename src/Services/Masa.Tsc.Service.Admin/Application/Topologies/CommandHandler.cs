@@ -78,8 +78,8 @@ public class CommandHandler
         {
             Page = 1,
             PageSize = 9999,
-            Scroll = "5m"
-            //TraceId = "6f4dc157698379a05fba4b6238a439f6"
+            Scroll = "5m",
+            TraceId = "af80d6fad26ec71def203d489e82f7fc"
         };
         var conditions = new List<FieldConditionDto>();
 
@@ -117,22 +117,15 @@ public class CommandHandler
             var traceId = item.TraceId;
             var key = string.Format(TopologyConstants.TOPOLOGY_TRACE_KEY, traceId);
             var type = item.GetServiceType();
-            string service = item.Resource["service.name"].ToString(), instance = item.Resource["service.instance.id"].ToString();
+            string service = item.Resource["service.name"].ToString()!, instance = item.Resource["service.instance.id"].ToString()!;
             string endpoint = "";
             bool isSuccess = !item.TryParseException(out _);
             if (type == TraceNodeTypes.Database)
             {
                 _ = item.TryParseDatabase(out var database);
-                if (!item.Attributes.ContainsKey("peer.service"))
-                {
-
-                }
-                else
-                {
-                    //mssql\elasticsearch
-                    instance = item.Attributes["peer.service"].ToString();
-                    service = $"{database.System}:{instance}";
-                }
+                //mssql\elasticsearch
+                instance = item.Attributes["peer.service"].ToString()!;
+                service = $"{database.System}:{instance}";
             }
             else if (item.TryParseHttp(out var http))
             {
@@ -183,7 +176,9 @@ public class CommandHandler
             do
             {
                 var sliceDic = dicValues.Skip(start).Take(size).ToDictionary(item => item.Key, item => item.Value);
+#pragma warning disable CS8620 // 由于引用类型的可为 null 性差异，实参不能用于形参。
                 _multilevelCacheClient.SetList(sliceDic, new CacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(20) });
+#pragma warning restore CS8620 // 由于引用类型的可为 null 性差异，实参不能用于形参。
                 page++;
                 start += size;
             }

@@ -3,7 +3,6 @@
 
 using Masa.Contrib.Caching.Distributed.StackExchangeRedis;
 using Masa.Tsc.Service.Admin.Infrastructure.Repositories.Topologies;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,10 +10,7 @@ var elasearchUrls = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<s
 builder.Services.AddElasticClientLogAndTrace(elasearchUrls, builder.Configuration.GetSection("Masa:Elastic:logIndex").Get<string>(), builder.Configuration.GetSection("Masa:Elastic:traceIndex").Get<string>())
     .AddObservable(builder.Logging, builder.Configuration, false)
     .AddPrometheusClient(builder.Configuration.GetSection("Masa:Prometheus").Value)
-    .AddElasticsearch(TopologyConstants.ES_CLINET_NAME, options =>
-    {
-        options.UseNodes(elasearchUrls);
-    });
+    .AddTopology(elasearchUrls);
 builder.Services.AddDaprClient();
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
 
@@ -112,25 +108,6 @@ var app = builder.Services
     .AddScoped<ITraceServiceRelationRepository, TraceServiceRelationRepository>()
     .AddScoped<ITraceServiceStateRepository, TraceServiceStateRepository>()
     .AddServices(builder);
-
-
-{
-    var fatory = builder.Services.BuildServiceProvider().GetRequiredService<IElasticsearchFactory>();
-    var client = fatory.CreateElasticClient(TopologyConstants.ES_CLINET_NAME);
-    var rep = client.Indices.Exists(TopologyConstants.SERVICE_INDEX_NAME);
-    if (!rep.Exists)
-        client.Indices.Create(TopologyConstants.SERVICE_INDEX_NAME, c => c.Map<TraceServiceNode>(m => m.AutoMap()));
-
-    rep = client.Indices.Exists(TopologyConstants.SERVICE_RELATION_INDEX_NAME);
-    if (!rep.Exists)
-        client.Indices.Create(TopologyConstants.SERVICE_RELATION_INDEX_NAME, c => c.Map<TraceServiceRelation>(m => m.AutoMap()));
-
-    rep = client.Indices.Exists(TopologyConstants.SERVICE_STATEDATA_INDEX_NAME);
-    if (!rep.Exists)
-        client.Indices.Create(TopologyConstants.SERVICE_STATEDATA_INDEX_NAME, c => c.Map<TraceServiceState>(m => m.AutoMap()));
-}
-
-
 
 app.UseMasaExceptionHandler();
 
