@@ -25,7 +25,7 @@ public static class ServiceExtensions
                  });
             });
 
-            services.AddSingleton(serviceProvider =>
+            services.AddScoped(serviceProvider =>
             {
                 var caller = serviceProvider.GetRequiredService<ICallerFactory>().Create(DEFAULT_CLIENT_NAME);
                 var client = new TscCaller(caller, serviceProvider.GetRequiredService<TokenProvider>());
