@@ -3,4 +3,4 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 
-public record AddInstrumentCommand(AddInstrumentDto Data) : Command;
+public record AddInstrumentCommand(AddInstrumentDto Data,Guid UserId) : Command;

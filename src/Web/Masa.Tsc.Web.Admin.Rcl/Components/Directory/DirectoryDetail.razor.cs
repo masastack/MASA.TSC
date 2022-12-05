@@ -30,7 +30,7 @@ public partial class DirectoryDetail
         {
             if (_model.Id != DirectoryId)
             {
-                var data = await ApiCaller.DirectoryService.GetAsync(CurrentUserId, DirectoryId);
+                var data = await ApiCaller.DirectoryService.GetAsync(DirectoryId);
                 if (data != null)
                 {
                     _model.Id = DirectoryId;

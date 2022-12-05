@@ -3,11 +3,9 @@
 
 namespace Masa.Tsc.Contracts.Admin.Instruments;
 
-public class UpdateInstrumentDto
+public class UpdateInstrumentPanelsShowDto
 {
-    [Required]
     public Guid Id { get; set; }
 
-    [Required]
-    public string Name { get; set; }
+    public UpdatePanelShowDto[] Panels { get; set; }
 }

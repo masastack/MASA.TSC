@@ -28,8 +28,8 @@ public partial class TscPanelEdit : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();        
-        await base.OnInitializedAsync();        
+        base.OnInitialized();
+        await base.OnInitializedAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -75,14 +75,14 @@ public partial class TscPanelEdit : IDisposable
         var height = await html.GetClientHeightAsync();
         var width = await html.GetClientWidthAsync();
 
-        await ApiCaller.PanelService.UpdateWidthHeightAsync(Value.Id, CurrentUserId, $"{width}px", $"{height}px");
+        //await ApiCaller.PanelService.UpdateWidthHeightAsync(Value.Id, CurrentUserId, $"{width}px", $"{height}px");
     }
 
     private async Task OnDelete()
     {
         if (!await PopupService.ConfirmAsync("删除", "确认要移除该panel吗"))
             return;
-        await ApiCaller.PanelService.DeleteAsync(CurrentUserId, Value.InstrumentId, Value.Id);
+        await ApiCaller.PanelService.DeleteAsync(Value.InstrumentId, Value.Id);
         await OnCallParent(OperateCommand.Remove, Value);
     }
 

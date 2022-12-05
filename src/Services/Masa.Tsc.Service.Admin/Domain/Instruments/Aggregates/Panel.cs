@@ -13,7 +13,7 @@ public class Panel : AggregateRoot<Guid>
 
     public string Description { get; set; } = string.Empty;
 
-    public int Sort { get; set; }
+    public int Index { get; set; }
 
     public PanelTypes Type { get; set; }
 
@@ -23,6 +23,10 @@ public class Panel : AggregateRoot<Guid>
 
     public string Width { get; set; } = string.Empty;
 
+    public string Left { get; set; } = string.Empty;
+
+    public string Top { get; set; } = string.Empty;
+
     //public string XName { get; set; }
 
     //public string YName { get; set; }
@@ -31,16 +35,11 @@ public class Panel : AggregateRoot<Guid>
 
     public Guid ParentId { get; set; }
 
-    public List<PanelMetric> Metrics { get; set; }
+    public List<PanelMetric>? Metrics { get; set; }
 
     public Panel(Guid Id) : base(Id) { }
 
     public Panel() { }
-
-    public void Remove()
-    {
-
-    }
 
     public void Update(PanelDto panel)
     {
@@ -50,7 +49,16 @@ public class Panel : AggregateRoot<Guid>
         }
         Title = panel.Title;
         Description = panel.Description ?? string.Empty;
-        Sort = panel.Sort;
+        Index = panel.Sort;
+    }
+
+    public void UpdateShow(UpdatePanelShowDto model)
+    {
+        Index = model.Index;
+        Height = model.Height;
+        Width = model.Width;
+        Top = model.Top;
+        Left = model.Left;
     }
 
     public void UpdateParentId(Guid parentId)
@@ -62,5 +70,36 @@ public class Panel : AggregateRoot<Guid>
     {
         Width = width ?? string.Empty;
         Height = height ?? string.Empty;
+    }
+
+    public static Panel ConvertTo(PanelDto model)
+    {
+        var panel = new Panel(model.Id)
+        {
+            Type = model.Type,
+            Title = model.Title ?? string.Empty,
+            Description = model.Description ?? string.Empty,
+            Index = model.Sort,
+            InstrumentId = model.InstrumentId,
+            ParentId = model.ParentId
+        };
+        if (model.Type == PanelTypes.Chart)
+        {
+            panel.ChartType = ((EChartPanelDto)model).ChartType;
+
+            if (model is EChartPanelDto chartDto && chartDto.Metrics != null && chartDto.Metrics.Any())
+            {
+                var list = chartDto.Metrics.Select(x => new PanelMetric(x.Id)
+                {
+                    Name = x.Name,
+                    Caculate = x.Caculate,
+                    PanelId = model.Id,
+                    Sort = x.Sort,
+                    Unit = x.Unit
+                });
+                panel.Metrics = list.ToList();
+            }
+        }
+        return panel;
     }
 }

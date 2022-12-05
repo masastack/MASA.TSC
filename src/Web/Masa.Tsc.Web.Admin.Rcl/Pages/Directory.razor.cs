@@ -57,7 +57,7 @@ public partial class Directory : IDisposable
     private async Task LoadDataAsync()
     {
         _isLoading = true;
-        _data = await ApiCaller.DirectoryService.GetTreeAsync(CurrentUserId);
+        _data = await ApiCaller.DirectoryService.GetTreeAsync();
         SetExpand(_data);
         _searchData = Array.Empty<DirectoryTreeDto>();
         _isLoading = false;
@@ -174,7 +174,7 @@ public partial class Directory : IDisposable
                 return;
             }
 
-            await ApiCaller.DirectoryService.DeleteAsync(item.Id, CurrentUserId);
+            await ApiCaller.DirectoryService.DeleteAsync(item.Id);
             await PopupService.ToastAsync("Delete Ok", AlertTypes.Success);
             var list = _data.ToList();
             list.Remove(item);

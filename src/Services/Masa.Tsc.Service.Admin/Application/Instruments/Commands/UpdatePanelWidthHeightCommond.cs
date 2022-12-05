@@ -3,4 +3,4 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 
-public record UpdatePanelWidthHeightCommond(Guid Id,string Height,string Width):Command;
+public record UpdatePanelWidthHeightCommond(Guid Id, string Height, string Width) : Command;
