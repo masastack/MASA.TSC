@@ -3,4 +3,4 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 
-public record UpdateInstrumentCommand(UpdateInstrumentDto Data,Guid UserId):Command;
+public record SetRootCommand(Guid UserId,Guid Id) : Command;

@@ -5,13 +5,13 @@ namespace Masa.Tsc.Contracts.Admin.Instruments;
 
 public class AddInstrumentDto
 {
-    public Guid Id { get; set; }=Guid.NewGuid();    
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required]
     public string Name { get; set; }
 
     [Required]
-    public string Layer{ get; set; }
+    public string Layer { get; set; }
 
     [Required]
     public string Model { get; set; }
@@ -20,7 +20,7 @@ public class AddInstrumentDto
 
     public bool IsGlobal { get; set; }
 
-    public bool IsRoot { get; set; }    
+    public bool IsRoot { get; set; }
 
     [Required]
     public Guid DirectoryId { get; set; }

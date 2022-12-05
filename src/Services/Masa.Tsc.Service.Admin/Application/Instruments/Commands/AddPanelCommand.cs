@@ -3,4 +3,4 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 
-public record AddPanelCommand(PanelDto Data):Command;
+public record AddPanelCommand(PanelDto Data, Guid instrumentId, Guid UserId) : Command;

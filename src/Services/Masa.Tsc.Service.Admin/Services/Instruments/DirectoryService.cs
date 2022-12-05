@@ -7,40 +7,38 @@ public class DirectoryService : ServiceBase
 {
     public DirectoryService() : base("/api/Instrument/directory")
     {
-        App.MapDelete($"{BaseUri}/{{id}}/{{userId}}", DeleteAsync);
-        App.MapGet($"{BaseUri}/{{userId}}/{{id}}", GetAsync);
-        App.MapGet($"{BaseUri}/tree/{{userId}}/{{isContainsInstrument}}", GetTreeAsync);
+        App.MapGet($"{BaseUri}/tree/{{isContainsInstrument}}", GetTreeAsync);
     }
 
-    public async Task<IEnumerable<DirectoryTreeDto>> GetTreeAsync([FromServices] IEventBus eventBus, Guid userId, bool isContainsInstrument)
+    public async Task<IEnumerable<DirectoryTreeDto>> GetTreeAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, bool isContainsInstrument)
     {
-        var query = new DirectoryTreeQuery(userId, isContainsInstrument);
+        var query = new DirectoryTreeQuery(userContext.GetUserId<Guid>(), isContainsInstrument);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
-    public async Task<DirectoryDto> GetAsync([FromServices] IEventBus eventBus, Guid userId, Guid id)
+    public async Task<DirectoryDto> GetAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, Guid id)
     {
-        var query = new DirectoryQuery(id, userId);
+        var query = new DirectoryQuery(id, userContext.GetUserId<Guid>());
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
-    public async Task AddAsync([FromServices] IEventBus eventBus, [FromBody] AddDirectoryDto param)
+    public async Task AddAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromBody] AddDirectoryDto param)
     {
-        var query = new AddDirectoryCommand(param.Name, param.Sort, param.ParentId, param.UserId);
-        await eventBus.PublishAsync(query);
+        var command = new AddDirectoryCommand(param.Name, param.Sort, param.ParentId, userContext.GetUserId<Guid>());
+        await eventBus.PublishAsync(command);
     }
 
-    public async Task UpdateAsync([FromServices] IEventBus eventBus, [FromBody] UpdateDirectoryDto param)
+    public async Task UpdateAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromBody] UpdateDirectoryDto param)
     {
-        var query = new UpdateDirectoryCommand(param.Id, param.Name, param.Sort, param.UserId);
-        await eventBus.PublishAsync(query);
+        var command = new UpdateDirectoryCommand(param.Id, param.Name, param.Sort, userContext.GetUserId<Guid>());
+        await eventBus.PublishAsync(command);
     }
 
-    public async Task DeleteAsync([FromServices] IEventBus eventBus, Guid id, Guid userId)
+    public async Task DeleteAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromQuery] Guid id)
     {
-        var query = new RemoveDirectoryCommand(id, userId);
-        await eventBus.PublishAsync(query);
+        var command = new RemoveDirectoryCommand(id, userContext.GetUserId<Guid>());
+        await eventBus.PublishAsync(command);
     }
 }

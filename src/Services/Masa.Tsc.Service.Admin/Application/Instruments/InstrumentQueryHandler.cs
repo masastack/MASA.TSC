@@ -52,7 +52,7 @@ public class InstrumentQueryHandler
     [EventHandler]
     public async Task Detail(InstrumentDetailQuery query)
     {
-        var dto = await _instrumentRepository.GetAsync(query.Id, query.UserId);
+        var dto = await _instrumentRepository.GetDetailAsync(query.Id, query.UserId);
 
         query.Result = new InstrumentDetailDto
         {
@@ -95,7 +95,7 @@ public class InstrumentQueryHandler
     [EventHandler]
     public async Task QueryPanels(PanelQuery query)
     {
-        var result = await _panelRepository.GetListAsync(t => t.InstrumentId == query.InstrumentId, nameof(Panel.Sort), false);
+        var result = await _panelRepository.GetListAsync(t => t.InstrumentId == query.InstrumentId, nameof(Panel.Index), false);
         if (result != null && result.Any())
             query.Result = result.Select(item => new PanelDto { }).ToList();
         else
