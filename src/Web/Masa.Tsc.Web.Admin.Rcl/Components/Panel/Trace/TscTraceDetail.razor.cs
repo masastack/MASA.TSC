@@ -53,7 +53,7 @@ public partial class TscTraceDetail
         _activeTreeItem = items.First();
     }
 
-    private List<TraceResponseTree> ToTree(IEnumerable<TraceResponseDto> items, TraceResponseTree? parent, long parentLeft = 0)
+    private List<TraceResponseTree> ToTree(IEnumerable<TraceResponseDto> items, TraceResponseTree? parent, TraceResponseTree? root = null, long parentLeft = 0)
     {
         int parentLevel = parent?.Level ?? 0;
         string? parentSpanId = parent?.SpanId;
@@ -73,7 +73,9 @@ public partial class TscTraceDetail
                 internalParentLeft += (long)Math.Ceiling((node.Timestamp - parent.Timestamp).TotalMilliseconds);
             }
 
-            var children = ToTree(items2, node, internalParentLeft).OrderBy(u => u.Timestamp).ToList();
+            root ??= node;
+
+            var children = ToTree(items2, node, root, internalParentLeft).OrderBy(u => u.Timestamp).ToList();
 
             if (children.Any())
             {
@@ -115,7 +117,7 @@ public partial class TscTraceDetail
             else if (parent is not null)
             {
                 Console.Out.WriteLine("internalParentLeft = {0}", internalParentLeft);
-                var marginLeft = internalParentLeft / (double)parent.Duration; // TODO:use top root duration!
+                var marginLeft = internalParentLeft / (double)root.Duration; // TODO:use top root duration!
 
                 var duration = (long)Math.Floor((node.EndTimestamp - node.Timestamp).TotalMilliseconds);
                 var durationPercent = (duration / (double)parent.Duration);
