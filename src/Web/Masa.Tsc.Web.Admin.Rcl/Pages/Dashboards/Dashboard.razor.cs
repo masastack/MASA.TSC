@@ -1,15 +1,14 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using System.ComponentModel.Design;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards;
 
 public partial class Dashboard
 {
-    private string? _search;
-    private int _page = 1;
-    private int _pageSize = 10;
+    string? _search;
+    int _page = 1;
+    int _pageSize = 10;
+    bool _expandAll = true;
 
     string Search
     {
@@ -43,7 +42,17 @@ public partial class Dashboard
         }
     }
 
-    public long Total { get; set; }
+    bool ExpandAll
+    {
+        get => Folders.Any(folder => folder.ISActive);
+        set 
+        {
+            Folders.ForEach(folder => folder.ISActive = value);
+            _expandAll = value; 
+        }
+    }
+
+    long Total { get; set; }
 
     IEnumerable<FolderDto> Folders { get; set; }
 
@@ -55,13 +64,17 @@ public partial class Dashboard
 
     Modes Mode { get; set; } = Modes.Folder;
 
-    public bool AddFolderDialogVisible { get; set; }
+    bool AddFolderDialogVisible { get; set; }
 
-    public bool AddDashboardDialogVisible { get; set; }
+    bool UpdateFolderDialogVisible { get; set; }
 
-    public bool UpdateDashboardDialogVisible { get; set; }
+    bool AddDashboardDialogVisible { get; set; }
 
-    public Guid CurrentDashboardId { get; set; }
+    bool UpdateDashboardDialogVisible { get; set; }
+
+    Guid CurrentDashboardId { get; set; }
+
+    Guid CurrentFolderId { get; set; }
 
     protected override string? PageName { get; set; } = "DashboardBlock";
 
@@ -170,6 +183,12 @@ public partial class Dashboard
         AddFolderDialogVisible = true;
     }
 
+    void OpenUpdateFolderDialog(FolderDto folder)
+    {
+        UpdateFolderDialogVisible = true;
+        CurrentFolderId = folder.Id;
+    }
+
     void OpenAddDashboardDialog()
     {
         AddDashboardDialogVisible = true;
@@ -197,11 +216,26 @@ public partial class Dashboard
         if (confirm) await RemoveDashboardAsync(dashboard.Id);
     }
 
-    async Task RemoveDashboardAsync(Guid apiResourceId)
+    async Task RemoveDashboardAsync(Guid dashboardId)
     {
         Loading = true;
         await Task.CompletedTask;
         OpenSuccessMessage(T("Delete dashboard data success"));
+        await GetFoldersAsync();
+        Loading = false;
+    }
+
+    async Task OpenRemoveFolderDialogAsync(FolderDto folder)
+    {
+        var confirm = await OpenConfirmDialog(T("Delete Folder"), T("Are you sure delete folder \"{0}\"?", folder.Name));
+        if (confirm) await RemoveDashboardAsync(folder.Id);
+    }
+
+    async Task RemoveFolderAsync(Guid folderId)
+    {
+        Loading = true;
+        await Task.CompletedTask;
+        OpenSuccessMessage(T("Delete folder data success"));
         await GetFoldersAsync();
         Loading = false;
     }

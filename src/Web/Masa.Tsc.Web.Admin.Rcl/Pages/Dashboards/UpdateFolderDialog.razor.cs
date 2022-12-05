@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards;
 
-public partial class UpdateDashboardDialog
+public partial class UpdateFolderDialog
 {
     [Parameter]
     public bool Visible { get; set; }
@@ -15,11 +15,11 @@ public partial class UpdateDashboardDialog
     public EventCallback OnSubmitSuccess { get; set; }
 
     [Parameter]
-    public Guid DashboardId { get; set; }
+    public Guid FolderId { get; set; }
 
     public MForm? Form { get; set; }
 
-    private UpdateDashboardDto Dashboard { get; set; } = new();
+    private UpdateFolderDto Folder { get; set; } = new();
 
     protected override string? PageName { get; set; } = "DashboardBlock";
 
@@ -34,7 +34,7 @@ public partial class UpdateDashboardDialog
     public async Task GetDashboardDetailAsync()
     {
         await Task.CompletedTask;
-        Dashboard = new();
+        Folder = new();
     }
 
     private async Task UpdateVisible(bool visible)
@@ -49,13 +49,13 @@ public partial class UpdateDashboardDialog
         }
     }
 
-    public async Task UpdatetDashboardAsync()
+    public async Task UpdateFolderAsync()
     {
         var success = Form!.Validate();
         if (success)
         {
             await Task.CompletedTask;
-            OpenSuccessMessage(T("Update dashboard data success"));
+            OpenSuccessMessage(T("Update folder data success"));
             await UpdateVisible(false);
             await OnSubmitSuccess.InvokeAsync();
         }

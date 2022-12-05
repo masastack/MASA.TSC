@@ -4,7 +4,7 @@
 <AutoHeight>
     <HeaderContent>
         <div class="d-flex mb-6">
-            <SLabeledRadioGroup TValue="Modes" @bind-Value=Mode Dense Class="mr-6" Style="border-width:1px;border-style: double;border-color:rgb(255 255 255 / 70%);">
+            <SLabeledRadioGroup TValue="Modes" @bind-Value=Mode Dense Class="mr-6 my-auto" Style="border-width:1px;border-style: double;border-color:rgb(255 255 255 / 70%);">
                 <SLabeledRadio Value="Modes.Folder">
                     <SIcon>@IconConstants.Folder</SIcon>
                 </SLabeledRadio>
@@ -12,11 +12,17 @@
                     <SIcon>@IconConstants.List</SIcon>
                 </SLabeledRadio>
             </SLabeledRadioGroup>
-            <SearchTextField @bind-Value="Search" Clearable FillBackground=false Style="flex:none;width: 300px !important;" />
+            @if (Mode is Modes.Folder)
+            {
+                <MButton Depressed Text Outlined Class="mr-6 my-auto" OnClick="() => ExpandAll = !ExpandAll">
+                    @(ExpandAll ? T("Close all") : T("Expend all"))
+                </MButton>
+            }
+            <SearchTextField @bind-Value="Search" Clearable FillBackground=false Class="my-auto" Style="flex:none;width: 300px !important;" />
             <MSpacer />
-            <SButton Icon OnClick=RefreshAsync Class="mr-6"><SIcon Tooltip="@T("Refresh")" Size=24>@IconConstants.Refresh</SIcon></SButton>
-            <SButton OnClick="OpenAddFolderDialog" Small Class="mr-6" Style="min-width:108px !important;">@T("Add folder")</SButton>
-            <SButton OnClick="OpenAddDashboardDialog" Small Style="min-width:140px !important;">@T("Add dashboard")</SButton>
+            <SButton Icon OnClick=RefreshAsync Class="mr-6 my-auto"><SIcon Tooltip="@T("Refresh")" Size=24>@IconConstants.Refresh</SIcon></SButton>
+            <SButton OnClick="OpenAddFolderDialog" Small Class="mr-6 my-auto" Style="min-width:108px !important;">@T("Add folder")</SButton>
+            <SButton OnClick="OpenAddDashboardDialog" Small Class="my-auto" Style="min-width:140px !important;">@T("Add dashboard")</SButton>
         </div>
     </HeaderContent>
     <AutoHeightContent>
@@ -61,7 +67,7 @@
                     {
                         <MListGroup PrependIcon="@IconConstants.Folder"
                                     NoAction
-                                    @bind-Value=folder.ISActive>
+                        @bind-Value=folder.ISActive>
                             <ActivatorContent>
                                 <MListItemContent>
                                     <MListItemTitle Class="h8">@folder.Name</MListItemTitle>
@@ -82,6 +88,11 @@
                                     </MListItem>
                                 }
                             </ChildContent>
+                            <AppendIconContent>
+                                <SButton Icon OnClick="() => OpenUpdateFolderDialog(folder)" StopPropagation><SIcon Tooltip="@T("Edit")" Style="transform: none !important">@IconConstants.Update</SIcon></SButton>
+                                <SButton Icon Color="red" OnClick="async () => await OpenRemoveFolderDialogAsync(folder)" StopPropagation><SIcon Tooltip="@T("Remove")" Color="red" Style="transform: none !important">@IconConstants.Remove</SIcon></SButton>
+                                <SIcon Size="28" Color="@(folder.ISActive ? "primary" : "")">@IconConstants.Down</SIcon>
+                            </AppendIconContent>
                         </MListGroup>
                     }
                 </MList>
@@ -96,3 +107,4 @@
 <AddFloderDialog @bind-Visible="AddFolderDialogVisible" OnSubmitSuccess=GetFoldersAsync />
 <AddDashboardDialog @bind-Visible="AddDashboardDialogVisible" OnSubmitSuccess=GetFoldersAsync />
 <UpdateDashboardDialog @bind-Visible="UpdateDashboardDialogVisible" DashboardId=CurrentDashboardId OnSubmitSuccess=GetFoldersAsync />
+<UpdateFolderDialog @bind-Visible="UpdateFolderDialogVisible" FolderId=CurrentFolderId OnSubmitSuccess=GetFoldersAsync />
