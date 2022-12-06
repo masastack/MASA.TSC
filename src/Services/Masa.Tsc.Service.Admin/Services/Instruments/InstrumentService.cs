@@ -1,23 +1,24 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Contracts.Admin.Dashboards;
+
 namespace Masa.Tsc.Service.Admin.Services.Instruments;
 
 public class InstrumentService : ServiceBase
 {
     public InstrumentService() : base("/api/Instrument")
     {
-        App.MapGet($"{BaseUri}/list/{{page}}/{{size}}/{{keyword}}", ListAsync);
-        App.MapPost($"{BaseUri}/set-root/{{id}}", SetRootAsync);
+        App.MapPost($"{BaseUri}/set-root/{{id}}/{{isRoot}}", SetRootAsync);
         App.MapPost($"{BaseUri}/set-panels-show-setting/", UpdatePanelsShowAsync);
     }
 
-    public async Task AddAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromBody] AddInstrumentDto model)
+    public async Task AddAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromBody] AddDashboardDto model)
     {
         await eventBus.PublishAsync(new AddInstrumentCommand(model, userContext.GetUserId<Guid>()));
     }
 
-    public async Task UpdateAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromBody] UpdateInstrumentDto model)
+    public async Task UpdateAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromBody] UpdateDashboardDto model)
     {
         await eventBus.PublishAsync(new UpdateInstrumentCommand(model, userContext.GetUserId<Guid>()));
     }
@@ -27,23 +28,30 @@ public class InstrumentService : ServiceBase
         await eventBus.PublishAsync(new RemoveInstrumentCommand(userContext.GetUserId<Guid>(), model.Ids.ToArray()));
     }
 
-    public async Task<PaginatedListBase<InstrumentListDto>> ListAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, int page, int size, string keyword)
+    public async Task<PaginatedListBase<InstrumentListDto>> GetListAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, int page, int size, string keyword)
     {
-        var query = new InstrumentQuery(userContext.GetUserId<Guid>(), keyword, page, size);
+        var query = new InstrumentListQuery(userContext.GetUserId<Guid>(), keyword, page, size);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
-    public async Task<InstrumentDetailDto> GetAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromQuery] Guid id)
+    public async Task<InstrumentDetailDto> GetDetailAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, Guid id)
     {
         var query = new InstrumentDetailQuery(userContext.GetUserId<Guid>(), id);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
-    public async Task SetRootAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromQuery] Guid id)
+    public async Task<UpdateDashboardDto> GetAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, Guid id)
     {
-        var command = new SetRootCommand(userContext.GetUserId<Guid>(), id);
+        var query = new InstrumentQuery(id, userContext.GetUserId<Guid>());
+        await eventBus.PublishAsync(query);
+        return query.Result;
+    }
+
+    public async Task SetRootAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, Guid id, bool isRoot = true)
+    {
+        var command = new SetRootCommand(id, isRoot, userContext.GetUserId<Guid>());
         await eventBus.PublishAsync(command);
     }
 

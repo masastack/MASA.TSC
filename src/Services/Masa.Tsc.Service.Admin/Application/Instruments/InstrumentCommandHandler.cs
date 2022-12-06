@@ -27,15 +27,15 @@ public class InstrumentCommandHandler
     [EventHandler]
     public async Task AddInstrumentAsync(AddInstrumentCommand command)
     {
-        var model = new Instrument(command.Data.Id)
+        var model = new Instrument
         {
             Name = command.Data.Name,
-            IsGlobal = command.Data.IsGlobal,
-            Layer = command.Data.Layer,
+            Layer = command.Data.Layer.ToString(),
             IsRoot = command.Data.IsRoot,
-            DirectoryId = command.Data.DirectoryId,
-            Model = command.Data.Model,
-            Sort = command.Data.Sort
+            DirectoryId = command.Data.Folder,
+            Model = command.Data.Model.ToString(),
+            Sort = command.Data.Order,
+            Lable = command.Data.Type.ToString()
         };
         await _instrumentRepository.AddAsync(model);
     }
@@ -65,7 +65,7 @@ public class InstrumentCommandHandler
     {
         var entry = await _instrumentRepository.GetAsync(command.Data.Id, command.UserId);
         if (entry == null)
-            throw new UserFriendlyException("数据不存在");
+            throw new UserFriendlyException($"instrument {command.Data.Id} is not exists");
         entry.Update(command.Data);
         await _instrumentRepository.UpdateAsync(entry);
     }
@@ -77,7 +77,7 @@ public class InstrumentCommandHandler
         if (instrument == null)
             throw new UserFriendlyException("数据不存在");
 
-        instrument.SetRoot();
+        instrument.SetRoot(command.IsRoot);
         await _instrumentRepository.UpdateAsync(instrument);
     }
 
@@ -86,7 +86,7 @@ public class InstrumentCommandHandler
     {
         var instrument = await _instrumentRepository.GetIncludePanelsAsync(command.Data.Id, command.UserId);
         if (instrument == null)
-            throw new UserFriendlyException("数据不存在");
+            throw new UserFriendlyException($"instrument {command.Data.Id} is not exists");
 
         instrument.UpdatePanelsShow(command.Data.Panels);
         await _instrumentRepository.UpdateAsync(instrument);
@@ -97,11 +97,11 @@ public class InstrumentCommandHandler
     {
         var instrument = await _instrumentRepository.GetIncludePanelsAsync(command.Data.InstrumentId, command.UserId);
         if (instrument == null)
-            throw new UserFriendlyException("数据不存在");
+            throw new UserFriendlyException($"instrument {command.Data.InstrumentId} is not exists");
 
         var panel = instrument.Panels.FirstOrDefault(p => p.Id == command.Data.Id);
         if (panel == null)
-            throw new UserFriendlyException("数据不存在");
+            throw new UserFriendlyException($"panel {command.Data.Id} is not exists");
         panel.Update(command.Data);
 
         await _instrumentRepository.UpdateAsync(instrument);

@@ -18,4 +18,13 @@ public partial class FolderSelect
     public bool Readonly { get; set; }
 
     protected List<FolderDto> Folders { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await ApiCaller.DirectoryService.GetListAsync(1, 999, isIncludeInstrument: false);
+        if (data.Result != null && data.Result.Any())
+            Folders = data.Result;
+
+        await base.OnInitializedAsync();
+    }
 }

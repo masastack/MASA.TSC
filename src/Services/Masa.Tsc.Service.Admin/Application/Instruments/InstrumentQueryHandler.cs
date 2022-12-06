@@ -19,7 +19,7 @@ public class InstrumentQueryHandler
     }
 
     [EventHandler]
-    public async Task Query(InstrumentQuery query)
+    public async Task Query(InstrumentListQuery query)
     {
         var result = await _instrumentRepository.GetPaginatedListAsync(Predicate(query), new PaginatedOptions
         {
@@ -38,7 +38,7 @@ public class InstrumentQueryHandler
         }
     }
 
-    private static Expression<Func<Instrument, bool>> Predicate(InstrumentQuery query)
+    private static Expression<Func<Instrument, bool>> Predicate(InstrumentListQuery query)
     {
         Expression<Func<Instrument, bool>> condition;
 
@@ -50,7 +50,7 @@ public class InstrumentQueryHandler
     }
 
     [EventHandler]
-    public async Task Detail(InstrumentDetailQuery query)
+    public async Task GetDetailAsync(InstrumentDetailQuery query)
     {
         var dto = await _instrumentRepository.GetDetailAsync(query.Id, query.UserId);
 
@@ -65,6 +65,25 @@ public class InstrumentQueryHandler
             Model = dto.Model,
             Sort = dto.Sort,
             Panels = ConvertPanels(dto.Panels, Guid.Empty)
+        };
+    }
+
+    [EventHandler]
+    public async Task GetAsync(InstrumentQuery query)
+    {
+        var instument = await _instrumentRepository.GetAsync(query.Id, query.UserId);
+        if (instument == null)
+            throw new UserFriendlyException($"instument {query.Id} is not exists");
+        query.Result = new()
+        {
+            Id = instument.Id,
+            Folder = instument.DirectoryId,
+            Name = instument.Name,
+            IsRoot = instument.IsRoot,
+            Layer = Enum.Parse<LayerTypes>(instument.Layer),
+            Model = Enum.Parse<ModelTypes>(instument.Model),
+            Type = Enum.Parse<LabelTypes>(instument.Lable),
+            Order = instument.Sort
         };
     }
 

@@ -132,10 +132,10 @@ public partial class TscInstrumentDetail
         }
         if (ParentId == Guid.Empty && _id != InstrumentId)
         {
-            var dto = await ApiCaller.InstrumentService.GetAsync(InstrumentId);
-            if (dto != null && dto.Panels != null)
-                Panels = dto.Panels;
-            _id = InstrumentId;
+            //var dto = await ApiCaller.InstrumentService.GetAsync(InstrumentId);
+            //if (dto != null && dto.Panels != null)
+            //    Panels = dto.Panels;
+            //_id = InstrumentId;
             _reload = true;
         }
         if (_reload)

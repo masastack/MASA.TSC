@@ -17,6 +17,8 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
 
     public bool IsRoot { get; set; }
 
+    public string Lable { get; set; }
+
     public Guid DirectoryId { get; set; }
 
     public bool IsGlobal { get; set; }
@@ -27,10 +29,13 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
 
     public Instrument() { }
 
-    public void Update(UpdateInstrumentDto pannel)
+    public void Update(UpdateDashboardDto pannel)
     {
         if (pannel.Name != Name)
             Name = pannel.Name;
+        Layer = pannel.Layer.ToString();
+        Model = pannel.Model.ToString();
+        Layer = pannel.Type.ToString();
     }
 
     public Panel AddPanel(PanelDto model)
@@ -68,9 +73,10 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
         }
     }
 
-    public void SetRoot()
+    public void SetRoot(bool isRoot)
     {
-        if (!IsRoot)
-            IsRoot = true;
+        if (IsRoot == isRoot)
+            return;
+        IsRoot = !IsRoot;
     }
 }

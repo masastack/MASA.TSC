@@ -5,4 +5,5 @@ namespace Masa.Tsc.Contracts.Admin.Dashboards;
 
 public class UpdateFolderDto : AddFolderDto
 {
+    public Guid Id { get; set; }
 }

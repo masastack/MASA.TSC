@@ -33,8 +33,7 @@ public partial class UpdateFolderDialog
 
     public async Task GetDashboardDetailAsync()
     {
-        await Task.CompletedTask;
-        Folder = new();
+        Folder = await ApiCaller.DirectoryService.GetAsync(FolderId);
     }
 
     private async Task UpdateVisible(bool visible)
@@ -54,7 +53,7 @@ public partial class UpdateFolderDialog
         var success = Form!.Validate();
         if (success)
         {
-            await Task.CompletedTask;
+            await ApiCaller.DirectoryService.UpdateAsync(Folder);
             OpenSuccessMessage(T("Update folder data success"));
             await UpdateVisible(false);
             await OnSubmitSuccess.InvokeAsync();

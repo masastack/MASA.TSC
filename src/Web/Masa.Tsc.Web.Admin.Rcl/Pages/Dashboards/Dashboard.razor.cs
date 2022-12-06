@@ -17,6 +17,10 @@ public partial class Dashboard
         {
             _search = value;
             _page = 1;
+            var isNeedExpand = !string.IsNullOrEmpty(value);
+            if (isNeedExpand | ExpandAll)
+                ExpandAll = isNeedExpand;
+
             GetFoldersAsync().ContinueWith(_ => InvokeAsync(StateHasChanged));
         }
     }
@@ -45,18 +49,18 @@ public partial class Dashboard
     bool ExpandAll
     {
         get => Folders.Any(folder => folder.ISActive);
-        set 
+        set
         {
             Folders.ForEach(folder => folder.ISActive = value);
-            _expandAll = value; 
+            _expandAll = value;
         }
     }
 
     long Total { get; set; }
 
-    IEnumerable<FolderDto> Folders { get; set; }
+    IEnumerable<FolderDto> Folders { get; set; } = new List<FolderDto>();
 
-    IEnumerable<DashboardDto> Dashboards => Folders.SelectMany(folder => 
+    IEnumerable<DashboardDto> Dashboards => Folders.SelectMany(folder =>
     {
         folder.Dashboards.ForEach(dashboard => dashboard.Folder = folder);
         return folder.Dashboards;
@@ -86,76 +90,9 @@ public partial class Dashboard
     async Task GetFoldersAsync()
     {
         Loading = true;
-        //todo search 
-        Folders = new List<FolderDto> 
-        {
-            new FolderDto
-            {
-                Id = Guid.NewGuid(),
-                Name ="订单",
-                Dashboards = new List<DashboardDto>
-                {
-                    new DashboardDto
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "历史订单",
-                        IsRoot = true,
-                        Layer = LayerTypes.K8s,
-                        Model = ModelTypes.Service
-                    },
-                    new DashboardDto
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "当日订单",
-                        IsRoot = true,
-                        Layer = LayerTypes.Mesh,
-                        Model = ModelTypes.ProcessRelation
-                    },
-                    new DashboardDto
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "亏损订单",
-                        IsRoot = true,
-                        Layer = LayerTypes.Mysql,
-                        Model = ModelTypes.Endpoint
-                    }
-                }
-            },
-           new FolderDto
-            {
-                Id = Guid.NewGuid(),
-                Name ="用户",
-                Dashboards = new List<DashboardDto>
-                {
-                    new DashboardDto
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "所有用户",
-                        IsRoot = false,
-                        Layer = LayerTypes.VirtualGateway,
-                        Model = ModelTypes.All
-                    },
-                    new DashboardDto
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "员工",
-                        IsRoot = false,
-                        Layer = LayerTypes.Mq,
-                        Model = ModelTypes.EndpointRelation
-                    },
-                    new DashboardDto
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "第三方用户",
-                        IsRoot = true,
-                        Layer = LayerTypes.Mysql,
-                        Model = ModelTypes.Endpoint
-                    }
-                }
-            }
-        };
-        Total = 6;
-        await Task.CompletedTask;
+        var result = await ApiCaller.DirectoryService.GetListAsync(Page, PageSize, Search);
+        Folders = result.Result ?? new();
+        Total = result.Total;
         Loading = false;
     }
 
@@ -166,7 +103,7 @@ public partial class Dashboard
         new() { Text = T(nameof(DashboardDto.Layer)), Value = nameof(DashboardDto.Layer), Sortable = false },
         new() { Text = T(nameof(DashboardDto.Model)), Value = nameof(DashboardDto.Model), Sortable = false },
         new() { Text = T(nameof(DashboardDto.IsRoot)), Value = nameof(DashboardDto.IsRoot), Sortable = false },
-        new() { Text = T("Action"), Value = "Action", Sortable = false, Align = DataTableHeaderAlign.Center, Width="105px" },
+        new() { Text = T("Action"), Value = "Action", Sortable = false, Align = DataTableHeaderAlign.Center, Width = "105px" },
     };
 
     async Task RefreshAsync()
@@ -204,7 +141,7 @@ public partial class Dashboard
     {
         Loading = true;
         dashboard.IsRoot = !dashboard.IsRoot;
-        await Task.CompletedTask;
+        await ApiCaller.InstrumentService.SetRootAsync(dashboard.Id, dashboard.IsRoot);
         OpenSuccessMessage(T("Action success"));
         await GetFoldersAsync();
         Loading = false;
@@ -219,7 +156,7 @@ public partial class Dashboard
     async Task RemoveDashboardAsync(Guid dashboardId)
     {
         Loading = true;
-        await Task.CompletedTask;
+        await ApiCaller.InstrumentService.DeleteAsync(dashboardId);
         OpenSuccessMessage(T("Delete dashboard data success"));
         await GetFoldersAsync();
         Loading = false;
@@ -228,13 +165,13 @@ public partial class Dashboard
     async Task OpenRemoveFolderDialogAsync(FolderDto folder)
     {
         var confirm = await OpenConfirmDialog(T("Delete Folder"), T("Are you sure delete folder \"{0}\"?", folder.Name));
-        if (confirm) await RemoveDashboardAsync(folder.Id);
+        if (confirm) await RemoveFolderAsync(folder.Id);
     }
 
     async Task RemoveFolderAsync(Guid folderId)
     {
         Loading = true;
-        await Task.CompletedTask;
+        await ApiCaller.DirectoryService.DeleteAsync(folderId);
         OpenSuccessMessage(T("Delete folder data success"));
         await GetFoldersAsync();
         Loading = false;
