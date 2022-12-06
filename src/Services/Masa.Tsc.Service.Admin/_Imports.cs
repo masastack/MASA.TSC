@@ -4,7 +4,6 @@
 global using Masa.BuildingBlocks.Authentication.Identity;
 global using Masa.BuildingBlocks.Caching;
 global using Masa.BuildingBlocks.Configuration;
-global using Masa.BuildingBlocks.Data;
 global using Masa.BuildingBlocks.Data.UoW;
 global using Masa.BuildingBlocks.Ddd.Domain.Entities;
 global using Masa.BuildingBlocks.Ddd.Domain.Entities.Full;
@@ -64,6 +63,7 @@ global using Masa.Utils.Data.Elasticsearch;
 global using Masa.Utils.Data.Prometheus;
 global using Masa.Utils.Data.Prometheus.Enums;
 global using Masa.Utils.Data.Prometheus.Model;
+global using Masa.Utils.Models;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;
