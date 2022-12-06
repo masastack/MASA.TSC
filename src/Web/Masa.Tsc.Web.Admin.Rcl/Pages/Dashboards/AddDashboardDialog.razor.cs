@@ -45,7 +45,7 @@ public partial class AddDashboardDialog
         var success = Form!.Validate();
         if (success)
         {
-            await Task.CompletedTask;
+            await ApiCaller.InstrumentService.AddAsync(Dashboard);
             OpenSuccessMessage(T("Add dashboard data success"));
             await UpdateVisible(false);
             await OnSubmitSuccess.InvokeAsync();

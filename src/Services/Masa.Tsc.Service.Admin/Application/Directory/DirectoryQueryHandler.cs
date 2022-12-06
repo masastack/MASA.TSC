@@ -1,6 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Contracts.Admin.Dashboards;
+using Masa.Tsc.Service.Admin.Application.Directory.Queries;
+
 namespace Masa.Tsc.Service.Admin.Application.Instruments;
 
 public class DirectoryQueryHandler
@@ -15,21 +18,42 @@ public class DirectoryQueryHandler
     }
 
     [EventHandler]
+    public async Task GetListAsync(DirectoryListQuery query)
+    {
+        var data = await _directoryRepository.GetListIncludeInstrumentsAsync(query.UserId, query.Page, query.PageSize, query.Keyword, query.IsIncludeInstrument);
+        if (data.Item2 == null || !data.Item2.Any())
+            query.Result = new PaginatedListBase<FolderDto>();
+        else
+            query.Result = new PaginatedListBase<FolderDto>
+            {
+                Result = data.Item2.Select(directory => new FolderDto
+                {
+                    Id = directory.Id,
+                    Name = directory.Name,
+                    Dashboards = directory.Instruments?.Select(instrument => new DashboardDto
+                    {
+                        Id = instrument.Id,
+                        Name = instrument.Name,
+                        IsRoot = instrument.IsRoot,
+                        Layer = Enum.Parse<LayerTypes>(instrument.Layer),
+                        Model = Enum.Parse<ModelTypes>(instrument.Model)
+                    })?.ToList()!
+                }).ToList(),
+                Total = data.Item1
+            };
+    }
+
+    [EventHandler]
     public async Task GetAsync(DirectoryQuery query)
     {
-        var directory = await _directoryRepository.FindAsync(t => t.Id == query.Id);
+        var directory = await _directoryRepository.FindAsync(m => m.Id == query.Id);
         if (directory == null)
-            throw new UserFriendlyException($"directory \"{query.Id}\" is not exists");
-
-        if (directory.UserId != Guid.Empty && directory.UserId != query.UserId)
-            throw new UserFriendlyException($"directory \"{query.Id}\" is denied");
+            throw new UserFriendlyException($"directory {query.Id} is not exists");
 
         query.Result = new()
         {
             Id = directory.Id,
-            ParentId = directory.ParentId,
-            Name = directory.Name,
-            Sort = directory.Sort
+            Name = directory.Name
         };
     }
 
@@ -42,7 +66,7 @@ public class DirectoryQueryHandler
             query.Result = Array.Empty<DirectoryTreeDto>();
             return;
         }
-        list = list.OrderBy(t => t.ParentId).ThenBy(t => t.Sort).ToList();
+        list = list.OrderBy(t => t.ParentId).ThenBy(t => t.Name).ToList();
         query.Result = ToTree(list, Guid.Empty);
         if (query.IsContainsInstrument)
         {
@@ -83,7 +107,7 @@ public class DirectoryQueryHandler
                 Id = item.Id,
                 ParentId = parentId,
                 Name = item.Name,
-                Sort = item.Sort,
+                //Sort = item.Sort,
                 DirectoryType = DirectoryTypes.Directory,
                 Children = ToTree(directories, item.Id)
             };

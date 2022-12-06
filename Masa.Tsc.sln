@@ -40,8 +40,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Tsc.Service.Admin", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Tsc.Web.Admin.Wasm", "src\Web\Masa.Tsc.Web.Admin.Wasm\Masa.Tsc.Web.Admin.Wasm.csproj", "{192AE8AB-9E20-44CB-895C-4F981179F92A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Stack.Components", "..\wuweilai\project\MASA.Stack.Components\src\Masa.Stack.Components\Masa.Stack.Components.csproj", "{6DB1AD32-0B90-49C5-9507-90B14CB9C8CD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -45,7 +45,7 @@ public partial class AddFloderDialog
         var success = Form!.Validate();
         if (success)
         {
-            await Task.CompletedTask;
+            await ApiCaller.DirectoryService.AddAsync(Folder);
             OpenSuccessMessage(T("Add folder data success"));
             await UpdateVisible(false);
             await OnSubmitSuccess.InvokeAsync();

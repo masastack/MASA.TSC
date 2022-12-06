@@ -33,8 +33,7 @@ public partial class UpdateDashboardDialog
 
     public async Task GetDashboardDetailAsync()
     {
-        await Task.CompletedTask;
-        Dashboard = new();
+        Dashboard = await ApiCaller.InstrumentService.GetAsync(DashboardId);
     }
 
     private async Task UpdateVisible(bool visible)
@@ -54,7 +53,7 @@ public partial class UpdateDashboardDialog
         var success = Form!.Validate();
         if (success)
         {
-            await Task.CompletedTask;
+            await ApiCaller.InstrumentService.UpdateAsync(Dashboard);
             OpenSuccessMessage(T("Update dashboard data success"));
             await UpdateVisible(false);
             await OnSubmitSuccess.InvokeAsync();

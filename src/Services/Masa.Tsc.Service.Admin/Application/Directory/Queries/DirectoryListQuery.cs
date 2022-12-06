@@ -5,7 +5,7 @@ using Masa.Tsc.Contracts.Admin.Dashboards;
 
 namespace Masa.Tsc.Service.Admin.Application.Directory.Queries;
 
-public record DirectoryQuery(Guid Id, Guid UserId) : Query<UpdateFolderDto>
+public record DirectoryListQuery(Guid UserId, int Page, int PageSize, string Keyword, bool IsIncludeInstrument = true) : Query<PaginatedListBase<FolderDto>>
 {
-    public override UpdateFolderDto Result { get; set; }
+    public override PaginatedListBase<FolderDto> Result { get; set; }
 }

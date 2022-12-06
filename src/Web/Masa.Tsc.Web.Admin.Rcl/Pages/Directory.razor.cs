@@ -192,11 +192,7 @@ public partial class Directory : IDisposable
         }
         else
         {
-            await ApiCaller.InstrumentService.DeleteAsync(new CommonRemoveDto<Guid>
-            {
-                Ids = new Guid[] { item.Id },
-                UserId = CurrentUserId
-            });
+            await ApiCaller.InstrumentService.DeleteAsync(item.Id);
         }
 
         await PopupService.ToastAsync("delete success", AlertTypes.Success);
