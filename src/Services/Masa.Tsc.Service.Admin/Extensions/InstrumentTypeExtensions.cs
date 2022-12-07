@@ -35,7 +35,7 @@ internal static class InstrumentTypeExtensions
         result.Height = panel.Height;
         result.Width = panel.Width;
         result.InstrumentId = panel.InstrumentId;
-        result.Sort = panel.Sort;
+        result.Sort = panel.Index;
         result.Type = panel.Type;
         result.Description = panel.Description;
         return result;

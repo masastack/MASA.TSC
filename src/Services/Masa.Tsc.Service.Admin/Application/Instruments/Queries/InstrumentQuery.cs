@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Queries;
 
-public record InstrumentQuery(Guid UserId, string Keyword, int Page, int Size) : Query<PaginatedListBase<InstrumentListDto>>
+public record InstrumentQuery(Guid Id,Guid UserId) : Query<UpdateDashboardDto>
 {
-    public override PaginatedListBase<InstrumentListDto> Result { get; set; }
+    public override UpdateDashboardDto Result { get; set; }
 }

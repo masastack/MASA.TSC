@@ -87,15 +87,13 @@ namespace Masa.Tsc.Service.Admin.Migrations
                     b.Property<Guid>("ParentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Sort")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -125,6 +123,11 @@ namespace Masa.Tsc.Service.Admin.Migrations
 
                     b.Property<bool>("IsRoot")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Lable")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
 
                     b.Property<string>("Layer")
                         .IsRequired()
@@ -178,19 +181,27 @@ namespace Masa.Tsc.Service.Admin.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Index")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("InstrumentId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Left")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("ParentId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Sort")
-                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Top")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");

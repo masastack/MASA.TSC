@@ -1,9 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+global using Masa.BuildingBlocks.Authentication.Identity;
 global using Masa.BuildingBlocks.Caching;
 global using Masa.BuildingBlocks.Configuration;
-global using Masa.BuildingBlocks.Data;
 global using Masa.BuildingBlocks.Data.UoW;
 global using Masa.BuildingBlocks.Ddd.Domain.Entities;
 global using Masa.BuildingBlocks.Ddd.Domain.Entities.Full;
@@ -33,10 +33,13 @@ global using Masa.Contrib.Service.Caller.Authentication.OpenIdConnect;
 global using Masa.Contrib.StackSdks.Tsc.Elasticsearch.Constants;
 global using Masa.Contrib.StackSdks.Tsc.Elasticsearch.Model;
 global using Masa.Tsc.Contracts.Admin;
+global using Masa.Tsc.Contracts.Admin.Dashboards;
 global using Masa.Tsc.Contracts.Admin.Enums;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Const;
 global using Masa.Tsc.Contracts.Admin.Instruments;
+global using Masa.Tsc.Contracts.Admin.Instruments.Panel;
 global using Masa.Tsc.Contracts.Admin.Topologies;
+global using Masa.Tsc.Service.Admin.Application.Directory.Queries;
 global using Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 global using Masa.Tsc.Service.Admin.Application.Instruments.Queries;
 global using Masa.Tsc.Service.Admin.Application.Logs;
@@ -60,6 +63,7 @@ global using Masa.Utils.Data.Elasticsearch;
 global using Masa.Utils.Data.Prometheus;
 global using Masa.Utils.Data.Prometheus.Enums;
 global using Masa.Utils.Data.Prometheus.Model;
+global using Masa.Utils.Models;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;
