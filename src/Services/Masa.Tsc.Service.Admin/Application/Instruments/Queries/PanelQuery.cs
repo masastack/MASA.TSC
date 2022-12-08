@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Queries;
 
-public record PanelQuery(Guid InstrumentId) : Query<List<PanelDto>>
+public record PanelQuery(Guid InstrumentId,Guid UserId) : Query<List<PanelDto>>
 {
     public override List<PanelDto> Result { get; set; }
 }

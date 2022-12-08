@@ -5,5 +5,11 @@ namespace Masa.Tsc.Service.Admin.Domain.Repositories;
 
 public interface IInstrumentRepository : IRepository<Instrument>
 {
-    Task<Instrument> GetAsync(Guid Id,Guid userId);
+    Task<Instrument> GetAsync(Guid id, Guid userId);
+
+    Task<List<Instrument>> GetListAsync(IEnumerable<Guid >ids, Guid userId);
+
+    Task<Instrument> GetDetailAsync(Guid Id, Guid userId);
+
+    Task<Instrument> GetIncludePanelsAsync(Guid Id, Guid userId);    
 }

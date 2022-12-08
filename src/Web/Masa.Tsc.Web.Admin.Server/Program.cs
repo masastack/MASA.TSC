@@ -33,7 +33,6 @@ string pmUrl = config.GetValue<string>("$public.AppSettings:PmClient:Url");
 builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl, pmUrl).AddMasaOpenIdConnect(oidc);
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSingleton<TokenProvider>();
 builder.Services.AddTscApiCaller(tscUrl);
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);

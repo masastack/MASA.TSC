@@ -3,4 +3,4 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 
-public record UpdatePanelCommand(PanelDto Data):Command;
+public record UpdatePanelCommand(PanelDto Data, Guid InstrumentId, Guid UserId) : Command;

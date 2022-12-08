@@ -26,43 +26,43 @@ public partial class DirectoryDetail
 
     protected override async Task OnParametersSetAsync()
     {
-        if (DirectoryId != Guid.Empty)
-        {
-            if (_model.Id != DirectoryId)
-            {
-                var data = await ApiCaller.DirectoryService.GetAsync(CurrentUserId, DirectoryId);
-                if (data != null)
-                {
-                    _model.Id = DirectoryId;
-                    _model.ParentId = data.ParentId;
-                    _model.Name = data.Name;
-                    _model.Sort = data.Sort;
-                    _model.UserId = CurrentUserId;
-                }
-                else
-                {
-                    await PopupService.AlertAsync($"${DirectoryId} is not exists", AlertTypes.Error);
-                }
-            }
-        }
-        else
-        {
-            _model.Id = DirectoryId;
-            _model.ParentId = ParentId;
-            _model.UserId = CurrentUserId;
-            _model.Name = default!;
-            _model.Sort = default!;
-        }
+        //if (DirectoryId != Guid.Empty)
+        //{
+        //    if (_model.Id != DirectoryId)
+        //    {
+        //        var data = await ApiCaller.DirectoryService.GetAsync(DirectoryId);
+        //        if (data != null)
+        //        {
+        //            _model.Id = DirectoryId;
+        //            _model.ParentId = data.ParentId;
+        //            _model.Name = data.Name;
+        //            //_model.Sort = data.Sort;
+        //            _model.UserId = CurrentUserId;
+        //        }
+        //        else
+        //        {
+        //            await PopupService.AlertAsync($"${DirectoryId} is not exists", AlertTypes.Error);
+        //        }
+        //    }
+        //}
+        //else
+        //{
+        //    _model.Id = DirectoryId;
+        //    _model.ParentId = ParentId;
+        //    _model.UserId = CurrentUserId;
+        //    _model.Name = default!;
+        //    _model.Sort = default!;
+        //}
         await base.OnParametersSetAsync();
     }
 
     private async Task SaveAsync()
     {
-        if (_model.Id.Equals(Guid.Empty))
-            await ApiCaller.DirectoryService.AddAsync(_model);
-        else
-            await ApiCaller.DirectoryService.UpdateAsync(_model);
-        if (SuccessFn is not null)
-            await SuccessFn.Invoke(new());
+        //if (_model.Id.Equals(Guid.Empty))
+        //    await ApiCaller.DirectoryService.AddAsync(_model);
+        //else
+        //    await ApiCaller.DirectoryService.UpdateAsync(_model);
+        //if (SuccessFn is not null)
+        //    await SuccessFn.Invoke(new());
     }
 }

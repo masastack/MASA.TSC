@@ -9,7 +9,7 @@ public class DirectoryEntityTypeConfiguration : IEntityTypeConfiguration<Domain.
     {
         builder.HasKey(x => x.Id);
         builder.HasIndex(x => x.UserId);
-        builder.Property(x => x.Sort).HasDefaultValue(0);
         builder.Property(x => x.Name).HasMaxLength(200);
+        builder.HasIndex(x => x.Name).IsUnique();
     }
 }

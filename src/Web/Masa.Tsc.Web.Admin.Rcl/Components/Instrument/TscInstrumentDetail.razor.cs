@@ -132,10 +132,10 @@ public partial class TscInstrumentDetail
         }
         if (ParentId == Guid.Empty && _id != InstrumentId)
         {
-            var dto = await ApiCaller.InstrumentService.GetAsync(CurrentUserId, InstrumentId);
-            if (dto != null && dto.Panels != null)
-                Panels = dto.Panels;
-            _id = InstrumentId;
+            //var dto = await ApiCaller.InstrumentService.GetAsync(InstrumentId);
+            //if (dto != null && dto.Panels != null)
+            //    Panels = dto.Panels;
+            //_id = InstrumentId;
             _reload = true;
         }
         if (_reload)
@@ -171,7 +171,7 @@ public partial class TscInstrumentDetail
         _editPanel = null;
         if (values != null && values.Length > 0 && values[0] is PanelDto panel)
         {
-            var find = _mDragZone.Items.FirstOrDefault(x => (Guid)x.Attributes["key"] == panel.Id);           
+            var find = _mDragZone.Items.FirstOrDefault(x => (Guid)x.Attributes["key"] == panel.Id);
             if (command == OperateCommand.Success)
             {
                 if (find == null)
@@ -254,12 +254,12 @@ public partial class TscInstrumentDetail
         newItem.Id = item.Id;
         _mDragZone.Items.Insert(sorttableEventArgs.NewIndex, newItem);
 
-        await ApiCaller.PanelService.UpdateParentAsync(panel.Id, ParentId, CurrentUserId);
-        await ApiCaller.PanelService.UpdateSortAsync(CurrentUserId, new UpdatePanelsSortDto { 
-             InstrumentId = InstrumentId,
-            ParentId = ParentId,
-            PanelIds=Panels.Select(t=>t.Id).ToList()
-        });
+        //await ApiCaller.PanelService.UpdateParentAsync(panel.Id, ParentId, CurrentUserId);
+        //await ApiCaller.PanelService.UpdateSortAsync(CurrentUserId, new UpdatePanelsSortDto { 
+        //     InstrumentId = InstrumentId,
+        //    ParentId = ParentId,
+        //    PanelIds=Panels.Select(t=>t.Id).ToList()
+        //});
 
         //var item = _items.FirstOrDefault(t => t.Id == sorttableEventArgs.ItemId);
         //if (item != null)
@@ -284,12 +284,12 @@ public partial class TscInstrumentDetail
             if (panel != null)
                 Panels.Remove(panel);
 
-            await ApiCaller.PanelService.UpdateSortAsync(CurrentUserId, new UpdatePanelsSortDto
-            {
-                InstrumentId = InstrumentId,
-                ParentId = ParentId,
-                PanelIds = Panels.Select(t => t.Id).ToList()
-            });
+            //await ApiCaller.PanelService.UpdateSortAsync(CurrentUserId, new UpdatePanelsSortDto
+            //{
+            //    InstrumentId = InstrumentId,
+            //    ParentId = ParentId,
+            //    PanelIds = Panels.Select(t => t.Id).ToList()
+            //});
         }
     }
 
