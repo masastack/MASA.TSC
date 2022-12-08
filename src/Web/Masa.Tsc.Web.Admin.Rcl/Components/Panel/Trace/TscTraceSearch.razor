@@ -1,54 +1,54 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<MRow Class="d-flex">
-    <MAutocomplete Label="Service"
+<div class="d-flex mb-6">
+    <SAutoComplete Label="Service"
                    Items="_services"
-                   Value="_service"
+                   @bind-Value="_service"
                    TItem=string
                    TValue=string
-                   ItemText="item=>item"
-                   ItemValue="item=>item"
+                   ItemText="item => item"
+                   ItemValue="item => item"
                    TItemValue=string
-                   Solo
-                   Dense
-                   Class="rounded-0"
-                   OnSearchInputUpdate="@(async item=>await UpdateSearchInputAsync(1,item))"
-                   @*OnSelectedItemUpdate="@(async item=>await UpdateItemAsync(1,item))" *@
-                   ValueChanged="@(async item=>await UpdateItemAsync(1,item))"></MAutocomplete>
-    <MAutocomplete Label="Instance"
+                   Small
+                   Class="mr-6"
+                   Style="max-width: 160px"
+                   OnSearchInputUpdate="@SearchServices"
+                   OnSelectedItemUpdate="Search">
+    </SAutoComplete>
+
+    <SAutoComplete Label="Instance"
                    Items="_instances"
-                   Value="_instance"
+                   @bind-Value="_instance"
                    TItem=string
                    TValue=string
-                   ItemText="item=>item"
-                   ItemValue="item=>item"
+                   ItemText="item => item"
+                   ItemValue="item => item"
                    TItemValue=string
-                   Solo
-                   Dense
-                   Class="rounded-0"
-                   OnSearchInputUpdate="@(async item=>await UpdateSearchInputAsync(2,item))"
-                   @*OnSelectedItemUpdate="@(async item=>await UpdateItemAsync(2,item))" *@
-                   ValueChanged="@(async item=>await UpdateItemAsync(2,item))"></MAutocomplete>
-    <MAutocomplete Label="Endpoint"
-                   Loading="_isLoading"
+                   Small
+                   Class="mr-6"
+                   Style="max-width: 160px"
+                   Disabled="@(string.IsNullOrWhiteSpace(_service))"
+                   OnSearchInputUpdate="@SearchInstances"
+                   OnSelectedItemUpdate="Search">
+    </SAutoComplete>
+
+    <SAutoComplete Label="Endpoint"
                    Items="_endpoints"
-                   Value="_endpoint"
+                   @bind-Value="_endpoint"
                    TItem=string
                    TValue=string
-                   ItemText="item=>item"
-                   ItemValue="item=>item"
+                   ItemText="item => item"
+                   ItemValue="item => item"
                    TItemValue=string
-                   OnSearchInputUpdate="@(async item=>await UpdateSearchInputAsync(3,item))"
-                   @*OnSelectedItemUpdate="@(async item=>await UpdateItemAsync(3,item))" *@
-                   ValueChanged="@(async item=>await UpdateItemAsync(3,item))"
-                   Solo
-                   Dense
-                   Class="rounded-0"></MAutocomplete>
-    <SearchTextField Label="TraceId/Search" Value="@_keyword" Solo Dense Class="rounded-0 flex-column-4"
-                     ValueChanged="@((value)=>ValueChange("keyword",value))"></SearchTextField>
-    <SDateTimeRangePicker Class="ma-0 pa-0 pt-2 pl-2" StartTime="_start" EndTime="_end"
-                          StartTimeChanged="@((value)=>ValueChange("start",value!))"
-                          EndTimeChanged="@((value)=>ValueChange("end",value!))" />
-    <MButton OnClick="SearchAsync" Loading="_isSearching" Class="rounded-0">Query</MButton>
-</MRow>
+                   OnSearchInputUpdate="@SearchEndpoints"
+                   Small
+                   Disabled="@(string.IsNullOrWhiteSpace(_service))"
+                   Style="max-width: 160px"
+                   OnSelectedItemUpdate="Search">
+    </SAutoComplete>
+
+    <MSpacer></MSpacer>
+
+    <SSearch Value="@_keyword" ValueChanged="KeywordChanged"></SSearch>
+</div>

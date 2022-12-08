@@ -1,8 +1,8 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<MContainer>
-    <TscTraceSearch OnSearchAsync="SearchAsync"></TscTraceSearch>
-    <TscTraceChart Query="_query" @ref="_chart"></TscTraceChart>
-    <TscTraceList Query="_query" @ref="_list"></TscTraceList>
-</MContainer>
+<TscTraceSearch OnQueryUpdate="Search"></TscTraceSearch>
+
+<TscTraceChart OnDateTimeRangeUpdate="Search"></TscTraceChart>
+
+<TscTraceList OnPaginationUpdate="Search" SearchResult="_queryResult"></TscTraceList>
