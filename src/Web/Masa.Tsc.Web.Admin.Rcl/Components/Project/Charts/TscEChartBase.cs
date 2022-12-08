@@ -10,13 +10,14 @@ public partial class TscEChartBase : TscComponentBase
     internal async Task OnLoadAsync(ProjectAppSearchModel query)
     {
         await LoadAsync(query);
+        await Task.Delay(200);
         _isLoading = false;
         StateHasChanged();
     }
 
     internal virtual async Task LoadAsync(ProjectAppSearchModel query)
     {
-        Thread.Sleep(200);
+        await Task.Delay(200);
         await Task.CompletedTask;
     }
 }

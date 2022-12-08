@@ -1,24 +1,22 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscEChartBase
 
-<MCard Class="flex-col col-3 ma-0 pa-0">
-    <MCardText Class="ma-0 pa-0">
+<MCard Width="Width" Height="Height" Class="d-flex flex-column rounded-lg">
+    <MCardTitle Class="d-flex justify-space-between">
+        <MLabel Class="emphasis2--text h6">@Title</MLabel>
+        <MLabel Class="emphasis2--text h6">@Total</MLabel>
+    </MCardTitle>
+    <MCardText Class="flex-grow-1">
         @if (_isLoading)
         {
             @("Loading ...")
         }
         else
         {
-            <MRow Class="ma-0 pa-0">
-                <MCol Cols="4">
-                    <div>@Title</div>
-                    <div>@Total</div>
-                    <div>@SubText</div>
-                </MCol>
-                <MCol Cols="8" Class="ma-0 pa-0">
-                    <MECharts Option="_options" Width="Width" Height="Height"></MECharts>
-                </MCol>
-            </MRow>
+            <MECharts Option="_options.Option" Width="@("100%")" Height="@("100%")"></MECharts>
         }
     </MCardText>
+    <MCardActions Class="regular3--text body2">
+        @SubText
+    </MCardActions>
 </MCard>

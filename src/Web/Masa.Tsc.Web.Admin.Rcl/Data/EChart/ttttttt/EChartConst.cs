@@ -7,6 +7,13 @@ internal static class EChartConst
 {
     #region init json
     private const string BarBasicJson = @"{
+  ""grid"": {
+    ""show"": false,
+    ""top"": 20,
+    ""bottom"": 20,
+    ""left"": 40,
+    ""right"": 20
+  },
 ""xAxis"": {
     ""type"": ""category"",
     ""data"": [""Mon"", ""Tue"", ""Wed"", ""Thu"", ""Fri"", ""Sat"", ""Sun""]
@@ -16,12 +23,20 @@ internal static class EChartConst
   },
   ""series"": [
     {
+      ""name"":""2022"",
       ""data"": [120, 200, 150, 80, 70, 110, 130],
       ""type"": ""bar""
     }
   ]
 }";
     private const string LineBasicJson = @"{
+ ""grid"": {
+    ""show"": false,
+    ""top"": 20,
+    ""bottom"": 20,
+    ""left"": 40,
+    ""right"": 20
+  },
   ""xAxis"": {
     ""type"": ""category"",
     ""data"": [""Mon"", ""Tue"", ""Wed"", ""Thu"", ""Fri"", ""Sat"", ""Sun""]
@@ -37,9 +52,6 @@ internal static class EChartConst
   ]
 }";
     private const string LineAreaBasicJson = @"{
-  ""title"": {
-    ""text"": ""Stacked Area Chart""
-  },
   ""tooltip"": {
     ""trigger"": ""axis"",
     ""axisPointer"": {
@@ -133,11 +145,6 @@ internal static class EChartConst
   ]
 }";
     private const string PieBasicJson = @"{
-  ""title"": {
-    ""text"": ""Referer of a Website"",
-    ""subtext"": ""Fake Data"",
-    ""left"": ""center""
-  },
   ""tooltip"": {
     ""trigger"": ""item""
   },
@@ -189,20 +196,47 @@ internal static class EChartConst
 }";
     #endregion
 
-    public static EChartType Bar { get; }
-    public static EChartType Pie { get; }
-    public static EChartType Line { get; }
-    public static EChartType Gauge { get; }
-    public static EChartType Heatmap { get; }
-    public static EChartType LineArea { get; }
-
-    static EChartConst()
+    public static EChartType Bar
     {
-        Bar = new EChartType("bar", "", BarBasicJson);
-        Line = new EChartType("line", "", LineBasicJson);
-        LineArea = new EChartType("line-area", "", LineAreaBasicJson);
-        Pie = new EChartType("pie", "", PieBasicJson);
-        Gauge = new EChartType("gauge", "", GaugeBasicJson);
+        get
+        {
+            return new EChartType("bar", "", BarBasicJson);
+        }
+    }
+    public static EChartType Pie
+    {
+        get
+        {
+            return new EChartType("pie", "", PieBasicJson);
+        }
+    }
+    public static EChartType Line
+    {
+        get
+        {
+            return new EChartType("line", "", LineBasicJson);
+        }
+    }
+    public static EChartType Gauge
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public static EChartType Heatmap
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public static EChartType LineArea
+    {
+        get
+        {
+            return new EChartType("line-area", "", LineAreaBasicJson);
+        }
     }
 }
 
