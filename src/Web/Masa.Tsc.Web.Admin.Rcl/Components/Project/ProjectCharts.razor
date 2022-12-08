@@ -1,25 +1,31 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<MRow>
-    <MCol Class="d-flex justify-space-between">
-        <ErrorWarnChart Title="ERRORS" SubText="errors" Error @ref="_errorWarnChart" />
-        <ErrorWarnChart Title="WARNS" SubText="warns" Warn @ref="_warnErrorChart"/>
-        <LogTraceChart Trace Height="150" Title="@("Trace")" @ref="_traceLogChart"/>
-    </MCol>
-</MRow>
-<MRow>
-    <MCol Class="d-flex justify-space-between">
-        <ObserveChart Title="OBSTACLES" Height="180" @ref="_observeChart"/>
-        <GrowthChart Title="Growth" Height="180" @ref="_growthChart"/>
-        <LogTraceChart Log Height="150" Title="@("Log")" @ref="_logTraceChart"/>
-    </MCol>
-</MRow>
-<MRow>
-    <MCol Class="d-flex justify-space-between">
-        <LogTraceStatiscChart Trace Error Title="Tace Errors" @ref="_traceErrorChart"/>
-        <LogTraceStatiscChart Trace Warn Title="Tace Warns" @ref="_traceWarnChart"/>
-        <LogTraceStatiscChart Log Error Title="Log Errors" @ref="_logErrorChart"/>
-        <LogTraceStatiscChart Log Warn Title="Log Warns" @ref="_logWarnChart"/>
-    </MCol>
-</MRow>
+<div class="h-314">
+    <MRow Style="background-color:#F0F3FA;" Class="@Class">
+        <MCol Cols="3">
+            <ErrorWarnChart Title="ERRORS" SubText="errors" @ref="_errorWarnChart" />
+        </MCol>
+        <MCol Cols="9">
+            <LogTraceChart Trace Title="@("Trace")" @ref="_traceLogChart" />
+        </MCol>
+        <MCol Cols="3">
+            <ObserveChart Title="OBSTACLES" @ref="_observeChart" />
+        </MCol>
+        <MCol Cols="3">
+            <GrowthChart Title="Growth" @ref="_growthChart" />
+        </MCol>
+        <MCol Cols="6">
+            <LogTraceChart Trace Title="@("Trace")" @ref="_traceLogChart1" />
+        </MCol>
+        <MCol Cols="6">
+            <Temp Title="@("Log")"></Temp>
+        </MCol>
+        <MCol Cols="3">
+            <LogTraceStatiscChart Trace Error Title="Tace Errors" @ref="_traceErrorChart" />
+        </MCol>
+        <MCol Cols="3">
+            <LogTraceStatiscChart Trace Warn Title="Tace Warns" @ref="_traceWarnChart" />
+        </MCol>
+    </MRow>
+</div>

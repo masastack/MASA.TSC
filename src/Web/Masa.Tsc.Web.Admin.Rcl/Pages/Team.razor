@@ -2,7 +2,80 @@
 @page "/team"
 @inherits TscComponentBase
 
-<Navigation Href="/team"></Navigation>
-<TeamSearch OnValueChanged="OnSearch" OnLoadProjectsAsync="LoadProjectAsync"></TeamSearch>
-<MonitorCard Monitor=_monitor Error=_error Normal="_normal" Warn="_warn" />
-<ProjectCard Projects=_projects RowCount=4></ProjectCard>
+<TeamSearch OnValueChanged="OnSearch"></TeamSearch>
+<MCard Class="mt-8" Style="height: calc(100vh - 190px);">
+    <MRow>
+        <MCol Md="10">
+            <HoneyCombGrid Data="_projects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor"
+                           OnItemClick="HandleOnItemClick" TItem="ProjectOverviewDto">
+                <CellBack>
+                    <div class="d-flex flex-column align-center mx-2 pt-7">
+                        <span class="d-inline-block text-truncate" style="width:120px;">@context.Name</span>
+                        @foreach (var app in context.Apps.Take(3))
+                        {
+                            if (app.Status == MonitorStatuses.Normal)
+                            {
+                                <span class="regular2--text ma-1 d-inline-block text-truncate text-center" style="width:98%;">@app.Name</span>
+                            }
+                            else
+                            {
+                                <MChip Class="ma-1 d-inline-block text-truncate text-center" Style="width:100%;" Color="@ChipLabelColor(app)" TextColor="white" Label Small>
+                                    @app.Name
+                                </MChip>
+                            }
+                        }
+                        @if (context.Apps.Count > 3)
+                        {
+                            <span class="regular3--text">...</span>
+                        }
+                    </div>
+                </CellBack>
+            </HoneyCombGrid>
+        </MCol>
+        <MCol Md="2">
+            <MonitorCard Class="ml-8"/>   
+        </MCol>
+    </MRow>
+</MCard>
+
+<TeamProjectDialog @bind-Visible="_visible"/>
+@code{
+    private bool _visible;
+
+    private void HandleOnItemClick(ProjectOverviewDto item)
+    {
+        _visible = true;
+    }
+
+    private string CellBackBackgroundStyle(ProjectOverviewDto overviewDto)
+    {
+        return overviewDto.Status switch
+        {
+            MonitorStatuses.Normal => "background: #E6FAF5;",
+            MonitorStatuses.Warn => "background: #FFF7E8;",
+            MonitorStatuses.Error => "background: #FFECE8;",
+            _ =>""
+        };
+    }
+
+    private string CellBorderColor(ProjectOverviewDto overviewDto)
+    {
+        return overviewDto.Status switch
+        {
+            MonitorStatuses.Normal => "#CDF5EB",
+            MonitorStatuses.Warn => "#FFE4BA",
+            MonitorStatuses.Error => "#FDCDC5",
+            _ => ""
+        };
+    }
+
+    private string ChipLabelColor(AppDto appDto)
+    {
+        return appDto.Status switch
+        {
+            MonitorStatuses.Warn => "#FF7D00",
+            MonitorStatuses.Error => "#FF5252",
+            _ => "#66BB6A"
+        };
+    }
+}

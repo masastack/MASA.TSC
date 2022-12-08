@@ -1,20 +1,29 @@
-﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+﻿  @namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<MCard Class="py-0 my-0" Style="box-shadow:none">
-    <MCardText Class="py-0 my-0">
-        <MRow Class="py-0 my-0">
-            <MCol Cols=12 Class="text-center text-h6 font-weight-bold py-0 my-0 pt-1">@Value.Name</MCol>
-        </MRow>
-        <MRow Class="py-0 my-0">
-            <MCol Cols=12 Class="text-center text-h6 font-weight-bold py-0 my-0 pt-1">@Value.Identity</MCol>
-        </MRow>
-        <MRow Class="py-0 my-0">
-            <MCol Cols=12 Class="text-center py-0 my-0 pt-1">应用：@Value.Apps.Count</MCol>
-        </MRow>
-        <MRow Class="py-0 my-0">
-            <MCol Cols=12 Class="py-0 my-0 pt-1">Description:@Value.Description</MCol>
-        </MRow>
+<MCard>
+    <MCardText>
+        <div class="d-flex justify-space-between emphasis--text h6">
+            <span>@Value.Name</span>
+            <span>@Value.Apps.Count</span>
+        </div>
+        <span class="regular3--text body2 mt-1">@Value.Identity</span>
+        <p class="regular--text body2 mt-4">
+            @Value.Description
+        </p>
+        <div class="mt-6">
+            <span class="regular3--text body2">创建人</span>
+            <MListItem Class="px-0 mt-2">
+                <MListItemAvatar>
+                    <MImage alt="Admin Avatar"
+                            Src="https://cdn.masastack.com/stack/images/website/masa-blazor/lists/5.png">
+                    </MImage>
+                </MListItemAvatar>
+                <MListItemContent>
+                    <MListItemTitle Class="regular--text body2">title</MListItemTitle>
+                </MListItemContent>
+            </MListItem>
+        </div>
     </MCardText>
 </MCard>
 

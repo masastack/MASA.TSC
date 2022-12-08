@@ -12,6 +12,7 @@ global using Masa.Contrib.Service.Caller.HttpClient;
 global using Masa.Tsc.ApiGateways.Caller.Services;
 global using Masa.Tsc.Contracts.Admin;
 global using Masa.Tsc.Contracts.Admin.Converters;
+global using Masa.Tsc.Contracts.Admin.Dashboards;
 global using Masa.Tsc.Contracts.Admin.Instruments;
 global using Masa.Utils.Data.Prometheus.Model;
 global using Masa.Utils.Models;

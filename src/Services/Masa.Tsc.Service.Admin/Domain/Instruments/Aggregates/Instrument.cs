@@ -35,7 +35,7 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
             Name = pannel.Name;
         Layer = pannel.Layer.ToString();
         Model = pannel.Model.ToString();
-        Layer = pannel.Type.ToString();
+        Lable = pannel.Type.ToString();
     }
 
     public Panel AddPanel(PanelDto model)

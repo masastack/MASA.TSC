@@ -1,0 +1,50 @@
+﻿@inherits TscComponentBase
+
+<SSheetDialog @bind-Value=Visible Title="111111">
+    <MCard Style="background-color:#F0F3FA;border-top-left-radius: 20px;border-top-right-radius: 20px;" Class="full-height">
+        <MRow NoGutters Class="full-height">
+            <MCol Style="background-color:white;border-top-left-radius: 20px;" Cols="2" Class="d-flex flex-column justify-space-between pa-6">
+                <ProjectDetail Value=@_project></ProjectDetail>
+                <TeamDetail Value=@_team></TeamDetail>
+            </MCol>
+            <MCol Cols="10" Class="pa-8">
+                <SearchBar AppId=@_appId Apps=@_project.Apps OnSearch="async (data)=>{ if(_projectCharts!=null) await  _projectCharts.OnLoadDataAsyc(data);}"></SearchBar>
+                <ProjectCharts Class="mt-2" @ref="_projectCharts"></ProjectCharts>
+            </MCol>
+        </MRow>
+    </MCard>
+</SSheetDialog>
+
+@code {
+    [Parameter]
+    public bool Visible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> VisibleChanged { get; set; }
+
+    private string _appId = string.Empty;
+    private TeamDto _team = new()
+        {
+            Name = "团队名称",
+            Avatar = "https://cdn.masastack.com/stack/images/website/masa-blazor/lists/5.png",
+            Description = "ABCDEFGHIJKLMNOPQRSTYVWXYZ members to your team to start collaborating. Click here to edit this description.Professional team",
+            AppTotal = 12,
+            ProjectTotal = 3,
+            Admins = new List<UserDto>
+            {
+                new UserDto
+                {
+                    Name="aaaaa",
+                    Avatar="https://cdn.masastack.com/stack/images/website/masa-blazor/lists/5.png",
+                    DisplayName="33333"
+                }
+            }
+        };
+    private ProjectDto _project = new()
+        {
+            Name = "项目名称",
+            Identity = "YDD2834190407104",
+            Description = "ABCDEFGHIJKLMNOPQRSTYVWXYZ members to your team to start collaborating. Click here to edit this description.Professional team",
+        };
+    private ProjectCharts _projectCharts = new();
+}
