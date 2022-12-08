@@ -13,7 +13,7 @@ public class InstrumentService : BaseService
 
     public async Task DeleteAsync(params Guid[] ids) => await Caller.DeleteAsync($"{RootPath}", new { ids });
 
-    public async Task SetRootAsync(Guid id,bool isRoot=true) => await Caller.PostAsync($"{RootPath}/set-root/{id}/{isRoot}",default);
+    public async Task SetRootAsync(Guid id, bool isRoot = true) => await Caller.PostAsync($"{RootPath}/set-root/{id}/{isRoot}", default);
 
     public async Task<UpdateDashboardDto> GetAsync(Guid id) => (await Caller.GetAsync<UpdateDashboardDto>($"{RootPath}/{id}"))!;
 
