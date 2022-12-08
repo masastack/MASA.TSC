@@ -5,7 +5,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages;
 
 public partial class Team
 {
-    private List<ProjectOverviewDto> _projects = default!;
+    private List<ProjectOverviewDto> _projects = new();
     private TeamSearchModel? _teamSearchModel = null;
     private int _error, _warn, _monitor, _normal;
     private bool _isLoad = true;
@@ -80,7 +80,7 @@ public partial class Team
     private async Task OnSearch(TeamSearchModel query)
     {
         _teamSearchModel = query;
-        await LoadData();        
+        await LoadData();
         StateHasChanged();
     }
 }

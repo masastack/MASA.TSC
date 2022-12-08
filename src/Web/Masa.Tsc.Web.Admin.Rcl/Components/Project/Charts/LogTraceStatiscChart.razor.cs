@@ -9,7 +9,7 @@ public partial class LogTraceStatiscChart
     public StringNumber Width { get; set; } = "100%";
 
     [Parameter]
-    public StringNumber Height { get; set; } = 300;
+    public StringNumber Height { get; set; } = "100%";
 
     [Parameter]
     public string Title { get; set; }
@@ -26,72 +26,11 @@ public partial class LogTraceStatiscChart
     [Parameter]
     public bool Warn { get; set; }
 
-    private EChartBarOption _options = new()
-    {
-        XAxis = new EChartOptionAxis
-        {
-            Type = "category"
-        },
-        YAxis = new EChartOptionAxis
-        {
-            Type = "value"
-        },
-        Series = new EChartOptionBarSeries[] {
-            new EChartOptionBarSeries{
-                Type="bar"
-            }            
-        }               
-    };
+    private EChartType _options = EChartConst.Bar;
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        //var data = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
-        //{
-        //    End = Query.End,
-        //    Start = Query.Start,
-        //    FieldMaps = new RequestFieldAggregationDto[] {
-        //        new RequestFieldAggregationDto{
-        //             AggegationType= Contracts.Admin.Enums.AggregationTypes.DateHistogram,
-        //             Name="@timestamp",
-        //             Alias="Span Count",
-        //        }
-        //    },
-        //    Queries = ConvertToQueries(isSpan: true),
-        //    Interval = GetInterval(),
-        //});
 
-        //var data2 = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
-        //{
-        //    End = Query.End,
-        //    Start = Query.Start,
-        //    FieldMaps = new RequestFieldAggregationDto[] {
-        //        new RequestFieldAggregationDto{
-        //             AggegationType= AggregationTypes.DateHistogram,
-        //             Name="@timestamp",
-        //             Alias="Trace Count",
-        //        }
-        //    },
-        //    Queries = ConvertToQueries(isTrace: true),
-        //    Interval = GetInterval(),
-        //});
-
-        var data1 = new ChartLineDataDto<ChartPointDto>
-        {
-            Data = new ChartPointDto[] {
-                new ChartPointDto{X="8-1",Y="30" },
-                new ChartPointDto{X="8-2",Y="60" },
-                new ChartPointDto{X="8-3",Y="80" },
-                new ChartPointDto{X="8-4",Y="20" },
-                new ChartPointDto{X="8-5",Y="34" },
-                new ChartPointDto{X="8-6",Y="34" },
-                new ChartPointDto{X="8-7",Y="25" }
-            }
-        };
-
-        if (data1.Data == null || !data1.Data.Any())
-            return;
-        _options.XAxis.Data = data1.Data.Select(item => DateTime.Parse(item.X).Format(CurrentTimeZone, GetFormat())).ToArray();
-        _options.Series[0].Data = data1.Data.Select(item => item.Y);
         await Task.CompletedTask;
     }
 

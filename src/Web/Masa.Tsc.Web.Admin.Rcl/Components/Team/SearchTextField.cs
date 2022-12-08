@@ -8,44 +8,35 @@ public class SearchTextField : MTextField<string>
     [Inject]
     public I18n? I18n { get; set; }
 
-    [Parameter]
-    public string IconClass { get; set; } = "mt-1 mr-1 emphasis2--text";
-
-    [Parameter]
-    public int IconSize { get; set; } = 16;
-
-    private string _defaultClass = "search";
-
     public override async Task SetParametersAsync(ParameterView parameters)
     {
+        Flat = true;
+        Dense = true;
+        Solo = true;
         HideDetails = "auto";
-        BackgroundColor = "fill-background";
-        Style = "max-width:540px;";
+        Style = "max-width:340px;";
+        BackgroundColor = "#F0F3FA";
         Placeholder = I18n!.T("Search");
         PrependInnerContent = builder =>
         {
             builder.OpenComponent<MIcon>(0);
-            builder.AddAttribute(1, "Size", (StringNumber)IconSize);
-            builder.AddAttribute(2, "Class", IconClass);
+            builder.AddAttribute(1, "Size", (StringNumber)16);
+            builder.AddAttribute(2, "Class", "mr-2 emphasis2--text");
             builder.AddAttribute(3, "ChildContent", (RenderFragment)delegate (RenderTreeBuilder builder2)
             {
                 builder2.AddContent(4, IconConstants.Search);
             });
             builder.CloseComponent();
         };
+
         await base.SetParametersAsync(parameters);
     }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        if (string.IsNullOrEmpty(Class))
-        {
-            Class = _defaultClass;
-        }
-        else if (!Class.Contains("search"))
-        {
-            Class = $"{Class} {_defaultClass}";
-        }
+        Class ??= "";
+        if (Class.Contains("rounded-2 search") is false)
+            Class += " rounded-2 search";
     }
 }
