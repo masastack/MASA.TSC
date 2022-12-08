@@ -5,42 +5,86 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceDetail
 {
-    [Parameter]
-    public string TraceId { get; set; }
+    private bool _dialogValue;
+    private StringNumber _tabValue;
 
-    private bool _isLoading = true;
-
-    private string _lastTraceId;
-    private List<TraceResponseTree> treeData = new();
-    private StringNumber tabValue;
-
-    private List<string>? actives;
+    private List<TraceResponseTree> _treeData = new();
+    private List<string>? _actives;
     private TraceResponseTree? _activeTreeItem;
+    private TraceResponseTree? _rootTreeItem;
+    private int _count;
+    private List<List<TraceResponseTimeline>> _timelinesView = new();
 
-    protected override async Task OnParametersSetAsync()
+    internal async Task OpenAsync(string traceId)
     {
-        await base.OnParametersSetAsync();
+        _tabValue = 0;
+        _dialogValue = true;
+        StateHasChanged();
 
-        if (_lastTraceId != TraceId)
+        await QueryTraceDetailAndToTree(traceId);
+        StateHasChanged();
+    }
+
+    private void DialogValueChanged(bool val)
+    {
+        _dialogValue = val;
+
+        if (!val)
         {
-            _lastTraceId = TraceId;
-
-            await QueryTraceDetailAndToTree(TraceId);
+            _activeTreeItem = null;
+            _rootTreeItem = null;
+            _treeData.Clear();
+            _timelinesView.Clear();
         }
     }
 
     private async Task QueryTraceDetailAndToTree(string traceId)
     {
-        _isLoading = true;
         var data = await ApiCaller.TraceService.GetAsync(traceId);
-        treeData = ToTree(data, null);
-        if (treeData.Any())
+
+        _count = data.Count() - 1;
+        if (_count == -1)
         {
-            _activeTreeItem = treeData.First();
-            actives = new List<string>() { _activeTreeItem.SpanId };
+            _count = 0;
         }
 
-        _isLoading = false;
+        _treeData = ToTree(data.OrderBy(item => item.Timestamp), null);
+        _timelinesView.Clear();
+        if (_treeData.Any())
+        {
+            _rootTreeItem = _treeData.First();
+            _activeTreeItem = _treeData.First();
+            _actives = new List<string>() { _activeTreeItem.SpanId };
+
+            _timelinesView.Add(_rootTreeItem.Timelines);
+
+            if (_rootTreeItem.Children is not null)
+            {
+                Test(_rootTreeItem.Children, 2);
+            }
+
+            void Test(List<TraceResponseTree> trees, int level)
+            {
+                if (_timelinesView.Count < level)
+                {
+                    _timelinesView.Add(new List<TraceResponseTimeline>());
+                }
+
+                var timelines = _timelinesView[level - 1];
+
+                foreach (var tree in trees)
+                {
+                    timelines.AddRange(tree.Timelines);
+
+                    if (tree.Children is null || tree.Children.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    Test(tree.Children, level + 1);
+                }
+            }
+        }
     }
 
     private void OnActiveUpdate(List<TraceResponseTree> items)
@@ -53,7 +97,8 @@ public partial class TscTraceDetail
         _activeTreeItem = items.First();
     }
 
-    private List<TraceResponseTree> ToTree(IEnumerable<TraceResponseDto> items, TraceResponseTree? parent, TraceResponseTree? root = null, long parentLeft = 0)
+    private List<TraceResponseTree> ToTree(IEnumerable<TraceResponseDto> items, TraceResponseTree? parent, TraceResponseTree? root = null,
+        double parentLeft = 0)
     {
         int parentLevel = parent?.Level ?? 0;
         string? parentSpanId = parent?.SpanId;
@@ -64,63 +109,55 @@ public partial class TscTraceDetail
 
         foreach (var node in nodes)
         {
-            var items2 = items.Except(found).ToList();
+            var restItems = items.Except(found).ToList();
             node.Children ??= new();
 
-            long internalParentLeft = parentLeft;
+            double internalParentLeft = parentLeft;
             if (parent is not null)
             {
-                internalParentLeft += (long)Math.Ceiling((node.Timestamp - parent.Timestamp).TotalMilliseconds);
+                internalParentLeft += (node.Timestamp - parent.Timestamp).TotalMilliseconds;
             }
 
             root ??= node;
 
-            var children = ToTree(items2, node, root, internalParentLeft).OrderBy(u => u.Timestamp).ToList();
-
-            if (children.Any())
+            if (restItems.Any())
             {
+                var children = ToTree(restItems, node, root, internalParentLeft).OrderBy(u => u.Timestamp).ToList();
+
                 node.Children.AddRange(children);
 
-                if (internalParentLeft > 0)
-                {
-                    Console.Out.WriteLine("internalParentLeft = {0}", internalParentLeft);
-                    var marginLeft = internalParentLeft / (double)parent.Duration;
-
-                    var duration = (long)Math.Floor((node.EndTimestamp - node.Timestamp).TotalMilliseconds);
-                    var durationPercent = (duration / (double)parent.Duration);
-                    node.Timelines.Add(new TraceResponseTimeline(true, durationPercent, marginLeft));
-                }
-
                 var lastTimestamp = node.Timestamp;
-                foreach (var child in children)
+                foreach (var (child, index) in children.Select((child, index) => (child, index)))
                 {
-                    var duration = (long)Math.Floor((child.Timestamp - lastTimestamp).TotalMilliseconds);
-                    if (duration < 0)
+                    var duration = (child.Timestamp - lastTimestamp).TotalMilliseconds;
+
+                    if (index == 0 && internalParentLeft > 0)
                     {
-                        continue;
+                        var marginLeft = internalParentLeft / root.DoubleDuration;
+                        node.Timelines.Add(new TraceResponseTimeline(true, duration / root.DoubleDuration, marginLeft));
+                    }
+                    else
+                    {
+                        node.Timelines.Add(new TraceResponseTimeline(true, duration / root.DoubleDuration));
                     }
 
-                    node.Timelines.Add(new TraceResponseTimeline(true, duration / (double)node.Duration));
-
-                    var childDuration = child.Duration;
-                    node.Timelines.Add(new TraceResponseTimeline(false, childDuration / (double)node.Duration));
+                    var childDuration = child.DoubleDuration;
+                    node.Timelines.Add(new TraceResponseTimeline(false, childDuration / root.DoubleDuration));
 
                     lastTimestamp = child.EndTimestamp;
                 }
 
                 if (lastTimestamp < node.EndTimestamp)
                 {
-                    var duration = (long)Math.Floor((node.EndTimestamp - lastTimestamp).TotalMilliseconds);
-                    node.Timelines.Add(new TraceResponseTimeline(true, duration / (double)node.Duration));
+                    var duration = (node.EndTimestamp - lastTimestamp).TotalMilliseconds;
+                    node.Timelines.Add(new TraceResponseTimeline(true, duration / root.DoubleDuration));
                 }
             }
             else if (parent is not null)
             {
-                Console.Out.WriteLine("internalParentLeft = {0}", internalParentLeft);
-                var marginLeft = internalParentLeft / (double)root.Duration; // TODO:use top root duration!
+                var marginLeft = internalParentLeft / root.DoubleDuration;
 
-                var duration = (long)Math.Floor((node.EndTimestamp - node.Timestamp).TotalMilliseconds);
-                var durationPercent = (duration / (double)parent.Duration);
+                var durationPercent = (node.DoubleDuration / root.DoubleDuration);
                 node.Timelines.Add(new TraceResponseTimeline(true, durationPercent, marginLeft));
             }
             else
@@ -132,8 +169,10 @@ public partial class TscTraceDetail
         return nodes;
     }
 
-    private static string FormatDuration(long ms)
+    private static string FormatDuration(double duration)
     {
+        var ms = (long)Math.Ceiling(duration);
+
         if (ms < 1000)
         {
             return $"{ms}ms";

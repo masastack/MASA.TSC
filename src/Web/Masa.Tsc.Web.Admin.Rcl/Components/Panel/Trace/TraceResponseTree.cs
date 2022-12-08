@@ -31,6 +31,27 @@ public class TraceResponseTree : TraceResponseDto
     public int Level { get; set; }
 
     public List<TraceResponseTimeline> Timelines { get; set; } = new();
+
+    public double DoubleDuration => (this.EndTimestamp - this.Timestamp).TotalMilliseconds;
 }
 
-public record TraceResponseTimeline(bool Render, double Percent, double marginLeft = 0);
+public class TraceResponseTimeline
+{
+    public TraceResponseTimeline(bool Render, double Percent, double marginLeft = 0)
+    {
+        this.Render = Render;
+        this.Percent = Percent;
+        this.marginLeft = marginLeft;
+    }
+
+    public bool Render { get; set; }
+    public double Percent { get; set; }
+    public double marginLeft { get; set; }
+
+    public void Deconstruct(out bool Render, out double Percent, out double marginLeft  )
+    {
+        Render = this.Render;
+        Percent = this.Percent;
+        marginLeft = this.marginLeft;
+    }
+}

@@ -7,12 +7,12 @@
             ItemsPerPage="10"
             Items=_data
             TItem="TraceResponseDto"
-            Loading="_isLoading"            
+            Loading="_isLoading"
             @ref="_mDataTable">
     <ItemColContent>
         @if (context.Header.Value == "Operate")
         {
-            <MIcon OnClick="@(()=>OpenAsync(context.Item))">mdi-view-headline</MIcon>
+            <MIcon OnClick="@(() => OpenAsync(context.Item))">mdi-view-headline</MIcon>
         }
         else if (context.Header.Text == "Timestamp")
         {
@@ -25,16 +25,4 @@
     </ItemColContent>
 </MDataTable>
 
-<MDialog @bind-Value="_showDialog"
-         Fullscreen>
-    <ChildContent>
-        <MCard Class="overflow-hidden">
-            <MCardTitle Class="d-flex justify-end">
-                <MIcon OnClick="CloseDialog" title="Close">mdi-close</MIcon>
-            </MCardTitle>
-            <MCardText>
-                <TscTraceDetail TraceId="@_selectTraceId"></TscTraceDetail>
-            </MCardText>
-        </MCard>
-    </ChildContent>
-</MDialog>
+<TscTraceDetail @ref="_tscTraceDetail"></TscTraceDetail>

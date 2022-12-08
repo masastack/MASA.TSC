@@ -2,96 +2,167 @@
 @using System.Globalization
 @inherits TscComponentBase
 
-<style>
-    .m-treeview.overflow-y-auto {
-    height: calc(100vh - 215px);
-    }
-</style>
-
-@if (_isLoading)
-{
-    <MRow>
-        <MCol>
-            Loading ...
-        </MCol>
-    </MRow>
-}
-else
-{
+<SSheetDialog Value="_dialogValue" ValueChanged="DialogValueChanged">
     <div class="d-flex">
-        <MTreeview Items="@treeData"
-                   ItemChildren="item => item.Children"
-                   ItemText="item => item.Name"
-                   ItemKey="item => item.SpanId"
-                   TItem="TraceResponseTree"
-                   TKey="string"
-                   OpenAll
-                   Activatable
-                   @bind-Active="actives"
-                   OnActiveUpdate="OnActiveUpdate"
-                   Class="flex-fill overflow-y-auto"
-                   Style="height: calc(100vh - 215px)">
-            <LabelContent>
-                <MListItem Dense>
-                    <MListItemContent>
-                        <div class="d-flex align-center">
-                            @{
-                                int level = context.Item.Level - 1;
+        <div class="pa-12" style="width:100%">
+            <div class="d-flex mb-6">
+                <SSearch Dense Style="max-width:300px"></SSearch>
+                <MSpacer></MSpacer>
+                @if (_rootTreeItem is not null)
+                {
+                    <div class="d-flex align-center">
+                        <div class="mr-6">
+                            <MChip Label Small Color="emphasis2 mr-3" Dark>起始点</MChip>
+                            <span class="regular--text">@_rootTreeItem.Timestamp</span>
+                        </div>
+                        <div class="mr-6">
+                            <MChip Label Small Color="emphasis2 mr-3" Dark>持续时间</MChip>
+                            <span class="regular--text">@FormatDuration(_rootTreeItem.DoubleDuration)</span>
+                        </div>
+                        <div>
+                            <MChip Label Small Color="emphasis2 mr-3" Dark>跨度</MChip>
+                            <span class="regular--text">@_count</span>
+                        </div>
+                    </div>
+                }
+            </div>
 
-                                <div style="min-width:calc(542px - @(level * 24)px)">
-                                    @context.Item.Name
-                                    @{
-                                        if (context.Item.Resource.ContainsKey("service.name"))
-                                        {
-                                            <div>
-                                                @context.Item.Resource["service.name"]
-                                                @((RenderFragment)(labelBuilder => RenderItemLabel(labelBuilder, context.Item)))
-                                            </div>
-                                        }
-                                    }
-                                </div>
+            <div class="mb-6">
+                @foreach (var timelines in _timelinesView)
+                {
+                    double sumOfMarginLeft = 0;
+
+                    <div class="trace-timelines mb-2">
+                        @foreach (var timeline in timelines)
+                        {
+                            if (timeline.marginLeft > 0)
+                            {
+                                var marginLeft = timeline.marginLeft - sumOfMarginLeft;
+                                sumOfMarginLeft += timeline.marginLeft + timeline.Percent;
+
+                                <div style="width: @(marginLeft * 100)%"></div>
                             }
-                            <div class="trace-timelines">
-                                @foreach (var timeline in context.Item.Timelines)
-                                {
-                                    if (timeline.marginLeft > 0)
-                                    {
-                                        <div style="width: @(timeline.marginLeft * 100)%"></div>
-                                    }
-                                    <div class="trace-timeline__section" style="width: @(timeline.Percent * 100)%;">
-                                        <div class="trace-timeline__background">
-                                            <div class="trace-timeline__leaner @(timeline.Render ? "" : "d-none")"></div>
-                                        </div>
+
+                            <div class="trace-timeline__section" style="width: @(timeline.Percent * 100)%;">
+                                <div class="trace-timeline__background">
+                                    <div class="trace-timeline__leaner @(timeline.Render ? "" : "d-none")"></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                @if (_rootTreeItem is not null)
+                {
+                    var scale = Math.Ceiling(_rootTreeItem.Duration / 5d);
+
+                    <div class="trace-timelines-view">
+                        <div class="trace-timelines-view__line">
+                            <div class="trace-timelines-view__line-item body2" style="left: 0;">0</div>
+                            <div class="trace-timelines-view__line-item body2" style="left: 20%;">@(FormatDuration(scale * 1))</div>
+                            <div class="trace-timelines-view__line-item body2" style="left: 40%;">@(FormatDuration(scale * 2))</div>
+                            <div class="trace-timelines-view__line-item body2" style="left: 60%;">@(FormatDuration(scale * 3))</div>
+                            <div class="trace-timelines-view__line-item body2" style="left: 80%;">@(FormatDuration(scale * 4))</div>
+                            <div class="trace-timelines-view__line-item body2" style="right: 0;">@(FormatDuration(_rootTreeItem.Duration))</div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <MTreeview Items="@_treeData"
+                       ItemChildren="item => item.Children"
+                       ItemText="item => item.Name"
+                       ItemKey="item => item.SpanId"
+                       TItem="TraceResponseTree"
+                       TKey="string"
+                       OpenAll
+                       Activatable
+                       @bind-Active="_actives"
+                       OnActiveUpdate="OnActiveUpdate"
+                       Class="flex-fill overflow-y-auto"
+                       Style='@($"height: calc(100vh - {_timelinesView.Count * 20 + 254}px)")'
+                       @key="@_treeData">
+                <LabelContent>
+                    <MListItem Dense>
+                        <MListItemContent>
+                            <div class="d-flex align-center">
+                                @{
+                                    int level = context.Item.Level - 1;
+
+                                    <div style="min-width:calc(542px - @(level * 24)px)">
+                                        @context.Item.Name
+                                        @{
+                                            if (context.Item.Resource.ContainsKey("service.name"))
+                                            {
+                                                <div>
+                                                    @context.Item.Resource["service.name"]
+                                                    @((RenderFragment)(labelBuilder => RenderItemLabel(labelBuilder, context.Item)))
+                                                </div>
+                                            }
+                                        }
                                     </div>
                                 }
+                                <div class="trace-timelines">
+                                    @foreach (var timeline in context.Item.Timelines)
+                                    {
+                                        if (timeline.marginLeft > 0)
+                                        {
+                                            <div style="width: @(timeline.marginLeft * 100)%"></div>
+                                        }
+                                        <div class="trace-timeline__section" style="width: @(timeline.Percent * 100)%;">
+                                            <div class="trace-timeline__background">
+                                                <div class="trace-timeline__leaner @(timeline.Render ? "" : "d-none")"></div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="d-inline-block ml-2" style="min-width: 52px;">
+                                    @FormatDuration(context.Item.DoubleDuration)
+                                </div>
                             </div>
-                            <div class="d-inline-block ml-2" style="min-width: 52px;">
-                                @FormatDuration(context.Item.Duration)
-                            </div>
-                        </div>
-                    </MListItemContent>
-                </MListItem>
-            </LabelContent>
-        </MTreeview>
+                        </MListItemContent>
+                    </MListItem>
+                </LabelContent>
+            </MTreeview>
+        </div>
 
-        <MDivider Vertical Class="mx-0" />
+        <MDivider Vertical Class="mx-0" Style="height:100vh" />
 
         @if (_activeTreeItem is not null)
         {
-            var detail = _activeTreeItem.ToDictionary(nameof(TraceResponseTree.Children), nameof(TraceResponseTree.Attributes), nameof(TraceResponseTree.Resource), nameof(TraceResponseTree.Timelines), nameof(TraceResponseTree.Level));
+            var detail = _activeTreeItem.ToDictionary(nameof(TraceResponseTree.Children), nameof(TraceResponseTree.Attributes), nameof(TraceResponseTree.Resource), nameof(TraceResponseTree.Timelines), nameof(TraceResponseTree.Level), nameof(TraceResponseTree.DoubleDuration));
 
-            <MCard Width="430" Flat Class="px-6 py-12">
-                <MCard>
-                    <div></div>
-                </MCard>
+            <div class="pa-12" style="width:430px">
+                <MList Dense Class="emphasis2 mb-4 rounded" Dark>
+                    <MListItem Dense>
+                        <MListItemContent>
+                            <MListItemTitle>SelfDuration</MListItemTitle>
+                        </MListItemContent>
+                        <MListItemAction>
+                            <MListItemActionText>
+                                @FormatDuration(_activeTreeItem.DoubleDuration)
+                            </MListItemActionText>
+                        </MListItemAction>
+                    </MListItem>
+                    <MListItem Dense>
+                        <MListItemContent>
+                            <MListItemTitle>TotalDuration</MListItemTitle>
+                        </MListItemContent>
+                        <MListItemAction>
+                            <MListItemActionText>
+                                @FormatDuration(_rootTreeItem!.DoubleDuration)
+                            </MListItemActionText>
+                        </MListItemAction>
+                    </MListItem>
+                </MList>
                 <div>
-                    <MTabs @bind-Value="tabValue" FixedTabs ShowArrows="false">
+                    <MTabs @bind-Value="_tabValue" FixedTabs ShowArrows="false">
                         <MTab>attr(@_activeTreeItem.Attributes.Count)</MTab>
                         <MTab>res(@_activeTreeItem.Resource.Count)</MTab>
                         <MTab>dt(@detail.Count)</MTab>
                         <MTab>logs</MTab>
                     </MTabs>
-                    <MTabsItems Value="tabValue">
+                    <MTabsItems Value="_tabValue">
                         <MTabItem>
                             @((RenderFragment)(dictRender => RenderDictionary(dictRender, _activeTreeItem.Attributes)))
                         </MTabItem>
@@ -106,11 +177,11 @@ else
                         </MTabItem>
                     </MTabsItems>
                 </div>
-            </MCard>
+            </div>
         }
 
     </div>
-}
+</SSheetDialog>
 
 @code {
 

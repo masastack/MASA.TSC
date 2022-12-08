@@ -8,11 +8,12 @@ public partial class TscTraceList : TscComponentBase
     [Parameter]
     public RequestTraceListDto Query { get; set; } = default!;
 
+    private TscTraceDetail? _tscTraceDetail;
+
     private IEnumerable<TraceResponseDto> _data = new List<TraceResponseDto>();
     private int _total = 0;
     private MDataTable<TraceResponseDto> _mDataTable = default!;
     private bool _isLoading = false;
-    private string _selectTraceId = default!;
     private List<DataTableHeader<TraceResponseDto>> _headers = new()
     {
         new("Service", item => item.Resource["service.name"])
@@ -47,9 +48,7 @@ public partial class TscTraceList : TscComponentBase
 
     private async Task OpenAsync(TraceResponseDto item)
     {
-        _selectTraceId = item.TraceId;
-        OpenDialog();
-        await Task.CompletedTask;
+        await _tscTraceDetail!.OpenAsync(item.TraceId);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
