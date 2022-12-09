@@ -1,0 +1,8 @@
+﻿﻿.date-time-range-picker__content ::deep .m-date-picker-table {
+    height: unset;
+    padding: 0;
+}
+
+.date-time-range-picker__content ::deep .m-card__actions {
+    padding-bottom: 0;
+}

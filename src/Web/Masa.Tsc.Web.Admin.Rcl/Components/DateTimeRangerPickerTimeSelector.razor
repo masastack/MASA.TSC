@@ -1,0 +1,161 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@using System.Timers;
+
+<div class="d-inline-flex align-center rounded px-4" style="border:1px solid rgba(0,0,0,.38);height: 40px;background-color:white;">
+        <DateTimeRangePicker @bind-StartDateTime="startDateTime"
+                             @bind-EndDateTime="endDateTime"
+                             OnConfirm="OnAbsoluteDateTimeUpdated">
+        </DateTimeRangePicker>
+
+        <MDivider Vertical Class="mx-2"></MDivider>
+
+        <Dropdown @bind-Value="relatedTimeSpanText"
+                  Items="RelatedItems"
+                  ItemText="item => item.Text"
+                  ItemValue="item => item.Text"
+                  TItem="RelatedItem"
+                  TValue="string"
+                  OnItemClick="OnRelatedTimeSpanSelected"
+                  OffsetY
+                  NudgeBottom="@((StringNumber)8)">
+            <ActivatorContent>
+                <MButton Small @attributes="@context.Attrs" Text>
+                    @relatedTimeSpanText
+                    <MIcon Right>mdi-menu-down</MIcon>
+                </MButton>
+            </ActivatorContent>
+        </Dropdown>
+
+        <MDivider Vertical Class="mx-2" />
+
+        <Dropdown Items="intervalList"
+                  ItemValue="item => item.Text"
+                  ItemText="item => item.Text"
+                  @bind-Value="interval"
+                  TItem="IntervalItem"
+                  TValue="string"
+                  OnItemClick="OnIntervalSelected">
+            <PrependContent>
+                <MButton Icon Small OnClick="Refresh">
+                    <MIcon Small>mdi-refresh</MIcon>
+                </MButton>
+            </PrependContent>
+            <ActivatorContent>
+                @{
+                    var exists = interval is not null && interval != "Off";
+                    <MButton Text Small Icon="!exists"
+                             @attributes="@context.Attrs">
+                        @if (exists)
+                        {
+                            <span class="mr-1">@interval</span>
+                        }
+                        <MIcon Small Right="@exists">mdi-menu-down</MIcon>
+                    </MButton>
+                }
+            </ActivatorContent>
+        </Dropdown>
+    </div>
+
+@code {
+    private DateTimeOffset startDateTime = DateTimeOffset.UtcNow.AddHours(-1);
+    private DateTimeOffset endDateTime = DateTimeOffset.UtcNow;
+    private string relatedTimeSpanText = "off";
+    private RelatedItem? relatedTimeSpan;
+    private string? interval = "off";
+    private List<RelatedItem> RelatedItems = new()
+    {
+        new RelatedItem("off", TimeSpan.FromMinutes(0)),
+        new RelatedItem("last-5-min", TimeSpan.FromMinutes(-5)),
+        new RelatedItem("last-15-min", TimeSpan.FromMinutes(-15)),
+        new RelatedItem("last-30-min", TimeSpan.FromMinutes(-30)),
+        new RelatedItem("last-1-hours", TimeSpan.FromHours(-1)),
+        new RelatedItem("last-3-hours", TimeSpan.FromHours(-3)),
+        new RelatedItem("last-6-hours", TimeSpan.FromHours(-6)),
+        new RelatedItem("last-12-hours", TimeSpan.FromHours(-12)),
+        new RelatedItem("last-24-hours", TimeSpan.FromHours(-24)),
+        new RelatedItem("last-2-days", TimeSpan.FromDays(-2)),
+    };
+    private List<IntervalItem> intervalList = new()
+    {
+        new IntervalItem("Off", TimeSpan.Zero),
+        new IntervalItem("10s", TimeSpan.FromSeconds(10)),
+        new IntervalItem("30s", TimeSpan.FromSeconds(30)),
+        new IntervalItem("1m", TimeSpan.FromMinutes(1)),
+        new IntervalItem("5m", TimeSpan.FromMinutes(5)),
+        new IntervalItem("15m", TimeSpan.FromMinutes(15)),
+        new IntervalItem("30m", TimeSpan.FromMinutes(30)),
+        new IntervalItem("1h", TimeSpan.FromHours(1)),
+        new IntervalItem("2h", TimeSpan.FromHours(2)),
+        new IntervalItem("1d", TimeSpan.FromDays(1)),
+    };
+    private Timer? timer;
+
+    private void UpdateRangeDateTimeToLatest()
+    {
+        if (relatedTimeSpan is null)
+        {
+            return;
+        }
+
+        endDateTime = DateTimeOffset.UtcNow.ToOffset(endDateTime.Offset);
+        startDateTime = endDateTime.Add(relatedTimeSpan.TimeSpan);
+    }
+
+    private void OnAbsoluteDateTimeUpdated()
+    {
+        relatedTimeSpan = null;
+        relatedTimeSpanText = "off";
+    }
+
+    private void OnRelatedTimeSpanSelected(RelatedItem item)
+    {
+        relatedTimeSpan = item;
+        UpdateRangeDateTimeToLatest();
+    }
+
+    private void OnIntervalSelected(IntervalItem item)
+    {
+        if (item.TimeSpan == TimeSpan.Zero)
+        {
+            timer?.Stop();
+            return;
+        }
+
+        if (timer == null)
+        {
+            timer = new()
+                {
+                    Interval = item.TimeSpan.TotalMilliseconds
+                };
+
+            timer.Elapsed += TimerOnElapsed;
+        }
+        else
+        {
+            timer.Stop();
+            timer.Interval = item.TimeSpan.TotalMilliseconds;
+        }
+
+        timer.Start();
+    }
+
+    private void TimerOnElapsed(object? sender, ElapsedEventArgs e)
+    {
+        UpdateRangeDateTimeToLatest();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void Refresh()
+    {
+        UpdateRangeDateTimeToLatest();
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+
+    private record IntervalItem(string Text, TimeSpan TimeSpan);
+
+    private record RelatedItem(string Text, TimeSpan TimeSpan);
+}

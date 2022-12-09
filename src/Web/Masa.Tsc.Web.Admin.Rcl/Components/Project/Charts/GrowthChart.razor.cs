@@ -9,7 +9,7 @@ public partial class GrowthChart
     public StringNumber Width { get; set; } = "100%";
 
     [Parameter]
-    public StringNumber Height { get; set; } = 300;
+    public StringNumber Height { get; set; } = "100%";
 
     [Parameter]
     public string Title { get; set; }
@@ -17,103 +17,50 @@ public partial class GrowthChart
     [Parameter]
     public string SubText { get; set; }
 
-    private EChartLineOption _options = new()
-    {
-        XAxis = new EChartOptionAxis
-        {
-            Type = "category",
-            Show = false
-        },
-        YAxis = new EChartOptionAxis
-        {
-            Type = "value",
-            Show = false
-        },
-        Grid = new EChartOptionGrid
-        {
-            Left = "2%",
-            Right = "3%",
-            Bottom = "10%"
-        }
-    };
-
     public int Total { get; set; } = 23;
+
+    private EChartType _options = EChartConst.Line;
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        //var data = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
-        //{
-        //    End = Query.End,
-        //    Start = Query.Start,
-        //    FieldMaps = new RequestFieldAggregationDto[] {
-        //        new RequestFieldAggregationDto{
-        //             AggegationType= Contracts.Admin.Enums.AggregationTypes.DateHistogram,
-        //             Name="@timestamp",
-        //             Alias="Span Count",
-        //        }
-        //    },
-        //    Queries = ConvertToQueries(isSpan: true),
-        //    Interval = GetInterval(),
-        //});
+        _options.SetValue("grid.bottom", 20);
+        _options.SetValue("xAxis.splitLine.show", false);
+        _options.SetValue("xAxis.axisTick.show", false);
+        _options.SetValue("xAxis.axisLine.show", false);
+        _options.SetValue("xAxis.axisLabel.show", false);
+        _options.SetValue("yAxis.splitLine.show", false);
+        _options.SetValue("yAxis.axisTick.show", false);
+        _options.SetValue("yAxis.axisLine.show", false);
+        _options.SetValue("yAxis.axisLabel.show", false);
+        _options.SetValue("yAxis.splitArea.show", false);
+        _options.SetValue("series[0].lineStyle.normal", new
+        {
+            width = 8,
+            color = new
+            {
+                type = "linear",
 
-        //var data2 = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
-        //{
-        //    End = Query.End,
-        //    Start = Query.Start,
-        //    FieldMaps = new RequestFieldAggregationDto[] {
-        //        new RequestFieldAggregationDto{
-        //             AggegationType= AggregationTypes.DateHistogram,
-        //             Name="@timestamp",
-        //             Alias="Trace Count",
-        //        }
-        //    },
-        //    Queries = ConvertToQueries(isTrace: true),
-        //    Interval = GetInterval(),
-        //});
-        //if (data.Data == null || !data.Data.Any())
-        //    return;
-
-        var data = new int[] { 20, 60, 80, 50 };
-
-        int rate = GetRate(data[data.Length - 2], data[data.Length - 1], data.Length, data.Max());
-        _options.XAxis.Data = new string[] { "8-1", "8-2", "8-3", "8-4" };
-        _options.Series = new EChartLineOptionSerie[1] {
-            new EChartLineOptionSerie{
-                Type="line",
-                Data=new object[] {
-                    new EChartLineDataSymbolOption {
-                    Value=data[0].ToString()
-                },
-                 new EChartLineDataSymbolOption {
-                    Value=data[1].ToString()
-                },
-                 new EChartLineDataSymbolOption {
-                    Value=data[2].ToString()
-                },
-                 new EChartLineDataSymbolOption {
-                    Value=data[3].ToString(),
-                    Symbol="arrow",
-                    SymbolSize=40,
-                    SymbolRotate=rate
-                }}
-            }
-        };
-        //_options.Series = new EChartOptionSerie[1] {
-        //    new EChartOptionSerie{
-        //         Data=new List<EChartOptionSerieData>{
-        //           GetModel(true,data1),GetModel(false,data2)
-        //         }
-        //    }
-        //};
-        var tt = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
-        var str = JsonSerializer.Serialize(_options, tt);
+                colorStops = new List<object>
+                {
+              new
+              {
+                  offset = 0,
+                  color = "#A9F387" // 0% 处的颜色
+              },
+              new
+              {
+                  offset = 1,
+                  color = "#48D8BF" // 100% 处的颜色
+              }
+            },
+                globalCoord = false // 缺省为 false
+            },
+            shadowColor = "rgba(72,216,191, 0.3)",
+            shadowBlur = 10,
+            shadowOffsetY = 20
+        });
+        _options.SetValue("series[0].smooth", true);
         await Task.CompletedTask;
-    }
-
-    private static EChartOptionSerieData GetModel(bool isTrace, string value)
-    {
-        return new EChartOptionSerieData { Name = isTrace ? "Tace" : "Log", Value = value };
     }
 
     private int GetRate(int lastValue, int value, int count, int max)
@@ -129,17 +76,5 @@ public partial class GrowthChart
             return (int)Math.Floor(y / x * 45);
         else
             return (int)Math.Floor(y / x * 45);
-
-        //(value-lastValue) / value*45
-
-        //var a = Math.Tan(1);
-        //var b = Math.Tanh(1);
-        //var c= Math.Tan(45);
-        //var d = Math.Tanh(45);
-
-        //return 0;
-        //double height = 100, width = 100;
-        //if(lastValue-value>0)
-        //    return Math.Tan((lastValue-value)/value)
     }
 }

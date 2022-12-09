@@ -10,7 +10,7 @@ public partial class LogTraceChart
     public StringNumber Width { get; set; } = "100%";
 
     [Parameter]
-    public StringNumber Height { get; set; } = 300;
+    public StringNumber Height { get; set; } = "100%";
 
     [Parameter]
     public bool Log { get; set; }
@@ -21,26 +21,7 @@ public partial class LogTraceChart
     [Parameter]
     public string Title { get; set; }
 
-    //[Parameter]
-    //public ProjectAppSearchModel Query { get { return _query; } set { _query = value; _isLoading = true; } }
-
-    private EChartLineOption _options = new()
-    {
-        Legend = new EChartOptionLegend
-        {
-            Data = new string[] { "Errors", "Caculates" },
-            Left = "true",
-            Orient = EchartOrientTypes.horizontal
-        },
-        Grid = new EChartOptionGrid
-        {
-            Left = "1%",
-            Right = "2%",
-            Top = "20%",
-            ContainLabel = true
-        }
-    };
-    //private ProjectAppSearchModel _query;
+    private EChartType _options = EChartConst.Line;
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
@@ -52,82 +33,6 @@ public partial class LogTraceChart
             start = query.Start.Value;
         if (query.End.HasValue)
             end = query.End.Value;
-
-        string interval = GetInterval(start, end);
-        if (Trace)
-        {
-            var queryModel = new SimpleAggregateRequestDto
-            {
-                End = end,
-                Start = start,
-                Service = query.AppId,
-                Type = AggregateTypes.DateHistogram,
-                Name ="@timestamp",
-                Alias = "Count",
-                Interval = interval,
-            };
-            var data1 = await ApiCaller.TraceService.AggregateAsync<IEnumerable<KeyValuePair<string,string>>>(queryModel);
-
-            queryModel.Type = AggregateTypes.Avg;
-            var data2 = await ApiCaller.TraceService.AggregateAsync<IEnumerable<KeyValuePair<string, string>>>(queryModel);
-
-            if (data1 == null || !data1.Any())
-                return;
-            var xPoints = data1.Select(item => DateTime.Parse(item.Key).Format(CurrentTimeZone, GetFormat(start, end))).ToArray();
-            
-            _options.XAxis.Data = xPoints;
-            _options.Series = new EChartLineOptionSerie[] {
-            new EChartLineOptionSerie{
-                Name="Errors",
-                 Data=data1.Select(item=>item.Value),
-                  Type="line",
-                  Stack="Total"
-            },
-            new EChartLineOptionSerie{
-             Name="Caculates",
-                 Data=data2.Select(item=>item.Value),
-                  Type="line",
-                  Stack="Total"
-            }
-        };
-        }
-        else
-        {
-            var queryModel = new SimpleAggregateRequestDto
-            {
-                End = end,
-                Start = start,
-                Service = query.AppId,
-                Type = AggregateTypes.DateHistogram,
-                Name = "@timestamp",
-                Alias = "Count",
-                Interval = interval,
-            };
-            var data1 = await ApiCaller.LogService.AggregateAsync<IEnumerable<KeyValuePair<string,string>>>(queryModel);
-
-            queryModel.Type = AggregateTypes.DistinctCount;
-            var data2 = await ApiCaller.LogService.AggregateAsync<IEnumerable<KeyValuePair<string, string>>>(queryModel);
-
-            if (data1 == null || !data1.Any())
-                return;
-            var xPoints = data1.Select(item => DateTime.Parse(item.Key).Format(CurrentTimeZone, GetFormat(start, end))).ToArray();
-
-            _options.XAxis.Data = xPoints;
-            _options.Series = new EChartLineOptionSerie[] {
-            new EChartLineOptionSerie{
-                Name="Errors",
-                 Data=data1.Select(item=>item.Value),
-                  Type="line",
-                  Stack="Total"
-            },
-            new EChartLineOptionSerie{
-             Name="Caculates",
-                 Data=data2.Select(item=>item.Value),
-                  Type="line",
-                  Stack="Total"
-            }
-        };
-        }
         await Task.CompletedTask;
     }
 

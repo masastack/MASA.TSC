@@ -1,56 +1,41 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<MCard Class="pa-0 ma-0" Style="box-shadow:none">
-    <MCardText Class="pa-0 ma-0">
-    <MRow Class="py-0 my-0">
-        <MCol Cols=12 Class="d-flex justify-center py-1">
-            <MImage Src="@Value.Avatar" Contain MaxHeight=50 MaxWidth=50></MImage>
-        </MCol>
-    </MRow>
-    <MRow Class="py-0 my-0">
-        <MCol Cols=12 Class="d-flex justify-center text-h6 font-wight-bold pb-1 my-0">
-            @Value.Name
-        </MCol>
-    </MRow>
-    <MRow Class="py-0 my-0">
-        <MCol Cols=12 Class="pb-1 my-0">
-            <div class="text-h6 text-center font-wight-bold">
-                Project team
-            </div>
-            <div class="d-flex justify-left">
-                <CUserList Users="@(Value.Admins?.Select(m=>new CUserList.UserListDto{ Name=m.Name, ImgUrl=m.Avatar}))" MaxHeight=24 MaxWidth=24></CUserList>
-            </div>
-        </MCol>
-    </MRow>
-    <MRow Class="py-0 my-0">
-        <MCol Cols=6 Class="pb-1 my-0 text-body-2">监测项目：@Value.ProjectTotal</MCol>
-        <MCol Cols=6 Class="pb-1 my-0 text-body-2">监测应用：@Value.AppTotal</MCol>
-    </MRow>
-    <MRow>
-        <MCol Cols=12 Class="py-0 my-0 text-body-2">Description:@Value.Description</MCol>
-    </MRow>
-    <MRow>
-        <MCol Cols=12 Class="py-0 my-0 py-8 d-flex justify-center">
-            <MIcon OnClick="UpDownTroggle">@_upDownClass</MIcon>
-        </MCol>
-    </MRow>
+<MCard>
+    <MCardText Style="background-color:#E9EDF7" Class="rounded-lg">
+        <MRow>
+            <MCol Cols=12>
+                <MListItem Class="px-0">
+                    <MListItemAvatar>
+                        <MImage alt="Team Avatar" Src="@Value.Avatar">
+                        </MImage>
+                    </MListItemAvatar>
+                    <MListItemContent>
+                        <MListItemTitle Class="emphasis--text h8">@Value.Name</MListItemTitle>
+                    </MListItemContent>
+                </MListItem>
+            </MCol>
+            <MCol Cols=6 Class="regular--text"><MLabel Class="body2">监测项目：</MLabel> <span class="subtitle2">@Value.ProjectTotal</span></MCol>
+            <MCol Cols=6 Class="regular--text"><MLabel Class="body2">监测应用：</MLabel><span class="subtitle2">@Value.AppTotal</span></MCol>
+            <MCol Cols=12 Class="regular2--text body2">Description:@Value.Description</MCol>
+        </MRow>
+        <MRow Class="">
+            @foreach (var user in Value.Admins)
+            {
+                <MCol Cols="@("auto")">
+                    <MChip Color="white">
+                        <MAvatar Left>
+                            <MImage Src="@user.Avatar" />
+                        </MAvatar>
+                        @user.Name
+                    </MChip>
+                </MCol>
+            }
+        </MRow>
     </MCardText>
 </MCard>
 
 @code {
-    private bool _down = true;
-    private string _upDownClass = "fas fa-chevron-down";
-
     [Parameter]
     public TeamDto Value { get; set; } = default!;
-
-    private void UpDownTroggle()
-    {
-        _down = !_down;
-        if (_down)
-            _upDownClass = "fas fa-chevron-down";
-        else
-            _upDownClass = "fas fa-chevron-up";
-    }
 }

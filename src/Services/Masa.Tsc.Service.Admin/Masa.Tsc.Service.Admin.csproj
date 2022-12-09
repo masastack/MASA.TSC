@@ -57,8 +57,6 @@
 		<PackageReference Include="Masa.Contrib.Data.Contracts" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Isolation.MultiEnvironment" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Development.DaprStarter.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Utils.Caching.DistributedMemory" Version="0.6.0-preview.13" />
-		<PackageReference Include="Masa.Utils.Caching.Redis" Version="0.6.0-preview.13" />
 		<PackageReference Include="MASA.Utils.Configuration.Json" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Utils.Extensions.Enums" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />

@@ -1,24 +1,18 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@implements IDisposable
 @inherits TscComponentBase
 
-<MRow Class="rounded-0 pa-0 ma-0">
-    <MCol Cols="3" Class="bg-color-A3AED0 pa-0 ma-0">
-        <MTabs SliderColor="white" Class="bg-color-A3AED0" SliderSize="2" FixedTabs>
-            <MTab Style="text-transform: none" ActiveClass="bg-color-A3AED0" Class="bg-color-A3AED0" IsActive>All</MTab>
-            <MTab Style="text-transform: none" ActiveClass="bg-color-A3AED0" Class="bg-color-A3AED0">Operator</MTab>
-            <MTab Style="text-transform: none" ActiveClass="bg-color-A3AED0" Class="bg-color-A3AED0">Basic Ability</MTab>
-            @*<MTab Style="text-transform: none" ActiveClass="bg-color-A3AED0" Class="bg-color-A3AED0">Data Factory</MTab>
-                <MTab Style="text-transform: none" ActiveClass="bg-color-A3AED0" Class="bg-color-A3AED0">Data Factory2</MTab>*@
+<div class="d-flex align-center">
+    <div class="flex-grow-1">
+        <MTabs Class="transparent-tab">
+            <MTab>All</MTab>
+            <MTab>Operator</MTab>
+            <MTab>Basic Ability</MTab>
+            <MTab>Data Factory</MTab>
         </MTabs>
-    </MCol>
-    <MCol Cols="9" Class="d-flex bg-color-A3AED0 pa-0 ma-0 py-1 overflow-hidden" Style="height:48px">
-        <MAutocomplete Class="col-2 pa-0 ma-0  rounded-0" BackgroundColor="white" Items="_projects"
-                       TItem="ProjectDto" TValue="string" TItemValue="string" ItemValue="r=>r.Name" Dense Outlined
-                       ItemText="r=>r.Identity" OnSelectedItemUpdate="@((ProjectDto value)=>OnValueChange(appid:value.Identity))">
-        </MAutocomplete>
-        <SearchTextField Class="col-6 pa-0 ma-0 rounded-0" BackgroundColor="white" Outlined Dense OnChange="@((value)=>OnValueChange(text:value))"></SearchTextField>
-        <SDateTimeRangePicker Class="pl-4 ml-0 my-0 pl-0 py-0 col-6 py-2 rounded-0" Style="max-width:390px"
-                              StartTimeChanged="@((start)=>OnValueChange(start:start))"
-                              EndTimeChanged="@((end)=>OnValueChange(end:end))" />
-    </MCol>
-</MRow>
+    </div>
+    <div style="width:300px;" class="mx-6">
+        <SSearch BackgroundColor="white" Dense/>
+    </div>
+    <DateTimeRangerPickerTimeSelector/>
+</div>

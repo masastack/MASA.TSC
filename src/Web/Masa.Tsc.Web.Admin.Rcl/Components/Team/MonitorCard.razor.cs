@@ -6,61 +6,61 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class MonitorCard
 {
     [Parameter]
-    public int Error { get { return GetValue(2); } set { SetData(value, 2); } }
+    public List<AppMonitorViewDto> Data { get; set; } = new();
 
     [Parameter]
-    public int Monitor { get { return GetValue(0); } set { SetData(value, 0); } }
+    public StringNumber Value { get; set; }
 
     [Parameter]
-    public int Normal { get { return GetValue(3); } set { SetData(value, 3); } }
+    public EventCallback<StringNumber> ValueChanged { get; set; }
 
-    [Parameter]
-    public int Warn { get { return GetValue(1); } set { SetData(value, 1); } }
-
-    /// <summary>
-    /// 0monitor 1warn 2error 3normal 
-    /// </summary>
-    public List<AppMonitorViewDto> Data { get; set; } = new List<AppMonitorViewDto>
-        {
-            new AppMonitorViewDto
-            {
-                Name="MONITORING",
-                Color="#A3AED0",
-                Total=0,
-                Icon="mdi-chart-line-variant"
-            },
-            new AppMonitorViewDto
-            {
-                Name="WARN",
-                Color="#C07401",
-                Total=0,
-                Icon="mdi-bell-ring"
-            },
-            new AppMonitorViewDto
-            {
-                Name="ERROR",
-                Color="#F80E1C",
-                Total=0,
-                Icon="mdi-bell"
-            },
-            new AppMonitorViewDto
-            {
-                Name="NORMAL",
-                Color="#299F00",
-                Total=0,
-                Icon="mdi-shield"
-            }
-        };
-
-    private void SetData(int value, int index)
+    protected override void OnAfterRender(bool firstRender)
     {
-        AppMonitorViewDto item = Data[index];
-        item.Total = value;
+        if (firstRender)
+        {
+            Data = new List<AppMonitorViewDto>
+            {
+                new AppMonitorViewDto
+                {
+                    Text="MONITORING",
+                    Color="#7C4DFF",
+                    Name="12/128",
+                    Icon="mdi-chart-line-variant"
+                },
+                new AppMonitorViewDto
+                {
+                    Text="WARN",
+                    Color="#FF6E40",
+                    Name="128",
+                    Icon="mdi-bell-ring"
+                },
+                new AppMonitorViewDto
+                {
+                    Text="ERROR",
+                    Color="#FF5252",
+                    Name="128",
+                    Icon="mdi-bell"
+                },
+                new AppMonitorViewDto
+                {
+                    Text="NORMAL",
+                    Color="#69F0AE",
+                    Name="128",
+                    Icon="mdi-shield"
+                }
+            };
+            StateHasChanged();
+        }
+        base.OnAfterRender(firstRender);
     }
 
-    private int GetValue(int index)
+    private string ItemStyle(AppMonitorViewDto appMonitor, bool active)
     {
-        return Data[index].Total;
+        if (active)
+        {
+            return $"border: 1px solid {appMonitor.Color};border-radius: 16px;";
+        }
+        return "border: 1px solid #E4E8F3;border-radius: 16px;";
     }
 }
 

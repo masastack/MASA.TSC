@@ -1,26 +1,30 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<MCard Class="monitor-item me-7 flex-row rounded" Style="@borderStyle">
-    <MCardTitle Class="text-md-subtitle-2 font-weight-bold align-md-content-center justify-center pa-0" Style="@style">@Value.Name</MCardTitle>
-    <MCardText Class="pa-4">
-        <MIcon Class="flex-row px-6" Large Color="@(Value.Color)">@Value.Icon</MIcon>
-        <span class="flex-row pl-14 font-weight-regular text-md-subtitle-1" style="@colorStyle">@Value.Total</span>
-    </MCardText>
+<MCard Class="pa-2" OnClick="OnClickHandler">
+        <MCardText Class="d-flex justify-space-between pa-0 pb-6">
+            <div class="d-flex flex-column justify-space-around">
+                <h3>@Value.Name</h3>
+                <span>@Value.Text</span>
+            </div>
+            <MIcon>@Value.Icon</MIcon>
+        </MCardText>
+    <MCardActions Class="pa-0">
+        <MProgressLinear Height="4" Color="@Value.Color" Rounded Value="100"></MProgressLinear>
+    </MCardActions>
 </MCard>
 @code {
     [Parameter]
     public AppMonitorViewDto Value { get; set; } = default!;
 
-    private string style = default!;
-    private string borderStyle = default!;
-    private string colorStyle = default!;
+    [Parameter]
+    public EventCallback<AppMonitorViewDto> OnClick { get; set; }
 
-    protected override void OnParametersSet()
+    private async Task OnClickHandler()
     {
-        style = $"background-color:{Value.Color};color:#ffffff";
-        borderStyle = $"border-color:{Value.Color}";
-        colorStyle = $"color:{Value.Color}";
-        base.OnParametersSet();
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(Value);
+        }
     }
 }

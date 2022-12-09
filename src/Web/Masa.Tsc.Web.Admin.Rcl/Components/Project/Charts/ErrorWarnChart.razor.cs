@@ -6,16 +6,10 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class ErrorWarnChart
 {
     [Parameter]
-    public StringNumber Width { get; set; } = 180;
+    public StringNumber Width { get; set; } = "100%";
 
     [Parameter]
-    public StringNumber Height { get; set; } = 190;
-
-    [Parameter]
-    public bool Error { get; set; }
-
-    [Parameter]
-    public bool Warn { get; set; }
+    public StringNumber Height { get; set; } = "100%";
 
     [Parameter]
     public string Title { get; set; }
@@ -23,15 +17,16 @@ public partial class ErrorWarnChart
     [Parameter]
     public string SubText { get; set; } = "先写死\r\n从数据库读取加载";
 
+    private int _total;
     private EChartType _options = EChartConst.Pie;
 
     protected override void OnInitialized()
     {
-        _options.SetValue("legend", new { buttom = "1%", right = true, orient = "horizontal" });
+        _options.SetValue("legend", new { bottom = 10, left = "center" });
         _options.SetValue("series[0]", new
         {
             type = "pie",
-            radius = "80%",
+            radius = "60%",
             emphasis = new
             {
                 itemStyle = new
@@ -41,12 +36,11 @@ public partial class ErrorWarnChart
                     shadowColor = "rgba(0, 0, 0, 0.5)"
                 }
             },
-            label = new { show = true }
+            label = new { show = false }
         });
         base.OnInitialized();
-    }    
+    }
 
-    private int _total { get; set; }
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
@@ -71,7 +65,7 @@ public partial class ErrorWarnChart
                 Service = query.AppId,
                 Conditions = new FieldConditionDto[] { new FieldConditionDto {
                    Name="SeverityText",
-                   Value=Warn ? "Warning" : "Error"
+                   Value = "Error"
                 } }
             });
 
@@ -80,11 +74,11 @@ public partial class ErrorWarnChart
             {
                 Start = start,
                 End = end,
-                Name= "@timestamp",
-                Alias= "Count",
-                Type=  AggregateTypes.Count,
-                Service=query.AppId
-            });        
+                Name = "@timestamp",
+                Alias = "Count",
+                Type = AggregateTypes.Count,
+                Service = query.AppId
+            });
         _total += data1;
         _total += data2;
 
