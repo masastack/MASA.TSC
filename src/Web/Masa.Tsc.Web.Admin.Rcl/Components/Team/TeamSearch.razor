@@ -4,7 +4,7 @@
 
 <div class="d-flex align-center">
     <div class="flex-grow-1">
-        <MTabs Class="transparent-tab">
+        <MTabs Class="transparent-tab" Value="@_value.ProjectType" ValueChanged=@(async (value)=>await OnValueChange(projectType:value.ToString()))>
             @foreach (var item in _projectTypes)
             {
                 <MTab Value=@item.Key>@item.Value</MTab>
@@ -12,7 +12,7 @@
         </MTabs>
     </div>
     <div style="width:300px;" class="mx-6">
-        <SSearch BackgroundColor="white" Dense />
+        <SSearch BackgroundColor="white" Dense ValueChanged=@(async (value)=>await OnValueChange(text:value)) />
     </div>
-    <DateTimeRangerPickerTimeSelector />
+    <DateTimeRangerPickerTimeSelector/>
 </div>

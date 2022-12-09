@@ -71,7 +71,7 @@ public partial class SearchBar
     {
         if (firstRender && OnSearch.HasDelegate)
         {
-            await OnSearch.InvokeAsync(Value);
+            await SearchAsync();
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -79,6 +79,6 @@ public partial class SearchBar
     private async Task OnSelectItemUpdate(AppDto item)
     {
         AppId = item.Identity;
-        await OnSearch.InvokeAsync(Value);
+        await SearchAsync();
     }
 }

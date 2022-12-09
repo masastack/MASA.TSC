@@ -12,4 +12,6 @@ public class TeamSearchModel
     public string Keyword { get; set; }
 
     public string AppId { get; set; }
+
+    public string ProjectType { get; set; }
 }
