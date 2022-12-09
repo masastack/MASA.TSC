@@ -5,24 +5,34 @@
 <ul class="m-honeycomb">
     @foreach (var item in Data)
     {
-        <li class="@SplicingCellClass()" @onclick="()=>OnClickHandler(item)" style="@(OnItemClick.HasDelegate?"cursor:pointer;":"")">
-            @if (CellBack!=null)
-            {
-                <div class="m-honeycomb-cell__back" style="@CellBackStyle.Invoke(item)">
-                    @CellBack(item)
-                </div>
-            }
-            @if (CellFront != null)
-            {
-                <div class="m-honeycomb-cell__front">
-                    @CellFront(item)
-                </div>
-            }
-            @if (HasBorder)
-            {
-                <div class="m-honeycomb-cell__border" style="background-color:@CellBorderColor(item)"></div>
-            }
-        </li>
+        <MMenu OpenOnHover Top OffsetY ContentClass="m-honeycomb-cell__tip">
+            <ActivatorContent>
+                <li @attributes="@context.Attrs" class="@SplicingCellClass()" @onclick="()=>OnClickHandler(item)" style="@(OnItemClick.HasDelegate?"cursor:pointer;":"")">
+                    @if (CellBack != null)
+                    {
+                        <div class="m-honeycomb-cell__back" style="@CellBackStyle.Invoke(item)">
+                            @CellBack(item)
+                        </div>
+                    }
+                    @if (CellFront != null)
+                    {
+                        <div class="m-honeycomb-cell__front">
+                            @CellFront(item)
+                        </div>
+                    }
+                    @if (HasBorder)
+                    {
+                        <div class="m-honeycomb-cell__border" style="background-color:@CellBorderColor(item)"></div>
+                    }
+                </li>
+            </ActivatorContent>
+            <ChildContent>
+                @if (CellHoverTip != null)
+                {
+                    @CellHoverTip(item)
+                }
+            </ChildContent>
+        </MMenu>
     }
     <li class="m-honeycomb-cell m-honeycomb__placeholder"></li>
 </ul>
@@ -33,6 +43,9 @@
 
     [Parameter]
     public RenderFragment<TItem>? CellFront { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem>? CellHoverTip { get; set; }
 
     [Parameter]
     public List<TItem> Data { get; set; } = new();

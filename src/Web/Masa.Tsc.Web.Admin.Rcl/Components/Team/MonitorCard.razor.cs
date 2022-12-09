@@ -24,28 +24,31 @@ public partial class MonitorCard
                 {
                     Text="MONITORING",
                     Color="#7C4DFF",
-                    Name="12/128",
+                    Value=12,
+                    Total=128,
                     Icon="mdi-chart-line-variant"
                 },
                 new AppMonitorViewDto
                 {
                     Text="WARN",
                     Color="#FF6E40",
-                    Name="128",
+                    Value=12,
+                    Total=128,
                     Icon="mdi-bell-ring"
                 },
                 new AppMonitorViewDto
                 {
                     Text="ERROR",
                     Color="#FF5252",
-                    Name="128",
+                    Value=12,
+                    Total=128,
                     Icon="mdi-bell"
                 },
                 new AppMonitorViewDto
                 {
                     Text="NORMAL",
                     Color="#69F0AE",
-                    Name="128",
+                    Value=12,
                     Icon="mdi-shield"
                 }
             };

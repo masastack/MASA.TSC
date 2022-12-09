@@ -30,16 +30,31 @@
                         }
                     </div>
                 </CellBack>
+                <CellHoverTip>
+                    <div style="height:150px;background-color:transparent;">
+                        <MCard Height=128 Width=240 Class="emphasis2" Style="border-bottom-left-radius:20px;border-bottom-right-radius:20px;">
+                            <MCardText Class="d-flex flex-column white--text body">
+                                <span>项目名称</span>
+                                <span>ID：0123122391</span>
+                                <span>9</span>
+                                <p>项目描述</p>
+                            </MCardText>
+                        </MCard>
+                        <div class="d-flex justify-center" style="margin-top: -10px;">
+                            <div style="width: 0;height: 0;border-style: solid;border-width: 0 20px 20px 0;border-color: transparent transparent #323D6F transparent;transform: rotate(315deg);"></div>
+                        </div>
+                    </div>
+                </CellHoverTip>
             </HoneyCombGrid>
         </MCol>
         <MCol Md="2">
-            <MonitorCard Class="ml-8"/>   
+            <MonitorCard Class="ml-8" />
         </MCol>
     </MRow>
 </MCard>
 
-<TeamProjectDialog @bind-Visible="_visible"/>
-@code{
+<TeamProjectDialog @bind-Visible="_visible" />
+@code {
     private bool _visible;
 
     private void HandleOnItemClick(ProjectOverviewDto item)
@@ -54,7 +69,7 @@
             MonitorStatuses.Normal => "background: #E6FAF5;",
             MonitorStatuses.Warn => "background: #FFF7E8;",
             MonitorStatuses.Error => "background: #FFECE8;",
-            _ =>""
+            _ => ""
         };
     }
 
