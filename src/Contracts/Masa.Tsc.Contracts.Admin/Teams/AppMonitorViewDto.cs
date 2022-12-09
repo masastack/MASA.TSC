@@ -9,9 +9,21 @@ public class AppMonitorViewDto
 
     public int Total { get; set; }
 
+    public int AppTotal { get; set; }
+
     public string Color { get; set; }
 
     public string Text { get; set; }
 
     public string Icon { get; set; }
+
+    public bool IsShowApp { get; set; } = true;
+
+    public string ToDispaly()
+    {
+        if (IsShowApp)
+            return $"{ServiceTotal} ({AppTotal})";
+        else
+            return ServiceTotal.ToString();
+    }
 }

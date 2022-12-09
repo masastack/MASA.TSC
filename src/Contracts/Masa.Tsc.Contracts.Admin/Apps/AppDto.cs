@@ -13,5 +13,7 @@ public class AppDto
 
     public ServiceTypes ServiceType { get; set; }
 
+    public AppTypes AppType { get; set; }
+
     public MonitorStatuses Status { get; set; }
 }

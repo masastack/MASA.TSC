@@ -20,6 +20,7 @@ builder.WebHost.UseKestrel(option =>
 });
 
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
+builder.Services.AddDccClient(dccConfig.RedisOptions);
 builder.Services.AddMasaConfiguration(configurationBuilder =>
 {
     configurationBuilder.UseDcc(dccConfig, default, default);

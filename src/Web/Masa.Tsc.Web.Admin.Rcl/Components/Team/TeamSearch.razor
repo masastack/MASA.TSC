@@ -5,14 +5,14 @@
 <div class="d-flex align-center">
     <div class="flex-grow-1">
         <MTabs Class="transparent-tab">
-            <MTab>All</MTab>
-            <MTab>Operator</MTab>
-            <MTab>Basic Ability</MTab>
-            <MTab>Data Factory</MTab>
+            @foreach (var item in _projectTypes)
+            {
+                <MTab Value=@item.Key>@item.Value</MTab>
+            }
         </MTabs>
     </div>
     <div style="width:300px;" class="mx-6">
-        <SSearch BackgroundColor="white" Dense/>
+        <SSearch BackgroundColor="white" Dense />
     </div>
-    <DateTimeRangerPickerTimeSelector/>
+    <DateTimeRangerPickerTimeSelector />
 </div>

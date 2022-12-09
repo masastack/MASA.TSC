@@ -6,7 +6,16 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class MonitorCard
 {
     [Parameter]
-    public List<AppMonitorViewDto> Data { get; set; } = new();
+    public AppMonitorDto Data
+    {
+        get { return _appMonitorDto; }
+        set
+        {
+            if (value == null) return;
+            _appMonitorDto = value;
+            UpdateItems();
+        }
+    }
 
     [Parameter]
     public StringNumber Value { get; set; }
@@ -14,47 +23,48 @@ public partial class MonitorCard
     [Parameter]
     public EventCallback<StringNumber> ValueChanged { get; set; }
 
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            Data = new List<AppMonitorViewDto>
+    private List<AppMonitorViewDto> _items { get; set; } = new List<AppMonitorViewDto>
             {
                 new AppMonitorViewDto
                 {
                     Text="MONITORING",
                     Color="#7C4DFF",
-                    Value=12,
-                    Total=128,
                     Icon="mdi-chart-line-variant"
                 },
                 new AppMonitorViewDto
                 {
                     Text="WARN",
-                    Color="#FF6E40",
-                    Value=12,
-                    Total=128,
+                    Color="#FF7D00",
                     Icon="mdi-bell-ring"
                 },
                 new AppMonitorViewDto
                 {
                     Text="ERROR",
                     Color="#FF5252",
-                    Value=12,
-                    Total=128,
                     Icon="mdi-bell"
                 },
                 new AppMonitorViewDto
                 {
                     Text="NORMAL",
                     Color="#69F0AE",
-                    Value=12,
-                    Icon="mdi-shield"
+                    Icon="mdi-shield",
+                    IsShowApp=false
                 }
             };
-            StateHasChanged();
-        }
-        base.OnAfterRender(firstRender);
+    private AppMonitorDto _appMonitorDto = new();
+
+    private void UpdateItems()
+    {
+        _items[0].ServiceTotal = _appMonitorDto.ServiceTotal;
+        _items[0].AppTotal = _appMonitorDto.AppTotal;
+
+        _items[1].ServiceTotal = _appMonitorDto.ServiceError;
+        _items[1].AppTotal = _appMonitorDto.AppError;
+
+        _items[2].ServiceTotal = _appMonitorDto.ServiceWarn;
+        _items[2].AppTotal = _appMonitorDto.AppWarn;
+
+        _items[3].ServiceTotal = _appMonitorDto.Normal;
     }
 
     private string ItemStyle(AppMonitorViewDto appMonitor, bool active)

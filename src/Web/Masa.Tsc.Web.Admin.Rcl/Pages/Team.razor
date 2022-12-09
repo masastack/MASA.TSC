@@ -48,18 +48,22 @@
             </HoneyCombGrid>
         </MCol>
         <MCol Md="2">
-            <MonitorCard Class="ml-8" />
+            <MonitorCard Class="ml-8" Data=_appMonitorDto />
         </MCol>
     </MRow>
 </MCard>
 
-<TeamProjectDialog @bind-Visible="_visible" />
+<TeamProjectDialog @bind-Visible="_visible" @ref="_teamProjectDialog" />
 @code {
     private bool _visible;
+    private TeamProjectDialog _teamProjectDialog;
 
-    private void HandleOnItemClick(ProjectOverviewDto item)
+    private async Task HandleOnItemClick(ProjectOverviewDto item)
     {
+        //_selectedProjectId = item.Identity;
+        //_selectedTeamId = item.TeamId;
         _visible = true;
+        await _teamProjectDialog.RefrshDataASync(item.TeamId, item.Identity);
     }
 
     private string CellBackBackgroundStyle(ProjectOverviewDto overviewDto)

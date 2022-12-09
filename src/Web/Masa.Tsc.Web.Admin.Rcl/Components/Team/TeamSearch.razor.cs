@@ -9,10 +9,14 @@ public partial class TeamSearch
     public EventCallback<TeamSearchModel> OnValueChanged { get; set; }
 
     private TeamSearchModel _value = new();
+    private List<KeyValuePair<string, string>> _projectTypes = new() { KeyValuePair.Create("", "All") };
 
-    protected override Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        return base.OnAfterRenderAsync(firstRender);
+        var data = await ApiCaller.ProjectService.GetProjectTypesAsync();
+        if (data != null)
+            _projectTypes.AddRange(data);
+        await base.OnInitializedAsync();
     }
 
     private async Task OnValueChange(DateTime? start = default, DateTime? end = default, string? text = default, string? appid = default)

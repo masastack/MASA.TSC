@@ -5,7 +5,7 @@
     <MCardText>
         <div class="d-flex justify-space-between emphasis--text h6">
             <span>@Value.Name</span>
-            <span>@Value.Apps.Count</span>
+            <span>@Value.Apps?.Count</span>
         </div>
         <span class="regular3--text body2 mt-1">@Value.Identity</span>
         <p class="regular--text body2 mt-4">
@@ -15,12 +15,11 @@
             <span class="regular3--text body2">创建人</span>
             <MListItem Class="px-0 mt-2">
                 <MListItemAvatar>
-                    <MImage alt="Admin Avatar"
-                            Src="https://cdn.masastack.com/stack/images/website/masa-blazor/lists/5.png">
+                    <MImage alt="Admin Avatar" Src="@Value.Creator.Avatar">
                     </MImage>
                 </MListItemAvatar>
                 <MListItemContent>
-                    <MListItemTitle Class="regular--text body2">title</MListItemTitle>
+                    <MListItemTitle Class="regular--text body2">@Value.Creator.DisplayName</MListItemTitle>
                 </MListItemContent>
             </MListItem>
         </div>

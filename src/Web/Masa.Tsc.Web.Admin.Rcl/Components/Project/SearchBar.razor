@@ -4,8 +4,8 @@
 <MRow Class="@Class">
     <MCol Cols="6" Class="d-flex justify-start align-center">
         <div style="width:210px;">
-            <SAutoComplete TItem="AppDto" TItemValue=string TValue=string @bind-Value=@Value.AppId
-                           Items=Apps ItemText="r=>r.Name" ItemValue="r=>r.Identity" Outlined Dense
+            <SAutoComplete TItem="AppDto" TItemValue=string TValue=string OnSelectedItemUpdate="OnSelectItemUpdate"
+                           Items=Apps ItemText="r=>r.Name" ItemValue="r=>r.Identity" Outlined Dense Value="@AppId"
                            Style="background-color:white;" />
         </div>
         <MChip Class="mx-6" Color="#05CD99" TextColor="white">应用类型</MChip>
