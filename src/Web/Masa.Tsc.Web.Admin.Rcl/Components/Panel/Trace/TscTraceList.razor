@@ -1,18 +1,18 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<MDataTable Headers="_headers"
-            OnOptionsUpdate=OnUpdateOptionsAsync
-            ServerItemsLength=_total
-            ItemsPerPage="10"
-            Items=_data
+<SDataTable Headers="_headers"
+            ServerItemsLength="_total"
+            ItemsPerPage="_pageSize"
+            Items="_data"
             TItem="TraceResponseDto"
-            Loading="_isLoading"            
-            @ref="_mDataTable">
+            Loading="@Loading"
+            Class="rounded-t-0"
+            Height='"calc(100vh - 620px)"'>
     <ItemColContent>
         @if (context.Header.Value == "Operate")
         {
-            <MIcon OnClick="@(()=>OpenAsync(context.Item))">mdi-view-headline</MIcon>
+            <MIcon OnClick="@(() => OpenAsync(context.Item))">mdi-view-headline</MIcon>
         }
         else if (context.Header.Text == "Timestamp")
         {
@@ -23,18 +23,12 @@
             @context.Value
         }
     </ItemColContent>
-</MDataTable>
+</SDataTable>
 
-<MDialog @bind-Value="_showDialog"
-         Fullscreen>
-    <ChildContent>
-        <MCard Class="overflow-hidden">
-            <MCardTitle Class="d-flex justify-end">
-                <MIcon OnClick="CloseDialog" title="Close">mdi-close</MIcon>
-            </MCardTitle>
-            <MCardText>
-                <TscTraceDetail TraceId="@_selectTraceId"></TscTraceDetail>
-            </MCardText>
-        </MCard>
-    </ChildContent>
-</MDialog>
+<SPagination @bind-Page="_page"
+             @bind-PageSize="_pageSize" 
+             Total="_total"
+             Class="white px-6 py-3"
+             OnChange="HandleOnPaginationUpdate" />
+
+<TscTraceDetail @ref="_tscTraceDetail"></TscTraceDetail>
