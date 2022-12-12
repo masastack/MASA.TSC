@@ -40,8 +40,11 @@
                     <ItemColContent>
                         @switch (context.Header.Value)
                         {
+                            case nameof(DashboardDto.Name):
+                                <div class="hover-pointer" @onclick="()=> NavigateToConfiguration(context.Item)">@context.Item.Name</div>
+                                break;
                             case nameof(DashboardDto.Folder):
-                                <span>@context.Item.Folder.Name</span>
+                                <div >@context.Item.Folder.Name</div>
                                 break;
                             case nameof(DashboardDto.IsRoot):
                                 <span>@(context.Item.IsRoot ? T("Yes") : T("No"))</span>

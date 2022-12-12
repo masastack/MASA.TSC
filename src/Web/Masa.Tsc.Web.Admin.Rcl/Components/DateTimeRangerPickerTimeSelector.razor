@@ -1,7 +1,7 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @using System.Timers;
 
-<div class="d-inline-flex align-center rounded px-4" style="border:1px solid rgba(0,0,0,.38);height: 40px;background-color:white;">
+<div class="d-inline-flex align-center rounded px-4 @Class" style="border:1px solid rgba(0,0,0,.38);height: 40px;background-color:white;">
         <DateTimeRangePicker @bind-StartDateTime="startDateTime"
                              @bind-EndDateTime="endDateTime"
                              OnConfirm="OnAbsoluteDateTimeUpdated">
@@ -57,6 +57,29 @@
     </div>
 
 @code {
+    [Parameter]
+    public DateTimeOffset StartDateTime
+    {
+        get => startDateTime;
+        set => startDateTime = value;
+    }
+
+    [Parameter]
+    public EventCallback<DateTimeOffset> StartDateTimeChanged { get; set; }
+
+    [Parameter]
+    public DateTimeOffset EndDateTime
+    {
+        get => endDateTime;
+        set => endDateTime = value;
+    }
+
+    [Parameter]
+    public EventCallback<DateTimeOffset> EndDateTimeChanged { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
     private DateTimeOffset startDateTime = DateTimeOffset.UtcNow.AddHours(-1);
     private DateTimeOffset endDateTime = DateTimeOffset.UtcNow;
     private string relatedTimeSpanText = "off";

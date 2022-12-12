@@ -39,3 +39,5 @@ global using System.Text.Json.Serialization;
 global using System.Text.RegularExpressions;
 global using Masa.Tsc.Contracts.Admin.Dashboards;
 global using System.Linq.Expressions;
+global using Masa.BuildingBlocks.StackSdks.Pm.Model;
+global using Masa.BuildingBlocks.StackSdks.Pm;

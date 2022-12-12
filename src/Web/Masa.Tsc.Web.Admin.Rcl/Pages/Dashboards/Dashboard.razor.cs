@@ -10,6 +10,9 @@ public partial class Dashboard
     int _pageSize = 10;
     bool _expandAll = true;
 
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
     string Search
     {
         get { return _search ?? ""; }
@@ -175,5 +178,10 @@ public partial class Dashboard
         OpenSuccessMessage(T("Delete folder data success"));
         await GetFoldersAsync();
         Loading = false;
+    }
+
+    void NavigateToConfiguration(DashboardDto dashboard)
+    {
+        NavigationManager.NavigateTo($"/dashboard/configuration/{dashboard.Id}");
     }
 }

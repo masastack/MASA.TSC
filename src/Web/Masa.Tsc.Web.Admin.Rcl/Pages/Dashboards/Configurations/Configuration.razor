@@ -1,0 +1,34 @@
+﻿@page "/dashboard/configuration/{dashboardId}"
+@inherits TscComponentBase
+
+<AutoHeight>
+    <HeaderContent>
+        <div class="d-flex mb-6">
+            <AppAutoComplete @bind-Value="AppId" FillBackground=false Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" />
+            <div style="width:100%;" class="d-flex">
+                <SearchTextField @bind-Value="@Search" FillBackground=false Clearable Class="mr-6 my-auto" />
+                <DateTimeRangerPickerTimeSelector @bind-StartDateTime=StartTime @bind-EndDateTime=EndTime Class="mr-6 my-auto" />
+            </div>
+            <MSwitch @bind-Value="IsEdit" LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="mr-6 my-auto" />
+            <SButton Icon Class="my-auto">
+                <SIcon Tooltip="@T("Save")" Size=24>@IconConstants.Save</SIcon>
+            </SButton>
+        </div>
+    </HeaderContent>
+    <AutoHeightContent>
+        <DefaultCard Class="full-height">
+            <div class="pt-3 pl-3" style="border: 1.13196px dashed #E4E8F3;border-radius: 9.05569px;width: 486px; display: flex;flex-wrap: wrap;">
+                @foreach (var componentType in GetComponentTypes())
+                {
+                    <div @onclick="() => AddCompontent(componentType)" style="width: 148px;min-width:148px;height: 60px;background: #F6F8FD;border-radius: 6.79176px;" class="d-flex hover-pointer px-3 mr-2 mb-2 suspend">
+                        <div class="d-flex my-auto" style="width:100%;">
+                            <span>@T(componentType.ToString())</span>
+                            <MSpacer />
+                            <SIcon Size="16">@IconConstants.Add</SIcon>
+                        </div>
+                    </div>
+                }
+            </div>
+        </DefaultCard>
+    </AutoHeightContent>
+</AutoHeight>
