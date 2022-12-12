@@ -5,11 +5,17 @@ namespace Masa.Tsc.Contracts.Admin;
 
 public class AppMonitorDto
 {
-    public int Total { get; set; }
+    public int ServiceTotal { get; set; }
 
-    public int Error { get; set; }
+    public int AppTotal { get; set; }
 
-    public int Warn { get; set; }
+    public int ServiceError { get; set; }
+
+    public int AppError { get; set; }
+
+    public int ServiceWarn { get; set; }
+
+    public int AppWarn { get; set; }
 
     public int Normal { get; set; }
 }

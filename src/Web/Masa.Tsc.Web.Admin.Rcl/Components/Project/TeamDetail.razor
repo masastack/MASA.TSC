@@ -7,8 +7,7 @@
             <MCol Cols=12>
                 <MListItem Class="px-0">
                     <MListItemAvatar>
-                        <MImage alt="Team Avatar" Src="@Value.Avatar">
-                        </MImage>
+                        <MImage alt="Team Avatar" Src="@Value.Avatar"> </MImage>
                     </MListItemAvatar>
                     <MListItemContent>
                         <MListItemTitle Class="emphasis--text h8">@Value.Name</MListItemTitle>
@@ -20,7 +19,7 @@
             <MCol Cols=12 Class="regular2--text body2">Description:@Value.Description</MCol>
         </MRow>
         <MRow Class="">
-            @foreach (var user in Value.Admins)
+            @foreach (var user in Value.Admins!)
             {
                 <MCol Cols="@("auto")">
                     <MChip Color="white">

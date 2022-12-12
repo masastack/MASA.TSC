@@ -1,25 +1,24 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Nest;
-
 namespace Masa.Tsc.Service.Admin.Application.Teams;
 
 public class QueryHandler
 {
     private readonly IAuthClient _authClient;
     private readonly IPmClient _pmClient;
-    private readonly IElasticClient _elasticClient;
-    private readonly IMasaPrometheusClient _prometheusClient;
-    private readonly TokenProvider _tokenProvider;
+    private readonly ILogService _logService;
+    private readonly ITraceService _traceService;
 
-    public QueryHandler(IPmClient pmClient, IAuthClient authClient, IElasticClient elasticClient, IMasaPrometheusClient prometheusClient, TokenProvider token)
+    public QueryHandler(IPmClient pmClient,
+        IAuthClient authClient,
+        ILogService logService,
+        ITraceService traceService)
     {
         _authClient = authClient;
         _pmClient = pmClient;
-        _elasticClient = elasticClient;
-        _prometheusClient = prometheusClient;
-        _tokenProvider = token;
+        _logService = logService;
+        _traceService = traceService;
     }
 
     [EventHandler]
@@ -57,9 +56,29 @@ public class QueryHandler
                     LabelName = project.LabelName,
                     Id = project.Id.ToString()
                 };
+
+                //需要优化，从列表可以返回创建人
+                var detail = await _pmClient.ProjectService.GetAsync(project.Id);
+                query.Result.CurrentProject.Creator = await GetUserAsync(detail.Creator);
                 await SetAppAsync(query, projects);
             }
         }
+    }
+
+    private async Task<UserDto> GetUserAsync(Guid creatorId)
+    {
+        var creator = (await _authClient.UserService.GetUsersAsync(creatorId))?.First();
+        if (creator != null)
+            return new UserDto
+            {
+                Account = creator.Account,
+                Avatar = creator.Avatar,
+                DisplayName = creator.DisplayName,
+                Gender = creator.Gender,
+                Id = creator.Id,
+                Name = creator.Name!,
+            };
+        return default!;
     }
 
     private async Task SetAppAsync(TeamDetailQuery query, List<Masa.BuildingBlocks.StackSdks.Pm.Model.ProjectModel> projects)
@@ -73,7 +92,8 @@ public class QueryHandler
                 Id = a.Id.ToString(),
                 Name = a.Name,
                 Identity = a.Identity,
-                ServiceType = a.ServiceType
+                ServiceType = a.ServiceType,
+                AppType = a.Type
             }).ToList();
         }
     }
@@ -85,87 +105,74 @@ public class QueryHandler
 
         if (teams == null || !teams.Any())
             return;
+
+        var monitors = await GetAllMonitServicesAsync(query.StartTime, query.EndTime);
+
         query.Result = new TeamMonitorDto
         {
-            Projects = await GetAllProjects(teams.Select(t => t.Id).ToList()),
+            Projects = await GetAllProjects(teams.Select(t => t.Id).ToList(), monitors),
             Monitor = new AppMonitorDto()
         };
 
-        var monitors = await GetAllMonitorAsync();
-        var errorWarns = await GetErrorAndWarnAsync();
+        var errors = await GetErrorOrWarnAsync(true, query.StartTime, query.EndTime);
+        var warnings = await GetErrorOrWarnAsync(false, query.StartTime, query.EndTime);
 
-        int error = 0, warn = 0, errorWarnAppCount = 0;
-        if (errorWarns != null && errorWarns.Any())
-        {
-            SetProjectStatus(query, errorWarns, ref error, ref warn);
-            errorWarnAppCount = errorWarns?.Where(item => item.Value.Item1 > 0 || item.Value.Item2 > 0)?.Count() ?? 0;
-        }
+        SetProjectErrorOrWarn(query, errors, true);
+        SetProjectErrorOrWarn(query, warnings, false);
 
-        query.Result.Monitor.Error = error;
-        query.Result.Monitor.Warn = warn;
-        if (monitors != null && monitors.Any())
-        {
-            query.Result.Monitor.Total = monitors.Count;
-            if (monitors.Count - errorWarnAppCount > 0)
-            {
-                query.Result.Monitor.Normal = monitors.Count - errorWarnAppCount;
-            }
-        }
+        query.Result.Monitor.ServiceTotal = query.Result.Projects.Count;
+        query.Result.Monitor.AppTotal = query.Result.Projects.Sum(p => p.Apps.Count);
+        query.Result.Monitor.ServiceError = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Error);
+        query.Result.Monitor.AppError = query.Result.Projects.Where(p => p.Status == MonitorStatuses.Error).Sum(p => p.Apps.Count(a => a.Status == MonitorStatuses.Error));
+        query.Result.Monitor.ServiceWarn = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Warn);
+        query.Result.Monitor.AppWarn = query.Result.Projects.Where(p => p.Status == MonitorStatuses.Warn).Sum(p => p.Apps.Count(a => a.Status == MonitorStatuses.Warn));
+        query.Result.Monitor.Normal = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Normal);
+
     }
 
-    private static void SetProjectStatus(TeamMonitorQuery query, Dictionary<string, (int, int)> errorWarns, ref int error, ref int warn)
+    private static void SetProjectErrorOrWarn(TeamMonitorQuery query, List<string> appIds, bool isError)
     {
-        if (errorWarns == null || !errorWarns.Any())
+        if (appIds == null || !appIds.Any())
             return;
 
         foreach (var project in query.Result.Projects)
         {
-            bool isError = false, isWarn = false;
-            foreach (var app in project.Apps)
-            {
-                SetAppStatus(errorWarns, ref error, ref warn, isError, ref isWarn, app);
-            }
-            if (isError)
-                project.Status = MonitorStatuses.Error;
-            else if (isWarn)
-                project.Status = MonitorStatuses.Warn;
+            if (project.Apps == null || !project.Apps.Any())
+                continue;
+            SetAppStatus(appIds, isError, project.Apps);
+            SetProjectStatus(project, isError);
         }
     }
 
-    private static void SetAppStatus(Dictionary<string, (int, int)> errorWarns, ref int error, ref int warn, bool isError, ref bool isWarn, AppDto app)
+    private static void SetAppStatus(List<string> appids, bool isError, List<AppDto> apps)
     {
-        if (errorWarns.ContainsKey(app.Identity))
+        foreach (var app in apps)
         {
-            var item = errorWarns[app.Identity];
-
-            if (item.Item2 > 0)
+            if (appids.Contains(app.Identity))
             {
-                if (!isError && !isWarn)
-                {
-                    isWarn = true;
-                    app.Status = MonitorStatuses.Warn;
-                }
-                warn += item.Item2;
-            }
-
-            if (item.Item1 > 0)
-            {
-                if (!isError)
-                {
-                    isError = true;
-                    isWarn = false;
+                if (isError)
                     app.Status = MonitorStatuses.Error;
-                }
-                error += item.Item1;
-
+                else if (app.Status == MonitorStatuses.Normal)
+                    app.Status = MonitorStatuses.Warn;
             }
         }
     }
 
-    private async Task<List<ProjectOverviewDto>> GetAllProjects(List<Guid> teamids)
+    private static void SetProjectStatus(ProjectOverviewDto project, bool isError)
     {
-        var list = new List<int>();
+        if (isError && project.Apps.Any(app => app.Status == MonitorStatuses.Error))
+            project.Status = MonitorStatuses.Error;
+        else if (!isError && project.Status == MonitorStatuses.Normal && project.Apps.Any(app => app.Status == MonitorStatuses.Warn))
+            project.Status = MonitorStatuses.Warn;
+    }
+
+    private async Task<List<ProjectOverviewDto>> GetAllProjects(List<Guid> teamids, List<string> appids)
+    {
         var result = new List<ProjectOverviewDto>();
+        if (appids == null || !appids.Any())
+            return result;
+
+        var list = new List<int>();
 
         var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(teamids);
         if (projects == null || !projects.Any())
@@ -184,17 +191,18 @@ public class QueryHandler
                 Identity = project.Identity,
                 LabelName = project.LabelName,
                 Name = project.Name,
-                TeamId = teamids.FirstOrDefault()
+                TeamId = project.TeamId
             };
 
             if (apps != null && apps.Any())
             {
-                model.Apps = apps.Where(a => a.ProjectId == project.Id).Select(a => new AppDto
+                model.Apps = apps.Where(a => a.ProjectId == project.Id && appids.Contains(a.Identity)).Select(a => new AppDto
                 {
                     Id = a.Id.ToString(),
                     Identity = a.Identity,
                     Name = a.Name,
-                    ServiceType = a.ServiceType
+                    ServiceType = a.ServiceType,
+                    AppType = a.Type
                 }).ToList();
             }
 
@@ -204,19 +212,52 @@ public class QueryHandler
         return result;
     }
 
-    private async Task<List<string>> GetAllMonitorAsync()
+    private async Task<List<string>> GetAllMonitServicesAsync(DateTime? start = default, DateTime? end = default)
     {
-        await Task.CompletedTask;
-        return new List<string> { "service1", "service2" };
+        var logServices = (IEnumerable<string>)await _logService.AggregateAsync(new SimpleAggregateRequestDto
+        {
+            Name = ElasticConstant.ServiceName,
+            Start = start ?? DateTime.MinValue,
+            End = end ?? DateTime.MinValue,
+            Type = AggregateTypes.GroupBy,
+            MaxCount = 999
+        });
+
+        var traceServices = (IEnumerable<string>)await _traceService.AggregateAsync(new SimpleAggregateRequestDto
+        {
+            Name = ElasticConstant.ServiceName,
+            Start = start ?? DateTime.MinValue,
+            End = end ?? DateTime.MinValue,
+            Type = AggregateTypes.GroupBy,
+            MaxCount = 999
+        });
+
+        var result = new List<string>();
+        if (logServices != null && logServices.Any())
+            result.AddRange(logServices);
+        if (traceServices != null && traceServices.Any())
+            result.AddRange(traceServices);
+        return result.Distinct().ToList();
     }
 
-    private async Task<Dictionary<string, ValueTuple<int, int>>> GetErrorAndWarnAsync()
+    private async Task<List<string>> GetErrorOrWarnAsync(bool isError, DateTime? start = default, DateTime? end = default)
     {
-        await Task.CompletedTask;
-        return new Dictionary<string, ValueTuple<int, int>> {
-            { "service1",ValueTuple.Create(5,20)},
-            { "service2",ValueTuple.Create(0,0)}
-        };
+        var services = (IEnumerable<string>)await _logService.AggregateAsync(new SimpleAggregateRequestDto
+        {
+            Name = ElasticConstant.ServiceName,
+            Start = start ?? DateTime.MinValue,
+            End = end ?? DateTime.MinValue,
+            Type = AggregateTypes.GroupBy,
+            MaxCount = 999,
+            Conditions = new FieldConditionDto[] {
+                new FieldConditionDto{
+                    Name="Resource.SeverityText",
+                     Type= ConditionTypes.Equal,
+                     Value= isError?"Error":"Warn"
+                }
+            }
+        });
+        return services?.ToList()!;
     }
 
     private UserDto ToUser(StaffModel model)

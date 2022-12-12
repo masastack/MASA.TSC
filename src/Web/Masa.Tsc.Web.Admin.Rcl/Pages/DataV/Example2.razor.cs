@@ -28,13 +28,13 @@ public partial class Example2
 
     private async Task LoadData()
     {
-        long start = 0, end = 0;
+        DateTime start = DateTime.MinValue, end = DateTime.MinValue;
         if (_teamSearchModel != null)
         {
             if (_teamSearchModel.Start.HasValue)
-                start = _teamSearchModel.Start.Value.ToUnixTimestamp();
+                start = _teamSearchModel.Start.Value;
             if (_teamSearchModel.End.HasValue)
-                end = _teamSearchModel.End.Value.ToUnixTimestamp();
+                end = _teamSearchModel.End.Value;
         }
         var data = await ApiCaller.ProjectService.OverviewAsync(new RequestTeamMonitorDto
         {
@@ -48,9 +48,9 @@ public partial class Example2
 
         if (data != null)
         {
-            _error = data.Monitor.Error;
-            _warn = data.Monitor.Warn;
-            _monitor = data.Monitor.Total;
+            _error = data.Monitor.ServiceError;
+            _warn = data.Monitor.ServiceWarn;
+            _monitor = data.Monitor.ServiceTotal;
             _normal = data.Monitor.Normal;
             _projects = data.Projects;
         }

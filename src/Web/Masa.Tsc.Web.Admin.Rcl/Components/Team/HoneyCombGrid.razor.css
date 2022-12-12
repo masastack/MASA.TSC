@@ -92,65 +92,66 @@
     margin: 0 12.5px;
 }
 
+/*nth-child*/
 @media (max-width: 640px) {
-    .m-honeycomb-cell:nth-child(3n) {
+    .m-honeycomb-cell:nth-of-type(3n) {
         margin-right: calc(50% - 125px);
         margin-left: calc(50% - 125px);
     }
 
-    .m-honeycomb__placeholder:nth-child(3n+5) {
+    .m-honeycomb__placeholder:nth-of-type(3n+5) {
         display: block;
     }
 }
 
 @media (min-width: 640px) and (max-width: 960px) {
-    .m-honeycomb-cell:nth-child(5n+4) {
+    .m-honeycomb-cell:nth-of-type(5n+4) {
         margin-left: calc(50% - 235px);
     }
 
-    .m-honeycomb-cell:nth-child(5n+5) {
+    .m-honeycomb-cell:nth-of-type(5n+5) {
         margin-right: calc(50% - 235px);
-    }
+    } 
 
-    .m-honeycomb__placeholder:nth-child(5n),
-    .m-honeycomb__placeholder:nth-child(5n+3) {
+    .m-honeycomb__placeholder:nth-of-type(5n),
+    .m-honeycomb__placeholder:nth-of-type(5n+3) {
         display: block;
     }
 }
 
 @media (min-width: 960px) and (max-width: 1264px) {
-    .m-honeycomb-cell:nth-child(7n+5) {
+    .m-honeycomb-cell:nth-of-type(7n+5) {
         margin-left: calc(50% - 292px);
     }
 
-        .m-honeycomb-cell:nth-child(7n+7),
-        .m-honeycomb-cell:nth-child(7n+5):nth-last-child(2) {
+        .m-honeycomb-cell:nth-of-type(7n+7),
+        .m-honeycomb-cell:nth-of-type(7n+5):nth-last-child(2) {
             margin-right: calc(50% - 292px);
         }
 
-    .m-honeycomb__placeholder:nth-child(7n+7),
-    .m-honeycomb__placeholder:nth-child(7n+9),
-    .m-honeycomb__placeholder:nth-child(7n+11) {
+    .m-honeycomb__placeholder:nth-of-type(7n+7),
+    .m-honeycomb__placeholder:nth-of-type(7n+9),
+    .m-honeycomb__placeholder:nth-of-type(7n+11) {
         display: block;
     }
 }
 
 @media (min-width: 1264px) {
-    .m-honeycomb-cell:nth-child(11n+7) {
+    .m-honeycomb-cell:nth-of-type(11n+7) {
         margin-left: calc(50% - 588px);
     }
 
-        .m-honeycomb-cell:nth-child(11n+11),
-        .m-honeycomb-cell:nth-child(11n+7):nth-last-child(2) {
+        .m-honeycomb-cell:nth-of-type(11n+11),
+        .m-honeycomb-cell:nth-of-type(11n+7):nth-last-child(2) {
             margin-right: calc(50% - 588px);
         }
 
-    .m-honeycomb__placeholder:nth-child(11n+7),
-    .m-honeycomb__placeholder:nth-child(11n+10),
-    .m-honeycomb__placeholder:nth-child(11n+11),
-    .m-honeycomb__placeholder:nth-child(11n+13),
-    .m-honeycomb__placeholder:nth-child(11n+15),
-    .m-honeycomb__placeholder:nth-child(11n+17) {
+    .m-honeycomb__placeholder:nth-of-type(11n+7),
+    .m-honeycomb__placeholder:nth-of-type(11n+10),
+    .m-honeycomb__placeholder:nth-of-type(11n+11),
+    .m-honeycomb__placeholder:nth-of-type(11n+13),
+    .m-honeycomb__placeholder:nth-of-type(11n+15),
+    .m-honeycomb__placeholder:nth-of-type(11n+17) {
         display: block;
     }
 }

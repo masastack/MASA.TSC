@@ -5,10 +5,10 @@ namespace Masa.Tsc.ApiGateways.Caller;
 
 public class TscCaller
 {
-    internal TscCaller(ICaller caller, TokenProvider tokenProvider)
+    internal TscCaller(IServiceProvider serviceProvider, ICaller caller, TokenProvider tokenProvider)
     {
         AppService = new AppService(caller, tokenProvider);
-        ProjectService = new ProjectService(caller, tokenProvider);
+        ProjectService = new ProjectService(caller, tokenProvider, serviceProvider.GetRequiredService<IDccClient>());
         TeamService = new TeamService(caller, tokenProvider);
         LogService = new LogService(caller, tokenProvider);
         TraceService = new TraceService(caller, tokenProvider);

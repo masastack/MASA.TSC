@@ -7,7 +7,7 @@ public partial class Team
 {
     private List<ProjectOverviewDto> _projects = new();
     private TeamSearchModel? _teamSearchModel = null;
-    private int _error, _warn, _monitor, _normal;
+    private AppMonitorDto _appMonitorDto;
     private bool _isLoad = true;
 
     protected override async Task OnParametersSetAsync()
@@ -28,13 +28,13 @@ public partial class Team
 
     private async Task LoadData()
     {
-        long start = 0, end = 0;
+        DateTime start = DateTime.MinValue, end = DateTime.MinValue;
         if (_teamSearchModel != null)
         {
             if (_teamSearchModel.Start.HasValue)
-                start = _teamSearchModel.Start.Value.ToUnixTimestamp();
+                start = _teamSearchModel.Start.Value;
             if (_teamSearchModel.End.HasValue)
-                end = _teamSearchModel.End.Value.ToUnixTimestamp();
+                end = _teamSearchModel.End.Value;
         }
         var data = await ApiCaller.ProjectService.OverviewAsync(new RequestTeamMonitorDto
         {
@@ -45,36 +45,11 @@ public partial class Team
             UserId = CurrentUserId
         });
 
-
+        _appMonitorDto = data.Monitor;
         if (data != null)
         {
-            _error = data.Monitor.Error;
-            _warn = data.Monitor.Warn;
-            _monitor = data.Monitor.Total;
-            _normal = data.Monitor.Normal;
             _projects = data.Projects;
         }
-    }
-
-    private async Task<IEnumerable<ProjectDto>> LoadProjectAsync()
-    {
-        if (_projects == null)
-        {
-            await LoadData();
-        }
-
-        if (_projects == null || !_projects.Any())
-            return default!;
-        return _projects.Select(x => new ProjectDto
-        {
-            Id = x.Id,
-            Name = x.Name,
-            Description = x.Description,
-            Identity = x.Identity,
-            LabelName = x.LabelName,
-            TeamId = x.TeamId,
-            Apps = x.Apps,
-        });
     }
 
     private async Task OnSearch(TeamSearchModel query)
