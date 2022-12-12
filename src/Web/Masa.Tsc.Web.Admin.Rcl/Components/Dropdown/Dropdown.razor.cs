@@ -21,6 +21,9 @@ public partial class Dropdown<TItem, TValue>
     public Func<TItem, string> ItemText { get; set; } = null!;
 
     [Parameter]
+    public Func<TItem, bool> ItemDisabled { get; set; } = _ => false;
+
+    [Parameter]
     public Func<TItem, string>? ItemIcon { get; set; }
 
     [Parameter]

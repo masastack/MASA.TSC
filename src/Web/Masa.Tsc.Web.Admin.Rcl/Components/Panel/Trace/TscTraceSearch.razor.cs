@@ -3,10 +3,19 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-public partial class TscTraceSearch : IDisposable
+public partial class TscTraceSearch
 {
-    [Parameter]
+    [Parameter, EditorRequired]
     public EventCallback<(string?, string?, string?, string?)> OnQueryUpdate { get; set; }
+
+    [Parameter, EditorRequired]
+    public Func<string, Task<IEnumerable<string>>> QueryServices { get; set; }
+
+    [Parameter, EditorRequired]
+    public Func<string, string, Task<IEnumerable<string>>> QueryInstances { get; set; }
+
+    [Parameter, EditorRequired]
+    public Func<string, string, Task<IEnumerable<string>>> QueryEndpoints { get; set; }
 
     private List<string> _services = new();
     private List<string> _instances = new();
@@ -17,52 +26,43 @@ public partial class TscTraceSearch : IDisposable
     private string? _endpoint;
     private string? _keyword;
 
+    private bool _serviceSearching;
+    private bool _instanceSearching;
+    private bool _endpointSearching;
+
     private async Task SearchServices(string key)
     {
-        var query = new SimpleAggregateRequestDto
-        {
-            MaxCount = 10,
-            Type = AggregateTypes.GroupBy,
-            Service = key
-        };
-
-        _services = (await ApiCaller.TraceService.GetAttrValuesAsync(query)).ToList();
+        _serviceSearching = true;
+        _services = (await QueryServices.Invoke(key)).ToList();
+        _serviceSearching = false;
     }
 
     private async Task SearchInstances(string key)
     {
-        var query = new SimpleAggregateRequestDto
-        {
-            MaxCount = 10,
-            Type = AggregateTypes.GroupBy,
-            Service = _service,
-            Instance = key
-        };
-
-        _instances = (await ApiCaller.TraceService.GetAttrValuesAsync(query)).ToList();
+        _instanceSearching = true;
+        _instances = (await QueryInstances(_service, key)).ToList();
+        _instanceSearching = false;
     }
 
     private async Task SearchEndpoints(string key)
     {
-        var query = new SimpleAggregateRequestDto
-        {
-            MaxCount = 10,
-            Type = AggregateTypes.GroupBy,
-            Service = _service,
-            Endpoint = key
-        };
-
-        _endpoints = (await ApiCaller.TraceService.GetAttrValuesAsync(query)).ToList();
+        _endpointSearching = true;
+        _endpoints = (await QueryEndpoints(_service, key)).ToList();
+        _endpointSearching = false;
     }
 
-    private async Task KeywordChanged(string? val)
+    private void KeywordChanged(string? val)
     {
         _keyword = val;
-        await Search();
+        Query();
     }
 
-    private async Task Search()
+    private void Query()
     {
-        await OnQueryUpdate.InvokeAsync((_service, _instance, _endpoint, _keyword));
+        NextTick(async () =>
+        {
+            await OnQueryUpdate.InvokeAsync((_service, _instance, _endpoint, _keyword));
+            StateHasChanged();
+        });
     }
 }

@@ -2,22 +2,29 @@
 @inherits TscComponentBase
 
 <div class="d-flex mb-6">
-    <SAutoComplete Label="Service"
+    <SAutoComplete Placeholder="Service"
                    Items="_services"
                    @bind-Value="_service"
-                   TItem=string
-                   TValue=string
                    ItemText="item => item"
                    ItemValue="item => item"
+                   TItem=string
+                   TValue=string
                    TItemValue=string
                    Small
-                   Class="mr-6"
+                   BackgroundColor="white"
+                   Clearable
+                   Flat
+                   Solo
+                   Outlined="false"
+                   Loading="_serviceSearching"
+                   Class="mr-6 rounded-2 m-input--h-40"
                    Style="max-width: 160px"
                    OnSearchInputUpdate="@SearchServices"
-                   OnSelectedItemUpdate="Search">
+                   OnSelectedItemUpdate="Query"
+                   OnClearClick="Query">
     </SAutoComplete>
 
-    <SAutoComplete Label="Instance"
+    <SAutoComplete Placeholder="Instance"
                    Items="_instances"
                    @bind-Value="_instance"
                    TItem=string
@@ -26,14 +33,21 @@
                    ItemValue="item => item"
                    TItemValue=string
                    Small
-                   Class="mr-6"
+                   BackgroundColor="white"
+                   Clearable
+                   Flat
+                   Solo
+                   Outlined="false"
+                   Loading="_instanceSearching"
+                   Class="mr-6 rounded-2 m-input--h-40"
                    Style="max-width: 160px"
                    Disabled="@(string.IsNullOrWhiteSpace(_service))"
                    OnSearchInputUpdate="@SearchInstances"
-                   OnSelectedItemUpdate="Search">
+                   OnSelectedItemUpdate="Query"
+                   OnClearClick="Query">
     </SAutoComplete>
 
-    <SAutoComplete Label="Endpoint"
+    <SAutoComplete Placeholder="Endpoint"
                    Items="_endpoints"
                    @bind-Value="_endpoint"
                    TItem=string
@@ -43,12 +57,24 @@
                    TItemValue=string
                    OnSearchInputUpdate="@SearchEndpoints"
                    Small
+                   BackgroundColor="white"
+                   Clearable
+                   Flat
+                   Solo
+                   Outlined="false"
+                   Loading="_endpointSearching"
                    Disabled="@(string.IsNullOrWhiteSpace(_service))"
-                   Style="max-width: 160px"
-                   OnSelectedItemUpdate="Search">
+                   Class="rounded-2 m-input--h-40"
+                   Style="max-width: 160px;"
+                   OnSelectedItemUpdate="Query"
+                   OnClearClick="Query">
     </SAutoComplete>
 
     <MSpacer></MSpacer>
 
-    <SSearch Value="@_keyword" ValueChanged="KeywordChanged"></SSearch>
+    <SSearch Value="@_keyword"
+             ValueChanged="KeywordChanged"
+             BackgroundColor="white"
+             Class="m-input--h-40">
+    </SSearch>
 </div>

@@ -1,14 +1,16 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<MCard>
+<MCard Style="border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important;">
     <MCardTitle>
         <span>Trace Errors statistical</span>
         <MSpacer></MSpacer>
-        <DateTimeRangerPickerTimeSelector OnUpdate="OnDateTimeUpdate" />
+        <DateTimeRangerPickerTimeSelector
+            DefaultQuickRange="s_defaultQuickRange"
+            OnUpdate="OnDateTimeUpdate" />
     </MCardTitle>
-    <MCardText>
-        ECharts here!
+    <MCardText Class="pa-0">
+        <MECharts Option="_option" Height="300"></MECharts>
     </MCardText>
 </MCard>
 
@@ -17,11 +19,121 @@
     [Parameter]
     public EventCallback<(DateTime, DateTime)> OnDateTimeRangeUpdate { get; set; }
 
+    // TODO: 传入的用于生成的ECharts的数据
+    // TODO: object改成强类型
+    [Parameter]
+    public object Data { get; set; }
+
+    private static readonly QuickRangeKey s_defaultQuickRange = QuickRangeKey.Last7Days;
+
+    private object _option;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        _option = GenOption(Data);
+    }
+
+    private static object GenOption(object data)
+    {
+    // TODO: 解析data生成一下数据
+
+        string[] xAxisData = { "12/2", "12/3", "12/4", "12/5", "12/6", "12/7", "12/8" };
+        long[] durations = { 10, 20, 66, 32, 112, 121, 5 };
+        int[] spans = { 110, 22, 323, 110, 210, 11, 11 };
+
+        return new
+        {
+            tooltip = new
+            {
+                trigger = "axis",
+                axisPointer = new
+                {
+                    type = "cross",
+                    crossStyle = new { color = "#A18BFF66" }
+                }
+            },
+            legend = new
+            {
+                data = new[] { "span", "duration" },
+                bottom = true
+            },
+            xAxis = new[]
+            {
+                new
+                {
+                    type = "category",
+                    data = xAxisData,
+                    axisPointer = new
+                    {
+                        type = "shadow"
+                    }
+                },
+            },
+            yAxis = new[]
+            {
+                new
+                {
+                    type = "value",
+                    name = "span",
+                    axisLabel = new
+                    {
+                        formatter = "{value}"
+                    }
+                },
+                new
+                {
+                    type = "value",
+                    name = "duration",
+                    axisLabel = new
+                    {
+                        formatter = "{value} ms"
+                    }
+                },
+            },
+            series = new[]
+            {
+                new
+                {
+                    name = "span",
+                    type = "bar",
+                    yAxisIndex = 0,
+                    data = (object)spans,
+                    itemStyle = new
+                    {
+                        color = "#4318FF"
+                    },
+                    lineStyle = new
+                    {
+                        color = "",
+                        type = ""
+                    },
+                    smooth = false
+                },
+                new
+                {
+                    name = "duration",
+                    type = "line",
+                    yAxisIndex = 1,
+                    data = (object)durations,
+                    itemStyle = new
+                    {
+                        color = ""
+                    },
+                    lineStyle = new
+                    {
+                        color = "#A18BFF",
+                        type = "dashed"
+                    },
+                    smooth = true
+                }
+            }
+        };
+    }
+
     private async Task OnDateTimeUpdate((DateTimeOffset start, DateTimeOffset end) range)
     {
-        Console.Out.WriteLine("range.start = {0}", range.start);
-        Console.Out.WriteLine("range.end = {0}", range.end);
-
         var localStart = new DateTime(range.start.UtcTicks + range.start.Offset.Ticks, DateTimeKind.Local);
         var localEnd = new DateTime(range.end.UtcTicks + range.end.Offset.Ticks, DateTimeKind.Local);
 

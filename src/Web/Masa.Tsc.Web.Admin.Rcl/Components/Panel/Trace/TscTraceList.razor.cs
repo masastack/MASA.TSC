@@ -1,6 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using System.Runtime.InteropServices.ComTypes;
 using Masa.Utils.Models;
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
@@ -13,12 +14,18 @@ public partial class TscTraceList : TscComponentBase
     [Parameter]
     public PaginatedListBase<TraceResponseDto>? SearchResult { get; set; }
 
+    [Parameter]
+    public bool SearchLoading { get; set; }
+
     private TscTraceDetail? _tscTraceDetail;
 
     private IEnumerable<TraceResponseDto> _data = new List<TraceResponseDto>();
     private int _total = 0;
-    private MDataTable<TraceResponseDto> _mDataTable = default!;
-    private bool _isLoading = false;
+
+    private int _page = 1;
+    private int _pageSize = 10;
+    private int _lastPage = 1;
+    private int _lastPageSize = 10;
 
     private List<DataTableHeader<TraceResponseDto>> _headers = new()
     {
@@ -67,8 +74,8 @@ public partial class TscTraceList : TscComponentBase
         await _tscTraceDetail!.OpenAsync(item.TraceId);
     }
 
-    private async Task OnUpdateOptionsAsync(DataOptions options)
+    private async Task HandleOnPaginationUpdate((int page, int pageSize) pagination)
     {
-        await OnPaginationUpdate.InvokeAsync((options.Page, options.ItemsPerPage));
+        await OnPaginationUpdate.InvokeAsync(pagination);
     }
 }
