@@ -14,99 +14,6 @@ public partial class TscTraceChart
     [Parameter]
     public RequestTraceListDto Query { get; set; } = default!;
 
-    private List<ValueTuple<string, string, int>> _chartOptions = new List<ValueTuple<string, string, int>> {
-        ValueTuple.Create("Histogram","mdi-table-of-contents",1),
-        ValueTuple.Create("Statistics","mdi-poll",2),
-        ValueTuple.Create("Table","mdi-view-week-outline",3)
-    };
-
-
-    private object _options = new object();
-    private int _chartIndex = 1;
-
-    private void ConvertOption(string[] xPoints, IEnumerable<ChartViewDto> data)
-    {
-        _options = new
-        {
-            Legend = new
-            {
-                Data = data.Select(x => x.Title),
-            },
-            XAxis = new
-            {
-                Data = xPoints
-            },
-            YAxis = new { },
-            Series =
-            data.Select(item => new
-            {
-                Name = item.Title,
-                Type = item.ChartType,
-                Data = item.Data
-            })
-
-
-            //new[]
-            //{
-            //    new
-            //    {
-            //        Name= "Span个数",
-            //        Type= "bar",
-            //        Data= new []{ 5, 20, 3600, 100000, 10, 20 }
-            //    },
-            //    new
-            //    {
-            //        Name= "延迟时间",
-            //        Type= "line",
-            //        Data= new []{ 20, 20, 3006, 10, 10, 20 }
-            //    }
-            //}
-        };
-    }
-
-    private async Task OnChartSwtich(int index)
-    {
-        _chartIndex = index;
-        StateHasChanged();
-        await Task.CompletedTask;
-    }
-
-    //public async Task LoadAsync()
-    //{
-    //    var data = await ApiCaller.TraceService.GetAggregateAsync(new RequestAggregationDto
-    //    {
-    //        End = Query.End,
-    //        Start = Query.Start,
-    //        FieldMaps = new RequestFieldAggregationDto[] {
-    //            new RequestFieldAggregationDto{
-    //                 AggegationType= Contracts.Admin.Enums.AggregationTypes.Count,
-    //                 Name="span.id",
-    //                 Alias="span_counts"
-    //            }
-    //        },
-    //        Queries = ConvertToQueries(),
-    //        Interval = GetInterval(),
-    //    });
-
-    //    var xPointes = data.List.Select(item => item.X).ToArray();
-
-    //    var list = new List<ChartViewDto>()
-    //    {
-    //        new ChartViewDto{
-    //            Title="Span Count",
-    //            ChartType="bar",
-    //            Pointes=data.List.Select(item=>item.Y).ToArray(),
-    //        }
-    //    };
-
-    //    foreach (var item in data.List)
-    //    {
-
-    //    }
-
-    //    await Task.CompletedTask;
-    //}
-
     public async Task LoadAsync()
     {
         var query = new SimpleAggregateRequestDto
@@ -146,7 +53,7 @@ public partial class TscTraceChart
             }
         };
 
-        ConvertOption(xPoints, list);
+        // ConvertOption(xPoints, list);
         StateHasChanged();
         await Task.CompletedTask;
     }

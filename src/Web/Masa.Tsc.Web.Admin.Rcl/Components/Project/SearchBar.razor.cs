@@ -6,22 +6,16 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class SearchBar
 {
     [Parameter]
-    public List<AppDto> Apps { get; set; } = new List<AppDto>
-    {
-        new AppDto
-        {
-            Name="aaa",
-            Identity="111"
-        }
-    };
+    public List<AppDto> Apps { get; set; } = new();
 
     [Parameter]
     public string AppId
     {
         get { return _value.AppId; }
-        set { 
+        set
+        {
             _defaultAppId = value;
-            if(_value.AppId==null)
+            if (_value.AppId == null)
                 _value.AppId = _defaultAppId;
         }
     }
@@ -75,11 +69,16 @@ public partial class SearchBar
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && OnSearch.HasDelegate)
         {
-            if (OnSearch.HasDelegate)
-                await OnSearch.InvokeAsync(Value);
+            await SearchAsync();
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task OnSelectItemUpdate(AppDto item)
+    {
+        AppId = item.Identity;
+        await SearchAsync();
     }
 }

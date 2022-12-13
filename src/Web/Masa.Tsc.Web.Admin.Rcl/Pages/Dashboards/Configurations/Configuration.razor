@@ -7,7 +7,7 @@
             <AppAutoComplete @bind-Value="AppId" FillBackground=false Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" />
             <div style="width:100%;" class="d-flex">
                 <SearchTextField @bind-Value="@Search" FillBackground=false Clearable Class="mr-6 my-auto" />
-                <DateTimeRangerPickerTimeSelector @bind-StartDateTime=StartTime @bind-EndDateTime=EndTime Class="mr-6 my-auto" />
+                <DateTimeRangeToolbar Class="mr-6 my-auto" />
             </div>
             <MSwitch @bind-Value="IsEdit" LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="mr-6 my-auto" />
             <SButton Icon Class="mr-3 my-auto" OnClick="() => AddPanel()">

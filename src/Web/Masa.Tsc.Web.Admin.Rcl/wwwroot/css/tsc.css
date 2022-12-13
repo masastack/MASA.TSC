@@ -219,6 +219,12 @@
     overflow: auto;
 }
 
+.m-honeycomb-cell__tip {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+}
+
 .hover-pointer {
     cursor: pointer;
 }

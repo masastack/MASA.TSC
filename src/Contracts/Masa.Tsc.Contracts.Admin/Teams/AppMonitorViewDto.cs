@@ -5,11 +5,23 @@ namespace Masa.Tsc.Contracts.Admin;
 
 public class AppMonitorViewDto
 {
-    public string Name { get; set; }
+    public int ServiceTotal { get; set; }
+
+    public int AppTotal { get; set; }
 
     public string Color { get; set; }
 
     public string Text { get; set; }
 
     public string Icon { get; set; }
+
+    public bool IsShowApp { get; set; } = true;
+
+    public string ToDispaly()
+    {
+        if (IsShowApp)
+            return $"{ServiceTotal} ({AppTotal})";
+        else
+            return ServiceTotal.ToString();
+    }
 }
