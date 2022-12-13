@@ -5,10 +5,10 @@ using Microsoft.JSInterop;
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.DataV.Modules.LinkTrackingTopologys;
 
-public partial class LinkTrackingTopology : BDomComponentBase
+public partial class LinkTrackingTopology2 : BDomComponentBase
 {
     [Parameter]
-    public LinkTrackingTopologyViewModel Value { get; set; } = new();
+    public LinkTrackingTopologyViewModel2 Value { get; set; } = new();
 
     private IJSObjectReference _helper = default!;
     private bool _helperRendered = false;

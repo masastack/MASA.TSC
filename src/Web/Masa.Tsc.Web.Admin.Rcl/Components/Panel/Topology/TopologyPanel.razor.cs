@@ -13,6 +13,7 @@ public partial class TopologyPanel
     protected override async Task OnInitializedAsync()
     {
         await GetYopologyPanelData();
+        await base.OnInitializedAsync();
     }
 
     LinkTrackingTopologyViewModel GetDepthData()
