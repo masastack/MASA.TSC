@@ -28,7 +28,7 @@ public static class ServiceExtensions
             services.AddScoped(serviceProvider =>
             {
                 var caller = serviceProvider.GetRequiredService<ICallerFactory>().Create(DEFAULT_CLIENT_NAME);
-                var client = new TscCaller(caller, serviceProvider.GetRequiredService<TokenProvider>());
+                var client = new TscCaller(serviceProvider, caller, serviceProvider.GetRequiredService<TokenProvider>());
                 return client;
             });
         }

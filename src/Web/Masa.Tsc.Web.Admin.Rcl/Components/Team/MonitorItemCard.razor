@@ -5,10 +5,10 @@
     <MCardText Class="d-flex justify-space-between pa-0 pb-6">
         <div class="d-flex flex-column justify-space-around">
             <div>
-                <span class="h5">@Value.Value</span>
-                @if (Value.Total != 0)
+                <span class="h5">@Value.ServiceTotal</span>
+                @if (Value.IsShowApp)
                 {
-                    <span class="regular3--text h8 ml-1">/@Value.Total</span>
+                    <span class="regular3--text h8 ml-1">/@Value.AppTotal</span>
                 }
             </div>
             <span class="regular3--text h8">@Value.Text</span>

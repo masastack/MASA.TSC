@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Service.Admin.Application.Projects.Queries;
+
 namespace Masa.Tsc.Service.Admin.Application.Projects;
 
 public class QueryHandler
@@ -13,6 +15,54 @@ public class QueryHandler
         _pmClient = pmClient;
         _authClient = authClient;
     }
+
+    [EventHandler]
+    public async Task GetProjectAsync(ProjectQuery query)
+    {
+        var project = await _pmClient.ProjectService.GetByIdentityAsync(query.ProjectId);
+        if (project == null)
+            throw new UserFriendlyException($"Project {query.ProjectId} is not exists");
+
+        var apps = await _pmClient.AppService.GetListByProjectIdsAsync(new List<int> { project.Id });
+        var team = await _authClient.TeamService.GetDetailAsync(project.TeamId)!;
+        var creator = (await _authClient.UserService.GetUsersAsync(project.Creator))?.First();
+
+        query.Result = new ProjectDto
+        {
+            // Apps=apps?.Select(a=>new AppDto { })
+            //Creator = new UserDto
+            //{
+            //    Account = creator.Account,
+            //    Avatar = creator.Avatar,
+            //    DisplayName = creator.DisplayName,
+            //    Gender = creator.Gender,
+            //    Id = creator.Id,
+            //    Name = creator.Name,
+            //}
+            TeamId = team.Id,
+            Id = project.Identity,
+            Description = project.Description,
+            Identity = project.Identity,
+            LabelName = project.Name,
+            Name = project.Name
+        };
+
+        if (apps != null && apps.Any())
+            query.Result.Apps = apps.Select(a => new AppDto { }).ToList();
+        if (creator != null)
+            query.Result.Creator = new UserDto
+            {
+                Account = creator.Account,
+                Avatar = creator.Avatar,
+                DisplayName = creator.DisplayName,
+                Gender = creator.Gender,
+                Id = creator.Id,
+                Name = creator.Name!,
+            };
+
+
+    }
+
 
     [EventHandler]
     public async Task GetProjectsAsync(ProjectsQuery query)
@@ -64,7 +114,8 @@ public class QueryHandler
                     Id = m.Id.ToString(),
                     Identity = m.Identity,
                     Name = m.Name,
-                    ServiceType = m.ServiceType
+                    ServiceType = m.ServiceType,
+                    AppType = m.Type
                 }).ToList();
             }
         }
