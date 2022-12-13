@@ -1,84 +1,88 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Web.Admin.Rcl.Pages.DataV.Modules.LinkTrackingTopologys;
+namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Topology;
 
-namespace Masa.Tsc.Web.Admin.Rcl.Pages.DataV;
-
-public partial class Example1 : BDomComponentBase
+public partial class TopologyPanel
 {
+    List<int> _depthItems = new() { 1, 2, 3 };
+    int _depth = 3;
 
-    public Masa.Tsc.Web.Admin.Rcl.Pages.DataV.Modules.LinkTrackingTopologys.LinkTrackingTopologyViewModel2 Data { get; set; } = new();
-
-    private Masa.Tsc.Web.Admin.Rcl.Pages.DataV.Modules.LinkTrackingTopologys.LinkTrackingTopologyViewModel2 AllData { get; set; } = new();
-
-    private int _depth;
-    private List<int> _depthItems = new List<int> { 1, 2, 3 };
+    public LinkTrackingTopologyViewModel Data { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        FillData();
-        DepthChange(3);
-        await base.OnInitializedAsync();
+        await GetYopologyPanelData();
     }
 
-    public void FillData()
+    LinkTrackingTopologyViewModel GetDepthData()
     {
-        AllData.Edges = new List<LinkTrackingTopologyEdgeViewModel2>
+        var nodes = Data.Nodes.Where(x => x.Depth <= _depth).ToList();
+        var edges = Data.Edges.Where(x => nodes.Any(y => y.Id == x.Source || y.Id == x.Target)).ToList();
+        return new LinkTrackingTopologyViewModel
         {
-            new LinkTrackingTopologyEdgeViewModel2
+            Nodes = nodes,
+            Edges = edges
+        };
+    }
+
+    async Task GetYopologyPanelData()
+    {
+        Data = new();
+        Data.Edges = new List<LinkTrackingTopologyEdgeViewModel>
+        {
+            new LinkTrackingTopologyEdgeViewModel
             {
                 Source="1",
                 Target="0",
                 Label="123.54"
             },
-            new LinkTrackingTopologyEdgeViewModel2
+            new LinkTrackingTopologyEdgeViewModel
             {
                 Source="0",
                 Target="2",
                 Label="123.54"
             },
-            new LinkTrackingTopologyEdgeViewModel2
+            new LinkTrackingTopologyEdgeViewModel
             {
                 Source="0",
                 Target="3",
                 Label="123.54"
             },
-            new LinkTrackingTopologyEdgeViewModel2
+            new LinkTrackingTopologyEdgeViewModel
             {
                 Source="0",
                 Target="4",
                 Label="123.54"
             },
-            new LinkTrackingTopologyEdgeViewModel2
+            new LinkTrackingTopologyEdgeViewModel
             {
                 Source="1",
                 Target="2",
                 Label="123.54"
             },
-            new LinkTrackingTopologyEdgeViewModel2
+            new LinkTrackingTopologyEdgeViewModel
             {
                 Source="5",
                 Target="1",
                 Label="123.54"
             },
-            new LinkTrackingTopologyEdgeViewModel2
+            new LinkTrackingTopologyEdgeViewModel
             {
                 Source="4",
                 Target="6",
                 Label="123.54"
             },
-            new LinkTrackingTopologyEdgeViewModel2
+            new LinkTrackingTopologyEdgeViewModel
             {
                 Source="7",
                 Target="5",
                 Label="123.54"
             },
         };
-
-        AllData.Nodes = new List<LinkTrackingTopologyNodeViewModel2>
+        Data.Nodes = new List<LinkTrackingTopologyNodeViewModel>
         {
-            new LinkTrackingTopologyNodeViewModel2{
+            new LinkTrackingTopologyNodeViewModel{
                 Id="0",
                 Label="EShop-Order",
                 Depth=0,
@@ -86,7 +90,7 @@ public partial class Example1 : BDomComponentBase
                 X=0,
                 Y=0
             },
-            new LinkTrackingTopologyNodeViewModel2{
+            new LinkTrackingTopologyNodeViewModel{
                 Id="1",
                 Label="EShop-ApI",
                 Depth=1,
@@ -94,7 +98,7 @@ public partial class Example1 : BDomComponentBase
                 X=-200,
                 Y=0
             },
-            new LinkTrackingTopologyNodeViewModel2{
+            new LinkTrackingTopologyNodeViewModel{
                 Id="2",
                 Label="EShop-Product",
                 Depth=1,
@@ -102,7 +106,7 @@ public partial class Example1 : BDomComponentBase
                 X=200,
                 Y=100
             },
-            new LinkTrackingTopologyNodeViewModel2{
+            new LinkTrackingTopologyNodeViewModel{
                 Id="3",
                 Label="EShop-Sql",
                 Depth=1,
@@ -110,7 +114,7 @@ public partial class Example1 : BDomComponentBase
                 X=300,
                 Y=-150
             },
-            new LinkTrackingTopologyNodeViewModel2{
+            new LinkTrackingTopologyNodeViewModel{
                 Id="4",
                 Label="EShop-Payment",
                 Depth=1,
@@ -118,7 +122,7 @@ public partial class Example1 : BDomComponentBase
                 X=200,
                 Y=50
             },
-            new LinkTrackingTopologyNodeViewModel2{
+            new LinkTrackingTopologyNodeViewModel{
                 Id="5",
                 Label="Api-gateway",
                 Depth=2,
@@ -126,7 +130,7 @@ public partial class Example1 : BDomComponentBase
                 X=-300,
                 Y=50
             },
-            new LinkTrackingTopologyNodeViewModel2{
+            new LinkTrackingTopologyNodeViewModel{
                 Id="6",
                 Label="EShop-Yun",
                 Depth=2,
@@ -134,7 +138,7 @@ public partial class Example1 : BDomComponentBase
                 X=500,
                 Y=50
             },
-            new LinkTrackingTopologyNodeViewModel2{
+            new LinkTrackingTopologyNodeViewModel{
                 Id="7",
                 Label="EShop-App",
                 Depth=3,
@@ -143,21 +147,13 @@ public partial class Example1 : BDomComponentBase
                 Y=-50
             },
         };
+
+        await Task.CompletedTask;
     }
 
-    private void DepthChange(int depth)
+    async Task Refresh()
     {
-        var nodes = AllData.Nodes.Where(x => x.Depth <= depth).ToList();
-        var edges = AllData.Edges.Where(x => nodes.Any(y => y.Id == x.Source || y.Id == x.Target)).ToList();
-        Data = new LinkTrackingTopologyViewModel2
-        {
-            Nodes = nodes,
-            Edges = edges
-        };
-    }
-
-    private void Refresh()
-    {
-
+        _depth = 1;
+        await GetYopologyPanelData();
     }
 }

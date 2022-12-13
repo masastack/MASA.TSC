@@ -3,7 +3,7 @@
 <MTabs Color="primary" @bind-Value="CurrentTab">
     @foreach (var tabItem in Panel.ChildPanels)
     {
-        <MTab Value="tabItem.Id.ToString()">
+        <MTab @key="tabItem.Id" Value="tabItem.Id.ToString()">
             @tabItem.Title
             @if(IsEdit)
             {

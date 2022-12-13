@@ -42,3 +42,6 @@ global using System.Linq.Expressions;
 global using Masa.BuildingBlocks.StackSdks.Pm.Model;
 global using Masa.BuildingBlocks.StackSdks.Pm;
 global using System.Diagnostics.CodeAnalysis;
+global using Microsoft.JSInterop;
+global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Models;
+global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Topology;

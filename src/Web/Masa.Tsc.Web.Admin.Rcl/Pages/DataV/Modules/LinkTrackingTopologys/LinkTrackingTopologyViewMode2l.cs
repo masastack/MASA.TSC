@@ -3,9 +3,9 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.DataV.Modules.LinkTrackingTopologys;
 
-public class LinkTrackingTopologyViewModel
+public class LinkTrackingTopologyViewModel2
 {
-    public List<LinkTrackingTopologyNodeViewModel> Nodes { get; set; } = new();
+    public List<LinkTrackingTopologyNodeViewModel2> Nodes { get; set; } = new();
 
-    public List<LinkTrackingTopologyEdgeViewModel> Edges { get; set; } = new();
+    public List<LinkTrackingTopologyEdgeViewModel2> Edges { get; set; } = new();
 }

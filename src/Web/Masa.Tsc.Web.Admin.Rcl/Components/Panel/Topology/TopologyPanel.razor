@@ -1,0 +1,31 @@
+﻿@inherits TscComponentBase
+
+<div class="d-flex">
+    <div class="full-width">
+        <LinkTrackingTopology Value="Data" />
+    </div>
+    <div style="width:242px;">
+        <div class="d-flex">
+            <SSelect @bind-Value=_depth
+                     Items="_depthItems"
+                     ItemText='item => T("{0} layer deep",item.ToString())'
+                     ItemValue="item => item"
+                     TItem="int"
+                     TItemValue="int"
+                     TValue="int"
+                     Class="fill-card body2"
+                     Style="width:163px">
+            </SSelect>
+            <SButton Icon>
+                <SIcon Tooltip="@T("Setting")" Size=16>
+                    @IconConstants.Setting
+                </SIcon>
+            </SButton>
+            <SButton Icon>
+                <SIcon Tooltip="@T("Refresh")" Size=16>
+                    @IconConstants.Refresh
+                </SIcon>
+            </SButton>
+        </div>
+    </div>
+</div>

@@ -10,6 +10,12 @@
             case PanelTypes.Text:
                 <MEditor />
                 break;
+            case PanelTypes.Trace:
+                <TscTrace />
+                break;
+            case PanelTypes.Topology:
+                <TopologyPanel />
+                break;
             default:
                 <PanelSelect Panel="context" OnSelect=" _ => {}" />
                 break;

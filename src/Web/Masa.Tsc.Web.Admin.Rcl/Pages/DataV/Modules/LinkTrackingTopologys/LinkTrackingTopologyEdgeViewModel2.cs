@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.DataV.Modules.LinkTrackingTopologys;
 
-public class LinkTrackingTopologyEdgeViewModel
+public class LinkTrackingTopologyEdgeViewModel2
 {
     public string Source { get; set; } = default!;
 
