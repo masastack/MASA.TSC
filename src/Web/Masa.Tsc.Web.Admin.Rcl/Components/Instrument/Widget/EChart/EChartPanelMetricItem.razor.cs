@@ -11,15 +11,6 @@ public partial class EChartPanelMetricItem
     [Parameter]
     public EChartPanelMetricItemModel Value { get; set; }
 
-    [Parameter]
-    public List<string> Names { get; set; }    
-
-    private async Task OnValueChanged()
-    {
-        if (ValueChanged.HasDelegate)
-            await ValueChanged.InvokeAsync(Value);
-    }    
-
     private async Task OnDeleteAsync()
     {
         await OnCallParent(OperateCommand.Remove, Value);

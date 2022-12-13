@@ -16,11 +16,6 @@ public partial class EChartPanelMetrics
 
     private List<string> _names;
 
-    private async Task OnItemsChange()
-    {
-        if (ItemsChanged.HasDelegate)
-            await ItemsChanged.InvokeAsync(Items);
-    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -40,9 +35,8 @@ public partial class EChartPanelMetrics
             var item = (EChartPanelMetricItemModel)values[0];
             Items.Remove(item);
             StateHasChanged();
-            await OnItemsChange();
-            return true;
+            return await Task.FromResult(true);
         }
-        return false;
+        return await Task.FromResult(false);
     }
 }

@@ -1,0 +1,67 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+
+<div class="d-flex justify-space-between align-center @Class" style="@Style">
+    <MLabel Class="emphasis2--text body">@Label</MLabel>
+    @if(Multiple){
+        <MButtonGroup Borderless 
+                  Values="Values" ValuesChanged="ValuesChanged"
+                  Dense Multiple>
+        @foreach (var item in Items)
+        {
+            <MButton Value="@item">
+                <span class="text-capitalize">@item</span>
+            </MButton>
+        }
+        </MButtonGroup>
+    }
+    else
+    {
+        <MButtonGroup Borderless 
+        Value="Value" ValueChanged="ValueChangedSN"
+                  Dense Mandatory>
+        @foreach (var item in Items)
+        {
+            <MButton Value="@item">
+                <span class="text-capitalize">@item</span>
+            </MButton>
+        }
+        </MButtonGroup>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public string Style { get; set; }
+
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter]
+    public string Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public List<StringNumber> Values { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<List<StringNumber>> ValuesChanged { get; set; }
+
+    [Parameter]
+    public IEnumerable<string> Items { get; set; } = new List<string>();
+
+    [Parameter]
+    public bool Multiple { get; set; } 
+
+    private async Task ValueChangedSN(StringNumber stringNumber)
+    {
+        if (ValueChanged.HasDelegate)
+        {
+            await ValueChanged.InvokeAsync(stringNumber?.AsT0);
+        }
+    }
+}

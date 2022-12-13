@@ -1,23 +1,25 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<MCard Width="240">
-    <MContainer>
+<MCard Class="pa-2">
+    <MCardText>
         <MRow>
-            <MTextField Value="Value.Name" OnChange=@(async (string value)=>{Value.Name=value;await OnValueChanged();}) Placeholder="指标名称" />
+            <MCol Md="12">
+                <STextField @bind-Value="Value.Name" Placeholder="指标名称" />
+            </MCol>
+            <MCol Md="12">
+                <STextField TValue="string" Placeholder="取值范围" />
+            </MCol>
+            <MCol Md="12">
+                <STextField @bind-Value="Value.Caculate" Placeholder="计算规则" />
+            </MCol>
+            <MCol Md="12">
+                <STextField @bind-Value="Value.Unit" Placeholder="单位" />
+            </MCol>
         </MRow>
-        <MRow>
-            <MTextField TValue="string" Placeholder="取值范围" />
-        </MRow>
-        <MRow>
-            <MTextField Value="Value.Caculate" OnChange=@(async (string value)=>{Value.Caculate=value;await OnValueChanged();}) Placeholder="计算规则" />
-        </MRow>
-        <MRow>
-            <MTextField Value="Value.Unit" Placeholder="单位" OnChange=@(async (string value)=>{Value.Unit=value;await OnValueChanged();}) />
-        </MRow>
-    </MContainer>
-    <MCardActions>
-        <MButton OnClick="@(()=>{})"><MIcon Color="@Value.Color">mdi-circle</MIcon></MButton>
-        <MButton OnClick="OnDeleteAsync"><MIcon>mdi-delete</MIcon></MButton>
+    </MCardText>
+    <MCardActions Class="d-flex justify-space-between">
+        <SColorGroup @bind-Value="Value.Color" Colors='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
+        <MIcon OnClick="OnDeleteAsync" Color="red">mdi-delete</MIcon>
     </MCardActions>
 </MCard>

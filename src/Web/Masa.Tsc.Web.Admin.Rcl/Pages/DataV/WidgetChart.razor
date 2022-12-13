@@ -1,0 +1,9 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@page "/datav/example3"
+@inherits TscComponentBase
+
+<TscWidgetChart @bind-Value="_panel"/>
+
+@code {
+    private PanelDto _panel { get; set; } = new();
+}
