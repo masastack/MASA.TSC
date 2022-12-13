@@ -238,10 +238,10 @@
     overflow-x: hidden;
 }
 
-/*.suspend :hover {
-    height: calc(100% + 10px);
-    transition-property: margin-top;
-    transition-duration: 0.5s;
-    box-shadow: 0px 18px 40px rgba(112, 144, 176, 0.12) !important;
-    margin-top: -4px;
-}*/
+.borderColor :hover {
+    border: solid #4318FF 1px;
+}
+
+.borderNone {
+    border:none !important;
+}

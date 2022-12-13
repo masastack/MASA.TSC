@@ -41,3 +41,4 @@ global using Masa.Tsc.Contracts.Admin.Dashboards;
 global using System.Linq.Expressions;
 global using Masa.BuildingBlocks.StackSdks.Pm.Model;
 global using Masa.BuildingBlocks.StackSdks.Pm;
+global using System.Diagnostics.CodeAnalysis;

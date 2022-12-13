@@ -12,32 +12,44 @@ public partial class Configuration
 
     string Search { get; set; }
 
-    bool IsEdit { get; set; }
+    bool IsEdit { get; set; } = true;
 
     DateTimeOffset StartTime { get; set; } = DateTimeOffset.Now.AddDays(-1);
 
     DateTimeOffset EndTime { get; set; } = DateTimeOffset.Now;
 
-    public List<ComponentTypes> GetComponentTypes(ComponentTypes type = default)
+    List<UpsertPanelDto> Panels { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
     {
-        if(type == default)
+        if (Panels.Any() is false)
         {
-            return new List<ComponentTypes> 
-            {
-                ComponentTypes.Tab,
-                ComponentTypes.Text,
-                ComponentTypes.Panel,
-                ComponentTypes.Topology,
-                ComponentTypes.Log,
-                ComponentTypes.Trace,
-                ComponentTypes.Indicators
-            };
+            Panels.Add(new());
         }
-        return new List<ComponentTypes>();
+
+        await Task.CompletedTask;
     }
 
-    public void AddCompontent(ComponentTypes type)
+    List<PanelTypes> GetPanelTypes(PanelTypes type = default)
     {
+        if (type == default)
+        {
+            return new List<PanelTypes>
+            {
+                PanelTypes.Tabs,
+                PanelTypes.Text,
+                PanelTypes.Chart,
+                PanelTypes.Topology,
+                PanelTypes.Log,
+                PanelTypes.Trace,
+                PanelTypes.Table
+            };
+        }
+        return new List<PanelTypes>();
+    }
 
+    void AddPanel()
+    {
+        Panels.Insert(0, new());
     }
 }

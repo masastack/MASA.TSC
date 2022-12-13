@@ -85,6 +85,7 @@
     "Are you sure delete folder \"{0}\"?": "确定删除目录\"{0}\"吗",
     "Are you sure delete dashboard \"{0}\"?": "确定删除仪表盘\"{0}\"吗"
   },
+  "Add Panel": "添加面板",
   "Name is required": "名称必须填写",
   "Folder is required": "目录必须填写",
   "Edit": "编辑",
