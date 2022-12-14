@@ -16,13 +16,22 @@
             case PanelTypes.Topology:
                 <TopologyPanel />
                 break;
+            case PanelTypes.Chart:
+                <ChartPanel />
+                break;
+            case PanelTypes.Log:
+                <TscLog />
+                break;
+            case PanelTypes.Table:
+                <TablePanel />
+                break;
             default:
                 <PanelSelect Panel="context" OnSelect=" _ => {}" />
                 break;
         }
         @if(IsEdit)
         {
-            <MMenu OffsetY>
+            <MMenu OpenOnHover OffsetY>
                 <ActivatorContent Context="menuContext">
                     <SButton Icon Style="position:absolute;top:0;right:0;" @attributes="@menuContext.Attrs">
                         <SIcon Size="24">@IconConstants.More</SIcon>
