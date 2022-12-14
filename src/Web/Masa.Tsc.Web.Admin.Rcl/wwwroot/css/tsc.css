@@ -251,3 +251,9 @@
 .borderNone {
     border:none !important;
 }
+
+.m-sheet.m-stepper:not(.m-sheet--outlined) {
+    box-shadow: none !important;
+    height: 100% !important;
+    width: 100% !important;
+}

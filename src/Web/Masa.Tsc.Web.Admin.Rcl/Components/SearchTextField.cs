@@ -14,7 +14,7 @@ public class SearchTextField : STextField<string>
         Flat = true;
         Solo = true;
         Small = true;
-        BackgroundColor = FillBackground ? "fill-background" : "";
+        BackgroundColor = FillBackground ? "fill-background" : "white";
         Style = "max-width:340px;";       
         Placeholder = I18n!.T("Search");
         PrependInnerContent = builder =>
