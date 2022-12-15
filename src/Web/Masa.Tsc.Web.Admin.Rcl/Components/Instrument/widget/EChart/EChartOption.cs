@@ -17,8 +17,6 @@ internal static class EChartOption
 
     public static Axis YAxis { get; set; } = new();
 
-    public static Title Title { get; set; } = new();
-
     public static event EChartOptionChangedEventHandler? EChartOptionChanged;
 
     static EChartOption()
@@ -252,15 +250,6 @@ public class Toolbox : NotifyingEntity
         get => _feature;
         set => SetField(ref _feature, value);
     }
-}
-
-public class Title
-{
-    public string Show { get; set; }
-
-    public string Text { get; set; }
-
-    public string Subtext { get; set; }
 }
 
 public class Axis : NotifyingEntity

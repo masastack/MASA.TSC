@@ -5,13 +5,13 @@
     <SSheetDialog @bind-Value=Visible Title="@_team.CurrentProject.Name">
         <MCard Style="background-color:#F0F3FA;border-top-left-radius: 20px;border-top-right-radius: 20px;" Class="full-height">
             <MRow NoGutters Class="full-height">
-                <MCol Style="background-color:white;border-top-left-radius: 20px;" Cols="2" Class="d-flex flex-column justify-space-between pa-6">
+                <MCol Style="background-color:white;border-top-left-radius: 20px;" Cols="2" Class="d-flex flex-column justify-space-between pa-6 pb-8">
                     <ProjectDetail Value=@_team.CurrentProject></ProjectDetail>
                     <TeamDetail Value=@_team></TeamDetail>
                 </MCol>
                 <MCol Cols="10" Class="pa-8">
                     <SearchBar AppId=@_appId Apps=@_team.CurrentProject.Apps OnSearch="async (data)=>{ if(_projectCharts!=null) await  _projectCharts.OnLoadDataAsyc(data);}"></SearchBar>
-                    <ProjectCharts Class="mt-2" @ref="_projectCharts"></ProjectCharts>
+                    <ProjectCharts Class="mt-2" @ref="_projectCharts"/>
                 </MCol>
             </MRow>
         </MCard>

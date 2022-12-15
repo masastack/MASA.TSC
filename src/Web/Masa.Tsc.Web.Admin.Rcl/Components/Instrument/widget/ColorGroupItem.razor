@@ -1,0 +1,26 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+
+<div class="d-flex justify-space-between align-center @Class" style="@Style">
+    <MLabel Class="emphasis2--text body">@Label</MLabel>
+    <SColorGroup Value="@Value" ValueChanged="ValueChanged" Colors='Items' />
+</div>
+
+@code {
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public string Style { get; set; }
+
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter]
+    public string Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public List<string> Items { get; set; } = new();
+}
