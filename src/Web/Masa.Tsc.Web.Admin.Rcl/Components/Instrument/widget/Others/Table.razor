@@ -3,8 +3,9 @@
 <MCard Height="410" Class="d-flex flex-column">
     <MCardTitle>
         <MLabel Class="emphasis2--text h6">@Title</MLabel>
+        @Fields.Count()
     </MCardTitle>
-    <MCardText Class="flex-grow-1">
+    <MCardText Class="flex-grow-1" Style="overflow-y: auto;">
         <MSimpleTable>
             @if (TableOption.ShowTableHeader)
             {
@@ -16,6 +17,12 @@
                         <th class="text-left">
                             Calories
                         </th>
+                        @foreach (var field in Fields)
+                        {
+                            <th class="text-left">
+                                @(string.IsNullOrWhiteSpace(field.Unit) ? @field.Name : $"{@field.Name}({field.Unit})")
+                            </th>
+                        }
                     </tr>
                 </thead>
             }
@@ -23,8 +30,12 @@
                 @foreach (var item in _desserts)
                 {
                     <tr @key="item.Name">
-                        <td>@item.Name</td>
-                        <td>@item.Calories</td>
+                        <td class="@($"text-{TableOption.ColumnAlignment}")">@item.Name</td>
+                        <td class="@($"text-{TableOption.ColumnAlignment}")">@item.Calories</td>
+                        @foreach (var field in Fields)
+                        {
+                            <td style="color:@field.Color" class="@($"text-{TableOption.ColumnAlignment}")">0.0</td>
+                        }
                     </tr>
                 }
             </tbody>
@@ -38,12 +49,10 @@
                 </tfoot>
             }
         </MSimpleTable>
- @*       <MDataTable Headers="_headers"
-                    ItemsPerPage="TableOption.ItemsPerPage"
-                    HideDefaultHeader="TableOption.HideDefaultHeader"
-                    HideDefaultFooter="TableOption.HideDefaultFooter"
-                    Items="_desserts">
-        </MDataTable>*@
+        @if (TableOption.EnablePaginaton)
+        {
+            <MPagination Length="10" TotalVisible="5"></MPagination>
+        }
     </MCardText>
 </MCard>
 
@@ -59,7 +68,7 @@
                 <STextField @bind-Value="@Title" Label="Title" />
             </MCol>
             <MCol Md="12">
-                <TableFieldMetrics Items="Fields"></TableFieldMetrics>
+                <TableFieldMetrics @bind-Items="Fields"></TableFieldMetrics>
             </MCol>
         </MRow>
     </MCardText>
@@ -86,105 +95,54 @@
 
     private List<string> _systemIdentities = new List<string>();
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
     public class Dessert
     {
         public string Name { get; set; }
 
         public int Calories { get; set; }
-
-        public double Fat { get; set; }
-
-        public int Carbs { get; set; }
-
-        public double Protein { get; set; }
-
-        public int Sodium { get; set; }
-
-        public string Calcium { get; set; }
-
-        public string Iron { get; set; }
     }
-
-    private List<DataTableHeader<Dessert>> _headers = new List<DataTableHeader<Dessert>>
-        {
-           new ()
-           {
-            Text= "Dessert (100g serving)",
-            Align= DataTableHeaderAlign.Start,
-            Sortable= false,
-            Value= nameof(Dessert.Name)
-          },
-          new (){ Text= "Calories", Value= nameof(Dessert.Calories)},
-          new (){ Text= "Fat (g)", Value= nameof(Dessert.Fat)},
-          new (){ Text= "Carbs (g)", Value= nameof(Dessert.Carbs)},
-          new (){ Text= "Protein (g)", Value= nameof(Dessert.Protein)},
-          new (){ Text= "Iron (%)", Value= nameof(Dessert.Iron)}
-        };
 
     private List<Dessert> _desserts = new List<Dessert>
         {
            new Dessert
            {
               Name= "Frozen Yogurt",
-              Calories= 159,
-              Fat= 6.0,
-              Carbs= 24,
-              Protein= 4.0,
-              Iron= "1%",
+              Calories= 159
             },
             new Dessert
             {
               Name= "Ice cream sandwich",
-              Calories= 237,
-              Fat= 9.0,
-              Carbs= 37,
-              Protein= 4.3,
-              Iron= "1%",
+              Calories= 237
             },
             new Dessert
             {
               Name= "Eclair",
-              Calories= 262,
-              Fat= 16.0,
-              Carbs= 23,
-              Protein= 6.0,
-              Iron= "7%",
+              Calories= 262
             },
             new Dessert
             {
               Name= "Cupcake",
-              Calories= 305,
-              Fat= 3.7,
-              Carbs= 67,
-              Protein= 4.3,
-              Iron= "8%",
+              Calories= 305
             },
             new Dessert
             {
                 Name= "Gingerbread",
-                Calories= 356,
-                Fat= 16.0,
-                Carbs= 49,
-                Protein= 3.9,
-                Iron= "16%"
+                Calories= 356
             },
             new Dessert
             {
                 Name= "Jelly bean",
-                Calories= 375,
-                Fat= 0.0,
-                Carbs= 94,
-                Protein= 0.0,
-                Iron= "0%",
+                Calories= 375
             },
             new Dessert
             {
                 Name= "Lollipop",
-                Calories= 392,
-                Fat= 0.2,
-                Carbs= 98,
-                Protein= 0,
-                Iron= "2%",
+                Calories= 392
             }
         };
 }

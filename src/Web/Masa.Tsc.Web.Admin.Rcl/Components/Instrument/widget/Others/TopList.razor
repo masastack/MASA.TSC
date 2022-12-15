@@ -1,10 +1,10 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 
-<MCard Class="d-flex flex-column">
+<MCard Class="d-flex flex-column" MaxHeight="410">
     <MCardTitle>
         <MLabel Class="emphasis2--text h6">@Title</MLabel>
     </MCardTitle>
-    <MCardText Class="flex-grow-1">
+    <MCardText Class="flex-grow-1" Style="overflow-y: auto;">
         <MList>
             @foreach (var item in Data)
             {

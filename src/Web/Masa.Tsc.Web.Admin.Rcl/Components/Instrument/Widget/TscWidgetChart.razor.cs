@@ -139,7 +139,7 @@ public partial class TscWidgetChart : TscWidgetBase
             _componentMetadata = new Dictionary<string, object>{
                 { "Title",_panelValue.Title},
                 { "SystemIdentity",_panelValue.SystemIdentity},
-                { "Fields",_tableField }
+                //{ "Fields",_tableField }
             };
         }
         else if (type == "top-list")

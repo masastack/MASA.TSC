@@ -11,17 +11,15 @@ public partial class TableFieldMetrics
     [Parameter]
     public EventCallback<List<TableFieldItemModel>> ItemsChanged { get; set; }
 
-    private List<string> _names;
-
     protected override async Task OnInitializedAsync()
     {
-        _names = await ApiCaller.MetricService.GetNamesAsync();
         await base.OnInitializedAsync();
     }
 
     private void Add()
     {
         Items.Add(new TableFieldItemModel { });
+        ItemsChanged.InvokeAsync(Items);
     }
 
     protected override async Task<bool> ExecuteCommondAsync(OperateCommand command, object[] values)
@@ -30,7 +28,7 @@ public partial class TableFieldMetrics
         {
             var item = (TableFieldItemModel)values[0];
             Items.Remove(item);
-            StateHasChanged();
+            await ItemsChanged.InvokeAsync(Items);
             return await Task.FromResult(true);
         }
         return await Task.FromResult(false);
