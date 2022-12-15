@@ -9,5 +9,5 @@ public class EChartPanelDto : PanelDto
 
     public override PanelTypes Type => PanelTypes.Chart;
 
-    public List<PanelMetricDto> Metrics { get; set; }
+    public List<PanelMetricDto> Metrics { get; set; } = new();
 }

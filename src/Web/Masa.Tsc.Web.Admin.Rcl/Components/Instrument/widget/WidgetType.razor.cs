@@ -3,13 +3,22 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-public partial class EChartPanelType
+public partial class WidgetType
 {
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
 
     [Parameter]
     public string Value { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await OnSelected(Items.First());
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
 
     private async Task OnSelected(EChartPanelTypeModel item)
     {
@@ -22,7 +31,18 @@ public partial class EChartPanelType
 
     private static List<EChartPanelTypeModel> Items { get; set; } = new List<EChartPanelTypeModel>
     {
-
+        new EChartPanelTypeModel
+        {
+            Name="表格",
+            Type="table",
+            Src="_content/Masa.Tsc.Web.Admin.Rcl/img/other/table.png"
+        },
+        new EChartPanelTypeModel
+        {
+            Name="Top列表",
+            Type="top-list",
+            Src="_content/Masa.Tsc.Web.Admin.Rcl/img/other/progress.png"
+        },
         new EChartPanelTypeModel
         {
             Name="折线图",

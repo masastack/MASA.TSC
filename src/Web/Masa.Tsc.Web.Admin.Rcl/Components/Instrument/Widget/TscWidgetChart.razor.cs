@@ -6,12 +6,12 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TscWidgetChart : TscWidgetBase
 {
     private EChartPanelDto _panelValue = new();
-
-    private List<EChartPanelMetricItemModel> _metrics = new();
-
+    private List<EChartPanelMetricItemModel> _echartMetrics = new();
+    private List<TableFieldItemModel> _tableField = new();
     private List<StringNumber> _panelValues = new List<StringNumber>() { 1 };
-
-    private MECharts _mECharts;
+    private Type _showType = typeof(Table);
+    private Type _panelType = typeof(TableExpansionPanel);
+    private Dictionary<string, object> _componentMetadata = new();
 
     public override PanelDto Value
     {
@@ -33,7 +33,7 @@ public partial class TscWidgetChart : TscWidgetBase
             }
             if (_panelValue.Metrics != null && _panelValue.Metrics.Any())
             {
-                _metrics = _panelValue.Metrics.Select(x => new EChartPanelMetricItemModel
+                _echartMetrics = _panelValue.Metrics.Select(x => new EChartPanelMetricItemModel
                 {
                     Caculate = x.Caculate,
                     Color = x.Color,
@@ -44,17 +44,17 @@ public partial class TscWidgetChart : TscWidgetBase
             else
             {
                 if (_panelValue.Metrics == null)
-                    _metrics = new List<EChartPanelMetricItemModel>();
+                    _echartMetrics = new List<EChartPanelMetricItemModel>();
                 else
-                    _metrics.Clear();
+                    _echartMetrics.Clear();
             }
         }
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        EChartOption.EChartOptionChanged += EChartOption_EChartOptionChanged;
-        base.OnInitialized();
+        await SetChartType(_panelValue.ChartType, LoadDataAsync);
+        await base.OnInitializedAsync();
     }
 
     private void FeatureChanged(List<StringNumber> features)
@@ -62,25 +62,12 @@ public partial class TscWidgetChart : TscWidgetBase
         EChartOption.Toolbox.Feature = features;
     }
 
-    private void EChartOption_EChartOptionChanged()
-    {
-        _mECharts.SetOption();
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (_panelValue.Metrics == null)
-            _panelValue.Metrics = new();
-        await SetChartType(_panelValue.ChartType, LoadDataAsync);
-        await base.OnInitializedAsync();
-    }
-
     private async Task<QueryResultDataResponse[]> LoadDataAsync()
     {
-        if (_metrics != null && _metrics.Any())
+        if (_echartMetrics != null && _echartMetrics.Any())
         {
             var requestData = new List<QueryResultDataResponse>();
-            foreach (var metric in _metrics)
+            foreach (var metric in _echartMetrics)
             {
                 var data = await ApiCaller.MetricService.GetQueryRangeAsync(new RequestMetricAggDto
                 {
@@ -138,27 +125,55 @@ public partial class TscWidgetChart : TscWidgetBase
                 InitLineArea(await dataFn());
                 break;
             default:
-                {
-                    StateHasChanged();
-                    break;
-                }
+                break;
         }
         StateHasChanged();
     }
 
     private async void OnTypeChange(string type)
     {
+        if (type == "table")
+        {
+            _panelType = typeof(TableExpansionPanel);
+            _showType = typeof(Table);
+            _componentMetadata = new Dictionary<string, object>{
+                { "Title",_panelValue.Title},
+                { "SystemIdentity",_panelValue.SystemIdentity},
+                { "Fields",_tableField }
+            };
+        }
+        else if (type == "top-list")
+        {
+            _panelType = typeof(TopListExpansionPanel);
+            _showType = typeof(TopList);
+            _componentMetadata = new Dictionary<string, object>{
+                { "Title",_panelValue.Title},
+                { "SystemIdentity",_panelValue.SystemIdentity}
+            };
+        }
+        else
+        {
+            _panelType = typeof(EChartExpansionPanel);
+            _showType = typeof(EChart);
+            _componentMetadata = new Dictionary<string, object>{
+                { "Title",_panelValue.Title},
+                { "Description",_panelValue.Description},
+                { "Metrics",_echartMetrics },
+                { "MetricsChanged",EventCallback.Factory.Create<List<EChartPanelMetricItemModel>>(this,OnItemsChange) }
+            };
+        }
         _panelValue.ChartType = type;
         await SetChartType(type, LoadDataAsync);
     }
 
     private async Task OnItemsChange(List<EChartPanelMetricItemModel> data)
     {
-        bool hasChange = HasMetricChange(_metrics, data);
-        _metrics = data;
+        //this method not work list add or delete
+        bool hasChange = HasMetricChange(_echartMetrics, data);
+        _echartMetrics = data;
         var index = 1;
         _panelValue.Metrics.Clear();
-        foreach (var item in _metrics)
+        foreach (var item in _echartMetrics)
         {
             _panelValue.Metrics.Add(new PanelMetricDto
             {
@@ -374,11 +389,5 @@ public partial class TscWidgetChart : TscWidgetBase
     private int GetLevel(int seconds)
     {
         return 0;
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        EChartOption.EChartOptionChanged -= EChartOption_EChartOptionChanged;
-        base.Dispose(disposing);
     }
 }

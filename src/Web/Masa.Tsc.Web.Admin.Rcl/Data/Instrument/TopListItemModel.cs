@@ -3,17 +3,13 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
-public class EChartPanelMetricItemModel
+public class TopListItemModel
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-
-    public string Color { get; set; }
 
     public string Name { get; set; }
 
     public string Unit { get; set; }
-
-    public string Caculate { get; set; }
 
     public string Range { get; set; }
 }

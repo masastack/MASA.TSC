@@ -3,29 +3,32 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-public partial class EChartPanelMetrics
+public partial class TableFieldMetrics
 {
     [Parameter]
-    public List<EChartPanelMetricItemModel> Items { get; set; } = new();
+    public List<TableFieldItemModel> Items { get; set; } = new();
 
     [Parameter]
-    public EventCallback<List<EChartPanelMetricItemModel>> ItemsChanged { get; set; }
+    public EventCallback<List<TableFieldItemModel>> ItemsChanged { get; set; }
+
+    private List<string> _names;
 
     protected override async Task OnInitializedAsync()
     {
+        _names = await ApiCaller.MetricService.GetNamesAsync();
         await base.OnInitializedAsync();
     }
 
     private void Add()
     {
-        Items.Add(new EChartPanelMetricItemModel { });
+        Items.Add(new TableFieldItemModel { });
     }
 
     protected override async Task<bool> ExecuteCommondAsync(OperateCommand command, object[] values)
     {
         if (command == OperateCommand.Remove)
         {
-            var item = (EChartPanelMetricItemModel)values[0];
+            var item = (TableFieldItemModel)values[0];
             Items.Remove(item);
             StateHasChanged();
             return await Task.FromResult(true);

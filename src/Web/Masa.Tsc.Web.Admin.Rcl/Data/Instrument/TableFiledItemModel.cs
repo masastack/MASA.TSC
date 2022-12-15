@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
-public class EChartPanelMetricItemModel
+public class TableFieldItemModel
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -13,7 +13,7 @@ public class EChartPanelMetricItemModel
 
     public string Unit { get; set; }
 
-    public string Caculate { get; set; }
+    public string Icon { get; set; }
 
     public string Range { get; set; }
 }

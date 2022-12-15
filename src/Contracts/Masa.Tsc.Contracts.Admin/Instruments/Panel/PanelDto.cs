@@ -16,13 +16,11 @@ public class PanelDto
 
     public string Height { get; set; }
 
-    public string Left { get; set; }
-
-    public string Top { get; set; }
-
     public string Title { get; set; }
 
     public string Description { get; set; } = string.Empty;
+
+    public string SystemIdentity { get; set; }
 
     public int Sort { get; set; }
 
