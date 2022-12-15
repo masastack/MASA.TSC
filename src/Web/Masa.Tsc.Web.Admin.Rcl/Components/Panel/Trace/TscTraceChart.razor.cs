@@ -6,113 +6,121 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TscTraceChart
 {
     [Parameter]
-    public StringNumber Width { get; set; } = "100%";
-
+    public EventCallback<(DateTime, DateTime)> OnDateTimeRangeUpdate { get; set; }
+    
     [Parameter]
-    public StringNumber Height { get; set; } = 300;
+    public ValueTuple<string, string, string>[] Data { get; set; } = Array.Empty<(string, string, string)>();
 
-    [Parameter]
-    public RequestTraceListDto Query { get; set; } = default!;
+    private static readonly QuickRangeKey s_defaultQuickRange = QuickRangeKey.Last1Hour;
 
-    public async Task LoadAsync()
+    private object _option;
+
+    protected override void OnParametersSet()
     {
-        var query = new SimpleAggregateRequestDto
+        base.OnParametersSet();
+
+        _option = GenOption();
+    }
+
+    private object GenOption()
+    {
+        if (Data == null)
+            return new object();
+
+        return new
         {
-            End = Query.End,
-            Start = Query.Start,
-            Alias = "Span Count",
-            Name = "@timestamp",
-            Type = AggregateTypes.DateHistogram,
-            Service = Query.Service,
-            Instance = Query.Instance,
-            Endpoint = Query.Endpoint,
-            Interval = GetInterval()
-        };
-        var data = await ApiCaller.TraceService.AggregateAsync<IEnumerable<KeyValuePair<string, string>>>(query);
-
-        query.Alias = "Trace Count";
-        var data2 = await ApiCaller.TraceService.AggregateAsync<IEnumerable<KeyValuePair<string, string>>>(query);
-        if (data2 == null || !data2.Any())
-            return;
-
-
-        var xPoints = data.Select(item => DateTime.Parse(item.Key).Format(CurrentTimeZone, GetFormat())).ToArray();
-        List<ChartViewDto> list = new()
-        {
-            new ChartViewDto
+            tooltip = new
             {
-                Title = "Span Count",
-                ChartType = "bar",
-                Data = data.Select(item => item.Value).ToArray(),
+                trigger = "axis",
+                axisPointer = new
+                {
+                    type = "cross",
+                    crossStyle = new { color = "#A18BFF66" }
+                }
             },
-            new ChartViewDto
+            legend = new
             {
-                Title = "Trace Count",
-                ChartType = "bar",
-                Data = data2.Select(item => item.Value).ToArray(),
+                data = new[] { "span", "duration" },
+                bottom = true
+            },
+            xAxis = new[]
+            {
+                new
+                {
+                    type = "category",
+                    data = Data.Select(item=>item.Item1),
+                    axisPointer = new
+                    {
+                        type = "shadow"
+                    }
+                },
+            },
+            yAxis = new[]
+            {
+                new
+                {
+                    type = "value",
+                    name = "span",
+                    axisLabel = new
+                    {
+                        formatter = "{value}"
+                    }
+                },
+                new
+                {
+                    type = "value",
+                    name = "duration",
+                    axisLabel = new
+                    {
+                        formatter = "{value} ms"
+                    }
+                },
+            },
+            series = new[]
+            {
+                new
+                {
+                    name = "span",
+                    type = "bar",
+                    yAxisIndex = 0,
+                    data = Data.Select(item=>item.Item2),
+                    itemStyle = new
+                    {
+                        color = "#4318FF"
+                    },
+                    lineStyle = new
+                    {
+                        color = "",
+                        type = ""
+                    },
+                    smooth = false
+                },
+                new
+                {
+                    name = "duration",
+                    type = "line",
+                    yAxisIndex = 1,
+                    data = Data.Select(item=>item.Item3),
+                    itemStyle = new
+                    {
+                        color = ""
+                    },
+                    lineStyle = new
+                    {
+                        color = "#A18BFF",
+                        type = "dashed"
+                    },
+                    smooth = true
+                }
             }
         };
-
-        // ConvertOption(xPoints, list);
-        StateHasChanged();
-        await Task.CompletedTask;
     }
 
-    private string GetInterval()
+    private async Task OnDateTimeUpdate((DateTimeOffset start, DateTimeOffset end) range)
     {
-        var minites = (int)Math.Round((Query.End - Query.Start).TotalMinutes, 0);
-        if (minites - 20 <= 0)
-            return "1m";
-        if (minites - 100 <= 0)
-            return "5m";
-        if (minites - 210 <= 0)
-            return "15m";
-        if (minites - 600 <= 0)
-            return "30m";
+        var localStart = new DateTime(range.start.UtcTicks + range.start.Offset.Ticks, DateTimeKind.Local);
+        var localEnd = new DateTime(range.end.UtcTicks + range.end.Offset.Ticks, DateTimeKind.Local);
 
-        var hours = minites / 60;
-        if (hours - 20 <= 0)
-            return "1h";
-        if (hours - 60 <= 0)
-            return "3h";
-        if (hours - 120 <= 0)
-            return "6h";
-        if (hours - 240 <= 0)
-            return "12h";
-
-        var days = hours / 24;
-        if (days - 20 <= 0)
-            return "1d";
-
-        return "1month";
-    }
-
-    private string GetFormat()
-    {
-        var minites = (int)Math.Round((Query.End - Query.Start).TotalMinutes, 0);
-        if (minites - 20 <= 0)
-            return "HH:mm";
-        if (minites - 100 <= 0)
-            return "HH:mm";
-        if (minites - 210 <= 0)
-            return "HH:mm";
-        if (minites - 600 <= 0)
-            return "HH:mm";
-
-        var hours = minites / 60;
-        if (hours - 20 <= 0)
-            return "dd H";
-        if (hours - 60 <= 0)
-            return "dd H";
-        if (hours - 120 <= 0)
-            return "dd H";
-        if (hours - 240 <= 0)
-            return "dd H";
-
-        var days = hours / 24;
-        if (days - 20 <= 0)
-            return "MM-dd";
-
-        return "yy-MM";
+        await OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd));
     }
 }

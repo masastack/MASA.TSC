@@ -56,7 +56,7 @@ public partial class TscComponentBase : BDomComponentBase
 
     public Guid CurrentUserId { get; private set; }
 
-    public TimeZoneInfo CurrentTimeZone { get; private set; } = TimeZoneInfo.Local;
+    public TimeZoneInfo CurrentTimeZone { get;  set; } = TimeZoneInfo.Local;
 
     protected virtual bool Loading { get; set; }
 

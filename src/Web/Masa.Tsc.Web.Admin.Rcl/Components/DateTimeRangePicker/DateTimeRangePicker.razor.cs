@@ -23,6 +23,12 @@ public partial class DateTimeRangePicker
     [Parameter]
     public EventCallback OnConfirm { get; set; }
 
+    [Parameter]
+    public TimeZoneInfo TimeZoneInfo { get; set; }
+
+    [Parameter]
+    public EventCallback<TimeZoneInfo> OnTimeZoneInfoChange { get; set; }
+
     private static ReadOnlyCollection<TimeZoneInfo> _systemTimeZones = TimeZoneInfo.GetSystemTimeZones();
 
     private TimeSpan _internalOffset;
@@ -200,6 +206,10 @@ public partial class DateTimeRangePicker
 
     private void OnInternalOffsetUpdated(TimeZoneInfo timeZoneInfo)
     {
+        TimeZoneInfo = timeZoneInfo;
+        base.CurrentTimeZone = TimeZoneInfo;
+        if (OnTimeZoneInfoChange.HasDelegate)
+            _ = OnTimeZoneInfoChange.InvokeAsync(timeZoneInfo);
         UpdateInternalStartDateTime(_internalStartDateTime.ToOffset(timeZoneInfo.BaseUtcOffset));
         UpdateInternalEndDateTime(_internalEndDateTime.ToOffset(timeZoneInfo.BaseUtcOffset));
     }

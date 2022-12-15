@@ -1,40 +1,149 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscWidgetBase
 
-@if (ReadOnly)
-{
-    <MECharts Option="_options" Width="@("100%")" Height="@("100%")"></MECharts>
-}
-else
-{
-    <MRow>
-        <MCol Cols="8">
-            <MECharts Option="_options" />
-            <MCard><MTextField @bind-Value="_panelValue.Title" Placeholder="" /></MCard>
-            <MCard><MTextarea @bind-Value="_panelValue.Description" Placeholder="" /></MCard>
-            <EChartPanelMetrics ReadOnly="ReadOnly" Items="_metrics" ItemsChanged="OnItemsChange"></EChartPanelMetrics>
-        </MCol>
-        <MCol Cols="4">
-            <MExpansionPanels Values="new (){1,2,3}" Multiple>
-                <MExpansionPanel Value="1">
-                    <MExpansionPanelHeader>Visualization</MExpansionPanelHeader>
-                    <MExpansionPanelContent>
-                        <EChartPanelType Value="_type.Type" ValueChanged="OnTypeChange"/>
-                    </MExpansionPanelContent>
-                </MExpansionPanel>
-                <MExpansionPanel Value="2">
-                    <MExpansionPanelHeader>Display</MExpansionPanelHeader>
-                    <MExpansionPanelContent>
-                        <EChartPanelDisplay />
-                    </MExpansionPanelContent>
-                </MExpansionPanel>
-                <MExpansionPanel Value="3">
-                    <MExpansionPanelHeader>Configration</MExpansionPanelHeader>
-                    <MExpansionPanelContent>
-                        <EChartPanelOther />
-                    </MExpansionPanelContent>
-                </MExpansionPanel>
-            </MExpansionPanels>
-        </MCol>
-    </MRow>
-}
+<MRow>
+    <MCol Md="12" Class="d-flex justify-end">
+        <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg">
+            取消
+        </SButton>
+        <SButton Small BorderRadiusClass="rounded-lg">
+            应用
+        </SButton>
+    </MCol>
+    <MCol Cols="8">
+        <MRow>
+            <MCol Md="12">
+                <MCard Height="410" Class="d-flex flex-column rounded-lg">
+                    <MCardTitle Class="d-flex justify-space-between">
+                        <MLabel Class="emphasis2--text h6">@EChartOption.Title.Text</MLabel>
+                        <MTooltip Top>
+                            <ActivatorContent>
+                                <MIcon @attributes="@context.Attrs">mdi-information-outline</MIcon>
+                            </ActivatorContent>
+                            <ChildContent>
+                                <span>@EChartOption.Title.Subtext</span>
+                            </ChildContent>
+                        </MTooltip>
+                    </MCardTitle>
+                    <MCardText Class="flex-grow-1">
+                        <MECharts Option="EChartOption.EChartType.Option" @ref="_mECharts" />
+                    </MCardText>
+                </MCard>
+            </MCol>
+            <MCol Md="4">
+                <MCard>
+                    <STextField @bind-Value="_panelValue.Title" Placeholder="" />
+                </MCard>
+            </MCol>
+            <MCol Md="8">
+                <MCard>
+                    <STextField @bind-Value="_panelValue.Description" Placeholder="" />
+                </MCard>
+            </MCol>
+        </MRow>
+        <EChartPanelMetrics Items="_metrics" ItemsChanged="OnItemsChange"></EChartPanelMetrics>
+    </MCol>
+    <MCol Cols="4">
+        <MCard>
+            <MCardText>
+                <MExpansionPanels Values="_panelValues" Multiple Style="z-index:auto !important;">
+                    <MExpansionPanel Value="1">
+                        <MExpansionPanelHeader Class="emphasis2--text h6">Visualization</MExpansionPanelHeader>
+                        <MExpansionPanelContent>
+                            <EChartPanelType Value="_type.Type" ValueChanged="OnTypeChange" />
+                        </MExpansionPanelContent>
+                    </MExpansionPanel>
+                    <MExpansionPanel Value="2">
+                        <MExpansionPanelHeader Class="emphasis2--text h6">Options</MExpansionPanelHeader>
+                        <MExpansionPanelContent>
+                            <MRow>
+                                <MCol Md="12">
+                                    <STextField Label="Title" @bind-Value="EChartOption.Title.Text" />
+                                </MCol>
+                                <MCol Md="12">
+                                    <STextarea HideDetails="true" @bind-Value="EChartOption.Title.Subtext" Outlined Label="Description" NoResize Rows="5" />
+                                </MCol>
+                            </MRow>
+                        </MExpansionPanelContent>
+                    </MExpansionPanel>
+                    <MExpansionPanel Value="3">
+                        <MExpansionPanelHeader Class="emphasis2--text h6">Tooltip</MExpansionPanelHeader>
+                        <MExpansionPanelContent>
+                            <MRow>
+                                <MCol Md="12">
+                                    <SwitchItem Label="Tooltip mode" @bind-Value="@EChartOption.Tooltip.Show" />
+                                </MCol>
+                                <MCol Md="12">
+                                    <ButtonGroupItem @bind-Value="@EChartOption.Tooltip.Trigger" Label="Trigger" Items='new List<string>{"item","axis","none"}' />
+                                </MCol>
+                                <MCol Md="12">
+                                    <ButtonGroupItem @bind-Value="@EChartOption.Tooltip.RenderModel" Label="Render mode" Items='new List<string>{"html","richText"}' />
+                                </MCol>
+                                <MCol Md="12">
+                                    <STextField @bind-Value="@EChartOption.Tooltip.ClassName" Label="Class Name" TValue="string" />
+                                </MCol>
+                            </MRow>
+                        </MExpansionPanelContent>
+                    </MExpansionPanel>
+                    <MExpansionPanel Value="4">
+                        <MExpansionPanelHeader Class="emphasis2--text h6">Legend</MExpansionPanelHeader>
+                        <MExpansionPanelContent>
+                            <MRow>
+                                <MCol Md="12">
+                                    <SwitchItem Label="Legend mode" @bind-Value="@EChartOption.Legend.Show" />
+                                </MCol>
+                                <MCol Md="12">
+                                    <ButtonGroupItem @bind-Value="@EChartOption.Legend.Type" Label="Type" Items='new List<string>{"plain","scroll"}' />
+                                </MCol>
+                                <MCol Md="12">
+                                    <ButtonGroupItem @bind-Value="@EChartOption.Legend.Orient" Label="Orient" Items='new List<string>{"horizontal","vertical"}' />
+                                </MCol>
+                                <MCol Md="12">
+                                    <ButtonGroupItem @bind-Value="@EChartOption.Legend.XPositon" Label="X Position" Items='new List<string>{"left","center","right"}' />
+                                </MCol>
+                                <MCol Md="12">
+                                    <ButtonGroupItem @bind-Value="@EChartOption.Legend.YPositon" Label="Y Position" Items='new List<string>{"top","center","bottom"}' />
+                                </MCol>
+                            </MRow>
+                        </MExpansionPanelContent>
+                    </MExpansionPanel>
+                    <MExpansionPanel Value="5">
+                        <MExpansionPanelHeader Class="emphasis2--text h6">Display</MExpansionPanelHeader>
+                        <MExpansionPanelContent>
+                            <SwitchItem Label="X轴" @bind-Value="@EChartOption.XAxis.Show" />
+                            <SwitchItem Label="X轴轴线" @bind-Value="@EChartOption.XAxis.ShowLine" />
+                            <SwitchItem Label="X轴刻度标签" @bind-Value="@EChartOption.XAxis.ShowLabel" />
+                            <SwitchItem Label="X轴刻度" @bind-Value="@EChartOption.XAxis.ShowTick" />
+                            <SwitchItem Label="Y轴" @bind-Value="@EChartOption.YAxis.Show" />
+                            <SwitchItem Label="Y轴轴线" @bind-Value="@EChartOption.YAxis.ShowLine" />
+                            <SwitchItem Label="Y轴刻度标签" @bind-Value="@EChartOption.YAxis.ShowLabel" />
+                            <SwitchItem Label="Y轴刻度" @bind-Value="@EChartOption.YAxis.ShowTick" />
+                        </MExpansionPanelContent>
+                    </MExpansionPanel>
+                    <MExpansionPanel Value="6">
+                        <MExpansionPanelHeader Class="emphasis2--text h6">Toolbox</MExpansionPanelHeader>
+                        <MExpansionPanelContent>
+                            <MRow>
+                                <MCol Md="12">
+                                    <SwitchItem Label="Toolbox mode" @bind-Value="@EChartOption.Toolbox.Show" />
+                                </MCol>
+                                <MCol Md="12">
+                                    <ButtonGroupItem Values="@EChartOption.Toolbox.Feature" ValuesChanged="FeatureChanged" Label="Feature" Multiple Items='new List<string>{"saveAsImage","dataView","restore","dataZoom"}' />
+                                </MCol>
+                                <MCol Md="12">
+                                    <ButtonGroupItem @bind-Value="@EChartOption.Toolbox.Orient" Label="Orient" Items='new List<string>{"horizontal","vertical"}' />
+                                </MCol>
+                                <MCol Md="12">
+                                    <ButtonGroupItem @bind-Value="@EChartOption.Toolbox.XPositon" Label="X Position" Items='new List<string>{"left","center","right"}' />
+                                </MCol>
+                                <MCol Md="12">
+                                    <ButtonGroupItem @bind-Value="@EChartOption.Toolbox.YPositon" Label="Y Position" Items='new List<string>{"top","center","bottom"}' />
+                                </MCol>
+                            </MRow>
+                        </MExpansionPanelContent>
+                    </MExpansionPanel>
+                </MExpansionPanels>
+            </MCardText>
+        </MCard>
+    </MCol>
+</MRow>

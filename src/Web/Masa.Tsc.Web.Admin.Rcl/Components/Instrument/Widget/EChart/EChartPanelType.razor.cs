@@ -14,23 +14,26 @@ public partial class EChartPanelType
     private async Task OnSelected(EChartPanelTypeModel item)
     {
         Value = item.Type;
+        Items.Where(x => x.Selected).ForEach(x => x.Selected = false);
+        item.Selected = true;
         if (ValueChanged.HasDelegate)
             await ValueChanged.InvokeAsync(Value);
     }
 
     private static List<EChartPanelTypeModel> Items { get; set; } = new List<EChartPanelTypeModel>
     {
-        new EChartPanelTypeModel
-        {
-            Name="柱形图",
-            Type="bar",
-            Src="_content/Masa.Tsc.Web.Admin.Rcl/img/echarts/bar.png"
-        },
+
         new EChartPanelTypeModel
         {
             Name="折线图",
             Type="line",
             Src="_content/Masa.Tsc.Web.Admin.Rcl/img/echarts/line.png"
+        },
+        new EChartPanelTypeModel
+        {
+            Name="柱形图",
+            Type="bar",
+            Src="_content/Masa.Tsc.Web.Admin.Rcl/img/echarts/bar.png"
         },
         new EChartPanelTypeModel
         {

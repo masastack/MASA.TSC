@@ -1,24 +1,16 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<MCard Class="d-flex">
-    @{
-        int index = 0;
-        if (Items != null)
-        {
-            while (Items.Count - index > 0)
-            {
-                var item = Items[index++];
-                <EChartPanelMetricItem Value="item" ValueChanged=@(async(value)=>{item=value;await OnItemsChange();}) Names="_names" CallParent="ChildCallHandler" />
-            }
-        }
-        if (!ReadOnly)
-        {
-            <MCard OnClick="Add">
-                <MCardText>
-                    <MIcon XLarge>mdi-plus</MIcon>
-                </MCardText>
-            </MCard>
-        }
+<MRow>
+    @foreach (var item in Items)
+    {
+        <MCol Md="4">
+            <EChartPanelMetricItem Value="item" Names="_names" CallParent="ChildCallHandler" />
+        </MCol>
     }
-</MCard>
+    <MCol Md="4">
+        <MCard Height=350 OnClick="Add" Class="d-flex justify-center align-center">
+            <MIcon XLarge>mdi-plus</MIcon>
+        </MCard>
+    </MCol>
+</MRow>

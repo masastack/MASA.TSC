@@ -9,9 +9,9 @@ public partial class TscWidgetChart : TscWidgetBase
 
     private List<EChartPanelMetricItemModel> _metrics = new();
 
-    private object _options = new();
+    private List<StringNumber> _panelValues = new List<StringNumber>() { 1 };
 
-    private EChartType _type;
+    private MECharts _mECharts;
 
     public override PanelDto Value
     {
@@ -49,6 +49,22 @@ public partial class TscWidgetChart : TscWidgetBase
                     _metrics.Clear();
             }
         }
+    }
+
+    protected override void OnInitialized()
+    {
+        EChartOption.EChartOptionChanged += EChartOption_EChartOptionChanged;
+        base.OnInitialized();
+    }
+
+    private void FeatureChanged(List<StringNumber> features)
+    {
+        EChartOption.Toolbox.Feature = features;
+    }
+
+    private void EChartOption_EChartOptionChanged()
+    {
+        _mECharts.SetOption();
     }
 
     protected override async Task OnInitializedAsync()
@@ -98,32 +114,31 @@ public partial class TscWidgetChart : TscWidgetBase
         switch (type)
         {
             case "line":
-                _type = EChartConst.Line;
+                EChartOption.EChartType = EChartConst.Line;
                 InitLine(await dataFn());
                 break;
             case "bar":
-                _type = EChartConst.Bar;
+                EChartOption.EChartType = EChartConst.Bar;
                 InitBar(await dataFn());
                 break;
             case "pie":
-                _type = EChartConst.Pie;
+                EChartOption.EChartType = EChartConst.Pie;
                 InitPie(await dataFn());
                 break;
             case "gauge":
-                _type = EChartConst.Gauge;
+                EChartOption.EChartType = EChartConst.Gauge;
                 InitGauge(await dataFn());
                 break;
-            case "heartmap":
-                _type = EChartConst.Heatmap;
+            case "heatmap":
+                EChartOption.EChartType = EChartConst.Heatmap;
                 InitHeatmap();
                 break;
             case "line-area":
-                _type = EChartConst.LineArea;
+                EChartOption.EChartType = EChartConst.LineArea;
                 InitLineArea(await dataFn());
                 break;
             default:
                 {
-                    _options = new();
                     StateHasChanged();
                     break;
                 }
@@ -197,16 +212,15 @@ public partial class TscWidgetChart : TscWidgetBase
                 if (!xPoints.Any())
                 {
                     xPoints = FmtTimespan(timeSpans);
-                    _type.SetValue("xAxis.data", xPoints);
+                    EChartOption.EChartType.SetValue("xAxis.data", xPoints);
                 }
 
                 list.Add(new { name = title, type = "line", stack = "Total", data = values });
             }
         }
 
-        _type.SetValue("legend.data", titles);
-        _type.SetValue("series", list);
-        _options = _type.Option;
+        EChartOption.EChartType.SetValue("legend.data", titles);
+        EChartOption.EChartType.SetValue("series", list);
     }
 
     private void InitBar(params QueryResultDataResponse[] data)
@@ -242,9 +256,8 @@ public partial class TscWidgetChart : TscWidgetBase
             }
         }
 
-        _type.SetValue("xAxis.data", titles);
-        _type.SetValue("series[0].data", list);
-        _options = _type.Option;
+        EChartOption.EChartType.SetValue("xAxis.data", titles);
+        EChartOption.EChartType.SetValue("series[0].data", list);
     }
 
     private void InitPie(params QueryResultDataResponse[] data)
@@ -278,8 +291,7 @@ public partial class TscWidgetChart : TscWidgetBase
                 list.Add(new { value, name = title });
             }
         }
-        _type.SetValue("series[0].data", list);
-        _options = _type.Option;
+        EChartOption.EChartType.SetValue("series[0].data", list);
     }
     private void InitGauge(params QueryResultDataResponse[] data)
     {
@@ -304,13 +316,11 @@ public partial class TscWidgetChart : TscWidgetBase
             {
                 var title = GetLabelName(sss.Metric!);
                 var value = sss.Values!.Select(it => (string)it[1]).Last();
-                _type.SetValue("series[0].data[0]", new { name = title, value });
+                EChartOption.EChartType.SetValue("series[0].data[0]", new { name = title, value });
                 break;
             }
             break;
         }
-
-        _options = _type.Option;
     }
     private void InitHeatmap(params QueryResultDataResponse[] data) { }
     private void InitLineArea(params QueryResultDataResponse[] data)
@@ -342,15 +352,14 @@ public partial class TscWidgetChart : TscWidgetBase
                 if (!xPoints.Any())
                 {
                     xPoints = FmtTimespan(timeSpans);
-                    _type.SetValue("xAxis.data", xPoints);
+                    EChartOption.EChartType.SetValue("xAxis.data", xPoints);
                 }
 
                 list.Add(new { name = title, type = "line", stack = "Total", areaStyle = new { }, emphasis = new { focus = "series" }, data = values });
             }
         }
-        _type.SetValue("legend.data", titles);
-        _type.SetValue("series", list);
-        _options = _type.Option;
+        EChartOption.EChartType.SetValue("legend.data", titles);
+        EChartOption.EChartType.SetValue("series", list);
     }
 
     private List<string> FmtTimespan(double[] timeSpans)
@@ -365,5 +374,11 @@ public partial class TscWidgetChart : TscWidgetBase
     private int GetLevel(int seconds)
     {
         return 0;
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        EChartOption.EChartOptionChanged -= EChartOption_EChartOptionChanged;
+        base.Dispose(disposing);
     }
 }

@@ -10,4 +10,6 @@ public class EChartPanelTypeModel
     public string Name { get; set; }
 
     public string Src { get; set; }
+
+    public bool Selected { get; set; }
 }

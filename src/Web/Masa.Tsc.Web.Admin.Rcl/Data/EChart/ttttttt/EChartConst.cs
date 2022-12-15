@@ -30,6 +30,8 @@ internal static class EChartConst
   ]
 }";
     private const string LineBasicJson = @"{
+ ""tooltip"":{""trigger"":""axis"",""show"":true},
+ ""legend"":{""show"":true,""left"":""center"",""top"":""bottom""},
  ""grid"": {
     ""show"": false,
     ""top"": 20,
@@ -63,11 +65,6 @@ internal static class EChartConst
   },
   ""legend"": {
     ""data"": [""Email"", ""Union Ads"", ""Video Ads"", ""Direct"", ""Search Engine""]
-  },
-  ""toolbox"": {
-    ""feature"": {
-      ""saveAsImage"": {}
-    }
   },
   ""grid"": {
     ""left"": ""3%"",
@@ -194,6 +191,494 @@ internal static class EChartConst
     }
   ]
 }";
+    private const string HeatmapBasicJson = @"{
+    ""tooltip"": {
+        ""position"": ""top""
+    },
+    ""grid"": {
+        ""height"": ""50%"",
+        ""top"": ""10%""
+    },
+    ""xAxis"": {
+        ""type"": ""category"",
+        ""data"": [
+            ""12a"",
+            ""1a"",
+            ""2a"",
+            ""3a"",
+            ""4a"",
+            ""5a"",
+            ""6a"",
+            ""7a"",
+            ""8a"",
+            ""9a"",
+            ""10a"",
+            ""11a"",
+            ""12p"",
+            ""1a"",
+            ""2a"",
+            ""3a""
+        ],
+        ""splitArea"": {
+            ""show"": true
+        }
+    },
+    ""yAxis"": {
+        ""type"": ""category"",
+        ""data"": [
+            ""Saturday"",
+            ""Friday"",
+            ""Thursday"",
+            ""Wednesday"",
+            ""Tuesday"",
+            ""Monday"",
+            ""Sunday""
+        ],
+        ""splitArea"": {
+            ""show"": true
+        }
+    },
+    ""visualMap"": {
+        ""min"": 0,
+        ""max"": 10,
+        ""calculable"": true,
+        ""orient"": ""horizontal"",
+        ""left"": ""center"",
+        ""bottom"": ""5%""
+    },
+    ""series"": [
+        {
+            ""name"": ""Punch Card"",
+            ""type"": ""heatmap"",
+            ""data"": [
+                [
+                    8,
+                    0,
+                    0
+                ],
+                [
+                    9,
+                    0,
+                    0
+                ],
+                [
+                    10,
+                    0,
+                    0
+                ],
+                [
+                    11,
+                    0,
+                    2
+                ],
+                [
+                    15,
+                    0,
+                    3
+                ],
+                [
+                    16,
+                    0,
+                    4
+                ],
+                [
+                    17,
+                    0,
+                    6
+                ],
+                [
+                    18,
+                    0,
+                    4
+                ],
+                [
+                    19,
+                    0,
+                    4
+                ],
+                [
+                    20,
+                    0,
+                    3
+                ],
+                [
+                    21,
+                    0,
+                    3
+                ],
+                [
+                    22,
+                    0,
+                    2
+                ],
+                [
+                    23,
+                    0,
+                    5
+                ],
+                [
+                    0,
+                    1,
+                    7
+                ],
+                [
+                    1,
+                    1,
+                    0
+                ],
+                [
+                    2,
+                    1,
+                    0
+                ],
+                [
+                    3,
+                    1,
+                    0
+                ],
+                [
+                    4,
+                    1,
+                    0
+                ],
+                [
+                    5,
+                    1,
+                    0
+                ],
+                [
+                    6,
+                    1,
+                    0
+                ],
+                [
+                    7,
+                    1,
+                    0
+                ],
+                [
+                    8,
+                    1,
+                    0
+                ],
+                [
+                    9,
+                    1,
+                    0
+                ],
+                [
+                    10,
+                    1,
+                    5
+                ],
+                [
+                    11,
+                    1,
+                    2
+                ],
+                [
+                    12,
+                    1,
+                    2
+                ],
+                [
+                    13,
+                    1,
+                    6
+                ],
+                [
+                    14,
+                    1,
+                    9
+                ],
+                [
+                    15,
+                    1,
+                    11
+                ],
+                [
+                    16,
+                    1,
+                    6
+                ],
+                [
+                    17,
+                    1,
+                    7
+                ],
+                [
+                    18,
+                    1,
+                    8
+                ],
+                [
+                    19,
+                    1,
+                    12
+                ],
+                [
+                    20,
+                    1,
+                    5
+                ],
+                [
+                    21,
+                    1,
+                    5
+                ],
+                [
+                    22,
+                    1,
+                    7
+                ],
+                [
+                    23,
+                    1,
+                    2
+                ],
+                [
+                    0,
+                    2,
+                    1
+                ],
+                [
+                    1,
+                    2,
+                    1
+                ],
+                [
+                    2,
+                    2,
+                    0
+                ],
+                [
+                    3,
+                    2,
+                    0
+                ],
+                [
+                    4,
+                    2,
+                    0
+                ],
+                [
+                    5,
+                    2,
+                    0
+                ],
+                [
+                    6,
+                    2,
+                    0
+                ],
+                [
+                    9,
+                    2,
+                    0
+                ],
+                [
+                    10,
+                    2,
+                    3
+                ],
+                [
+                    16,
+                    2,
+                    6
+                ],
+                [
+                    4,
+                    4,
+                    0
+                ],
+                [
+                    5,
+                    4,
+                    1
+                ],
+                [
+                    6,
+                    4,
+                    0
+                ],
+                [
+                    7,
+                    4,
+                    0
+                ],
+                [
+                    8,
+                    4,
+                    0
+                ],
+                [
+                    9,
+                    4,
+                    2
+                ],
+                [
+                    10,
+                    4,
+                    4
+                ],
+                [
+                    11,
+                    4,
+                    4
+                ],
+                [
+                    22,
+                    4,
+                    3
+                ],
+                [
+                    23,
+                    4,
+                    0
+                ],
+                [
+                    0,
+                    5,
+                    2
+                ],
+                [
+                    1,
+                    5,
+                    1
+                ],
+                [
+                    2,
+                    5,
+                    0
+                ],
+                [
+                    3,
+                    5,
+                    3
+                ],
+                [
+                    4,
+                    5,
+                    0
+                ],
+                [
+                    5,
+                    5,
+                    0
+                ],
+                [
+                    6,
+                    5,
+                    0
+                ],
+                [
+                    7,
+                    5,
+                    0
+                ],
+                [
+                    8,
+                    5,
+                    2
+                ],
+                [
+                    9,
+                    5,
+                    0 
+                ],
+                [
+                    10,
+                    5,
+                    4
+                ],
+                [
+                    11,
+                    5,
+                    1
+                ],
+                [
+                    12,
+                    5,
+                    5
+                ],
+                [
+                    13,
+                    5,
+                    10
+                ],
+                [
+                    14,
+                    5,
+                    5
+                ],
+                [
+                    15,
+                    5,
+                    7
+                ],
+                [
+                    16,
+                    5,
+                    11
+                ],
+                [
+                    17,
+                    5,
+                    6
+                ],
+                [
+                    18,
+                    5,
+                    0
+                ],
+                [
+                    19,
+                    5,
+                    5
+                ],
+                [
+                    20,
+                    5,
+                    3
+                ],
+                [
+                    21,
+                    5,
+                    4
+                ],
+                [
+                    22,
+                    5,
+                    2
+                ],
+                [
+                    23,
+                    5,
+                    0
+                ],
+                [
+                    0,
+                    6,
+                    1
+                ],
+                [
+                    1,
+                    6,
+                    0
+                ]
+            ],
+            ""label"": {
+                ""show"": true
+            },
+            ""emphasis"": {
+                ""itemStyle"": {
+                    ""shadowBlur"": 10,
+                    ""shadowColor"": ""rgba(0, 0, 0, 0.5)""
+                }
+            }
+        }
+    ]
+}";
     #endregion
 
     public static EChartType Bar
@@ -221,14 +706,14 @@ internal static class EChartConst
     {
         get
         {
-            throw new NotImplementedException();
+            return new EChartType("gauge", "", GaugeBasicJson);
         }
     }
     public static EChartType Heatmap
     {
         get
         {
-            throw new NotImplementedException();
+            return new EChartType("heatmap", "", HeatmapBasicJson);
         }
     }
     public static EChartType LineArea
