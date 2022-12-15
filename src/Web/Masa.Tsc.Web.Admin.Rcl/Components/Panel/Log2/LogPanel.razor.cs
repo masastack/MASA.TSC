@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 using Masa.Tsc.Contracts.Admin.Logs;
+using System.Linq;
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Log2;
 
@@ -60,8 +61,11 @@ public partial class LogPanel
 
     List<LogDto> Logs { get; set; } = new();
 
+    Dictionary<string, LogTree> _demo;
+
     protected override async Task OnInitializedAsync()
     {
+        _demo = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(Parent.Demo)).EnumerateObject().ToDictionary(item => item.Name,item => new LogTree(item.Value));
         await GetLogsAsync();
     }
 

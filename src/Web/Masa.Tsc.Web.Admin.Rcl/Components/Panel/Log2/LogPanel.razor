@@ -30,7 +30,7 @@
                         <div class="mt-2 body regular3--text">@context.Timestamp.ToString("yyyy")</div>
                     </div>
                     <div class="full-widthh">
-                        <LogView />
+                        <LogView JsonObject="context.ExtensionData.ToDictionary(item => item.Key,item => new LogTree(item.Value))" />
                     </div>
                 </dvi>
                 <MDivider Class="mb-6" />
