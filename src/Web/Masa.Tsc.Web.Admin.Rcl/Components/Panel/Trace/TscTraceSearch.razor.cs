@@ -15,20 +15,26 @@ public partial class TscTraceSearch
     public Func<string, string, Task<IEnumerable<string>>> QueryInstances { get; set; }
 
     [Parameter, EditorRequired]
-    public Func<string, string, Task<IEnumerable<string>>> QueryEndpoints { get; set; }
+    public Func<string, string, string, Task<IEnumerable<string>>> QueryEndpoints { get; set; }
 
     private List<string> _services = new();
     private List<string> _instances = new();
     private List<string> _endpoints = new();
 
     private string _service = string.Empty;
-    private string? _instance;
+    private string _instance = string.Empty;
     private string? _endpoint;
     private string? _keyword;
 
     private bool _serviceSearching;
     private bool _instanceSearching;
     private bool _endpointSearching;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SearchServices(default!);
+        await base.OnInitializedAsync();
+    }
 
     private async Task SearchServices(string key)
     {
@@ -47,7 +53,7 @@ public partial class TscTraceSearch
     private async Task SearchEndpoints(string key)
     {
         _endpointSearching = true;
-        _endpoints = (await QueryEndpoints(_service, key)).ToList();
+        _endpoints = (await QueryEndpoints(_service, _instance??string.Empty, key)).ToList();
         _endpointSearching = false;
     }
 

@@ -20,7 +20,7 @@
 	  <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.3" />
   </ItemGroup>
 
-	<ItemGroup>
+	<ItemGroup>		
 		<ProjectReference Include="..\..\ApiGateways\Masa.Tsc.ApiGateways.Caller\Masa.Tsc.ApiGateways.Caller.csproj" />
 		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
 	</ItemGroup>

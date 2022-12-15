@@ -1,9 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using System.Runtime.InteropServices.ComTypes;
-using Masa.Utils.Models;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceList : TscComponentBase
@@ -18,14 +15,10 @@ public partial class TscTraceList : TscComponentBase
     public bool SearchLoading { get; set; }
 
     private TscTraceDetail? _tscTraceDetail;
-
     private IEnumerable<TraceResponseDto> _data = new List<TraceResponseDto>();
     private int _total = 0;
-
     private int _page = 1;
     private int _pageSize = 10;
-    private int _lastPage = 1;
-    private int _lastPageSize = 10;
 
     private List<DataTableHeader<TraceResponseDto>> _headers = new()
     {
