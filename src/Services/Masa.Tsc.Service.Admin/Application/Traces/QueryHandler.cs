@@ -37,23 +37,15 @@ public class QueryHandler
         };
         if (!string.IsNullOrEmpty(query.Endpoint))
         {
-            var tttt = new FieldConditionDto
+            var list = queryDto.Conditions?.ToList() ?? new();
+            var endpointCondition = new FieldConditionDto
             {
                 Name = "Attributes.http.url",
                 Type = ConditionTypes.Equal,
                 Value = query.Endpoint
             };
-
-            if (queryDto.Conditions == null)
-                queryDto.Conditions = new FieldConditionDto[] {
-                    tttt
-                };
-            else
-            {
-                var list = queryDto.Conditions.ToList();
-                list.Add(tttt);
-                queryDto.Conditions=list;
-            }
+            list.Add(endpointCondition);
+            queryDto.Conditions = list;
         }
 
         query.Result = await _traceService.ListAsync(queryDto);
@@ -64,18 +56,49 @@ public class QueryHandler
     [EventHandler]
     public async Task GetAttrValuesAsync(TraceAttrValuesQuery query)
     {
+        var list = query.Data.Conditions?.ToList() ?? new();
         if (string.IsNullOrEmpty(query.Data.Service))
         {
             query.Data.Name = ElasticConstant.ServiceName;
+            if (!string.IsNullOrEmpty(query.Data.Keyword))
+            {
+                list.Add(new FieldConditionDto
+                {
+                    Name = ElasticConstant.ServiceName,
+                    Type = ConditionTypes.Regex,
+                    Value = $"*{query.Data.Keyword}*"
+                });
+            }
         }
         else if (query.Data.Instance == null)
         {
             query.Data.Name = ElasticConstant.ServiceInstance;
+            if (!string.IsNullOrEmpty(query.Data.Keyword))
+            {
+                list.Add(new FieldConditionDto
+                {
+                    Name = ElasticConstant.ServiceInstance,
+                    Type = ConditionTypes.Regex,
+                    Value = $"*{query.Data.Keyword}*"
+                });
+            }
         }
         else
         {
-            query.Data.Name = "Attributes.http.url";// ElasticConstant.Endpoint;
+            // ElasticConstant.Endpoint;
+            query.Data.Name = "Attributes.http.url";
+            if (!string.IsNullOrEmpty(query.Data.Keyword))
+            {
+                list.Add(new FieldConditionDto
+                {
+                    Name = ElasticConstant.Endpoint,
+                    Type = ConditionTypes.Regex,
+                    Value = $"*{query.Data.Keyword}*"
+                });
+            }
         }
+        query.Data.Conditions = list;
+        query.Data.Keyword = default!;
 
         query.Result = (IEnumerable<string>)await _traceService.AggregateAsync(query.Data);
         if (query.Result == null)
