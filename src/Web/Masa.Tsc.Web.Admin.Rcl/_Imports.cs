@@ -50,4 +50,4 @@ global using System.Diagnostics.CodeAnalysis;
 global using Microsoft.JSInterop;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Topology.Models;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Topology;
-global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Log2.Models;
+global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Log.Models;
