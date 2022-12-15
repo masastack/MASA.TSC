@@ -13,7 +13,6 @@ public partial class LogPanel
     int _pageSize = 10;
     DateTime? _startTime;
     DateTime? _endTime;
-    bool _wordBreak;
     object _option;
 
     string Search
@@ -51,21 +50,12 @@ public partial class LogPanel
         }
     }
 
-    bool WordBreak
-    {
-        get => _wordBreak;
-        set => _wordBreak = value;
-    }
-
     long Total { get; set; }
 
     List<LogDto> Logs { get; set; } = new();
 
-    Dictionary<string, LogTree> _demo;
-
     protected override async Task OnInitializedAsync()
     {
-        _demo = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(Parent.Demo)).EnumerateObject().ToDictionary(item => item.Name,item => new LogTree(item.Value));
         await GetLogsAsync();
     }
 
