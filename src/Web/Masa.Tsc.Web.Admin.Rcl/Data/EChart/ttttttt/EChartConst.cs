@@ -725,7 +725,7 @@ internal static class EChartConst
     }
 }
 
-internal class EChartType
+public class EChartType
 {
     public EChartType(string name, string src, string json)
     {

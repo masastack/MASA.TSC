@@ -3,23 +3,23 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-internal static class EChartOption
+public class EChartOption
 {
-    public static EChartType EChartType { get; set; }
+    public EChartType EChartType { get; set; }
 
-    public static Tooltip Tooltip { get; set; } = new();
+    public Tooltip Tooltip { get; set; } = new();
 
-    public static Legend Legend { get; set; } = new();
+    public Legend Legend { get; set; } = new();
 
-    public static Toolbox Toolbox { get; set; } = new();
+    public Toolbox Toolbox { get; set; } = new();
 
-    public static Axis XAxis { get; set; } = new();
+    public Axis XAxis { get; set; } = new();
 
-    public static Axis YAxis { get; set; } = new();
+    public Axis YAxis { get; set; } = new();
 
-    public static event EChartOptionChangedEventHandler? EChartOptionChanged;
+    public event EChartOptionChangedEventHandler? EChartOptionChanged;
 
-    static EChartOption()
+    public EChartOption()
     {
         EChartType = EChartConst.Line;
         Tooltip.PropertyChanged += Tooltip_PropertyChanged;
@@ -29,7 +29,7 @@ internal static class EChartOption
         YAxis.PropertyChanged += YAxis_PropertyChanged;
     }
 
-    private static void YAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void YAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
         {
@@ -50,7 +50,7 @@ internal static class EChartOption
         EChartOptionChanged?.Invoke();
     }
 
-    private static void XAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void XAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
         {
@@ -71,7 +71,7 @@ internal static class EChartOption
         EChartOptionChanged?.Invoke(); ;
     }
 
-    private static void Toolbox_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void Toolbox_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
         {
@@ -95,7 +95,7 @@ internal static class EChartOption
         EChartOptionChanged?.Invoke();
     }
 
-    private static void Legend_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void Legend_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
         {
@@ -119,7 +119,7 @@ internal static class EChartOption
         EChartOptionChanged?.Invoke();
     }
 
-    private static void Tooltip_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void Tooltip_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
         {
@@ -216,7 +216,7 @@ public class Legend : NotifyingEntity
 public class Toolbox : NotifyingEntity
 {
     bool _show = true;
-    string _orient = "vertical";
+    string _orient = "horizontal";
     string _xPositon = "right";
     string _yPositon = "top";
     List<StringNumber> _feature = new();

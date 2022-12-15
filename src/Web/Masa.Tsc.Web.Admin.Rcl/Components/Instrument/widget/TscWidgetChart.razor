@@ -3,6 +3,7 @@
 
 <MRow>
     <MCol Md="12" Class="d-flex justify-end">
+        <MIcon>mdi-refresh</MIcon>
         <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg">
             取消
         </SButton>
@@ -71,16 +72,16 @@
                             <MExpansionPanelContent>
                                 <MRow>
                                     <MCol Md="12">
-                                        <SwitchItem Label="Tooltip mode" @bind-Value="@EChartOption.Tooltip.Show" />
+                                        <SwitchItem Label="Tooltip mode" @bind-Value="@_eChartOption.Tooltip.Show" />
                                     </MCol>
                                     <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@EChartOption.Tooltip.Trigger" Label="Trigger" Items='new List<string>{"item","axis","none"}' />
+                                        <ButtonGroupItem @bind-Value="@_eChartOption.Tooltip.Trigger" Label="Trigger" Items='new List<string>{"item","axis","none"}' />
                                     </MCol>
                                     <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@EChartOption.Tooltip.RenderModel" Label="Render mode" Items='new List<string>{"html","richText"}' />
+                                        <ButtonGroupItem @bind-Value="@_eChartOption.Tooltip.RenderModel" Label="Render mode" Items='new List<string>{"html","richText"}' />
                                     </MCol>
                                     <MCol Md="12">
-                                        <STextField @bind-Value="@EChartOption.Tooltip.ClassName" Label="Class Name" TValue="string" />
+                                        <STextField @bind-Value="@_eChartOption.Tooltip.ClassName" Label="Class Name" TValue="string" />
                                     </MCol>
                                 </MRow>
                             </MExpansionPanelContent>
@@ -90,19 +91,19 @@
                             <MExpansionPanelContent>
                                 <MRow>
                                     <MCol Md="12">
-                                        <SwitchItem Label="Legend mode" @bind-Value="@EChartOption.Legend.Show" />
+                                        <SwitchItem Label="Legend mode" @bind-Value="@_eChartOption.Legend.Show" />
                                     </MCol>
                                     <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@EChartOption.Legend.Type" Label="Type" Items='new List<string>{"plain","scroll"}' />
+                                        <ButtonGroupItem @bind-Value="@_eChartOption.Legend.Type" Label="Type" Items='new List<string>{"plain","scroll"}' />
                                     </MCol>
                                     <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@EChartOption.Legend.Orient" Label="Orient" Items='new List<string>{"horizontal","vertical"}' />
+                                        <ButtonGroupItem @bind-Value="@_eChartOption.Legend.Orient" Label="Orient" Items='new List<string>{"horizontal","vertical"}' />
                                     </MCol>
                                     <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@EChartOption.Legend.XPositon" Label="X Position" Items='new List<string>{"left","center","right"}' />
+                                        <ButtonGroupItem @bind-Value="@_eChartOption.Legend.XPositon" Label="X Position" Items='new List<string>{"left","center","right"}' />
                                     </MCol>
                                     <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@EChartOption.Legend.YPositon" Label="Y Position" Items='new List<string>{"top","center","bottom"}' />
+                                        <ButtonGroupItem @bind-Value="@_eChartOption.Legend.YPositon" Label="Y Position" Items='new List<string>{"top","center","bottom"}' />
                                     </MCol>
                                 </MRow>
                             </MExpansionPanelContent>
@@ -110,14 +111,14 @@
                         <MExpansionPanel Value="4">
                             <MExpansionPanelHeader Class="emphasis2--text h6">Axis</MExpansionPanelHeader>
                             <MExpansionPanelContent>
-                                <SwitchItem Label="X轴" @bind-Value="@EChartOption.XAxis.Show" />
-                                <SwitchItem Label="X轴轴线" @bind-Value="@EChartOption.XAxis.ShowLine" />
-                                <SwitchItem Label="X轴刻度标签" @bind-Value="@EChartOption.XAxis.ShowLabel" />
-                                <SwitchItem Label="X轴刻度" @bind-Value="@EChartOption.XAxis.ShowTick" />
-                                <SwitchItem Label="Y轴" @bind-Value="@EChartOption.YAxis.Show" />
-                                <SwitchItem Label="Y轴轴线" @bind-Value="@EChartOption.YAxis.ShowLine" />
-                                <SwitchItem Label="Y轴刻度标签" @bind-Value="@EChartOption.YAxis.ShowLabel" />
-                                <SwitchItem Label="Y轴刻度" @bind-Value="@EChartOption.YAxis.ShowTick" />
+                                <SwitchItem Label="X轴" @bind-Value="@_eChartOption.XAxis.Show" />
+                                <SwitchItem Label="X轴轴线" @bind-Value="@_eChartOption.XAxis.ShowLine" />
+                                <SwitchItem Label="X轴刻度标签" @bind-Value="@_eChartOption.XAxis.ShowLabel" />
+                                <SwitchItem Label="X轴刻度" @bind-Value="@_eChartOption.XAxis.ShowTick" />
+                                <SwitchItem Label="Y轴" @bind-Value="@_eChartOption.YAxis.Show" />
+                                <SwitchItem Label="Y轴轴线" @bind-Value="@_eChartOption.YAxis.ShowLine" />
+                                <SwitchItem Label="Y轴刻度标签" @bind-Value="@_eChartOption.YAxis.ShowLabel" />
+                                <SwitchItem Label="Y轴刻度" @bind-Value="@_eChartOption.YAxis.ShowTick" />
                             </MExpansionPanelContent>
                         </MExpansionPanel>
                         <MExpansionPanel Value="5">
@@ -125,19 +126,19 @@
                             <MExpansionPanelContent>
                                 <MRow>
                                     <MCol Md="12">
-                                        <SwitchItem Label="Toolbox mode" @bind-Value="@EChartOption.Toolbox.Show" />
+                                        <SwitchItem Label="Toolbox mode" @bind-Value="@_eChartOption.Toolbox.Show" />
                                     </MCol>
                                     <MCol Md="12">
-                                        <ButtonGroupItem Values="@EChartOption.Toolbox.Feature" ValuesChanged="FeatureChanged" Label="Feature" Multiple Items='new List<string>{"saveAsImage","dataView","restore","dataZoom"}' />
+                                        <ButtonGroupItem @bind-Values="@_eChartOption.Toolbox.Feature" Label="Feature" Multiple Items='new List<string>{"saveAsImage","dataView","restore","dataZoom"}' />
                                     </MCol>
                                     <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@EChartOption.Toolbox.Orient" Label="Orient" Items='new List<string>{"horizontal","vertical"}' />
+                                        <ButtonGroupItem @bind-Value="@_eChartOption.Toolbox.Orient" Label="Orient" Items='new List<string>{"horizontal","vertical"}' />
                                     </MCol>
                                     <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@EChartOption.Toolbox.XPositon" Label="X Position" Items='new List<string>{"left","center","right"}' />
+                                        <ButtonGroupItem @bind-Value="@_eChartOption.Toolbox.XPositon" Label="X Position" Items='new List<string>{"left","center","right"}' />
                                     </MCol>
                                     <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@EChartOption.Toolbox.YPositon" Label="Y Position" Items='new List<string>{"top","center","bottom"}' />
+                                        <ButtonGroupItem @bind-Value="@_eChartOption.Toolbox.YPositon" Label="Y Position" Items='new List<string>{"top","center","bottom"}' />
                                     </MCol>
                                 </MRow>
                             </MExpansionPanelContent>
