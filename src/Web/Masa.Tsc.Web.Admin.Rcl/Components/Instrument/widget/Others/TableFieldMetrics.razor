@@ -5,7 +5,9 @@
     @foreach (var item in Items)
     {
         <MCol Md="4">
-            <TableFieldMetricItem Value="item" CallParent="ChildCallHandler" />
+            <CascadingValue Value="@this" IsFixed>
+                <TableFieldMetricItem Value="item" CallParent="ChildCallHandler" />
+            </CascadingValue>
         </MCol>
     }
     <MCol Md="4">
