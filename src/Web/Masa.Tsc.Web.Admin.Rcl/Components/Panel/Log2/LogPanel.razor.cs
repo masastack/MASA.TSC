@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Contracts.Admin.Logs;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Log2;
 
 public partial class LogPanel
@@ -56,7 +58,7 @@ public partial class LogPanel
 
     long Total { get; set; }
 
-    List<LogResponseDto> Logs { get; set; } = new();
+    List<LogDto> Logs { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -74,14 +76,14 @@ public partial class LogPanel
             Page = Page,
             Query = Search
         };
-        var response = await ApiCaller.LogService.GetPageAsync(query);
+        var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
         Logs = response.Result;
         Total = response.Total;
         GenOption(default);
         Loading = false;
     }
 
-    private void GenOption(object data)
+    void GenOption(object data)
     {
         // TODO: 解析data生成一下数据
 

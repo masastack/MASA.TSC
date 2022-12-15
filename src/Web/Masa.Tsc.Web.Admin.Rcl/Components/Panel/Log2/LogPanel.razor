@@ -22,14 +22,14 @@
                 </MCardText>
             </MCard>
         }
-        <MVirtualScroll OverscanCount=5 TItem="LogResponseDto" Items="Logs" Class="pa-6 m-sheet theme--light" Style="height: calc(100vh - 290px);border-bottom-left-radius: 20px ; border-bottom-right-radius: 20px ;">
+        <MVirtualScroll OverscanCount=5 TItem="LogDto" Items="Logs" Class="pa-6 m-sheet theme--light" Style="height: calc(100vh - 290px);border-bottom-left-radius: 20px ; border-bottom-right-radius: 20px ;">
             <ItemContent>
                 <dvi class="d-flex">
-                    <div>
+                    <div style="min-width:234px;">
                         <div class="h5 regular--text">@context.Timestamp.ToString("MM-dd HH:mm:ss")</div>
                         <div class="mt-2 body regular3--text">@context.Timestamp.ToString("yyyy")</div>
                     </div>
-                    <div>
+                    <div class="full-widthh">
                         <LogView />
                     </div>
                 </dvi>

@@ -1,6 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Contracts.Admin.Logs;
+using System.Text.Json.Nodes;
+
 namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class LogService : BaseService
@@ -28,5 +31,10 @@ public class LogService : BaseService
     public async Task<PaginatedListBase<LogResponseDto>> GetPageAsync(LogPageQueryDto param)
     {
         return await Caller.GetAsync<PaginatedListBase<LogResponseDto>>($"{RootPath}/list", param) ?? default!;
+    }
+
+    public async Task<PaginatedListBase<LogDto>> GetDynamicPageAsync(LogPageQueryDto param)
+    {
+        return await Caller.GetAsync<PaginatedListBase<LogDto>>($"{RootPath}/list", param) ?? default!;
     }
 }

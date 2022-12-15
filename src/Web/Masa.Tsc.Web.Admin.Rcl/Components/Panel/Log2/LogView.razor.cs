@@ -5,5 +5,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Log2;
 
 public partial class LogView
 {
-
+    [Parameter]
+    public JsonObject Json { get; set; }
 }
