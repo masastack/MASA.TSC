@@ -1,0 +1,24 @@
+﻿@inherits TscComponentBase
+
+<MTabs Color="primary" @bind-Value="CurrentTab">
+    @foreach (var tabItem in Panel.ChildPanels)
+    {
+        <MTab @key="tabItem.Id" Value="tabItem.Id.ToString()">
+            @tabItem.Title
+            @if(IsEdit)
+            {
+                <SButton Icon>
+                    <SIcon Size="24" OnClickStopPropagation OnClick="() => CloseTabItem(tabItem)">@IconConstants.Close</SIcon>
+                </SButton>               
+            }
+        </MTab>
+    }
+</MTabs>
+<MTabsItems Value="CurrentTab">
+    @foreach (var tabItem in Panel.ChildPanels)
+    {
+        <MTabItem Value="tabItem.Id.ToString()">
+            <PanelGrids Panels="tabItem.ChildPanels" />
+        </MTabItem>
+    }
+</MTabsItems>

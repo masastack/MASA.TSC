@@ -1,31 +1,36 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Web.Admin.Rcl.Pages.DataV.Modules;
-using Masa.Tsc.Web.Admin.Rcl.Pages.DataV.Modules.LinkTrackingTopologys;
+namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Topology;
 
-namespace Masa.Tsc.Web.Admin.Rcl.Pages.DataV;
-
-public partial class Example1 : BDomComponentBase
+public partial class TopologyPanel
 {
+    List<int> _depthItems = new() { 1, 2, 3 };
+    int _depth = 3;
 
-    public LinkTrackingTopologyViewModel Data { get; set; } = new();
-
-    private LinkTrackingTopologyViewModel AllData { get; set; } = new();
-
-    private int _depth;
-    private List<int> _depthItems = new List<int> { 1, 2, 3 };
+    public LinkTrackingTopologyViewModel Data { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        FillData();
-        DepthChange(3);
+        await GetYopologyPanelData();
         await base.OnInitializedAsync();
     }
 
-    public void FillData()
+    LinkTrackingTopologyViewModel GetDepthData()
     {
-        AllData.Edges = new List<LinkTrackingTopologyEdgeViewModel>
+        var nodes = Data.Nodes.Where(x => x.Depth <= _depth).ToList();
+        var edges = Data.Edges.Where(x => nodes.Any(y => y.Id == x.Source || y.Id == x.Target)).ToList();
+        return new LinkTrackingTopologyViewModel
+        {
+            Nodes = nodes,
+            Edges = edges
+        };
+    }
+
+    async Task GetYopologyPanelData()
+    {
+        Data = new();
+        Data.Edges = new List<LinkTrackingTopologyEdgeViewModel>
         {
             new LinkTrackingTopologyEdgeViewModel
             {
@@ -76,8 +81,7 @@ public partial class Example1 : BDomComponentBase
                 Label="123.54"
             },
         };
-
-        AllData.Nodes = new List<LinkTrackingTopologyNodeViewModel>
+        Data.Nodes = new List<LinkTrackingTopologyNodeViewModel>
         {
             new LinkTrackingTopologyNodeViewModel{
                 Id="0",
@@ -144,21 +148,13 @@ public partial class Example1 : BDomComponentBase
                 Y=-50
             },
         };
+
+        await Task.CompletedTask;
     }
 
-    private void DepthChange(int depth)
+    async Task Refresh()
     {
-        var nodes = AllData.Nodes.Where(x => x.Depth <= depth).ToList();
-        var edges = AllData.Edges.Where(x => nodes.Any(y => y.Id == x.Source || y.Id == x.Target)).ToList();
-        Data = new LinkTrackingTopologyViewModel
-        {
-            Nodes = nodes,
-            Edges = edges
-        };
-    }
-
-    private void Refresh()
-    {
-
+        _depth = 1;
+        await GetYopologyPanelData();
     }
 }

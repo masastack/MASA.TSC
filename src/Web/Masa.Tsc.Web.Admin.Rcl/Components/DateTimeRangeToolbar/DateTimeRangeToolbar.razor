@@ -2,7 +2,7 @@
 @using System.Timers;
 @implements IDisposable
 
-<div class="d-inline-flex align-center rounded px-4"
+<div class="d-inline-flex align-center rounded px-4 @Class"
      style="border:1px solid #E4E8F3; height: 40px; background-color:white;">
     <DateTimeRangePicker @bind-StartDateTime="_startDateTime"
                          @bind-EndDateTime="_endDateTime"
@@ -69,6 +69,9 @@
 
     [Parameter]
     public EventCallback<(DateTimeOffset, DateTimeOffset)> OnUpdate { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
 
     private static readonly QuickRange s_internalDefaultQuickRange = new(QuickRangeKey.Last12Hours, TimeSpan.FromHours(-12));
 

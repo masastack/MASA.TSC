@@ -1,0 +1,65 @@
+﻿@inherits TscComponentBase
+
+<MGridstack Items="Panels" Readonly="!IsEdit" ItemKey="panel => panel.Id.ToString()" ItemStyle="border:solid #E4E8F3 1px;cursor: move;position:absolute" ItemPosition="panel => new(panel.Width,panel.Height)" TItem="UpsertPanelDto">
+   <ItemContent>
+        @switch (context.PanelType)
+        {
+            case PanelTypes.Tabs:
+                <TabsPanel Panel="context" />
+                break;
+            case PanelTypes.Text:
+                <MEditor />
+                break;
+            case PanelTypes.Trace:
+                <TscTrace />
+                break;
+            case PanelTypes.Topology:
+                <TopologyPanel />
+                break;
+            case PanelTypes.Chart:
+                <ChartPanel />
+                break;
+            case PanelTypes.Log:
+                <LogPanel />
+                break;
+            case PanelTypes.Table:
+                <TablePanel />
+                break;
+            default:
+                <PanelSelect Panel="context" OnSelect=" _ => {}" />
+                break;
+        }
+        @if(IsEdit)
+        {
+            <MMenu OpenOnHover OffsetY>
+                <ActivatorContent Context="menuContext">
+                    <SButton Icon Style="position:absolute;top:0;right:0;" @attributes="@menuContext.Attrs">
+                        <SIcon Size="24">@IconConstants.More</SIcon>
+                    </SButton>
+                </ActivatorContent>
+                <ChildContent>
+                    <MList>
+                        @if (context.PanelType == PanelTypes.Tabs)
+                        {
+                            <MListItem OnClick="() => AddTabItem(context)">
+                                <MListItemTitle>
+                                    Add Tab Item
+                                </MListItemTitle>
+                            </MListItem>
+                            <MListItem OnClick="() => AddChildPanel(context)">
+                                <MListItemTitle>
+                                    Add Panel
+                                </MListItemTitle>
+                            </MListItem>
+                        }
+                        <MListItem OnClick="() => RemovePanel(context)">
+                            <MListItemTitle>
+                                Remove Panel
+                            </MListItemTitle>
+                        </MListItem>
+                    </MList>
+                </ChildContent>
+            </MMenu>
+        }        
+    </ItemContent>
+</MGridstack>

@@ -1,0 +1,19 @@
+﻿@inherits TscComponentBase
+
+@if (IsEdit)
+{
+    <div style="height:100%;width:100%;" class="d-flex">
+        <div class="pt-3 pl-3 ma-auto" style="border: 1.13196px dashed #E4E8F3;border-radius: 9.05569px;width: 486px; display: flex;flex-wrap: wrap;">
+            @foreach (var panelType in GetPanelTypes())
+            {
+                <div @onclick="() => SelectPanelAsync(Panel,panelType)" style="width: 148px;min-width:148px;height: 60px;background: #F6F8FD;border-radius: 6.79176px;" class="d-flex hover-pointer borderNone px-3 mr-2 mb-2">
+                    <div class="d-flex my-auto borderNone" style="width:100%;">
+                        <span class="borderNone">@T(panelType.ToString())</span>
+                        <MSpacer Class="borderNone" />
+                        <SIcon Class="borderNone" Size="16">@IconConstants.Add</SIcon>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

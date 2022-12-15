@@ -6,7 +6,6 @@ namespace Masa.Tsc.Contracts.Admin.Enums;
 public enum PanelTypes
 {
     Text=1,
-    Card,
     Table,
     Chart,
     Trace,

@@ -1,11 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Microsoft.JSInterop;
+namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Topology.Models;
 
-namespace Masa.Tsc.Web.Admin.Rcl.Pages.DataV.Modules.LinkTrackingTopologys;
-
-public partial class LinkTrackingTopology : BDomComponentBase
+public partial class LinkTrackingTopology
 {
     [Parameter]
     public LinkTrackingTopologyViewModel Value { get; set; } = new();

@@ -223,3 +223,55 @@
     background-color: transparent !important;
     box-shadow: none !important;
 }
+}
+
+.hover-pointer {
+    cursor: pointer;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    word-break: break-all;
+}
+
+.flex-height-auto {
+    flex: auto;
+}
+
+.overflow-y {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.borderColor :hover {
+    border: solid #4318FF 1px;
+}
+
+.borderNone {
+    border:none !important;
+}
+
+.m-sheet.m-stepper:not(.m-sheet--outlined) {
+    box-shadow: none !important;
+    height: 100% !important;
+    width: 100% !important;
+}
+
+/*scrollbar*/
+::-webkit-scrollbar-track {
+    border-radius: 15px;
+    margin: 5px 0;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    margin: 5px 0;
+}
+
+::-webkit-scrollbar-thumb {
+    margin: 5px 0;
+    border-radius: 15px;
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.44, rgb(170 168 168)), color-stop(0.72, rgb(170 168 168)), color-stop(0.86, rgb(170 168 168)));
+}

@@ -40,8 +40,11 @@
                     <ItemColContent>
                         @switch (context.Header.Value)
                         {
+                            case nameof(DashboardDto.Name):
+                                <div class="hover-pointer" @onclick="()=> NavigateToConfiguration(context.Item)">@context.Item.Name</div>
+                                break;
                             case nameof(DashboardDto.Folder):
-                                <span>@context.Item.Folder.Name</span>
+                                <div >@context.Item.Folder.Name</div>
                                 break;
                             case nameof(DashboardDto.IsRoot):
                                 <span>@(context.Item.IsRoot ? T("Yes") : T("No"))</span>
@@ -76,9 +79,11 @@
                             <ChildContent>
                                 @foreach (var dashboard in folder.Dashboards)
                                 {
-                                    <MListItem Link Class="ml-n6">
+                                    <MListItem Link Class="ml-n6" OnClick="()=> NavigateToConfiguration(dashboard)">
                                         <MListItemContent>
-                                            <MListItemTitle Class="body emphasis2--text">@dashboard.Name</MListItemTitle>
+                                            <MListItemTitle Class="body emphasis2--text" >
+                                                @dashboard.Name
+                                            </MListItemTitle>
                                         </MListItemContent>
                                         <MListItemAction>
                                             <SButton Text Style="min-width:150px !important;" OnClick="async () => await SwitchRootAsync(dashboard)">@T(dashboard.IsRoot ? "Not set as root" : "Set as root")</SButton>
