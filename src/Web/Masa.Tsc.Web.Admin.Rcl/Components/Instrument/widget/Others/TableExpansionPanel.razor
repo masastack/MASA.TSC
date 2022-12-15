@@ -1,24 +1,5 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 
-<MExpansionPanel Value="2">
-    <MExpansionPanelHeader Class="emphasis2--text h6">Options</MExpansionPanelHeader>
-    <MExpansionPanelContent>
-        <MRow>
-            <MCol Md="12">
-                <SwitchItem Label="Show table header" @bind-Value="@TableOption.ShowTableHeader" />
-            </MCol>
-            <MCol Md="12">
-                <SwitchItem Label="Show table footer" @bind-Value="@TableOption.ShowTableFooter" />
-            </MCol>
-            <MCol Md="12">
-                <ButtonGroupItem @bind-Value="@TableOption.ColumnAlignment" Label="Column alignment" Items='new List<string>{"auto","left","center","right"}' />
-            </MCol>
-            <MCol Md="12">
-                <SwitchItem Label="Enable pagination" @bind-Value="@TableOption.EnablePaginaton" />
-            </MCol>
-        </MRow>
-    </MExpansionPanelContent>
-</MExpansionPanel>
 
 @code {
 

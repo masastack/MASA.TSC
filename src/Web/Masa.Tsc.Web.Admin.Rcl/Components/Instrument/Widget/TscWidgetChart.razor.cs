@@ -7,11 +7,13 @@ public partial class TscWidgetChart : TscWidgetBase
 {
     private EChartPanelDto _panelValue = new();
     private List<EChartPanelMetricItemModel> _echartMetrics = new();
-    private List<TableFieldItemModel> _tableField = new();
     private List<StringNumber> _panelValues = new List<StringNumber>() { 1 };
     private Type _showType = typeof(Table);
     private Type _panelType = typeof(TableExpansionPanel);
     private Dictionary<string, object> _componentMetadata = new();
+    private DynamicComponent _dynamicComponent;
+    private TableOption _tableOption = new();
+    private TopListOption _topListOption = new();
 
     public override PanelDto Value
     {
@@ -54,7 +56,19 @@ public partial class TscWidgetChart : TscWidgetBase
     protected override async Task OnInitializedAsync()
     {
         await SetChartType(_panelValue.ChartType, LoadDataAsync);
+        _tableOption.PropertyChanged += TableOption_PropertyChanged;
+        _topListOption.PropertyChanged += TopListOption_PropertyChanged;
         await base.OnInitializedAsync();
+    }
+
+    private void TopListOption_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        (_dynamicComponent.Instance as TopList)?.StateUpdated();
+    }
+
+    private void TableOption_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        (_dynamicComponent.Instance as Table)?.StateUpdated();
     }
 
     private void FeatureChanged(List<StringNumber> features)
@@ -139,7 +153,7 @@ public partial class TscWidgetChart : TscWidgetBase
             _componentMetadata = new Dictionary<string, object>{
                 { "Title",_panelValue.Title},
                 { "SystemIdentity",_panelValue.SystemIdentity},
-                //{ "Fields",_tableField }
+                { "Option",_tableOption}
             };
         }
         else if (type == "top-list")
@@ -148,7 +162,8 @@ public partial class TscWidgetChart : TscWidgetBase
             _showType = typeof(TopList);
             _componentMetadata = new Dictionary<string, object>{
                 { "Title",_panelValue.Title},
-                { "SystemIdentity",_panelValue.SystemIdentity}
+                { "SystemIdentity",_panelValue.SystemIdentity},
+                { "Option",_topListOption}
             };
         }
         else
@@ -389,5 +404,12 @@ public partial class TscWidgetChart : TscWidgetBase
     private int GetLevel(int seconds)
     {
         return 0;
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        _tableOption.PropertyChanged -= TableOption_PropertyChanged;
+        _topListOption.PropertyChanged -= TopListOption_PropertyChanged;
+        base.Dispose(disposing);
     }
 }

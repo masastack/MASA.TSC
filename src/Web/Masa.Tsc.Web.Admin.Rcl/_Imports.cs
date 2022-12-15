@@ -20,6 +20,7 @@ global using Masa.Tsc.Contracts.Admin.Dashboards;
 global using Masa.Tsc.Contracts.Admin.Enums;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Command;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Const;
+global using Masa.Tsc.Contracts.Admin.Infrastructure.Utils;
 global using Masa.Tsc.Contracts.Admin.Instruments;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Log.Models;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Topology.Models;

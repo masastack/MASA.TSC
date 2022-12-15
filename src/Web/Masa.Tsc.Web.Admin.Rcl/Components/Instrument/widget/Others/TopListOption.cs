@@ -3,11 +3,26 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-internal static class TopListOption
+public class TopListOption : NotifyingEntity
 {
-    public static int MaxCount { get; set; }
+    int _maxCount = 5;
+    string _desc, _color = "#4318FF";
 
-    public static string Desc { get; set; }
+    public int MaxCount
+    {
+        get { return _maxCount; }
+        set { SetField(ref _maxCount, value); }
+    }
 
-    public static string Color { get; set; } = "#4318FF";
+    public string Desc
+    {
+        get { return _desc; }
+        set { SetField(ref _desc, value); }
+    }
+
+    public string Color
+    {
+        get { return _color; }
+        set { SetField(ref _color, value); }
+    }
 }

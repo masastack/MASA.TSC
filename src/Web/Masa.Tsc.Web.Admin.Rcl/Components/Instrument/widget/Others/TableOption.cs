@@ -3,15 +3,39 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-internal static class TableOption
+public class TableOption : NotifyingEntity
 {
-    public static int ItemsPerPage { get; set; } = 10;
+    int _itemsPerPage = 10;
+    bool _showTableHeader = true, _showTableFooter, _enablePaginaton;
+    string _columnAlignment;
 
-    public static bool ShowTableHeader { get; set; } = true;
+    public int ItemsPerPage
+    {
+        get { return _itemsPerPage; }
+        set { SetField(ref _itemsPerPage, value); }
+    }
 
-    public static bool ShowTableFooter { get; set; }
+    public bool ShowTableHeader
+    {
+        get { return _showTableHeader; }
+        set { SetField(ref _showTableHeader, value); }
+    }
 
-    public static bool EnablePaginaton { get; set; }
+    public bool ShowTableFooter
+    {
+        get { return _showTableFooter; }
+        set { SetField(ref _showTableFooter, value); }
+    }
 
-    public static string ColumnAlignment { get; set; }
+    public bool EnablePaginaton
+    {
+        get { return _enablePaginaton; }
+        set { SetField(ref _enablePaginaton, value); }
+    }
+
+    public string ColumnAlignment
+    {
+        get { return _columnAlignment; }
+        set { SetField(ref _columnAlignment, value); }
+    }
 }

@@ -11,7 +11,7 @@
         </SButton>
     </MCol>
     <MCol Cols="8">
-        <DynamicComponent Type="@_showType" Parameters=_componentMetadata />
+        <DynamicComponent Type="@_showType" Parameters=_componentMetadata @ref="_dynamicComponent" />
     </MCol>
     <MCol Cols="4">
         <MCard>
@@ -30,16 +30,16 @@
                             <MExpansionPanelContent>
                                 <MRow>
                                     <MCol Md="12">
-                                        <SwitchItem Label="Show table header" @bind-Value="@TableOption.ShowTableHeader" />
+                                        <SwitchItem Label="Show table header" @bind-Value="@_tableOption.ShowTableHeader" />
                                     </MCol>
                                     <MCol Md="12">
-                                        <SwitchItem Label="Show table footer" @bind-Value="@TableOption.ShowTableFooter" />
+                                        <SwitchItem Label="Show table footer" @bind-Value="@_tableOption.ShowTableFooter" />
                                     </MCol>
                                     <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@TableOption.ColumnAlignment" Label="Column alignment" Items='new List<string>{"auto","left","center","right"}' />
+                                        <ButtonGroupItem @bind-Value="@_tableOption.ColumnAlignment" Label="Column alignment" Items='new List<string>{"auto","left","center","right"}' />
                                     </MCol>
                                     <MCol Md="12">
-                                        <SwitchItem Label="Enable pagination" @bind-Value="@TableOption.EnablePaginaton" />
+                                        <SwitchItem Label="Enable pagination" @bind-Value="@_tableOption.EnablePaginaton" />
                                     </MCol>
                                 </MRow>
                             </MExpansionPanelContent>
@@ -52,14 +52,14 @@
                             <MExpansionPanelContent>
                                 <MRow>
                                     <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@TopListOption.Desc" Label="Desc" Items='new List<string>{"auto","asc","desc"}' />
+                                        <ButtonGroupItem @bind-Value="@_topListOption.Desc" Label="Desc" Items='new List<string>{"auto","asc","desc"}' />
                                     </MCol>
                                     <MCol Md="12">
-                                        <ColorGroupItem @bind-Value="@TopListOption.Color" Label="Color" Items='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
+                                        <ColorGroupItem @bind-Value="@_topListOption.Color" Label="Color" Items='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
                                     </MCol>
-                                 @*   <MCol Md="12">
-                                        <STextField @bind-Value="@TopListOption.MaxCount" Type="number" Label="Max Count"/>
-                                    </MCol>*@
+                                    <MCol Md="12">
+                                        <STextField @bind-Value="@_topListOption.MaxCount" Type="number" Label="Max Count" />
+                                    </MCol>
                                 </MRow>
                             </MExpansionPanelContent>
                         </MExpansionPanel>

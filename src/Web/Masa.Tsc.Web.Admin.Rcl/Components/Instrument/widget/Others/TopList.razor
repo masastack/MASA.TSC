@@ -6,7 +6,7 @@
     </MCardTitle>
     <MCardText Class="flex-grow-1" Style="overflow-y: auto;">
         <MList>
-            @foreach (var item in GetSortData())
+            @foreach (var item in GetData())
             {
                 <MListItem Class="px-0" Dense>
                     <MListItemAvatar Style="background: #F4F1FF;border-radius: 10px;">
@@ -17,7 +17,7 @@
                             <MLabel Class="body2 regular2--text d-inline-block text-truncate">@item.Value</MLabel>
                         </MListItemTitle>
                         <MListItemSubtitle>
-                            <MProgressLinear Height="8" Color="@TopListOption.Color" Rounded Value="@item.Key"></MProgressLinear>
+                            <MProgressLinear Height="8" Color="@Option.Color" Rounded Value="@item.Key"></MProgressLinear>
                         </MListItemSubtitle>
                     </MListItemContent>
                 </MListItem>
@@ -71,6 +71,9 @@
     [Parameter]
     public List<KeyValuePair<int, string>> Data { get; set; } = new();
 
+    [Parameter]
+    public TopListOption Option { get; set; } = new();
+
     private List<string> _systemIdentities = new List<string>();
     private TopListItemModel _topListItemModel = new();
 
@@ -89,16 +92,22 @@
         base.OnAfterRender(firstRender);
     }
 
-    private List<KeyValuePair<int, string>> GetSortData()
+    public void StateUpdated()
     {
-        if (TopListOption.Desc == "desc")
+        StateHasChanged();
+    }
+
+    private List<KeyValuePair<int, string>> GetData()
+    {
+        var items = Data;
+        if (Option.Desc == "desc")
         {
-            return Data.OrderByDescending(i=>i.Key);
+            items = Data.OrderByDescending(i => i.Key).ToList();
         }
-        if (TopListOption.Desc == "asc")
+        if (Option.Desc == "asc")
         {
-            return Data.OrderBy(i => i.Key);
+            items = Data.OrderBy(i => i.Key).ToList();
         }
-        return Data;
+        return items.Take(Option.MaxCount).ToList();
     }
 }

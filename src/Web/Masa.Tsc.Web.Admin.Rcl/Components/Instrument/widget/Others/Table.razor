@@ -3,11 +3,10 @@
 <MCard Height="410" Class="d-flex flex-column">
     <MCardTitle>
         <MLabel Class="emphasis2--text h6">@Title</MLabel>
-        @Fields.Count()
     </MCardTitle>
     <MCardText Class="flex-grow-1" Style="overflow-y: auto;">
         <MSimpleTable>
-            @if (TableOption.ShowTableHeader)
+            @if (Option.ShowTableHeader)
             {
                 <thead>
                     <tr>
@@ -30,16 +29,16 @@
                 @foreach (var item in _desserts)
                 {
                     <tr @key="item.Name">
-                        <td class="@($"text-{TableOption.ColumnAlignment}")">@item.Name</td>
-                        <td class="@($"text-{TableOption.ColumnAlignment}")">@item.Calories</td>
+                        <td class="@($"text-{Option.ColumnAlignment}")">@item.Name</td>
+                        <td class="@($"text-{Option.ColumnAlignment}")">@item.Calories</td>
                         @foreach (var field in Fields)
                         {
-                            <td style="color:@field.Color" class="@($"text-{TableOption.ColumnAlignment}")">0.0</td>
+                            <td style="color:@field.Color" class="@($"text-{Option.ColumnAlignment}")">0.0</td>
                         }
                     </tr>
                 }
             </tbody>
-            @if (TableOption.ShowTableFooter)
+            @if (Option.ShowTableFooter)
             {
                 <tfoot>
                     <tr>
@@ -49,7 +48,7 @@
                 </tfoot>
             }
         </MSimpleTable>
-        @if (TableOption.EnablePaginaton)
+        @if (Option.EnablePaginaton)
         {
             <MPagination Length="10" TotalVisible="5"></MPagination>
         }
@@ -93,11 +92,19 @@
     [Parameter]
     public EventCallback<List<TableFieldItemModel>> FieldsChanged { get; set; }
 
+    [Parameter]
+    public TableOption Option { get; set; } = new();
+
     private List<string> _systemIdentities = new List<string>();
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
+    }
+
+    public void StateUpdated()
+    {
+        StateHasChanged();
     }
 
     public class Dessert
