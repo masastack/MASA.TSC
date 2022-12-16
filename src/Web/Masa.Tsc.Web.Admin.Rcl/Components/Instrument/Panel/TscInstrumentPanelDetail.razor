@@ -1,7 +1,7 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-@switch (Type)
+@*@switch (Type)
 {
     case PanelTypes.Text:
         {
@@ -38,7 +38,7 @@
             <TscWidgetDefault @bind-Value="_panel" @ref="_widget" />
         }
         break;
-}
+}*@
 
 <MButton OnClick="OnSubmitAsync">确认</MButton>
 <MButton OnClick="@(async ()=>await OnCallParent(OperateCommand.Back))">返回</MButton>

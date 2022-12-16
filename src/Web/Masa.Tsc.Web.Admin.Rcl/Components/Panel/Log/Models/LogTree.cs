@@ -5,7 +5,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Log.Models;
 
 public class LogTree
 {
-    string? stringValue;
+    string? _stringValue;
     Dictionary<string, LogTree>? _objectValue;
     List<LogTree>? _arrayValue;
 
@@ -26,6 +26,8 @@ public class LogTree
 
     public override string ToString()
     {
+        if (_stringValue is not null) return _stringValue;
+
         return JsonElement.ValueKind switch
         {
             JsonValueKind.False or JsonValueKind.True => JsonElement.GetBoolean().ToString(),

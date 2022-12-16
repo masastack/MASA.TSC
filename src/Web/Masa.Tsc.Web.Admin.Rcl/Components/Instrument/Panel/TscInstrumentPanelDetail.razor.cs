@@ -23,37 +23,37 @@ public partial class TscInstrumentPanelDetail
 
     protected override void OnParametersSet()
     {
-        if (_panel.InstrumentId != InstrumentId || _panel.ParentId != ParentId)
-        {
-            _panel = new PanelDto
-            {
-                InstrumentId = InstrumentId,
-                ParentId = ParentId,
-                Id = Guid.NewGuid(),
-            };
-        }
+        //if (_panel.InstrumentId != InstrumentId || _panel.ParentId != ParentId)
+        //{
+        //    _panel = new PanelDto
+        //    {
+        //        InstrumentId = InstrumentId,
+        //        ParentId = ParentId,
+        //        Id = Guid.NewGuid(),
+        //    };
+        //}
         base.OnParametersSet();
     }
 
     private async Task OnSubmitAsync()
     {
-        var item = _widget.Value;
-        item.Sort = Index;
-        await ApiCaller.PanelService.AddAsync(item);
-        if (item.Type == PanelTypes.Tabs)
-        {
-            var tabs = ((TabsPanelDto)item).Tabs;
-            int sort = 1;
-            foreach (var tab in tabs)
-            {
-                tab.Sort = sort++;
-                tab.ParentId = item.Id;
-                tab.Type = PanelTypes.TabItem;
-                await ApiCaller.PanelService.AddAsync(tab);
-            }
-        }
+        //var item = _widget.Value;
+        //item.Sort = Index;
+        //await ApiCaller.PanelService.AddAsync(item);
+        //if (item.Type == PanelTypes.Tabs)
+        //{
+        //    var tabs = ((TabsPanelDto)item).Tabs;
+        //    int sort = 1;
+        //    foreach (var tab in tabs)
+        //    {
+        //        tab.Sort = sort++;
+        //        tab.ParentId = item.Id;
+        //        tab.Type = PanelTypes.TabItem;
+        //        await ApiCaller.PanelService.AddAsync(tab);
+        //    }
+        //}
 
-        _panel.Id = Guid.NewGuid();
-        await OnCallParent(OperateCommand.Success, item);
+        //_panel.Id = Guid.NewGuid();
+        //await OnCallParent(OperateCommand.Success, item);
     }
 }

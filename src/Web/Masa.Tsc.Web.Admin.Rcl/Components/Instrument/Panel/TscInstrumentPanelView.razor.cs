@@ -6,10 +6,10 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TscInstrumentPanelView
 {
     [Parameter]
-    public PanelDto Value { get; set; }
+    public UpsertPanelDto Value { get; set; }
 
     [Parameter]
-    public EventCallback<PanelDto> ValueChanged { get; set; }
+    public EventCallback<UpsertPanelDto> ValueChanged { get; set; }
 
     [Parameter]
     public bool Readonly { get; set; }
@@ -39,8 +39,9 @@ public partial class TscInstrumentPanelView
         //    //await ApiCaller.PanelService.AddAsync
 
         //}
-        if (isSave)
-            await ApiCaller.PanelService.UpdateAsync(item);
+
+        //if (isSave)
+        //    await ApiCaller.PanelService.UpdateAsync(item);
         Value = item;
         await OnCallParent(OperateCommand.Success, Value);
     }

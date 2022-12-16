@@ -3,29 +3,29 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-public partial class TscWidgetTrace : TscWidgetBase
-{
-    private PanelDto _panelValue = CreateDefault<PanelDto>();
+//public partial class TscWidgetTrace : TscWidgetBase
+//{
+//    private PanelDto _panelValue = CreateDefault<PanelDto>();
 
-    protected override void OnInitialized()
-    {
-        _panelValue.Type = PanelTypes.Trace;
-        base.OnInitialized();
-    }
+//    protected override void OnInitialized()
+//    {
+//        _panelValue.Type = PanelTypes.Trace;
+//        base.OnInitialized();
+//    }
 
-    public override PanelDto Value
-    {
-        get { return _panelValue; }
-        set
-        {
-            if (value == null)
-            {
-                value = CreateDefault<PanelDto>();
-                value.Type = PanelTypes.Trace;
-            }
+//    public override PanelDto Value
+//    {
+//        get { return _panelValue; }
+//        set
+//        {
+//            if (value == null)
+//            {
+//                value = CreateDefault<PanelDto>();
+//                value.Type = PanelTypes.Trace;
+//            }
 
-            if (value.Id != _panelValue.Id || value.Sort != _panelValue.Sort)
-                _panelValue = value;
-        }
-    }
-}
+//            if (value.Id != _panelValue.Id || value.Sort != _panelValue.Sort)
+//                _panelValue = value;
+//        }
+//    }
+//}

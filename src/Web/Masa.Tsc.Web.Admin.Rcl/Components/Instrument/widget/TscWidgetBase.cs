@@ -5,15 +5,14 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscWidgetBase : TscComponentBase
 {
-
     [Parameter]
     public bool ReadOnly { get; set; }
 
     [Parameter]
-    public virtual PanelDto Value { get; set; }
+    public virtual UpsertPanelDto Value { get; set; }
 
     [Parameter]
-    public EventCallback<PanelDto> ValueChanged { get; set; }
+    public EventCallback<UpsertPanelDto> ValueChanged { get; set; }
 
     protected Dictionary<string, object> Values { get; set; } = new();
 

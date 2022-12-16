@@ -23,7 +23,15 @@ public class UpsertPanelDto
 
     public List<UpsertPanelDto> ChildPanels { get; set; } = new();
 
-    public List<PanelMetricDto> PanelMetrics { get; set; } = new();
+    public List<PanelMetricDto> Metrics { get; set; } = new();
+
+    public Dictionary<ExtensionFieldTypes, object?> ExtensionData { get; set; } = new();
+
+    public object? this[ExtensionFieldTypes field]
+    {
+        get => ExtensionData.GetValueOrDefault(field);
+        set => ExtensionData[field] = value;
+    }
 
     #region UI
 
