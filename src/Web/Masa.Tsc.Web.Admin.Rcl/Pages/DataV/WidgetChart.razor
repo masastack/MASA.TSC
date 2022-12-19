@@ -1,9 +1,40 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @page "/datav/example3"
+@page "/datav/dashboard/example3/{panelId}"
 @inherits TscComponentBase
 
-<TscWidgetChart @bind-Value="_panel"/>
+<TscWidgetChart @bind-Value="Panel" />
 
 @code {
-    private UpsertPanelDto _panel { get; set; } = new();
+    [Inject]
+    List<UpsertPanelDto> Panels { get; set; }
+
+    [Parameter]
+    public string? PanelId { get; set; }
+
+    public UpsertPanelDto Panel { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        if (PanelId is not null)
+            Panel = FindPanel(Panels) ?? throw new UserFriendlyException("find panel error");
+    }
+
+    UpsertPanelDto? FindPanel(List<UpsertPanelDto> panels)
+    {
+        foreach(var panel in panels)
+        {
+            if (panel.Id == Guid.Parse(PanelId!))
+            {
+                return panel;
+            }
+            if(panel.ChildPanels.Any())
+            {
+                var data = FindPanel(panel.ChildPanels);
+                if (data is not null) return data;
+            }
+        }
+
+        return default;
+    }
 }

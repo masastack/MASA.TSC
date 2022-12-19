@@ -2,8 +2,9 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 using Masa.Tsc.Web.Admin.Rcl.Data.EChart;
+using Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards;
 
-namespace Masa.Tsc.Web.Admin.Rcl.Components;
+namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
 public partial class TscWidgetChart : TscWidgetBase
 {
@@ -17,6 +18,9 @@ public partial class TscWidgetChart : TscWidgetBase
     private TableOption _tableOption = new();
     private TopListOption _topListOption = new();
     private EChartOption _eChartOption = new();
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
 
     //public override PanelDto Value
     //{
@@ -403,6 +407,11 @@ public partial class TscWidgetChart : TscWidgetBase
     private int GetLevel(int seconds)
     {
         return 0;
+    }
+
+    void NavigateToPanelConfigurationPage()
+    {
+        NavigationManager.NavigateTo($"/dashboard/configuration/record");
     }
 
     protected override void Dispose(bool disposing)

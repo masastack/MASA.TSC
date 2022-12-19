@@ -1,5 +1,4 @@
-﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
-@inherits TscWidgetBase
+﻿@inherits TscWidgetBase
 
 <MRow>
     <MCol Md="12" Class="d-flex justify-end">
@@ -7,7 +6,7 @@
         <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg">
             取消
         </SButton>
-        <SButton Small BorderRadiusClass="rounded-lg">
+        <SButton Small BorderRadiusClass="rounded-lg" OnClick="() => NavigateToPanelConfigurationPage()">
             应用
         </SButton>
     </MCol>

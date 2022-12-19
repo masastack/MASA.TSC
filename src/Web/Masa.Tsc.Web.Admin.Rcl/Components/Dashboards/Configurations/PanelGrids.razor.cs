@@ -18,7 +18,7 @@ public partial class PanelGrids
 
     void IniPanels(List<UpsertPanelDto> panels, UpsertPanelDto? parentPanel = null)
     {
-        foreach (var panel in Panels)
+        foreach (var panel in panels)
         {
             panel.ParentPanel = parentPanel;
             if(panel.ChildPanels.Any())
@@ -53,9 +53,12 @@ public partial class PanelGrids
             PanelType = PanelTypes.TabItem,
             Title = $"item {panel.ChildPanels.Count + 1}",
             ParentPanel = panel,
-            ChildPanels = new List<UpsertPanelDto>
+        };
+        tabItem.ChildPanels = new List<UpsertPanelDto>
+        {
+            new()
             {
-                new()
+                 ParentPanel = tabItem
             }
         };
         panel.ChildPanels.Add(tabItem);

@@ -5,6 +5,9 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
 
 public partial class PanelSelect
 {
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
     [Parameter]
     public UpsertPanelDto Panel { get; set; }
 
@@ -34,6 +37,7 @@ public partial class PanelSelect
 
     async Task SelectPanelAsync(UpsertPanelDto panel, PanelTypes type)
     {
+        panel.PanelType = type;
         switch (type)
         {
             case PanelTypes.Tabs:
@@ -51,10 +55,12 @@ public partial class PanelSelect
                     }
                 };
                 break;
+            case PanelTypes.Chart:
+                NavigationManager.NavigateTo($"/datav/dashboard/example3/{panel.Id}");
+                break;
             default:
                 break;
-        }
-        panel.PanelType = type;
+        }        
 
         await OnSelect.InvokeAsync(panel);
     }

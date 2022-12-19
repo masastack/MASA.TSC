@@ -5,8 +5,14 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations;
 
 public partial class Configuration
 {
+    [Inject]
+    List<UpsertPanelDto> Panels { get; set; }
+
     [Parameter]
     public string DashboardId { get; set; }
+
+    [Parameter]
+    public string? Mode { get; set; }
 
     int AppId { get; set; }
 
@@ -18,34 +24,19 @@ public partial class Configuration
 
     DateTimeOffset EndTime { get; set; } = DateTimeOffset.Now;
 
-    List<UpsertPanelDto> Panels { get; set; } = new();
-
     protected override async Task OnInitializedAsync()
     {
+        if (DashboardId is null)
+        {
+            return;
+        }
+        //todo get panel config
         if (Panels.Any() is false)
         {
             Panels.Add(new());
         }
 
         await Task.CompletedTask;
-    }
-
-    List<PanelTypes> GetPanelTypes(PanelTypes type = default)
-    {
-        if (type == default)
-        {
-            return new List<PanelTypes>
-            {
-                PanelTypes.Tabs,
-                PanelTypes.Text,
-                PanelTypes.Chart,
-                PanelTypes.Topology,
-                PanelTypes.Log,
-                PanelTypes.Trace,
-                PanelTypes.Table
-            };
-        }
-        return new List<PanelTypes>();
     }
 
     void AddPanel()

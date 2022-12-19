@@ -16,3 +16,4 @@ global using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 global using System.Diagnostics;
 global using System.Security.Cryptography.X509Certificates;
 global using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
+global using Masa.Tsc.Web.Admin.Rcl.Extentions;

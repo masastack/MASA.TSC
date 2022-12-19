@@ -16,14 +16,11 @@
             case PanelTypes.Topology:
                 <TopologyPanel />
                 break;
-            case PanelTypes.Chart:
-                <TscWidgetChart />
+            case PanelTypes.Chart or PanelTypes.Table:
+                <TscWidgetChart Value="context" />
                 break;
             case PanelTypes.Log:
                 <LogPanel />
-                break;
-            case PanelTypes.Table:
-                <TablePanel />
                 break;
             default:
                 <PanelSelect Panel="context" OnSelect=" _ => {}" />

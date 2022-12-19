@@ -36,6 +36,8 @@ builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl, pmUrl).A
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTscApiCaller(tscUrl);
 
+builder.Services.AddRcl();
+
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 var app = builder.Build();
 

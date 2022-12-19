@@ -5,9 +5,9 @@ namespace Masa.Tsc.Web.Admin.Rcl.Extentions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddRcl(IServiceCollection serviceCollection)
+    public static IServiceCollection AddRcl(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddScoped<Dictionary<Guid, UpsertChartPanelDto>>();
+        serviceCollection.AddScoped<List<UpsertPanelDto>>();
 
         return serviceCollection;
     }
