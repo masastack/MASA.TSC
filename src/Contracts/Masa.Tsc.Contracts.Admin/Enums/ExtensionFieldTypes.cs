@@ -6,5 +6,19 @@ namespace Masa.Tsc.Contracts.Admin.Enums;
 public enum ExtensionFieldTypes
 {
     ChartType,
-    SystemIdentity
+    SystemIdentity,
+    Desc,
+    MaxCount,
+    Color,
+    ItemsPerPage,
+    ShowTableHeader,
+    ShowTableFooter,
+    EnablePaginaton,
+    ColumnAlignment,
+    EChartType,
+    Tooltip,
+    Legend,
+    Toolbox,
+    XAxis,
+    YAxis
 }

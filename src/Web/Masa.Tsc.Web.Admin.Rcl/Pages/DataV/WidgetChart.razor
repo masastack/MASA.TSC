@@ -3,7 +3,7 @@
 @page "/datav/dashboard/example3/{panelId}"
 @inherits TscComponentBase
 
-<TscWidgetChart @bind-Value="Panel" />
+<ChartPanel Value="Panel" />
 
 @code {
     [Inject]
@@ -12,12 +12,14 @@
     [Parameter]
     public string? PanelId { get; set; }
 
-    public UpsertPanelDto Panel { get; set; } = new();
+    public UpsertChartPanelDto Panel { get; set; }
 
     protected override void OnInitialized()
     {
         if (PanelId is not null)
-            Panel = FindPanel(Panels) ?? throw new UserFriendlyException("find panel error");
+            Panel = FindPanel(Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException("find panel error");
+        else
+            Panel = new UpsertChartPanelDto(default);
     }
 
     UpsertPanelDto? FindPanel(List<UpsertPanelDto> panels)

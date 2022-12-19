@@ -9,7 +9,7 @@ public partial class Configuration
     List<UpsertPanelDto> Panels { get; set; }
 
     [Parameter]
-    public string DashboardId { get; set; }
+    public string? DashboardId { get; set; }
 
     [Parameter]
     public string? Mode { get; set; }
@@ -31,10 +31,8 @@ public partial class Configuration
             return;
         }
         //todo get panel config
-        if (Panels.Any() is false)
-        {
-            Panels.Add(new());
-        }
+        Panels.Clear();
+        Panels.Add(new());
 
         await Task.CompletedTask;
     }

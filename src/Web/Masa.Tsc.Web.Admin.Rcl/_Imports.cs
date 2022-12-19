@@ -49,4 +49,6 @@ global using System.Text.Json.Nodes;
 global using System.Text.Json.Serialization;
 global using System.Text.RegularExpressions;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Models;
-global using static Masa.Tsc.Contracts.Admin.Enums.ExtensionFieldTypes;
+global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Modules.TopList;
+global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Modules.Table;
+global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Modules.Echart;

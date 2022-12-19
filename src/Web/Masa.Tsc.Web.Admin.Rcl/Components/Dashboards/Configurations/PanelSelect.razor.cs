@@ -9,7 +9,7 @@ public partial class PanelSelect
     public NavigationManager NavigationManager { get; set; }
 
     [Parameter]
-    public UpsertPanelDto Panel { get; set; }
+    public Guid PanelId { get; set; }
 
     [Parameter]
     public EventCallback<UpsertPanelDto> OnSelect { get; set; }
@@ -35,12 +35,17 @@ public partial class PanelSelect
         return new List<PanelTypes>();
     }
 
-    async Task SelectPanelAsync(UpsertPanelDto panel, PanelTypes type)
+    async Task SelectPanelAsync(PanelTypes type)
     {
-        panel.PanelType = type;
+        UpsertPanelDto panel = new();
         switch (type)
         {
             case PanelTypes.Tabs:
+                panel = new UpsertPanelDto()
+                {
+                    Id = PanelId,
+                    PanelType = type,
+                };
                 panel.ChildPanels = new List<UpsertPanelDto>
                 {
                     new()
@@ -56,6 +61,7 @@ public partial class PanelSelect
                 };
                 break;
             case PanelTypes.Chart:
+                panel = new UpsertChartPanelDto(PanelId);
                 NavigationManager.NavigateTo($"/datav/dashboard/example3/{panel.Id}");
                 break;
             default:

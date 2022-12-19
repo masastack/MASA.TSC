@@ -17,13 +17,13 @@
                 <TopologyPanel />
                 break;
             case PanelTypes.Chart or PanelTypes.Table:
-                <TscWidgetChart Value="context" />
+                <ChartPanel Value="context as UpsertChartPanelDto" />
                 break;
             case PanelTypes.Log:
                 <LogPanel />
                 break;
             default:
-                <PanelSelect Panel="context" OnSelect=" _ => {}" />
+                <PanelSelect PanelId="context.Id" OnSelect="ReplacePanel" />
                 break;
         }
         @if(IsEdit)

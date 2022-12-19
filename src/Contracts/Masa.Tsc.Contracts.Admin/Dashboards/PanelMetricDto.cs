@@ -9,6 +9,8 @@ public class PanelMetricDto
 
     public string Name { get; set; }
 
+    public string Range { get; set; }
+
     public string Caculate { get; set; }
 
     public string Color { get; set; }

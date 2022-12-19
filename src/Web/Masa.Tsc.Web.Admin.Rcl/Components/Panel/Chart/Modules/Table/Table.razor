@@ -1,12 +1,10 @@
-﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
-
-<MCard Height="410" Class="d-flex flex-column">
+﻿<MCard Height="410" Class="d-flex flex-column">
     <MCardTitle>
-        <MLabel Class="emphasis2--text h6">@Title</MLabel>
+        <MLabel Class="emphasis2--text h6">@Value.Title</MLabel>
     </MCardTitle>
     <MCardText Class="flex-grow-1" Style="overflow-y: auto;">
         <MSimpleTable>
-            @if (Option.ShowTableHeader)
+            @if (Value.ShowTableHeader)
             {
                 <thead>
                     <tr>
@@ -29,16 +27,16 @@
                 @foreach (var item in _desserts)
                 {
                     <tr @key="item.Name">
-                        <td class="@($"text-{Option.ColumnAlignment}")">@item.Name</td>
-                        <td class="@($"text-{Option.ColumnAlignment}")">@item.Calories</td>
+                        <td class="@($"text-{Value.ColumnAlignment}")">@item.Name</td>
+                        <td class="@($"text-{Value.ColumnAlignment}")">@item.Calories</td>
                         @foreach (var field in Fields)
                         {
-                            <td style="color:@field.Color" class="@($"text-{Option.ColumnAlignment}")">0.0</td>
+                            <td style="color:@field.Color" class="@($"text-{Value.ColumnAlignment}")">0.0</td>
                         }
                     </tr>
                 }
             </tbody>
-            @if (Option.ShowTableFooter)
+            @if (Value.ShowTableFooter)
             {
                 <tfoot>
                     <tr>
@@ -48,7 +46,7 @@
                 </tfoot>
             }
         </MSimpleTable>
-        @if (Option.EnablePaginaton)
+        @if (Value.EnablePaginaton)
         {
             <MPagination Length="10" TotalVisible="5"></MPagination>
         }
@@ -59,12 +57,12 @@
     <MCardText>
         <MRow>
             <MCol Md="6">
-                <SSelect @bind-Value="@SystemIdentity" Items="_systemIdentities"
+                <SSelect @bind-Value="@Value.SystemIdentity" Items="_systemIdentities"
                          ItemText="item => item"
                          ItemValue="item => item" />
             </MCol>
             <MCol Md="6">
-                <STextField @bind-Value="@Title" Label="Title" />
+                <STextField @bind-Value="@Value.Title" Label="Title" />
             </MCol>
             <MCol Md="12">
                 <TableFieldMetrics @bind-Items="Fields"></TableFieldMetrics>
@@ -75,16 +73,7 @@
 
 @code {
     [Parameter]
-    public string Title { get; set; }
-
-    [Parameter]
-    public EventCallback<string> TitleChanged { get; set; }
-
-    [Parameter]
-    public string SystemIdentity { get; set; }
-
-    [Parameter]
-    public EventCallback<string> SystemIdentityChanged { get; set; }
+    public ITablePanelValue Value { get; set; }
 
     [Parameter]
     public List<TableFieldItemModel> Fields { get; set; } = new();
@@ -96,11 +85,6 @@
     public TableOption Option { get; set; } = new();
 
     private List<string> _systemIdentities = new List<string>();
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-    }
 
     public void StateUpdated()
     {

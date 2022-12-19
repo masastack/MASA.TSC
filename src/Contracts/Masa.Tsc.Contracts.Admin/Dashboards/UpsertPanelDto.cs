@@ -23,7 +23,7 @@ public class UpsertPanelDto
 
     public List<UpsertPanelDto> ChildPanels { get; set; } = new();
 
-    public List<PanelMetricDto> Metrics { get; set; } = new();
+    public virtual List<PanelMetricDto> Metrics { get; set; } = new();
 
     public Dictionary<ExtensionFieldTypes, object?> ExtensionData { get; set; } = new();
 

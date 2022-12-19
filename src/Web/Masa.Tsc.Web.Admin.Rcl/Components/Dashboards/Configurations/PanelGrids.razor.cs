@@ -72,4 +72,10 @@ public partial class PanelGrids
         else
             panel.ParentPanel.ChildPanels.Remove(panel);
     }
+
+    void ReplacePanel(UpsertPanelDto panel)
+    {
+        Panels.RemoveAll(p => p.Id == panel.Id);
+        Panels.Add(panel);
+    }
 }
