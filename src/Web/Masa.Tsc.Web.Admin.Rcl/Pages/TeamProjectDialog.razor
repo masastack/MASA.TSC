@@ -1,4 +1,5 @@
 ﻿@inherits TscComponentBase
+@namespace Masa.Tsc.Web.Admin.Rcl.Components
 
 @if (_team != null)
 {
@@ -10,42 +11,10 @@
                     <TeamDetail Value=@_team></TeamDetail>
                 </MCol>
                 <MCol Cols="10" Class="pa-8">
-                    <SearchBar AppId=@_appId Apps=@_team.CurrentProject.Apps OnSearch="async (data)=>{ if(_projectCharts!=null) await  _projectCharts.OnLoadDataAsyc(data);}"></SearchBar>
-                    <ProjectCharts Class="mt-2" @ref="_projectCharts"/>
+                    <SearchBar AppId=@_appId Apps=@_team.CurrentProject.Apps OnSearch="LoadChartAsync"></SearchBar>
+                    <ProjectCharts Class="mt-2" @ref="_projectCharts"></ProjectCharts>
                 </MCol>
             </MRow>
         </MCard>
     </SSheetDialog>
-}
-
-@code {
-    [Parameter]
-    public bool Visible { get; set; }
-
-    [Parameter]
-    public EventCallback<bool> VisibleChanged { get; set; }
-
-    public string _projectId { get; set; }
-    public Guid _teamId { get; set; }
-    private string _appId = string.Empty;
-    private TeamDto _team = default!;
-    private ProjectCharts _projectCharts = new();
-
-    public async Task RefrshDataASync(Guid teamId, string projectId)
-    {
-        Visible = true;
-        if (!string.IsNullOrEmpty(projectId) && teamId != Guid.Empty && _projectId != projectId && _teamId != teamId)
-        {
-            _team = await ApiCaller.TeamService.GetTeamAsync(teamId, projectId);
-            _projectId = projectId;
-            _teamId = teamId;
-        }
-        if (_team.CurrentProject != null && _team.CurrentProject.Apps != null && _team.CurrentProject.Apps.Any())
-        {
-            var first = _team.CurrentProject.Apps.First();
-            if (first.Identity != _appId)
-                _appId = first.Identity;
-        }
-        StateHasChanged();
-    }
 }
