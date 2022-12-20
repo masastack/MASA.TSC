@@ -4,7 +4,7 @@
     </MCardTitle>
     <MCardText Class="flex-grow-1" Style="overflow-y: auto;">
         <MList>
-            @foreach (var (key,value) in GetData())
+            @foreach (var (key, value) in Data)
             {
                 <MListItem Class="px-0" Dense>
                     <MListItemAvatar Style="background: #F4F1FF;border-radius: 10px;">
@@ -24,90 +24,10 @@
     </MCardText>
 </MCard>
 
-<MCard Class="mt-6">
-    <MCardText>
-        <MRow>
-            <MCol Md="6">
-                <SSelect @bind-Value="@Value.SystemIdentity" Items="_systemIdentities"
-                         ItemText="item => item"
-                         ItemValue="item => item" />
-            </MCol>
-            <MCol Md="6">
-                <STextField @bind-Value="@Value.Title" />
-            </MCol>
-            @foreach(var item in Value.Metrics)
-            {
-                <MCol Md="4">
-                    <MCard Class="pa-2" Style="background-color:#F6F8FD">
-                        <MCardText>
-                            <MRow>
-                                <MCol Md="12">
-                                    <STextField BackgroundColor="white" @bind-Value="item.Name" Label="指标名称" />
-                                </MCol>
-                                <MCol Md="12">
-                                    <STextField BackgroundColor="white" @bind-Value="item.Caculate" Label="取值范围" />
-                                </MCol>
-                            </MRow>
-                        </MCardText>
-                    </MCard>
-                </MCol>
-            }
-        </MRow>
-    </MCardText>
-</MCard>
-
 @code {
     [Parameter]
     public ITopListPanelValue Value { get; set; }
 
     [Parameter]
-    public List<(int, string)> Data { get; set; } = new();
-
-    private List<string> _systemIdentities = new List<string>();
-
-    //protected override void OnAfterRender(bool firstRender)
-    //{
-    //    if (firstRender)
-    //    {
-    //        Data = new List<(int, string)>()
-    //        {
-    //            (315,"ca53b5105c97478db8c86db2e3f76551@10.104.2.40"),
-    //            (111,"ca53b5105c97478db8c86db2e3f76551@10.104.2.40"),
-    //            (23,"ca53b5105c97478db8c86db2e3f76551@10.104.2.40")
-    //        };
-    //        StateHasChanged();
-    //    }
-    //    base.OnAfterRender(firstRender);
-    //}
-
-    protected override void OnInitialized()
-    {
-        GetData();
-    }
-
-    public void StateUpdated()
-    {
-        StateHasChanged();
-    }
-
-    private IEnumerable<(int, string)> GetData()
-    {
-        if (Data.Count < Value.MaxCount)
-        {
-            for (var i = 0; i < Value.MaxCount - Data.Count;i++)
-            {
-                Data.Add((Random.Shared.Next(1, 100),Guid.NewGuid().ToString()));
-            }
-        }
-        if (Value.Desc == "desc")
-        {
-            return Data.OrderByDescending(i => i.Item1).ToList();
-        }
-        else if (Value.Desc == "asc")
-        {
-            return Data.OrderBy(i => i.Item1).ToList();
-        }
-
-        return Data.Take(Value.MaxCount).ToList();
-    }
+    public IEnumerable<(int, string)> Data { get; set; } = new List<(int, string)>();
 }

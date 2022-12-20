@@ -1,0 +1,65 @@
+﻿<EChart Value="Value" />
+
+<MCard Class="mt-6">
+    <MCardText>
+        <MRow>
+            <MCol Md="4">
+                <STextField @bind-Value="@Value.Title" Label="Title" />
+            </MCol>
+            <MCol Md="8">
+                <STextField @bind-Value="@Value.Description" Label="Description" />
+            </MCol>
+            <MCol Md="12">
+                <MRow>
+                    @foreach (var item in Value.Metrics)
+                    {
+                        <MCol Md="4">
+                            <MCard Class="pa-2" Style="background-color:#F6F8FD">
+                                <MCardText>
+                                    <MRow>
+                                        <MCol Md="12">
+                                            <STextField BackgroundColor="white" @bind-Value="item.Name" Label="指标名称" />
+                                        </MCol>
+                                        <MCol Md="12">
+                                            <STextField BackgroundColor="white" @bind-Value="item.Range" Label="取值范围" />
+                                        </MCol>
+                                        <MCol Md="12">
+                                            <STextField BackgroundColor="white" @bind-Value="item.Caculate" Label="计算规则" />
+                                        </MCol>
+                                        <MCol Md="12">
+                                            <STextField BackgroundColor="white" @bind-Value="item.Unit" Label="单位" />
+                                        </MCol>
+                                    </MRow>
+                                </MCardText>
+                                <MCardActions Class="d-flex justify-space-between">
+                                    <SColorGroup @bind-Value="item.Color" Colors='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
+                                    <MIcon OnClick="() => Remove(item)" Color="red">mdi-delete</MIcon>
+                                </MCardActions>
+                            </MCard>
+                        </MCol>
+                    }
+                    <MCol Md="4">
+                        <MCard Height=350 OnClick="Add" Class="d-flex justify-center align-center" Style="background-color:#F6F8FD">
+                            <MIcon XLarge>mdi-plus</MIcon>
+                        </MCard>
+                    </MCol>
+                </MRow>
+            </MCol>
+        </MRow>
+    </MCardText>
+</MCard>
+
+@code {
+    [Parameter]
+    public IEChartPanelValue Value { get; set; }
+
+    private void Add()
+    {
+        Value.Metrics.Add(new());
+    }
+
+    private void Remove(PanelMetricDto metric)
+    {
+        Value.Metrics.Remove(metric);
+    }
+}

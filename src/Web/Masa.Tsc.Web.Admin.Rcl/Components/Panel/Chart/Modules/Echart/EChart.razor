@@ -1,6 +1,4 @@
-﻿@implements IDisposable
-
-<MCard Height="410" Class="d-flex flex-column rounded-lg">
+﻿<MCard Height="410" Class="d-flex flex-column rounded-lg">
     <MCardTitle Class="d-flex justify-space-between">
         <MLabel Class="emphasis2--text h6">@Value.Title</MLabel>
         <MTooltip Top>
@@ -13,70 +11,23 @@
         </MTooltip>
     </MCardTitle>
     <MCardText Class="flex-grow-1">
-        <MECharts Option="Value.EChartType.Option" @ref="_mECharts" />
-    </MCardText>
-</MCard>
-<MCard Class="mt-6">
-    <MCardText>
-        <MRow>
-            <MCol Md="4">
-                <STextField @bind-Value="@Value.Title" Label="Title" />
-            </MCol>
-            <MCol Md="8">
-                <STextField @bind-Value="@Value.Description" Label="Description" />
-            </MCol>
-            <MCol Md="12">
-                <EChartPanelMetrics @bind-Items="Value.Metrics" />
-            </MCol>
-        </MRow>
+        <MECharts Option="Value.EChartType.Option" /> @*@ref="_mECharts"*@
     </MCardText>
 </MCard>
 
 @code {
     [Parameter]
     public IEChartPanelValue Value { get; set; }
-    //[Parameter]
-    //public string Title { get; set; }
 
-    //[Parameter]
-    //public EventCallback<string> TitleChanged { get; set; }
+    //private MECharts _mECharts = null!;
 
-    //[Parameter]
-    //public string Description { get; set; }
+    //private void EChartOption_EChartOptionChanged()
+    //{
+    //    _mECharts.SetOption();
+    //}
 
-    //[Parameter]
-    //public EventCallback<string> DescriptionChanged { get; set; }
-
-    //[Parameter]
-    //public List<EChartPanelMetricItemModel> Metrics { get; set; } = new ();
-
-    //[Parameter]
-    //public EventCallback<List<EChartPanelMetricItemModel>> MetricsChanged { get; set; }
-
-    //[Parameter]
-    //public EChartOption EChartOption { get; set; }
-
-    private MECharts _mECharts = null!;
-
-
-    protected override void OnInitialized()
-    {
-        //EChartOption.EChartOptionChanged += EChartOption_EChartOptionChanged;
-        base.OnInitialized();
-    }
-
-    private void EChartOption_EChartOptionChanged()
-    {
-        _mECharts.SetOption();
-    }
-
-    public void StateUpdated()
-    {
-        _mECharts.SetOption();
-    }
-
-    public void Dispose()
-    {
-        //EChartOption.EChartOptionChanged -= EChartOption_EChartOptionChanged;
-    }
+    //public void StateUpdated()
+    //{
+    //    _mECharts.SetOption();
+    //}
 }

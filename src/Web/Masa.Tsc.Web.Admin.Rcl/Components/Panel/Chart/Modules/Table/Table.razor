@@ -24,7 +24,7 @@
                 </thead>
             }
             <tbody>
-                @foreach (var item in _desserts)
+                @foreach (var item in Data)
                 {
                     <tr @key="item.Name">
                         <td class="@($"text-{Value.ColumnAlignment}")">@item.Name</td>
@@ -53,78 +53,10 @@
     </MCardText>
 </MCard>
 
-<MCard Class="mt-6">
-    <MCardText>
-        <MRow>
-            <MCol Md="6">
-                <SSelect @bind-Value="@Value.SystemIdentity" Items="_systemIdentities"
-                         ItemText="item => item"
-                         ItemValue="item => item" />
-            </MCol>
-            <MCol Md="6">
-                <STextField @bind-Value="@Value.Title" Label="Title" />
-            </MCol>
-            <MCol Md="12">
-                <TableFieldMetrics @bind-Items="Value.Metrics" />
-            </MCol>
-        </MRow>
-    </MCardText>
-</MCard>
-
 @code {
     [Parameter]
     public ITablePanelValue Value { get; set; }
 
-    private List<string> _systemIdentities = new List<string>();
-
-    public void StateUpdated()
-    {
-        StateHasChanged();
-    }
-
-    public class Dessert
-    {
-        public string Name { get; set; }
-
-        public int Calories { get; set; }
-    }
-
-    private List<Dessert> _desserts = new List<Dessert>
-        {
-           new Dessert
-           {
-              Name= "Frozen Yogurt",
-              Calories= 159
-            },
-            new Dessert
-            {
-              Name= "Ice cream sandwich",
-              Calories= 237
-            },
-            new Dessert
-            {
-              Name= "Eclair",
-              Calories= 262
-            },
-            new Dessert
-            {
-              Name= "Cupcake",
-              Calories= 305
-            },
-            new Dessert
-            {
-                Name= "Gingerbread",
-                Calories= 356
-            },
-            new Dessert
-            {
-                Name= "Jelly bean",
-                Calories= 375
-            },
-            new Dessert
-            {
-                Name= "Lollipop",
-                Calories= 392
-            }
-        };
+    [Parameter]
+    public List<Dessert> Data { get; set; }
 }

@@ -68,9 +68,9 @@ public partial class ChartPanel : TscComponentBase
     {
         DynamicComponentMap = new() 
         {
-            ["table"] = new(typeof(Table), new() { ["Value"] = Value }),
-            ["top-list"] = new(typeof(TopList), new() { ["Value"] = Value }),
-            ["e-chart"] = new(typeof(EChart), new() { ["Value"] = Value }),
+            ["table"] = new(typeof(TableConfiguration), new() { ["Value"] = Value }),
+            ["top-list"] = new(typeof(TopListConfiguration), new() { ["Value"] = Value }),
+            ["e-chart"] = new(typeof(EChartConfiguration), new() { ["Value"] = Value }),
         };
        
         //await SetChartType(Value.ChartType, LoadDataAsync);
