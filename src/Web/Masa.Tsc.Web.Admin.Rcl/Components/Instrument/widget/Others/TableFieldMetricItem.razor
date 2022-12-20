@@ -1,6 +1,5 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
-@implements IDisposable
 
 <MCard Class="pa-2" Style="background-color:#F6F8FD">
     <MCardText>
@@ -27,33 +26,13 @@
 
 @code {
     [Parameter]
-    public TableFieldItemModel Value { get; set; }
+    public PanelMetricDto Value { get; set; }
 
     [Parameter]
-    public EventCallback<TableFieldItemModel> ValueChanged { get; set; }
-
-    [CascadingParameter]
-    public TableFieldMetrics TableFieldMetrics { get; set; }
-
-    protected override void OnInitialized()
-    {
-        Value.PropertyChanged += PropertyChanged;
-        base.OnInitialized();
-    }
-
-    private void PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        TableFieldMetrics.ItemsChanged.InvokeAsync(TableFieldMetrics.Items);
-    }
+    public EventCallback<PanelMetricDto> ValueChanged { get; set; }
 
     private async Task OnDeleteAsync()
     {
         await OnCallParent(OperateCommand.Remove, Value);
-    }
-
-    public new void Dispose()
-    {
-        Value.PropertyChanged -= PropertyChanged;
-        base.Dispose();
     }
 }

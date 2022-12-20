@@ -31,7 +31,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
 
     public string ChartType
     {
-        get => this[ExtensionFieldTypes.ChartType] as string ?? "";
+        get => this[ExtensionFieldTypes.ChartType] as string ?? "table";
         set
         {
             this[ExtensionFieldTypes.ChartType] = value;

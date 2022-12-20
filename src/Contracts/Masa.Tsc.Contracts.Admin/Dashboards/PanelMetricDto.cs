@@ -15,6 +15,8 @@ public class PanelMetricDto
 
     public string Color { get; set; }
 
+    public string Icon { get; set; }
+
     public string Unit { get; set; }
 
     public int Sort { get; set; }

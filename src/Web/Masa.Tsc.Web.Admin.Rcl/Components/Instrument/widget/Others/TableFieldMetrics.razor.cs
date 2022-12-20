@@ -6,10 +6,10 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TableFieldMetrics
 {
     [Parameter]
-    public List<TableFieldItemModel> Items { get; set; } = new();
+    public List<PanelMetricDto> Items { get; set; } = new();
 
     [Parameter]
-    public EventCallback<List<TableFieldItemModel>> ItemsChanged { get; set; }
+    public EventCallback<List<PanelMetricDto>> ItemsChanged { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -18,7 +18,7 @@ public partial class TableFieldMetrics
 
     private void Add()
     {
-        Items.Add(new TableFieldItemModel { });
+        Items.Add(new PanelMetricDto { });
         ItemsChanged.InvokeAsync(Items);
     }
 
@@ -26,7 +26,7 @@ public partial class TableFieldMetrics
     {
         if (command == OperateCommand.Remove)
         {
-            var item = (TableFieldItemModel)values[0];
+            var item = (PanelMetricDto)values[0];
             Items.Remove(item);
             await ItemsChanged.InvokeAsync(Items);
             return await Task.FromResult(true);

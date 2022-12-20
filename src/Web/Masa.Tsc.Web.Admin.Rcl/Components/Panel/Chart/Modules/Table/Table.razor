@@ -14,7 +14,7 @@
                         <th class="text-left">
                             Calories
                         </th>
-                        @foreach (var field in Fields)
+                        @foreach (var field in Value.Metrics)
                         {
                             <th class="text-left">
                                 @(string.IsNullOrWhiteSpace(field.Unit) ? @field.Name : $"{@field.Name}({field.Unit})")
@@ -29,7 +29,7 @@
                     <tr @key="item.Name">
                         <td class="@($"text-{Value.ColumnAlignment}")">@item.Name</td>
                         <td class="@($"text-{Value.ColumnAlignment}")">@item.Calories</td>
-                        @foreach (var field in Fields)
+                        @foreach (var field in Value.Metrics)
                         {
                             <td style="color:@field.Color" class="@($"text-{Value.ColumnAlignment}")">0.0</td>
                         }
@@ -65,7 +65,7 @@
                 <STextField @bind-Value="@Value.Title" Label="Title" />
             </MCol>
             <MCol Md="12">
-                <TableFieldMetrics @bind-Items="Fields"></TableFieldMetrics>
+                <TableFieldMetrics @bind-Items="Value.Metrics" />
             </MCol>
         </MRow>
     </MCardText>
@@ -74,15 +74,6 @@
 @code {
     [Parameter]
     public ITablePanelValue Value { get; set; }
-
-    [Parameter]
-    public List<TableFieldItemModel> Fields { get; set; } = new();
-
-    [Parameter]
-    public EventCallback<List<TableFieldItemModel>> FieldsChanged { get; set; }
-
-    [Parameter]
-    public TableOption Option { get; set; } = new();
 
     private List<string> _systemIdentities = new List<string>();
 
