@@ -5,7 +5,7 @@
         @switch (context.PanelType)
         {
             case PanelTypes.Tabs:
-                <TabsPanel Panel="context" />
+                <TabsPanel Panel="context as UpsertTabsPanelDto" />
                 break;
             case PanelTypes.Text:
                 <MEditor />
@@ -38,12 +38,12 @@
                     <MList>
                         @if (context.PanelType == PanelTypes.Tabs)
                         {
-                            <MListItem OnClick="() => AddTabItem(context)">
+                            <MListItem OnClick="() => AddTabItem(context as UpsertTabsPanelDto)">
                                 <MListItemTitle>
                                     Add Tab Item
                                 </MListItemTitle>
                             </MListItem>
-                            <MListItem OnClick="() => AddChildPanel(context)">
+                            <MListItem OnClick="() => AddChildPanel(context as UpsertTabsPanelDto)">
                                 <MListItemTitle>
                                     Add Panel
                                 </MListItemTitle>

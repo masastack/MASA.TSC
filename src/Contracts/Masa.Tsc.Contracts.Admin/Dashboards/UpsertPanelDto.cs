@@ -35,17 +35,8 @@ public class UpsertPanelDto
 
     #region UI
 
-    UpsertPanelDto? _currentTabItem;
-
     [JsonIgnore]
     public UpsertPanelDto? ParentPanel { get; set; }
-
-    [JsonIgnore]
-    public UpsertPanelDto? CurrentTabItem
-    {
-        get => _currentTabItem ?? ChildPanels.FirstOrDefault();
-        set => _currentTabItem = value;
-    }
 
     #endregion
 }

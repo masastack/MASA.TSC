@@ -3,8 +3,13 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
-public partial class ChartPanel
+public partial class ChartPanelConfiguration : TscComponentBase
 {
+    List<StringNumber> _panelValues = new() { 1 };
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
     [Parameter]
     public UpsertChartPanelDto Value { get; set; }
 
@@ -16,9 +21,14 @@ public partial class ChartPanel
     {
         DynamicComponentMap = new()
         {
-            ["table"] = new(typeof(TableDemo), new() { ["Value"] = Value }),
-            ["top-list"] = new(typeof(TopListDemo), new() { ["Value"] = Value }),
-            ["e-chart"] = new(typeof(EChart), new() { ["Value"] = Value }),
+            ["table"] = new(typeof(TableConfiguration), new() { ["Value"] = Value }),
+            ["top-list"] = new(typeof(TopListConfiguration), new() { ["Value"] = Value }),
+            ["e-chart"] = new(typeof(EChartConfiguration), new() { ["Value"] = Value }),
         };
+    }
+
+    void NavigateToPanelConfigurationPage()
+    {
+        NavigationManager.NavigateTo($"/dashboard/configuration/record");
     }
 }

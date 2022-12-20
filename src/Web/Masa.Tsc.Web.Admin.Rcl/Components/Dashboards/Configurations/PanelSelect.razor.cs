@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Tabs.Models;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
 
 public partial class PanelSelect
@@ -41,30 +43,15 @@ public partial class PanelSelect
         switch (type)
         {
             case PanelTypes.Tabs:
-                panel = new UpsertPanelDto()
-                {
-                    Id = PanelId,
-                    PanelType = type,
-                };
-                panel.ChildPanels = new List<UpsertPanelDto>
-                {
-                    new()
-                    {
-                        PanelType = PanelTypes.TabItem,
-                        Title = "item1",
-                        ChildPanels = new List<UpsertPanelDto>
-                        {
-                            new()
-                        },
-                        ParentPanel = panel,
-                    }
-                };
+                panel = new UpsertTabsPanelDto(PanelId);
                 break;
             case PanelTypes.Chart:
                 panel = new UpsertChartPanelDto(PanelId);
                 NavigationManager.NavigateTo($"/datav/dashboard/example3/{panel.Id}");
                 break;
             default:
+                panel.Id = PanelId;
+                panel.PanelType = type;
                 break;
         }        
 
