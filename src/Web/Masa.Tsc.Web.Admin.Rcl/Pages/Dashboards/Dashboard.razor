@@ -4,23 +4,23 @@
 <AutoHeight>
     <HeaderContent>
         <div class="d-flex mb-6">
-            <SLabeledRadioGroup TValue="Modes" @bind-Value=Mode Dense Class="mr-6 my-auto" Style="border-width:1px;border-style: double;border-color:rgb(255 255 255 / 70%);">
+            <SLabeledRadioGroup TValue="Modes" @bind-Value=Mode Dense ActiveClass="fill-background" Class="mr-6 my-auto white">
                 <SLabeledRadio Value="Modes.Folder">
-                    <SIcon>@IconConstants.Folder</SIcon>
+                    <SIcon Color="@(Mode == Modes.Folder ? "primary" : "emphasis2")">@IconConstants.Folder</SIcon>
                 </SLabeledRadio>
                 <SLabeledRadio Value="Modes.Table">
-                    <SIcon>@IconConstants.List</SIcon>
+                    <SIcon Color="@(Mode == Modes.Table ? "primary" : "emphasis2")">@IconConstants.List</SIcon>
                 </SLabeledRadio>
             </SLabeledRadioGroup>
             @if (Mode is Modes.Folder)
             {
-                <MButton Depressed Text Outlined Class="mr-6 my-auto" OnClick="() => ExpandAll = !ExpandAll">
+                <MButton Depressed Text Outlined Class="mr-6 my-auto regular--text body2 white" OnClick="() => ExpandAll = !ExpandAll">
                     @(ExpandAll ? T("Close all") : T("Expend all"))
                 </MButton>
             }
             <SearchTextField @bind-Value="Search" Clearable FillBackground=false Class="my-auto" Style="flex:none;width: 300px !important;" />
             <MSpacer />
-            <SButton Icon OnClick=RefreshAsync Class="mr-6 my-auto"><SIcon Tooltip="@T("Refresh")" Size=24>@IconConstants.Refresh</SIcon></SButton>
+            <SButton Icon OnClick=RefreshAsync Class="mr-6 my-auto"><SIcon Tooltip="@T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon></SButton>
             <SButton OnClick="OpenAddFolderDialog" Small Class="mr-6 my-auto" Style="min-width:108px !important;">@T("Add folder")</SButton>
             <SButton OnClick="OpenAddDashboardDialog" Small Class="my-auto" Style="min-width:140px !important;">@T("Add dashboard")</SButton>
         </div>
@@ -51,9 +51,9 @@
                                 break;
                             case "Action":
                                 <div class="d-flex">
-                                    <SButton Text Style="min-width:150px !important;" OnClick="async () => await SwitchRootAsync(context.Item)">@T(context.Item.IsRoot ? "Not set as root" : "Set as root")</SButton>
-                                    <SButton Icon><SIcon Tooltip="@T("Edit")" OnClick="() => OpenUpdateDashboardDialog(context.Item)">@IconConstants.Update</SIcon></SButton>
-                                    <SButton Icon Color="red" OnClick="async () => await OpenRemoveDashboardDialogAsync(context.Item)"><SIcon Tooltip="@T("Remove")" Color="red">@IconConstants.Remove</SIcon></SButton>
+                                    <SButton Text Style="max-width:150px !important;border-radius: 6px !important;" Small Class="white btn mr-2" OnClick="async () => await SwitchRootAsync(context.Item)"><span class="emphasis2--text">@T(context.Item.IsRoot ? "Not set as root" : "Set as root")</span></SButton>
+                                    <SButton Icon Class="mr-4"><SIcon Tooltip="@T("Edit")" OnClick="() => OpenUpdateDashboardDialog(context.Item)">@IconConstants.Update</SIcon></SButton>
+                                    <SButton Icon Color="red" OnClick="async () => await OpenRemoveDashboardDialogAsync(context.Item)"><SIcon Tooltip="@T("Remove")" Style="color:#F44336 !important;">@IconConstants.Remove</SIcon></SButton>
                                 </div>
                                 break;
                             default:
@@ -68,36 +68,37 @@
                 <MList Height="@("calc(100vh - 289px)")" Class="overflow-auto">
                     @foreach (var folder in Folders)
                     {
-                        <MListGroup PrependIcon="@IconConstants.Folder"
+                        <MListGroup PrependIcon="mdi-folder-outline"
                                     NoAction
-                        @bind-Value=folder.ISActive>
+                                    @bind-Value=folder.ISActive>
                             <ActivatorContent>
                                 <MListItemContent>
                                     <MListItemTitle Class="h8">@folder.Name</MListItemTitle>
                                 </MListItemContent>
                             </ActivatorContent>
+                            <AppendIconContent>
+                                <SButton Icon OnClick="() => OpenUpdateFolderDialog(folder)" Class="mr-4" StopPropagation><SIcon Tooltip="@T("Edit")" Style="transform: none !important">@IconConstants.Update</SIcon></SButton>
+                                <SButton Icon Color="red" Class="mr-10" OnClick="async () => await OpenRemoveFolderDialogAsync(folder)" StopPropagation><SIcon Tooltip="@T("Remove")" Color="red" Style="transform: none !important">@IconConstants.Remove</SIcon></SButton>
+                                <SIcon Size="28" Color="@(folder.ISActive ? "primary" : "")">@IconConstants.Down</SIcon>
+                            </AppendIconContent>
                             <ChildContent>
                                 @foreach (var dashboard in folder.Dashboards)
                                 {
                                     <MListItem Link Class="ml-n6" OnClick="()=> NavigateToConfiguration(dashboard)">
                                         <MListItemContent>
-                                            <MListItemTitle Class="body emphasis2--text" >
+                                            <MListItemTitle Class="body emphasis2--text">
                                                 @dashboard.Name
                                             </MListItemTitle>
                                         </MListItemContent>
                                         <MListItemAction>
-                                            <SButton Text Style="min-width:150px !important;" OnClick="async () => await SwitchRootAsync(dashboard)">@T(dashboard.IsRoot ? "Not set as root" : "Set as root")</SButton>
-                                            <SButton Icon OnClick="() => OpenUpdateDashboardDialog(dashboard)"><SIcon Tooltip="@T("Edit")">@IconConstants.Update</SIcon></SButton>
+                                            <MChip Class="mr-8 my-auto" Color="primary"> @dashboard.Model.ToString()</MChip>
+                                            <SButton Text Style="max-width:150px !important;border-radius: 6px !important;" Small Class="white btn mr-2" OnClick="async () => await SwitchRootAsync(dashboard)"><span class="emphasis2--text">@T(dashboard.IsRoot ? "Not set as root" : "Set as root")</span></SButton>
+                                            <SButton Icon Class="mr-4" OnClick="() => OpenUpdateDashboardDialog(dashboard)"><SIcon Tooltip="@T("Edit")">@IconConstants.Update</SIcon></SButton>
                                             <SButton Icon Color="red" OnClick="async () => await OpenRemoveDashboardDialogAsync(dashboard)"><SIcon Tooltip="@T("Remove")" Color="red">@IconConstants.Remove</SIcon></SButton>
                                         </MListItemAction>
                                     </MListItem>
                                 }
                             </ChildContent>
-                            <AppendIconContent>
-                                <SButton Icon OnClick="() => OpenUpdateFolderDialog(folder)" StopPropagation><SIcon Tooltip="@T("Edit")" Style="transform: none !important">@IconConstants.Update</SIcon></SButton>
-                                <SButton Icon Color="red" OnClick="async () => await OpenRemoveFolderDialogAsync(folder)" StopPropagation><SIcon Tooltip="@T("Remove")" Color="red" Style="transform: none !important">@IconConstants.Remove</SIcon></SButton>
-                                <SIcon Size="28" Color="@(folder.ISActive ? "primary" : "")">@IconConstants.Down</SIcon>
-                            </AppendIconContent>
                         </MListGroup>
                     }
                 </MList>

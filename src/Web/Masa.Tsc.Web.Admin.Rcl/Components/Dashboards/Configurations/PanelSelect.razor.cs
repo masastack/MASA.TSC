@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Tabs.Models;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
 
 public partial class PanelSelect
@@ -47,7 +45,7 @@ public partial class PanelSelect
                 break;
             case PanelTypes.Chart:
                 panel = new UpsertChartPanelDto(PanelId);
-                NavigationManager.NavigateTo($"/datav/dashboard/example3/{panel.Id}");
+                NavigationManager.NavigateTo($"/dashboard/configuration/chart/{panel.Id}");
                 break;
             default:
                 panel.Id = PanelId;

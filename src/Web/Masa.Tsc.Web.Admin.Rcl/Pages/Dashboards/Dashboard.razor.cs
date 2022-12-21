@@ -8,7 +8,6 @@ public partial class Dashboard
     string? _search;
     int _page = 1;
     int _pageSize = 10;
-    bool _expandAll = true;
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -55,7 +54,6 @@ public partial class Dashboard
         set
         {
             Folders.ForEach(folder => folder.ISActive = value);
-            _expandAll = value;
         }
     }
 

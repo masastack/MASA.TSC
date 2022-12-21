@@ -1,7 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.Web.Admin.Rcl.Components;
+namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
 public partial class WidgetType
 {
@@ -15,7 +15,7 @@ public partial class WidgetType
     {
         if (firstRender)
         {
-            await OnSelected(Items.First());
+            (Items.FirstOrDefault(item => item.Type == Value) ?? Items.First()).Selected = true;
         }
         await base.OnAfterRenderAsync(firstRender);
     }

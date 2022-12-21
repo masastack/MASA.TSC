@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<MGridstack Items="Panels" Readonly="!IsEdit" ItemKey="panel => panel.Id.ToString()" ItemStyle="border:solid #E4E8F3 1px;cursor: move;position:absolute" ItemPosition="panel => new(panel.Width,panel.Height)" TItem="UpsertPanelDto">
+<MGridstack Items="Panels" Readonly="!IsEdit" ItemKey="panel => panel.Id.ToString()" ItemClass="pt-5" ItemStyle="border:solid #E4E8F3 1px;cursor: move;position:absolute" ItemPosition="panel => new(panel.Width,panel.Height)" TItem="UpsertPanelDto">
    <ItemContent>
         @switch (context.PanelType)
         {
@@ -40,18 +40,26 @@
                         {
                             <MListItem OnClick="() => AddTabItem(context as UpsertTabsPanelDto)">
                                 <MListItemTitle>
-                                    Add Tab Item
+                                    @T("Add Tab Item")
                                 </MListItemTitle>
                             </MListItem>
                             <MListItem OnClick="() => AddChildPanel(context as UpsertTabsPanelDto)">
                                 <MListItemTitle>
-                                    Add Panel
+                                    @T("Add Panel")
+                                </MListItemTitle>
+                            </MListItem>
+                        }
+                        else if (context.PanelType == PanelTypes.Chart)
+                        {
+                            <MListItem OnClick="() => ConfigurationChartPanel(context)">
+                                <MListItemTitle>
+                                    @T("Edit Panel")
                                 </MListItemTitle>
                             </MListItem>
                         }
                         <MListItem OnClick="() => RemovePanel(context)">
                             <MListItemTitle>
-                                Remove Panel
+                                @T("Remove Panel")
                             </MListItemTitle>
                         </MListItem>
                     </MList>

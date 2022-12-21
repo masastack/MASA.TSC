@@ -1,13 +1,3 @@
 ﻿@page "/dashbord/log"
 
 <LogPanel />
-
-@code {
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        var activity = System.Diagnostics.Activity.Current;
-        if (activity != null)
-            activity.AddTag("blazor_page", true);
-    }
-}
