@@ -13,8 +13,6 @@ public class Panel : AggregateRoot<Guid>
 
     public string Description { get; set; } = string.Empty;
 
-    public int Index { get; set; }
-
     public PanelTypes Type { get; set; }
 
     public string UiType { get; set; } = string.Empty;
@@ -27,19 +25,105 @@ public class Panel : AggregateRoot<Guid>
 
     public string Top { get; set; } = string.Empty;
 
-    //public string XName { get; set; }
+    #region tab and items
 
-    //public string YName { get; set; }
-
-    public string ChartType { get; set; } = string.Empty;
+    public int Index { get; set; }
 
     public Guid ParentId { get; set; }
 
+    public List<Panel> Panels { get; set; }
+
+    #endregion
+
+    #region echart 、table and top n
+
+    public string ChartType { get; set; } = string.Empty;
+
+    public Dictionary<ExtensionFieldTypes, object?> ExtensionData { get; set; }
+
     public List<PanelMetric>? Metrics { get; set; }
+
+    #endregion
 
     public Panel(Guid Id) : base(Id) { }
 
     public Panel() { }
+
+    public Panel(UpsertPanelDto data)
+    {
+    }
+
+    public void Update(UpsertPanelDto update)
+    {
+        if (Type == PanelTypes.Tabs)
+        {
+            UpdateTabItems(update.ChildPanels);
+        }
+
+        Title = update.Title;
+        Description = update.Description;
+
+        if (update.Metrics != null && update.Metrics.Any())
+        {
+
+        }
+        else if (Metrics != null && Metrics.Any())
+        {
+            Metrics.Clear();
+        }
+
+        if (update.ExtensionData != null && update.ExtensionData.Any())
+        Exe
+
+
+
+        // if (Type == PanelTypes.Text ||)
+    }
+
+    /// <summary>
+    /// update tab items
+    /// </summary>
+    /// <param name="children"></param>
+    private void UpdateTabItems(List<UpsertPanelDto> children)
+    {
+        if (children == null || !children.Any())
+        {
+            if (Panels != null && Panels.Any())
+                Panels.Clear();
+        }
+        if (Panels == null)
+            Panels = new();
+        var list = new List<Panel>();
+
+        var itemIndex = 0;
+        foreach (var item in children!)
+        {
+            var panel = Panels.FirstOrDefault(x => x.Id == item.Id);
+            if (panel == null)
+            {
+                panel = new Panel { };
+            }
+            else
+            {
+                panel.UpdateTabItem(item, itemIndex);
+                Panels.Remove(panel);
+            }
+            list.Add(panel);
+            itemIndex++;
+        }
+        Panels = list;
+    }
+
+    public void UpdateTabItem(UpsertPanelDto update, int index)
+    {
+        if (Type == PanelTypes.TabItem)
+            return;
+
+        Index = index;
+        Title = update.Title;
+
+        //update pannels
+    }
 
     public void Update(PanelDto panel)
     {
@@ -49,27 +133,14 @@ public class Panel : AggregateRoot<Guid>
         }
         Title = panel.Title;
         Description = panel.Description ?? string.Empty;
-        Index = panel.Sort;
     }
 
     public void UpdateShow(UpdatePanelShowDto model)
     {
-        Index = model.Index;
         Height = model.Height;
         Width = model.Width;
         Top = model.Top;
         Left = model.Left;
-    }
-
-    public void UpdateParentId(Guid parentId)
-    {
-        ParentId = parentId;
-    }
-
-    public void UpdateWidthHeight(string height, string width)
-    {
-        Width = width ?? string.Empty;
-        Height = height ?? string.Empty;
     }
 
     public static Panel ConvertTo(PanelDto model)

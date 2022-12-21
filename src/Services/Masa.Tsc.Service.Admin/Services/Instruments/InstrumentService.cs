@@ -9,6 +9,7 @@ public class InstrumentService : ServiceBase
     {
         App.MapPost($"{BaseUri}/set-root/{{id}}/{{isRoot}}", SetRootAsync);
         App.MapPost($"{BaseUri}/set-panels-show-setting/", UpdatePanelsShowAsync);
+        App.MapPost($"{BaseUri}/upsert/{{instrumentId}}", UpsertAsync);
     }
 
     public async Task AddAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromBody] AddDashboardDto model)
@@ -24,6 +25,11 @@ public class InstrumentService : ServiceBase
     public async Task DeleteAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromBody] CommonRemoveDto<Guid> model)
     {
         await eventBus.PublishAsync(new RemoveInstrumentCommand(userContext.GetUserId<Guid>(), model.Ids.ToArray()));
+    }
+
+    public async Task UpsertAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, Guid instrumentId, [FromBody] UpsertPanelDto[] model)
+    {
+        await eventBus.PublishAsync(new UpInsertCommand(model, instrumentId, userContext.GetUserId<Guid>()));
     }
 
     public async Task<PaginatedListBase<InstrumentListDto>> GetListAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, int page, int size, string keyword)

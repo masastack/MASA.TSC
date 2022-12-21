@@ -165,6 +165,19 @@ public class InstrumentCommandHandler
     }
     #endregion
 
+    #region upsert
+
+    public async Task UpsertInstrumentAsync(UpInsertCommand command)
+    {
+        var entry = await _instrumentRepository.GetDetailAsync(command.InstumentId, command.UserId);
+        if (entry == null)
+            throw new UserFriendlyException($"instrument {command.InstumentId} is not exists");
+        entry.UpdatePanels(command.Data);
+        await _instrumentRepository.UpdateAsync(entry);
+    }
+
+    #endregion
+
     #region  remove
 
     [EventHandler]

@@ -73,6 +73,34 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
         }
     }
 
+    public void UpdatePanels(UpsertPanelDto[] data)
+    {
+        if (data == null || !data.Any())
+        {
+            if (Panels != null && this.Panels.Any())
+                Panels.Clear();
+        }
+
+        if (Panels == null)
+            Panels = new();
+        var list = new List<Panel>();
+        foreach (var item in data!)
+        {
+            var panel = Panels.FirstOrDefault(p => p.Id == item.Id);
+            if (panel == null)
+            {
+                panel = new Panel(item);
+            }
+            else
+            {
+                Panels.Remove(panel);
+            }
+            panel.Update(item);
+            list.Add(panel);
+        }
+        Panels = list;
+    }
+
     public void SetRoot(bool isRoot)
     {
         if (IsRoot == isRoot)
