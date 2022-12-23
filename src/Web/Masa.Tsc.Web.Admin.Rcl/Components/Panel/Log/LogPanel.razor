@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<AutoHeight AutoClass="mt-6 full-height">
+<AutoHeight AutoClass="mt-6 full-height" AutoStyle="max-height: calc(100vh - 245px);" Overflow>
     <HeaderContent>
         <div class="d-flex">
             <SearchTextField @bind-Value="@Search" FillBackground=false Clearable Class="my-auto" />
@@ -21,7 +21,7 @@
                 </MCardText>
             </MCard>
         }
-        <MVirtualScroll OverscanCount=5 TItem="LogDto" Items="Logs" Class="pa-6 m-sheet theme--light" Style="height: calc(100vh - 290px);border-bottom-left-radius: 20px ; border-bottom-right-radius: 20px ;">
+        <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="Logs" Class="pa-6 m-sheet theme--light" Style="border-bottom-left-radius: 20px ; border-bottom-right-radius: 20px ;">
             <ItemContent>
                 <dvi class="d-flex">
                     <div style="min-width:234px;">
@@ -29,7 +29,7 @@
                         <div class="mt-2 body regular3--text">@context.Timestamp.ToString("yyyy")</div>
                     </div>
                     <div class="full-widthh">
-                        <LogView JsonObject="context.ExtensionData.ToDictionary(item => item.Key,item => new LogTree(item.Value))" />
+                        <LogView Search="@Search" JsonObject="context.ExtensionData" />
                     </div>
                 </dvi>
                 <MDivider Class="mb-6" />

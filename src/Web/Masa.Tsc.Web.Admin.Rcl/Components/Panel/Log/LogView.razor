@@ -10,14 +10,16 @@
                 <div class="px-2 ml-4 mr-6 my-auto fill-background" style="border-radius: 6px;height: 25px;text-align:center;">
                     <span class="emphasis2--text btn">@name</span>
                 </div>
-                <span class="body2 regular2--text my-auto">:@logTree.ToString()</span>
+                <span class="body2 regular2--text my-auto">
+                    :@logTree.ToMarkUpString(Search)
+                </span>
             </div>
         }
         else if (logTree.IsObject)
         {
             <div class="d-flex mb-4">
-                <SButton Icon Class="ml-n5">
-                    <SIcon Size="24" Color="regular2" OnClick="() => logTree.Expanded =!logTree.Expanded">
+                <SButton Icon Class="ml-n5" OnClick="() => logTree.Expanded =!logTree.Expanded">
+                    <SIcon Size="24" Color="regular2">
                         @(logTree.Expanded ? IconConstants.MenuDown : IconConstants.MenuRight)
                     </SIcon>
                 </SButton>
@@ -29,7 +31,7 @@
             @if (logTree.Expanded)
             {
                 <div class="pl-5 mb-4">
-                    <LogView JsonObject=logTree.ToObject() />
+                    <LogView Search=@Search CloseAotoExpand="true" JsonObject=logTree.ToObject() />
                     <div class="body2 primary--text">}</div>
                 </div>
             }
@@ -37,8 +39,8 @@
         else if (logTree.IsArray)
         {
             <div class="d-flex mb-4">
-                <SButton Icon Class="ml-n5">
-                    <SIcon Size="24" Color="regular2" OnClick="() => logTree.Expanded =!logTree.Expanded">
+                <SButton Icon Class="ml-n5" OnClick="() => logTree.Expanded =!logTree.Expanded">
+                    <SIcon Size="24" Color="regular2">
                         @(logTree.Expanded ? IconConstants.MenuDown : IconConstants.MenuRight)
                     </SIcon>
                 </SButton>
@@ -50,7 +52,7 @@
             @if (logTree.Expanded)
             {
                 <div class="pl-5 mb-4">
-                    <LogView JsonArray=logTree.ToArray() />
+                    <LogView Search=@Search CloseAotoExpand="true" JsonArray=logTree.ToArray() />
                     <div class="body2 primary--text">]</div>
                 </div>
             }
@@ -63,7 +65,9 @@ else if(JsonArray is not null)
     {
         if (logTree.IsValueType)
         {
-            <span class="body2 regular2--text">:@logTree.ToString()</span>
+            <span class="body2 regular2--text">
+                :@logTree.ToMarkUpString(Search)
+            </span>
         }
         else if (logTree.IsObject)
         {
@@ -78,7 +82,7 @@ else if(JsonArray is not null)
             @if (logTree.Expanded)
             {
                 <div class="pl-5 mb-4">
-                    <LogView JsonObject=logTree.ToObject() />
+                    <LogView Search=@Search CloseAotoExpand="true" JsonObject=logTree.ToObject() />
                     <div class="body2 primary--text">}</div>
                 </div>
             }
@@ -96,47 +100,10 @@ else if(JsonArray is not null)
             @if (logTree.Expanded)
             {
                 <div class="pl-5 mb-4">
-                    <LogView JsonArray=logTree.ToArray() />
+                    <LogView Search=@Search CloseAotoExpand="true" JsonArray=logTree.ToArray() />
                     <div class="body2 primary--text">]</div>
                 </div>
             }
         }
     }
 }
-
-@*<div class="d-flex mb-4">
-    <SButton Icon Class="mr-4">
-        <SIcon Size="24" Color="regular2">
-            @IconConstants.MenuRight
-        </SIcon>
-    </SButton>
-    <div class="px-2 mr-6 my-auto fill-background" style="border-radius: 6px;height: 25px;text-align:center;">
-        <span class="emphasis2--text btn">ActionName</span>
-    </div>
-    <span class="body2 regular2--text my-auto">:hhh</span>
-</div>
-<div class="d-flex mb-4">
-    <SButton Icon Class="mr-4">
-        <SIcon Size="24" Color="regular2">
-            @IconConstants.MenuDown
-        </SIcon>
-    </SButton>
-    <div class="px-2 mr-6 my-auto fill-background" style="border-radius: 6px;height: 25px;text-align:center;">
-        <span class="emphasis2--text btn">ActionName</span>
-    </div>
-    <span class="body2 regular2--text my-auto">:hhh</span>
-</div>
-@if(true)
-{
-    <div class="d-flex mb-4 ml-8">
-        <SButton Icon Class="mr-4">
-            <SIcon Size="24" Color="regular2" Class="mr-4">
-                @IconConstants.MenuDown
-            </SIcon>
-        </SButton>
-        <div class="px-2 mr-6 my-auto fill-background" style="border-radius: 6px;height: 25px;text-align:center;">
-            <span class="emphasis2--text btn">ActionName</span>
-        </div>
-        <span class="body2 regular2--text my-auto">:hhh</span>
-    </div>
-}*@

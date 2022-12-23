@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Contracts.Admin.Logs;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Log;
 
 public partial class LogPanel
@@ -21,7 +19,7 @@ public partial class LogPanel
         {
             _search = value;
             _page = 1;
-            GetLogsAsync().ContinueWith(_ => InvokeAsync(StateHasChanged));
+            //GetLogsAsync().ContinueWith(_ => InvokeAsync(StateHasChanged));
         }
     }
 
@@ -32,7 +30,7 @@ public partial class LogPanel
     int Page
     {
         get => _page;
-        set 
+        set
         {
             _page = value;
             GetLogsAsync().ContinueWith(_ => InvokeAsync(StateHasChanged));
@@ -51,7 +49,7 @@ public partial class LogPanel
 
     long Total { get; set; }
 
-    List<LogDto> Logs { get; set; } = new();
+    List<LogModel> Logs { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -67,10 +65,10 @@ public partial class LogPanel
             Start = StartTime ?? default,
             End = EndTime ?? default,
             Page = Page,
-            Query = Search
+            //Query = Search
         };
         var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
-        Logs = response.Result;
+        Logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
         Total = response.Total;
         GenOption(default);
         Loading = false;

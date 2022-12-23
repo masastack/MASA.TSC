@@ -18,6 +18,9 @@ public partial class AutoHeight
     public string AutoClass { get; set; } = "";
 
     [Parameter]
+    public string AutoStyle { get; set; } = "";
+
+    [Parameter]
     public string Class { get; set; } = "";
 
     [Parameter]
