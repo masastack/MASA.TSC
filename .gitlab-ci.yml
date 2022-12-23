@@ -13,7 +13,7 @@ variables:
   TSCWebDockerFile: ./src/Web/Masa.Tsc.Web.Admin.Server/Dockerfile
   TSCServiceDockerFile: ./src/Services/Masa.Tsc.Service.Admin/Dockerfile
   
-  NAMESPACE_DEV: tsc-dev
+  NAMESPACE_DEV: masa-tsc-dev
   WebDomain_dev: tsc-develop.masastack.com
   ServiceDomain_dev: tsc-service-develop.masastack.com
   
@@ -21,7 +21,7 @@ variables:
   TSC_Service_Image: $CI_ALI_REGISTRY_DOMAIN/masa/$TSC_Service_Name:dev-$CI_PIPELINE_ID
   TSC_Web_Image: $CI_ALI_REGISTRY_DOMAIN/masa/$TSC_Web_Name:dev-$CI_PIPELINE_ID
 
-  NAMESPACE_STAGING: tsc-staging
+  NAMESPACE_STAGING: masa-tsc-staging
   WebDomain_staging: tsc-staging.masastack.com
   ServiceDomain_staging: tsc-service-staging.masastack.com
   
@@ -33,7 +33,7 @@ docker-dev:
   before_script:
     - docker login -u $CI_ALI_REGISTRY_USER -p $CI_ALI_REGISTRY_PASSWD $CI_ALI_REGISTRY_DOMAIN 
   only:
-    - main  
+    - develop  
   script:
     - docker build -f $TSCWebDockerFile -t $TSC_Web_Image .
     - docker push $TSC_Web_Image 
@@ -52,7 +52,7 @@ deploy-dev:
   tags:
     - ydy-runner
   only:
-    - main  
+    - develop  
   script:
     - ls
     - pwd 
@@ -73,7 +73,7 @@ deploy-staging:
   tags:
     - ydy-runner
   only:
-    - main  
+    - develop  
   script:
     - ls
     - pwd 
