@@ -5,9 +5,14 @@ namespace Masa.Tsc.Service.Admin.Domain.Aggregates;
 
 public class PanelMetric : AggregateRoot<Guid>
 {
-    public PanelMetric():base() { }
+    public PanelMetric() : base() { }
 
-    public PanelMetric(Guid id):base(id) { }
+    public PanelMetric(Guid id) : base(id) { }
+
+    public PanelMetric(PanelMetricDto data)
+    {
+        Update(data);
+    }
 
     public Panel Panel { get; set; }
 
@@ -17,9 +22,21 @@ public class PanelMetric : AggregateRoot<Guid>
 
     public string Caculate { get; set; }
 
-    public string Color { get; set; }=string.Empty;
+    public string Color { get; set; } = string.Empty;
 
-    public string Unit { get; set; }    
+    public string Unit { get; set; }
 
     public int Sort { get; set; }
+
+    public string Icon { get; set; } = string.Empty;    
+
+    public void Update(PanelMetricDto data)
+    {
+        Name = data.Name;
+        Caculate = data.Caculate;
+        Color = data.Color;
+        Unit = data.Unit;
+        Sort = data.Sort;
+        Icon = data.Icon;
+    }
 }

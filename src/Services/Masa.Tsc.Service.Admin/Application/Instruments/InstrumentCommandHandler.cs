@@ -39,23 +39,6 @@ public class InstrumentCommandHandler
         };
         await _instrumentRepository.AddAsync(model);
     }
-
-    /// <summary>
-    /// add pannel
-    /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
-    [EventHandler(0)]
-    public async Task AddPanelAsync(AddPanelCommand command)
-    {
-        var instrument = await _instrumentRepository.GetIncludePanelsAsync(command.Data.InstrumentId, command.UserId);
-        if (instrument == null)
-            throw new UserFriendlyException("数据不存在");
-        instrument.AddPanel(command.Data);
-
-        await _instrumentRepository.UpdateAsync(instrument);
-    }
-
     #endregion
 
     #region update
@@ -79,90 +62,7 @@ public class InstrumentCommandHandler
 
         instrument.SetRoot(command.IsRoot);
         await _instrumentRepository.UpdateAsync(instrument);
-    }
-
-    [EventHandler]
-    public async Task UpdatePanelsShowAsync(UpdatePanelsShowCommand command)
-    {
-        var instrument = await _instrumentRepository.GetIncludePanelsAsync(command.Data.Id, command.UserId);
-        if (instrument == null)
-            throw new UserFriendlyException($"instrument {command.Data.Id} is not exists");
-
-        instrument.UpdatePanelsShow(command.Data.Panels);
-        await _instrumentRepository.UpdateAsync(instrument);
-    }
-
-    [EventHandler(0)]
-    public async Task UpdatePanelAsync(UpdatePanelCommand command)
-    {
-        var instrument = await _instrumentRepository.GetIncludePanelsAsync(command.Data.InstrumentId, command.UserId);
-        if (instrument == null)
-            throw new UserFriendlyException($"instrument {command.Data.InstrumentId} is not exists");
-
-        var panel = instrument.Panels.FirstOrDefault(p => p.Id == command.Data.Id);
-        if (panel == null)
-            throw new UserFriendlyException($"panel {command.Data.Id} is not exists");
-        panel.Update(command.Data);
-
-        await _instrumentRepository.UpdateAsync(instrument);
-    }
-
-    [EventHandler(1)]
-    public async Task UpdatePanelMetricAsync(UpdatePanelCommand command)
-    {
-        var panel = await _panelRepository.FindAsync(item => item.Id == command.Data.Id);
-        if (panel != null && panel.Type == PanelTypes.Chart)
-        {
-            var echartPanel = ((EChartPanelDto)command.Data);
-            var metrics = await _metricReposity.ToQueryable().Where(x => x.PanelId == panel.Id).OrderBy(x => x.Sort).ToListAsync();
-            var adds = new List<PanelMetric>();
-            foreach (var item in echartPanel.Metrics)
-            {
-                var find = metrics.FirstOrDefault(x => x.Id == item.Id);
-                if (find == null)
-                {
-                    adds.Add(new PanelMetric(item.Id)
-                    {
-                        Caculate = item.Caculate,
-                        Name = item.Name,
-                        PanelId = panel.Id,
-                        Sort = item.Sort,
-                        Unit = item.Unit,
-                    });
-                }
-                else
-                {
-                    find.Name = item.Name;
-                    find.Unit = item.Unit;
-                    find.Sort = item.Sort;
-                    find.Caculate = item.Caculate;
-                }
-            }
-            var removes = metrics.Where(x => !echartPanel.Metrics.Any(t => t.Id == x.Id)).ToList();
-
-            while (adds.Any() && removes.Any())
-            {
-                var add = adds[0];
-                var remove = removes[0];
-                remove.Name = add.Name;
-                remove.Unit = add.Unit;
-                remove.Sort = add.Sort;
-                remove.Caculate = add.Caculate;
-                adds.Remove(add);
-                removes.Remove(remove);
-            }
-
-            if (removes.Any())
-                metrics.RemoveAll(x => removes.Any(item => item.Id == x.Id));
-
-            if (removes.Any())
-                await _metricReposity.RemoveRangeAsync(removes);
-            if (adds.Any())
-                await _metricReposity.AddRangeAsync(adds);
-            if (metrics.Any())
-                await _metricReposity.UpdateRangeAsync(metrics);
-        }
-    }
+    } 
     #endregion
 
     #region upsert
@@ -175,7 +75,6 @@ public class InstrumentCommandHandler
         entry.UpdatePanels(command.Data);
         await _instrumentRepository.UpdateAsync(entry);
     }
-
     #endregion
 
     #region  remove
@@ -189,21 +88,7 @@ public class InstrumentCommandHandler
         var instrumentIds = list.Select(m => m.Id).ToArray();
         await RemovePanelsByInstrumentAsync(instrumentIds);
         await _instrumentRepository.RemoveRangeAsync(list);
-    }
-
-    [EventHandler]
-    public async Task RemovePanelAsync(RemovePanelCommand command)
-    {
-        var instrument = await _instrumentRepository.GetIncludePanelsAsync(command.PannelId, command.UserId);
-        if (instrument == null)
-            throw new UserFriendlyException("数据不存在");
-        var panel = instrument.RemovePanel(command.PannelId);
-        if (panel != null)
-        {
-            await RemovePanelsByIdAsync(command.PannelId);
-            await _panelRepository.RemoveAsync(panel);
-        }
-    }
+    }    
 
     private async Task RemovePanelsByInstrumentAsync(params Guid[] instrumentIds)
     {

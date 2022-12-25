@@ -15,8 +15,6 @@ public class Panel : AggregateRoot<Guid>
 
     public PanelTypes Type { get; set; }
 
-    public string UiType { get; set; } = string.Empty;
-
     public string Height { get; set; } = string.Empty;
 
     public string Width { get; set; } = string.Empty;
@@ -37,27 +35,41 @@ public class Panel : AggregateRoot<Guid>
 
     #region echart 、table and top n
 
-    public string ChartType { get; set; } = string.Empty;
-
     public Dictionary<ExtensionFieldTypes, object?> ExtensionData { get; set; }
 
     public List<PanelMetric>? Metrics { get; set; }
 
     #endregion
 
-    public Panel(Guid Id) : base(Id) { }
-
     public Panel() { }
+
+    public Panel(Guid Id) : base(Id) { }    
 
     public Panel(UpsertPanelDto data)
     {
+        Id = data.Id;
+        Update(data);
+    }
+
+    private Panel(UpsertPanelDto data, Guid parentId, int index)
+    {
+        Type = data.PanelType;
+        ParentId = parentId;
+        Index = index;
+        Description = data.Description;
+        Width = data.Width.ToString();
+        Height = data.Height.ToString();
+        Top = data.Y.ToString();
+        Left = data.X.ToString();
+        InstrumentId = data.Id;
+        ExtensionData = data.ExtensionData;
     }
 
     public void Update(UpsertPanelDto update)
     {
         if (Type == PanelTypes.Tabs)
         {
-            UpdateTabItems(update.ChildPanels);
+            UpdateTabItems(update.ChildPanels,Id);
         }
 
         Title = update.Title;
@@ -65,7 +77,17 @@ public class Panel : AggregateRoot<Guid>
 
         if (update.Metrics != null && update.Metrics.Any())
         {
-
+            var list = new List<PanelMetric>();
+            foreach (var item in update.Metrics)
+            {
+                var metric = Metrics?.FirstOrDefault(m => m.Id == item.Id);
+                if (metric == null)
+                    metric = new PanelMetric(item);
+                else
+                    metric.Update(item);
+                list.Add(metric);
+            }
+            Metrics = list;
         }
         else if (Metrics != null && Metrics.Any())
         {
@@ -73,18 +95,14 @@ public class Panel : AggregateRoot<Guid>
         }
 
         if (update.ExtensionData != null && update.ExtensionData.Any())
-        Exe
-
-
-
-        // if (Type == PanelTypes.Text ||)
+            ExtensionData = update.ExtensionData;
     }
 
     /// <summary>
     /// update tab items
     /// </summary>
     /// <param name="children"></param>
-    private void UpdateTabItems(List<UpsertPanelDto> children)
+    private void UpdateTabItems(List<UpsertPanelDto> children, Guid parentId)
     {
         if (children == null || !children.Any())
         {
@@ -101,7 +119,7 @@ public class Panel : AggregateRoot<Guid>
             var panel = Panels.FirstOrDefault(x => x.Id == item.Id);
             if (panel == null)
             {
-                panel = new Panel { };
+                panel = new Panel(item, parentId, itemIndex);
             }
             else
             {
@@ -114,7 +132,7 @@ public class Panel : AggregateRoot<Guid>
         Panels = list;
     }
 
-    public void UpdateTabItem(UpsertPanelDto update, int index)
+    private void UpdateTabItem(UpsertPanelDto update, int index)
     {
         if (Type == PanelTypes.TabItem)
             return;
@@ -125,52 +143,32 @@ public class Panel : AggregateRoot<Guid>
         //update pannels
     }
 
-    public void Update(PanelDto panel)
-    {
-        if (panel.Type == PanelTypes.Chart)
-        {
-            ChartType = ((EChartPanelDto)panel).ChartType;
-        }
-        Title = panel.Title;
-        Description = panel.Description ?? string.Empty;
-    }
-
-    public void UpdateShow(UpdatePanelShowDto model)
-    {
-        Height = model.Height;
-        Width = model.Width;
-        Top = model.Top;
-        Left = model.Left;
-    }
-
-    public static Panel ConvertTo(PanelDto model)
-    {
-        var panel = new Panel(model.Id)
-        {
-            Type = model.Type,
-            Title = model.Title ?? string.Empty,
-            Description = model.Description ?? string.Empty,
-            Index = model.Sort,
-            InstrumentId = model.InstrumentId,
-            ParentId = model.ParentId
-        };
-        if (model.Type == PanelTypes.Chart)
-        {
-            panel.ChartType = ((EChartPanelDto)model).ChartType;
-
-            if (model is EChartPanelDto chartDto && chartDto.Metrics != null && chartDto.Metrics.Any())
-            {
-                var list = chartDto.Metrics.Select(x => new PanelMetric(x.Id)
-                {
-                    Name = x.Name,
-                    Caculate = x.Caculate,
-                    PanelId = model.Id,
-                    Sort = x.Sort,
-                    Unit = x.Unit
-                });
-                panel.Metrics = list.ToList();
-            }
-        }
-        return panel;
-    }
+    //public static Panel ConvertTo(PanelDto model)
+    //{
+    //    var panel = new Panel(model.Id)
+    //    {
+    //        Type = model.Type,
+    //        Title = model.Title ?? string.Empty,
+    //        Description = model.Description ?? string.Empty,
+    //        Index = model.Sort,
+    //        InstrumentId = model.InstrumentId,
+    //        ParentId = model.ParentId
+    //    };
+    //    if (model.Type == PanelTypes.Chart)
+    //    {
+    //        if (model is EChartPanelDto chartDto && chartDto.Metrics != null && chartDto.Metrics.Any())
+    //        {
+    //            var list = chartDto.Metrics.Select(x => new PanelMetric(x.Id)
+    //            {
+    //                Name = x.Name,
+    //                Caculate = x.Caculate,
+    //                PanelId = model.Id,
+    //                Sort = x.Sort,
+    //                Unit = x.Unit
+    //            });
+    //            panel.Metrics = list.ToList();
+    //        }
+    //    }
+    //    return panel;
+    //}
 }

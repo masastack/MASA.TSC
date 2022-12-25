@@ -48,7 +48,7 @@ internal static class InstrumentTypeExtensions
 
     private static PanelDto GetChartPanel(Panel panel)
     {
-        var result = GetDefault(panel, new EChartPanelDto { ChartType = panel.ChartType });
+        var result = GetDefault(panel, new EChartPanelDto {  });
         ((EChartPanelDto)result).Metrics = panel.Metrics.Select(item => new PanelMetricDto
         {
             Caculate = item.Caculate,

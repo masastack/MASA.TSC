@@ -25,53 +25,18 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
 
     public List<Panel> Panels { get; set; }
 
-    public Instrument(Guid Id) : base(Id) { }
-
     public Instrument() { }
 
-    public void Update(UpdateDashboardDto pannel)
-    {
-        if (pannel.Name != Name)
-            Name = pannel.Name;
-        Layer = pannel.Layer.ToString();
-        Model = pannel.Model.ToString();
-        Lable = pannel.Type.ToString();
-    }
+    public Instrument(Guid Id) : base(Id) { }    
 
-    public Panel AddPanel(PanelDto model)
+    public void Update(UpdateDashboardDto dashbord)
     {
-        var panel = Panel.ConvertTo(model);
-        if (Panels == null)
-            Panels = new List<Panel> { panel };
-        else
-            Panels.Add(panel);
-        return panel;
-    }
-
-    public Panel RemovePanel(Guid panelId)
-    {
-        if (Panels != null && Panels.Any(p => p.Id == panelId))
-        {
-            var find = Panels.First(p => p.Id == panelId);
-            Panels.Remove(find);
-            return find;
-        }
-        return default!;
-    }
-
-    public void UpdatePanelsShow(UpdatePanelShowDto[] data)
-    {
-        if (Panels == null || !Panels.Any() || data == null || !data.Any())
-            return;
-
-        foreach (var item in data)
-        {
-            var panel = Panels.FirstOrDefault(p => p.Id == item.Id);
-            if (panel == null)
-                continue;
-            panel.UpdateShow(item);
-        }
-    }
+        if (dashbord.Name != Name)
+            Name = dashbord.Name;
+        Layer = dashbord.Layer.ToString();
+        Model = dashbord.Model.ToString();
+        Lable = dashbord.Type.ToString();
+    }    
 
     public void UpdatePanels(UpsertPanelDto[] data)
     {
