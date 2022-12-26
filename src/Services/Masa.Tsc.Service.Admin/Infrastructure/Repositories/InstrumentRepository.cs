@@ -48,6 +48,8 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
         return instrument;
     }
 
+    #region update
+
     public override async Task<Instrument> UpdateAsync(Instrument instrument, CancellationToken cancellationToken = default(CancellationToken))
     {
         var panels = GetAllPanels(instrument.Panels);
@@ -184,5 +186,26 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
                 result.AddRange(panel.Metrics);
         }
         return result;
+    }
+
+    #endregion
+
+    public override async Task RemoveRangeAsync(IEnumerable<Instrument> entities, CancellationToken cancellationToken = default)
+    {
+        if (entities == null || !entities.Any())
+            return;
+        var instrumentIds= entities.Select(item=>item.Id).ToList();
+        var panels = await _context.Set<Panel>().Where(m => instrumentIds.Contains(m.InstrumentId)).ToListAsync();
+        if (panels != null && panels.Any())
+        { 
+            var panelIds=panels.Select(item=>item.Id).ToList();
+           var metrics= await _context.Set<PanelMetric>().Where(m => panelIds.Contains(m.PanelId)).ToListAsync();
+            if(metrics!=null&&metrics.Any())
+                _context.Set<PanelMetric>().RemoveRange(metrics);
+
+            _context.Set<Panel>().RemoveRange(panels);
+        }
+
+        _context.RemoveRange(entities);
     }
 }

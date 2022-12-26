@@ -21,5 +21,5 @@ public class InstrumentDetailDto
 
     public bool IsRoot { get; set; }
    
-    public List<PanelDto> Panels { get; set; }
+    public List<UpsertPanelDto> Panels { get; set; }
 }

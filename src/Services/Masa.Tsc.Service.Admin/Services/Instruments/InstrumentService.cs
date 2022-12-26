@@ -27,7 +27,7 @@ public class InstrumentService : ServiceBase
         await eventBus.PublishAsync(new RemoveInstrumentCommand(userContext.GetUserId<Guid>(), model.Ids.ToArray()));
     }
 
-    public async Task UpsertAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, Guid instrumentId, [FromBody] UpsertPanelDto[] model)
+    private async Task UpsertAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, Guid instrumentId, [FromBody] UpsertPanelDto[] model)
     {
         await eventBus.PublishAsync(new UpInsertCommand(model, instrumentId, userContext.GetUserId<Guid>()));
     }

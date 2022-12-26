@@ -6,16 +6,10 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments;
 public class InstrumentQueryHandler
 {
     private readonly IInstrumentRepository _instrumentRepository;
-    private readonly IPanelRepository _panelRepository;
-    private readonly IMetricReposity _metricReposity;
 
-    public InstrumentQueryHandler(IInstrumentRepository instrumentRepository,
-        IPanelRepository panelRepository,
-        IMetricReposity metricReposity)
+    public InstrumentQueryHandler(IInstrumentRepository instrumentRepository)
     {
         _instrumentRepository = instrumentRepository;
-        _panelRepository = panelRepository;
-        _metricReposity = metricReposity;
     }
 
     [EventHandler]
@@ -64,7 +58,7 @@ public class InstrumentQueryHandler
             Layer = dto.Layer,
             Model = dto.Model,
             Sort = dto.Sort,
-            Panels = ConvertPanels(dto.Panels, Guid.Empty)
+            Panels = ConvertPanels(dto.Panels)
         };
     }
 
@@ -87,47 +81,40 @@ public class InstrumentQueryHandler
         };
     }
 
-    private List<PanelDto> ConvertPanels(List<Panel> panels, Guid parentId)
+    private List<UpsertPanelDto> ConvertPanels(List<Panel> panels)
     {
-        var children = panels.Where(m => m.ParentId == parentId).ToList();
-        panels.RemoveAll(m => m.ParentId == parentId);
-        if (!children.Any())
+        if (panels == null || !panels.Any())
             return default!;
-
-        var result = new List<PanelDto>();
-        foreach (var item in children)
+        var result = new List<UpsertPanelDto>();
+        foreach (var panel in panels)
         {
-            var panel = item.Type.ToModel(item);
-            if (item.Type == PanelTypes.Tabs)
+            var dto = new UpsertPanelDto
             {
-                ((TabsPanelDto)(panel)).Tabs = ConvertPanels(panels, panel.Id)?.Select(item => (TabItemPanelDto)item)?.ToList()!;
-            }
-            else if (item.Type == PanelTypes.TabItem)
-            {
-                ((TabItemPanelDto)(panel)).Tabs = ConvertPanels(panels, panel.Id);
-            }
-            result.Add(panel);
+                Description = panel.Description,
+                ExtensionData = panel.ExtensionData,
+                Height = int.Parse(panel.Height),
+                Width = int.Parse(panel.Width),
+                X = int.Parse(panel.Left),
+                Y = int.Parse(panel.Top),
+                Title = panel.Title,
+                Id = panel.Id,
+                PanelType = panel.Type,
+                Metrics = panel.Metrics?.Select(item => new PanelMetricDto
+                {
+                    Caculate = item.Caculate,
+                    Color = item.Color,
+                    Icon = item.Icon,
+                    Id = item.Id,
+                    Name = item.Name,
+                    Sort = item.Sort,
+                    Unit = item.Unit,
+                    Range = item.Name
+                })?.ToList()!
+            };
+            if (panel.Panels != null && panel.Panels.Any())
+                dto.ChildPanels = ConvertPanels(panel.Panels);
+            result.Add(dto);
         }
         return result;
-    }
-
-    [EventHandler]
-    public async Task QueryPanels(PanelQuery query)
-    {
-        var result = await _panelRepository.GetListAsync(t => t.InstrumentId == query.InstrumentId, nameof(Panel.Index), false);
-        if (result != null && result.Any())
-            query.Result = result.Select(item => new PanelDto { }).ToList();
-        else
-            query.Result = new();
-    }
-
-    [EventHandler]
-    public async Task QueryMetrics(PanelMetricQuery query)
-    {
-        var result = await _metricReposity.GetListAsync(t => t.PanelId == query.PanelId, nameof(PanelMetric.Sort), false);
-        if (result != null && result.Any())
-            query.Result = result.Select(item => new PanelMetricDto { }).ToList();
-        else
-            query.Result = new();
     }
 }
