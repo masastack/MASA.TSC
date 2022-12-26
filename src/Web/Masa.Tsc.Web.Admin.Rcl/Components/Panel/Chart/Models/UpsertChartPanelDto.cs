@@ -1,37 +1,99 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Util.Reflection.Expressions;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Models;
 
 public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePanelValue, IEChartPanelValue
 {
     public string Color
     {
-        get => this[ExtensionFieldTypes.Color] as string ?? "";
+        get 
+        {
+            var value = this[ExtensionFieldTypes.Color];            
+            if(value is string stringValue)
+            {
+                return stringValue;
+            }
+            else if(value is JsonElement jsonElement)
+            {
+                return jsonElement.GetString() ?? "";
+            }
+            return "";
+        }
         set => this[ExtensionFieldTypes.Color] = value;
     }
 
     public string SystemIdentity
     {
-        get => this[ExtensionFieldTypes.SystemIdentity] as string ?? "";
+        get
+        {
+            var value = this[ExtensionFieldTypes.SystemIdentity];
+            if (value is string stringValue)
+            {
+                return stringValue;
+            }
+            else if (value is JsonElement jsonElement)
+            {
+                return jsonElement.GetString() ?? "";
+            }
+            return "";
+        }
         set => this[ExtensionFieldTypes.SystemIdentity] = value;
     }
 
     public string Desc
     {
-        get => this[ExtensionFieldTypes.Desc] as string ?? "";
+        get
+        {
+            var value = this[ExtensionFieldTypes.Desc];
+            if (value is string stringValue)
+            {
+                return stringValue;
+            }
+            else if (value is JsonElement jsonElement)
+            {
+                return jsonElement.GetString() ?? "";
+            }
+            return "";
+        }
         set => this[ExtensionFieldTypes.Desc] = value;
     }
 
     public int MaxCount
     {
-        get => this[ExtensionFieldTypes.MaxCount] as int? ?? 3;
+        get
+        {
+            var value = this[ExtensionFieldTypes.MaxCount];
+            if (value is int intValue)
+            {
+                return intValue;
+            }
+            else if (value is JsonElement jsonElement)
+            {
+                return jsonElement.GetInt32();
+            }
+            return 3;
+        }
         set => this[ExtensionFieldTypes.MaxCount] = value;
     }
 
     public string ChartType
     {
-        get => this[ExtensionFieldTypes.ChartType] as string ?? "table";
+        get
+        {
+            var value = this[ExtensionFieldTypes.ChartType];
+            if (value is string stringValue)
+            {
+                return stringValue;
+            }
+            else if (value is JsonElement jsonElement)
+            {
+                return jsonElement.GetString() ?? "table";
+            }
+            return "table";
+        }
         set
         {
             this[ExtensionFieldTypes.ChartType] = value;
@@ -63,31 +125,91 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
 
     public int ItemsPerPage
     {
-        get => this[ExtensionFieldTypes.ItemsPerPage] as int? ?? 10;
+        get
+        {
+            var value = this[ExtensionFieldTypes.ItemsPerPage];
+            if (value is int intValue)
+            {
+                return intValue;
+            }
+            else if (value is JsonElement jsonElement)
+            {
+                return jsonElement.GetInt32();
+            }
+            return 10;
+        }
         set => this[ExtensionFieldTypes.ItemsPerPage] = value;
     }
 
     public bool ShowTableHeader
     {
-        get => this[ExtensionFieldTypes.ShowTableHeader] as bool? ?? false;
+        get
+        {
+            var value = this[ExtensionFieldTypes.ShowTableHeader];
+            if (value is bool booleanValue)
+            {
+                return booleanValue;
+            }
+            else if (value is JsonElement jsonElement)
+            {
+                return jsonElement.GetBoolean();
+            }
+            return false;
+        }
         set => this[ExtensionFieldTypes.ShowTableHeader] = value;
     }
 
     public bool ShowTableFooter
     {
-        get => this[ExtensionFieldTypes.ShowTableFooter] as bool? ?? false;
+        get
+        {
+            var value = this[ExtensionFieldTypes.ShowTableFooter];
+            if (value is bool booleanValue)
+            {
+                return booleanValue;
+            }
+            else if (value is JsonElement jsonElement)
+            {
+                return jsonElement.GetBoolean();
+            }
+            return false;
+        }
         set => this[ExtensionFieldTypes.ShowTableFooter] = value;
     }
 
     public bool EnablePaginaton
     {
-        get => this[ExtensionFieldTypes.EnablePaginaton] as bool? ?? false;
+        get
+        {
+            var value = this[ExtensionFieldTypes.EnablePaginaton];
+            if (value is bool booleanValue)
+            {
+                return booleanValue;
+            }
+            else if (value is JsonElement jsonElement)
+            {
+                return jsonElement.GetBoolean();
+            }
+            return false;
+        }
         set => this[ExtensionFieldTypes.EnablePaginaton] = value;
     }
 
     public string ColumnAlignment
     {
-        get => this[ExtensionFieldTypes.ColumnAlignment] as string ?? "";
+        get
+        {
+            var value = this[ExtensionFieldTypes.ColumnAlignment];
+            if (value is string stringValue)
+            {
+                return stringValue;
+            }
+            else if (value is JsonElement jsonElement)
+            {
+                return jsonElement.GetString() ?? "";
+            }
+            return "";
+        }
         set => this[ExtensionFieldTypes.ColumnAlignment] = value;
     }
 
@@ -95,13 +217,24 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
     {
         get
         {            
-            var value = this[ExtensionFieldTypes.EChartType] as EChartType;
-            if (value is null)
+            var value = this[ExtensionFieldTypes.EChartType];
+            if (value is EChartType echartType)
             {
-                value = EChartConst.Line;
-                this[ExtensionFieldTypes.EChartType] = value;
+                return echartType;
             }
-            return value;
+            else if (value is JsonElement jsonElement)
+            {
+                var jsonValue = jsonElement.Deserialize<EChartType>();
+                if (jsonValue is not null)
+                {
+                    this[ExtensionFieldTypes.EChartType] = jsonValue;
+                    return jsonValue;
+                }
+            }
+
+            value = EChartConst.Line;
+            this[ExtensionFieldTypes.EChartType] = value;
+            return (EChartType)value;
         }
         set => this[ExtensionFieldTypes.EChartType] = value;
     }
@@ -110,13 +243,24 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
     {
         get
         {
-            var value = this[ExtensionFieldTypes.Tooltip] as Tooltip;
-            if (value is null)
+            var value = this[ExtensionFieldTypes.Tooltip];
+            if (value is Tooltip tooltip)
             {
-                value = new();
-                this[ExtensionFieldTypes.Tooltip] = value;
+                return tooltip;
             }
-            return value;
+            else if (value is JsonElement jsonElement)
+            {
+                var jsonValue = jsonElement.Deserialize<Tooltip>();
+                if (jsonValue is not null)
+                {
+                    this[ExtensionFieldTypes.Tooltip] = jsonValue;
+                    return jsonValue;
+                }
+            }
+
+            value = new Tooltip();
+            this[ExtensionFieldTypes.Tooltip] = value;
+            return (Tooltip)value;
         }
         set => this[ExtensionFieldTypes.Tooltip] = value;
     }
@@ -125,13 +269,24 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
     {
         get
         {
-            var value = this[ExtensionFieldTypes.Legend] as Legend;
-            if (value is null)
+            var value = this[ExtensionFieldTypes.Legend];
+            if (value is Legend legend)
             {
-                value = new();
-                this[ExtensionFieldTypes.Legend] = value;
+                return legend;
             }
-            return value;
+            else if (value is JsonElement jsonElement)
+            {
+                var jsonValue = jsonElement.Deserialize<Legend>();
+                if (jsonValue is not null)
+                {
+                    this[ExtensionFieldTypes.Legend] = jsonValue;
+                    return jsonValue;
+                }
+            }
+
+            value = new Legend();
+            this[ExtensionFieldTypes.Legend] = value;
+            return (Legend)value;
         }
         set => this[ExtensionFieldTypes.Legend] = value;
     }
@@ -140,13 +295,24 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
     {
         get
         {
-            var value = this[ExtensionFieldTypes.Toolbox] as Toolbox;
-            if (value is null)
+            var value = this[ExtensionFieldTypes.Toolbox];
+            if (value is Toolbox toolbox)
             {
-                value = new();
-                this[ExtensionFieldTypes.Toolbox] = value;
+                return toolbox;
             }
-            return value;
+            else if (value is JsonElement jsonElement)
+            {
+                var jsonValue = jsonElement.Deserialize<Toolbox>();
+                if (jsonValue is not null)
+                {
+                    this[ExtensionFieldTypes.Toolbox] = jsonValue;
+                    return jsonValue;
+                }
+            }
+
+            value = new Toolbox();
+            this[ExtensionFieldTypes.Toolbox] = value;
+            return (Toolbox)value;
         }
         set => this[ExtensionFieldTypes.Toolbox] = value;
     }
@@ -155,13 +321,24 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
     {
         get
         {
-            var value = this[ExtensionFieldTypes.XAxis] as Axis;
-            if (value is null)
+            var value = this[ExtensionFieldTypes.XAxis];
+            if (value is Axis axis)
             {
-                value = new();
-                this[ExtensionFieldTypes.XAxis] = value;
+                return axis;
             }
-            return value;
+            else if (value is JsonElement jsonElement)
+            {
+                var jsonValue = jsonElement.Deserialize<Axis>();
+                if (jsonValue is not null)
+                {
+                    this[ExtensionFieldTypes.XAxis] = jsonValue;
+                    return jsonValue;
+                }
+            }
+
+            value = new Axis();
+            this[ExtensionFieldTypes.XAxis] = value;
+            return (Axis)value;
         }
         set => this[ExtensionFieldTypes.XAxis] = value;
     }
@@ -170,13 +347,24 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
     {
         get
         {
-            var value = this[ExtensionFieldTypes.YAxis] as Axis;
-            if (value is null)
+            var value = this[ExtensionFieldTypes.YAxis];
+            if (value is Axis axis)
             {
-                value = new();
-                this[ExtensionFieldTypes.YAxis] = value;
+                return axis;
             }
-            return value;
+            else if (value is JsonElement jsonElement)
+            {
+                var jsonValue = jsonElement.Deserialize<Axis>();
+                if (jsonValue is not null)
+                {
+                    this[ExtensionFieldTypes.YAxis] = jsonValue;
+                    return jsonValue;
+                }
+            }
+
+            value = new Axis();
+            this[ExtensionFieldTypes.YAxis] = value;
+            return (Axis)value;
         }
         set => this[ExtensionFieldTypes.YAxis] = value;
     }
@@ -189,5 +377,23 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             new()
         };
         PanelType = PanelTypes.Chart;
+    }
+
+    public void Clone(UpsertPanelDto panel)
+    {
+        Title = panel.Title;
+        Description = panel.Description;
+        PanelType = panel.PanelType;
+        Width = panel.Width;
+        Height = panel.Height;
+        X = panel.X;
+        Y = panel.Y;
+        Metrics.Clear();
+        Metrics.AddRange(panel.Metrics);
+        ExtensionData.Clear();
+        foreach (var (key, value) in panel.ExtensionData)
+        {
+            ExtensionData.Add(key, value);
+        }
     }
 }

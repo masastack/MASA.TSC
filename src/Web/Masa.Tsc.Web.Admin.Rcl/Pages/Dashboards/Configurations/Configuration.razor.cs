@@ -20,9 +20,9 @@ public partial class Configuration
 
     bool IsEdit { get; set; } = true;
 
-    DateTimeOffset StartTime { get; set; } = DateTimeOffset.Now.AddDays(-1);
+    DateTimeOffset StartTime { get; set; }
 
-    DateTimeOffset EndTime { get; set; } = DateTimeOffset.Now;
+    DateTimeOffset EndTime { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -30,15 +30,30 @@ public partial class Configuration
         {
             return;
         }
+        await GetPanelsAsync();
+    }
+
+    async Task GetPanelsAsync()
+    {
         //todo get panel config
         Panels.Clear();
         Panels.Add(new());
-
         await Task.CompletedTask;
     }
 
     void AddPanel()
     {
         Panels.Insert(0, new());
+    }
+
+    async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    {
+        (StartTime, EndTime) = times;
+    }
+
+    async Task SaveAsync()
+    {
+        await Task.CompletedTask;
+        OpenSuccessMessage(T("Save success"));
     }
 }

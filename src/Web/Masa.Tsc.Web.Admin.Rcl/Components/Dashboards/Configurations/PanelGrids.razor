@@ -1,70 +1,75 @@
 ﻿@inherits TscComponentBase
 
-<MGridstack Items="Panels" Readonly="!IsEdit" ItemKey="panel => panel.Id.ToString()" ItemClass="pt-5" ItemStyle="border:solid #E4E8F3 1px;cursor: move;position:absolute" ItemPosition="panel => new(panel.Width,panel.Height)" TItem="UpsertPanelDto">
+<MGridstack Items="Panels" Readonly="!IsEdit" ItemKey="panel => panel.Id.ToString()" ItemStyle="border:solid #E4E8F3 1px;cursor: move;position:absolute;overflow:hidden;" ItemPosition="panel => new(panel.Width,panel.Height)" TItem="UpsertPanelDto">
    <ItemContent>
-        @switch (context.PanelType)
-        {
-            case PanelTypes.Tabs:
-                <TabsPanel Panel="context as UpsertTabsPanelDto" />
-                break;
-            case PanelTypes.Text:
-                <MEditor />
-                break;
-            case PanelTypes.Trace:
-                <TscTrace />
-                break;
-            case PanelTypes.Topology:
-                <TopologyPanel />
-                break;
-            case PanelTypes.Chart or PanelTypes.Table:
-                <ChartPanel Value="context as UpsertChartPanelDto" />
-                break;
-            case PanelTypes.Log:
-                <LogPanel />
-                break;
-            default:
-                <PanelSelect PanelId="context.Id" OnSelect="ReplacePanel" />
-                break;
-        }
-        @if(IsEdit)
-        {
-            <MMenu OpenOnHover OffsetY>
-                <ActivatorContent Context="menuContext">
-                    <SButton Icon Style="position:absolute;top:0;right:0;" @attributes="@menuContext.Attrs">
-                        <SIcon Size="24">@IconConstants.More</SIcon>
-                    </SButton>
-                </ActivatorContent>
-                <ChildContent>
-                    <MList>
-                        @if (context.PanelType == PanelTypes.Tabs)
-                        {
-                            <MListItem OnClick="() => AddTabItem(context as UpsertTabsPanelDto)">
+       <div style="height:35px;" class="d-flex">
+           <MSpacer />
+            @if (IsEdit)
+            {
+                <MMenu OpenOnHover OffsetY>
+                    <ActivatorContent Context="menuContext">
+                        <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
+                            <SIcon Size="24">@IconConstants.More</SIcon>
+                        </SButton>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <MList>
+                            @if (context.PanelType == PanelTypes.Tabs)
+                            {
+                                <MListItem OnClick="() => AddTabItem(context as UpsertTabsPanelDto)">
+                                    <MListItemTitle>
+                                        @T("Add Tab Item")
+                                    </MListItemTitle>
+                                </MListItem>
+                                <MListItem OnClick="() => AddChildPanel(context as UpsertTabsPanelDto)">
+                                    <MListItemTitle>
+                                        @T("Add Panel")
+                                    </MListItemTitle>
+                                </MListItem>
+                            }
+                            else if (context.PanelType == PanelTypes.Chart)
+                            {
+                                <MListItem OnClick="() => ConfigurationChartPanel(context)">
+                                    <MListItemTitle>
+                                        @T("Edit Panel")
+                                    </MListItemTitle>
+                                </MListItem>
+                            }
+                            <MListItem OnClick="() => RemovePanel(context)">
                                 <MListItemTitle>
-                                    @T("Add Tab Item")
+                                    @T("Remove Panel")
                                 </MListItemTitle>
                             </MListItem>
-                            <MListItem OnClick="() => AddChildPanel(context as UpsertTabsPanelDto)">
-                                <MListItemTitle>
-                                    @T("Add Panel")
-                                </MListItemTitle>
-                            </MListItem>
-                        }
-                        else if (context.PanelType == PanelTypes.Chart)
-                        {
-                            <MListItem OnClick="() => ConfigurationChartPanel(context)">
-                                <MListItemTitle>
-                                    @T("Edit Panel")
-                                </MListItemTitle>
-                            </MListItem>
-                        }
-                        <MListItem OnClick="() => RemovePanel(context)">
-                            <MListItemTitle>
-                                @T("Remove Panel")
-                            </MListItemTitle>
-                        </MListItem>
-                    </MList>
-                </ChildContent>
-            </MMenu>
-        }        
+                        </MList>
+                    </ChildContent>
+                </MMenu>
+            }
+        </div>
+        <div style="overflow:auto;max-height:calc(100vh - 260px)">
+            @switch (context.PanelType)
+            {
+                case PanelTypes.Tabs:
+                    <TabsPanel Panel="context as UpsertTabsPanelDto" />
+                    break;
+                case PanelTypes.Text:
+                    <MEditor />
+                    break;
+                case PanelTypes.Trace:
+                    <TscTrace />
+                    break;
+                case PanelTypes.Topology:
+                    <TopologyPanel />
+                    break;
+                case PanelTypes.Chart or PanelTypes.Table:
+                    <ChartPanel Value="context as UpsertChartPanelDto" />
+                    break;
+                case PanelTypes.Log:
+                    <LogPanel />
+                    break;
+                default:
+                    <PanelSelect PanelId="context.Id" OnSelect="ReplacePanel" />
+                    break;
+            }
+        </div>          
     </ItemContent>
 </MGridstack>

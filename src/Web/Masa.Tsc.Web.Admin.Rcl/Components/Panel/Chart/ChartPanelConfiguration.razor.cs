@@ -13,6 +13,8 @@ public partial class ChartPanelConfiguration : TscComponentBase
     [Parameter]
     public UpsertChartPanelDto Value { get; set; }
 
+    string ValueBackup { get; set; }
+
     Dictionary<string, DynamicComponentDescription> DynamicComponentMap { get; set; }
 
     DynamicComponentDescription CurrentDynamicComponent => DynamicComponentMap.ContainsKey(Value.ChartType) ? DynamicComponentMap[Value.ChartType] : DynamicComponentMap["e-chart"];
@@ -25,10 +27,18 @@ public partial class ChartPanelConfiguration : TscComponentBase
             ["top-list"] = new(typeof(TopListConfiguration), new() { ["Value"] = Value }),
             ["e-chart"] = new(typeof(EChartConfiguration), new() { ["Value"] = Value }),
         };
+        ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
     }
 
     void NavigateToPanelConfigurationPage()
     {
         NavigationManager.NavigateTo($"/dashboard/configuration/record");
+    }
+
+    void Cancel()
+    {
+        var backUp = JsonSerializer.Deserialize<UpsertPanelDto>(ValueBackup);
+        Value.Clone(backUp!);
+        NavigateToPanelConfigurationPage();
     }
 }

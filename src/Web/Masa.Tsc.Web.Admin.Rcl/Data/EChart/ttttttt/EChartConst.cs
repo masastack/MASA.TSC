@@ -727,13 +727,18 @@ internal static class EChartConst
 
 public class EChartType
 {
+    [JsonConstructor]
+    public EChartType()
+    {
+
+    }
     public EChartType(string name, string src, string json)
     {
         Name = name;
         Src = src;
         //try
         //{
-        _json = JsonNode.Parse(Regex.Replace(json, @"\s", ""))!;
+        Json = JsonNode.Parse(Regex.Replace(json, @"\s", ""))!;
         //}
         //catch (Exception ex)
         //{ 
@@ -741,16 +746,14 @@ public class EChartType
         //}
     }
 
-    public string Name { get; private set; }
+    public string Name { get; set; }
 
     public string Src { get; set; }
 
-    public object Option
-    {
-        get { return _json; }
-    }
+    [JsonIgnore]
+    public object Option => Json;
 
-    private readonly JsonNode _json;
+    public JsonNode Json { get; set; }
 
     public void SetValue(string path, object value)
     {
@@ -760,7 +763,7 @@ public class EChartType
         var target = ConvertJsonNode(value);
 
         int pathIndex = 0;
-        var current = _json;
+        var current = Json;
         do
         {
             current = SetAttr(paths[pathIndex++], current, pathIndex - paths.Length == 0 ? target : null);
@@ -909,6 +912,6 @@ public class EChartType
 
     public string GetValue()
     {
-        return _json.ToJsonString();
+        return Json.ToJsonString();
     }
 }
