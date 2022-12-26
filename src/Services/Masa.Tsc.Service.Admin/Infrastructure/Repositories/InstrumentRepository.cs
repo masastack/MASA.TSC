@@ -27,22 +27,31 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
         var instrument = await _context.Set<Instrument>().AsNoTracking().FirstAsync(item => item.Id == Id && (item.IsGlobal || item.Creator == userId));
         if (instrument == null)
             return default!;
-        var panels = await _context.Set<Panel>().AsNoTracking().Where(item => item.InstrumentId == Id).ToListAsync();
-        if (panels != null && panels.Any())
-        {
-            var panelIds = panels.Select(item => item.Id).ToList();
-            var metrics = await _context.Set<PanelMetric>().AsNoTracking().Where(item => panelIds.Contains(item.PanelId)).ToListAsync();
-            if (metrics != null && metrics.Any())
-            {
-                foreach (var panel in panels)
-                {
-                    var matchMetrics = metrics.Where(item => item.PanelId == panel.Id).ToList();
-                    if (matchMetrics.Any())
-                        panel.Metrics = matchMetrics;
-                }
-            }
 
-            instrument.Panels = GetChildren(panels, Guid.Empty);
+        try
+        {
+
+            var panels = await _context.Set<Panel>().AsNoTracking().Where(item => item.InstrumentId == Id).ToListAsync();
+            if (panels != null && panels.Any())
+            {
+                var panelIds = panels.Select(item => item.Id).ToList();
+                var metrics = await _context.Set<PanelMetric>().AsNoTracking().Where(item => panelIds.Contains(item.PanelId)).ToListAsync();
+                if (metrics != null && metrics.Any())
+                {
+                    foreach (var panel in panels)
+                    {
+                        var matchMetrics = metrics.Where(item => item.PanelId == panel.Id).ToList();
+                        if (matchMetrics.Any())
+                            panel.Metrics = matchMetrics;
+                    }
+                }
+
+                instrument.Panels = GetChildren(panels, Guid.Empty);
+            }
+        }catch(Exception ex)
+        {
+
+
         }
 
         return instrument;

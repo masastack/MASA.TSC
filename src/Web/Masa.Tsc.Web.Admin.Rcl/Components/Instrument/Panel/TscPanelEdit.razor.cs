@@ -82,7 +82,7 @@ public partial class TscPanelEdit : IDisposable
     {
         if (!await PopupService.ConfirmAsync("删除", "确认要移除该panel吗"))
             return;
-        await ApiCaller.PanelService.DeleteAsync(Value.InstrumentId, Value.Id);
+        //await ApiCaller.PanelService.DeleteAsync(Value.InstrumentId, Value.Id);
         await OnCallParent(OperateCommand.Remove, Value);
     }
 

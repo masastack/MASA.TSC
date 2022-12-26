@@ -41,6 +41,11 @@ public partial class Configuration
         await Task.CompletedTask;
     }
 
+    async Task OnSaveAsync()
+    {
+        await ApiCaller.InstrumentService.UpsertPanelAsync(Guid.Parse(DashboardId), Panels.ToArray());
+    }
+
     void AddPanel()
     {
         Panels.Insert(0, new());

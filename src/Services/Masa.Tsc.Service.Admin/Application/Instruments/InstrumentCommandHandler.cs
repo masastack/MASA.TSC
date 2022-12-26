@@ -56,11 +56,11 @@ public class InstrumentCommandHandler
 
         instrument.SetRoot(command.IsRoot);
         await _instrumentRepository.UpdateAsync(instrument);
-    } 
+    }
     #endregion
 
     #region upsert
-
+    [EventHandler]
     public async Task UpsertInstrumentAsync(UpInsertCommand command)
     {
         var entry = await _instrumentRepository.GetDetailAsync(command.InstumentId, command.UserId);

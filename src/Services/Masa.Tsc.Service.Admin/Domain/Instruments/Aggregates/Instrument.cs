@@ -54,7 +54,7 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
             var panel = Panels.FirstOrDefault(p => p.Id == item.Id);
             if (panel == null)
             {
-                panel = new Panel(item);
+                panel = new Panel(item,Id);
             }
             else
             {

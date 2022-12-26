@@ -17,7 +17,7 @@ public class PanelEntityTypeConfiguration : IEntityTypeConfiguration<Panel>
 
         //builder.HasOne(x => x.Instrument).WithMany(p => p.Panels).HasForeignKey(x => new { x.InstrumentId });
         builder.Property(x => x.ExtensionData).HasMaxLength(500).HasConversion(
-            v => JsonSerializer.Serialize(v, v.GetType(), default(JsonSerializerOptions)!),
-            v => JsonSerializer.Deserialize<Dictionary<ExtensionFieldTypes, object?>>(v, default(JsonSerializerOptions)!)!);
+            v => JsonSerializer.Serialize(v, v.GetType(), default(JsonSerializerOptions)!) ?? string.Empty,
+            v => JsonSerializer.Deserialize<Dictionary<ExtensionFieldTypes, object?>>(v, default(JsonSerializerOptions)!)!).IsRequired(false);
     }
 }

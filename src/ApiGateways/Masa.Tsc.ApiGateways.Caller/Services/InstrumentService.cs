@@ -15,9 +15,11 @@ public class InstrumentService : BaseService
 
     public async Task SetRootAsync(Guid id, bool isRoot = true) => await Caller.PostAsync($"{RootPath}/set-root/{id}/{isRoot}", default);
 
+    public async Task UpsertPanelAsync(Guid instrumentId,params UpsertPanelDto[] panels) => await Caller.PostAsync($"{RootPath}/upsert/{instrumentId}", panels);
+
     public async Task<UpdateDashboardDto> GetAsync(Guid id) => (await Caller.GetAsync<UpdateDashboardDto>($"{RootPath}/{id}"))!;
 
-    public async Task<InstrumentDetailDto> GetDetailAsync(Guid id) => (await Caller.GetAsync<InstrumentDetailDto>($"{RootPath}/detail?id={id}"))!;
+    public async Task<InstrumentDetailDto> GetDetailAsync(Guid id) => (await Caller.GetAsync<InstrumentDetailDto>($"{RootPath}/detail/{id}"))!;
 
     public async Task<PaginatedListBase<InstrumentListDto>> ListAsync(int page, int size, string keyword) => (await Caller.GetAsync<PaginatedListBase<InstrumentListDto>>($"{RootPath}/list/{page}/{size}/{keyword}"))!;
 }
