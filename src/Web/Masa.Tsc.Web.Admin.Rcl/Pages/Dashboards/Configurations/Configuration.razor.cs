@@ -35,16 +35,12 @@ public partial class Configuration
 
     async Task GetPanelsAsync()
     {
+        var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(DashboardId));
         //todo get panel config
         Panels.Clear();
-        Panels.Add(new());
-        await Task.CompletedTask;
-    }
-
-    async Task OnSaveAsync()
-    {
-        await ApiCaller.InstrumentService.UpsertPanelAsync(Guid.Parse(DashboardId), Panels.ToArray());
-    }
+        if (detail.Panels != null && detail.Panels.Any())
+            Panels.AddRange(detail.Panels);
+    }   
 
     void AddPanel()
     {
@@ -58,7 +54,7 @@ public partial class Configuration
 
     async Task SaveAsync()
     {
-        await Task.CompletedTask;
+        await ApiCaller.InstrumentService.UpsertPanelAsync(Guid.Parse(DashboardId), Panels.ToArray());
         OpenSuccessMessage(T("Save success"));
     }
 }
