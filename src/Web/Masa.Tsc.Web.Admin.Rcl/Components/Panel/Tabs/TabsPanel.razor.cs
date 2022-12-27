@@ -11,6 +11,9 @@ public partial class TabsPanel
     [CascadingParameter]
     public bool IsEdit { get; set; }
 
+    [Parameter]
+    public bool IsEditTabItem { get; set; }
+
     [DisallowNull]
     StringNumber? CurrentTab
     {
