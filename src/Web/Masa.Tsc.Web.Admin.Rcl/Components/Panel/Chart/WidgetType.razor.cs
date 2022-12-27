@@ -16,6 +16,7 @@ public partial class WidgetType
         if (firstRender)
         {
             (Items.FirstOrDefault(item => item.Type == Value) ?? Items.First()).Selected = true;
+            base.StateHasChanged();
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -29,7 +30,7 @@ public partial class WidgetType
             await ValueChanged.InvokeAsync(Value);
     }
 
-    private static List<EChartPanelTypeModel> Items { get; set; } = new List<EChartPanelTypeModel>
+    private List<EChartPanelTypeModel> Items { get; set; } = new List<EChartPanelTypeModel>
     {
         new EChartPanelTypeModel
         {

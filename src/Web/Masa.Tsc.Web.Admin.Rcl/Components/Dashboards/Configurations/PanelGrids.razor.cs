@@ -14,6 +14,8 @@ public partial class PanelGrids
     [CascadingParameter]
     public bool IsEdit { get; set; }
 
+    private MGridstack<UpsertPanelDto>? Gridstack;
+
     protected override void OnInitialized()
     {
         IniPanels(Panels);
@@ -62,5 +64,18 @@ public partial class PanelGrids
     void ConfigurationChartPanel(UpsertPanelDto panel)
     {
         NavigationManager.NavigateTo($"/dashboard/configuration/chart/{panel.Id}");
+    }
+
+    async Task SavePanelGrid()
+    {
+        var grids = await Gridstack!.OnSave();
+        foreach(var grid in grids)
+        {
+            var panel = Panels.First(p => p.Id == Guid.Parse(grid.Id));
+            panel.Width = grid.W;
+            panel.Height = grid.H;
+            panel.X = grid.X ?? 0;
+            panel.Y = grid.Y ?? 0;
+        }
     }
 }

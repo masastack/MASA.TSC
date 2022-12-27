@@ -9,7 +9,7 @@ public partial class Configuration
     List<UpsertPanelDto> Panels { get; set; }
 
     [Parameter]
-    public string? DashboardId { get; set; }
+    public string DashboardId { get; set; }
 
     [Parameter]
     public string? Mode { get; set; }
@@ -26,7 +26,7 @@ public partial class Configuration
 
     protected override async Task OnInitializedAsync()
     {
-        if (DashboardId is null)
+        if (Mode is not null)
         {
             return;
         }

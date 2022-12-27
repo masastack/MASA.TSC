@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<MGridstack Items="Panels" Readonly="!IsEdit" ItemKey="panel => panel.Id.ToString()" ItemStyle="border:solid #E4E8F3 1px;cursor: move;position:absolute;overflow:hidden;" ItemPosition="panel => new(panel.Width,panel.Height)" TItem="UpsertPanelDto">
+<MGridstack Items="Panels" Readonly="!IsEdit" @ref="@Gridstack" ItemKey="panel => panel.Id.ToString()" ItemStyle="border:solid #E4E8F3 1px;cursor: move;position:absolute;overflow:hidden;" ItemPosition="panel => new(panel.Width,panel.Height,panel.X,panel.Y)" TItem="UpsertPanelDto">
    <ItemContent>
        <div style="height:35px;" class="d-flex">
            <MSpacer />

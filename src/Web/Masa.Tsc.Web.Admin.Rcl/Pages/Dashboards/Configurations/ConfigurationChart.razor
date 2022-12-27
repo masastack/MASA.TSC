@@ -1,6 +1,6 @@
-﻿@page "/dashboard/configuration/chart/{panelId}"
+﻿@page "/dashboard/configuration/chart/{dashboardId}/{panelId}"
 
-<ChartPanelConfiguration Value="Panel" />
+<ChartPanelConfiguration DashboardId="@DashboardId" Value="Panel" />
 
 @code {
     [Inject]
@@ -8,6 +8,10 @@
 
     [Parameter]
     public string? PanelId { get; set; }
+
+
+    [Parameter]
+    public string DashboardId { get; set; }
 
     public UpsertChartPanelDto Panel { get; set; }
 

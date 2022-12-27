@@ -17,6 +17,9 @@ public partial class PanelSelect
     [CascadingParameter]
     public bool IsEdit { get; set; }
 
+    [CascadingParameter]
+    public string DashboardId { get; set; }
+
     List<PanelTypes> GetPanelTypes(PanelTypes type = default)
     {
         if (type == default)
@@ -45,7 +48,7 @@ public partial class PanelSelect
                 break;
             case PanelTypes.Chart:
                 panel = new UpsertChartPanelDto(PanelId);
-                NavigationManager.NavigateTo($"/dashboard/configuration/chart/{panel.Id}");
+                NavigationManager.NavigateTo($"/dashboard/configuration/chart/{DashboardId}/{panel.Id}");
                 break;
             default:
                 panel.Id = PanelId;

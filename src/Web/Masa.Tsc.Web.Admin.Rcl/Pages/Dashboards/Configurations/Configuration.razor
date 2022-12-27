@@ -1,4 +1,4 @@
-﻿@page "/dashboard/configuration/record"
+﻿@page "/dashboard/configuration/{dashboardId}/{mode}"
 @page "/dashboard/configuration/{dashboardId}"
 @inherits TscComponentBase
 
@@ -22,7 +22,9 @@
     <AutoHeightContent>
         <DefaultCard Class="full-height">
             <CascadingValue Value="IsEdit">
-                <PanelGrids Panels="Panels" />
+                <CascadingValue Value="DashboardId" IsFixed>
+                    <PanelGrids Panels="Panels" />
+                </CascadingValue>
             </CascadingValue>
         </DefaultCard>
     </AutoHeightContent>
