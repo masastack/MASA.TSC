@@ -40,7 +40,23 @@ public partial class Configuration
         Panels.Clear();
         if (detail.Panels != null && detail.Panels.Any())
             Panels.AddRange(detail.Panels);
-    }   
+
+        Convert(Panels);
+    }
+
+    void Convert(List<UpsertPanelDto> panels)
+    {
+        var chartPanels = panels.Where(panel => panel.PanelType == PanelTypes.Chart);
+        var tabsPanels = panels.Where(panel => panel.PanelType == PanelTypes.Tabs);
+        panels.RemoveAll(panel => panel.PanelType == PanelTypes.Chart || panel.PanelType == PanelTypes.Tabs);
+        panels.AddRange(chartPanels.Select(panel => new UpsertChartPanelDto(default).Clone(panel)));
+        panels.AddRange(chartPanels.Select(panel => new UpsertTabsPanelDto(default).Clone(panel)));
+        foreach(var panel in panels)
+        {
+            if (panel.ChildPanels.Any() is false) continue;
+            else Convert(panel.ChildPanels);
+        }
+    }
 
     void AddPanel()
     {

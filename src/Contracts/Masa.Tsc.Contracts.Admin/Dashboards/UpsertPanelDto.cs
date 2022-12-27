@@ -38,5 +38,28 @@ public class UpsertPanelDto
     [JsonIgnore]
     public UpsertPanelDto? ParentPanel { get; set; }
 
+    public virtual UpsertPanelDto Clone(UpsertPanelDto panel)
+    {
+        Id = panel.Id;
+        Title = panel.Title;
+        Description = panel.Description;
+        PanelType = panel.PanelType;
+        Width = panel.Width;
+        Height = panel.Height;
+        X = panel.X;
+        Y = panel.Y;
+        ChildPanels.Clear();
+        ChildPanels.AddRange(panel.ChildPanels);
+        Metrics.Clear();
+        Metrics.AddRange(panel.Metrics);
+        ExtensionData.Clear();
+        foreach (var (key, value) in panel.ExtensionData)
+        {
+            ExtensionData.Add(key, value);
+        }
+
+        return this;
+    }
+
     #endregion
 }

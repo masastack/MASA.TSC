@@ -1,22 +1,20 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Util.Reflection.Expressions;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Models;
 
 public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePanelValue, IEChartPanelValue
 {
     public string Color
     {
-        get 
+        get
         {
-            var value = this[ExtensionFieldTypes.Color];            
-            if(value is string stringValue)
+            var value = this[ExtensionFieldTypes.Color];
+            if (value is string stringValue)
             {
                 return stringValue;
             }
-            else if(value is JsonElement jsonElement)
+            else if (value is JsonElement jsonElement)
             {
                 return jsonElement.GetString() ?? "";
             }
@@ -216,7 +214,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
     public EChartType EChartType
     {
         get
-        {            
+        {
             var value = this[ExtensionFieldTypes.EChartType];
             if (value is EChartType echartType)
             {
@@ -379,21 +377,24 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         PanelType = PanelTypes.Chart;
     }
 
-    public void Clone(UpsertPanelDto panel)
-    {
-        Title = panel.Title;
-        Description = panel.Description;
-        PanelType = panel.PanelType;
-        Width = panel.Width;
-        Height = panel.Height;
-        X = panel.X;
-        Y = panel.Y;
-        Metrics.Clear();
-        Metrics.AddRange(panel.Metrics);
-        ExtensionData.Clear();
-        foreach (var (key, value) in panel.ExtensionData)
-        {
-            ExtensionData.Add(key, value);
-        }
-    }
+    //public UpsertPanelDto Clone(UpsertPanelDto panel)
+    //{
+    //    Id = panel.Id;
+    //    Title = panel.Title;
+    //    Description = panel.Description;
+    //    PanelType = panel.PanelType;
+    //    Width = panel.Width;
+    //    Height = panel.Height;
+    //    X = panel.X;
+    //    Y = panel.Y;
+    //    Metrics.Clear();
+    //    Metrics.AddRange(panel.Metrics);
+    //    ExtensionData.Clear();
+    //    foreach (var (key, value) in panel.ExtensionData)
+    //    {
+    //        ExtensionData.Add(key, value);
+    //    }
+
+    //    return this;
+    //}
 }
