@@ -11,6 +11,7 @@ public class PanelMetric : AggregateRoot<Guid>
 
     public PanelMetric(PanelMetricDto data)
     {
+        PanelId = data.Id;
         Update(data);
     }
 

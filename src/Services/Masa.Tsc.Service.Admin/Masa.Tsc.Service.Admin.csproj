@@ -77,7 +77,6 @@
 	<ItemGroup>
 		<Folder Include="Domain\Projects\Repositories\" />
 		<Folder Include="Domain\Teams\Repositories\" />
-		<Folder Include="Migrations\" />
 	</ItemGroup>
 
 	<ItemGroup>

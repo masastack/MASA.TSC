@@ -157,33 +157,4 @@ public class Panel : AggregateRoot<Guid>
         Index = index;
         Title = update.Title;
     }
-
-    //public static Panel ConvertTo(PanelDto model)
-    //{
-    //    var panel = new Panel(model.Id)
-    //    {
-    //        Type = model.Type,
-    //        Title = model.Title ?? string.Empty,
-    //        Description = model.Description ?? string.Empty,
-    //        Index = model.Sort,
-    //        InstrumentId = model.InstrumentId,
-    //        ParentId = model.ParentId
-    //    };
-    //    if (model.Type == PanelTypes.Chart)
-    //    {
-    //        if (model is EChartPanelDto chartDto && chartDto.Metrics != null && chartDto.Metrics.Any())
-    //        {
-    //            var list = chartDto.Metrics.Select(x => new PanelMetric(x.Id)
-    //            {
-    //                Name = x.Name,
-    //                Caculate = x.Caculate,
-    //                PanelId = model.Id,
-    //                Sort = x.Sort,
-    //                Unit = x.Unit
-    //            });
-    //            panel.Metrics = list.ToList();
-    //        }
-    //    }
-    //    return panel;
-    //}
 }

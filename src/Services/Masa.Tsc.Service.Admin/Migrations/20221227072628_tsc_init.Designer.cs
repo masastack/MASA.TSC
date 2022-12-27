@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Masa.Tsc.Service.Admin.Migrations
 {
     [DbContext(typeof(TscDbContext))]
-    [Migration("20221226071248_tsc_1226")]
-    partial class tsc_1226
+    [Migration("20221227072628_tsc_init")]
+    partial class tsc_init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -176,9 +176,8 @@ namespace Masa.Tsc.Service.Admin.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ExtensionData")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Height")
                         .IsRequired()

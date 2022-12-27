@@ -46,20 +46,27 @@ public class InstrumentQueryHandler
     [EventHandler]
     public async Task GetDetailAsync(InstrumentDetailQuery query)
     {
-        var dto = await _instrumentRepository.GetDetailAsync(query.Id, query.UserId);
-
-        query.Result = new InstrumentDetailDto
+        try
         {
-            Id = dto.Id,
-            Name = dto.Name,
-            DirecotryId = dto.DirectoryId,
-            IsGlobal = dto.IsGlobal,
-            IsRoot = dto.IsRoot,
-            Layer = dto.Layer,
-            Model = dto.Model,
-            Sort = dto.Sort,
-            Panels = ConvertPanels(dto.Panels)
-        };
+            var dto = await _instrumentRepository.GetDetailAsync(query.Id, query.UserId);
+
+            query.Result = new InstrumentDetailDto
+            {
+                Id = dto.Id,
+                Name = dto.Name,
+                DirecotryId = dto.DirectoryId,
+                IsGlobal = dto.IsGlobal,
+                IsRoot = dto.IsRoot,
+                Layer = dto.Layer,
+                Model = dto.Model,
+                Sort = dto.Sort,
+                Panels = ConvertPanels(dto.Panels)
+            };
+        }catch(Exception ex)
+        {
+
+
+        }
     }
 
     [EventHandler]
