@@ -98,22 +98,22 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             switch (value)
             {
                 case "line":
-                    this[ExtensionFieldTypes.EChartType] = EChartConst.Line;
+                    EChartType = EChartConst.Line;
                     break;
                 case "bar":
-                    this[ExtensionFieldTypes.EChartType] = EChartConst.Bar;
+                    EChartType = EChartConst.Bar;
                     break;
                 case "pie":
-                    this[ExtensionFieldTypes.EChartType] = EChartConst.Pie;
+                    EChartType = EChartConst.Pie;
                     break;
                 case "gauge":
-                    this[ExtensionFieldTypes.EChartType] = EChartConst.Gauge;
+                    EChartType = EChartConst.Gauge;
                     break;
                 case "heatmap":
-                    this[ExtensionFieldTypes.EChartType] = EChartConst.Heatmap;
+                    EChartType = EChartConst.Heatmap;
                     break;
                 case "line-area":
-                    this[ExtensionFieldTypes.EChartType] = EChartConst.LineArea;
+                    EChartType = EChartConst.LineArea;
                     break;
                 default:
                     break;
@@ -211,31 +211,40 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         set => this[ExtensionFieldTypes.ColumnAlignment] = value;
     }
 
+
+    public EChartType _eChartType;
+
     public EChartType EChartType
     {
-        get
-        {
-            var value = this[ExtensionFieldTypes.EChartType];
-            if (value is EChartType echartType)
-            {
-                return echartType;
-            }
-            else if (value is JsonElement jsonElement)
-            {
-                var jsonValue = jsonElement.Deserialize<EChartType>();
-                if (jsonValue is not null)
-                {
-                    this[ExtensionFieldTypes.EChartType] = jsonValue;
-                    return jsonValue;
-                }
-            }
-
-            value = EChartConst.Line;
-            this[ExtensionFieldTypes.EChartType] = value;
-            return (EChartType)value;
-        }
-        set => this[ExtensionFieldTypes.EChartType] = value;
+        get => _eChartType ??= EChartConst.Line;
+        set => _eChartType = value;
     }
+
+    //public EChartType EChartType
+    //{
+    //    get
+    //    {
+    //        var value = this[ExtensionFieldTypes.EChartType];
+    //        if (value is EChartType echartType)
+    //        {
+    //            return echartType;
+    //        }
+    //        else if (value is JsonElement jsonElement)
+    //        {
+    //            var jsonValue = jsonElement.Deserialize<EChartType>();
+    //            if (jsonValue is not null)
+    //            {
+    //                this[ExtensionFieldTypes.EChartType] = jsonValue;
+    //                return jsonValue;
+    //            }
+    //        }
+
+    //        value = EChartConst.Line;
+    //        this[ExtensionFieldTypes.EChartType] = value;
+    //        return (EChartType)value;
+    //    }
+    //    set => this[ExtensionFieldTypes.EChartType] = value;
+    //}
 
     public Tooltip Tooltip
     {
@@ -376,25 +385,4 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         };
         PanelType = PanelTypes.Chart;
     }
-
-    //public UpsertPanelDto Clone(UpsertPanelDto panel)
-    //{
-    //    Id = panel.Id;
-    //    Title = panel.Title;
-    //    Description = panel.Description;
-    //    PanelType = panel.PanelType;
-    //    Width = panel.Width;
-    //    Height = panel.Height;
-    //    X = panel.X;
-    //    Y = panel.Y;
-    //    Metrics.Clear();
-    //    Metrics.AddRange(panel.Metrics);
-    //    ExtensionData.Clear();
-    //    foreach (var (key, value) in panel.ExtensionData)
-    //    {
-    //        ExtensionData.Add(key, value);
-    //    }
-
-    //    return this;
-    //}
 }

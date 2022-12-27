@@ -52,4 +52,12 @@ public class UpsertTabsPanelDto : UpsertPanelDto
     {
         CurrentTabItem = ChildPanels.First(child => child.Id == id) as UpsertTabItemPanelDto;
     }
+
+    public override UpsertPanelDto Clone(UpsertPanelDto panel)
+    {
+        var clone = base.Clone(panel);
+        _currentTabItem = null;
+
+        return clone;
+    }
 }
