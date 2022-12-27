@@ -45,14 +45,14 @@ public class Panel : AggregateRoot<Guid>
 
     public Panel(Guid Id) : base(Id) { }
 
-    public Panel(UpsertPanelDto data,Guid instrumentId)
+    public Panel(UpsertPanelDto data, Guid instrumentId)
     {
         Id = data.Id;
         InstrumentId = instrumentId;
         Update(data);
     }
 
-    private Panel(UpsertPanelDto data, Guid parentId, int index)
+    private Panel(UpsertPanelDto data, Guid parentId, int index, Guid instrumentId)
     {
         Type = data.PanelType;
         ParentId = parentId;
@@ -62,12 +62,14 @@ public class Panel : AggregateRoot<Guid>
         Height = data.Height.ToString();
         Top = data.Y.ToString();
         Left = data.X.ToString();
-        InstrumentId = data.Id;
+        Id = data.Id;
+        InstrumentId = instrumentId;
         ExtensionData = data.ExtensionData;
     }
 
     public void Update(UpsertPanelDto update)
     {
+        Type = update.PanelType;
         if (Type == PanelTypes.Tabs)
         {
             UpdateTabItems(update.ChildPanels, Id);
@@ -128,7 +130,7 @@ public class Panel : AggregateRoot<Guid>
             var panel = Panels.FirstOrDefault(x => x.Id == item.Id);
             if (panel == null)
             {
-                panel = new Panel(item, parentId, itemIndex);
+                panel = new Panel(item, parentId, itemIndex, InstrumentId);
             }
             else
             {

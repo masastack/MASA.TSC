@@ -20,23 +20,23 @@ public class PanelMetric : AggregateRoot<Guid>
 
     public string Name { get; set; }
 
-    public string Caculate { get; set; }
+    public string Caculate { get; set; } = string.Empty;
 
     public string Color { get; set; } = string.Empty;
 
-    public string Unit { get; set; }
+    public string Unit { get; set; } = string.Empty;
 
     public int Sort { get; set; }
 
-    public string Icon { get; set; } = string.Empty;    
+    public string Icon { get; set; } = string.Empty;
 
     public void Update(PanelMetricDto data)
     {
         Name = data.Name;
-        Caculate = data.Caculate;
-        Color = data.Color;
-        Unit = data.Unit;
+        Caculate = data.Caculate ?? string.Empty;
+        Color = data.Color ?? string.Empty;
+        Unit = data.Unit ?? string.Empty;
         Sort = data.Sort;
-        Icon = data.Icon;
+        Icon = data.Icon ?? string.Empty;
     }
 }

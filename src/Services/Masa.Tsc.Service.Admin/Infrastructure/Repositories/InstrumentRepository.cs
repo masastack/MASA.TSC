@@ -62,11 +62,11 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
     public override async Task<Instrument> UpdateAsync(Instrument instrument, CancellationToken cancellationToken = default(CancellationToken))
     {
         var panels = GetAllPanels(instrument.Panels);
-        var originalPanels = _context.Set<Panel>().Where(item => item.InstrumentId == instrument.Id).ToList();
+        var originalPanels = _context.Set<Panel>().AsNoTracking().Where(item => item.InstrumentId == instrument.Id).ToList();
         UpdateMetrics(panels, originalPanels);
         UpdatePanels(panels, originalPanels);
         _context.Update(instrument);
-        await Task.CompletedTask;
+        await _context.SaveChangesAsync();
         return instrument;
     }
 
@@ -86,17 +86,19 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
             {
                 var orignalIds = originalPanels.Select(item => item.Id).ToList();
                 var updates = updatePanels.Where(item => orignalIds.Contains(item.Id)).ToList();
+                List<Guid> updateIds = new();
                 if (updates.Any())
                 {
                     current.UpdateRange(updates);
-                    var updateIds = updates.Select(item => item.Id).ToList();
-
-                    orignalIds.RemoveAll(id => updateIds.Contains(id));
+                    updateIds = updates.Select(item => item.Id).ToList();                    
                 }
 
                 var adds = updatePanels.Where(item => !orignalIds.Contains(item.Id)).ToList();
                 if (adds.Any())
                     current.AddRange(adds);
+
+                if (updateIds.Any())                
+                    orignalIds.RemoveAll(id => updateIds.Contains(id));
 
                 if (orignalIds.Any())
                     current.RemoveRange(originalPanels.Where(item => orignalIds.Contains(item.Id)).ToList());
@@ -124,17 +126,19 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
             {
                 var orignalIds = originals.Select(item => item.Id).ToList();
                 var updates = all.Where(item => orignalIds.Contains(item.Id)).ToList();
+                List<Guid> updateIds = new();
                 if (updates.Any())
                 {
                     current.UpdateRange(updates);
-                    var updateIds = updates.Select(item => item.Id).ToList();
-
-                    orignalIds.RemoveAll(id => updateIds.Contains(id));
+                    updateIds = updates.Select(item => item.Id).ToList();                    
                 }
 
                 var adds = all.Where(item => !orignalIds.Contains(item.Id)).ToList();
                 if (adds.Any())
                     current.AddRange(adds);
+
+                if (updateIds.Any())
+                    orignalIds.RemoveAll(id => updateIds.Contains(id));
 
                 if (orignalIds.Any())
                     current.RemoveRange(originals.Where(item => orignalIds.Contains(item.Id)).ToList());
