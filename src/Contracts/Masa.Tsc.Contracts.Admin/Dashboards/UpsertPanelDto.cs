@@ -51,11 +51,14 @@ public class UpsertPanelDto
         ChildPanels.Clear();
         ChildPanels.AddRange(panel.ChildPanels);
         Metrics.Clear();
-        Metrics.AddRange(panel.Metrics);
+        Metrics.AddRange(panel.Metrics ?? new());
         ExtensionData.Clear();
-        foreach (var (key, value) in panel.ExtensionData)
+        if(panel.ExtensionData is not null)
         {
-            ExtensionData.Add(key, value);
+            foreach (var (key, value) in panel.ExtensionData)
+            {
+                ExtensionData.Add(key, value);
+            }
         }
 
         return this;
