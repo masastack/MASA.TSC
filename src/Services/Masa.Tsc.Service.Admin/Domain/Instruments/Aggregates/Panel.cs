@@ -45,10 +45,11 @@ public class Panel : AggregateRoot<Guid>
 
     public Panel(Guid Id) : base(Id) { }
 
-    public Panel(UpsertPanelDto data, Guid instrumentId)
+    public Panel(UpsertPanelDto data, Guid instrumentId, Guid parentId)
     {
         Id = data.Id;
         InstrumentId = instrumentId;
+        ParentId = parentId;
         Update(data);
     }
 
@@ -57,7 +58,7 @@ public class Panel : AggregateRoot<Guid>
         Type = data.PanelType;
         ParentId = parentId;
         Index = index;
-        Description = data.Description;
+        Title = data.Title ?? string.Empty;
         Width = data.Width.ToString();
         Height = data.Height.ToString();
         Top = data.Y.ToString();
@@ -65,6 +66,15 @@ public class Panel : AggregateRoot<Guid>
         Id = data.Id;
         InstrumentId = instrumentId;
         ExtensionData = data.ExtensionData;
+
+        if (data.ChildPanels != null)
+        {
+            Panels = new List<Panel>();
+            foreach (var item in data.ChildPanels)
+            {
+                Panels.Add(new Panel(item, instrumentId, Id));
+            }
+        }
     }
 
     public void Update(UpsertPanelDto update)
@@ -74,12 +84,8 @@ public class Panel : AggregateRoot<Guid>
         {
             UpdateTabItems(update.ChildPanels, Id);
         }
-        if (!string.IsNullOrEmpty(update.Title))
-            Title = update.Title;
-        else
-            Title = update.PanelType.ToString("G");
-        if (!string.IsNullOrEmpty(update.Description))
-            Description = update.Description;
+        Title = update.Title ?? update.PanelType.ToString("G");
+        Description = update.Description ?? string.Empty;
 
         Width = update.Width.ToString();
         Height = update.Height.ToString();
@@ -150,8 +156,6 @@ public class Panel : AggregateRoot<Guid>
 
         Index = index;
         Title = update.Title;
-
-        //update pannels
     }
 
     //public static Panel ConvertTo(PanelDto model)

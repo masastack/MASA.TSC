@@ -48,7 +48,8 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
 
                 instrument.Panels = GetChildren(panels, Guid.Empty);
             }
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
 
 
@@ -90,14 +91,14 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
                 if (updates.Any())
                 {
                     current.UpdateRange(updates);
-                    updateIds = updates.Select(item => item.Id).ToList();                    
+                    updateIds = updates.Select(item => item.Id).ToList();
                 }
 
                 var adds = updatePanels.Where(item => !orignalIds.Contains(item.Id)).ToList();
                 if (adds.Any())
                     current.AddRange(adds);
 
-                if (updateIds.Any())                
+                if (updateIds.Any())
                     orignalIds.RemoveAll(id => updateIds.Contains(id));
 
                 if (orignalIds.Any())
@@ -130,7 +131,7 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
                 if (updates.Any())
                 {
                     current.UpdateRange(updates);
-                    updateIds = updates.Select(item => item.Id).ToList();                    
+                    updateIds = updates.Select(item => item.Id).ToList();
                 }
 
                 var adds = all.Where(item => !orignalIds.Contains(item.Id)).ToList();
@@ -156,13 +157,17 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
             return default!;
         if (list.Any(item => item.Type == PanelTypes.TabItem))
             list = list.OrderBy(item => item.Index).ToList();
-
+        var childrens = new List<Panel>();
         foreach (var panel in list)
         {
             var children = GetChildren(panels, panel.Id);
-            if (children != null && children.Any())
-                list.Add(panel);
+            if (children?.Any() is true)
+                panel.Panels=children;
+            //    childrens.AddRange(children);
         }
+
+        //if (childrens.Any())
+        //    list.AddRange(childrens);
 
         return list;
     }
@@ -207,13 +212,13 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
     {
         if (entities == null || !entities.Any())
             return;
-        var instrumentIds= entities.Select(item=>item.Id).ToList();
+        var instrumentIds = entities.Select(item => item.Id).ToList();
         var panels = await _context.Set<Panel>().Where(m => instrumentIds.Contains(m.InstrumentId)).ToListAsync();
         if (panels != null && panels.Any())
-        { 
-            var panelIds=panels.Select(item=>item.Id).ToList();
-           var metrics= await _context.Set<PanelMetric>().Where(m => panelIds.Contains(m.PanelId)).ToListAsync();
-            if(metrics!=null&&metrics.Any())
+        {
+            var panelIds = panels.Select(item => item.Id).ToList();
+            var metrics = await _context.Set<PanelMetric>().Where(m => panelIds.Contains(m.PanelId)).ToListAsync();
+            if (metrics != null && metrics.Any())
                 _context.Set<PanelMetric>().RemoveRange(metrics);
 
             _context.Set<Panel>().RemoveRange(panels);

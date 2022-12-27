@@ -27,7 +27,7 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
 
     public Instrument() { }
 
-    public Instrument(Guid Id) : base(Id) { }    
+    public Instrument(Guid Id) : base(Id) { }
 
     public void Update(UpdateDashboardDto dashbord)
     {
@@ -36,7 +36,7 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
         Layer = dashbord.Layer.ToString();
         Model = dashbord.Model.ToString();
         Lable = dashbord.Type.ToString();
-    }    
+    }
 
     public void UpdatePanels(UpsertPanelDto[] data)
     {
@@ -54,7 +54,7 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
             var panel = Panels.FirstOrDefault(p => p.Id == item.Id);
             if (panel == null)
             {
-                panel = new Panel(item,Id);
+                panel = new Panel(item, Id, Guid.Empty);
             }
             else
             {
