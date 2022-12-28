@@ -1,0 +1,64 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+
+<MCard Height="410" Class="d-flex flex-column">
+    <MCardTitle>
+        <MLabel Class="emphasis2--text h6">@Value.Title</MLabel>
+    </MCardTitle>
+    <MCardText Class="flex-grow-1" Style="overflow-y: auto;">
+        <MSimpleTable>
+            @if (Value.ShowTableHeader)
+            {
+                <thead>
+                    <tr>
+                        <th class="text-left">
+                            Name
+                        </th>
+                        <th class="text-left">
+                            Calories
+                        </th>
+                        @foreach (var field in Value.Metrics)
+                        {
+                            <th class="text-left">
+                                @(string.IsNullOrWhiteSpace(field.Unit) ? @field.Name : $"{@field.Name}({field.Unit})")
+                            </th>
+                        }
+                    </tr>
+                </thead>
+            }
+            <tbody>
+                @foreach (var item in Data)
+                {
+                    <tr @key="item.Name">
+                        <td class="@($"text-{Value.ColumnAlignment}")">@item.Name</td>
+                        <td class="@($"text-{Value.ColumnAlignment}")">@item.Calories</td>
+                        @foreach (var field in Value.Metrics)
+                        {
+                            <td style="color:@field.Color" class="@($"text-{Value.ColumnAlignment}")">0.0</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+            @if (Value.ShowTableFooter)
+            {
+                <tfoot>
+                    <tr>
+                        <td>Sum</td>
+                        <td>$180</td>
+                    </tr>
+                </tfoot>
+            }
+        </MSimpleTable>
+        @if (Value.EnablePaginaton)
+        {
+            <MPagination Length="10" TotalVisible="5"></MPagination>
+        }
+    </MCardText>
+</MCard>
+
+@code {
+    [Parameter]
+    public ITablePanelValue Value { get; set; }
+
+    [Parameter]
+    public List<Dessert> Data { get; set; }
+}
