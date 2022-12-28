@@ -14,6 +14,8 @@ public partial class PanelGrids
     [CascadingParameter]
     public bool IsEdit { get; set; }
 
+    public bool IsEditTabItem { get; set; }
+
     private MGridstack<UpsertPanelDto>? Gridstack;
 
     protected override void OnInitialized()
@@ -41,6 +43,11 @@ public partial class PanelGrids
     void AddTabItem(UpsertTabsPanelDto? panel)
     {
         panel?.AddTabItem();
+    }
+
+    void EditEditTabItems()
+    {
+        IsEditTabItem = !IsEditTabItem;
     }
 
     void RemovePanel(UpsertPanelDto panel)

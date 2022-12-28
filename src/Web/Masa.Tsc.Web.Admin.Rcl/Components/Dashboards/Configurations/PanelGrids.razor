@@ -21,6 +21,11 @@
                                         @T("Add Tab Item")
                                     </MListItemTitle>
                                 </MListItem>
+                                <MListItem OnClick="() => EditEditTabItems()">
+                                    <MListItemTitle>
+                                        @T("Edit Tab Item")
+                                    </MListItemTitle>
+                                </MListItem>
                                 <MListItem OnClick="() => AddChildPanel(context as UpsertTabsPanelDto)">
                                     <MListItemTitle>
                                         @T("Add Panel")
@@ -49,7 +54,7 @@
             @switch (context.PanelType)
             {
                 case PanelTypes.Tabs:
-                    <TabsPanel Panel="context as UpsertTabsPanelDto" />
+                    <TabsPanel Panel="context as UpsertTabsPanelDto" IsEditTabItem=IsEditTabItem />
                     break;
                 case PanelTypes.Text:
                     <MEditor />
