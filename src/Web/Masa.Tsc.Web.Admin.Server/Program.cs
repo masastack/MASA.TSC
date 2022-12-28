@@ -13,11 +13,11 @@ builder.Services.Configure<JsonOptions>(option =>
     option.JsonSerializerOptions.Converters.Add(new QueryResultDataResponseConverter());
 });
 
-//builder.WebHost.UseKestrel(option =>
-//{
-//    option.ConfigureHttpsDefaults(options =>
-//    options.ServerCertificate = new X509Certificate2(Path.Combine("Certificates", "7348307__lonsid.cn.pfx"), "cqUza0MN"));
-//});
+builder.WebHost.UseKestrel(option =>
+{
+    option.ConfigureHttpsDefaults(options =>
+    options.ServerCertificate = new X509Certificate2(Path.Combine("Certificates", "7348307__lonsid.cn.pfx"), "cqUza0MN"));
+});
 
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
 builder.Services.AddDccClient(dccConfig.RedisOptions);
