@@ -225,5 +225,6 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
         }
 
         _context.RemoveRange(entities);
+        await _context.SaveChangesAsync();
     }
 }

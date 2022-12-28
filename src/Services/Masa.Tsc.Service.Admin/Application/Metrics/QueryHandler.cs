@@ -1,6 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Service.Admin.Application.Metrics.Queries;
+using System.Text;
+
 namespace Masa.Tsc.Service.Admin.Application.Metrics;
 
 public class QueryHandler
@@ -138,6 +141,49 @@ public class QueryHandler
         }
 
         _logger.LogError("request failed {data.ErrorType} {data.Error}", data);
+    }
+
+    [EventHandler]
+    public async Task GetMultiRangeAsync(MultiRangeQuery query)
+    {
+        var tasks = new Task<QueryResultCommonResponse>[query.Data.MetricNames.Count];
+        var index = 0;
+        foreach (var name in query.Data.MetricNames)
+        {
+            var metric = AppendCondition(name, query.Data.ServiceName, query.Data.Instance, query.Data.EndPoint);
+            tasks[index] = _prometheusClient.QueryRangeAsync(new QueryRangeRequest
+            {
+                End = query.Data.End.ToUnixTimestamp().ToString(),
+                Start = query.Data.Start.ToUnixTimestamp().ToString(),
+                Query = metric,
+                Step = query.Data.Step,
+            });
+            index++;
+        }
+        var result = await Task.WhenAll(tasks);
+        query.Result = result.Select(item => item.Data!).ToList();
+    }
+
+    private string AppendCondition(string str, string service, string instance, string endpoint)
+    {
+        StringBuilder text = new StringBuilder();
+        if (!string.IsNullOrEmpty(service))
+            text.Append($"\"service_name\"=\"{service}\",");
+        if (!string.IsNullOrEmpty(instance))
+            text.Append($"\"service_instance_id\"=\"{instance}\",");
+        if (!string.IsNullOrEmpty(endpoint))
+            text.Append($"\"service_endpoint\"=\"{endpoint}\",");
+
+        if (text.Length == 0)
+            return str;
+
+        int position = str.IndexOf('{');
+        if (position > 0)
+        {
+            return str.Insert(position + 1, text.ToString());
+        }
+
+        return str;
     }
 
     private static Dictionary<string, Dictionary<string, List<string>>> ConverToKeyValues(IEnumerable<IDictionary<string, string>> sources)
