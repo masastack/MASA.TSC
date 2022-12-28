@@ -1,14 +1,10 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
 public partial class ChartPanelConfiguration : TscComponentBase
 {
-    List<StringNumber> _panelValues = new() { 1 };
-
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
@@ -21,6 +17,8 @@ public partial class ChartPanelConfiguration : TscComponentBase
     string ValueBackup { get; set; }
 
     Dictionary<string, DynamicComponentDescription> DynamicComponentMap { get; set; }
+    List<StringNumber> _panelValues = new() { 1 };
+    string _listType = string.Empty;
 
     DynamicComponentDescription CurrentDynamicComponent => DynamicComponentMap.ContainsKey(Value.ChartType) ? DynamicComponentMap[Value.ChartType] : DynamicComponentMap["e-chart"];
 
@@ -28,11 +26,20 @@ public partial class ChartPanelConfiguration : TscComponentBase
     {
         DynamicComponentMap = new()
         {
-            ["table"] = new(typeof(TableConfiguration), new() { ["Value"] = Value }),
-            ["top-list"] = new(typeof(TopListConfiguration), new() { ["Value"] = Value }),
+            ["table"] = new(typeof(Lists), new()
+            {
+                ["Value"] = Value,
+                ["OnListTypeChanged"] = EventCallback.Factory.Create<string>(this, ListTypeChanged)
+            }),
             ["e-chart"] = new(typeof(EChartConfiguration), new() { ["Value"] = Value }),
         };
         ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
+    }
+
+    public void ListTypeChanged(string type)
+    {
+        _listType = type;
+        //this.StateHasChanged();
     }
 
     void NavigateToPanelConfigurationPage()
