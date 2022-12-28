@@ -727,11 +727,6 @@ internal static class EChartConst
 
 public class EChartType
 {
-    [JsonConstructor]
-    public EChartType()
-    {
-
-    }
     public EChartType(string name, string src, string json)
     {
         Name = name;

@@ -1,23 +1,19 @@
-﻿@page "/dashboard/configuration/chart/{dashboardId}/{panelId}"
+﻿@page "/dashboard/configuration/chart/{panelId}"
 
-<ChartPanelConfiguration DashboardId="@DashboardId" Value="Panel" />
+<ChartPanelConfiguration Value="Panel" />
 
 @code {
     [Inject]
-    List<UpsertPanelDto> Panels { get; set; }
+    ConfigurationRecord ConfigurationRecord { get; set; }
 
     [Parameter]
     public string? PanelId { get; set; }
-
-
-    [Parameter]
-    public string DashboardId { get; set; }
 
     public UpsertChartPanelDto Panel { get; set; }
 
     protected override void OnInitialized()
     {
-        Panel = FindPanel(Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException("find panel error");
+        Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException("find panel error");
     }
 
     UpsertPanelDto? FindPanel(List<UpsertPanelDto> panels)

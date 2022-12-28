@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
 public partial class ChartPanelConfiguration : TscComponentBase
@@ -14,9 +12,6 @@ public partial class ChartPanelConfiguration : TscComponentBase
 
     [Parameter]
     public UpsertChartPanelDto Value { get; set; }
-
-    [Parameter]
-    public string DashboardId { get; set; }
 
     string ValueBackup { get; set; }
 
@@ -37,7 +32,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
 
     void NavigateToPanelConfigurationPage()
     {
-        NavigationManager.NavigateTo($"/dashboard/configuration/{DashboardId}/record");
+        NavigationManager.NavigateTo($"/dashboard/configuration/record");
     }
 
     void Cancel()

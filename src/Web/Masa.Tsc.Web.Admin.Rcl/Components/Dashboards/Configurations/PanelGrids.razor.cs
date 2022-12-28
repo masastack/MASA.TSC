@@ -28,10 +28,10 @@ public partial class PanelGrids
         foreach (var panel in panels)
         {
             panel.ParentPanel = parentPanel;
-            if(panel.ChildPanels.Any())
+            if (panel.ChildPanels.Any())
             {
                 IniPanels(panel.ChildPanels, panel);
-            }           
+            }
         }
     }
 
@@ -52,7 +52,7 @@ public partial class PanelGrids
 
     void RemovePanel(UpsertPanelDto panel)
     {
-        if(panel is UpsertTabItemPanelDto tabItem)
+        if (panel is UpsertTabItemPanelDto tabItem)
         {
             tabItem.RemovePanel(panel);
         }
@@ -76,7 +76,7 @@ public partial class PanelGrids
     async Task SavePanelGrid()
     {
         var grids = await Gridstack!.OnSave();
-        foreach(var grid in grids)
+        foreach (var grid in grids)
         {
             var panel = Panels.First(p => p.Id == Guid.Parse(grid.Id));
             panel.Width = grid.W;
