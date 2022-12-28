@@ -7,6 +7,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
 {
     List<string> _systemIdentities = new List<string>();
     List<StringNumber> _panelValues = new() { 1 };
+    string _listType = string.Empty;
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -25,6 +26,12 @@ public partial class ChartPanelConfiguration : TscComponentBase
     {
         ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
         await GetGetMetricsAsync();
+    }
+
+    public void ListTypeChanged(string type)
+    {
+        _listType = type;
+        //this.StateHasChanged();
     }
 
     void NavigateToPanelConfigurationPage()

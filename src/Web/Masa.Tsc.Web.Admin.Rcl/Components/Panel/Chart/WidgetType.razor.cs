@@ -40,12 +40,6 @@ public partial class WidgetType
         },
         new EChartPanelTypeModel
         {
-            Name="Top列表",
-            Type="top-list",
-            Src="_content/Masa.Tsc.Web.Admin.Rcl/img/other/progress.png"
-        },
-        new EChartPanelTypeModel
-        {
             Name="折线图",
             Type="line",
             Src="_content/Masa.Tsc.Web.Admin.Rcl/img/echarts/line.png"
