@@ -11,4 +11,8 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 ENV ASPNETCORE_URLS=https://0.0.0.0:443
 EXPOSE 443
+
+ENTRYPOINT ["dotnet","dev-certs https --clean"]
+ENTRYPOINT ["dotnet","dev-certs https -t"]
+ENTRYPOINT ["dotnet","dev-certs https --check"]
 ENTRYPOINT ["dotnet", "Masa.Tsc.Web.Admin.Server.dll"]
