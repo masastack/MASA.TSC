@@ -1,0 +1,86 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+
+<MRow>
+    <MCol Md="12">
+        <DynamicComponent Type="@CurrentComponentModule.ShowType" Parameters=CurrentComponentModule.Metadata />
+    </MCol>
+    <MCol Md="12">
+        <MCard>
+            <MCardTitle>
+                <MRow>
+                    <MCol Md="6">
+                        <SSelect @bind-Value="@Value.SystemIdentity" Items="_systemIdentities"
+                                 ItemText="item => item"
+                                 ItemValue="item => item" />
+                    </MCol>
+                    <MCol Md="6">
+                        <MButtonGroup Value="@_listType" ValueChanged="ListTypeChanged" Mandatory>
+                            <MButton Class="text-capitalize" Value="@("service-list")">
+                                Service List
+                            </MButton>
+                            <MButton Class="text-capitalize" Value="@("endpoint-list")">
+                                Endpoint List
+                            </MButton>
+                            <MButton Class="text-capitalize" Value="@("instance-list")">
+                                Instance List
+                            </MButton>
+                            <MButton Class="text-capitalize" Value="@("top-list")">
+                                Top List
+                            </MButton>
+                        </MButtonGroup>
+                    </MCol>
+                </MRow>
+            </MCardTitle>
+            <MCardText>
+                <DynamicComponent Type="@CurrentComponentConfiguration.ShowType" Parameters=CurrentComponentConfiguration.Metadata />
+            </MCardText>
+        </MCard>
+    </MCol>
+</MRow>
+
+@code {
+    [Parameter]
+    public ITablePanelValue Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnListTypeChanged { get; set; }
+
+    private List<string> _systemIdentities = new List<string>();
+    private StringNumber _listType = "service-list";
+    Dictionary<string, DynamicComponentDescription> ComponentModuleMap { get; set; }
+    Dictionary<string, DynamicComponentDescription> ComponentConfigurationMap { get; set; }
+
+    DynamicComponentDescription CurrentComponentModule => ComponentModuleMap[_listType.AsT0];
+
+    DynamicComponentDescription CurrentComponentConfiguration => ComponentConfigurationMap[_listType.AsT0];
+
+    protected override void OnInitialized()
+    {
+        ComponentModuleMap = new()
+        {
+            ["service-list"] = new(typeof(ServiceListDemo), new() { ["Value"] = Value }),
+            ["instance-list"] = new(typeof(InstanceListDemo), new() { ["Value"] = Value }),
+            ["endpoint-list"] = new(typeof(EndpointListDemo), new() { ["Value"] = Value }),
+            ["top-list"] = new(typeof(TopListDemo), new() { ["Value"] = Value })
+        };
+
+        ComponentConfigurationMap = new Dictionary<string, DynamicComponentDescription>
+        {
+            ["service-list"] = new(typeof(ServiceListConfiguration), new() { ["Values"]=Value.Metrics }),
+            ["instance-list"] = new(typeof(InstanceListConfiguration), new() { ["Values"] = Value.Metrics }),
+            ["endpoint-list"] = new(typeof(EndpointListConfiguration), new() { ["Values"] = Value.Metrics }),
+            ["top-list"] = new(typeof(TopListConfiguration), new() { ["Values"] = Value.Metrics })
+        };
+        base.OnInitialized();
+    }
+
+    private void ListTypeChanged(StringNumber listType)
+    {
+        _listType = listType;
+        Value.Metrics.Clear();
+        if (OnListTypeChanged.HasDelegate)
+        {
+            OnListTypeChanged.InvokeAsync(listType.AsT0);
+        }
+    }
+}

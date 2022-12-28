@@ -1,0 +1,47 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+
+<EndpointList Value=Value Data="_desserts" />
+
+@code {
+    [Parameter]
+    public ITablePanelValue Value { get; set; }
+
+    private List<Dessert> _desserts = new List<Dessert>
+        {
+           new Dessert
+           {
+              Name= "Frozen Yogurt",
+              Calories= 159
+            },
+            new Dessert
+            {
+              Name= "Ice cream sandwich",
+              Calories= 237
+            },
+            new Dessert
+            {
+              Name= "Eclair",
+              Calories= 262
+            },
+            new Dessert
+            {
+              Name= "Cupcake",
+              Calories= 305
+            },
+            new Dessert
+            {
+                Name= "Gingerbread",
+                Calories= 356
+            },
+            new Dessert
+            {
+                Name= "Jelly bean",
+                Calories= 375
+            },
+            new Dessert
+            {
+                Name= "Lollipop",
+                Calories= 392
+            }
+        };
+}
