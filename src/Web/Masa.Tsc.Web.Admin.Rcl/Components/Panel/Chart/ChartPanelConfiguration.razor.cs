@@ -5,6 +5,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
 public partial class ChartPanelConfiguration : TscComponentBase
 {
+    List<string> _systemIdentities = new List<string>();
     List<StringNumber> _panelValues = new() { 1 };
 
     [Inject]
@@ -13,20 +14,10 @@ public partial class ChartPanelConfiguration : TscComponentBase
     [Parameter]
     public UpsertChartPanelDto Value { get; set; }
 
-    string ValueBackup { get; set; }
-
-    Dictionary<string, DynamicComponentDescription> DynamicComponentMap { get; set; }
-
-    DynamicComponentDescription CurrentDynamicComponent => DynamicComponentMap.ContainsKey(Value.ChartType) ? DynamicComponentMap[Value.ChartType] : DynamicComponentMap["e-chart"];
+    string ValueBackup { get; set; }  
 
     protected override void OnInitialized()
     {
-        DynamicComponentMap = new()
-        {
-            ["table"] = new(typeof(TableConfiguration), new() { ["Value"] = Value }),
-            ["top-list"] = new(typeof(TopListConfiguration), new() { ["Value"] = Value }),
-            ["e-chart"] = new(typeof(EChartConfiguration), new() { ["Value"] = Value }),
-        };
         ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
     }
 
@@ -40,5 +31,15 @@ public partial class ChartPanelConfiguration : TscComponentBase
         var backUp = JsonSerializer.Deserialize<UpsertPanelDto>(ValueBackup);
         Value.Clone(backUp!);
         NavigateToPanelConfigurationPage();
+    }
+
+    private void Add()
+    {
+        Value.Metrics.Add(new());
+    }
+
+    private void Remove(PanelMetricDto metric)
+    {
+        Value.Metrics.Remove(metric);
     }
 }

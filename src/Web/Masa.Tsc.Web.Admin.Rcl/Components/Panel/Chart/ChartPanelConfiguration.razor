@@ -11,7 +11,97 @@
         </SButton>
     </MCol>
     <MCol Cols="8">
-        <DynamicComponent Type="@CurrentDynamicComponent.ShowType" Parameters=CurrentDynamicComponent.Metadata />
+        <ChartPanel Value="Value" />
+        <MCard Class="mt-6">
+            <MCardText>
+                <MRow>
+                    <MCol Md="4">
+                        @if(Value.ChartType == "table" || Value.ChartType == "top-list")
+                        {
+                            <SSelect @bind-Value="@Value.SystemIdentity" 
+                                 Items="_systemIdentities"
+                                 ItemText="item => item"
+                                 ItemValue="item => item" />
+                        }
+                        else
+                        {
+                            <STextField @bind-Value="@Value.Title" Label="Title" />
+                        }
+                    </MCol>
+                    <MCol Md="8">
+                        <STextField @bind-Value="@Value.Description" Label="Description" />
+                    </MCol>
+                    <MCol Md="12">
+                        <MRow>
+                            @if (Value.ChartType == "top-list")
+                            {
+                                <MCol Md="4">
+                                    <MCard Class="pa-2" Style="background-color:#F6F8FD">
+                                        <MCardText>
+                                            <MRow>
+                                                <MCol Md="12">
+                                                    <STextField BackgroundColor="white" @bind-Value="Value.Metrics[0].Name" Label="指标名称" />
+                                                </MCol>
+                                                <MCol Md="12">
+                                                    <STextField BackgroundColor="white" @bind-Value="Value.Metrics[0].Range" Label="取值范围" />
+                                                </MCol>
+                                            </MRow>
+                                        </MCardText>
+                                    </MCard>
+                                </MCol>
+                            }
+                            else
+                            {
+                                @foreach (var item in Value.Metrics)
+                                {
+                                    <MCol Md="4">
+                                        <MCard Class="pa-2" Style="background-color:#F6F8FD">
+                                            <MCardText>
+                                                <MRow>
+                                                    <MCol Md="12">
+                                                        <STextField BackgroundColor="white" DebounceInterval="500" @bind-Value="item.DisplayName" Label="显示名称" />
+                                                    </MCol>
+                                                    <MCol Md="12">
+                                                        <STextField BackgroundColor="white" DebounceInterval="1000" @bind-Value="item.Name" Label="指标名称" />
+                                                    </MCol>
+                                                    <MCol Md="12">
+                                                        <STextField BackgroundColor="white" @bind-Value="item.Range" Label="取值范围" />
+                                                    </MCol>
+                                                    @if (Value.ChartType == "table")
+                                                    {
+                                                        <MCol Md="12">
+                                                            <STextField BackgroundColor="white" @bind-Value="item.Icon" Label="图标" />
+                                                        </MCol>
+                                                    }
+                                                    else
+                                                    {
+                                                        <MCol Md="12">
+                                                            <STextField BackgroundColor="white" @bind-Value="item.Caculate" Label="计算规则" />
+                                                        </MCol>
+                                                    }
+                                                    <MCol Md="12">
+                                                        <STextField BackgroundColor="white" @bind-Value="item.Unit" Label="单位" />
+                                                    </MCol>
+                                                </MRow>
+                                            </MCardText>
+                                            <MCardActions Class="d-flex justify-space-between">
+                                                <SColorGroup @bind-Value="item.Color" Colors='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
+                                                <MIcon OnClick="() => Remove(item)" Color="red">mdi-delete</MIcon>
+                                            </MCardActions>
+                                        </MCard>
+                                    </MCol>
+                                }
+                                <MCol Md="4">
+                                    <MCard Height=350 OnClick="Add" Class="d-flex justify-center align-center" Style="background-color:#F6F8FD">
+                                        <MIcon XLarge>mdi-plus</MIcon>
+                                    </MCard>
+                                </MCol>
+                            }                           
+                        </MRow>
+                    </MCol>
+                </MRow>
+            </MCardText>
+        </MCard>
     </MCol>
     <MCol Cols="4">
         <MCard>

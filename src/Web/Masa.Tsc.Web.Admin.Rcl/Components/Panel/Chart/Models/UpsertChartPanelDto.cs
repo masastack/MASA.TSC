@@ -220,32 +220,6 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         set => _eChartType = value;
     }
 
-    //public EChartType EChartType
-    //{
-    //    get
-    //    {
-    //        var value = this[ExtensionFieldTypes.EChartType];
-    //        if (value is EChartType echartType)
-    //        {
-    //            return echartType;
-    //        }
-    //        else if (value is JsonElement jsonElement)
-    //        {
-    //            var jsonValue = jsonElement.Deserialize<EChartType>();
-    //            if (jsonValue is not null)
-    //            {
-    //                this[ExtensionFieldTypes.EChartType] = jsonValue;
-    //                return jsonValue;
-    //            }
-    //        }
-
-    //        value = EChartConst.Line;
-    //        this[ExtensionFieldTypes.EChartType] = value;
-    //        return (EChartType)value;
-    //    }
-    //    set => this[ExtensionFieldTypes.EChartType] = value;
-    //}
-
     public Tooltip Tooltip
     {
         get
@@ -384,5 +358,45 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             new()
         };
         PanelType = PanelTypes.Chart;
+    }
+
+    public object GetChartData()
+    {
+        //EChartType.Json["xAxis"]!["data"] = new JsonArray(Metrics.Select(item => (JsonNode)item.DisplayName!).ToArray());
+        if(ChartType is "line" or "bar")
+        {
+            EChartType.Json["series"] = new JsonArray(Metrics.Select(item => new JsonObject
+            {
+                ["name"] = item.DisplayName,
+                ["type"] = ChartType,
+                ["data"] = new JsonArray(120 + Random.Shared.Next(100), 200 + Random.Shared.Next(100), 150 + Random.Shared.Next(100), 80 + Random.Shared.Next(100), 70 + Random.Shared.Next(100), 110 + Random.Shared.Next(100), 130)
+            }).ToArray());
+        }
+        else if(ChartType is "pie")
+        {
+            EChartType.Json["series"].AsArray().First()["data"] = new JsonArray(Metrics.Select(item => new JsonObject
+            {
+                ["name"] = item.DisplayName,
+                ["value"] = Random.Shared.Next(100)
+            }).ToArray());
+        }
+        else if (ChartType is "line-area")
+        {
+            EChartType.Json["legend"]!["data"]= new JsonArray(Metrics.Select(item => (JsonNode)item.DisplayName!).ToArray());
+            EChartType.Json["series"] = new JsonArray(Metrics.Select(item => new JsonObject
+            {
+                ["name"] = item.DisplayName,
+                ["type"] = "line",
+                ["stack"] = "Total",
+                ["areaStyle"] = new JsonObject(),
+                ["emphasis"] = new JsonObject() 
+                {
+                    ["focus"] = "series"
+                },
+                ["data"] = new JsonArray(120 + Random.Shared.Next(100), 200 + Random.Shared.Next(100), 150 + Random.Shared.Next(100), 80 + Random.Shared.Next(100), 70 + Random.Shared.Next(100), 110 + Random.Shared.Next(100), 130)
+            }).ToArray());
+        }
+
+        return EChartType.Json;
     }
 }
