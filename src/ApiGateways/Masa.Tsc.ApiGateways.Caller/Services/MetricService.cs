@@ -46,6 +46,11 @@ public class MetricService : BaseService
         return default!;
     }
 
+    public async Task<List<string>> GetValues(RequestMetricListDto param)
+    {
+       return await Caller.GetByBodyAsync<List<string>>($"{RootPath}/multi-range", param);
+    }
+
     private QueryResultDataResponse ConvertResult(QueryResultDataResponse result)
     {
         var options = new JsonSerializerOptions

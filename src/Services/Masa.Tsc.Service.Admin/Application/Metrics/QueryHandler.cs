@@ -1,6 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Google.Type;
 using Masa.Tsc.Service.Admin.Application.Metrics.Queries;
 using System.Text;
 
@@ -164,15 +165,44 @@ public class QueryHandler
         query.Result = result.Select(item => item.Data!).ToList();
     }
 
+    [EventHandler]
+    public async Task GetValuesAsync(ValuesQuery query)
+    {
+        var metric = "";
+        if (string.Equals(query.Data.Type, nameof(query.Data.Service), StringComparison.InvariantCultureIgnoreCase))
+            metric = $"group by (service_name) (http_client_duration_bucket{{}})";
+        else if (string.Equals(query.Data.Type, nameof(query.Data.Instance), StringComparison.InvariantCultureIgnoreCase))
+            metric = $"group by (service_instance_id) (http_client_duration_bucket{{}})";
+        else
+            metric = $"group by (endpoint) (http_client_duration_bucket{{}})";
+
+        metric = AppendCondition(metric, query.Data.Service, query.Data.Instance, query.Data.Endpoint);
+
+        var result = await _prometheusClient.QueryRangeAsync(new QueryRangeRequest
+        {
+            End = query.Data.End.ToUnixTimestamp().ToString(),
+            Start = query.Data.Start.ToUnixTimestamp().ToString(),
+            Query = metric,
+            Step = query.Data.Step
+        });
+
+        if (result.Status == ResultStatuses.Success)
+        {
+            if (result.Data == null || result.Data.Result == null || !result.Data.Result.Any())
+                return;
+            query.Result = result.Data.Result.Select(item => ((QueryResultMatrixRangeResponse)item).Metric.Values.FirstOrDefault()?.ToString()).ToList()!;
+        }
+    }
+
     private string AppendCondition(string str, string service, string instance, string endpoint)
     {
         StringBuilder text = new StringBuilder();
         if (!string.IsNullOrEmpty(service))
-            text.Append($"\"service_name\"=\"{service}\",");
+            text.Append($"service_name=\"{service}\",");
         if (!string.IsNullOrEmpty(instance))
-            text.Append($"\"service_instance_id\"=\"{instance}\",");
+            text.Append($"service_instance_id=\"{instance}\",");
         if (!string.IsNullOrEmpty(endpoint))
-            text.Append($"\"service_endpoint\"=\"{endpoint}\",");
+            text.Append($"endpoint=\"{endpoint}\",");
 
         if (text.Length == 0)
             return str;
