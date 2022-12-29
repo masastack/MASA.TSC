@@ -38,6 +38,7 @@ global using Masa.Tsc.Contracts.Admin.Enums;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Const;
 global using Masa.Tsc.Contracts.Admin.Instruments;
 global using Masa.Tsc.Contracts.Admin.Instruments.Panel;
+global using Masa.Tsc.Contracts.Admin.Metrics;
 global using Masa.Tsc.Contracts.Admin.Topologies;
 global using Masa.Tsc.Service.Admin.Application.Directory.Queries;
 global using Masa.Tsc.Service.Admin.Application.Instruments.Commands;

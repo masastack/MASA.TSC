@@ -58,4 +58,11 @@ public class MetricService : ServiceBase
         await eventBus.PublishAsync(query);
         return query.Result;
     }
+
+    public async Task<List<string>> GetValuesAsync([FromServices] IEventBus eventBus, [FromBody] RequestMetricListDto param)
+    {
+        var query=new ValuesQuery(param);
+        await eventBus.PublishAsync(query);
+        return query.Result;
+    }
 }
