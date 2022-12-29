@@ -113,7 +113,7 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
 
         var current = _context.Set<PanelMetric>();
         var panelIds = originalPanels.Select(item => item.Id).ToList();
-        var originals = originalPanels == null || !originalPanels.Any() ? default! : current.Where(item => panelIds.Contains(item.PanelId)).ToList();
+        var originals = originalPanels == null || !originalPanels.Any() ? default! : current.AsNoTracking().Where(item => panelIds.Contains(item.PanelId)).ToList();
         if (originals == null || !originals.Any())
         {
             if (all != null && all.Any())
