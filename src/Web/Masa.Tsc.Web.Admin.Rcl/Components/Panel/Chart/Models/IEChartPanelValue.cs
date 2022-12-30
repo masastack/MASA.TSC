@@ -18,4 +18,6 @@ public interface IEChartPanelValue : IPanelValue
     public Axis YAxis { get; set; }
 
     public object GetChartData();
+
+    public string GetChartKey();
 }

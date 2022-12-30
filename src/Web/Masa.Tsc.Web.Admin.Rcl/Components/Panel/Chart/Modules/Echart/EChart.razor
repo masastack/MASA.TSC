@@ -11,7 +11,7 @@
         </MTooltip>
     </MCardTitle>
     <MCardText Class="flex-grow-1">
-        <MECharts @key=@(string.Join(',',Value.Metrics.Select(item => item.Name))+string.Join(',',Value.Metrics.Select(item => item.DisplayName))) Option="Value.GetChartData()" /> @*@ref="_mECharts"*@
+        <MECharts @key=@Value.GetChartKey() Option="Value.GetChartData()" /> @*@ref="_mECharts"*@
     </MCardText>
 </MCard>
 

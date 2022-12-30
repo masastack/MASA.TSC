@@ -14,11 +14,17 @@ public partial class ChartPanelConfiguration : TscComponentBase
     [Parameter]
     public UpsertChartPanelDto Value { get; set; }
 
-    string ValueBackup { get; set; }  
+    [Parameter]
+    public Func<Task<List<QueryResultDataResponse>>> GetMetrics { get; set; }
 
-    protected override void OnInitialized()
+    bool IsLoading { get; set; }
+
+    string ValueBackup { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
         ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
+        await GetGetMetricsAsync();
     }
 
     void NavigateToPanelConfigurationPage()
@@ -33,13 +39,26 @@ public partial class ChartPanelConfiguration : TscComponentBase
         NavigateToPanelConfigurationPage();
     }
 
-    private void Add()
+    void Add()
     {
         Value.Metrics.Add(new());
     }
 
-    private void Remove(PanelMetricDto metric)
+    void Remove(PanelMetricDto metric)
     {
         Value.Metrics.Remove(metric);
+    }
+
+    async Task GetGetMetricsAsync()
+    {
+        IsLoading = true;
+        Value.SetChartData(await GetMetrics());
+        IsLoading = false;
+    }
+
+    async Task MetricNameChangedAsync(PanelMetricDto metric, string metricName)
+    {
+        metric.Name = metricName;
+        await GetGetMetricsAsync();
     }
 }

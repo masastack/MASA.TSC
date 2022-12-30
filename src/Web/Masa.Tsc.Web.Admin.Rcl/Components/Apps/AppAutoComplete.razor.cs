@@ -6,10 +6,10 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Apps;
 public partial class AppAutoComplete
 {
     [Parameter]
-    public int Value { get; set; }
+    public string Value { get; set; }
 
     [Parameter]
-    public EventCallback<int> ValueChanged { get; set; }
+    public EventCallback<string> ValueChanged { get; set; }
 
     [Parameter]
     public bool FillBackground { get; set; } = true;
@@ -26,9 +26,9 @@ public partial class AppAutoComplete
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Value == 0 && Apps.Any())
+        if (string.IsNullOrEmpty(Value) && Apps.Any())
         {
-            var value = Apps.First().Id;
+            var value = Apps.First().Name;
             await ValueChanged.InvokeAsync(value);
         }
     }

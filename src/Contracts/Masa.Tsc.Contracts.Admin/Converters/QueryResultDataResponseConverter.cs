@@ -77,7 +77,7 @@ public class QueryResultDataResponseConverter : JsonConverter<QueryResultDataRes
 
     private object[] ConvertObject(object[] values)
     {
-        return new object[] { ((JsonElement)values[0]).GetDouble(), ((JsonElement)values[1]).GetString()! };
+        return new object[] { ((JsonElement)values[0]).GetInt64(), ((JsonElement)values[1]).GetString()! };
     }
 
     public override void Write(Utf8JsonWriter writer, QueryResultDataResponse value, JsonSerializerOptions options)

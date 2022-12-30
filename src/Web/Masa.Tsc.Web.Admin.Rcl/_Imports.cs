@@ -54,3 +54,4 @@ global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Modules.Table;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Modules.Echart;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Tabs.Models;
 global using Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations.Models;
+global using Masa.Tsc.Contracts.Admin.Metrics;

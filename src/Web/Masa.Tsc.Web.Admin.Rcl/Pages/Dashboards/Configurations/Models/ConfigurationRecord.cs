@@ -7,7 +7,7 @@ public class ConfigurationRecord
 {
     public List<UpsertPanelDto> Panels { get; set; } = new();
 
-    public int AppId { get; set; }
+    public string AppName { get; set; }
 
     public string Search { get; set; }
 
@@ -20,7 +20,7 @@ public class ConfigurationRecord
     public void Clear()
     {
         Panels.Clear();
-        AppId = default;
+        AppName = "";
         Search = "";
         DashboardId = "";
         StartTime = default;

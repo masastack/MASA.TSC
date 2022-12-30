@@ -1,6 +1,7 @@
 ﻿@page "/dashboard/configuration/chart/{panelId}"
+@inherits TscComponentBase
 
-<ChartPanelConfiguration Value="Panel" />
+<ChartPanelConfiguration GetMetrics=GetMetricsAsync Value="Panel" />
 
 @code {
     [Inject]
@@ -9,7 +10,7 @@
     [Parameter]
     public string? PanelId { get; set; }
 
-    public UpsertChartPanelDto Panel { get; set; }
+    UpsertChartPanelDto Panel { get; set; }
 
     protected override void OnInitialized()
     {
@@ -32,5 +33,17 @@
         }
 
         return default;
+    }
+
+    async Task<List<QueryResultDataResponse>> GetMetricsAsync()
+    {
+        return await base.ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto()
+        {
+           Start = ConfigurationRecord.StartTime.UtcDateTime,
+           End = ConfigurationRecord.EndTime.UtcDateTime,
+           ServiceName = ConfigurationRecord.AppName,
+           Step = "5s",
+           MetricNames = Panel.Metrics.Select(item => item.Name).ToList()
+        });
     }
 }
