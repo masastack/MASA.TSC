@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Web.Admin.Rcl.Data.EChart;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Models;
 
 public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePanelValue, IEChartPanelValue
@@ -381,15 +383,15 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         var key = GetChartKey();
         if (Key == key) return EChartType.Json;
         Key = key;
-
-        if(ChartType is "line" or "bar")
+        if (ChartType is "line" or "bar")
         {
-            List<QueryResultMatrixRangeResponse> data = new();
-            foreach(var item in _chartData)
+            var data = GetMatrixRangeData();
+
+            foreach (var item in _chartData)
             {
                 if (item is not null)
                 {
-                    foreach(var result in item.Result)
+                    foreach (var result in item.Result)
                     {
                         if (result is QueryResultMatrixRangeResponse matrix) data.Add(matrix);
                     }
@@ -399,29 +401,15 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             {
                 ["type"] = ChartType,
                 ["name"] = string.Join("-",item.Metric.Values),
-                ["data"] = new JsonArray(item.Values.Take(1000).Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Convert.ToInt32(value[1]))).ToArray())
-            }).ToArray());
-            //EChartType.Json["series"] = new JsonArray(Metrics.Select(item => new JsonObject
-            //{
-            //    ["name"] = item.DisplayName,
-            //    ["type"] = ChartType,
-            //    ["data"] = new JsonArray(120 + Random.Shared.Next(100), 200 + Random.Shared.Next(100), 150 + Random.Shared.Next(100), 80 + Random.Shared.Next(100), 70 + Random.Shared.Next(100), 110 + Random.Shared.Next(100), 130,145,54534,53453)
-            //}).ToArray());
-        }
-        else if(ChartType is "pie")
-        {
-            EChartType.Json["series"].AsArray().First()["data"] = new JsonArray(Metrics.Select(item => new JsonObject
-            {
-                ["name"] = item.DisplayName,
-                ["value"] = Random.Shared.Next(100)
+                ["data"] = new JsonArray(item.Values.Take(1000).Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Convert.ToDouble(value[1]))).ToArray())
             }).ToArray());
         }
         else if (ChartType is "line-area")
         {
-            EChartType.Json["legend"]!["data"]= new JsonArray(Metrics.Select(item => (JsonNode)item.DisplayName!).ToArray());
-            EChartType.Json["series"] = new JsonArray(Metrics.Select(item => new JsonObject
+            var data = GetMatrixRangeData();
+            EChartType.Json["series"] = new JsonArray(data.Take(3).Select(item => new JsonObject
             {
-                ["name"] = item.DisplayName,
+                ["name"] = string.Join("-", item.Metric.Values),
                 ["type"] = "line",
                 ["stack"] = "Total",
                 ["areaStyle"] = new JsonObject(),
@@ -429,22 +417,32 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
                 {
                     ["focus"] = "series"
                 },
-                ["data"] = new JsonArray(120 + Random.Shared.Next(100), 200 + Random.Shared.Next(100), 150 + Random.Shared.Next(100), 80 + Random.Shared.Next(100), 70 + Random.Shared.Next(100), 110 + Random.Shared.Next(100), 130)
+                ["data"] = new JsonArray(item.Values.Take(1000).Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Convert.ToDouble(value[1]))).ToArray())
+            }).ToArray());
+        }
+        else if (ChartType is "pie")
+        {
+            var data = GetInstantVectorData();
+            EChartType.Json["series"].AsArray().First()["data"] = new JsonArray(data.Select(item => new JsonObject
+            {
+                ["name"] = string.Join("-", item.Metric.Values),
+                ["value"] = Convert.ToDouble(item.Value[1])
             }).ToArray());
         }
         else if(ChartType is "gauge")
         {
-            EChartType.Json["series"].AsArray().First()["data"] = new JsonArray(Metrics.Select(item => new JsonObject
+            var data = GetInstantVectorData();
+            EChartType.Json["series"].AsArray().First()["data"] = new JsonArray(data.Take(1).Select(item => new JsonObject
             {
-                ["name"] = item.DisplayName,
-                ["value"] = Random.Shared.Next(100),
+                ["name"] = string.Join("-", item.Metric.Values),
+                ["value"] = Convert.ToDouble(item.Value[1]),
                 ["title"] = new JsonObject()
                 {
-                    ["offsetCenter"] = new JsonArray($"{GetPosition(Metrics.IndexOf(item)+1)}%","80%")
+                    ["offsetCenter"] = new JsonArray($"{GetPosition(data.IndexOf(item)+1)}%","80%")
                 },
                 ["detail"] = new JsonObject()
                 {
-                    ["offsetCenter"] = new JsonArray($"{GetPosition(Metrics.IndexOf(item)+1)}%", "95%")
+                    ["offsetCenter"] = new JsonArray($"{GetPosition(data.IndexOf(item)+1)}%", "95%")
                 },
             }).ToArray());
         }
@@ -468,5 +466,56 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
                 return 60 * index - 32 * Metrics.Count;
             }
         }
+
+        List<QueryResultMatrixRangeResponse> GetMatrixRangeData()
+        {
+            List<QueryResultMatrixRangeResponse> data = new();
+
+            foreach (var item in _chartData)
+            {
+                if (item is not null)
+                {
+                    foreach (var result in item.Result)
+                    {
+                        if (result is QueryResultMatrixRangeResponse matrix) data.Add(matrix);
+                    }
+                }
+            }
+
+            return data;
+        }
+
+        List<QueryResultInstantVectorResponse> GetInstantVectorData()
+        {
+            List<QueryResultInstantVectorResponse> data = new();
+
+            foreach (var item in _chartData)
+            {
+                if (item is not null)
+                {
+                    foreach (var result in item.Result)
+                    {
+                        if (result is QueryResultInstantVectorResponse matrix) data.Add(matrix);
+                    }
+                }
+            }
+
+            return data;
+        }
+    }
+
+    public override UpsertPanelDto Clone(UpsertPanelDto panel)
+    {
+        base.Clone(panel);
+        var value = this[ExtensionFieldTypes.ChartType];
+        if (value is string stringValue)
+        {
+            ChartType = stringValue;
+        }
+        else if (value is JsonElement jsonElement)
+        {
+            ChartType = jsonElement.GetString() ?? "table";
+        }
+        return this;
     }
 }

@@ -25,21 +25,38 @@ public partial class ChartPanel
             ["e-chart"] = new(typeof(EChart), new() { ["Value"] = Value }),
         };
 
-        IsLoading = true;
-        var data = await GetMetricsAsync();
-        Value.SetChartData(data);
-        IsLoading = false;
+        await ReloadAsync();
     }
 
     async Task<List<QueryResultDataResponse>> GetMetricsAsync()
     {
-        return await base.ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto()
+        if(Value.ChartType is "pie" or "gauge")
         {
-            Start = ConfigurationRecord.StartTime.UtcDateTime,
-            End = ConfigurationRecord.EndTime.UtcDateTime,
-            ServiceName = ConfigurationRecord.AppName,
-            Step = "5s",
-            MetricNames = Value.Metrics.Select(item => item.Name).ToList()
-        });
+            return await base.ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto()
+            {
+                Time = ConfigurationRecord.StartTime.UtcDateTime,
+                ServiceName = ConfigurationRecord.AppName,
+                Queries = Value.Metrics.Select(item => item.Name).ToList()
+            });
+        }
+        else
+        {
+            return await base.ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto()
+            {
+                Start = ConfigurationRecord.StartTime.UtcDateTime,
+                End = ConfigurationRecord.EndTime.UtcDateTime,
+                ServiceName = ConfigurationRecord.AppName,
+                Step = "5s",
+                MetricNames = Value.Metrics.Select(item => item.Name).ToList()
+            });
+        }
+    }
+
+    public async Task ReloadAsync()
+    {
+        IsLoading = true;
+        var data = await GetMetricsAsync();
+        Value.SetChartData(data);
+        IsLoading = false;
     }
 }

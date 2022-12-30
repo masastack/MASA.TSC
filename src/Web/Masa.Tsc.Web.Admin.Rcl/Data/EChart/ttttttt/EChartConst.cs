@@ -63,9 +63,7 @@ internal static class EChartConst
       }
     }
   },
-  ""legend"": {
-    ""data"": [""Email"", ""Union Ads"", ""Video Ads"", ""Direct"", ""Search Engine""]
-  },
+  ""legend"":{""show"":true,""left"":""center"",""top"":""top""},
   ""grid"": {
     ""left"": ""3%"",
     ""right"": ""4%"",
@@ -75,8 +73,7 @@ internal static class EChartConst
   ""xAxis"": [
     {
       ""type"": ""category"",
-      ""boundaryGap"": false,
-      ""data"": [""Mon"", ""Tue"", ""Wed"", ""Thu"", ""Fri"", ""Sat"", ""Sun""]
+      ""boundaryGap"": false
     }
   ],
   ""yAxis"": [

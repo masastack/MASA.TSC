@@ -15,8 +15,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
     [Parameter]
     public UpsertChartPanelDto Value { get; set; }
 
-    [Parameter]
-    public Func<Task<List<QueryResultDataResponse>>> GetMetrics { get; set; }
+    public ChartPanel ChartPanel { get; set; }
 
     bool IsLoading { get; set; }
 
@@ -25,12 +24,6 @@ public partial class ChartPanelConfiguration : TscComponentBase
     protected override void OnInitialized()
     {
         ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
-    }
-
-    public void ListTypeChanged(string type)
-    {
-        _listType = type;
-        //this.StateHasChanged();
     }
 
     void NavigateToPanelConfigurationPage()
@@ -58,7 +51,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
     async Task GetGetMetricsAsync()
     {
         IsLoading = true;
-        Value.SetChartData(await GetMetrics());
+        await ChartPanel.ReloadAsync();
         IsLoading = false;
     }
 
