@@ -11,6 +11,8 @@ public partial class Configuration
     [Parameter]
     public string? DashboardId { get; set; }
 
+    List<PanelGrids> PanelGrids { get; set; } = new();
+
     bool IsEdit { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
@@ -61,6 +63,7 @@ public partial class Configuration
 
     async Task SaveAsync()
     {
+        await Task.WhenAll(PanelGrids.Select(item => item.SavePanelGridAsync()));
         await ApiCaller.InstrumentService.UpsertPanelAsync(Guid.Parse(ConfigurationRecord.DashboardId), ConfigurationRecord.Panels.ToArray());
         OpenSuccessMessage(T("Save success"));
     }

@@ -8,7 +8,7 @@ internal static class EChartConst
     #region init json
     private const string BarBasicJson = @"{
  ""tooltip"":{""trigger"":""axis"",""show"":true},
- ""legend"":{""show"":true,""left"":""center"",""top"":""bottom""},
+ ""legend"":{""show"":true,""left"":""center"",""top"":""top""},
   ""grid"": {
     ""show"": false,
     ""top"": 20,
@@ -17,8 +17,7 @@ internal static class EChartConst
     ""right"": 20
   },
 ""xAxis"": {
-    ""type"": ""category"",
-    ""data"": [""Mon"", ""Tue"", ""Wed"", ""Thu"", ""Fri"", ""Sat"", ""Sun""]
+    ""type"": ""category""
   },
   ""yAxis"": {
     ""type"": ""value""

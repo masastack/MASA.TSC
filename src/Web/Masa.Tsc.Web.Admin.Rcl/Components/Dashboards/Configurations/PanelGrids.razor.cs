@@ -14,12 +14,16 @@ public partial class PanelGrids
     [CascadingParameter]
     public bool IsEdit { get; set; }
 
+    [CascadingParameter]
+    public List<PanelGrids> PanelGridRange { get; set; }
+
     public bool IsEditTabItem { get; set; }
 
     private MGridstack<UpsertPanelDto>? Gridstack;
 
     protected override void OnInitialized()
     {
+        PanelGridRange.Add(this);
         IniPanels(Panels);
     }
 
@@ -62,10 +66,13 @@ public partial class PanelGrids
             panel.ParentPanel.ChildPanels.Remove(panel);
     }
 
-    void ReplacePanel(UpsertPanelDto panel)
+    async Task ReplacePanel(UpsertPanelDto panel)
     {
-        Panels.RemoveAll(p => p.Id == panel.Id);
+        var data = Panels.First(p => p.Id == panel.Id);
+        panel.Clone(data);
+        Panels.Remove(data);
         Panels.Add(panel);
+        await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
     }
 
     void ConfigurationChartPanel(UpsertPanelDto panel)
@@ -73,7 +80,7 @@ public partial class PanelGrids
         NavigationManager.NavigateTo($"/dashboard/configuration/chart/{panel.Id}");
     }
 
-    async Task SavePanelGrid()
+    public async Task SavePanelGridAsync()
     {
         var grids = await Gridstack!.OnSave();
         foreach (var grid in grids)
