@@ -44,8 +44,7 @@ public partial class PanelSelect
                 panel = new UpsertTabsPanelDto(PanelId);
                 break;
             case PanelTypes.Chart:
-                panel = new UpsertChartPanelDto(PanelId);
-                NavigationManager.NavigateTo($"/dashboard/configuration/chart/{panel.Id}");
+                panel = new UpsertChartPanelDto(PanelId);               
                 break;
             default:
                 panel.Id = PanelId;
@@ -54,5 +53,6 @@ public partial class PanelSelect
         }        
 
         await OnSelect.InvokeAsync(panel);
+        if(type is PanelTypes.Chart) NavigationManager.NavigateTo($"/dashboard/configuration/chart/{panel.Id}");
     }
 }

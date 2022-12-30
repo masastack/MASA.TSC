@@ -68,11 +68,14 @@ public partial class PanelGrids
 
     async Task ReplacePanel(UpsertPanelDto panel)
     {
+        await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
         var data = Panels.First(p => p.Id == panel.Id);
-        panel.Clone(data);
+        panel.X = data.X;
+        panel.Y = data.Y;
+        panel.Width = data.Width;
+        panel.Height = data.Height;
         Panels.Remove(data);
         Panels.Add(panel);
-        await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
     }
 
     void ConfigurationChartPanel(UpsertPanelDto panel)
