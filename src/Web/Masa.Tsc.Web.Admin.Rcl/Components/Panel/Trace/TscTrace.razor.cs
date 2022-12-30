@@ -131,7 +131,7 @@ public partial class TscTrace
                 values[index].Item3 = (string)item[1];
             }
 
-            var timeSpan = (long)Math.Floor((double)item[0] * 1000);
+            var timeSpan = (long)Math.Floor(Convert.ToDouble(item[0]) * 1000);
             var time = timeSpan.ToDateTime();
             values[index].Item1 = time.Format(CurrentTimeZone, fmt);
             //values[index].Item1 = timeSpan.ToString();
