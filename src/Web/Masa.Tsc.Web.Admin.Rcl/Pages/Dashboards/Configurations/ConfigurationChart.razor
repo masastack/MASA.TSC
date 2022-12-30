@@ -1,23 +1,20 @@
-﻿@page "/dashboard/configuration/chart/{dashboardId}/{panelId}"
+﻿@page "/dashboard/configuration/chart/{panelId}"
+@inherits TscComponentBase
 
-<ChartPanelConfiguration DashboardId="@DashboardId" Value="Panel" />
+<ChartPanelConfiguration GetMetrics=GetMetricsAsync Value="Panel" />
 
 @code {
     [Inject]
-    List<UpsertPanelDto> Panels { get; set; }
+    ConfigurationRecord ConfigurationRecord { get; set; }
 
     [Parameter]
     public string? PanelId { get; set; }
 
-
-    [Parameter]
-    public string DashboardId { get; set; }
-
-    public UpsertChartPanelDto Panel { get; set; }
+    UpsertChartPanelDto Panel { get; set; }
 
     protected override void OnInitialized()
     {
-        Panel = FindPanel(Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException("find panel error");
+        Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException("find panel error");
     }
 
     UpsertPanelDto? FindPanel(List<UpsertPanelDto> panels)
@@ -36,5 +33,17 @@
         }
 
         return default;
+    }
+
+    async Task<List<QueryResultDataResponse>> GetMetricsAsync()
+    {
+        return await base.ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto()
+        {
+           Start = ConfigurationRecord.StartTime.UtcDateTime,
+           End = ConfigurationRecord.EndTime.UtcDateTime,
+           ServiceName = ConfigurationRecord.AppName,
+           Step = "5s",
+           MetricNames = Panel.Metrics.Select(item => item.Name).ToList()
+        });
     }
 }

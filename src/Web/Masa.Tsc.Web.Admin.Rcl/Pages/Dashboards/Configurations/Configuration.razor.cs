@@ -6,42 +6,33 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations;
 public partial class Configuration
 {
     [Inject]
-    List<UpsertPanelDto> Panels { get; set; }
+    public ConfigurationRecord ConfigurationRecord { get; set; }
 
     [Parameter]
-    public string DashboardId { get; set; }
+    public string? DashboardId { get; set; }
 
-    [Parameter]
-    public string? Mode { get; set; }
-
-    int AppId { get; set; }
-
-    string Search { get; set; }
+    List<PanelGrids> PanelGrids { get; set; } = new();
 
     bool IsEdit { get; set; } = true;
 
-    DateTimeOffset StartTime { get; set; }
-
-    DateTimeOffset EndTime { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
-        if (Mode is not null)
+        if (DashboardId is null)
         {
             return;
         }
+        ConfigurationRecord.Clear();
+        ConfigurationRecord.DashboardId = DashboardId;
         await GetPanelsAsync();
     }
 
     async Task GetPanelsAsync()
     {
-        var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(DashboardId));
-        //todo get panel config
-        Panels.Clear();
+        var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(ConfigurationRecord.DashboardId));
         if (detail.Panels != null && detail.Panels.Any())
-            Panels.AddRange(detail.Panels);
+            ConfigurationRecord.Panels.AddRange(detail.Panels);
 
-        Convert(Panels);
+        Convert(ConfigurationRecord.Panels);
     }
 
     void Convert(List<UpsertPanelDto> panels)
@@ -62,17 +53,18 @@ public partial class Configuration
 
     void AddPanel()
     {
-        Panels.Insert(0, new());
+        ConfigurationRecord.Panels.Insert(0, new());
     }
 
     async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
-        (StartTime, EndTime) = times;
+        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
     }
 
     async Task SaveAsync()
     {
-        await ApiCaller.InstrumentService.UpsertPanelAsync(Guid.Parse(DashboardId), Panels.ToArray());
+        await Task.WhenAll(PanelGrids.Select(item => item.SavePanelGridAsync()));
+        await ApiCaller.InstrumentService.UpsertPanelAsync(Guid.Parse(ConfigurationRecord.DashboardId), ConfigurationRecord.Panels.ToArray());
         OpenSuccessMessage(T("Save success"));
     }
 }
