@@ -34,12 +34,6 @@ public partial class ChartPanelConfiguration : TscComponentBase
         //this.StateHasChanged();
     }
 
-    public void ListTypeChanged(string type)
-    {
-        _listType = type;
-        //this.StateHasChanged();
-    }
-
     void NavigateToPanelConfigurationPage()
     {
         NavigationManager.NavigateTo($"/dashboard/configuration/record");
