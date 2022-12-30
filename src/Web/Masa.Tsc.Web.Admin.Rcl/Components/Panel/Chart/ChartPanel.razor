@@ -1,5 +1,14 @@
 ﻿@inherits TscComponentBase
 
-<DynamicComponent Type="@CurrentDynamicComponent.ShowType" Parameters=CurrentDynamicComponent.Metadata />
+@if (IsLoading)
+{
+    <div class="d-flex full-height full-width">
+        <div class="ma-auto">@T("数据加载中.....")</div>
+    </div>
+}
+else
+{   
+    <DynamicComponent Type="@CurrentDynamicComponent.ShowType" Parameters=CurrentDynamicComponent.Metadata />
+}
 
 

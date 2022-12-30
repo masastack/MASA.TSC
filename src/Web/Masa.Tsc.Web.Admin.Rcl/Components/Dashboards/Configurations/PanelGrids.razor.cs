@@ -66,13 +66,15 @@ public partial class PanelGrids
             panel.ParentPanel.ChildPanels.Remove(panel);
     }
 
-    async Task ReplacePanel(UpsertPanelDto panel)
-    {
+    void ReplacePanel(UpsertPanelDto panel)
+    {       
         var data = Panels.First(p => p.Id == panel.Id);
-        panel.Clone(data);
+        panel.X = data.X;
+        panel.Y = data.Y;
+        panel.Width = data.Width;
+        panel.Height = data.Height;
         Panels.Remove(data);
         Panels.Add(panel);
-        await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
     }
 
     void ConfigurationChartPanel(UpsertPanelDto panel)
