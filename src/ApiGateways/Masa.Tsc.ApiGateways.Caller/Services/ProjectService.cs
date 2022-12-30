@@ -18,7 +18,6 @@ public class ProjectService : BaseService
 
     public async Task<List<KeyValuePair<string, string>>> GetProjectTypesAsync()
     {
-
         var data = await _dccClient.LabelService.GetListByTypeCodeAsync("ProjectType");
         if (data == null || !data.Any())
             return new List<KeyValuePair<string, string>>();

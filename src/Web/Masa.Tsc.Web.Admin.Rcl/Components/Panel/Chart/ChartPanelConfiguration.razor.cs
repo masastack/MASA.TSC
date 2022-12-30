@@ -5,6 +5,10 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
 public partial class ChartPanelConfiguration : TscComponentBase
 {
+    List<string> _systemIdentities = new List<string>();
+    List<StringNumber> _panelValues = new() { 1 };
+    string _listType = string.Empty;
+
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
@@ -12,28 +16,16 @@ public partial class ChartPanelConfiguration : TscComponentBase
     public UpsertChartPanelDto Value { get; set; }
 
     [Parameter]
-    public string DashboardId { get; set; }
+    public Func<Task<List<QueryResultDataResponse>>> GetMetrics { get; set; }
+
+    bool IsLoading { get; set; }
 
     string ValueBackup { get; set; }
 
-    Dictionary<string, DynamicComponentDescription> DynamicComponentMap { get; set; }
-    List<StringNumber> _panelValues = new() { 1 };
-    string _listType = string.Empty;
-
-    DynamicComponentDescription CurrentDynamicComponent => DynamicComponentMap.ContainsKey(Value.ChartType) ? DynamicComponentMap[Value.ChartType] : DynamicComponentMap["e-chart"];
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        DynamicComponentMap = new()
-        {
-            ["table"] = new(typeof(Lists), new()
-            {
-                ["Value"] = Value,
-                ["OnListTypeChanged"] = EventCallback.Factory.Create<string>(this, ListTypeChanged)
-            }),
-            ["e-chart"] = new(typeof(EChartConfiguration), new() { ["Value"] = Value }),
-        };
         ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
+        await GetGetMetricsAsync();
     }
 
     public void ListTypeChanged(string type)
@@ -44,7 +36,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
 
     void NavigateToPanelConfigurationPage()
     {
-        NavigationManager.NavigateTo($"/dashboard/configuration/{DashboardId}/record");
+        NavigationManager.NavigateTo($"/dashboard/configuration/record");
     }
 
     void Cancel()
@@ -52,5 +44,28 @@ public partial class ChartPanelConfiguration : TscComponentBase
         var backUp = JsonSerializer.Deserialize<UpsertPanelDto>(ValueBackup);
         Value.Clone(backUp!);
         NavigateToPanelConfigurationPage();
+    }
+
+    void Add()
+    {
+        Value.Metrics.Add(new());
+    }
+
+    void Remove(PanelMetricDto metric)
+    {
+        Value.Metrics.Remove(metric);
+    }
+
+    async Task GetGetMetricsAsync()
+    {
+        IsLoading = true;
+        Value.SetChartData(await GetMetrics());
+        IsLoading = false;
+    }
+
+    async Task MetricNameChangedAsync(PanelMetricDto metric, string metricName)
+    {
+        metric.Name = metricName;
+        await GetGetMetricsAsync();
     }
 }

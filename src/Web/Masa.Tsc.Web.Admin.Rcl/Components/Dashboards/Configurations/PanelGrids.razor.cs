@@ -14,12 +14,16 @@ public partial class PanelGrids
     [CascadingParameter]
     public bool IsEdit { get; set; }
 
+    [CascadingParameter]
+    public List<PanelGrids> PanelGridRange { get; set; }
+
     public bool IsEditTabItem { get; set; }
 
     private MGridstack<UpsertPanelDto>? Gridstack;
 
     protected override void OnInitialized()
     {
+        PanelGridRange.Add(this);
         IniPanels(Panels);
     }
 
@@ -28,10 +32,10 @@ public partial class PanelGrids
         foreach (var panel in panels)
         {
             panel.ParentPanel = parentPanel;
-            if(panel.ChildPanels.Any())
+            if (panel.ChildPanels.Any())
             {
                 IniPanels(panel.ChildPanels, panel);
-            }           
+            }
         }
     }
 
@@ -52,7 +56,7 @@ public partial class PanelGrids
 
     void RemovePanel(UpsertPanelDto panel)
     {
-        if(panel is UpsertTabItemPanelDto tabItem)
+        if (panel is UpsertTabItemPanelDto tabItem)
         {
             tabItem.RemovePanel(panel);
         }
@@ -62,10 +66,13 @@ public partial class PanelGrids
             panel.ParentPanel.ChildPanels.Remove(panel);
     }
 
-    void ReplacePanel(UpsertPanelDto panel)
+    async Task ReplacePanel(UpsertPanelDto panel)
     {
-        Panels.RemoveAll(p => p.Id == panel.Id);
+        var data = Panels.First(p => p.Id == panel.Id);
+        panel.Clone(data);
+        Panels.Remove(data);
         Panels.Add(panel);
+        await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
     }
 
     void ConfigurationChartPanel(UpsertPanelDto panel)
@@ -73,10 +80,10 @@ public partial class PanelGrids
         NavigationManager.NavigateTo($"/dashboard/configuration/chart/{panel.Id}");
     }
 
-    async Task SavePanelGrid()
+    public async Task SavePanelGridAsync()
     {
         var grids = await Gridstack!.OnSave();
-        foreach(var grid in grids)
+        foreach (var grid in grids)
         {
             var panel = Panels.First(p => p.Id == Guid.Parse(grid.Id));
             panel.Width = grid.W;
