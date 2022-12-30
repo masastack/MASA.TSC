@@ -22,10 +22,9 @@ public partial class ChartPanelConfiguration : TscComponentBase
 
     string ValueBackup { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
-        await GetGetMetricsAsync();
     }
 
     public void ListTypeChanged(string type)

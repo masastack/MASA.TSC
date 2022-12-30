@@ -66,9 +66,8 @@ public partial class PanelGrids
             panel.ParentPanel.ChildPanels.Remove(panel);
     }
 
-    async Task ReplacePanel(UpsertPanelDto panel)
-    {
-        await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
+    void ReplacePanel(UpsertPanelDto panel)
+    {       
         var data = Panels.First(p => p.Id == panel.Id);
         panel.X = data.X;
         panel.Y = data.Y;
