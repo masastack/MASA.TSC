@@ -79,7 +79,7 @@
 		<Folder Include="Domain\Teams\Repositories\" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<ItemGroup>		
 		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
 	</ItemGroup>
 

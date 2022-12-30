@@ -1,7 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Contracts.Admin.Metrics;
 using Masa.Tsc.Service.Admin.Application.Metrics.Queries;
 
 namespace Masa.Tsc.Service.Admin.Services;
@@ -14,6 +13,7 @@ public class MetricService : ServiceBase
         App.MapGet($"{BaseUri}/range-values", GetRangeValuesAsync);
         App.MapGet($"{BaseUri}/query-range", GetQueryRangeAsync);
         App.MapGet($"{BaseUri}/multi-range", GetMultiRangeAsync);
+        App.MapGet($"{BaseUri}/multi-query", GetMultiQueryAsync);
     }
 
     public async Task<IEnumerable<string>> GetNamesAsync([FromServices] IEventBus eventBus, [FromQuery] string? match)
@@ -55,6 +55,13 @@ public class MetricService : ServiceBase
     private async Task<List<QueryResultDataResponse>> GetMultiRangeAsync([FromServices] IEventBus eventBus, [FromBody] RequestMultiQueryRangeDto param)
     {
         var query = new MultiRangeQuery(param);
+        await eventBus.PublishAsync(query);
+        return query.Result;
+    }
+
+    private async Task<List<QueryResultDataResponse>> GetMultiQueryAsync([FromServices] IEventBus eventBus, [FromBody] RequestMultiQueryDto param)
+    {
+        var query = new MultiQuery(param);
         await eventBus.PublishAsync(query);
         return query.Result;
     }

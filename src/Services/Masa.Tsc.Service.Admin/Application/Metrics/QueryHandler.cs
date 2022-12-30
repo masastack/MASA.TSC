@@ -166,6 +166,25 @@ public class QueryHandler
     }
 
     [EventHandler]
+    public async Task GetMultiQueryAsync(MultiQuery query)
+    {
+        var tasks = new Task<QueryResultCommonResponse>[query.Data.Queries.Count];
+        var index = 0;
+        foreach (var name in query.Data.Queries)
+        {
+            var metric = AppendCondition(name, query.Data.ServiceName, query.Data.Instance, query.Data.EndPoint);
+            tasks[index] = _prometheusClient.QueryAsync(new QueryRequest
+            {
+                Time = query.Data.Time.ToUnixTimestamp().ToString(),
+                Query = metric
+            });
+            index++;
+        }
+        var result = await Task.WhenAll(tasks);
+        query.Result = result.Select(item => item.Data!).ToList();
+    }
+
+    [EventHandler]
     public async Task GetValuesAsync(ValuesQuery query)
     {
         var metric = "";

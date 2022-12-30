@@ -11,7 +11,7 @@
                     <TeamDetail Value=@_team></TeamDetail>
                 </MCol>
                 <MCol Cols="10" Class="pa-8">
-                    <SearchBar AppId=@_appId Apps=@_team.CurrentProject.Apps OnSearch="LoadChartAsync"></SearchBar>
+                    <SearchBar Apps=@_team.CurrentProject.Apps OnSearch="LoadChartAsync"></SearchBar>
                     <ProjectCharts Class="mt-2" @ref="_projectCharts"></ProjectCharts>
                 </MCol>
             </MRow>

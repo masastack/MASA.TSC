@@ -6,17 +6,16 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class SearchBar
 {
     [Parameter]
-    public List<AppDto> Apps { get; set; } = new();
-
-    [Parameter]
-    public string AppId
+    public List<AppDto> Apps
     {
-        get { return _value.AppId; }
+        get { return _apps; }
         set
         {
-            _defaultAppId = value;
-            if (_value.AppId == null)
-                _value.AppId = _defaultAppId;
+            _apps = value ?? new();
+            if (_apps != null && _apps.Any() && string.IsNullOrEmpty(_value.AppId))
+            {
+                _value.AppId = _apps.First().Identity;
+            }
         }
     }
 
@@ -27,7 +26,9 @@ public partial class SearchBar
         set
         {
             if (value != null)
+            {
                 _value = value;
+            }
             else
             {
                 _value.AppId = default!;
@@ -41,30 +42,15 @@ public partial class SearchBar
     [Parameter]
     public EventCallback<ProjectAppSearchModel> OnSearch { get; set; }
 
-    private string _searchIconClass = "fas fa-rotate";
-    //private bool _loading = false;
     private ProjectAppSearchModel _value = new();
-    private string _defaultAppId;
-    private List<string> _selectDataSource = new List<string>
-    {
-        "15分钟",
-        "30分钟",
-        "1小时",
-        "5小时"
-    };
+    private List<AppDto> _apps = new();
+
+    private AppDto GetApp() => Apps?.FirstOrDefault(item => item.Identity == _value.AppId);
 
     private async Task SearchAsync()
     {
-        //_searchIconClass = "fas fa-circle-notch fa-spin";
-        //StateHasChanged();
-        //_loading = true;
         if (OnSearch.HasDelegate)
             await OnSearch.InvokeAsync(Value);
-        //_loading = false;
-        //Thread.Sleep(500);
-        //_searchIconClass = "fas fa-rotate";
-        //StateHasChanged();
-        //await Task.CompletedTask;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -78,7 +64,8 @@ public partial class SearchBar
 
     private async Task OnSelectItemUpdate(AppDto item)
     {
-        AppId = item.Identity;
+        _value.AppId = item.Identity;
+        StateHasChanged();
         await SearchAsync();
     }
 }

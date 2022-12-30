@@ -46,6 +46,16 @@ public class MetricService : BaseService
         return default!;
     }
 
+    public async Task<List<QueryResultDataResponse>> GetMultiQueryAsync(RequestMultiQueryDto param)
+    {
+        var result = (await Caller.GetByBodyAsync<List<QueryResultDataResponse>>($"{RootPath}/multi-query", param))!;
+        if (result != null && result.Any())
+        {
+            return result.Select(item => ConvertResult(item)).ToList();
+        }
+        return default!;
+    }
+
     public async Task<List<string>> GetValues(RequestMetricListDto param)
     {
        return await Caller.GetByBodyAsync<List<string>>($"{RootPath}/multi-range", param);

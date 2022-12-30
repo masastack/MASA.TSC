@@ -1,6 +1,10 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Nest;
+using static Nest.JoinField;
+using System.Collections.Generic;
+
 namespace Masa.Tsc.Service.Admin.Domain.Aggregates;
 
 public class Panel : AggregateRoot<Guid>
@@ -151,10 +155,35 @@ public class Panel : AggregateRoot<Guid>
 
     private void UpdateTabItem(UpsertPanelDto update, int index)
     {
-        if (Type == PanelTypes.TabItem)
+        if (Type != PanelTypes.TabItem)
             return;
 
         Index = index;
         Title = update.Title;
+
+        if (update.ChildPanels == null || !update.ChildPanels.Any())
+        {
+            if (Panels != null && Panels.Any())
+                Panels.Clear();
+        }
+        else
+        {
+            var list = new List<Panel>();
+            foreach (var item in update.ChildPanels)
+            {
+                var panel = Panels.FirstOrDefault(x => x.Id == item.Id);
+                if (panel == null)
+                {
+                    panel = new Panel(item, InstrumentId,Id);
+                }
+                else
+                {
+                    panel.Update(item);
+                    Panels.Remove(panel);
+                }
+                list.Add(panel);
+            }
+            Panels = list;
+        }
     }
 }
