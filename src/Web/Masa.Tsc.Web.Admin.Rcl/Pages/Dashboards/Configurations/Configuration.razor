@@ -5,10 +5,10 @@
 <AutoHeight>
     <HeaderContent>
         <div class="d-flex mb-6">
-            <AppAutoComplete Value="ConfigurationRecord.AppName" FillBackground=false Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" />
+            <AppAutoComplete @bind-Value="@ConfigurationRecord.AppName" FillBackground=false Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" />
             <div style="width:100%;" class="d-flex">
-                <SearchTextField Value="@ConfigurationRecord.Search" FillBackground=false Clearable Class="mr-6 my-auto" />
-                <DateTimeRangeToolbar Class="mr-6 my-auto" OnUpdate="OnDateTimeUpdateAsync" />
+                <SearchTextField @bind-Value="@ConfigurationRecord.Search" FillBackground=false Clearable Class="mr-6 my-auto" />
+                <DateTimeRangeToolbar Class="mr-6 my-auto" OnUpdate="OnDateTimeUpdateAsync" /> @*StartDateTime=ConfigurationRecord.StartTime EndDateTime=ConfigurationRecord.EndTime*@
             </div>
             <MSwitch @bind-Value="IsEdit" LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="mr-6 my-auto" />
             <SButton Icon Class="mr-3 my-auto" OnClick="() => AddPanel()">
@@ -23,7 +23,9 @@
         <DefaultCard Class="full-height">
             <CascadingValue Value="IsEdit">
                 <CascadingValue Value="PanelGrids" IsFixed>
-                    <PanelGrids Panels="ConfigurationRecord.Panels" />
+                    <CascadingValue Value="ConfigurationRecord">
+                        <PanelGrids Panels="ConfigurationRecord.Panels" />
+                    </CascadingValue>
                 </CascadingValue>
             </CascadingValue>
         </DefaultCard>

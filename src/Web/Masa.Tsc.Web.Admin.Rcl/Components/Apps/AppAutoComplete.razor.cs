@@ -28,7 +28,7 @@ public partial class AppAutoComplete
     {
         if (string.IsNullOrEmpty(Value) && Apps.Any())
         {
-            var value = Apps.First().Name;
+            var value = Apps.First().Identity;
             await ValueChanged.InvokeAsync(value);
         }
     }

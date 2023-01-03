@@ -522,28 +522,28 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
 
         //Key = key;
         //todo add set chart option
-        EChartType.SetValue("yAxis.show", YAxis.Show);
-        EChartType.SetValue("yAxis.axisLine.show", YAxis.ShowLine);
-        EChartType.SetValue("yAxis.axisTick.show", YAxis.ShowTick);
-        EChartType.SetValue("yAxis.axisLabel.show", YAxis.ShowLabel);
-        EChartType.SetValue("xAxis.show", XAxis.Show);
-        EChartType.SetValue("xAxis.axisLine.show", XAxis.ShowLine);
-        EChartType.SetValue("xAxis.axisTick.show", XAxis.ShowTick);
-        EChartType.SetValue("xAxis.axisLabel.show", XAxis.ShowLabel);
-        EChartType.SetValue("toolbox.show", Toolbox.Show);
-        EChartType.SetValue("toolbox.orient", Toolbox.Orient);
-        EChartType.SetValue("toolbox.left", Toolbox.XPositon);
-        EChartType.SetValue("toolbox.top", Toolbox.YPositon);
-        EChartType.SetValue("toolbox.feature", Toolbox.Feature.ToDictionary(f => f.AsT0, f => new object()));
-        EChartType.SetValue("legend.show", Legend.Show);
-        EChartType.SetValue("legend.orient", Legend.Orient);
-        EChartType.SetValue("legend.left", Legend.XPositon);
-        EChartType.SetValue("legend.top", Legend.YPositon);
-        EChartType.SetValue("legend.type", Legend.Type);
-        EChartType.SetValue("tooltip.show", Tooltip.Show);
-        EChartType.SetValue("tooltip.renderMode", Tooltip.RenderModel);
-        EChartType.SetValue("tooltip.className", Tooltip.ClassName);
-        EChartType.SetValue("tooltip.trigger", Tooltip.Trigger);
+        //EChartType.SetValue("yAxis.show", YAxis.Show);
+        //EChartType.SetValue("yAxis.axisLine.show", YAxis.ShowLine);
+        //EChartType.SetValue("yAxis.axisTick.show", YAxis.ShowTick);
+        //EChartType.SetValue("yAxis.axisLabel.show", YAxis.ShowLabel);
+        //EChartType.SetValue("xAxis.show", XAxis.Show);
+        //EChartType.SetValue("xAxis.axisLine.show", XAxis.ShowLine);
+        //EChartType.SetValue("xAxis.axisTick.show", XAxis.ShowTick);
+        //EChartType.SetValue("xAxis.axisLabel.show", XAxis.ShowLabel);
+        //EChartType.SetValue("toolbox.show", Toolbox.Show);
+        //EChartType.SetValue("toolbox.orient", Toolbox.Orient);
+        //EChartType.SetValue("toolbox.left", Toolbox.XPositon);
+        //EChartType.SetValue("toolbox.top", Toolbox.YPositon);
+        //EChartType.SetValue("toolbox.feature", Toolbox.Feature.ToDictionary(f => f.AsT0, f => new object()));
+        //EChartType.SetValue("legend.show", Legend.Show);
+        //EChartType.SetValue("legend.orient", Legend.Orient);
+        //EChartType.SetValue("legend.left", Legend.XPositon);
+        //EChartType.SetValue("legend.top", Legend.YPositon);
+        //EChartType.SetValue("legend.type", Legend.Type);
+        //EChartType.SetValue("tooltip.show", Tooltip.Show);
+        //EChartType.SetValue("tooltip.renderMode", Tooltip.RenderModel);
+        //EChartType.SetValue("tooltip.className", Tooltip.ClassName);
+        //EChartType.SetValue("tooltip.trigger", Tooltip.Trigger);
     }
 
     private void YAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)

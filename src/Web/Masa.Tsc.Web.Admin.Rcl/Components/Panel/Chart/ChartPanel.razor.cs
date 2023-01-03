@@ -8,12 +8,14 @@ public partial class ChartPanel
     [Parameter]
     public UpsertChartPanelDto Value { get; set; }
 
-    [Inject]
+    [CascadingParameter]
     ConfigurationRecord ConfigurationRecord { get; set; }
 
     bool IsLoading { get; set; }
 
     string? OldChartType { get; set; }
+
+    string? OldConfigRecordKey { get; set; }
 
     Dictionary<string, DynamicComponentDescription> DynamicComponentMap { get; set; }
 
@@ -49,6 +51,16 @@ public partial class ChartPanel
                 }
             }
             OldChartType = Value.ChartType;
+        }
+
+        if(OldConfigRecordKey != ConfigurationRecord.Key)
+        {
+            if(OldConfigRecordKey is not null)
+            {
+                await ReloadAsync();
+            }
+
+            OldConfigRecordKey = ConfigurationRecord.Key;
         }
     }
 
