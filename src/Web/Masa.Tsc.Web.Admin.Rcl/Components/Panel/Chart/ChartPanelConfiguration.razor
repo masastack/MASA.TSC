@@ -58,9 +58,6 @@
                                         <MCard Class="pa-2" Style="background-color:#F6F8FD">
                                             <MCardText>
                                                 <MRow>
-                                                    @*<MCol Md="12">
-                                                        <STextField BackgroundColor="white" DebounceInterval="500" @bind-Value="item.DisplayName" Label="显示名称" />
-                                                    </MCol>*@
                                                     <MCol Md="12">
                                                         <STextField BackgroundColor="white" DebounceInterval="1000" TValue="string" Value="item.Name" ValueChanged="async value => await MetricNameChangedAsync(item,value) " Label="指标名称" />
                                                     </MCol>

@@ -13,6 +13,8 @@ public partial class ChartPanel
 
     bool IsLoading { get; set; }
 
+    string? OldChartType { get; set; }
+
     Dictionary<string, DynamicComponentDescription> DynamicComponentMap { get; set; }
 
     DynamicComponentDescription CurrentDynamicComponent => DynamicComponentMap.ContainsKey(Value.ChartType) ? DynamicComponentMap[Value.ChartType] : DynamicComponentMap["e-chart"];
@@ -26,6 +28,28 @@ public partial class ChartPanel
         };
 
         await ReloadAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if(OldChartType != Value.ChartType)
+        {
+            if(OldChartType is "line" or "bar" or "line-area")
+            {
+                if(Value.ChartType is "gauge" or "heatmap" or "pie")
+                {
+                    await ReloadAsync();
+                }
+            }
+            else if(OldChartType is "gauge" or "heatmap" or "pie")
+            {
+                if (Value.ChartType is "line" or "bar" or "line-area")
+                {
+                    await ReloadAsync();
+                }
+            }
+            OldChartType = Value.ChartType;
+        }
     }
 
     async Task<List<QueryResultDataResponse>> GetMetricsAsync()
