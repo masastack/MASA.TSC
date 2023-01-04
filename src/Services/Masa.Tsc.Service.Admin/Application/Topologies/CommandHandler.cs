@@ -33,24 +33,24 @@ public class CommandHandler
     public async Task StartAsync(StartCommand command)
     {
         var stateModel = await _multilevelCacheClient.GetAsync<TaskRunStateDto>(TopologyConstants.TOPOLOGY_TASK_KEY);
-        //if (stateModel != null)
-        //{
-        //    if (stateModel.Status == 1)
-        //        throw new UserFriendlyException("Task has running !");
-        //    else if (stateModel.Status == 2)
-        //    {
-        //        stateModel.Status = 1;
-        //        stateModel.End = command.End;
-        //    }
-        //    else
-        //    {
-        //        if (stateModel.End > DateTime.MinValue)
-        //            stateModel.Start = stateModel.End;
-        //        stateModel.End = command.End;
-        //        stateModel.Status = 1;
-        //    }
-        //}
-        //else
+        if (stateModel != null)
+        {
+            if (stateModel.Status == 1)
+                throw new UserFriendlyException("Task has running !");
+            else if (stateModel.Status == 2)
+            {
+                stateModel.Status = 1;
+                stateModel.End = command.End;
+            }
+            else
+            {
+                if (stateModel.End > DateTime.MinValue)
+                    stateModel.Start = stateModel.End;
+                stateModel.End = command.End;
+                stateModel.Status = 1;
+            }
+        }
+        else
         {
             stateModel = new TaskRunStateDto()
             {

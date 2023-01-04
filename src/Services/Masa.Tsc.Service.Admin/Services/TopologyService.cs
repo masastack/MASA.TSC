@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Service.Admin.Application.Topologies.Commands;
-
 namespace Masa.Tsc.Service.Admin.Services;
 
 public class TopologyService : ServiceBase
@@ -12,8 +10,10 @@ public class TopologyService : ServiceBase
         App.MapGet($"{BaseUri}/Start", StartAsync);
     }
 
-    public async Task StartAsync([FromServices] IEventBus eventBus, [FromQuery] DateTime start, [FromQuery] DateTime end)
+    public async Task StartAsync([FromServices] IEventBus eventBus, [FromQuery] DateTimeOffset excuteTime)
     {
+        var end = excuteTime.ToUniversalTime().DateTime;
+        var start = DateTime.MinValue;
         var command = new StartCommand(start, end);
         await eventBus.PublishAsync(command);
     }
