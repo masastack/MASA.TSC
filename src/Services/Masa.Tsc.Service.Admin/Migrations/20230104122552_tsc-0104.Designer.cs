@@ -4,6 +4,7 @@ using Masa.Tsc.Service.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Masa.Tsc.Service.Admin.Migrations
 {
     [DbContext(typeof(TscDbContext))]
-    partial class TscDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230104122552_tsc-0104")]
+    partial class tsc0104
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

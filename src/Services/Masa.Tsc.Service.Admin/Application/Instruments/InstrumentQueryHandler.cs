@@ -112,6 +112,7 @@ public class InstrumentQueryHandler
                     Caculate = item.Caculate,
                     Color = item.Color,
                     Icon = item.Icon,
+                    DisplayName= item.DisplayName,
                     Id = item.Id,
                     Name = item.Name,
                     Sort = item.Sort,
