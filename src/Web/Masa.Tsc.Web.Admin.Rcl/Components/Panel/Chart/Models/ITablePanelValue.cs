@@ -19,5 +19,7 @@ public interface ITablePanelValue : IPanelValue
 
     public ListTypes ListType { get; set; }
 
-    public List<List<Dessert>> GetTableOption(List<string> services, string jumpName, string jumpId);
+    public List<List<Dessert>> GetTableOption();
+
+    public void SetTableOption(List<string> services, string jumpName, string jumpId);
 }

@@ -532,6 +532,24 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         return data;
     }
 
+    List<List<QueryResultMatrixRangeResponse>> GetTableMatrixRangeData()
+    {
+        List<List<QueryResultMatrixRangeResponse>> data = new();
+
+        if (_chartData is not null)
+        {
+            foreach (var item in _chartData)
+            {
+                if (item is not null)
+                {
+                    data.Add(item.Result.Select(item => (QueryResultMatrixRangeResponse)item).ToList());
+                }
+            }
+        }
+
+        return data;
+    }
+
     void LoadChartOption()
     {
         if (IsLoadOption is false) return;
@@ -596,28 +614,37 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         EChartType.SetValue("tooltip.trigger", Tooltip.Trigger);
     }
 
-    public List<List<Dessert>> GetTableOption(List<string> services, string jumpName,string jumpId)
+    public List<List<Dessert>> GetTableOption()
     {
-        if (IsLoadChartData is false) return _tableData;
+        return _tableData;
+    }
 
-        IsLoadChartData = false;
+    public void SetTableOption(List<string> services, string jumpName,string jumpId)
+    {
         _tableData.Clear();
-        var data = GetMatrixRangeData();
+        var data = GetTableMatrixRangeData();
         foreach (var service in services)
         {
             var rowData = new List<Dessert>();
             rowData.Add(new Dessert { JumpId = jumpId, Text = service });
             rowData.AddRange(data.Select(item =>
             {
-                if (item.Metric?.TryGetValue(jumpName, out object serviceName) is true)
+                var firstData = item.FirstOrDefault(e => 
                 {
-                    return new Dessert { Text = serviceName.ToString() };
+                    if(e.Metric?.TryGetValue(jumpName, out object serviceName) is true)
+                    {
+                        return serviceName.ToString() == service;
+                    }
+                    return false;
+                });
+                if (firstData is not null)
+                {
+                    return new Dessert { Text = firstData.Values.FirstOrDefault()?[1].ToString()??"" };
                 }
                 return new Dessert { Text = "" };
             }));
+            _tableData.Add(rowData);
         }
-
-        return _tableData;
     }
 
     private void YAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)
