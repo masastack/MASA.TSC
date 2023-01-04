@@ -58,7 +58,7 @@ public class MetricService : BaseService
 
     public async Task<List<string>> GetValues(RequestMetricListDto param)
     {
-       return await Caller.GetByBodyAsync<List<string>>($"{RootPath}/multi-range", param);
+        return (await Caller.GetAsync<List<string>>($"{RootPath}/values", param))!;
     }
 
     private QueryResultDataResponse ConvertResult(QueryResultDataResponse result)
