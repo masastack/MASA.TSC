@@ -68,11 +68,11 @@ public partial class WidgetType
             Type="gauge",
             Src="_content/Masa.Tsc.Web.Admin.Rcl/img/echarts/gauge.png"
         },
-        new EChartPanelTypeModel
-        {
-            Name="热力图",
-            Type="heatmap",
-            Src="_content/Masa.Tsc.Web.Admin.Rcl/img/echarts/heatmap.png"
-        }
+        //new EChartPanelTypeModel
+        //{
+        //    Name="热力图",
+        //    Type="heatmap",
+        //    Src="_content/Masa.Tsc.Web.Admin.Rcl/img/echarts/heatmap.png"
+        //}
     };
 }
