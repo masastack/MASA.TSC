@@ -20,4 +20,10 @@ public partial class TscEChartBase : TscComponentBase
         await Task.Delay(200);
         await Task.CompletedTask;
     }
+
+    protected string ToDateTimeStr(double value)
+    {
+        var millionSeconds = (long)Math.Floor(value * 1000);
+        return millionSeconds.ToDateTime().Format(CurrentTimeZone);
+    }
 }

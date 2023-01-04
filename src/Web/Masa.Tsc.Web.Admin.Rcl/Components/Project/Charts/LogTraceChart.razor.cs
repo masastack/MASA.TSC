@@ -5,18 +5,11 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class LogTraceChart
 {
-
     [Parameter]
     public StringNumber Width { get; set; } = "100%";
 
     [Parameter]
     public StringNumber Height { get; set; } = "100%";
-
-    [Parameter]
-    public bool Log { get; set; }
-
-    [Parameter]
-    public bool Trace { get; set; }
 
     [Parameter]
     public string Title { get; set; }
@@ -40,31 +33,46 @@ public partial class LogTraceChart
         var result = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
-                "histogram_quantile(0.50,sum(increase(http_server_duration_bucket[5m])) by (le))",
-                "histogram_quantile(0.75,sum(increase(http_server_duration_bucket[5m])) by (le))",
-                "histogram_quantile(0.90,sum(increase(http_server_duration_bucket[5m])) by (le))",
-                "histogram_quantile(0.95,sum(increase(http_server_duration_bucket[5m])) by (le))",
-                "histogram_quantile(0.99,sum(increase(http_server_duration_bucket[5m])) by (le))"
+                "histogram_quantile(0.50,sum(increase(http_server_duration_bucket[1m])) by (le))",
+                "histogram_quantile(0.75,sum(increase(http_server_duration_bucket[1m])) by (le))",
+                "histogram_quantile(0.90,sum(increase(http_server_duration_bucket[1m])) by (le))",
+                "histogram_quantile(0.95,sum(increase(http_server_duration_bucket[1m])) by (le))",
+                "histogram_quantile(0.99,sum(increase(http_server_duration_bucket[1m])) by (le))"
             },
             Start = start,
             End = end,
             Step = step.ToString()
         });
 
-        Dictionary<string, List<double>> dddd = new Dictionary<string, List<double>>();
+        Dictionary<string, List<string>> dddd = new Dictionary<string, List<string>>();
         var timeSpans = new List<double>();
 
-        var series = new string[] {"P50","P75","P90","P95","P99"};
+        var legend = new string[] {"P50","P75","P90","P95","P99"};
         var index = 0;
-        //foreach (var item in result)
-        //{
-        //    if (item != null && item.ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && item.Result != null && item.Result.Any())
-        //    {
-        //        var key = series[index++];
-        //        //timeSpans.AddRange()
-        //    }
-        //}
+        foreach (var item in result)
+        {
+            if (item != null && item.ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && item.Result != null && item.Result.Any())
+            {
+                var key = legend[index++];
+                timeSpans.AddRange(((QueryResultMatrixRangeResponse)item.Result[0]).Values.Select(values => Convert.ToDouble(values[0])));
+            }
+        }
 
+        timeSpans=timeSpans.Distinct().ToList();
+        timeSpans.Sort();
+        index = 0;
+        foreach (var item in result)
+        {
+            if (item != null && item.ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && item.Result != null && item.Result.Any())
+            {
+                var key = legend[index++];
+                dddd[key]=((QueryResultMatrixRangeResponse)item.Result[0]).Values.Select(values => values[1].ToString()).ToList()!;
+            }
+        }
+
+        _options.SetValue("legend.data", legend);
+        _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value)));
+        _options.SetValue("series", dddd.Select(item => new {name=item.Key,type="line",data=item.Value }));
 
 
         await Task.CompletedTask;

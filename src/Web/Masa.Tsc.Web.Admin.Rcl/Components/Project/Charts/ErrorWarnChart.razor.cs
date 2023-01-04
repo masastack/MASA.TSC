@@ -17,7 +17,7 @@ public partial class ErrorWarnChart
     public string Title { get; set; }
 
     [Parameter]
-    public string SubText { get; set; } = "先写死\r\n从数据库读取加载";
+    public string SubText { get; set; } = "该服务目前时间段内平均成功率 65%\r\n该服务目前时间段内平均失败率45%";
 
     private double _total;
     private EChartType _options = EChartConst.Pie;
@@ -51,25 +51,27 @@ public partial class ErrorWarnChart
             return;
         if (query.End == null)
             query.End = DateTime.Now;
-        var results = await ApiCaller.MetricService.GetMultiRangeAsync(new Contracts.Admin.Metrics.RequestMultiQueryRangeDto
+        if (query.Start == null)
+            query.Start = query.End.Value.AddDays(-1);
+
+        var step = (long)Math.Floor((query.End.Value - query.Start.Value).TotalSeconds);
+        var results = await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto
         {
-            MetricNames = new List<string> {
-            "http_server_duration_count{http_status_code!~\"5[0-9]+\"}",
-                "http_server_duration_count{}"
+            Queries = new List<string> {
+            $"sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\",service_name=\"{query.AppId}\"}}[{step}s]))",
+            $"sum by(service_name) (increase(http_server_duration_count{{service_name=\"{query.AppId}\"}}[{step}s]))"
            },
-            Start = query.End.Value.AddMinutes(-5),
-            End = query.End.Value,
-            Step = "5s"
+            Time = query.End.Value,
         });
 
         double[] values = new double[2];
         var index = 0;
         foreach (var item in results)
         {
-            if (item != null && item.ResultType == ResultTypes.Matrix && item.Result != null && item.Result.Any())
+            if (item != null && item.ResultType == ResultTypes.Vector && item.Result != null && item.Result.Any())
             {
-                var first = (QueryResultMatrixRangeResponse)item.Result.First();
-                values[index++] = Convert.ToDouble(first.Values.Last()[1]);
+                var first = (QueryResultInstantVectorResponse)item.Result.First();
+                values[index++] = Convert.ToDouble(first.Value[1]);
             }
         }
 
@@ -80,48 +82,17 @@ public partial class ErrorWarnChart
         }
         else
         {
-            values[0] = Math.Round(values[0] * 100 /  values[1], 4);
+            values[0] = Math.Round(values[0] * 100 / values[1], 4);
             values[1] = 100 - values[0];
             _total = values[0];
         }
-
-
-
-        //var data1 = await ApiCaller.LogService.AggregateAsync<int>(
-        //    new SimpleAggregateRequestDto
-        //    {
-        //        Start = start,
-        //        End = end,
-        //        Name = "@timestamp",
-        //        Alias = "Count",
-        //        Type = AggregateTypes.Count,
-        //        Service = query.AppId,
-        //        Conditions = new FieldConditionDto[] { new FieldConditionDto {
-        //           Name="SeverityText",
-        //           Value = "Error"
-        //        } }
-        //    });
-
-        //var data2 = await ApiCaller.TraceService.AggregateAsync<int>(
-        //    new SimpleAggregateRequestDto
-        //    {
-        //        Start = start,
-        //        End = end,
-        //        Name = "@timestamp",
-        //        Alias = "Count",
-        //        Type = AggregateTypes.Count,
-        //        Service = query.AppId
-        //    });
-        //_total += data1;
-        //_total += data2;
-
         _options.SetValue("tooltip.formatter", "{d}%");
         _options.SetValue("series[0].data", new object[] {GetModel(true,values[0]),
             GetModel(false,values[1]) });
     }
 
-    private static object GetModel(bool isTrace, double value)
+    private static object GetModel(bool isSuccess, double value)
     {
-        return new { name = isTrace ? "Tace" : "Log", value };
+        return new { name = isSuccess ? "Success" : "Fail", value };
     }
 }

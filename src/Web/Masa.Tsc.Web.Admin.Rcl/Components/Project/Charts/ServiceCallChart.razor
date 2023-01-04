@@ -4,7 +4,7 @@
 <MCard Width="Width" Height="Height" Class="d-flex flex-column rounded-lg">
     <MCardTitle Class="d-flex justify-space-between">
         <MLabel Class="emphasis2--text h6">@Title</MLabel>
-        <MLabel Class="emphasis2--text h6">@Total</MLabel>
+        <MIcon>mdi-information-outline</MIcon>
     </MCardTitle>
     <MCardText Class="flex-grow-1">
         @if (_isLoading)
@@ -13,11 +13,7 @@
         }
         else
         {
-            @Total@Unit
-            @*<MECharts Option="_options.Option" Width="@("100%")" Height="@("100%")"></MECharts>*@
+            <MECharts Option="_options.Option" Width="@("100%")" Height="@("100%")"></MECharts>
         }
     </MCardText>
-    <MCardActions Class="regular3--text body2">
-        @SubText
-    </MCardActions>
 </MCard>

@@ -1,6 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Contrib.StackSdks.Tsc.Elasticsearch.Constants;
+using Nest;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Log;
 
 public partial class LogPanel
@@ -70,16 +73,33 @@ public partial class LogPanel
         var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
         Logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
         Total = response.Total;
-        GenOption(default);
+        await GenOption();
         Loading = false;
     }
 
-    void GenOption(object data)
+    protected string ToDateTimeStr(long value)
+    {
+        return value.ToDateTime().Format(CurrentTimeZone);
+    }
+
+    async Task GenOption()
     {
         // TODO: 解析data生成一下数据
 
-        string[] xAxisData = { "12/2", "12/3", "12/4", "12/5", "12/6", "12/7", "12/8" };
-        long[] durations = { 10, 20, 66, 32, 112, 121, 5 };
+        DateTime end = EndTime ?? DateTime.Now, start = StartTime ?? end.AddDays(-1);
+
+
+        var result=await ApiCaller.LogService.AggregateAsync<List<KeyValuePair<long,long>>>(new SimpleAggregateRequestDto
+        {
+            Start = start,
+            End = end,
+            Name = "@timestamp", //ElasticConstant.Log.Timestamp,
+            Type = AggregateTypes.DateHistogram,
+            Interval = "5m",
+        });
+
+        string[] xAxisData = result?.Select(item => ToDateTimeStr(item.Key))?.ToArray()?? Array.Empty<string>();
+        long[] durations = result?.Select(item => item.Value)?.ToArray()??Array.Empty<long>();
         int[] spans = { 110, 22, 323, 110, 210, 11, 11 };
 
         _option = new
@@ -95,7 +115,7 @@ public partial class LogPanel
             },
             legend = new
             {
-                data = new[] { "span", "duration" },
+                data = new[] { "count" },
                 bottom = true
             },
             xAxis = new[]

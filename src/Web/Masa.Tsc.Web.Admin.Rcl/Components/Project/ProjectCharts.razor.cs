@@ -6,12 +6,12 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class ProjectCharts
 {
     private ErrorWarnChart? _errorWarnChart;
-    private LogTraceChart? _traceLogChart;
+    private ServiceCallChart? _traceLogChart;
     private LogTraceChart? _traceLogChart1;
     private ObserveChart? _observeChart;
     private GrowthChart? _growthChart;
-    private LogTraceStatiscChart? _traceErrorChart;
-    private LogTraceStatiscChart? _traceWarnChart;
+    //private LogTraceStatiscChart? _traceErrorChart;
+    //private LogTraceStatiscChart? _traceWarnChart;
 
     public async Task OnSearchAsync()
     {
@@ -29,8 +29,8 @@ public partial class ProjectCharts
         tasks.Add(_traceLogChart1?.OnLoadAsync(query));
         tasks.Add(_observeChart?.OnLoadAsync(query));
         tasks.Add(_growthChart?.OnLoadAsync(query));
-        tasks.Add(_traceErrorChart?.OnLoadAsync(query));
-        tasks.Add(_traceWarnChart?.OnLoadAsync(query));
+        //tasks.Add(_traceErrorChart?.OnLoadAsync(query));
+        //tasks.Add(_traceWarnChart?.OnLoadAsync(query));     
         await Task.WhenAll(tasks);
     }
 }

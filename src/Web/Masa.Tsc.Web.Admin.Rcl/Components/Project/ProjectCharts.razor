@@ -4,28 +4,25 @@
 <div class="h-269">
     <MRow Style="background-color:#F0F3FA;" Class="@Class">
         <MCol Cols="3">
-            <ErrorWarnChart Title="ERRORS" SubText="errors" @ref="_errorWarnChart" />
+            <ErrorWarnChart Title=@("Service Success Rate") SubText="errors" @ref="_errorWarnChart" />
         </MCol>
         <MCol Cols="9">
-            <LogTraceChart Trace Title="@("Trace")" @ref="_traceLogChart" />
+            <ServiceCallChart Title="@("Service Load(调用次数/每分钟)")" @ref="_traceLogChart" />
         </MCol>
         <MCol Cols="3">
-            <ObserveChart Title="OBSTACLES" @ref="_observeChart" />
+            <ObserveChart @ref="_observeChart" />
         </MCol>
         <MCol Cols="3">
             <GrowthChart Title="Apdex" @ref="_growthChart" />
         </MCol>
         <MCol Cols="6">
-            <LogTraceChart Trace Title="@("Service Response Time Percentile (ms)")" @ref="_traceLogChart1" />
+            <LogTraceChart Title="@("Service Response Time Percentile (ms)")" @ref="_traceLogChart1" />
         </MCol>
         <MCol Cols="6">
-            <Temp Title="@("Log")"></Temp>
+            <Temp Title="@("Service Endpoint(calls/min)")"></Temp>
         </MCol>
-        <MCol Cols="3">
-            <LogTraceStatiscChart Trace Error Title="Tace Errors" @ref="_traceErrorChart" />
-        </MCol>
-        <MCol Cols="3">
-            <LogTraceStatiscChart Trace Warn Title="Tace Warns" @ref="_traceWarnChart" />
+        <MCol Cols="6">
+            <Temp Title="@("Service Slow Endpont(ms)")"></Temp>
         </MCol>
     </MRow>
 </div>
