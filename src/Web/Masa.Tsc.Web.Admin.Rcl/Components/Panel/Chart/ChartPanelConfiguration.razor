@@ -16,7 +16,7 @@
             <MCardText>
                 <MRow>
                     <MCol Md="4">
-                        @if(Value.ChartType == "table" || Value.ChartType == "top-list")
+                        @if(Value.ChartType == "table")
                         {
                             <SSelect @bind-Value="@Value.SystemIdentity" 
                                  Items="_systemIdentities"
@@ -29,11 +29,31 @@
                         }
                     </MCol>
                     <MCol Md="8">
-                        <STextField @bind-Value="@Value.Description" Label="Description" />
+                        @if(Value.ChartType == "table")
+                        {
+                            <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
+                                <MButton Class="text-capitalize" Value="@ListTypes.ServiceList.ToString()">
+                                    Service List
+                                </MButton>
+                                <MButton Class="text-capitalize" Value="@ListTypes.EndpointList.ToString()">
+                                    Endpoint List
+                                </MButton>
+                                <MButton Class="text-capitalize" Value="@ListTypes.InstanceList.ToString()">
+                                    Instance List
+                                </MButton>
+                                <MButton Class="text-capitalize" Value="ListTypes.TopList.ToString()">
+                                    Top List
+                                </MButton>
+                            </MButtonGroup>
+                        }
+                        else
+                        {
+                            <STextField @bind-Value="@Value.Description" Label="Description" />
+                        }
                     </MCol>
                     <MCol Md="12">
                         <MRow>
-                            @if (Value.ChartType == "top-list")
+                            @if (Value.ChartType == "table" && Value.ListType == ListTypes.TopList)
                             {
                                 <MCol Md="4">
                                     <MCard Class="pa-2" Style="background-color:#F6F8FD">

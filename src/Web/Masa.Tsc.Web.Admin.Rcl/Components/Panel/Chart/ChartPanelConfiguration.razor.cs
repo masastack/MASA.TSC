@@ -60,4 +60,9 @@ public partial class ChartPanelConfiguration : TscComponentBase
         metric.Name = metricName;
         await GetGetMetricsAsync();
     }
+
+    void ListTypeChanged(StringNumber listType)
+    {
+        Value.ListType = Enum.Parse<ListTypes>(listType.ToString()!);
+    }
 }

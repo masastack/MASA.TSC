@@ -59,6 +59,7 @@ public partial class Configuration
     async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
         (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
+        await base.InvokeAsync(base.StateHasChanged);
     }
 
     async Task SaveAsync()

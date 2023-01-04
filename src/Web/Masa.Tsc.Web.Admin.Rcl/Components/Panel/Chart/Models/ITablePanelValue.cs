@@ -16,4 +16,6 @@ public interface ITablePanelValue : IPanelValue
     public bool EnablePaginaton { get; set; }
 
     public string ColumnAlignment { get; set; }
+
+    public ListTypes ListType { get; set; }
 }

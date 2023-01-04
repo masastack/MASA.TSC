@@ -96,6 +96,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         {
             this[ExtensionFieldTypes.ChartType] = value;
             IsLoadChartData = true;
+            IsLoadOption = true;
             switch (value)
             {
                 case "line":
@@ -212,12 +213,23 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         set => this[ExtensionFieldTypes.ColumnAlignment] = value;
     }
 
-    public EChartType _eChartType;
-
-    public EChartType EChartType
+    public ListTypes ListType
     {
-        get => _eChartType ??= EChartConst.Line;
-        set => _eChartType = value;
+        get
+        {
+            var value = this[ExtensionFieldTypes.ListType];
+            if (value is ListTypes enumValue)
+            {
+                return enumValue;
+            }
+            else if (value is JsonElement jsonElement)
+            {
+                var number = jsonElement.GetInt32();
+                return (ListTypes)number;
+            }
+            return ListTypes.ServiceList;
+        }
+        set => this[ExtensionFieldTypes.ListType] = value;
     }
 
     public Tooltip Tooltip
@@ -350,6 +362,14 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         set => this[ExtensionFieldTypes.YAxis] = value;
     }
 
+    public EChartType _eChartType;
+
+    public EChartType EChartType
+    {
+        get => _eChartType ??= EChartConst.Line;
+        set => _eChartType = value;
+    }
+
     public UpsertChartPanelDto(Guid id)
     {
         Id = id;
@@ -360,9 +380,11 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         PanelType = PanelTypes.Chart;
     }
 
-    string Key { get; set; }
-
     bool IsLoadChartData { get; set; }
+
+    bool IsLoadOption { get; set; } = true;
+
+    string Key { get; set; }
 
     List<QueryResultDataResponse> _chartData = new();
 
@@ -374,7 +396,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
 
     public string GetChartKey()
     {
-        return IsLoadChartData + ChartType;
+        return Key; //IsLoadChartData + ChartType;
     }
 
     public object GetChartOption()
@@ -514,142 +536,99 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             return data;
         }
     }
-
+   
     void LoadChartOption()
     {
-        //var key = GetChartKey();
-        //if (Key == key) return;
+        if (IsLoadOption is false) return;
 
-        //Key = key;
-        //todo add set chart option
-        //EChartType.SetValue("yAxis.show", YAxis.Show);
-        //EChartType.SetValue("yAxis.axisLine.show", YAxis.ShowLine);
-        //EChartType.SetValue("yAxis.axisTick.show", YAxis.ShowTick);
-        //EChartType.SetValue("yAxis.axisLabel.show", YAxis.ShowLabel);
-        //EChartType.SetValue("xAxis.show", XAxis.Show);
-        //EChartType.SetValue("xAxis.axisLine.show", XAxis.ShowLine);
-        //EChartType.SetValue("xAxis.axisTick.show", XAxis.ShowTick);
-        //EChartType.SetValue("xAxis.axisLabel.show", XAxis.ShowLabel);
-        //EChartType.SetValue("toolbox.show", Toolbox.Show);
-        //EChartType.SetValue("toolbox.orient", Toolbox.Orient);
-        //EChartType.SetValue("toolbox.left", Toolbox.XPositon);
-        //EChartType.SetValue("toolbox.top", Toolbox.YPositon);
-        //EChartType.SetValue("toolbox.feature", Toolbox.Feature.ToDictionary(f => f.AsT0, f => new object()));
-        //EChartType.SetValue("legend.show", Legend.Show);
-        //EChartType.SetValue("legend.orient", Legend.Orient);
-        //EChartType.SetValue("legend.left", Legend.XPositon);
-        //EChartType.SetValue("legend.top", Legend.YPositon);
-        //EChartType.SetValue("legend.type", Legend.Type);
-        //EChartType.SetValue("tooltip.show", Tooltip.Show);
-        //EChartType.SetValue("tooltip.renderMode", Tooltip.RenderModel);
-        //EChartType.SetValue("tooltip.className", Tooltip.ClassName);
-        //EChartType.SetValue("tooltip.trigger", Tooltip.Trigger);
+        IsLoadOption = false;
+
+        if(ChartType is "line-area")
+        {
+            var yAxis = EChartType.Json["yAxis"].AsArray().First()!;
+            yAxis["show"] = YAxis.Show;
+            yAxis["axisLine"] = new JsonObject
+            {
+                ["show"] = YAxis.ShowLine
+            };
+            yAxis["axisTick"] = new JsonObject
+            {
+                ["show"] = YAxis.ShowTick
+            };
+            yAxis["axisLabel"] = new JsonObject
+            {
+                ["show"] = YAxis.ShowLabel
+            };
+            var xAxis = EChartType.Json["xAxis"].AsArray().First()!;
+            xAxis["show"] = XAxis.Show;
+            xAxis["axisLine"] = new JsonObject
+            {
+                ["show"] = XAxis.ShowLine
+            };
+            xAxis["axisTick"] = new JsonObject
+            {
+                ["show"] = XAxis.ShowTick
+            };
+            xAxis["axisLabel"] = new JsonObject
+            {
+                ["show"] = XAxis.ShowLabel
+            };
+        }
+        else
+        {
+            EChartType.SetValue("yAxis.show", YAxis.Show);
+            EChartType.SetValue("yAxis.axisLine.show", YAxis.ShowLine);
+            EChartType.SetValue("yAxis.axisTick.show", YAxis.ShowTick);
+            EChartType.SetValue("yAxis.axisLabel.show", YAxis.ShowLabel);
+            EChartType.SetValue("xAxis.show", XAxis.Show);
+            EChartType.SetValue("xAxis.axisLine.show", XAxis.ShowLine);
+            EChartType.SetValue("xAxis.axisTick.show", XAxis.ShowTick);
+            EChartType.SetValue("xAxis.axisLabel.show", XAxis.ShowLabel);
+        }
+        EChartType.SetValue("toolbox.show", Toolbox.Show);
+        EChartType.SetValue("toolbox.orient", Toolbox.Orient);
+        EChartType.SetValue("toolbox.left", Toolbox.XPositon);
+        EChartType.SetValue("toolbox.top", Toolbox.YPositon);
+        EChartType.SetValue("toolbox.feature", Toolbox.Feature.ToDictionary(f => f.AsT0, f => new object()));
+        EChartType.SetValue("legend.show", Legend.Show);
+        EChartType.SetValue("legend.orient", Legend.Orient);
+        EChartType.SetValue("legend.left", Legend.XPositon);
+        EChartType.SetValue("legend.top", Legend.YPositon);
+        EChartType.SetValue("legend.type", Legend.Type);
+        EChartType.SetValue("tooltip.show", Tooltip.Show);
+        EChartType.SetValue("tooltip.renderMode", Tooltip.RenderModel);
+        EChartType.SetValue("tooltip.className", Tooltip.ClassName);
+        EChartType.SetValue("tooltip.trigger", Tooltip.Trigger);
     }
 
     private void YAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        switch (e.PropertyName)
-        {
-            case nameof(YAxis.Show):
-                EChartType.SetValue("yAxis.show", YAxis.Show);
-                break;
-            case nameof(YAxis.ShowLine):
-                EChartType.SetValue("yAxis.axisLine.show", YAxis.ShowLine);
-                break;
-            case nameof(YAxis.ShowTick):
-                EChartType.SetValue("yAxis.axisTick.show", YAxis.ShowTick);
-                break;
-            case nameof(YAxis.ShowLabel):
-                EChartType.SetValue("yAxis.axisLabel.show", YAxis.ShowLabel);
-                break;
-            default: break;
-        }
+        Key = "YAxis" + Guid.NewGuid();
+        IsLoadOption = true;
     }
 
     private void XAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        switch (e.PropertyName)
-        {
-            case nameof(XAxis.Show):
-                EChartType.SetValue("xAxis.show", XAxis.Show);
-                break;
-            case nameof(XAxis.ShowLine):
-                EChartType.SetValue("xAxis.axisLine.show", XAxis.ShowLine);
-                break;
-            case nameof(XAxis.ShowTick):
-                EChartType.SetValue("xAxis.axisTick.show", XAxis.ShowTick);
-                break;
-            case nameof(XAxis.ShowLabel):
-                EChartType.SetValue("xAxis.axisLabel.show", XAxis.ShowLabel);
-                break;
-            default: break;
-        }
+        Key = "XAxis" + Guid.NewGuid();
+        IsLoadOption = true;
     }
 
     private void Toolbox_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        switch (e.PropertyName)
-        {
-            case nameof(Toolbox.Show):
-                EChartType.SetValue("toolbox.show", Toolbox.Show);
-                break;
-            case nameof(Toolbox.Orient):
-                EChartType.SetValue("toolbox.orient", Toolbox.Orient);
-                break;
-            case nameof(Toolbox.XPositon):
-                EChartType.SetValue("toolbox.left", Toolbox.XPositon);
-                break;
-            case nameof(Toolbox.YPositon):
-                EChartType.SetValue("toolbox.top", Toolbox.YPositon);
-                break;
-            case nameof(Toolbox.Feature):
-                EChartType.SetValue("toolbox.feature", Toolbox.Feature.ToDictionary(f => f.AsT0, f => new object()));
-                break;
-            default: break;
-        }
+        Key = "Toolbox" + Guid.NewGuid();
+        IsLoadOption = true;
     }
 
     private void Legend_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        switch (e.PropertyName)
-        {
-            case nameof(Legend.Show):
-                EChartType.SetValue("legend.show", Legend.Show);
-                break;
-            case nameof(Legend.Orient):
-                EChartType.SetValue("legend.orient", Legend.Orient);
-                break;
-            case nameof(Legend.XPositon):
-                EChartType.SetValue("legend.left", Legend.XPositon);
-                break;
-            case nameof(Legend.YPositon):
-                EChartType.SetValue("legend.top", Legend.YPositon);
-                break;
-            case nameof(Legend.Type):
-                EChartType.SetValue("legend.type", Legend.Type);
-                break;
-            default: break;
-        }
+        Key = "Legend" + Guid.NewGuid();
+        IsLoadOption = true;
     }
 
     private void Tooltip_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        switch (e.PropertyName)
-        {
-            case nameof(Tooltip.Show):
-                EChartType.SetValue("tooltip.show", Tooltip.Show);
-                break;
-            case nameof(Tooltip.RenderModel):
-                EChartType.SetValue("tooltip.renderMode", Tooltip.RenderModel);
-                break;
-            case nameof(Tooltip.ClassName):
-                EChartType.SetValue("tooltip.className", Tooltip.ClassName);
-                break;
-            case nameof(Tooltip.Trigger):
-                EChartType.SetValue("tooltip.trigger", Tooltip.Trigger);
-                break;
-            default: break;
-        }
+        Key = "Tooltip" + Guid.NewGuid();
+        IsLoadOption = true;
     }
 
     public override UpsertPanelDto Clone(UpsertPanelDto panel)
@@ -664,6 +643,13 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         {
             ChartType = jsonElement.GetString() ?? "table";
         }
+
+        Tooltip.PropertyChanged += Tooltip_PropertyChanged;
+        Legend.PropertyChanged += Legend_PropertyChanged;
+        Toolbox.PropertyChanged += Toolbox_PropertyChanged;
+        XAxis.PropertyChanged += XAxis_PropertyChanged;
+        YAxis.PropertyChanged += YAxis_PropertyChanged;
+
         return this;
     }
 }

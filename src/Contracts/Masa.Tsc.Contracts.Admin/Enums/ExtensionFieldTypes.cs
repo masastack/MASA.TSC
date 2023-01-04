@@ -16,6 +16,7 @@ public enum ExtensionFieldTypes
     EnablePaginaton,
     ColumnAlignment,
     EChartType,
+    ListType,
     Tooltip,
     Legend,
     Toolbox,

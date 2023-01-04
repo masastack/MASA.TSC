@@ -14,26 +14,26 @@
                                  ItemValue="item => item" />
                     </MCol>
                     <MCol Md="6" Align="AlignTypes.End">
-                        <MButtonGroup Value="@_listType" ValueChanged="ListTypeChanged" Mandatory>
-                            <MButton Class="text-capitalize" Value="@("service-list")">
+                        <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
+                            <MButton Class="text-capitalize" Value="@ListTypes.ServiceList.ToString()">
                                 Service List
                             </MButton>
-                            <MButton Class="text-capitalize" Value="@("endpoint-list")">
+                            <MButton Class="text-capitalize" Value="@ListTypes.EndpointList.ToString()">
                                 Endpoint List
                             </MButton>
-                            <MButton Class="text-capitalize" Value="@("instance-list")">
+                            <MButton Class="text-capitalize" Value="@ListTypes.InstanceList.ToString()">
                                 Instance List
                             </MButton>
-                            <MButton Class="text-capitalize" Value="@("top-list")">
+                            <MButton Class="text-capitalize" Value="ListTypes.TopList.ToString()">
                                 Top List
                             </MButton>
                         </MButtonGroup>
                     </MCol>
                 </MRow>
             </MCardTitle>
-@*            <MCardText>
+            <MCardText>
                 <DynamicComponent Type="@CurrentComponentConfiguration.ShowType" Parameters=CurrentComponentConfiguration.Metadata />
-            </MCardText>*@
+            </MCardText>
         </MCard>
     </MCol>
 </MRow>
@@ -47,36 +47,36 @@
 
     private List<string> _systemIdentities = new List<string>();
     private StringNumber _listType = "service-list";
-    Dictionary<string, DynamicComponentDescription> ComponentModuleMap { get; set; }
-    Dictionary<string, DynamicComponentDescription> ComponentConfigurationMap { get; set; }
+    Dictionary<ListTypes, DynamicComponentDescription> ComponentModuleMap { get; set; }
+    Dictionary<ListTypes, DynamicComponentDescription> ComponentConfigurationMap { get; set; }
 
-    DynamicComponentDescription CurrentComponentModule => ComponentModuleMap[_listType.AsT0];
+    DynamicComponentDescription CurrentComponentModule => ComponentModuleMap[Value.ListType];
 
-    DynamicComponentDescription CurrentComponentConfiguration => ComponentConfigurationMap[_listType.AsT0];
+    DynamicComponentDescription CurrentComponentConfiguration => ComponentConfigurationMap[Value.ListType];
 
     protected override void OnInitialized()
     {
         ComponentModuleMap = new()
         {
-            ["service-list"] = new(typeof(ServiceListDemo), new() { ["Value"] = Value }),
-            ["instance-list"] = new(typeof(InstanceListDemo), new() { ["Value"] = Value }),
-            ["endpoint-list"] = new(typeof(EndpointListDemo), new() { ["Value"] = Value }),
-            ["top-list"] = new(typeof(TopListDemo), new() { ["Value"] = Value })
+            [ListTypes.ServiceList] = new(typeof(ServiceListDemo), new() { ["Value"] = Value }),
+            [ListTypes.InstanceList] = new(typeof(InstanceListDemo), new() { ["Value"] = Value }),
+            [ListTypes.EndpointList] = new(typeof(EndpointListDemo), new() { ["Value"] = Value }),
+            [ListTypes.TopList] = new(typeof(TopListDemo), new() { ["Value"] = Value })
         };
 
-        ComponentConfigurationMap = new Dictionary<string, DynamicComponentDescription>
+        ComponentConfigurationMap = new()
         {
-            ["service-list"] = new(typeof(ServiceListConfiguration), new() { ["Values"]=Value.Metrics }),
-            ["instance-list"] = new(typeof(InstanceListConfiguration), new() { ["Values"] = Value.Metrics }),
-            ["endpoint-list"] = new(typeof(EndpointListConfiguration), new() { ["Values"] = Value.Metrics }),
-            ["top-list"] = new(typeof(TopListConfiguration), new() { ["Values"] = Value.Metrics })
+            [ListTypes.ServiceList] = new(typeof(ServiceListConfiguration), new() { ["Values"]=Value.Metrics }),
+            [ListTypes.InstanceList] = new(typeof(InstanceListConfiguration), new() { ["Values"] = Value.Metrics }),
+            [ListTypes.EndpointList] = new(typeof(EndpointListConfiguration), new() { ["Values"] = Value.Metrics }),
+            [ListTypes.TopList] = new(typeof(TopListConfiguration), new() { ["Values"] = Value.Metrics })
         };
         base.OnInitialized();
     }
 
     private void ListTypeChanged(StringNumber listType)
     {
-        _listType = listType;
+        Value.ListType = Enum.Parse<ListTypes>(listType.ToString()!);
         Value.Metrics.Clear();
         if (OnListTypeChanged.HasDelegate)
         {

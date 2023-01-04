@@ -25,7 +25,7 @@ public partial class ChartPanel
     {
         DynamicComponentMap = new()
         {
-            ["table"] = new(typeof(Lists), new() { ["Value"] = Value }),
+            ["table"] = new(typeof(ListPanel), new() { ["Value"] = Value }),
             ["e-chart"] = new(typeof(EChart), new() { ["Value"] = Value }),
         };
 
