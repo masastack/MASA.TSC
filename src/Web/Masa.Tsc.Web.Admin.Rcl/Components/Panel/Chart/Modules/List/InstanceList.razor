@@ -28,14 +28,14 @@
             <tbody>
                 @foreach (var item in Data)
                 {
-                    <tr @key="item.Name">
+                   @* <tr @key="item.Name">
                         <td class="@($"text-{Value.ColumnAlignment}")">@item.Name</td>
                         @foreach (var field in Value.Metrics)
                         {
                             <td style="color:@field.Color" class="@($"text-{Value.ColumnAlignment}")">0.0</td>
                         }
                         <td class="@($"text-{Value.ColumnAlignment}")">@item.Calories</td>
-                    </tr>
+                    </tr>*@
                 }
             </tbody>
             @if (Value.ShowTableFooter)

@@ -172,15 +172,29 @@ public class Tooltip : NotifyingEntity
         get => _trigger;
         set => SetField(ref _trigger, value);
     }
+
+    public Tooltip()
+    {
+
+    }
+
+    [JsonConstructor]
+    public Tooltip(bool show, string className, string renderModel, string trigger)
+    {
+        _show = show;
+        _className = className;
+        _renderModel = renderModel;
+        _trigger = trigger;
+    }
 }
 
 public class Legend : NotifyingEntity
 {
     bool _show = true;
-    string _orient = "vertical";
+    string _orient = "horizontal";
     string _xPositon = "center";
-    string _yPositon = "bottom";
-    string _type = "plain";
+    string _yPositon = "top";
+    string _type = "scroll";
 
     public bool Show
     {
@@ -250,12 +264,25 @@ public class Toolbox : NotifyingEntity
         get => _feature;
         set => SetField(ref _feature, value);
     }
+
+    public Toolbox()
+    {
+    }
+
+    [JsonConstructor]
+    public Toolbox(bool show, string orient, string xPositon, string yPositon, List<StringNumber> feature)
+    {
+        _show = show;
+        _orient = orient;
+        _xPositon = xPositon;
+        _yPositon = yPositon;
+        _feature = feature ?? new();
+    }
 }
 
 public class Axis : NotifyingEntity
 {
     bool _show = true, _showLine = true, _showTick = true, _showLabel = true;
-
 
     public bool Show
     {
@@ -279,6 +306,20 @@ public class Axis : NotifyingEntity
     {
         get => _showLabel;
         set => SetField(ref _showLabel, value);
+    }
+
+    public Axis()
+    {
+
+    }
+
+    [JsonConstructor]
+    public Axis(bool show, bool showLine, bool showTick, bool showLabel)
+    {
+        _show = show;
+        _showLine = showLine;
+        _showTick = showTick;
+        _showLabel = showLabel;
     }
 }
 

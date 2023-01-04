@@ -24,10 +24,12 @@ public partial class ChartPanelConfiguration : TscComponentBase
     protected override void OnInitialized()
     {
         ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
+        if (Value.Metrics.Any() is false) Value.Metrics.Add(new());
     }
 
     void NavigateToPanelConfigurationPage()
     {
+        Value.Metrics.RemoveAll(item => string.IsNullOrEmpty(item.Name));
         NavigationManager.NavigateTo($"/dashboard/configuration/record");
     }
 

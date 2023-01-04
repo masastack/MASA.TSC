@@ -18,4 +18,6 @@ public interface ITablePanelValue : IPanelValue
     public string ColumnAlignment { get; set; }
 
     public ListTypes ListType { get; set; }
+
+    public List<List<Dessert>> GetTableOption(List<string> services, string jumpName, string jumpId);
 }

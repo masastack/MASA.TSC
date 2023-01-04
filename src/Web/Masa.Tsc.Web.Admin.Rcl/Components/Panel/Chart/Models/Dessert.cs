@@ -5,7 +5,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Models;
 
 public class Dessert
 {
-    public string Name { get; set; }
+    public string Text { get; set; }
 
-    public int Calories { get; set; }
+    public string JumpId { get; set; }
 }

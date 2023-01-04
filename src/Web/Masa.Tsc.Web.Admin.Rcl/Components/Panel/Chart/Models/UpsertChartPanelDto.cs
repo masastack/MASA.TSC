@@ -154,7 +154,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             {
                 return jsonElement.GetBoolean();
             }
-            return false;
+            return true;
         }
         set => this[ExtensionFieldTypes.ShowTableHeader] = value;
     }
@@ -243,7 +243,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             }
             else if (value is JsonElement jsonElement)
             {
-                var jsonValue = jsonElement.Deserialize<Tooltip>();
+                var jsonValue = jsonElement.Deserialize<Tooltip>(JsonOption);
                 if (jsonValue is not null)
                 {
                     this[ExtensionFieldTypes.Tooltip] = jsonValue;
@@ -269,7 +269,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             }
             else if (value is JsonElement jsonElement)
             {
-                var jsonValue = jsonElement.Deserialize<Legend>();
+                var jsonValue = jsonElement.Deserialize<Legend>(JsonOption);
                 if (jsonValue is not null)
                 {
                     this[ExtensionFieldTypes.Legend] = jsonValue;
@@ -295,7 +295,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             }
             else if (value is JsonElement jsonElement)
             {
-                var jsonValue = jsonElement.Deserialize<Toolbox>();
+                var jsonValue = jsonElement.Deserialize<Toolbox>(JsonOption);
                 if (jsonValue is not null)
                 {
                     this[ExtensionFieldTypes.Toolbox] = jsonValue;
@@ -321,7 +321,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             }
             else if (value is JsonElement jsonElement)
             {
-                var jsonValue = jsonElement.Deserialize<Axis>();
+                var jsonValue = jsonElement.Deserialize<Axis>(JsonOption);
                 if (jsonValue is not null)
                 {
                     this[ExtensionFieldTypes.XAxis] = jsonValue;
@@ -347,7 +347,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             }
             else if (value is JsonElement jsonElement)
             {
-                var jsonValue = jsonElement.Deserialize<Axis>();
+                var jsonValue = jsonElement.Deserialize<Axis>(JsonOption);
                 if (jsonValue is not null)
                 {
                     this[ExtensionFieldTypes.YAxis] = jsonValue;
@@ -370,6 +370,11 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         set => _eChartType = value;
     }
 
+    static JsonSerializerOptions JsonOption = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     public UpsertChartPanelDto(Guid id)
     {
         Id = id;
@@ -387,6 +392,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
     string Key { get; set; }
 
     List<QueryResultDataResponse> _chartData = new();
+    List<List<Dessert>> _tableData = new();
 
     public void SetChartData(List<QueryResultDataResponse> chartData)
     {
@@ -415,17 +421,6 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         if (ChartType is "line" or "bar")
         {
             var data = GetMatrixRangeData();
-
-            foreach (var item in _chartData)
-            {
-                if (item is not null)
-                {
-                    foreach (var result in item.Result)
-                    {
-                        if (result is QueryResultMatrixRangeResponse matrix) data.Add(matrix);
-                    }
-                }
-            }
             EChartType.Json["series"] = new JsonArray(data.Take(3).Select(item => new JsonObject
             {
                 ["type"] = ChartType,
@@ -493,57 +488,57 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
                 return 60 * index - 32 * Metrics.Count;
             }
         }
-
-        List<QueryResultMatrixRangeResponse> GetMatrixRangeData()
-        {
-            List<QueryResultMatrixRangeResponse> data = new();
-
-            if (_chartData is not null)
-            {
-                foreach (var item in _chartData)
-                {
-                    if (item is not null)
-                    {
-                        foreach (var result in item.Result)
-                        {
-                            if (result is QueryResultMatrixRangeResponse matrix) data.Add(matrix);
-                        }
-                    }
-                }
-            }
-
-            return data;
-        }
-
-        List<QueryResultInstantVectorResponse> GetInstantVectorData()
-        {
-            List<QueryResultInstantVectorResponse> data = new();
-
-            if(_chartData is not null)
-            {
-                foreach (var item in _chartData)
-                {
-                    if (item is not null)
-                    {
-                        foreach (var result in item.Result)
-                        {
-                            if (result is QueryResultInstantVectorResponse matrix) data.Add(matrix);
-                        }
-                    }
-                }
-            }
-
-            return data;
-        }
     }
-   
+
+    List<QueryResultMatrixRangeResponse> GetMatrixRangeData()
+    {
+        List<QueryResultMatrixRangeResponse> data = new();
+
+        if (_chartData is not null)
+        {
+            foreach (var item in _chartData)
+            {
+                if (item is not null)
+                {
+                    foreach (var result in item.Result)
+                    {
+                        if (result is QueryResultMatrixRangeResponse matrix) data.Add(matrix);
+                    }
+                }
+            }
+        }
+
+        return data;
+    }
+
+    List<QueryResultInstantVectorResponse> GetInstantVectorData()
+    {
+        List<QueryResultInstantVectorResponse> data = new();
+
+        if (_chartData is not null)
+        {
+            foreach (var item in _chartData)
+            {
+                if (item is not null)
+                {
+                    foreach (var result in item.Result)
+                    {
+                        if (result is QueryResultInstantVectorResponse matrix) data.Add(matrix);
+                    }
+                }
+            }
+        }
+
+        return data;
+    }
+
     void LoadChartOption()
     {
         if (IsLoadOption is false) return;
 
         IsLoadOption = false;
 
-        if(ChartType is "line-area")
+        if (ChartType is "line-area")
         {
             var yAxis = EChartType.Json["yAxis"].AsArray().First()!;
             yAxis["show"] = YAxis.Show;
@@ -599,6 +594,30 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         EChartType.SetValue("tooltip.renderMode", Tooltip.RenderModel);
         EChartType.SetValue("tooltip.className", Tooltip.ClassName);
         EChartType.SetValue("tooltip.trigger", Tooltip.Trigger);
+    }
+
+    public List<List<Dessert>> GetTableOption(List<string> services, string jumpName,string jumpId)
+    {
+        if (IsLoadChartData is false) return _tableData;
+
+        IsLoadChartData = false;
+        _tableData.Clear();
+        var data = GetMatrixRangeData();
+        foreach (var service in services)
+        {
+            var rowData = new List<Dessert>();
+            rowData.Add(new Dessert { JumpId = jumpId, Text = service });
+            rowData.AddRange(data.Select(item =>
+            {
+                if (item.Metric?.TryGetValue(jumpName, out object serviceName) is true)
+                {
+                    return new Dessert { Text = serviceName.ToString() };
+                }
+                return new Dessert { Text = "" };
+            }));
+        }
+
+        return _tableData;
     }
 
     private void YAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)

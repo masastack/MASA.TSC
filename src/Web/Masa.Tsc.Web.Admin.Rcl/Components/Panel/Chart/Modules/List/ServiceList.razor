@@ -11,10 +11,7 @@
                 <thead>
                     <tr>
                         <th class="text-left">
-                            Name
-                        </th>
-                        <th class="text-left">
-                            Calories
+                            Service
                         </th>
                         @foreach (var field in Value.Metrics)
                         {
@@ -26,19 +23,23 @@
                 </thead>
             }
             <tbody>
-                @foreach (var item in Data)
+                @foreach (var option in Data)
                 {
-                    <tr @key="item.Name">
-                        <td class="@($"text-{Value.ColumnAlignment}")">@item.Name</td>
-                        <td class="@($"text-{Value.ColumnAlignment}")">@item.Calories</td>
-                        @foreach (var field in Value.Metrics)
+                    <tr>
+                        @foreach (var item in option)
                         {
-                            <td style="color:@field.Color" class="@($"text-{Value.ColumnAlignment}")">0.0</td>
+                            @if (item.JumpId is not null)
+                            {
+                                <td @onclick="() => ToDashboardConfiguration(item.JumpId,item.Text)" class="@($"text-{Value.ColumnAlignment}") primary--text)">
+                                    @item.Text
+                                </td>
+                            }
+                            <td class="@($"text-{Value.ColumnAlignment}")">@item.Text</td>
                         }
                     </tr>
                 }
             </tbody>
-            @if (Value.ShowTableFooter)
+@*            @if (Value.ShowTableFooter)
             {
                 <tfoot>
                     <tr>
@@ -46,12 +47,12 @@
                         <td>$180</td>
                     </tr>
                 </tfoot>
-            }
+            }*@
         </MSimpleTable>
-        @if (Value.EnablePaginaton)
+@*        @if (Value.EnablePaginaton)
         {
             <MPagination Length="10" TotalVisible="5"></MPagination>
-        }
+        }*@
     </MCardText>
 </MCard>
 
@@ -60,5 +61,13 @@
     public ITablePanelValue Value { get; set; }
 
     [Parameter]
-    public List<Dessert> Data { get; set; }
+    public List<List<Dessert>> Data { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    void ToDashboardConfiguration(string dashboardId, string serviceName)
+    {
+        NavigationManager.NavigateTo($"/dashboard/configuration/{dashboardId}/{serviceName}");
+    }
 }
