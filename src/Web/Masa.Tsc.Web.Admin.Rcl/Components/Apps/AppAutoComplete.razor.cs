@@ -26,9 +26,9 @@ public partial class AppAutoComplete
 
     protected override async Task OnParametersSetAsync()
     {
-        if (string.IsNullOrEmpty(Value) && Apps.Any())
+        if (string.IsNullOrEmpty(Value) && Apps?.Any() is true)
         {
-            var value = Apps.First().Name;
+            var value = Apps.First().Identity;
             await ValueChanged.InvokeAsync(value);
         }
     }

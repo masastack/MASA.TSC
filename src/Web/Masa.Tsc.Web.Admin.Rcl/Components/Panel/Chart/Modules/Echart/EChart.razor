@@ -11,23 +11,11 @@
         </MTooltip>
     </MCardTitle>
     <MCardText Class="flex-grow-1">
-        <MECharts @key=@Value.GetChartKey() Option="Value.GetChartData()" /> @*@ref="_mECharts"*@
+        <MECharts @key=@Value.GetChartKey() Option="Value.GetChartOption()" />
     </MCardText>
 </MCard>
 
 @code {
     [Parameter]
     public IEChartPanelValue Value { get; set; }
-
-    //private MECharts _mECharts = null!;
-
-    //private void EChartOption_EChartOptionChanged()
-    //{
-    //    _mECharts.SetOption();
-    //}
-
-    //public void StateUpdated()
-    //{
-    //    _mECharts.SetOption();
-    //}
 }

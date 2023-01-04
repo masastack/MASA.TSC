@@ -5,7 +5,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public class SearchTextField : STextField<string>
 {   
-
     [Parameter]
     public bool FillBackground { get; set; } = true;
 
@@ -35,6 +34,7 @@ public class SearchTextField : STextField<string>
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
+        BackgroundColor = FillBackground ? "fill-background" : "white";
         Class ??= "";
         if (Class.Contains("rounded-2 search") is false)
             Class += " rounded-2 search";

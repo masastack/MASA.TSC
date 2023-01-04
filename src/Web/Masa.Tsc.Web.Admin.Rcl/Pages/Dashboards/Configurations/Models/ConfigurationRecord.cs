@@ -17,6 +17,8 @@ public class ConfigurationRecord
 
     public DateTimeOffset EndTime { get; set; }
 
+    public string Key => AppName + StartTime + EndTime;
+
     public void Clear()
     {
         Panels.Clear();

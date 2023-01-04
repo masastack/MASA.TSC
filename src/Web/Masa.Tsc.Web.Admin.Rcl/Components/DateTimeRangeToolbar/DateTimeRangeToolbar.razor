@@ -72,6 +72,20 @@
     [Parameter]
     public string Class { get; set; }
 
+    [Parameter]
+    public DateTimeOffset StartDateTime
+    {
+        get => _startDateTime;
+        set => _startDateTime = value;
+    }
+
+    [Parameter]
+    public DateTimeOffset EndDateTime
+    {
+        get => _endDateTime;
+        set => _endDateTime = value;
+    }
+
     private static readonly QuickRange s_internalDefaultQuickRange = new(QuickRangeKey.Last12Hours, TimeSpan.FromHours(-12));
 
     private Timer? _timer;

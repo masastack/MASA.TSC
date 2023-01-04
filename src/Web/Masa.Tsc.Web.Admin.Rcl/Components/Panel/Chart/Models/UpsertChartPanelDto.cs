@@ -95,6 +95,8 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         set
         {
             this[ExtensionFieldTypes.ChartType] = value;
+            IsLoadChartData = true;
+            IsLoadOption = true;
             switch (value)
             {
                 case "line":
@@ -211,12 +213,23 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         set => this[ExtensionFieldTypes.ColumnAlignment] = value;
     }
 
-    public EChartType _eChartType;
-
-    public EChartType EChartType
+    public ListTypes ListType
     {
-        get => _eChartType ??= EChartConst.Line;
-        set => _eChartType = value;
+        get
+        {
+            var value = this[ExtensionFieldTypes.ListType];
+            if (value is ListTypes enumValue)
+            {
+                return enumValue;
+            }
+            else if (value is JsonElement jsonElement)
+            {
+                var number = jsonElement.GetInt32();
+                return (ListTypes)number;
+            }
+            return ListTypes.ServiceList;
+        }
+        set => this[ExtensionFieldTypes.ListType] = value;
     }
 
     public Tooltip Tooltip
@@ -349,6 +362,14 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         set => this[ExtensionFieldTypes.YAxis] = value;
     }
 
+    public EChartType _eChartType;
+
+    public EChartType EChartType
+    {
+        get => _eChartType ??= EChartConst.Line;
+        set => _eChartType = value;
+    }
+
     public UpsertChartPanelDto(Guid id)
     {
         Id = id;
@@ -359,106 +380,110 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         PanelType = PanelTypes.Chart;
     }
 
+    bool IsLoadChartData { get; set; }
+
+    bool IsLoadOption { get; set; } = true;
+
     string Key { get; set; }
 
-    List<QueryResultDataResponse> _chartData =new();
-
-    string ChartDataKey { get; set; }
+    List<QueryResultDataResponse> _chartData = new();
 
     public void SetChartData(List<QueryResultDataResponse> chartData)
     {
         _chartData = chartData;
-        ChartDataKey = Guid.NewGuid().ToString();
+        IsLoadChartData = true;
     }
 
     public string GetChartKey()
     {
-        return ChartDataKey + ChartType + string.Join(",", base.Metrics.Select(item => item.Name).Union(base.Metrics.Select(item => item.DisplayName)));
+        return Key; //IsLoadChartData + ChartType;
     }
 
-    public object GetChartData()
+    public object GetChartOption()
     {
-        var key = GetChartKey();
-        if (Key == key) return EChartType.Json;
-        Key = key;
+        LoadChartData();
+        LoadChartOption();
 
-        if(ChartType is "line" or "bar")
+        return EChartType.Json;
+    }
+
+    void LoadChartData()
+    {
+        if (IsLoadChartData is false) return;
+
+        IsLoadChartData = false;
+        if (ChartType is "line" or "bar")
         {
-            List<QueryResultMatrixRangeResponse> data = new();
-            foreach(var item in _chartData)
+            var data = GetMatrixRangeData();
+
+            foreach (var item in _chartData)
             {
                 if (item is not null)
                 {
-                    foreach(var result in item.Result)
+                    foreach (var result in item.Result)
                     {
                         if (result is QueryResultMatrixRangeResponse matrix) data.Add(matrix);
                     }
                 }
             }
-            EChartType.Json["series"] = new JsonArray(data.Take(3).Select(item => new JsonObject 
+            EChartType.Json["series"] = new JsonArray(data.Take(3).Select(item => new JsonObject
             {
                 ["type"] = ChartType,
-                ["name"] = string.Join("-",item.Metric.Values),
-                ["data"] = new JsonArray(item.Values.Take(1000).Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Convert.ToInt32(value[1]))).ToArray())
-            }).ToArray());
-            //EChartType.Json["series"] = new JsonArray(Metrics.Select(item => new JsonObject
-            //{
-            //    ["name"] = item.DisplayName,
-            //    ["type"] = ChartType,
-            //    ["data"] = new JsonArray(120 + Random.Shared.Next(100), 200 + Random.Shared.Next(100), 150 + Random.Shared.Next(100), 80 + Random.Shared.Next(100), 70 + Random.Shared.Next(100), 110 + Random.Shared.Next(100), 130,145,54534,53453)
-            //}).ToArray());
-        }
-        else if(ChartType is "pie")
-        {
-            EChartType.Json["series"].AsArray().First()["data"] = new JsonArray(Metrics.Select(item => new JsonObject
-            {
-                ["name"] = item.DisplayName,
-                ["value"] = Random.Shared.Next(100)
+                ["name"] = string.Join("-", item.Metric.Values),
+                ["data"] = new JsonArray(item.Values.Take(1000).Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Convert.ToDouble(value[1]))).ToArray())
             }).ToArray());
         }
         else if (ChartType is "line-area")
         {
-            EChartType.Json["legend"]!["data"]= new JsonArray(Metrics.Select(item => (JsonNode)item.DisplayName!).ToArray());
-            EChartType.Json["series"] = new JsonArray(Metrics.Select(item => new JsonObject
+            var data = GetMatrixRangeData();
+            EChartType.Json["series"] = new JsonArray(data.Take(3).Select(item => new JsonObject
             {
-                ["name"] = item.DisplayName,
+                ["name"] = string.Join("-", item.Metric.Values),
                 ["type"] = "line",
                 ["stack"] = "Total",
                 ["areaStyle"] = new JsonObject(),
-                ["emphasis"] = new JsonObject() 
+                ["emphasis"] = new JsonObject()
                 {
                     ["focus"] = "series"
                 },
-                ["data"] = new JsonArray(120 + Random.Shared.Next(100), 200 + Random.Shared.Next(100), 150 + Random.Shared.Next(100), 80 + Random.Shared.Next(100), 70 + Random.Shared.Next(100), 110 + Random.Shared.Next(100), 130)
+                ["data"] = new JsonArray(item.Values.Take(1000).Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Convert.ToDouble(value[1]))).ToArray())
             }).ToArray());
         }
-        else if(ChartType is "gauge")
+        else if (ChartType is "pie")
         {
-            EChartType.Json["series"].AsArray().First()["data"] = new JsonArray(Metrics.Select(item => new JsonObject
+            var data = GetInstantVectorData();
+            EChartType.Json["series"].AsArray().First()["data"] = new JsonArray(data.Select(item => new JsonObject
             {
-                ["name"] = item.DisplayName,
-                ["value"] = Random.Shared.Next(100),
+                ["name"] = string.Join("-", item.Metric.Values),
+                ["value"] = Convert.ToDouble(item.Value[1])
+            }).ToArray());
+        }
+        else if (ChartType is "gauge")
+        {
+            var data = GetInstantVectorData();
+            EChartType.Json["series"].AsArray().First()["data"] = new JsonArray(data.Take(1).Select(item => new JsonObject
+            {
+                ["name"] = string.Join("-", item.Metric.Values),
+                ["value"] = Convert.ToDouble(item.Value[1]),
                 ["title"] = new JsonObject()
                 {
-                    ["offsetCenter"] = new JsonArray($"{GetPosition(Metrics.IndexOf(item)+1)}%","80%")
+                    ["offsetCenter"] = new JsonArray($"{GetPosition(data.IndexOf(item) + 1)}%", "80%")
                 },
                 ["detail"] = new JsonObject()
                 {
-                    ["offsetCenter"] = new JsonArray($"{GetPosition(Metrics.IndexOf(item)+1)}%", "95%")
+                    ["offsetCenter"] = new JsonArray($"{GetPosition(data.IndexOf(item) + 1)}%", "95%")
                 },
             }).ToArray());
         }
-        else if(ChartType is "heatmap")
+        else if (ChartType is "heatmap")
         {
             EChartType.Json["series"] = new JsonArray(Metrics.Select(item => new JsonObject
             {
                 ["name"] = item.DisplayName,
                 ["type"] = ChartType,
-                ["data"] = new JsonArray(new JsonArray(8,0,0), new JsonArray(11,0,2), new JsonArray(15,0,3), new JsonArray(11,11,11), new JsonArray(10,3,5))
+                ["data"] = new JsonArray(new JsonArray(8, 0, 0), new JsonArray(11, 0, 2), new JsonArray(15, 0, 3), new JsonArray(11, 11, 11), new JsonArray(10, 3, 5))
             }).ToArray());
         }
-
-        return EChartType.Json;
 
         int GetPosition(int index)
         {
@@ -468,5 +493,163 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
                 return 60 * index - 32 * Metrics.Count;
             }
         }
+
+        List<QueryResultMatrixRangeResponse> GetMatrixRangeData()
+        {
+            List<QueryResultMatrixRangeResponse> data = new();
+
+            if (_chartData is not null)
+            {
+                foreach (var item in _chartData)
+                {
+                    if (item is not null)
+                    {
+                        foreach (var result in item.Result)
+                        {
+                            if (result is QueryResultMatrixRangeResponse matrix) data.Add(matrix);
+                        }
+                    }
+                }
+            }
+
+            return data;
+        }
+
+        List<QueryResultInstantVectorResponse> GetInstantVectorData()
+        {
+            List<QueryResultInstantVectorResponse> data = new();
+
+            if(_chartData is not null)
+            {
+                foreach (var item in _chartData)
+                {
+                    if (item is not null)
+                    {
+                        foreach (var result in item.Result)
+                        {
+                            if (result is QueryResultInstantVectorResponse matrix) data.Add(matrix);
+                        }
+                    }
+                }
+            }
+
+            return data;
+        }
+    }
+   
+    void LoadChartOption()
+    {
+        if (IsLoadOption is false) return;
+
+        IsLoadOption = false;
+
+        if(ChartType is "line-area")
+        {
+            var yAxis = EChartType.Json["yAxis"].AsArray().First()!;
+            yAxis["show"] = YAxis.Show;
+            yAxis["axisLine"] = new JsonObject
+            {
+                ["show"] = YAxis.ShowLine
+            };
+            yAxis["axisTick"] = new JsonObject
+            {
+                ["show"] = YAxis.ShowTick
+            };
+            yAxis["axisLabel"] = new JsonObject
+            {
+                ["show"] = YAxis.ShowLabel
+            };
+            var xAxis = EChartType.Json["xAxis"].AsArray().First()!;
+            xAxis["show"] = XAxis.Show;
+            xAxis["axisLine"] = new JsonObject
+            {
+                ["show"] = XAxis.ShowLine
+            };
+            xAxis["axisTick"] = new JsonObject
+            {
+                ["show"] = XAxis.ShowTick
+            };
+            xAxis["axisLabel"] = new JsonObject
+            {
+                ["show"] = XAxis.ShowLabel
+            };
+        }
+        else
+        {
+            EChartType.SetValue("yAxis.show", YAxis.Show);
+            EChartType.SetValue("yAxis.axisLine.show", YAxis.ShowLine);
+            EChartType.SetValue("yAxis.axisTick.show", YAxis.ShowTick);
+            EChartType.SetValue("yAxis.axisLabel.show", YAxis.ShowLabel);
+            EChartType.SetValue("xAxis.show", XAxis.Show);
+            EChartType.SetValue("xAxis.axisLine.show", XAxis.ShowLine);
+            EChartType.SetValue("xAxis.axisTick.show", XAxis.ShowTick);
+            EChartType.SetValue("xAxis.axisLabel.show", XAxis.ShowLabel);
+        }
+        EChartType.SetValue("toolbox.show", Toolbox.Show);
+        EChartType.SetValue("toolbox.orient", Toolbox.Orient);
+        EChartType.SetValue("toolbox.left", Toolbox.XPositon);
+        EChartType.SetValue("toolbox.top", Toolbox.YPositon);
+        EChartType.SetValue("toolbox.feature", Toolbox.Feature.ToDictionary(f => f.AsT0, f => new object()));
+        EChartType.SetValue("legend.show", Legend.Show);
+        EChartType.SetValue("legend.orient", Legend.Orient);
+        EChartType.SetValue("legend.left", Legend.XPositon);
+        EChartType.SetValue("legend.top", Legend.YPositon);
+        EChartType.SetValue("legend.type", Legend.Type);
+        EChartType.SetValue("tooltip.show", Tooltip.Show);
+        EChartType.SetValue("tooltip.renderMode", Tooltip.RenderModel);
+        EChartType.SetValue("tooltip.className", Tooltip.ClassName);
+        EChartType.SetValue("tooltip.trigger", Tooltip.Trigger);
+    }
+
+    private void YAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        Key = "YAxis" + Guid.NewGuid();
+        IsLoadOption = true;
+    }
+
+    private void XAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        Key = "XAxis" + Guid.NewGuid();
+        IsLoadOption = true;
+    }
+
+    private void Toolbox_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        Key = "Toolbox" + Guid.NewGuid();
+        IsLoadOption = true;
+    }
+
+    private void Legend_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        Key = "Legend" + Guid.NewGuid();
+        IsLoadOption = true;
+    }
+
+    private void Tooltip_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        Key = "Tooltip" + Guid.NewGuid();
+        IsLoadOption = true;
+    }
+
+    public override UpsertPanelDto Clone(UpsertPanelDto panel)
+    {
+        base.Clone(panel);
+        var value = this[ExtensionFieldTypes.ChartType];
+        if (value is string stringValue)
+        {
+            ChartType = stringValue;
+        }
+        else if (value is JsonElement jsonElement)
+        {
+            ChartType = jsonElement.GetString() ?? "table";
+        }
+
+        Tooltip.PropertyChanged += Tooltip_PropertyChanged;
+        Legend.PropertyChanged += Legend_PropertyChanged;
+        Toolbox.PropertyChanged += Toolbox_PropertyChanged;
+        XAxis.PropertyChanged += XAxis_PropertyChanged;
+        YAxis.PropertyChanged += YAxis_PropertyChanged;
+
+        return this;
     }
 }

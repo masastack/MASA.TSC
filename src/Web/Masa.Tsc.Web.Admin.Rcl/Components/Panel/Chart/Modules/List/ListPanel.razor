@@ -1,0 +1,22 @@
+﻿<DynamicComponent Type="@CurrentComponentModule.ShowType" Parameters=CurrentComponentModule.Metadata />
+
+@code {
+
+    [Parameter]
+    public ITablePanelValue Value { get; set; }
+
+    Dictionary<ListTypes, DynamicComponentDescription> ComponentModuleMap { get; set; }
+
+    DynamicComponentDescription CurrentComponentModule => ComponentModuleMap[Value.ListType];
+
+    protected override void OnInitialized()
+    {
+        ComponentModuleMap = new()
+        {
+            [ListTypes.ServiceList] = new(typeof(ServiceListDemo), new() { ["Value"] = Value }),
+            [ListTypes.InstanceList] = new(typeof(InstanceListDemo), new() { ["Value"] = Value }),
+            [ListTypes.EndpointList] = new(typeof(EndpointListDemo), new() { ["Value"] = Value }),
+            [ListTypes.TopList] = new(typeof(TopListDemo), new() { ["Value"] = Value })
+        };
+    }
+}
