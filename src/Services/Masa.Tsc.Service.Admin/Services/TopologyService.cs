@@ -10,7 +10,6 @@ public class TopologyService : ServiceBase
     public TopologyService() : base("/api/topology")
     {
         App.MapGet($"{BaseUri}/Start", StartAsync);
-        App.MapGet($"{BaseUri}/{{serviceName}}/{{level}}/{{start}}/{{end}}", asdasdasdasdasAsync);
     }
 
     public async Task StartAsync([FromServices] IEventBus eventBus, [FromQuery] DateTime start, [FromQuery] DateTime end)
@@ -19,7 +18,7 @@ public class TopologyService : ServiceBase
         await eventBus.PublishAsync(command);
     }
 
-    public async Task<TopologyResultDto> asdasdasdasdasAsync([FromServices] IEventBus eventBus, string serviceName, int level, DateTime start, DateTime end)
+    public async Task<TopologyResultDto> GetAsync([FromServices] IEventBus eventBus, string serviceName, int level, DateTime start, DateTime end)
     {
         var query = new TopologyQuery(new TopologyRequestDto { ServiceName = serviceName, Level = level, Start = start, End = end });
         await eventBus.PublishAsync(query);

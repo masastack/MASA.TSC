@@ -17,7 +17,7 @@ public partial class GrowthChart
     [Parameter]
     public string SubText { get; set; }
 
-    public int Total { get; set; } = 23;
+    public double Total { get; set; }
 
     private EChartType _options = EChartConst.Line;
 
@@ -45,12 +45,12 @@ public partial class GrowthChart
               new
               {
                   offset = 0,
-                  color = "#A9F387" // 0% 处的颜色
+                  color = "rgb(255,236,236)" // 0% 处的颜色
               },
               new
               {
                   offset = 1,
-                  color = "#48D8BF" // 100% 处的颜色
+                  color = "rgb(248,76,54)" // 100% 处的颜色
               }
             },
                 globalCoord = false // 缺省为 false
@@ -60,21 +60,27 @@ public partial class GrowthChart
             shadowOffsetY = 20
         });
         _options.SetValue("series[0].smooth", true);
-        await Task.CompletedTask;
-    }
-
-    private int GetRate(int lastValue, int value, int count, int max)
-    {
-        int width = 300; int height = 180;
-        double x = width * 1.0 / count;
-        var temp = value - lastValue;
-        double y = temp * 1.0 / max * height;
-
-
-
-        if (temp > 0)
-            return (int)Math.Floor(y / x * 45);
+        if (query.Start is null)
+            query.Start = DateTime.Now.AddDays(-1);
+        if (query.End is null)
+            query.End = DateTime.Now;
+        var data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
+        {
+            MetricNames = new List<string> { "(count(http_server_duration_bucket>1000 and http_server_duration_bucket<=4000)*0.5+count(http_server_duration_bucket<1000))/count(http_server_duration_bucket)" },
+            Start = query.Start.Value,
+            End = query.End.Value,
+            Step = "5m"
+        });       
+        if (data[0] != null && data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix)
+        {
+            var seriesData = ((QueryResultMatrixRangeResponse)data[0].Result.First()).Values.Select(items => Convert.ToDouble(items[1])*100).ToArray();
+            Total = seriesData.Last();
+            _options.SetValue("series[0].data", seriesData);
+        }
         else
-            return (int)Math.Floor(y / x * 45);
+        {
+            _options.SetValue("series[0].data", new double[0]);
+            Total = 0;
+        }
     }
 }

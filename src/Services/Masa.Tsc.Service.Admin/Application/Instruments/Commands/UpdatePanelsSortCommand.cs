@@ -1,6 +1,6 @@
-﻿// Copyright (c) MASA Stack All rights reserved.
-// Licensed under the MIT License. See LICENSE.txt in the project root for license information.
+﻿//// Copyright (c) MASA Stack All rights reserved.
+//// Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.Service.Admin.Application.Instruments.Commands;
+//namespace Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 
-public record UpdatePanelsSortCommand(Guid Id,Guid ParentId,List<Guid> PanelIds): Command;
+//public record UpdatePanelsSortCommand(Guid Id,Guid ParentId,List<Guid> PanelIds): Command;

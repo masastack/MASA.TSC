@@ -188,11 +188,11 @@ public class QueryHandler
     public async Task GetValuesAsync(ValuesQuery query)
     {
         var metric = "";
-        if (string.Equals(query.Data.Type, nameof(query.Data.Service), StringComparison.InvariantCultureIgnoreCase))
+        if (query.Data.Type == MetricValueTypes.Service)
             metric = $"group by (service_name) (http_client_duration_bucket{{}})";
-        else if (string.Equals(query.Data.Type, nameof(query.Data.Instance), StringComparison.InvariantCultureIgnoreCase))
+        else if (query.Data.Type == MetricValueTypes.Instance)
             metric = $"group by (service_instance_id) (http_client_duration_bucket{{}})";
-        else
+        else if (query.Data.Type == MetricValueTypes.Endpoint)
             metric = $"group by (endpoint) (http_client_duration_bucket{{}})";
 
         metric = AppendCondition(metric, query.Data.Service, query.Data.Instance, query.Data.Endpoint);

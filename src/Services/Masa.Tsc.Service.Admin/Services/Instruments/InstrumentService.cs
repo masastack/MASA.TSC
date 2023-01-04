@@ -7,8 +7,7 @@ public class InstrumentService : ServiceBase
 {
     public InstrumentService() : base("/api/Instrument")
     {
-        App.MapPost($"{BaseUri}/set-root/{{id}}/{{isRoot}}", SetRootAsync);
-        App.MapPost($"{BaseUri}/set-panels-show-setting/", UpdatePanelsShowAsync);
+        App.MapPost($"{BaseUri}/set-root/{{id}}/{{isRoot}}", SetRootAsync);        
         App.MapPost($"{BaseUri}/upsert/{{instrumentId}}", UpsertAsync);
     }
 
@@ -59,9 +58,11 @@ public class InstrumentService : ServiceBase
         await eventBus.PublishAsync(command);
     }
 
-    public async Task UpdatePanelsShowAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromBody] UpdateInstrumentPanelsShowDto model)
+    public async Task<LinkResultDto> GetLinkAsync([FromServices] IEventBus eventBus, MetricValueTypes type)
     {
-        var command = new UpdatePanelsShowCommand(model, userContext.GetUserId<Guid>());
-        await eventBus.PublishAsync(command);
+        var query = new LinkTypeQuery(type);
+        await eventBus.PublishAsync(query);
+        return query.Result;
     }
+
 }

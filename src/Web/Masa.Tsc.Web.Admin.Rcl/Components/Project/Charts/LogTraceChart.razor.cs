@@ -27,12 +27,46 @@ public partial class LogTraceChart
     {
         if (query == null)
             return;
-        DateTime start = DateTime.Now.Date;
+        DateTime start = DateTime.Now.AddDays(-1);
         DateTime end = DateTime.Now;
         if (query.Start.HasValue)
             start = query.Start.Value;
         if (query.End.HasValue)
             end = query.End.Value;
+
+        var step = (int)Math.Floor((end - start).TotalSeconds / 250);
+        if (step - 5 < 0)
+            step = 5;
+        var result = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
+        {
+            MetricNames = new List<string> {
+                "histogram_quantile(0.50,sum(increase(http_server_duration_bucket[5m])) by (le))",
+                "histogram_quantile(0.75,sum(increase(http_server_duration_bucket[5m])) by (le))",
+                "histogram_quantile(0.90,sum(increase(http_server_duration_bucket[5m])) by (le))",
+                "histogram_quantile(0.95,sum(increase(http_server_duration_bucket[5m])) by (le))",
+                "histogram_quantile(0.99,sum(increase(http_server_duration_bucket[5m])) by (le))"
+            },
+            Start = start,
+            End = end,
+            Step = step.ToString()
+        });
+
+        Dictionary<string, List<double>> dddd = new Dictionary<string, List<double>>();
+        var timeSpans = new List<double>();
+
+        var series = new string[] {"P50","P75","P90","P95","P99"};
+        var index = 0;
+        //foreach (var item in result)
+        //{
+        //    if (item != null && item.ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && item.Result != null && item.Result.Any())
+        //    {
+        //        var key = series[index++];
+        //        //timeSpans.AddRange()
+        //    }
+        //}
+
+
+
         await Task.CompletedTask;
     }
 

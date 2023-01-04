@@ -62,7 +62,8 @@ public class InstrumentQueryHandler
                 Sort = dto.Sort,
                 Panels = ConvertPanels(dto.Panels)
             };
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
 
 
@@ -123,5 +124,26 @@ public class InstrumentQueryHandler
             result.Add(dto);
         }
         return result;
+    }
+
+    [EventHandler]
+    public async Task GetPanelLinkAsync(LinkTypeQuery query)
+    {
+        if (query.Type == MetricValueTypes.Service || query.Type == MetricValueTypes.Instance || query.Type == MetricValueTypes.Endpoint)
+        {
+            var type = ModelTypes.Service;
+            if (query.Type == MetricValueTypes.Service)
+                type = ModelTypes.Service;
+            else if (query.Type == MetricValueTypes.Instance)
+                type = ModelTypes.ServiceInstance;
+            else
+                type = ModelTypes.Endpoint;
+            var instrument = await _instrumentRepository.ToQueryable().Where(item => item.Model == type.ToString("G")).OrderBy(item => item.CreationTime).FirstOrDefaultAsync();
+            query.Result = new LinkResultDto { InstrumentId = instrument?.Id };
+        }
+        else
+        {
+            query.Result = new LinkResultDto { Href = "/dashbord/trace" };
+        }
     }
 }

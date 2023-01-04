@@ -22,4 +22,6 @@ public class InstrumentService : BaseService
     public async Task<InstrumentDetailDto> GetDetailAsync(Guid id) => (await Caller.GetAsync<InstrumentDetailDto>($"{RootPath}/detail/{id}"))!;
 
     public async Task<PaginatedListBase<InstrumentListDto>> ListAsync(int page, int size, string keyword) => (await Caller.GetAsync<PaginatedListBase<InstrumentListDto>>($"{RootPath}/list/{page}/{size}/{keyword}"))!;
+
+    public async Task<LinkResultDto> GetLinkAsync(MetricValueTypes type) => (await Caller.GetAsync<LinkResultDto>($"{RootPath}/link", new { type }))!;
 }

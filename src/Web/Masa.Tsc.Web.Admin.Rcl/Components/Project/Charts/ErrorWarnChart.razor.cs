@@ -76,7 +76,7 @@ public partial class ErrorWarnChart
         if (values[1] == 0)
         {
             values[0] = 100;
-            _total = 1;
+            _total = 100;
         }
         else
         {
@@ -115,12 +115,13 @@ public partial class ErrorWarnChart
         //_total += data1;
         //_total += data2;
 
+        _options.SetValue("tooltip.formatter", "{d}%");
         _options.SetValue("series[0].data", new object[] {GetModel(true,values[0]),
             GetModel(false,values[1]) });
     }
 
     private static object GetModel(bool isTrace, double value)
     {
-        return new { name = isTrace ? "Tace" : "Log", value = value };
+        return new { name = isTrace ? "Tace" : "Log", value };
     }
 }

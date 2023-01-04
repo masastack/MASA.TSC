@@ -79,7 +79,8 @@
 		<Folder Include="Domain\Teams\Repositories\" />
 	</ItemGroup>
 
-	<ItemGroup>		
+	<ItemGroup>
+		<!--<ProjectReference Include="..\..\..\..\MASA.Framework\src\Contrib\StackSdks\Masa.Contrib.StackSdks.Tsc\Masa.Contrib.StackSdks.Tsc.csproj" />-->
 		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
 	</ItemGroup>
 

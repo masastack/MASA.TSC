@@ -17,5 +17,5 @@ public class RequestMetricListDto
 
     public string Step { get; set; }
 
-    public string Type { get; set; }
+    public MetricValueTypes Type { get; set; }
 }
