@@ -9,9 +9,9 @@ public class PanelMetric : AggregateRoot<Guid>
 
     public PanelMetric(Guid id) : base(id) { }
 
-    public PanelMetric(PanelMetricDto data)
+    public PanelMetric(Guid panelId,PanelMetricDto data)
     {
-        PanelId = data.Id;
+        PanelId = panelId;
         Update(data);
     }
 

@@ -197,6 +197,8 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
 
     private List<PanelMetric> GetAllMetrics(List<Panel> panels)
     {
+        if(panels==null||!panels.Any())
+            return default!;
         var result = new List<PanelMetric>();
         foreach (var panel in panels)
         {
