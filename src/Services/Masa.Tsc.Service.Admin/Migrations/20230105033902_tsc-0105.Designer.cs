@@ -4,6 +4,7 @@ using Masa.Tsc.Service.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Masa.Tsc.Service.Admin.Migrations
 {
     [DbContext(typeof(TscDbContext))]
-    partial class TscDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230105033902_tsc-0105")]
+    partial class tsc0105
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,6 +260,8 @@ namespace Masa.Tsc.Service.Admin.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PanelId");
+
                     b.ToTable("PanelMetric", "tsc");
                 });
 
@@ -308,9 +312,23 @@ namespace Masa.Tsc.Service.Admin.Migrations
                     b.Navigation("Directory");
                 });
 
+            modelBuilder.Entity("Masa.Tsc.Service.Admin.Domain.Aggregates.PanelMetric", b =>
+                {
+                    b.HasOne("Masa.Tsc.Service.Admin.Domain.Aggregates.Panel", null)
+                        .WithMany("Metrics")
+                        .HasForeignKey("PanelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Masa.Tsc.Service.Admin.Domain.Aggregates.Directory", b =>
                 {
                     b.Navigation("Instruments");
+                });
+
+            modelBuilder.Entity("Masa.Tsc.Service.Admin.Domain.Aggregates.Panel", b =>
+                {
+                    b.Navigation("Metrics");
                 });
 #pragma warning restore 612, 618
         }

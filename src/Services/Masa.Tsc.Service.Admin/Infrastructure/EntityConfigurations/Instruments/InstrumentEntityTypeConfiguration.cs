@@ -14,5 +14,6 @@ public class InstrumentEntityTypeConfiguration : IEntityTypeConfiguration<Instru
         builder.Property(x => x.Model).HasMaxLength(40);
         builder.Property(x => x.Lable).HasMaxLength(40);
         builder.HasOne(x => x.Directory).WithMany(x => x.Instruments).HasForeignKey(x => x.DirectoryId);
+        builder.Ignore(x => x.Panels);
     }
 }

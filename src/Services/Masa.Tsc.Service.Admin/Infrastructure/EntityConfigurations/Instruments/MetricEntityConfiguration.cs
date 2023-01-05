@@ -14,7 +14,6 @@ public class MetricEntityConfiguration : IEntityTypeConfiguration<PanelMetric>
         builder.Property(x => x.Color).HasMaxLength(20).IsRequired(false);
         builder.Property(x => x.Icon).HasMaxLength(20).IsRequired(false);
         builder.Property(x => x.DisplayName).HasMaxLength(200).IsRequired(false);
-
-        //builder.HasOne(x => x.Panel).WithMany(p => p.Metrics).HasForeignKey(x => new { x.PanelId });
+        builder.Ignore(x => x.Panel);
     }
 }
