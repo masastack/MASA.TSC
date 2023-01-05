@@ -26,7 +26,7 @@ public partial class TeamProjectDialog
     public async Task RefrshDataASync(Guid teamId, string projectId)
     {
         Visible = true;
-        if (!string.IsNullOrEmpty(projectId) && teamId != Guid.Empty && _projectId != projectId && _teamId != teamId)
+        if (!string.IsNullOrEmpty(projectId) && teamId != Guid.Empty && (_projectId != projectId || _teamId != teamId))
         {
             _team = await ApiCaller.TeamService.GetTeamAsync(teamId, projectId);
             _projectId = projectId;

@@ -19,12 +19,12 @@
     protected override void OnInitialized()
     {
         ComponentModuleMap = new()
-            {
-                [ListTypes.ServiceList] = new(typeof(ServiceList), new() { ["Value"] = Value }),
-                [ListTypes.InstanceList] = new(typeof(InstanceList), new() { ["Value"] = Value }),
-                [ListTypes.EndpointList] = new(typeof(EndpointList), new() { ["Value"] = Value }),
-                [ListTypes.TopList] = new(typeof(TopList), new() { ["Value"] = Value })
-            };
+        {
+            [ListTypes.ServiceList] = new(typeof(ServiceList), new() { ["Value"] = Value }),
+            [ListTypes.InstanceList] = new(typeof(InstanceList), new() { ["Value"] = Value }),
+            [ListTypes.EndpointList] = new(typeof(EndpointList), new() { ["Value"] = Value }),
+            [ListTypes.TopList] = new(typeof(TopList), new() { ["Value"] = Value })
+        };
     }
 
     protected override async Task OnParametersSetAsync()

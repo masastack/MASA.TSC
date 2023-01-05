@@ -7,12 +7,14 @@ public class TopologyService : ServiceBase
 {
     public TopologyService() : base("/api/topology")
     {
-        App.MapGet($"{BaseUri}/Start", StartAsync);
+        App.MapGet($"{BaseUri}/start", StartAsync);
     }
 
-    public async Task StartAsync([FromServices] IEventBus eventBus, [FromQuery] DateTimeOffset excuteTime)
+    public async Task StartAsync([FromServices] IEventBus eventBus, [FromQuery] DateTimeOffset? excuteTime)
     {
-        var end = excuteTime.ToUniversalTime().DateTime;
+        if (excuteTime == null)
+            excuteTime = new DateTimeOffset(DateTime.UtcNow);
+        var end = excuteTime.Value.ToUniversalTime().DateTime;
         var start = DateTime.MinValue;
         var command = new StartCommand(start, end);
         await eventBus.PublishAsync(command);

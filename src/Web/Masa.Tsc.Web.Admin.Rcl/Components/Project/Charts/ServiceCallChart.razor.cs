@@ -20,8 +20,8 @@ public partial class ServiceCallChart
     {
         if (query == null)
             return;
-        DateTime start = DateTime.Now.AddDays(-1);
-        DateTime end = DateTime.Now;
+        DateTime start = DateTime.UtcNow.AddDays(-1);
+        DateTime end = DateTime.UtcNow;
         if (query.Start.HasValue)
             start = query.Start.Value;
         if (query.End.HasValue)
