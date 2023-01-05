@@ -17,13 +17,13 @@ public class CommandHandler
     private static bool _readComplete = false;
 
     public CommandHandler(ITraceService traceService,
-        IMultilevelCacheClient multilevelCacheClient,
+        IMultilevelCacheClientFactory multilevelCacheClientFactory,
         ITraceServiceNodeRepository traceServiceNodeRepository,
         ITraceServiceRelationRepository traceServiceRelationRepository,
         ITraceServiceStateRepository traceServiceStateRepository)
     {
         _traceService = traceService;
-        _multilevelCacheClient = multilevelCacheClient;
+        _multilevelCacheClient = multilevelCacheClientFactory.Create(GetType().Assembly.FullName!);
         _traceServiceNodeRepository = traceServiceNodeRepository;
         _traceServiceRelationRepository = traceServiceRelationRepository;
         _traceServiceStateRepository = traceServiceStateRepository;

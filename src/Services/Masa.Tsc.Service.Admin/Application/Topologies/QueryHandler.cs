@@ -8,10 +8,10 @@ public class QueryHandler
     private readonly IMultilevelCacheClient _multilevelCacheClient;
     private readonly ITraceServiceStateRepository _traceServiceStateRepository;
 
-    public QueryHandler(IMultilevelCacheClient multilevelCacheClient,
+    public QueryHandler(IMultilevelCacheClientFactory multilevelCacheClientFactory,
         ITraceServiceStateRepository traceServiceStateRepository)
     {
-        _multilevelCacheClient = multilevelCacheClient;
+        _multilevelCacheClient = multilevelCacheClientFactory.Create(GetType().Assembly.FullName!);
         _traceServiceStateRepository = traceServiceStateRepository;
     }
 
@@ -28,20 +28,23 @@ public class QueryHandler
         }
 
         var relations = _multilevelCacheClient.Get<List<TraceServiceRelation>>(TopologyConstants.TOPOLOGY_SERVICES_RELATIONS_KEY)!;
-        var findRelations = GetRelations(query.Data.Level, service.Id, relations);
-
-        //所关联的服务id
-        var serviceIds = GetServiceIds(findRelations);
-        result.Services = services.Where(item => serviceIds.Contains(item.Id)).Select(item => new TopologyServiceDto
+        if (relations != null && relations.Any())
         {
-            Id = item.Id,
-            Name = item.Service,
-            Type = item.Type
-        }).ToList();
-        result.Relations = relations.Select(item => new TopologyServiceRelationDto { CurrentId = item.ServiceId, DestId = item.DestServiceId }).ToList();
-        if (serviceIds.Any())
-            result.Data = await _traceServiceStateRepository.GetServiceTermsDataAsync(query.Data.Start, query.Data.End, serviceIds.ToArray());
-        query.Result = result;
+            var findRelations = GetRelations(query.Data.Level, service.Id, relations);
+
+            //所关联的服务id
+            var serviceIds = GetServiceIds(findRelations);
+            result.Services = services.Where(item => serviceIds.Contains(item.Id)).Select(item => new TopologyServiceDto
+            {
+                Id = item.Id,
+                Name = item.Service,
+                Type = item.Type
+            }).ToList();
+            result.Relations = relations.Select(item => new TopologyServiceRelationDto { CurrentId = item.ServiceId, DestId = item.DestServiceId }).ToList();
+            if (serviceIds.Any())
+                result.Data = await _traceServiceStateRepository.GetServiceTermsDataAsync(query.Data.Start, query.Data.End, serviceIds.ToArray());
+            query.Result = result;
+        }
     }
 
     private List<TraceServiceRelation> GetRelations(int max, string serviceId, List<TraceServiceRelation> relations, int level = 1)

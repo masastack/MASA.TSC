@@ -12,10 +12,11 @@ builder.Services.AddDaprClient();
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
 
 RedisConfigurationOptions redis;
-if(builder.Environment.IsEnvironment("Development"))
- {
-    redis = builder.Configuration.GetSection("redis").Get<RedisConfigurationOptions>();
-}else
+if (builder.Environment.IsEnvironment("Development"))
+{
+    redis = builder.Configuration.GetSection("redis:RedisOptions").Get<RedisConfigurationOptions>();
+}
+else
 {
     redis = dccConfig.RedisOptions;
 }
@@ -63,12 +64,13 @@ builder.Services.AddMasaIdentity(options =>
     })
     .AddAuthClient(config["$public.AppSettings:AuthClient:Url"], dccConfig.RedisOptions)
     .AddPmClient(config["$public.AppSettings:PmClient:Url"])
-    .AddMultilevelCache(distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis)
-    , multilevelCacheOptions =>
-    {
-        multilevelCacheOptions.SubscribeKeyPrefix = MasaStackConsts.TSC_SYSTEM_ID;
-        multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
-    });
+    .AddMultilevelCache(typeof(Program).Assembly.FullName!,
+        distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
+        multilevelCacheOptions =>
+        {
+            multilevelCacheOptions.SubscribeKeyPrefix = MasaStackConsts.TSC_SYSTEM_ID;
+            multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
+        });
 
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
