@@ -174,7 +174,7 @@ public class Panel : AggregateRoot<Guid>
                 var panel = Panels.FirstOrDefault(x => x.Id == item.Id);
                 if (panel == null)
                 {
-                    panel = new Panel(item, InstrumentId,Id);
+                    panel = new Panel(item, InstrumentId, Id);
                 }
                 else
                 {

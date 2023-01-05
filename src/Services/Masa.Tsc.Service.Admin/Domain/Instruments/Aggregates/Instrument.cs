@@ -40,10 +40,10 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
 
     public void UpdatePanels(UpsertPanelDto[] data)
     {
-        if (data == null || !data.Any())
+        if ((data == null || !data.Any()) && Panels != null && this.Panels.Any())
         {
-            if (Panels != null && this.Panels.Any())
-                Panels.Clear();
+            Panels.Clear();
+            return;
         }
 
         if (Panels == null)
