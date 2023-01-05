@@ -48,7 +48,7 @@ public partial class Configuration
         Convert(ConfigurationRecord.Panels);
     }
 
-    void Convert(List<UpsertPanelDto> panels)
+    void Convert(List<UpsertPanelDto> panels, UpsertPanelDto? parentPanel = null)
     {
         var chartPanels = panels.Where(panel => panel.PanelType == PanelTypes.Chart).ToList();
         var tabsPanels = panels.Where(panel => panel.PanelType == PanelTypes.Tabs).ToList();
@@ -56,11 +56,11 @@ public partial class Configuration
         panels.RemoveAll(panel => panel.PanelType == PanelTypes.Chart || panel.PanelType == PanelTypes.Tabs || panel.PanelType == PanelTypes.TabItem);
         panels.AddRange(chartPanels.Select(panel => new UpsertChartPanelDto(default).Clone(panel)));
         panels.AddRange(tabsPanels.Select(panel => new UpsertTabsPanelDto(default).Clone(panel)));
-        panels.AddRange(tabItemPanels.Select(panel => new UpsertTabItemPanelDto(default).Clone(panel)));
+        panels.AddRange(tabItemPanels.Select(panel => new UpsertTabItemPanelDto(parentPanel as UpsertTabsPanelDto).Clone(panel)));
         foreach (var panel in panels)
         {
             if (panel.ChildPanels.Any() is false) continue;
-            else Convert(panel.ChildPanels);
+            else Convert(panel.ChildPanels, panel);
         }
     }
 
