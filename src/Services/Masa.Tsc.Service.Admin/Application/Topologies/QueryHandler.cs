@@ -11,7 +11,7 @@ public class QueryHandler
     public QueryHandler(IMultilevelCacheClientFactory multilevelCacheClientFactory,
         ITraceServiceStateRepository traceServiceStateRepository)
     {
-        _multilevelCacheClient = multilevelCacheClientFactory.Create(GetType().Assembly.FullName!);
+        _multilevelCacheClient = multilevelCacheClientFactory.Create(MasaStackConsts.TSC_SYSTEM_SERVICE_APP_ID);
         _traceServiceStateRepository = traceServiceStateRepository;
     }
 

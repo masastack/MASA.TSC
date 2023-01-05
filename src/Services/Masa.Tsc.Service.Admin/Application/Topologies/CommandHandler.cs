@@ -23,7 +23,7 @@ public class CommandHandler
         ITraceServiceStateRepository traceServiceStateRepository)
     {
         _traceService = traceService;
-        _multilevelCacheClient = multilevelCacheClientFactory.Create(GetType().Assembly.FullName!);
+        _multilevelCacheClient = multilevelCacheClientFactory.Create(MasaStackConsts.TSC_SYSTEM_SERVICE_APP_ID);
         _traceServiceNodeRepository = traceServiceNodeRepository;
         _traceServiceRelationRepository = traceServiceRelationRepository;
         _traceServiceStateRepository = traceServiceStateRepository;

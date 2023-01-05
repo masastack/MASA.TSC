@@ -64,7 +64,7 @@ builder.Services.AddMasaIdentity(options =>
     })
     .AddAuthClient(config["$public.AppSettings:AuthClient:Url"], dccConfig.RedisOptions)
     .AddPmClient(config["$public.AppSettings:PmClient:Url"])
-    .AddMultilevelCache(typeof(Program).Assembly.FullName!,
+    .AddMultilevelCache(MasaStackConsts.TSC_SYSTEM_SERVICE_APP_ID,
         distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
         multilevelCacheOptions =>
         {
