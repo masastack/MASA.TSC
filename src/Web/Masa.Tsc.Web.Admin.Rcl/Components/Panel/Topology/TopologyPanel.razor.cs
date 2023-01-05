@@ -7,8 +7,13 @@ public partial class TopologyPanel
 {
     List<int> _depthItems = new() { 1, 2, 3 };
     int _depth = 3;
+    int _oldDepth = 0;
+
+    [CascadingParameter]
+    ConfigurationRecord ConfigurationRecord { get; set; }
 
     public LinkTrackingTopologyViewModel Data { get; set; }
+    public LinkTrackingTopologyViewModel ViewData { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -18,13 +23,18 @@ public partial class TopologyPanel
 
     LinkTrackingTopologyViewModel GetDepthData()
     {
-        var nodes = Data.Nodes.Where(x => x.Depth <= _depth).ToList();
-        var edges = Data.Edges.Where(x => nodes.Any(y => y.Id == x.Source || y.Id == x.Target)).ToList();
-        return new LinkTrackingTopologyViewModel
+        if(_oldDepth != _depth)
         {
-            Nodes = nodes,
-            Edges = edges
-        };
+            _oldDepth = _depth;
+            var nodes = Data.Nodes.Where(x => x.Depth <= _depth).ToList();
+            var edges = Data.Edges.Where(x => nodes.Any(y => y.Id == x.Source || y.Id == x.Target)).ToList();
+            ViewData = new LinkTrackingTopologyViewModel
+            {
+                Nodes = nodes,
+                Edges = edges
+            };
+        }
+        return ViewData;
     }
 
     async Task GetYopologyPanelData()
@@ -36,49 +46,49 @@ public partial class TopologyPanel
             {
                 Source="1",
                 Target="0",
-                Label="123.54"
+                Label="11"
             },
             new LinkTrackingTopologyEdgeViewModel
             {
                 Source="0",
                 Target="2",
-                Label="123.54"
+                Label="12"
             },
             new LinkTrackingTopologyEdgeViewModel
             {
                 Source="0",
                 Target="3",
-                Label="123.54"
+                Label="13"
             },
             new LinkTrackingTopologyEdgeViewModel
             {
                 Source="0",
                 Target="4",
-                Label="123.54"
+                Label="14"
             },
             new LinkTrackingTopologyEdgeViewModel
             {
                 Source="1",
                 Target="2",
-                Label="123.54"
+                Label="15"
             },
             new LinkTrackingTopologyEdgeViewModel
             {
                 Source="5",
                 Target="1",
-                Label="123.54"
+                Label="16"
             },
             new LinkTrackingTopologyEdgeViewModel
             {
                 Source="4",
                 Target="6",
-                Label="123.54"
+                Label="17"
             },
             new LinkTrackingTopologyEdgeViewModel
             {
                 Source="7",
                 Target="5",
-                Label="123.54"
+                Label="18"
             },
         };
         Data.Nodes = new List<LinkTrackingTopologyNodeViewModel>
@@ -149,6 +159,8 @@ public partial class TopologyPanel
             },
         };
 
+
+        //await ApiCaller.TopologyService.GetAsync();
         await Task.CompletedTask;
     }
 
