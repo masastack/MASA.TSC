@@ -422,17 +422,17 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         if (ChartType is "line" or "bar")
         {
             var data = GetMatrixRangeData();
-            EChartType.Json["series"] = new JsonArray(data.Take(3).Select(item => new JsonObject
+            EChartType.Json["series"] = new JsonArray(data.Select(item => new JsonObject
             {
                 ["type"] = ChartType,
                 ["name"] = string.Join("-", item.Metric.Values),
-                ["data"] = new JsonArray(item.Values.Take(1000).Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Convert.ToDouble(value[1]))).ToArray())
+                ["data"] = new JsonArray(item.Values.Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Convert.ToDouble(value[1]))).ToArray())
             }).ToArray());
         }
         else if (ChartType is "line-area")
         {
             var data = GetMatrixRangeData();
-            EChartType.Json["series"] = new JsonArray(data.Take(3).Select(item => new JsonObject
+            EChartType.Json["series"] = new JsonArray(data.Select(item => new JsonObject
             {
                 ["name"] = string.Join("-", item.Metric.Values),
                 ["type"] = "line",
@@ -442,7 +442,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
                 {
                     ["focus"] = "series"
                 },
-                ["data"] = new JsonArray(item.Values.Take(1000).Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Convert.ToDouble(value[1]))).ToArray())
+                ["data"] = new JsonArray(item.Values.Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Convert.ToDouble(value[1]))).ToArray())
             }).ToArray());
         }
         else if (ChartType is "pie")
