@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<MGridstack Items="Panels" Readonly="!IsEdit" @ref="@Gridstack" ItemKey="panel => panel.Id.ToString()" ItemStyle="@("border:solid #E4E8F3 1px;position:absolute;"+(IsEdit?"cursor: move;":""))" ItemPosition="panel => new(panel.Width,panel.Height,panel.X,panel.Y)" TItem="UpsertPanelDto">
+<MGridstack Items="Panels" Readonly="!IsEdit" @ref="@Gridstack" ItemKey="panel => panel.Id.ToString()" ItemStyle="@("border:solid #E4E8F3 1px;position:absolute;overflow:hiden"+(IsEdit?"cursor: move;":""))" ItemPosition="panel => new(panel.Width,panel.Height,panel.X,panel.Y)" TItem="UpsertPanelDto">
    <ItemContent>
        <div style="height:35px;" class="d-flex">
            <MSpacer />
@@ -50,7 +50,7 @@
                 </MMenu>
             }
         </div>
-        <div style="overflow:auto;max-height:calc(100vh - 260px)">
+        <div style="overflow:auto;max-height:calc(100% - 35px)">
             @switch (context.PanelType)
             {
                 case PanelTypes.Tabs:
