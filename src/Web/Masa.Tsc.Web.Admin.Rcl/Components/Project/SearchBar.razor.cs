@@ -12,14 +12,18 @@ public partial class SearchBar
         set
         {
             _apps = value ?? new();
-            if (_apps != null && _apps.Any() && string.IsNullOrEmpty(_value.AppId))
+            if (_apps != null && _apps.Any())
             {
-                _value.AppId = _apps.First().Identity;
+                var appid = _apps.First().Identity;
+                if (string.IsNullOrEmpty(_value.AppId) || _value.AppId != appid)
+                    _value.AppId = appid;
             }
+            else
+                _value.AppId = default!;
         }
     }
 
-    [Parameter]
+    //[Parameter]
     public ProjectAppSearchModel Value
     {
         get { return _value; }
@@ -53,14 +57,37 @@ public partial class SearchBar
             await OnSearch.InvokeAsync(Value);
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async Task UpdateTimeAsync((DateTimeOffset start, DateTimeOffset end) times)
     {
-        if (firstRender && OnSearch.HasDelegate)
-        {
-            await SearchAsync();
-        }
-        await base.OnAfterRenderAsync(firstRender);
+        _value.Start = times.start.ToUniversalTime().UtcDateTime;
+        _value.End = times.end.ToUniversalTime().UtcDateTime;
+        await SearchAsync();
     }
+
+    //protected override async Task OnParametersSetAsync()
+    //{
+    //    await SearchAsync();
+    //    await base.OnParametersSetAsync();
+    //}
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        if (parameters.TryGetValue(nameof(Apps), out List<AppDto> apps))
+        {
+            if (apps != null && apps.Any() && string.IsNullOrEmpty(_value.AppId) || (apps == null || !apps.Any()) && !apps.Any(app => app.Identity == _value.AppId))
+                await SearchAsync();
+        }
+    }
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if (firstRender && OnSearch.HasDelegate)
+    //    {
+    //        await SearchAsync();
+    //    }
+    //    await base.OnAfterRenderAsync(firstRender);
+    //}
 
     private async Task OnSelectItemUpdate(AppDto item)
     {

@@ -61,17 +61,17 @@ public partial class GrowthChart
         });
         _options.SetValue("series[0].smooth", true);
         if (query.Start is null)
-            query.Start = DateTime.Now.AddDays(-1);
+            query.Start = DateTime.UtcNow.AddDays(-1);
         if (query.End is null)
-            query.End = DateTime.Now;
+            query.End = DateTime.UtcNow;
         var data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
-            MetricNames = new List<string> { "(count(http_server_duration_bucket>1000 and http_server_duration_bucket<=4000)*0.5+count(http_server_duration_bucket<1000))/count(http_server_duration_bucket)" },
+            MetricNames = new List<string> { $"(count(http_server_duration_bucket{{service_name=\"{query.AppId}\"}}>1000 and http_server_duration_bucket{{service_name=\"{query.AppId}\"}}<=4000)*0.5+count(http_server_duration_bucket{{service_name=\"{query.AppId}\"}}<1000))/count(http_server_duration_bucket{{service_name=\"{query.AppId}\"}})" },
             Start = query.Start.Value,
             End = query.End.Value,
             Step = "5m"
-        });       
-        if (data[0] != null && data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix)
+        });
+        if (data[0] != null && data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix&& data[0].Result!=null&& data[0].Result.Any())
         {
             var seriesData = ((QueryResultMatrixRangeResponse)data[0].Result.First()).Values.Select(items => Convert.ToDouble(items[1])*100).ToArray();
             Total = seriesData.Last();

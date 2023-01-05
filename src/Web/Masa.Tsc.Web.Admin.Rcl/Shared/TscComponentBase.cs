@@ -117,8 +117,9 @@ public partial class TscComponentBase : BDomComponentBase
 
     private TimeZoneInfo GetTimeZone()
     {
-        string id = $"{Setting.TimeZone}:{Setting.TimeZoneOffset}", name = $"timeZone:{Setting.TimeZone},{id},lang:{Setting.Language}";
-        return TimeZoneInfo.CreateCustomTimeZone(id, new TimeSpan(Setting.TimeZone, Setting.TimeZoneOffset, 0), name, name);
+        return TimeZoneInfo.Utc;
+        //string id = $"{Setting.TimeZone}:{Setting.TimeZoneOffset}", name = $"timeZone:{Setting.TimeZone},{id},lang:{Setting.Language}";
+        //return TimeZoneInfo.CreateCustomTimeZone(id, new TimeSpan(Setting.TimeZone, Setting.TimeZoneOffset, 0), name, name);
     }
 
     public static object GetDictionaryValue(object obj, string path)

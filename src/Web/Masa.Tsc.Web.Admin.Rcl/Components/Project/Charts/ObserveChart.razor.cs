@@ -27,7 +27,7 @@ public partial class ObserveChart : TscEChartBase
     {
         var metric = $"avg by (service_name) (http_server_duration_bucket{{service_name=\"{query.AppId}\"}}>10)";
         Total = 0;
-        var result= await ApiCaller.MetricService.GetQueryAsync(metric, query.End ?? DateTime.Now);
+        var result= await ApiCaller.MetricService.GetQueryAsync(metric, query.End ?? DateTime.UtcNow);
         if (result != null && result.Result != null && result.Result.Any() && result.ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Vector)
         {
            int total=(int)Math.Floor(Convert.ToDouble(((QueryResultInstantVectorResponse)result.Result[0]).Value[1]));

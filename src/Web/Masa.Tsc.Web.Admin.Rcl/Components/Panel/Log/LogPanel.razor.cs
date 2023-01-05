@@ -85,7 +85,7 @@ public partial class LogPanel
     {
         // TODO: 解析data生成一下数据
 
-        DateTime end = EndTime ?? DateTime.Now, start = StartTime ?? end.AddDays(-1);
+        DateTime end = EndTime ?? DateTime.UtcNow, start = StartTime ?? end.AddDays(-1);
 
 
         var result=await ApiCaller.LogService.AggregateAsync<List<KeyValuePair<long,long>>>(new SimpleAggregateRequestDto

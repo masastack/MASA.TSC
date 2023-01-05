@@ -50,7 +50,7 @@ public partial class ErrorWarnChart
         if (query == null)
             return;
         if (query.End == null)
-            query.End = DateTime.Now;
+            query.End = DateTime.UtcNow;
         if (query.Start == null)
             query.Start = query.End.Value.AddDays(-1);
 
