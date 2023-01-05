@@ -23,14 +23,17 @@
         </div>
     </HeaderContent>
     <AutoHeightContent>
-        <DefaultCard Class="full-height">
-            <CascadingValue Value="IsEdit">
-                <CascadingValue Value="PanelGrids" IsFixed>
-                    <CascadingValue Value="ConfigurationRecord">
-                        <PanelGrids Panels="ConfigurationRecord.Panels" />
+        @if(string.IsNullOrEmpty(ConfigurationRecord.DashboardId) is false)
+        {
+            <DefaultCard Class="full-height">
+                <CascadingValue Value="IsEdit">
+                    <CascadingValue Value="PanelGrids" IsFixed>
+                        <CascadingValue Value="ConfigurationRecord">
+                            <PanelGrids Panels="ConfigurationRecord.Panels" />
+                        </CascadingValue>
                     </CascadingValue>
                 </CascadingValue>
-            </CascadingValue>
-        </DefaultCard>
+            </DefaultCard>
+        }
     </AutoHeightContent>
 </AutoHeight>

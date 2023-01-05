@@ -656,7 +656,8 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
     public void SetTopListOption(string href)
     {
         _topListData.Clear();
-        var data = GetMatrixRangeData();
+        var data = _chartData.FirstOrDefault()?.Result?.Select(item => item as QueryResultMatrixRangeResponse);
+        if (data is null) return;
         _topListData.AddRange(data.Select(item => new TopListOption
         {
             Href = href,

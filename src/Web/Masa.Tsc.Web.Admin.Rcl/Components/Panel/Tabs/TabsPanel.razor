@@ -25,7 +25,10 @@
     @foreach (var tabItem in Panel.ChildPanels)
     {
         <MTabItem Value="tabItem.Id.ToString()">
-            <PanelGrids Panels="tabItem.ChildPanels" />
+            @if (tabItem.ChildPanels.Any())
+            {
+                <PanelGrids Panels="tabItem.ChildPanels" />
+            }
         </MTabItem>
     }
 </MTabsItems>

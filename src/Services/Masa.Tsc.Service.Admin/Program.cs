@@ -11,15 +11,7 @@ builder.Services.AddElasticClientLogAndTrace(elasearchUrls, builder.Configuratio
 builder.Services.AddDaprClient();
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
 
-RedisConfigurationOptions redis;
-if (builder.Environment.IsEnvironment("Development"))
-{
-    redis = builder.Configuration.GetSection("redis:RedisOptions").Get<RedisConfigurationOptions>();
-}
-else
-{
-    redis = dccConfig.RedisOptions;
-}
+var redis = builder.Configuration.GetSection("redis:RedisOptions").Get<RedisConfigurationOptions>();
 
 builder.Services.AddHttpContextAccessor()
     .AddMasaConfiguration(configurationBuilder => configurationBuilder.UseDcc(dccConfig, default, default));
