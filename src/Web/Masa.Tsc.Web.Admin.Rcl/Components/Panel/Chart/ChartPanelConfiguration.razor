@@ -60,7 +60,7 @@
                                         <MCardText>
                                             <MRow>
                                                 <MCol Md="12">
-                                                    <STextField BackgroundColor="white" @bind-Value="Value.Metrics[0].Name" Label="指标名称" />
+                                                    <STextField BackgroundColor="white" DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].Name" ValueChanged="async value => await MetricNameChangedAsync(Value.Metrics[0],value) " Label="指标名称" />
                                                 </MCol>
                                                 <MCol Md="12">
                                                     <STextField BackgroundColor="white" @bind-Value="Value.Metrics[0].Range" Label="取值范围" />

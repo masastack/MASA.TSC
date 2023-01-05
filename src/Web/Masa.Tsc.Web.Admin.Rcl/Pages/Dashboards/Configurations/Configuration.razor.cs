@@ -8,6 +8,9 @@ public partial class Configuration
     [Inject]
     public ConfigurationRecord ConfigurationRecord { get; set; }
 
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
     [Parameter]
     public string? DashboardId { get; set; }
 
@@ -18,12 +21,22 @@ public partial class Configuration
     protected override async Task OnInitializedAsync()
     {
         if (DashboardId is null)
-        {
+        {            
             return;
         }
         ConfigurationRecord.Clear();
         ConfigurationRecord.DashboardId = DashboardId;
         await GetPanelsAsync();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (string.IsNullOrEmpty(ConfigurationRecord.DashboardId)) NavigationManager.NavigateTo($"/dashboard");
+    }
+
+    protected override bool ShouldRender()
+    {
+        return string.IsNullOrEmpty(ConfigurationRecord.DashboardId) is false;
     }
 
     async Task GetPanelsAsync()

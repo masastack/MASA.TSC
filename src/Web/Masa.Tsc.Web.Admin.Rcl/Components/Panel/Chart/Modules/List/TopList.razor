@@ -6,18 +6,18 @@
     </MCardTitle>
     <MCardText Class="flex-grow-1" Style="overflow-y: auto;">
         <MList>
-            @foreach (var (key, value) in Data)
+            @foreach (var item in Value.GetTopListOption())
             {
-                <MListItem Class="px-0" Dense>
+                <MListItem Class="px-0" Dense OnClick="() => ToDashboardConfiguration(item.Href)">
                     <MListItemAvatar Style="background: #F4F1FF;border-radius: 10px;">
-                        <span>@key</span>
+                        <span>@item.Value</span>
                     </MListItemAvatar>
                     <MListItemContent>
                         <MListItemTitle Class="d-flex justify-space-between">
-                            <MLabel Class="body2 regular2--text d-inline-block text-truncate">@value</MLabel>
+                            <MLabel Class="body2 regular2--text d-inline-block text-truncate">@item.Text</MLabel>
                         </MListItemTitle>
                         <MListItemSubtitle>
-                            <MProgressLinear Height="8" Color="@(Value.Color as string)" Rounded Value="@key"></MProgressLinear>
+                            <MProgressLinear Height="8" Color="@(Value.Color as string)" Rounded Value="@item.Value"></MProgressLinear>
                         </MListItemSubtitle>
                     </MListItemContent>
                 </MListItem>
@@ -30,6 +30,11 @@
     [Parameter]
     public ITopListPanelValue Value { get; set; }
 
-    [Parameter]
-    public IEnumerable<(int, string)> Data { get; set; } = new List<(int, string)>();
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    void ToDashboardConfiguration(string href)
+    {
+        NavigationManager.NavigateTo(href);
+    }
 }

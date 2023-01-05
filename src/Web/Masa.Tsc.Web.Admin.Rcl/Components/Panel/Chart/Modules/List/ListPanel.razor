@@ -32,7 +32,11 @@
         if (OldListType != Value.ListType && DataIsReady)
         {
             OldListType = Value.ListType;
-            if (Value.ListType is ListTypes.TopList) return;
+            if (Value.ListType is ListTypes.TopList)
+            {
+                var jumpId = await GetJumpId();
+                Value.SetTopListOption(jumpId);
+            }
             else
             {
                 var serviceNamse = await GetServiceNames() ?? new();
@@ -90,10 +94,10 @@
                 jumpName = "service_name";
                 break;
             case ListTypes.InstanceList:
-                jumpName = "InstanceList";
+                jumpName = "instance";
                 break;
             case ListTypes.EndpointList:
-                jumpName = "EndpointList";
+                jumpName = "endpoint";
                 break;
             default:
                 break;
