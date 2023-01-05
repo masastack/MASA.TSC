@@ -3,10 +3,8 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Models;
 
-public interface ITablePanelValue : IPanelValue
+public interface ITablePanelValue : ITopListPanelValue, IPanelValue
 {
-    public string SystemIdentity { get; set; }
-
     public int ItemsPerPage { get; set; }
 
     public bool ShowTableHeader { get; set; }

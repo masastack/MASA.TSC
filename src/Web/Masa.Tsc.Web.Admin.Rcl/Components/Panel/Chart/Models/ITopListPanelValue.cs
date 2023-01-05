@@ -14,4 +14,8 @@ public interface ITopListPanelValue: IPanelValue
     public int MaxCount { get; set; }
 
     public string ChartType { get; set; }
+
+    public List<TopListOption> GetTopListOption();
+
+    public void SetTopListOption(string href);
 }

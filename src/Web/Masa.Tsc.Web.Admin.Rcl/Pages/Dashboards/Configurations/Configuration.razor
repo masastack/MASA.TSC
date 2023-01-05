@@ -11,12 +11,15 @@
                 <DateTimeRangeToolbar Class="mr-6 my-auto" OnUpdate="OnDateTimeUpdateAsync" />
             </div>
             <MSwitch @bind-Value="IsEdit" LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="mr-6 my-auto" />
-            <SButton Icon Class="mr-3 my-auto" OnClick="() => AddPanel()">
-                <SIcon Tooltip="@T("Add Panel")" Size=28>@IconConstants.Chart</SIcon>
-            </SButton>
-            <SButton Icon Class="my-auto" OnClick="SaveAsync">
-                <SIcon Tooltip="@T("Save")" Size=28>@IconConstants.Save</SIcon>
-            </SButton>
+            @if (IsEdit)
+            {
+                <SButton Icon Class="mr-3 my-auto" OnClick="() => AddPanel()">
+                    <SIcon Tooltip="@T("Add Panel")" Size=28>@IconConstants.Chart</SIcon>
+                </SButton>
+                <SButton Icon Class="my-auto" OnClick="SaveAsync">
+                    <SIcon Tooltip="@T("Save")" Size=28>@IconConstants.Save</SIcon>
+                </SButton>
+            }
         </div>
     </HeaderContent>
     <AutoHeightContent>

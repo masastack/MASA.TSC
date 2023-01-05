@@ -393,6 +393,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
 
     List<QueryResultDataResponse> _chartData = new();
     List<List<Dessert>> _tableData = new();
+    List<TopListOption> _topListData = new();
 
     public void SetChartData(List<QueryResultDataResponse> chartData)
     {
@@ -645,6 +646,23 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             }));
             _tableData.Add(rowData);
         }
+    }
+
+    public List<TopListOption> GetTopListOption()
+    {
+        return _topListData;
+    }
+
+    public void SetTopListOption(string href)
+    {
+        _topListData.Clear();
+        var data = GetMatrixRangeData();
+        _topListData.AddRange(data.Select(item => new TopListOption
+        {
+            Href = href,
+            Text = string.Join('-', item.Metric.Select(metric => metric.Value)),
+            Value = Convert.ToDouble(item.Values.FirstOrDefault()?[1] ?? 0)
+        }));
     }
 
     private void YAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)
