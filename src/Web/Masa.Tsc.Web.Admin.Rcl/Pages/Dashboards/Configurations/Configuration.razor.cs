@@ -21,7 +21,7 @@ public partial class Configuration
     protected override async Task OnInitializedAsync()
     {
         if (DashboardId is null)
-        {            
+        {
             return;
         }
         ConfigurationRecord.Clear();
@@ -68,12 +68,25 @@ public partial class Configuration
     void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
         (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
-        //await base.InvokeAsync(base.StateHasChanged);
+    }
+
+    async Task OnAutoDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    {
+        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
+        await base.InvokeAsync(base.StateHasChanged);
     }
 
     async Task SaveAsync()
     {
-        await Task.WhenAll(PanelGrids.Select(item => item.SavePanelGridAsync()));
+        if(ConfigurationRecord.Panels.Any() is false)
+        {
+            PanelGrids.Clear();
+        }
+        else
+        {
+            await PanelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();// dont not remove
+            await Task.WhenAll(PanelGrids.Select(item => item.SavePanelGridAsync()));
+        }
         await ApiCaller.InstrumentService.UpsertPanelAsync(Guid.Parse(ConfigurationRecord.DashboardId), ConfigurationRecord.Panels.ToArray());
         OpenSuccessMessage(T("Save success"));
     }

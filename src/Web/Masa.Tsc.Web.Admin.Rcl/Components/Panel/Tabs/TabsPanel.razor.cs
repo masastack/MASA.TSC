@@ -38,9 +38,10 @@ public partial class TabsPanel
 
     void RemovePanelGrid(UpsertPanelDto panel)
     {
+        PanelGridRange.RemoveAll(item => item.ParentPanel == panel);
         if (panel.ChildPanels.Any())
         {
-            PanelGridRange.RemoveAll(item => item.Panels.Any(item2 => item2.ParentPanel?.Id == panel.Id));
+            //PanelGridRange.RemoveAll(item => item.Panels.Any(item2 => item2.ParentPanel?.Id == panel.Id));
             foreach (var item in panel.ChildPanels)
             {
                 RemovePanelGrid(item);

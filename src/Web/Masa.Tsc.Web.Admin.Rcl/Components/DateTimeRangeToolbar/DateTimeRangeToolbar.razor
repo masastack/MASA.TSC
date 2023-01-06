@@ -70,6 +70,9 @@
     public EventCallback<(DateTimeOffset, DateTimeOffset)> OnUpdate { get; set; }
 
     [Parameter]
+    public EventCallback<(DateTimeOffset, DateTimeOffset)> OnAutoUpdate { get; set; }
+
+    [Parameter]
     public string Class { get; set; }
 
     [Parameter]
@@ -169,7 +172,7 @@
         }
     }
 
-    private async Task UpdateRangeDateTimeToLatest()
+    private async Task UpdateRangeDateTimeToLatest(bool autoUpdate = false)
     {
         if (_quickRange.TryGetRange(_endDateTime.Offset, out var value))
         {
@@ -179,7 +182,15 @@
 
         if (OnUpdate.HasDelegate)
         {
-            await OnUpdate.InvokeAsync((_startDateTime, _endDateTime));
+            if (autoUpdate)
+            {
+                await OnAutoUpdate.InvokeAsync((_startDateTime, _endDateTime));
+            }
+            else
+            {
+                
+                await OnUpdate.InvokeAsync((_startDateTime, _endDateTime));
+            }
         }
     }
 
@@ -227,7 +238,7 @@
 
     private void TimerOnElapsed(object? sender, ElapsedEventArgs e)
     {
-        _ = UpdateRangeDateTimeToLatest();
+        _ = UpdateRangeDateTimeToLatest(true);
         InvokeAsync(StateHasChanged);
     }
 

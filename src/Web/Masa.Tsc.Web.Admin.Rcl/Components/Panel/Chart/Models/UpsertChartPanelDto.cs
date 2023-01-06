@@ -1,6 +1,10 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using BlazorComponent;
+using Google.Protobuf.WellKnownTypes;
+using System.Linq;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Models;
 
 public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePanelValue, IEChartPanelValue
@@ -426,7 +430,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             {
                 ["type"] = ChartType,
                 ["name"] = string.Join("-", item.Metric.Values),
-                ["data"] = new JsonArray(item.Values.Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Convert.ToDouble(value[1]))).ToArray())
+                ["data"] = new JsonArray(item.Values.Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), ConvertToDouble(value[1]))).ToArray())
             }).ToArray());
         }
         else if (ChartType is "line-area")
@@ -442,7 +446,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
                 {
                     ["focus"] = "series"
                 },
-                ["data"] = new JsonArray(item.Values.Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Convert.ToDouble(value[1]))).ToArray())
+                ["data"] = new JsonArray(item.Values.Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), ConvertToDouble(value[1]))).ToArray())
             }).ToArray());
         }
         else if (ChartType is "pie")
@@ -451,7 +455,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             EChartType.Json["series"].AsArray().First()["data"] = new JsonArray(data.Select(item => new JsonObject
             {
                 ["name"] = string.Join("-", item.Metric.Values),
-                ["value"] = Convert.ToDouble(item.Value[1])
+                ["value"] = ConvertToDouble(item.Value[1])
             }).ToArray());
         }
         else if (ChartType is "gauge")
@@ -460,7 +464,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             EChartType.Json["series"].AsArray().First()["data"] = new JsonArray(data.Take(1).Select(item => new JsonObject
             {
                 ["name"] = string.Join("-", item.Metric.Values),
-                ["value"] = Convert.ToDouble(item.Value[1]),
+                ["value"] = ConvertToDouble(item.Value[1]),
                 ["title"] = new JsonObject()
                 {
                     ["offsetCenter"] = new JsonArray($"{GetPosition(data.IndexOf(item) + 1)}%", "80%")
@@ -488,6 +492,12 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             {
                 return 60 * index - 32 * Metrics.Count;
             }
+        }
+        double ConvertToDouble(object value)
+        {
+            double.TryParse(value.ToString(), out double doubleValue);
+            if (double.IsNaN(doubleValue)) doubleValue = 0;
+            return doubleValue;
         }
     }
 

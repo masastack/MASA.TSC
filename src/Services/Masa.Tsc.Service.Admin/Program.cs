@@ -13,7 +13,11 @@ builder.Services.AddElasticClientLogAndTrace(elasearchUrls, builder.Configuratio
 builder.Services.AddDaprClient();
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
 
-var redis = builder.Configuration.GetSection("redis:RedisOptions").Get<RedisConfigurationOptions>();
+RedisConfigurationOptions redis;
+if (builder.Environment.IsDevelopment())
+    redis = builder.Configuration.GetSection("redis:RedisOptions").Get<RedisConfigurationOptions>();
+else
+    redis = dccConfig.RedisOptions;
 
 builder.Services.AddHttpContextAccessor()
     .AddMasaConfiguration(configurationBuilder => configurationBuilder.UseDcc(dccConfig, default, default));
@@ -96,13 +100,18 @@ var app = builder.Services
         });
     })
     .AddTransient(typeof(IMiddleware<>), typeof(LogMiddleware<>))
-    .AddDomainEventBus(options =>
-    {
-        options.UseIntegrationEventBus(options => options.UseDapr().UseEventLog<TscDbContext>())
-        .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer().UseFilter())
-        .UseRepository<TscDbContext>()
-        .UseEventBus();
-    })
+    .AddDomainEventBus(dispatcherOptions =>
+        {
+            dispatcherOptions
+                .UseIntegrationEventBus(options =>
+                {
+                    options.UseDapr()
+                    .UseEventLog<TscDbContext>()
+                    .UseEventBus();
+                })
+                .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer().UseFilter())
+                .UseRepository<TscDbContext>();
+        })
     .AddTopologyRepository()
     .AddServices(builder);
 

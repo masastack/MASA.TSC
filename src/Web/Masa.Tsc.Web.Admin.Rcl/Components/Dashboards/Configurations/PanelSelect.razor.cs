@@ -17,9 +17,6 @@ public partial class PanelSelect
     [CascadingParameter]
     public bool IsEdit { get; set; }
 
-    [CascadingParameter]
-    public List<PanelGrids> PanelGridRange { get; set; }
-
     List<PanelTypes> GetPanelTypes(PanelTypes type = default)
     {
         if (type == default)
@@ -39,17 +36,15 @@ public partial class PanelSelect
     }
 
     async Task SelectPanelAsync(PanelTypes type)
-    {
-        await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
+    {       
         UpsertPanelDto panel = new();
         switch (type)
         {
             case PanelTypes.Tabs:
                 panel = new UpsertTabsPanelDto(PanelId);
                 break;
-            case PanelTypes.Chart:
-                panel = new UpsertChartPanelDto(PanelId);
-                NavigationManager.NavigateTo($"/dashboard/configuration/chart/{panel.Id}");
+            case PanelTypes.Chart or PanelTypes.Table:
+                panel = new UpsertChartPanelDto(PanelId);               
                 break;
             default:
                 panel.Id = PanelId;
