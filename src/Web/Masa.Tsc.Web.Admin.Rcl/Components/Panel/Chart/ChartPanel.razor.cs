@@ -36,16 +36,16 @@ public partial class ChartPanel
     {
         if(OldChartType != Value.ChartType)
         {
-            if(OldChartType is "line" or "bar" or "line-area" or "table")
+            if(OldChartType is "line" or "bar" or "line-area")
             {
-                if(Value.ChartType is "gauge" or "heatmap" or "pie")
+                if(Value.ChartType is "gauge" or "heatmap" or "pie" or "table")
                 {
                     await ReloadAsync();
                 }
             }
-            else if(OldChartType is "gauge" or "heatmap" or "pie")
+            else if(OldChartType is "gauge" or "heatmap" or "pie" or "table")
             {
-                if (Value.ChartType is "line" or "bar" or "line-area" or "table")
+                if (Value.ChartType is "line" or "bar" or "line-area")
                 {
                     await ReloadAsync();
                 }
@@ -67,7 +67,7 @@ public partial class ChartPanel
     async Task<List<QueryResultDataResponse>> GetMetricsAsync()
     {
         if (Value.Metrics.Any(item => item.Name is not null) is false) return new();
-        if(Value.ChartType is "pie" or "gauge")
+        if(Value.ChartType is "pie" or "gauge" or "table")
         {
             return await base.ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto()
             {

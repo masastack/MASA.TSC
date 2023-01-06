@@ -14,6 +14,9 @@ public partial class Configuration
     [Parameter]
     public string? DashboardId { get; set; }
 
+    [Parameter]
+    public string ServiceName { get; set; }
+
     List<PanelGrids> PanelGrids { get; set; } = new();
 
     bool IsEdit { get; set; } = true;
@@ -26,7 +29,20 @@ public partial class Configuration
         }
         ConfigurationRecord.Clear();
         ConfigurationRecord.DashboardId = DashboardId;
+        ConfigurationRecord.AppName = ServiceName;
         await GetPanelsAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if(ConfigurationRecord.DashboardId != DashboardId)
+        {
+            ConfigurationRecord.Clear();
+            ConfigurationRecord.DashboardId = DashboardId;
+            ConfigurationRecord.AppName = ServiceName;
+            PanelGrids.Clear();
+            await GetPanelsAsync();
+        }
     }
 
     protected override void OnAfterRender(bool firstRender)
