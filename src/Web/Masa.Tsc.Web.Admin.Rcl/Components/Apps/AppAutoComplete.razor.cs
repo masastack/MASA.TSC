@@ -17,7 +17,7 @@ public partial class AppAutoComplete
     [Inject]
     public IPmClient PmClient { get; set; }
 
-    List<AppDetailModel> Apps { get; set; }
+    List<AppDetailModel> Apps { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {

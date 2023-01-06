@@ -103,7 +103,7 @@ public class Panel : AggregateRoot<Guid>
             {
                 var metric = Metrics?.FirstOrDefault(m => m.Id == item.Id);
                 if (metric == null)
-                    metric = new PanelMetric(item);
+                    metric = new PanelMetric(Id, item);
                 else
                     metric.Update(item);
                 list.Add(metric);
@@ -174,7 +174,7 @@ public class Panel : AggregateRoot<Guid>
                 var panel = Panels.FirstOrDefault(x => x.Id == item.Id);
                 if (panel == null)
                 {
-                    panel = new Panel(item, InstrumentId,Id);
+                    panel = new Panel(item, InstrumentId, Id);
                 }
                 else
                 {

@@ -3,11 +3,14 @@
 <DefaultCard>
     <div class="d-flex">
         <div style="overflow:auto;" class="full-width">
-            <LinkTrackingTopology Value="GetDepthData()" />
+            @if (Data?.Nodes?.Any() is true)
+            {
+                <LinkTrackingTopology Value="Data" />
+            }
         </div>
         <div style="min-width:242px;overflow:auto;">
-            <div class="d-flex">
-                <SSelect @bind-Value=_depth
+            <div class="d-flex mt-1">
+                <SSelect @bind-Value=Depth
                          Items="_depthItems"
                          ItemText='item => T("{0} layer deep",item.ToString())'
                          ItemValue="item => item"
@@ -23,7 +26,7 @@
                         @IconConstants.Setting
                     </SIcon>
                 </SButton>
-                <SButton Icon Color="black">
+                <SButton Icon Color="black" OnClick="RefreshAsync">
                     <SIcon Tooltip="@T("Refresh")" Size=16>
                         @IconConstants.Refresh
                     </SIcon>
@@ -54,7 +57,7 @@
                     <div class="emphasis2--text btn">节点</div>
                 </div>
             </div>
-            <div class="emphasis2--text subtitle2 mt-6 mb-2">@T("拓扑分析")</div>
+           @* <div class="emphasis2--text subtitle2 mt-6 mb-2">@T("拓扑分析")</div>
             <div class="d-flex mb-2" style="width: 194px;height: 64px;background: #F6F8FD;border-radius: 8px;">
                 <div class="ma-auto emphasis2--text">
                     <div class="h6">22</div>
@@ -78,7 +81,7 @@
                     <div class="h6">22</div>
                     <div class="emphasis2--text btn">节点</div>
                 </div>
-            </div>
+            </div>*@
 
             <div class="d-flex">
                 <div class="mr-2 my-auto" style="width: 8px;height: 8px;background: #05CD99;border-radius: 1px;" />

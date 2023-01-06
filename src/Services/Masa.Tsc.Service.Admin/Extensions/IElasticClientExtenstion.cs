@@ -17,6 +17,8 @@ internal static class IElasticClientExtenstion
     public static async Task BulkAllAsync<T>(this IElasticClient client, IEnumerable<T> data, string indexName, ILogger logger) where T : class
     {
         int numberOfSlices = Environment.ProcessorCount;
+        if (numberOfSlices <= 1)
+            numberOfSlices = 2;
         int size = 1000;
         var bulkAllObservable = client.BulkAll(data, buk => buk.Index(indexName)
          .Size(size)
@@ -65,6 +67,8 @@ internal static class IElasticClientExtenstion
     public static async Task<IEnumerable<T>> ScrollAllAsync<T>(this IElasticClient client, string indexName, string scroll) where T : class
     {
         int numberOfSlices = Environment.ProcessorCount;
+        if (numberOfSlices <= 1)
+            numberOfSlices = 2;
         var scrollAllObservable = client.ScrollAll<T>(scroll, numberOfSlices, sc => sc
            .MaxDegreeOfParallelism(numberOfSlices)
            .Search(s => s.Index(indexName))

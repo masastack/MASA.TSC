@@ -11,14 +11,7 @@ builder.Services.AddElasticClientLogAndTrace(elasearchUrls, builder.Configuratio
 builder.Services.AddDaprClient();
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
 
-RedisConfigurationOptions redis;
-if(builder.Environment.IsEnvironment("Development"))
- {
-    redis = builder.Configuration.GetSection("redis").Get<RedisConfigurationOptions>();
-}else
-{
-    redis = dccConfig.RedisOptions;
-}
+var redis = builder.Configuration.GetSection("redis:RedisOptions").Get<RedisConfigurationOptions>();
 
 builder.Services.AddHttpContextAccessor()
     .AddMasaConfiguration(configurationBuilder => configurationBuilder.UseDcc(dccConfig, default, default));
@@ -63,12 +56,13 @@ builder.Services.AddMasaIdentity(options =>
     })
     .AddAuthClient(config["$public.AppSettings:AuthClient:Url"], dccConfig.RedisOptions)
     .AddPmClient(config["$public.AppSettings:PmClient:Url"])
-    .AddMultilevelCache(distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis)
-    , multilevelCacheOptions =>
-    {
-        multilevelCacheOptions.SubscribeKeyPrefix = MasaStackConsts.TSC_SYSTEM_ID;
-        multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
-    });
+    .AddMultilevelCache(MasaStackConsts.TSC_SYSTEM_SERVICE_APP_ID,
+        distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
+        multilevelCacheOptions =>
+        {
+            multilevelCacheOptions.SubscribeKeyPrefix = MasaStackConsts.TSC_SYSTEM_ID;
+            multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
+        });
 
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

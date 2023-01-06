@@ -34,15 +34,10 @@ public partial class Configuration
         if (string.IsNullOrEmpty(ConfigurationRecord.DashboardId)) NavigationManager.NavigateTo($"/dashboard");
     }
 
-    protected override bool ShouldRender()
-    {
-        return string.IsNullOrEmpty(ConfigurationRecord.DashboardId) is false;
-    }
-
     async Task GetPanelsAsync()
     {
         var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(ConfigurationRecord.DashboardId));
-        if (detail.Panels != null && detail.Panels.Any())
+        if (detail?.Panels != null && detail.Panels.Any())
             ConfigurationRecord.Panels.AddRange(detail.Panels);
 
         Convert(ConfigurationRecord.Panels);
@@ -50,6 +45,7 @@ public partial class Configuration
 
     void Convert(List<UpsertPanelDto> panels, UpsertPanelDto? parentPanel = null)
     {
+        panels.ForEach(panel => panel.ParentPanel = parentPanel);
         var chartPanels = panels.Where(panel => panel.PanelType == PanelTypes.Chart).ToList();
         var tabsPanels = panels.Where(panel => panel.PanelType == PanelTypes.Tabs).ToList();
         var tabItemPanels = panels.Where(panel => panel.PanelType == PanelTypes.TabItem).ToList();
@@ -69,10 +65,10 @@ public partial class Configuration
         ConfigurationRecord.Panels.Insert(0, new());
     }
 
-    async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
         (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
-        await base.InvokeAsync(base.StateHasChanged);
+        //await base.InvokeAsync(base.StateHasChanged);
     }
 
     async Task SaveAsync()

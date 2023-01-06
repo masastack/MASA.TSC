@@ -24,7 +24,7 @@ public partial class PanelGrids
     protected override void OnInitialized()
     {
         PanelGridRange.Add(this);
-        IniPanels(Panels);
+        //IniPanels(Panels);
     }
 
     void IniPanels(List<UpsertPanelDto> panels, UpsertPanelDto? parentPanel = null)
@@ -56,14 +56,24 @@ public partial class PanelGrids
 
     void RemovePanel(UpsertPanelDto panel)
     {
-        if (panel is UpsertTabItemPanelDto tabItem)
-        {
-            tabItem.RemovePanel(panel);
-        }
-        else if (panel.ParentPanel is null)
+        RemovePanelGrid(panel);
+
+        if (panel.ParentPanel is null)
             Panels.Remove(panel);
         else
-            panel.ParentPanel.ChildPanels.Remove(panel);
+            panel.ParentPanel.ChildPanels.Remove(panel);       
+    }
+
+    void RemovePanelGrid(UpsertPanelDto panel)
+    {
+        if (panel.ChildPanels.Any())
+        {
+            PanelGridRange.RemoveAll(item => item.Panels.Any(item2 => item2.ParentPanel?.Id == panel.Id));
+            foreach(var item in panel.ChildPanels)
+            {
+                RemovePanelGrid(item);
+            }
+        }
     }
 
     void ReplacePanel(UpsertPanelDto panel)

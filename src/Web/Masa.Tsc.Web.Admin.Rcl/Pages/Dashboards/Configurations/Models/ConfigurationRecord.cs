@@ -13,9 +13,9 @@ public class ConfigurationRecord
 
     public string DashboardId { get; set; }
 
-    public DateTimeOffset StartTime { get; set; }
+    public DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow.AddMinutes(-15);
 
-    public DateTimeOffset EndTime { get; set; }
+    public DateTimeOffset EndTime { get; set; } = DateTimeOffset.UtcNow;
 
     public string Key => AppName + StartTime + EndTime;
 
@@ -25,7 +25,7 @@ public class ConfigurationRecord
         AppName = "";
         Search = "";
         DashboardId = "";
-        StartTime = default;
-        EndTime = default;
+        //StartTime = default;
+        //EndTime = default;
     }
 }
