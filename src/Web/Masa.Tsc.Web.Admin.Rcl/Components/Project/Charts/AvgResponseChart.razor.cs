@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-public partial class ObserveChart : TscEChartBase
+public partial class AvgResponseChart : TscEChartBase
 {
     [Parameter]
     public StringNumber Width { get; set; } = "100%";
@@ -27,15 +27,15 @@ public partial class ObserveChart : TscEChartBase
     {
         var metric = $"avg by (service_name) (http_server_duration_bucket{{service_name=\"{query.AppId}\"}}>10)";
         Total = 0;
-        var result= await ApiCaller.MetricService.GetQueryAsync(metric, query.End ?? DateTime.UtcNow);
+        var result = await ApiCaller.MetricService.GetQueryAsync(metric, query.End ?? DateTime.UtcNow);
         if (result != null && result.Result != null && result.Result.Any() && result.ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Vector)
         {
-           int total=(int)Math.Floor(Convert.ToDouble(((QueryResultInstantVectorResponse)result.Result[0]).Value[1]));
+            int total = (int)Math.Floor(Convert.ToDouble(((QueryResultInstantVectorResponse)result.Result[0]).Value[1]));
 
             if (total - 1000 > 0)
             {
                 Unit = "s";
-                Total = total / 1000.0 ;
+                Total = total / 1000.0;
             }
             else
             {
