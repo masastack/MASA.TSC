@@ -22,7 +22,7 @@ public class ConfigurationRecord
     public void Clear()
     {
         Panels.Clear();
-        AppName = "";
+        //AppName = "";
         Search = "";
         DashboardId = "";
         //StartTime = default;

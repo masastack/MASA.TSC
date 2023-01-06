@@ -11,6 +11,9 @@ public partial class PanelGrids
     [Parameter]
     public List<UpsertPanelDto> Panels { get; set; }
 
+    [Parameter]
+    public UpsertPanelDto? ParentPanel { get; set; }
+
     [CascadingParameter]
     public bool IsEdit { get; set; }
 
@@ -19,24 +22,11 @@ public partial class PanelGrids
 
     public bool IsEditTabItem { get; set; }
 
-    private MGridstack<UpsertPanelDto>? Gridstack;
+    public MGridstack<UpsertPanelDto>? Gridstack;
 
     protected override void OnInitialized()
     {
         PanelGridRange.Add(this);
-        //IniPanels(Panels);
-    }
-
-    void IniPanels(List<UpsertPanelDto> panels, UpsertPanelDto? parentPanel = null)
-    {
-        foreach (var panel in panels)
-        {
-            panel.ParentPanel = parentPanel;
-            if (panel.ChildPanels.Any())
-            {
-                IniPanels(panel.ChildPanels, panel);
-            }
-        }
     }
 
     void AddChildPanel(UpsertTabsPanelDto? panel)
@@ -66,9 +56,10 @@ public partial class PanelGrids
 
     void RemovePanelGrid(UpsertPanelDto panel)
     {
+        PanelGridRange.RemoveAll(item => item.ParentPanel == panel);
         if (panel.ChildPanels.Any())
         {
-            PanelGridRange.RemoveAll(item => item.Panels.Any(item2 => item2.ParentPanel?.Id == panel.Id));
+            //PanelGridRange.RemoveAll(item => item.Panels.Any(item2 => item2.ParentPanel?.Id == panel.Id));
             foreach(var item in panel.ChildPanels)
             {
                 RemovePanelGrid(item);
@@ -76,8 +67,8 @@ public partial class PanelGrids
         }
     }
 
-    void ReplacePanel(UpsertPanelDto panel)
-    {       
+    async Task ReplacePanel(UpsertPanelDto panel)
+    {
         var data = Panels.First(p => p.Id == panel.Id);
         panel.X = data.X;
         panel.Y = data.Y;
@@ -85,6 +76,11 @@ public partial class PanelGrids
         panel.Height = data.Height;
         Panels.Remove(data);
         Panels.Add(panel);
+        if(panel.PanelType is PanelTypes.Chart)
+        {
+            await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
+            NavigationManager.NavigateTo($"/dashboard/configuration/chart/{panel.Id}");
+        }
     }
 
     void ConfigurationChartPanel(UpsertPanelDto panel)

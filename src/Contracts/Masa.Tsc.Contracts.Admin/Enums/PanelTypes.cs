@@ -5,6 +5,7 @@ namespace Masa.Tsc.Contracts.Admin.Enums;
 
 public enum PanelTypes
 {
+    Select = 0,
     Text=1,
     Table,
     Chart,
