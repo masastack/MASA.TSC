@@ -35,7 +35,7 @@ public partial class Configuration
 
     protected override async Task OnParametersSetAsync()
     {
-        if(ConfigurationRecord.DashboardId != DashboardId)
+        if(DashboardId is not null && ConfigurationRecord.DashboardId != DashboardId)
         {
             ConfigurationRecord.Clear();
             ConfigurationRecord.DashboardId = DashboardId;

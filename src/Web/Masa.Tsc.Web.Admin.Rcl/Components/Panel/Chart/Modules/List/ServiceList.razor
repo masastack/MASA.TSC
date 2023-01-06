@@ -1,8 +1,16 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 
 <MCard Height="410" Class="d-flex flex-column">
-    <MCardTitle>
+    <MCardTitle Class="d-flex justify-space-between">
         <MLabel Class="emphasis2--text h6">@Value.Title</MLabel>
+        <MTooltip Top>
+            <ActivatorContent>
+                <MIcon @attributes="@context.Attrs">mdi-information-outline</MIcon>
+            </ActivatorContent>
+            <ChildContent>
+                <span>@Value.Description</span>
+            </ChildContent>
+        </MTooltip>
     </MCardTitle>
     <MCardText Class="flex-grow-1" Style="overflow-y: auto;">
         <MSimpleTable>
@@ -42,19 +50,19 @@
                     </tr>
                 }
             </tbody>
-@*            @if (Value.ShowTableFooter)
+            @*            @if (Value.ShowTableFooter)
             {
-                <tfoot>
-                    <tr>
-                        <td>Sum</td>
-                        <td>$180</td>
-                    </tr>
-                </tfoot>
+            <tfoot>
+            <tr>
+            <td>Sum</td>
+            <td>$180</td>
+            </tr>
+            </tfoot>
             }*@
         </MSimpleTable>
-@*        @if (Value.EnablePaginaton)
+        @*        @if (Value.EnablePaginaton)
         {
-            <MPagination Length="10" TotalVisible="5"></MPagination>
+        <MPagination Length="10" TotalVisible="5"></MPagination>
         }*@
     </MCardText>
 </MCard>

@@ -18,11 +18,13 @@
         <MCol Cols="6">
             <LogTraceChart Title="@("Service Response Time Percentile (ms)")" @ref="_traceLogChart1" />
         </MCol>
-        <MCol Cols="6">
-            <Tops Title="@("Service Endpoint(calls/min)")"></Tops>
-        </MCol>
-        <MCol Cols="6">
-            <Tops Title="@("Service Slow Endpont(ms)")"></Tops>
-        </MCol>
+        <CascadingValue Value="_configurationRecord">
+            <MCol Cols="6">
+                <ChartPanel Value="_endpoint" />
+            </MCol>
+            <MCol Cols="6">
+                <ChartPanel Value="_slowEndpoint" />
+            </MCol>
+        </CascadingValue>
     </MRow>
 </div>
