@@ -16,9 +16,6 @@ public partial class ErrorWarnChart
     [Parameter]
     public string Title { get; set; }
 
-    [Parameter]
-    public string SubText { get; set; } = "该服务目前时间段内平均成功率 65%\r\n该服务目前时间段内平均失败率45%";
-
     private double _total;
     private EChartType _options = EChartConst.Pie;
 

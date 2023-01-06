@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-public partial class GrowthChart
+public partial class ApdexChart
 {
     [Parameter]
     public StringNumber Width { get; set; } = "100%";
@@ -13,9 +13,6 @@ public partial class GrowthChart
 
     [Parameter]
     public string Title { get; set; }
-
-    [Parameter]
-    public string SubText { get; set; }
 
     public double Total { get; set; }
 
@@ -71,9 +68,9 @@ public partial class GrowthChart
             End = query.End.Value,
             Step = "5m"
         });
-        if (data[0] != null && data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix&& data[0].Result!=null&& data[0].Result.Any())
+        if (data[0] != null && data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && data[0].Result != null && data[0].Result.Any())
         {
-            var seriesData = ((QueryResultMatrixRangeResponse)data[0].Result.First()).Values.Select(items => Convert.ToDouble(items[1])*100).ToArray();
+            var seriesData = ((QueryResultMatrixRangeResponse)data[0].Result.First()).Values.Select(items => Convert.ToDouble(items[1]) * 100).ToArray();
             Total = seriesData.Last();
             _options.SetValue("series[0].data", seriesData);
         }

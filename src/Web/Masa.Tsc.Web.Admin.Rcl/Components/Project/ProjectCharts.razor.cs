@@ -9,7 +9,7 @@ public partial class ProjectCharts
     private ServiceCallChart? _traceLogChart;
     private LogTraceChart? _traceLogChart1;
     private AvgResponseChart? _avgResponseChart;
-    private GrowthChart? _growthChart;
+    private ApdexChart? _apdexChart;
 
     public async Task OnSearchAsync()
     {
@@ -26,7 +26,7 @@ public partial class ProjectCharts
         tasks.Add(_traceLogChart?.OnLoadAsync(query));
         tasks.Add(_traceLogChart1?.OnLoadAsync(query));
         tasks.Add(_avgResponseChart?.OnLoadAsync(query));
-        tasks.Add(_growthChart?.OnLoadAsync(query));
+        tasks.Add(_apdexChart?.OnLoadAsync(query));
         //tasks.Add(_traceErrorChart?.OnLoadAsync(query));
         //tasks.Add(_traceWarnChart?.OnLoadAsync(query));     
         await Task.WhenAll(tasks);

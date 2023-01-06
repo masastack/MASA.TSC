@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.Dispatcher.IntegrationEvents;
+
 var builder = WebApplication.CreateBuilder(args);
 
 var elasearchUrls = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<string[]>();
@@ -94,13 +96,12 @@ var app = builder.Services
         });
     })
     .AddTransient(typeof(IMiddleware<>), typeof(LogMiddleware<>))
-    .AddIntegrationEventBus<IntegrationEventLogService>(options =>
+    .AddDomainEventBus(options =>
     {
-        options.UseDapr()
+        options.UseIntegrationEventBus(options => options.UseDapr().UseEventLog<TscDbContext>())
         .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer().UseFilter())
-        .UseEventLog<TscDbContext>()
-        .UseEventBus()
-        .UseRepository<TscDbContext>();
+        .UseRepository<TscDbContext>()
+        .UseEventBus();
     })
     .AddTopologyRepository()
     .AddServices(builder);

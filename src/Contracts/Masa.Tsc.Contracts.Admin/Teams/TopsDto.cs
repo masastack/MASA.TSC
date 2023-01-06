@@ -3,10 +3,8 @@
 
 namespace Masa.Tsc.Contracts.Admin;
 
-public class TempDto
+public class TopsDto
 {
-    public string Icon { get; set; }
-
     public string Color { get; set; }
 
     public int Value { get; set; }

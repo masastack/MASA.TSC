@@ -14,11 +14,6 @@ public partial class AvgResponseChart : TscEChartBase
     [Parameter]
     public string Title { get; set; } = "服务平均响应(毫秒/秒)";
 
-    [Parameter]
-    public string SubText { get; set; } = "该时间段内服务平均响应时间 平均值";
-
-    //private EChartType _options = EChartConst.Pie;
-
     public double Total { get; set; } = 0;
 
     public string Unit { get; set; } = "ms";
@@ -43,20 +38,5 @@ public partial class AvgResponseChart : TscEChartBase
                 Unit = "ms";
             }
         }
-
-        //_options.SetValue("legend", new { bottom = 10, left = "center" });
-        //_options.SetValue("title", new
-        //{
-        //    text = "69%",
-        //    x = "center",
-        //    y = "center",
-        //    textStyle = new
-        //    {
-        //        fontSize = 30
-        //    }
-        //});
-        //_options.SetValue("series[0].radius", new List<string> { "40%", "70%" });
-        //_options.SetValue("series[0].label", new { show = false });
-        //await Task.CompletedTask;
     }
 }

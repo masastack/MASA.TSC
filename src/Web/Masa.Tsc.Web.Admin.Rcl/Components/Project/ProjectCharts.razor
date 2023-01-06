@@ -4,7 +4,7 @@
 <div class="h-269">
     <MRow Style="background-color:#F0F3FA;" Class="@Class">
         <MCol Cols="3">
-            <ErrorWarnChart Title=@("Service Success Rate") SubText="errors" @ref="_errorWarnChart" />
+            <ErrorWarnChart Title=@("Service Success Rate") @ref="_errorWarnChart" />
         </MCol>
         <MCol Cols="9">
             <ServiceCallChart Title="@("Service Load(调用次数/每分钟)")" @ref="_traceLogChart" />
@@ -13,7 +13,7 @@
             <AvgResponseChart @ref="_avgResponseChart" />
         </MCol>
         <MCol Cols="3">
-            <GrowthChart Title="Apdex" @ref="_growthChart" />
+            <ApdexChart Title="Apdex" @ref="_apdexChart" />
         </MCol>
         <MCol Cols="6">
             <LogTraceChart Title="@("Service Response Time Percentile (ms)")" @ref="_traceLogChart1" />

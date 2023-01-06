@@ -2,22 +2,22 @@
 @inherits TscEChartBase
 
 <MCard Width="Width" Height="Height" Class="d-flex flex-column rounded-lg">
-    <MCardTitle Class="d-flex justify-space-between">
+    <MCardTitle>
         <MLabel Class="emphasis2--text h6">@Title</MLabel>
-        <MLabel Class="emphasis2--text h6">@Total</MLabel>
     </MCardTitle>
-    <MCardText Class="flex-grow-1">
+    <MCardText Class="flex-grow-1 d-flex justify-center align-center emphasis--text">
         @if (_isLoading)
         {
             @("Loading ...")
         }
         else
         {
-            @Total@Unit
-            @*<MECharts Option="_options.Option" Width="@("100%")" Height="@("100%")"></MECharts>*@
+            <span style="font-weight: 700;font-size: 60px;line-height: 76px;text-align: center;letter-spacing: -0.5px;">@Total</span>
+            <span class="ml-2 h4 ">@Unit</span>
         }
     </MCardText>
-    <MCardActions Class="regular3--text body2">
-        @SubText
+    <MCardActions Class="regular3--text body2 px-4">
+        该时间段内服务平均响应时间 <br/>
+        平均值
     </MCardActions>
 </MCard>
