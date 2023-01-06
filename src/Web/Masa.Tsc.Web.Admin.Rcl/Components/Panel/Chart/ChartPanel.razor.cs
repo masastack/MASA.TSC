@@ -55,12 +55,12 @@ public partial class ChartPanel
 
         if(OldConfigRecordKey != ConfigurationRecord.Key)
         {
-            if(OldConfigRecordKey is not null)
+            var back = OldConfigRecordKey;
+            OldConfigRecordKey = ConfigurationRecord.Key;
+            if (back is not null)
             {
                 await ReloadAsync();
             }
-
-            OldConfigRecordKey = ConfigurationRecord.Key;
         }
     }
 

@@ -29,7 +29,10 @@
                 <CascadingValue Value="IsEdit">
                     <CascadingValue Value="PanelGrids" IsFixed>
                         <CascadingValue Value="ConfigurationRecord">
-                            <PanelGrids Panels="ConfigurationRecord.Panels" />
+                            @if(ConfigurationRecord.Panels.Any())
+                            {
+                                <PanelGrids Panels="ConfigurationRecord.Panels" />
+                            }
                         </CascadingValue>
                     </CascadingValue>
                 </CascadingValue>

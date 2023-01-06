@@ -65,10 +65,10 @@ public partial class Configuration
         ConfigurationRecord.Panels.Insert(0, new());
     }
 
-    async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
         (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
-        await base.InvokeAsync(base.StateHasChanged);
+        //await base.InvokeAsync(base.StateHasChanged);
     }
 
     async Task SaveAsync()
