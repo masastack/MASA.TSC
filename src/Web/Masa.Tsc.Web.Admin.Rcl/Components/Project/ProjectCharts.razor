@@ -10,7 +10,7 @@
             <ServiceCallChart Title="@("Service Load(调用次数/每分钟)")" @ref="_traceLogChart" />
         </MCol>
         <MCol Cols="3">
-            <ObserveChart @ref="_observeChart" />
+            <AvgResponseChart @ref="_avgResponseChart" />
         </MCol>
         <MCol Cols="3">
             <GrowthChart Title="Apdex" @ref="_growthChart" />
@@ -19,10 +19,10 @@
             <LogTraceChart Title="@("Service Response Time Percentile (ms)")" @ref="_traceLogChart1" />
         </MCol>
         <MCol Cols="6">
-            <Temp Title="@("Service Endpoint(calls/min)")"></Temp>
+            <Tops Title="@("Service Endpoint(calls/min)")"></Tops>
         </MCol>
         <MCol Cols="6">
-            <Temp Title="@("Service Slow Endpont(ms)")"></Temp>
+            <Tops Title="@("Service Slow Endpont(ms)")"></Tops>
         </MCol>
     </MRow>
 </div>
