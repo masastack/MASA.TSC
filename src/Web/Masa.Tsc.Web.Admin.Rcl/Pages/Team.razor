@@ -54,6 +54,8 @@
 </MCard>
 
 <TeamProjectDialog @bind-Visible="_visible" ProjectId="@_selectedProjectId" TeamId="@_selectedTeamId" />
+<MLoading @bind-Value="_isLoad" />
+
 @code {
     private bool _visible;
     private string _selectedProjectId;

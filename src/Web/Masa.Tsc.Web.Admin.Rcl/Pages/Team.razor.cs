@@ -17,17 +17,16 @@ public partial class Team
 
     protected override async void OnAfterRender(bool firstRender)
     {
-        if (_isLoad)
+        if (firstRender)
         {
             await LoadData();
             StateHasChanged();
-            _isLoad = false;
         }
-        base.OnAfterRender(firstRender);
     }
 
     private async Task LoadData()
     {
+        _isLoad = true;
         DateTime start = DateTime.MinValue, end = DateTime.MinValue;
         if (_teamSearchModel != null)
         {
@@ -50,12 +49,12 @@ public partial class Team
         {
             _projects = data.Projects;
         }
+        _isLoad = false;
     }
 
     private async Task OnSearch(TeamSearchModel query)
     {
         _teamSearchModel = query;
         await LoadData();
-        StateHasChanged();
     }
 }

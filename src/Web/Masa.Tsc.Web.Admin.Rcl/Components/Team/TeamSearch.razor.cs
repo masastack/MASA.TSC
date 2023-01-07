@@ -5,6 +5,8 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TeamSearch
 {
+    string _search;
+
     [Parameter]
     public EventCallback<TeamSearchModel> OnValueChanged { get; set; }
 
@@ -48,4 +50,9 @@ public partial class TeamSearch
             await OnValueChanged.InvokeAsync(_value);
     }
 
+    async Task SearchChangedAsync(string value)
+    {
+        _search = value;
+        await OnValueChange(text: value);
+    }
 }
