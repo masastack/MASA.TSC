@@ -1,7 +1,7 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<div class="h-269">
+<div class="h-269" style="overflow-y: auto;overflow-x:hidden;">
     <MRow Style="background-color:#F0F3FA;" Class="@Class">
         <MCol Cols="3">
             <ErrorWarnChart Title=@("Service Success Rate") @ref="_errorWarnChart" />
@@ -18,7 +18,7 @@
         <MCol Cols="6">
             <LogTraceChart Title="@("Service Response Time Percentile (ms)")" @ref="_traceLogChart1" />
         </MCol>
-        <CascadingValue Value="_configurationRecord">
+        <CascadingValue Value="ConfigurationRecord">           
             <MCol Cols="6">
                 <ChartPanel Value="_endpoint" />
             </MCol>

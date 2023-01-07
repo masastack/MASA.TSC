@@ -53,17 +53,17 @@
     </MRow>
 </MCard>
 
-<TeamProjectDialog @bind-Visible="_visible" @ref="_teamProjectDialog" />
+<TeamProjectDialog @bind-Visible="_visible" ProjectId="@_selectedProjectId" TeamId="@_selectedTeamId" />
 @code {
     private bool _visible;
-    private TeamProjectDialog _teamProjectDialog;
+    private string _selectedProjectId;
+    private Guid _selectedTeamId;
 
-    private async Task HandleOnItemClick(ProjectOverviewDto item)
+    private void HandleOnItemClick(ProjectOverviewDto item)
     {
-        //_selectedProjectId = item.Identity;
-        //_selectedTeamId = item.TeamId;
+        _selectedProjectId = item.Identity;
+        _selectedTeamId = item.TeamId;
         _visible = true;
-        await _teamProjectDialog.RefrshDataASync(item.TeamId, item.Identity);
     }
 
     private string CellBackBackgroundStyle(ProjectOverviewDto overviewDto)

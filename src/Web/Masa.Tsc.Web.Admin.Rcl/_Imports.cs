@@ -52,3 +52,4 @@ global using System.Text.Json.Serialization;
 global using System.Text.RegularExpressions;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Modules.List;
+global using Masa.Tsc.Web.Admin.Rcl.Components.Apps;

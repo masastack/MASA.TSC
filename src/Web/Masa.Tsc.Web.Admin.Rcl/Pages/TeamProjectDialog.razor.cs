@@ -5,39 +5,56 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TeamProjectDialog
 {
+    string _projectId { get; set; }
+
+    Guid _teamId { get; set; }
+
     [Parameter]
     public bool Visible { get; set; }
 
     [Parameter]
     public EventCallback<bool> VisibleChanged { get; set; }
 
-    public string _projectId { get; set; }
-    public Guid _teamId { get; set; }
-    private string _appId = string.Empty;
-    private TeamDto _team = default!;
-    private ProjectCharts _projectCharts = new();
+    [Parameter]
+    public string ProjectId { get; set; }
 
-    private async Task LoadChartAsync(ProjectAppSearchModel query)
+    [Parameter]
+    public Guid TeamId { get; set; }
+
+    ConfigurationRecord ConfigurationRecord { get; set; } = new();
+
+    AppAutoComplete AppAutoComplete { get; set; }
+
+    List<AppDetailModel> Apps { get; set; } = new();
+
+    TeamDto Team { get; set; }
+
+    protected override async Task OnParametersSetAsync()
     {
-        if (_projectCharts != null)
-            await _projectCharts.OnLoadDataAsyc(query);
+        if(Visible && !string.IsNullOrEmpty(ProjectId) && TeamId != Guid.Empty && (ProjectId != _projectId || TeamId != _teamId))
+        {
+            _projectId = ProjectId;
+            _teamId = TeamId;
+            Team = await ApiCaller.TeamService.GetTeamAsync(TeamId, ProjectId);
+            Apps = Team.CurrentProject.Apps.Select(app => new AppDetailModel 
+            {
+                Name = app.Name,
+                Identity = app.Identity,
+                Type = app.AppType,
+                ServiceType = app.ServiceType
+            }).ToList();
+            ConfigurationRecord.AppName = Apps.FirstOrDefault()?.Identity;
+        }
     }
 
-    public async Task RefrshDataASync(Guid teamId, string projectId)
+    void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
-        Visible = true;
-        if (!string.IsNullOrEmpty(projectId) && teamId != Guid.Empty && (_projectId != projectId || _teamId != teamId))
-        {
-            _team = await ApiCaller.TeamService.GetTeamAsync(teamId, projectId);
-            _projectId = projectId;
-            _teamId = teamId;
-        }
-        if (_team.CurrentProject != null && _team.CurrentProject.Apps != null && _team.CurrentProject.Apps.Any())
-        {
-            var first = _team.CurrentProject.Apps.First();
-            if (first.Identity != _appId)
-                _appId = first.Identity;
-        }
-        StateHasChanged();
+        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
+    }
+
+    async Task OnAutoDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    {
+        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
+        await base.InvokeAsync(base.StateHasChanged);
     }
 }

@@ -7,7 +7,7 @@ public class ConfigurationRecord
 {
     public List<UpsertPanelDto> Panels { get; set; } = new();
 
-    public string AppName { get; set; }
+    public string? AppName { get; set; }
 
     public string Search { get; set; }
 
@@ -17,7 +17,7 @@ public class ConfigurationRecord
 
     public DateTimeOffset EndTime { get; set; } = DateTimeOffset.UtcNow;
 
-    public string Key => AppName + StartTime + EndTime;
+    public string? Key => AppName is null ? null : AppName + StartTime + EndTime;
 
     public void Clear()
     {

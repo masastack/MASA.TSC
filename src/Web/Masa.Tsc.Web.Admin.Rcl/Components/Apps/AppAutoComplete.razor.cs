@@ -5,6 +5,9 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Apps;
 
 public partial class AppAutoComplete
 {
+    [Inject]
+    public IPmClient PmClient { get; set; }
+
     [Parameter]
     public string Value { get; set; }
 
@@ -14,14 +17,17 @@ public partial class AppAutoComplete
     [Parameter]
     public bool FillBackground { get; set; } = true;
 
-    [Inject]
-    public IPmClient PmClient { get; set; }
+    [Parameter]
+    public List<AppDetailModel> Apps { get; set; }
 
-    List<AppDetailModel> Apps { get; set; } = new();
+    public AppDetailModel? CurrentApp => Apps.FirstOrDefault(app => app.Identity == Value);
 
     protected override async Task OnInitializedAsync()
     {
-        Apps = await PmClient.AppService.GetListAsync();
+        if(Apps is null)
+        {
+            Apps = await PmClient.AppService.GetListAsync();
+        }
     }
 
     protected override async Task OnParametersSetAsync()
