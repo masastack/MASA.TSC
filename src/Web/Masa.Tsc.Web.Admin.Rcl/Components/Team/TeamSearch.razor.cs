@@ -7,8 +7,21 @@ public partial class TeamSearch
 {
     string _search;
 
+    public string Search
+    {
+        get => _search;
+        set 
+        {
+            _search = value;
+            OnValueChange(text: value);
+        }
+    }
+
     [Parameter]
     public EventCallback<TeamSearchModel> OnValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<TeamSearchModel> OnTabsChanged { get; set; }
 
     private TeamSearchModel _value = new() { ProjectType = "all" };
     private List<KeyValuePair<string, string>> _projectTypes = new() { KeyValuePair.Create("all", "All") };
@@ -50,9 +63,25 @@ public partial class TeamSearch
             await OnValueChanged.InvokeAsync(_value);
     }
 
-    async Task SearchChangedAsync(string value)
+    async Task OnTabsChange(string projectType)
     {
-        _search = value;
-        await OnValueChange(text: value);
+        _value.ProjectType = projectType;
+        await OnTabsChanged.InvokeAsync(_value);
+    }
+
+    async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    {
+        var (startTime, endTime) = times;
+        _value.Start = startTime.UtcDateTime;
+        _value.End = endTime.UtcDateTime;
+        await OnValueChanged.InvokeAsync(_value);
+    }
+
+    async Task OnAutoDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    {
+        var (startTime, endTime) = times;
+        _value.Start = startTime.UtcDateTime;
+        _value.End = endTime.UtcDateTime;
+        await base.InvokeAsync(async() => await OnValueChanged.InvokeAsync(_value));
     }
 }

@@ -6,14 +6,11 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages;
 public partial class Team
 {
     private List<ProjectOverviewDto> _projects = new();
+    private List<ProjectOverviewDto> _viewProjects = new();
     private TeamSearchModel? _teamSearchModel = null;
     private AppMonitorDto _appMonitorDto;
     private bool _isLoad = true;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await base.OnParametersSetAsync();
-    }
+    private StringNumber _projectStatus ="";
 
     protected override async void OnAfterRender(bool firstRender)
     {
@@ -48,6 +45,7 @@ public partial class Team
         if (data != null)
         {
             _projects = data.Projects;
+            _viewProjects = GetViewData();
         }
         _isLoad = false;
     }
@@ -56,5 +54,31 @@ public partial class Team
     {
         _teamSearchModel = query;
         await LoadData();
+    }
+
+    private void OnTabsChange(TeamSearchModel query)
+    {
+        _teamSearchModel = query;
+        _viewProjects = GetViewData();
+    }
+
+    void ProjectStatusChanged(StringNumber projectStatus)
+    {
+        _projectStatus = projectStatus;
+        _viewProjects = GetViewData();
+    }
+
+    List<ProjectOverviewDto> GetViewData()
+    {
+        IEnumerable<ProjectOverviewDto>? result = _projects;
+        if (_projectStatus != "MONITORING" && _projectStatus != "")
+        {
+            result = result.Where(item => item.Status.ToString().Equals(_projectStatus.ToString(), StringComparison.OrdinalIgnoreCase));
+        }
+        if(_teamSearchModel?.ProjectType!="all" && string.IsNullOrEmpty(_teamSearchModel?.ProjectType) is false)
+        {
+            result = result.Where(item => item.LabelName.Equals(_teamSearchModel.ProjectType, StringComparison.OrdinalIgnoreCase));
+        }
+        return result.ToList();
     }
 }
