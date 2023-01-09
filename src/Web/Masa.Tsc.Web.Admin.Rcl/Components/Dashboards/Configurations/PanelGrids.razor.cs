@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Nest;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
 
 public partial class PanelGrids
@@ -16,6 +18,12 @@ public partial class PanelGrids
 
     [CascadingParameter]
     public bool IsEdit { get; set; }
+
+    [CascadingParameter(Name = "DashboardId")]
+    public string DashboardId { get; set; }
+
+    [CascadingParameter(Name = "ServiceName")]
+    public string? ServiceName { get; set; }
 
     [CascadingParameter]
     public List<PanelGrids> PanelGridRange { get; set; }
@@ -51,7 +59,7 @@ public partial class PanelGrids
         if (panel.ParentPanel is null)
             Panels.Remove(panel);
         else
-            panel.ParentPanel.ChildPanels.Remove(panel);       
+            panel.ParentPanel.ChildPanels.Remove(panel);
     }
 
     void RemovePanelGrid(UpsertPanelDto panel)
@@ -60,7 +68,7 @@ public partial class PanelGrids
         if (panel.ChildPanels.Any())
         {
             //PanelGridRange.RemoveAll(item => item.Panels.Any(item2 => item2.ParentPanel?.Id == panel.Id));
-            foreach(var item in panel.ChildPanels)
+            foreach (var item in panel.ChildPanels)
             {
                 RemovePanelGrid(item);
             }
@@ -76,16 +84,16 @@ public partial class PanelGrids
         panel.Height = data.Height;
         Panels.Remove(data);
         Panels.Add(panel);
-        if(panel.PanelType is PanelTypes.Chart)
+        if (panel.PanelType is PanelTypes.Chart)
         {
             await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
-            NavigationManager.NavigateTo($"/dashboard/configuration/chart/{panel.Id}");
+            NavigationManager.NavigateToConfigurationChart(DashboardId, panel.Id.ToString(), ServiceName);
         }
     }
 
     void ConfigurationChartPanel(UpsertPanelDto panel)
     {
-        NavigationManager.NavigateTo($"/dashboard/configuration/chart/{panel.Id}");
+        NavigationManager.NavigateToConfigurationChart(DashboardId, panel.Id.ToString(), ServiceName);
     }
 
     public async Task SavePanelGridAsync()

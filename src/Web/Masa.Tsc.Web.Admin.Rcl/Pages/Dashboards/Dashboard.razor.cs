@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Web.Admin.Rcl.Extentions;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards;
 
 public partial class Dashboard
@@ -180,6 +182,6 @@ public partial class Dashboard
 
     void NavigateToConfiguration(DashboardDto dashboard)
     {
-        NavigationManager.NavigateTo($"/dashboard/configuration/{dashboard.Id}");
+        NavigationManager.NavigateToDashboardConfiguration(dashboard.Id.ToString());
     }
 }

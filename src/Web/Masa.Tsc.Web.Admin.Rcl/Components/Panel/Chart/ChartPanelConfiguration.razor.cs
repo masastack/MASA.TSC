@@ -15,6 +15,12 @@ public partial class ChartPanelConfiguration : TscComponentBase
     [Parameter]
     public UpsertChartPanelDto Value { get; set; }
 
+    [Parameter]
+    public string DashboardId { get; set; }
+
+    [Parameter]
+    public string? ServiceName { get; set; }
+
     public ChartPanel ChartPanel { get; set; }
 
     bool IsLoading { get; set; }
@@ -30,7 +36,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
     void NavigateToPanelConfigurationPage()
     {
         Value.Metrics.RemoveAll(item => string.IsNullOrEmpty(item.Name));
-        NavigationManager.NavigateTo($"/dashboard/configuration/record");
+        NavigationManager.NavigateToDashboardConfigurationRecord(DashboardId, ServiceName);
     }
 
     void Cancel()
