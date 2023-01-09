@@ -16,6 +16,8 @@ public class CommandHandler
     private static List<TraceServiceRelation> addRestions = new List<TraceServiceRelation>();
     private static ConcurrentQueue<TraceNodeCache> traceNodeQueue = new();
     private static bool _readComplete = false;
+    private static Task _currentTask;
+    private static CancellationTokenSource  _tokenSource = new ();
 
     public CommandHandler(ITraceService traceService,
         IMultilevelCacheClientFactory multilevelCacheClientFactory,
@@ -35,53 +37,65 @@ public class CommandHandler
     [EventHandler]
     public async Task StartAsync(StartCommand command)
     {
-        var stateModel = await _multilevelCacheClient.GetAsync<TaskRunStateDto>(TopologyConstants.TOPOLOGY_TASK_KEY);
-        if (stateModel != null)
+        if(_currentTask!=null)
+            throw new UserFriendlyException("Task has running !");
+
+        _currentTask = Task.Factory.StartNew(async () =>
         {
-            if (stateModel.Status == 1)
-                throw new UserFriendlyException("Task has running !");
-            else if (stateModel.Status == 2)
+            var stateModel = await _multilevelCacheClient.GetAsync<TaskRunStateDto>(TopologyConstants.TOPOLOGY_TASK_KEY);
+            if (stateModel != null)
             {
-                stateModel.Status = 1;
-                stateModel.End = command.End;
+                //if (stateModel.Status == 1)
+                //    throw new UserFriendlyException("Task has running !");
+                //else
+                if (stateModel.Status == 2)
+                {
+                    stateModel.Status = 1;
+                    stateModel.End = command.End;
+                }
+                else
+                {
+                    if (stateModel.End > DateTime.MinValue)
+                        stateModel.Start = stateModel.End;
+                    stateModel.End = command.End;
+                    stateModel.Status = 1;
+                }
             }
             else
             {
-                if (stateModel.End > DateTime.MinValue)
-                    stateModel.Start = stateModel.End;
-                stateModel.End = command.End;
-                stateModel.Status = 1;
+                stateModel = new TaskRunStateDto()
+                {
+                    Start = command.Start,
+                    End = command.End,
+                    Status = 1
+                };
             }
-        }
-        else
-        {
-            stateModel = new TaskRunStateDto()
+            await _multilevelCacheClient.SetAsync(TopologyConstants.TOPOLOGY_TASK_KEY, stateModel);
+
+            try
             {
-                Start = command.Start,
-                End = command.End,
-                Status = 1
-            };
-        }
-        await _multilevelCacheClient.SetAsync(TopologyConstants.TOPOLOGY_TASK_KEY, stateModel);
+                await GetTraceDataAsync(stateModel.Start, stateModel.End);
 
-        try
-        {
-            await GetTraceDataAsync(stateModel.Start, stateModel.End);
-
-            await SaveServiceAsync();
-            await SetServiceCacheAsync();
-            await SaveRelationsAsync();
-            await SetRelationCacheASync();
-            stateModel.Status = 4;
-            await _multilevelCacheClient.SetAsync(TopologyConstants.TOPOLOGY_TASK_KEY, stateModel);
-            _logger.LogInformation("StartAsync end");
-        }
-        catch (Exception ex)
-        {
-            stateModel.Status = 2;
-            await _multilevelCacheClient.SetAsync(TopologyConstants.TOPOLOGY_TASK_KEY, stateModel);
-            _logger.LogError("StartAsync", ex);
-        }
+                await SaveServiceAsync();
+                await SetServiceCacheAsync();
+                await SaveRelationsAsync();
+                await SetRelationCacheASync();
+                stateModel.Status = 4;
+                await _multilevelCacheClient.SetAsync(TopologyConstants.TOPOLOGY_TASK_KEY, stateModel);
+                _logger.LogInformation("StartAsync end");
+            }
+            catch (Exception ex)
+            {
+                stateModel.Status = 2;
+                await _multilevelCacheClient.SetAsync(TopologyConstants.TOPOLOGY_TASK_KEY, stateModel);
+                _logger.LogError("StartAsync", ex);
+            }
+            finally
+            {
+                _logger.LogInformation("StartAsync finally");
+                _currentTask = null;
+            }
+        }, cancellationToken: _tokenSource.Token, TaskCreationOptions.LongRunning,TaskScheduler.Current);
     }
 
     private async Task GetTraceDataAsync(DateTime start, DateTime end)
@@ -177,7 +191,7 @@ public class CommandHandler
     }
 
     private async Task<List<string>> SaveTraceCacheAsync()
-    {
+    {        
         var dicValues = new Dictionary<string, List<TraceNodeCache>>();
         var addKeys = new List<string>();
         do
