@@ -114,7 +114,7 @@ namespace Masa.Tsc.Service.Admin.Migrations
                     Top = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
                     Index = table.Column<int>(type: "int", nullable: false),
                     ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ExtensionData = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    ExtensionData = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     PanelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
@@ -142,7 +142,7 @@ namespace Masa.Tsc.Service.Admin.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PanelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Caculate = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Color = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Unit = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false, defaultValue: ""),

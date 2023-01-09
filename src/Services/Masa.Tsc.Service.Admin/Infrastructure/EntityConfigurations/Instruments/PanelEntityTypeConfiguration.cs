@@ -8,7 +8,7 @@ public class PanelEntityTypeConfiguration : IEntityTypeConfiguration<Panel>
     public void Configure(EntityTypeBuilder<Panel> builder)
     {
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Title).HasMaxLength(500).IsRequired();
+        builder.Property(x => x.Title).HasMaxLength(200).IsRequired();
         builder.Property(x => x.Description).HasMaxLength(255);
         builder.Property(x => x.Height).HasMaxLength(40);
         builder.Property(x => x.Width).HasMaxLength(40);

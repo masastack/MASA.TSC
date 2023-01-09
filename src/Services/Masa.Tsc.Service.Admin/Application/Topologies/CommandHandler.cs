@@ -10,6 +10,7 @@ public class CommandHandler
     private readonly ITraceServiceNodeRepository _traceServiceNodeRepository;
     private readonly ITraceServiceRelationRepository _traceServiceRelationRepository;
     private readonly ITraceServiceStateRepository _traceServiceStateRepository;
+    private readonly ILogger _logger;
 
     private static List<TraceServiceCache> addNodes = new List<TraceServiceCache>();
     private static List<TraceServiceRelation> addRestions = new List<TraceServiceRelation>();
@@ -20,13 +21,15 @@ public class CommandHandler
         IMultilevelCacheClientFactory multilevelCacheClientFactory,
         ITraceServiceNodeRepository traceServiceNodeRepository,
         ITraceServiceRelationRepository traceServiceRelationRepository,
-        ITraceServiceStateRepository traceServiceStateRepository)
+        ITraceServiceStateRepository traceServiceStateRepository,
+        ILogger<CommandHandler> logger)
     {
         _traceService = traceService;
         _multilevelCacheClient = multilevelCacheClientFactory.Create(MasaStackConsts.TSC_SYSTEM_SERVICE_APP_ID);
         _traceServiceNodeRepository = traceServiceNodeRepository;
         _traceServiceRelationRepository = traceServiceRelationRepository;
         _traceServiceStateRepository = traceServiceStateRepository;
+        _logger = logger;
     }
 
     [EventHandler]
@@ -61,14 +64,21 @@ public class CommandHandler
         }
         await _multilevelCacheClient.SetAsync(TopologyConstants.TOPOLOGY_TASK_KEY, stateModel);
 
-        await GetTraceDataAsync(stateModel);
+        try
+        {
+            await GetTraceDataAsync(stateModel);
 
-        await SaveServiceAsync();
-        await SetServiceCacheAsync();
-        await SaveRelationsAsync();
-        await SetRelationCacheASync();
-        stateModel.Status = 4;
-        await _multilevelCacheClient.SetAsync(TopologyConstants.TOPOLOGY_TASK_KEY, stateModel);
+            await SaveServiceAsync();
+            await SetServiceCacheAsync();
+            await SaveRelationsAsync();
+            await SetRelationCacheASync();
+            stateModel.Status = 4;
+            await _multilevelCacheClient.SetAsync(TopologyConstants.TOPOLOGY_TASK_KEY, stateModel);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("StartAsync", ex);
+        }
     }
 
     private async Task GetTraceDataAsync(TaskRunStateDto taskRunStat)
@@ -101,7 +111,7 @@ public class CommandHandler
             //TraceId = "af80d6fad26ec71def203d489e82f7fc"
         };
         bool isEnd = false;
-        long total = 0,current=0;
+        long total = 0, current = 0;
         do
         {
             var result = await _traceService.ScrollAsync(query);
@@ -115,6 +125,7 @@ public class CommandHandler
             }
             current += result?.Result?.Count ?? 0;
             SetTraceQueue(result.Result!);
+            _logger.LogInformation($"GetAllTraceDataAsync total: {total}, current: {current}");
         }
         while (!isEnd);
     }
@@ -160,7 +171,7 @@ public class CommandHandler
             };
             traceNodeQueue.Enqueue(traceNode);
         }
-    }    
+    }
 
     private async Task<List<string>> SaveTraceCacheAsync()
     {
@@ -198,7 +209,7 @@ public class CommandHandler
             do
             {
                 var sliceKeys = addKeys.Skip(start).Take(size).ToList();
-                var result=await _multilevelCacheClient.GetListAsync<List<TraceNodeCache>>(sliceKeys);
+                var result = await _multilevelCacheClient.GetListAsync<List<TraceNodeCache>>(sliceKeys);
                 if (result == null || !result.Any())
                 {
                     foreach (var items in result)
@@ -208,7 +219,7 @@ public class CommandHandler
                         var key = string.Format(TopologyConstants.TOPOLOGY_TRACE_KEY, items.First().TraceId);
                         if (dicValues.ContainsKey(key))
                             dicValues[key].InsertRange(0, items);
-                    }                
+                    }
                 }
                 page++;
                 start += size;
