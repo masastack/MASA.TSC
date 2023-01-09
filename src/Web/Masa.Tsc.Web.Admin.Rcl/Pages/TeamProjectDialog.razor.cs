@@ -66,7 +66,7 @@ public partial class TeamProjectDialog
         var data = await base.ApiCaller.InstrumentService.GetLinkAsync(MetricValueTypes.Service);
         if (data?.InstrumentId is not null)
         {
-            NavigationManager.NavigateTo($"/dashboard/configuration/{data.InstrumentId}/{ConfigurationRecord.AppName}");
+            NavigationManager.NavigateToDashboardConfiguration(data.InstrumentId.ToString()!, ConfigurationRecord.AppName);
         }
     }
 }

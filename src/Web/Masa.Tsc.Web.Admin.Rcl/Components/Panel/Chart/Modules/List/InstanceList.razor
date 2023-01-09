@@ -74,8 +74,8 @@
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
-    void ToDashboardConfiguration(string dashboardId, string serviceName)
+    void ToDashboardConfiguration(string dashboardId, string instanceName)
     {
-        NavigationManager.NavigateTo($"/dashboard/configuration/{dashboardId}/{serviceName}");
+        NavigationManager.NavigateToDashboardConfiguration(dashboardId, instanceName:instanceName);
     }
 }

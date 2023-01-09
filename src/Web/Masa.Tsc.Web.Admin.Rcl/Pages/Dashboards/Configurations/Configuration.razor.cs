@@ -12,7 +12,7 @@ public partial class Configuration
     public NavigationManager NavigationManager { get; set; }
 
     [Parameter]
-    public string? DashboardId { get; set; }
+    public string DashboardId { get; set; }
 
     [Parameter]
     public string ServiceName { get; set; }
@@ -23,36 +23,46 @@ public partial class Configuration
 
     protected override async Task OnInitializedAsync()
     {
-        if (DashboardId is null)
-        {
-            return;
-        }
-        ConfigurationRecord.Clear();
+        if (NavigationManager.Uri.Contains("record")) return;
         ConfigurationRecord.DashboardId = DashboardId;
         ConfigurationRecord.AppName = ServiceName;
+        if (ServiceName is null)
+        {
+            ConfigurationRecord.Panels.Clear();
+            return;
+        }       
+
         await GetPanelsAsync();
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        if(DashboardId is not null && ConfigurationRecord.DashboardId != DashboardId)
+        if(ConfigurationRecord.DashboardId != DashboardId)
         {
-            ConfigurationRecord.Clear();
             ConfigurationRecord.DashboardId = DashboardId;
             ConfigurationRecord.AppName = ServiceName;
             PanelGrids.Clear();
+            await GetPanelsAsync();
+        }
+        else if(ServiceName is not null && ServiceName != ConfigurationRecord.AppName)
+        {
+            ConfigurationRecord.AppName = ServiceName;
             await GetPanelsAsync();
         }
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (string.IsNullOrEmpty(ConfigurationRecord.DashboardId)) NavigationManager.NavigateTo($"/dashboard");
+        if (NavigationManager.Uri.Contains("record") && string.IsNullOrEmpty(ConfigurationRecord.DashboardId))
+        {
+            NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName);
+        }
     }
 
     async Task GetPanelsAsync()
     {
         var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(ConfigurationRecord.DashboardId));
+        ConfigurationRecord.Panels.Clear();
         if (detail?.Panels != null && detail.Panels.Any())
             ConfigurationRecord.Panels.AddRange(detail.Panels);
 
@@ -105,5 +115,11 @@ public partial class Configuration
         }
         await ApiCaller.InstrumentService.UpsertPanelAsync(Guid.Parse(ConfigurationRecord.DashboardId), ConfigurationRecord.Panels.ToArray());
         OpenSuccessMessage(T("Save success"));
+    }
+
+    void ServiceNameChange(string serviceName)
+    {
+        ServiceName = serviceName;
+        NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName);
     }
 }

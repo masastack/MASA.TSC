@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using System;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages;
 
 public partial class Team
@@ -71,7 +73,7 @@ public partial class Team
     List<ProjectOverviewDto> GetViewData()
     {
         IEnumerable<ProjectOverviewDto>? result = _projects;
-        if (_projectStatus != "MONITORING" && _projectStatus != "")
+        if (_projectStatus != "MONITORING" && string.IsNullOrEmpty(_projectStatus?.ToString()) is false)
         {
             result = result.Where(item => item.Status.ToString().Equals(_projectStatus.ToString(), StringComparison.OrdinalIgnoreCase));
         }

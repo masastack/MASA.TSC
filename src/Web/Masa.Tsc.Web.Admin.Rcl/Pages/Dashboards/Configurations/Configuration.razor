@@ -1,4 +1,5 @@
-﻿@page "/dashboard/configuration/record"
+﻿@page "/dashboard/configuration/record/{dashboardId}"
+@page "/dashboard/configuration/record/{dashboardId}/{serviceName}"
 @page "/dashboard/configuration/{dashboardId}"
 @page "/dashboard/configuration/{dashboardId}/{serviceName}"
 @inherits TscComponentBase
@@ -6,7 +7,7 @@
 <AutoHeight Overflow AutoStyle="max-height: calc(100vh - 185px);height: 900px">
     <HeaderContent>
         <div class="d-flex mb-6">
-            <AppAutoComplete @bind-Value="@ConfigurationRecord.AppName" FillBackground=false Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" />
+            <AppAutoComplete Value="@ServiceName" ValueChanged=ServiceNameChange FillBackground=false Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" />
             <div style="width:100%;" class="d-flex">
                 <SearchTextField @bind-Value="@ConfigurationRecord.Search" FillBackground=false Clearable Class="mr-6 my-auto" />
                 <DateTimeRangeToolbar Class="mr-6 my-auto" DefaultQuickRange="QuickRangeKey.Last15Minutes" OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
@@ -24,20 +25,17 @@
         </div>
     </HeaderContent>
     <AutoHeightContent>
-        @if(string.IsNullOrEmpty(ConfigurationRecord.DashboardId) is false)
-        {
-            <DefaultCard Style="min-height: calc(100vh - 185px);">
-                <CascadingValue Value="IsEdit">
-                    <CascadingValue Value="PanelGrids" IsFixed>
-                        <CascadingValue Value="ConfigurationRecord">
-                            @if (ConfigurationRecord.Panels.Any())
-                            {
-                                <PanelGrids @key="ConfigurationRecord.DashboardId" Panels="ConfigurationRecord.Panels" />
-                            }
-                        </CascadingValue>
+        <DefaultCard Style="min-height: calc(100vh - 185px);">
+            <CascadingValue Value="IsEdit">
+                <CascadingValue Value="PanelGrids" IsFixed>
+                    <CascadingValue Value="ConfigurationRecord">
+                        @if (ConfigurationRecord.Panels.Any())
+                        {
+                            <PanelGrids @key="ConfigurationRecord.DashboardId" Panels="ConfigurationRecord.Panels" />
+                        }
                     </CascadingValue>
                 </CascadingValue>
-            </DefaultCard>
-        }
+            </CascadingValue>
+        </DefaultCard>
     </AutoHeightContent>
 </AutoHeight>
