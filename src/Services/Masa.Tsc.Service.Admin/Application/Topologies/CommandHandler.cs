@@ -101,6 +101,7 @@ public class CommandHandler
             //TraceId = "af80d6fad26ec71def203d489e82f7fc"
         };
         bool isEnd = false;
+        long total = 0,current=0;
         do
         {
             var result = await _traceService.ScrollAsync(query);
@@ -110,8 +111,9 @@ public class CommandHandler
             if (string.IsNullOrEmpty(query.ScrollId))
             {
                 query.ScrollId = ((ElasticsearchScrollResponseDto<TraceResponseDto>)result).ScrollId;
+                total = result.Total;
             }
-
+            current += result?.Result?.Count ?? 0;
             SetTraceQueue(result.Result!);
         }
         while (!isEnd);

@@ -193,7 +193,7 @@ public class QueryHandler
         else if (query.Type == MetricValueTypes.Instance)
             metric = $"group by (service_instance_id) (http_client_duration_bucket{{}})";
         else if (query.Type == MetricValueTypes.Endpoint)
-            metric = $"group by (endpoint) (http_client_duration_bucket{{}})";
+            metric = $"group by (http_target) (http_response_bucket{{}})";
 
         metric = AppendCondition(metric, query.Service, default!, default!);
 
