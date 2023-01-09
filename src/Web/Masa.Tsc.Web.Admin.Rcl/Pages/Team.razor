@@ -2,59 +2,68 @@
 @page "/team"
 @inherits TscComponentBase
 
-<TeamSearch OnValueChanged="OnSearch"></TeamSearch>
-<MCard Class="mt-8" Style="height: calc(100vh - 190px);">
-    <MRow>
-        <MCol Md="10">
-            <HoneyCombGrid Data="_projects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor"
-                           OnItemClick="HandleOnItemClick" TItem="ProjectOverviewDto">
-                <CellBack>
-                    <div class="d-flex flex-column align-center mx-2 pt-7">
-                        <span class="d-inline-block text-truncate" style="width:120px;">@context.Name</span>
-                        @foreach (var app in context.Apps.Take(3))
-                        {
-                            if (app.Status == MonitorStatuses.Normal)
+<TeamSearch OnValueChanged="OnSearch" OnTabsChanged="OnTabsChange"></TeamSearch>
+@if(_isLoad)
+{
+    <div class="full-height full-width d-flex">
+        <div class="ma-auto">加载中...</div>
+    </div>
+}
+else
+{
+    <MCard Class="mt-8" Style="height: calc(100vh - 190px);">
+        <MRow>
+            <MCol Md="10">
+                <HoneyCombGrid Data="_viewProjects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor"
+                               OnItemClick="HandleOnItemClick" TItem="ProjectOverviewDto">
+                    <CellBack>
+                        <div class="d-flex flex-column align-center mx-2 pt-7">
+                            <span class="d-inline-block text-truncate" style="width:120px;">@context.Name</span>
+                            @foreach (var app in context.Apps.Take(3))
                             {
-                                <span class="regular2--text ma-1 d-inline-block text-truncate text-center" style="width:98%;">@app.Name</span>
+                                if (app.Status == MonitorStatuses.Normal)
+                                {
+                                    <span class="regular2--text ma-1 d-inline-block text-truncate text-center" style="width:98%;">@app.Name</span>
+                                }
+                                else
+                                {
+                                    <MChip Class="ma-1 d-inline-block text-truncate text-center" Style="width:100%;" Color="@ChipLabelColor(app)" TextColor="white" Label Small>
+                                        @app.Name
+                                    </MChip>
+                                }
                             }
-                            else
+                            @if (context.Apps.Count > 3)
                             {
-                                <MChip Class="ma-1 d-inline-block text-truncate text-center" Style="width:100%;" Color="@ChipLabelColor(app)" TextColor="white" Label Small>
-                                    @app.Name
-                                </MChip>
+                                <span class="regular3--text">...</span>
                             }
-                        }
-                        @if (context.Apps.Count > 3)
-                        {
-                            <span class="regular3--text">...</span>
-                        }
-                    </div>
-                </CellBack>
-                <CellHoverTip>
-                    <div style="height:150px;background-color:transparent;">
-                        <MCard Height=128 Width=240 Class="emphasis2" Style="border-bottom-left-radius:20px;border-bottom-right-radius:20px;">
-                            <MCardText Class="d-flex flex-column white--text body">
-                                <span>@context.Name</span>
-                                <span>ID：@context.Id</span>
-                                <span>@context.Apps.Count</span>
-                                <p>@context.Description</p>
-                            </MCardText>
-                        </MCard>
-                        <div class="d-flex justify-center" style="margin-top: -10px;">
-                            <div style="width: 0;height: 0;border-style: solid;border-width: 0 20px 20px 0;border-color: transparent transparent #323D6F transparent;transform: rotate(315deg);"></div>
                         </div>
-                    </div>
-                </CellHoverTip>
-            </HoneyCombGrid>
-        </MCol>
-        <MCol Md="2">
-            <MonitorCard Class="ml-8" Data=_appMonitorDto />
-        </MCol>
-    </MRow>
-</MCard>
+                    </CellBack>
+                    <CellHoverTip>
+                        <div style="height:150px;background-color:transparent;">
+                            <MCard Height=128 Width=240 Class="emphasis2" Style="border-bottom-left-radius:20px;border-bottom-right-radius:20px;">
+                                <MCardText Class="d-flex flex-column white--text body">
+                                    <span>@context.Name</span>
+                                    <span>ID：@context.Id</span>
+                                    <span>@context.Apps.Count</span>
+                                    <p>@context.Description</p>
+                                </MCardText>
+                            </MCard>
+                            <div class="d-flex justify-center" style="margin-top: -10px;">
+                                <div style="width: 0;height: 0;border-style: solid;border-width: 0 20px 20px 0;border-color: transparent transparent #323D6F transparent;transform: rotate(315deg);"></div>
+                            </div>
+                        </div>
+                    </CellHoverTip>
+                </HoneyCombGrid>
+            </MCol>
+            <MCol Md="2">
+                <MonitorCard Class="ml-8" Data=_appMonitorDto Value="@_projectStatus" ValueChanged="ProjectStatusChanged" />
+            </MCol>
+        </MRow>
+    </MCard>
+}
 
 <TeamProjectDialog @bind-Visible="_visible" ProjectId="@_selectedProjectId" TeamId="@_selectedTeamId" />
-<MLoading @bind-Value="_isLoad" />
+@*<MLoading @bind-Value="_isLoad" />*@
 
 @code {
     private bool _visible;

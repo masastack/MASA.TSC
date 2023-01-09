@@ -4,7 +4,7 @@
 
 <div class="d-flex align-center">
     <div class="flex-grow-1">
-        <MTabs Class="transparent-tab" Value="@_value.ProjectType" ValueChanged=@(async (value)=>await OnValueChange(projectType:value.ToString()))>
+        <MTabs Class="transparent-tab" Value="@_value.ProjectType" ValueChanged=@(async (value)=>await OnTabsChange(projectType:value.ToString()))>
             @foreach (var item in _projectTypes)
             {
                 <MTab Value=@item.Key>@item.Value</MTab>
@@ -12,7 +12,7 @@
         </MTabs>
     </div>
     <div style="width:300px;" class="mx-6">
-        <SearchTextField Style="width:220px;border-radius: 10px !important;" Value="@_search" FillBackground=false Clearable ValueChanged=SearchChangedAsync />
+        <SearchTextField Style="width:220px;border-radius: 10px !important;" @bind-Value="@Search" FillBackground=false Clearable />
     </div>
-    <DateTimeRangeToolbar/>
+    <DateTimeRangeToolbar DefaultQuickRange="QuickRangeKey.Last15Minutes" OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
 </div>

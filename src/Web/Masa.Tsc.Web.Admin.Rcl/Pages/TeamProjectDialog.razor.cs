@@ -9,6 +9,9 @@ public partial class TeamProjectDialog
 
     Guid _teamId { get; set; }
 
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
     [Parameter]
     public bool Visible { get; set; }
 
@@ -31,12 +34,12 @@ public partial class TeamProjectDialog
 
     protected override async Task OnParametersSetAsync()
     {
-        if(Visible && !string.IsNullOrEmpty(ProjectId) && TeamId != Guid.Empty && (ProjectId != _projectId || TeamId != _teamId))
+        if (Visible && !string.IsNullOrEmpty(ProjectId) && TeamId != Guid.Empty && (ProjectId != _projectId || TeamId != _teamId))
         {
             _projectId = ProjectId;
             _teamId = TeamId;
             Team = await ApiCaller.TeamService.GetTeamAsync(TeamId, ProjectId);
-            Apps = Team.CurrentProject.Apps.Select(app => new AppDetailModel 
+            Apps = Team.CurrentProject.Apps.Select(app => new AppDetailModel
             {
                 Name = app.Name,
                 Identity = app.Identity,
@@ -56,5 +59,14 @@ public partial class TeamProjectDialog
     {
         (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
         await base.InvokeAsync(base.StateHasChanged);
+    }
+
+    async Task NavigateToDashboardConfiguration()
+    {
+        var data = await base.ApiCaller.InstrumentService.GetLinkAsync(MetricValueTypes.Service);
+        if (data?.InstrumentId is not null)
+        {
+            NavigationManager.NavigateTo($"/dashboard/configuration/{data.InstrumentId}/{ConfigurationRecord.AppName}");
+        }
     }
 }
