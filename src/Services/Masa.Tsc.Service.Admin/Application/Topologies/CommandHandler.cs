@@ -66,7 +66,7 @@ public class CommandHandler
 
         try
         {
-            await GetTraceDataAsync(stateModel);
+            await GetTraceDataAsync(stateModel.Start, stateModel.End);
 
             await SaveServiceAsync();
             await SetServiceCacheAsync();
@@ -74,18 +74,21 @@ public class CommandHandler
             await SetRelationCacheASync();
             stateModel.Status = 4;
             await _multilevelCacheClient.SetAsync(TopologyConstants.TOPOLOGY_TASK_KEY, stateModel);
+            _logger.LogInformation("StartAsync end");
         }
         catch (Exception ex)
         {
+            stateModel.Status = 2;
+            await _multilevelCacheClient.SetAsync(TopologyConstants.TOPOLOGY_TASK_KEY, stateModel);
             _logger.LogError("StartAsync", ex);
         }
     }
 
-    private async Task GetTraceDataAsync(TaskRunStateDto taskRunStat)
+    private async Task GetTraceDataAsync(DateTime start, DateTime end)
     {
         _readComplete = false;
         Task<List<string>> task1 = SaveTraceCacheAsync();
-        Task task2 = GetAllTraceDataAsync(taskRunStat).ContinueWith(t => { _readComplete = true; });
+        Task task2 = GetAllTraceDataAsync(start, end).ContinueWith(t => { _readComplete = true; });
         List<string> result;
         try
         {
@@ -99,15 +102,15 @@ public class CommandHandler
         await AnalysisTrace(result);
     }
 
-    private async Task GetAllTraceDataAsync(TaskRunStateDto taskRunState)
+    private async Task GetAllTraceDataAsync(DateTime start, DateTime end)
     {
         var query = new ElasticsearchScrollRequestDto
         {
             Page = 1,
             PageSize = 9999,
             Scroll = "20m",
-            Start = taskRunState.Start,
-            End = taskRunState.End
+            Start = start,
+            End = end
             //TraceId = "af80d6fad26ec71def203d489e82f7fc"
         };
         bool isEnd = false;
