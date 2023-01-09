@@ -71,45 +71,50 @@ public class CommandHandler
         await _multilevelCacheClient.SetAsync(TopologyConstants.TOPOLOGY_TASK_KEY, stateModel);
     }
 
-    private async Task GetTraceDataAsync(TaskRunStateDto taskRunState)
+    private async Task GetTraceDataAsync(TaskRunStateDto taskRunStat)
     {
-        var query = new ElasticsearchScrollRequestDto
-        {
-            Page = 1,
-            PageSize = 9999,
-            Scroll = "5m",
-            //TraceId = "af80d6fad26ec71def203d489e82f7fc"
-        };
-        var conditions = new List<FieldConditionDto>();
-
-        if (taskRunState.Start > DateTime.MinValue)
-            conditions.Add(new FieldConditionDto
-            {
-                Name = ElasticConstant.Trace.Timestamp,
-                Type = ConditionTypes.Great,
-                Value = taskRunState.Start,
-            });
-        conditions.Add(new FieldConditionDto
-        {
-            Name = ElasticConstant.Trace.Timestamp,
-            Type = ConditionTypes.LessEqual,
-            Value = taskRunState.End,
-        });
-
-        Task<List<string>> task;
+        _readComplete = false;
+        Task<List<string>> task1 = SaveTraceCacheAsync();
+        Task task2 = GetAllTraceDataAsync(taskRunStat).ContinueWith(t => { _readComplete = true; });
+        List<string> result;
         try
         {
-            _readComplete = false;
-            task = SaveTraceCacheAsync();
-            _traceService.GetAll(query, SetTraceQueue);
+            await task2;
+            result = await task1;
         }
         finally
         {
             _readComplete = true;
         }
+        await AnalysisTrace(result);
+    }
 
-        var traceKeys = await task;
-        await AnalysisTrace(traceKeys);
+    private async Task GetAllTraceDataAsync(TaskRunStateDto taskRunState)
+    {
+        var query = new ElasticsearchScrollRequestDto
+        {
+            Page = 1,
+            PageSize = 9999,
+            Scroll = "20m",
+            Start = taskRunState.Start,
+            End = taskRunState.End
+            //TraceId = "af80d6fad26ec71def203d489e82f7fc"
+        };
+        bool isEnd = false;
+        do
+        {
+            var result = await _traceService.ScrollAsync(query);
+            if (result.Result == null || !result.Result.Any() || result.Result.Count - query.PageSize < 0)
+                isEnd = true;
+
+            if (string.IsNullOrEmpty(query.ScrollId))
+            {
+                query.ScrollId = ((ElasticsearchScrollResponseDto<TraceResponseDto>)result).ScrollId;
+            }
+
+            SetTraceQueue(result.Result!);
+        }
+        while (!isEnd);
     }
 
     private void SetTraceQueue(IEnumerable<TraceResponseDto> result)
@@ -153,22 +158,12 @@ public class CommandHandler
             };
             traceNodeQueue.Enqueue(traceNode);
         }
-    }
-
-    private async Task<List<TraceNodeCache>> GetCacheTraceAsync(string key, TraceNodeCache addItem)
-    {
-        var values = await _multilevelCacheClient.GetAsync<List<TraceNodeCache>>(key);
-        if (values != null)
-            values.Add(addItem);
-        else
-            values = new List<TraceNodeCache>() { addItem };
-
-        return values;
-    }
+    }    
 
     private async Task<List<string>> SaveTraceCacheAsync()
     {
         var dicValues = new Dictionary<string, List<TraceNodeCache>>();
+        var addKeys = new List<string>();
         do
         {
             var hasData = traceNodeQueue.TryDequeue(out var traceCacheItem);
@@ -187,9 +182,37 @@ public class CommandHandler
                 if (dicValues.ContainsKey(key))
                     dicValues[key].Add(traceCacheItem);
                 else
-                    dicValues.Add(key, await GetCacheTraceAsync(key, traceCacheItem));
+                {
+                    addKeys.Add(key);
+                    dicValues.Add(key, new List<TraceNodeCache> { traceCacheItem });
+                }
             }
         } while (true);
+
+        //批量更新
+        if (addKeys.Any())
+        {
+            int size = 50, start = 0, page = 1, total = dicValues.Count;
+            do
+            {
+                var sliceKeys = addKeys.Skip(start).Take(size).ToList();
+                var result=await _multilevelCacheClient.GetListAsync<List<TraceNodeCache>>(sliceKeys);
+                if (result == null || !result.Any())
+                {
+                    foreach (var items in result)
+                    {
+                        if (items == null || !items.Any())
+                            continue;
+                        var key = string.Format(TopologyConstants.TOPOLOGY_TRACE_KEY, items.First().TraceId);
+                        if (dicValues.ContainsKey(key))
+                            dicValues[key].InsertRange(0, items);
+                    }                
+                }
+                page++;
+                start += size;
+            }
+            while (total - start > 0);
+        }
 
         //保存trace数据
         if (dicValues.Any())

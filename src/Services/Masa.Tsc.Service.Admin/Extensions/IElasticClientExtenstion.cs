@@ -57,41 +57,39 @@ internal static class IElasticClientExtenstion
     }
 
     /// <summary>
-    /// 数据量少量情况下可使用，量较多时禁用
+    /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="client"></param>
     /// <param name="indexName"></param>
-    /// <param name="query"></param>
+    /// <param name="scroll"></param>
     /// <returns></returns>
     public static async Task<IEnumerable<T>> ScrollAllAsync<T>(this IElasticClient client, string indexName, string scroll) where T : class
     {
-        int numberOfSlices = Environment.ProcessorCount;
-        if (numberOfSlices <= 1)
-            numberOfSlices = 2;
-        var scrollAllObservable = client.ScrollAll<T>(scroll, numberOfSlices, sc => sc
-           .MaxDegreeOfParallelism(numberOfSlices)
-           .Search(s => s.Index(indexName))
-       );
-
-        var waitHandle = new ManualResetEvent(false);
-        ExceptionDispatchInfo? info = null;
-
-        var result = new List<T>();
-        var scrollAllObserver = new ScrollAllObserver<T>(
-            onNext: response => result.AddRange(response.SearchResponse.Documents),
-            onError: e =>
+        ISearchResponse<T> searchResponse;
+        string scrollId = default!;
+        List<T> result = new();
+        bool isEnd = false;
+        int pageSize = 5000;
+        do
+        {
+            if (string.IsNullOrEmpty(scrollId))
             {
-                info = ExceptionDispatchInfo.Capture(e);
-                waitHandle.Set();
-            },
-            onCompleted: () => waitHandle.Set()
-        );
+                searchResponse = await client.SearchAsync<T>(searchDescriptor => searchDescriptor.Index(indexName).Scroll(scroll).Size(pageSize));
+                scrollId = searchResponse.ScrollId;
+            }
+            else
+            {
+                searchResponse = await client.ScrollAsync<T>(scroll, scrollId);
+            }
+            if (!searchResponse.IsValid)
+                break;
+            if (!searchResponse.Documents.Any() || searchResponse.Documents.Count - pageSize < 0)
+                isEnd = true;
+            if (searchResponse.Documents.Any())
+                result.AddRange(searchResponse.Documents);
+        } while (!isEnd);
 
-        scrollAllObservable.Subscribe(scrollAllObserver);
-        waitHandle.WaitOne();
-        info?.Throw();
-        await Task.CompletedTask;
         return result;
     }
 }
