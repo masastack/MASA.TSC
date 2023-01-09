@@ -28,15 +28,11 @@
         <DefaultCard Style="min-height: calc(100vh - 185px);">
             <CascadingValue Value="IsEdit">
                 <CascadingValue Value="PanelGrids" IsFixed>
-                    <CascadingValue Value="DashboardId" Name="DashboardId" IsFixed>
-                        <CascadingValue Value="ServiceName" Name="ServiceName" IsFixed>
-                            <CascadingValue Value="ConfigurationRecord">
-                                @if (ConfigurationRecord.Panels.Any())
-                                {
-                                    <PanelGrids @key="ConfigurationRecord.DashboardId" Panels="ConfigurationRecord.Panels" />
-                                }
-                            </CascadingValue>
-                        </CascadingValue>
+                    <CascadingValue Value="ConfigurationRecord">
+                        @if (ConfigurationRecord.Panels.Any())
+                        {
+                            <PanelGrids @key="ConfigurationRecord.DashboardId" Panels="ConfigurationRecord.Panels" />
+                        }
                     </CascadingValue>
                 </CascadingValue>
             </CascadingValue>

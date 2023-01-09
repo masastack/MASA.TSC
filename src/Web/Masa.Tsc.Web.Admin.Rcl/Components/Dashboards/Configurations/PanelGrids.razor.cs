@@ -19,12 +19,6 @@ public partial class PanelGrids
     [CascadingParameter]
     public bool IsEdit { get; set; }
 
-    [CascadingParameter(Name = "DashboardId")]
-    public string DashboardId { get; set; }
-
-    [CascadingParameter(Name = "ServiceName")]
-    public string? ServiceName { get; set; }
-
     [CascadingParameter]
     public List<PanelGrids> PanelGridRange { get; set; }
 
@@ -87,13 +81,13 @@ public partial class PanelGrids
         if (panel.PanelType is PanelTypes.Chart)
         {
             await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
-            NavigationManager.NavigateToConfigurationChart(DashboardId, panel.Id.ToString(), ServiceName);
+            NavigationManager.NavigateToConfigurationChart(panel.Id.ToString());
         }
     }
 
     void ConfigurationChartPanel(UpsertPanelDto panel)
     {
-        NavigationManager.NavigateToConfigurationChart(DashboardId, panel.Id.ToString(), ServiceName);
+        NavigationManager.NavigateToConfigurationChart(panel.Id.ToString());
     }
 
     public async Task SavePanelGridAsync()

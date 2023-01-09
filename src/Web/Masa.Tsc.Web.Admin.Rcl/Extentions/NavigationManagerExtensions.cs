@@ -38,4 +38,9 @@ public static class NavigationManagerExtensions
         }
         navigationManager.NavigateTo($"{bashUri}/{panelId}");
     }
+
+    public static void NavigateToConfigurationChart(this NavigationManager navigationManager, string panelId)
+    {
+        navigationManager.NavigateTo($"/dashboard/configuration/chart/{panelId}");
+    }
 }

@@ -1,4 +1,5 @@
-﻿@page "/dashboard/configuration/chart/{dashboardId}/{panelId}"
+﻿@page "/dashboard/configuration/chart/{panelId}"
+@page "/dashboard/configuration/chart/{dashboardId}/{panelId}"
 @page "/dashboard/configuration/chart/{dashboardId}/{serviceName}/{panelId}"
 @inherits TscComponentBase
 
@@ -17,19 +18,30 @@
     public NavigationManager NavigationManager { get; set; }
 
     [Parameter]
-    public string DashboardId { get; set; }
+    public string? DashboardId { get; set; }
 
     [Parameter]
     public string? ServiceName { get; set; }
 
     [Parameter]
-    public string? PanelId { get; set; }
+    public string PanelId { get; set; }
+
+    public bool ReLoad { get; set; }
 
     UpsertChartPanelDto? Panel { get; set; }
 
     protected override void OnInitialized()
     {
+        if (DashboardId is null) return;
         if (string.IsNullOrEmpty(ConfigurationRecord.DashboardId) is false)
+        {
+            Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException("find panel error");
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        if(ReLoad)
         {
             Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException("find panel error");
         }
@@ -40,6 +52,11 @@
         if (string.IsNullOrEmpty(ConfigurationRecord.DashboardId))
         {
             NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName);
+        }
+        else if(DashboardId is null)
+        {
+            ReLoad = true;
+            NavigationManager.NavigateToConfigurationChart(ConfigurationRecord.DashboardId, PanelId, ConfigurationRecord.AppName);
         }
     }
 
