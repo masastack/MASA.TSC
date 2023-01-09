@@ -7,7 +7,7 @@ public partial class TscTraceChart
 {
     [Parameter]
     public EventCallback<(DateTime, DateTime)> OnDateTimeRangeUpdate { get; set; }
-    
+
     [Parameter]
     public ValueTuple<string, string, string>[] Data { get; set; } = Array.Empty<(string, string, string)>();
 
@@ -122,5 +122,11 @@ public partial class TscTraceChart
         var localEnd = new DateTime(range.end.UtcTicks + range.end.Offset.Ticks, DateTimeKind.Local);
 
         await OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd));
+    }
+
+    private async Task OnDateTimeAutoUpdate((DateTimeOffset start, DateTimeOffset end) range)
+    {
+        await OnDateTimeUpdate(range);
+        StateHasChanged();
     }
 }

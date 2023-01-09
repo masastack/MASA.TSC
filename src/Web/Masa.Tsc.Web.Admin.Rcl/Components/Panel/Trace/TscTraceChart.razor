@@ -3,11 +3,12 @@
 
 <MCard Style="border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important;">
     <MCardTitle>
-        <span>Trace Errors statistical</span>
+        <span>Trace</span>
         <MSpacer></MSpacer>
         <DateTimeRangeToolbar
             DefaultQuickRange="s_defaultQuickRange"
-            OnUpdate="OnDateTimeUpdate" />
+            OnUpdate="OnDateTimeUpdate"
+            OnAutoUpdate="OnDateTimeAutoUpdate" />
     </MCardTitle>
     <MCardText Class="pa-0">
         <MECharts Option="_option" Height="300"></MECharts>

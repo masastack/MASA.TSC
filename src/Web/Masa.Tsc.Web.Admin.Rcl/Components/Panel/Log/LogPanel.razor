@@ -5,7 +5,7 @@
         <div class="d-flex">
             <SearchTextField @bind-Value="@Search" FillBackground=false Clearable Class="my-auto" />
             <MSpacer />
-            <DateTimeRangeToolbar Class="mr-6 my-auto" />
+            <DateTimeRangeToolbar Class="mr-6 my-auto" OnUpdate="OnUpdate" OnAutoUpdate="OnAutoUpdate" />
         </div>
     </HeaderContent>
     <AutoHeightContent>

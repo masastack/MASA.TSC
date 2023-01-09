@@ -90,7 +90,7 @@ public partial class TscTrace
             End = query.End,
             Start = query.Start,
             Step = interval,
-            Match = $"sum(http_client_duration_count{text})",
+            Match = $"sum (increase(http_server_duration_count{text}[23s]))",
         });
 
         var durationResult = await ApiCaller.MetricService.GetQueryRangeAsync(new RequestMetricAggDto
@@ -98,7 +98,7 @@ public partial class TscTrace
             End = query.End,
             Start = query.Start,
             Step = interval,
-            Match = $"avg(http_client_duration_sum{text}/http_client_duration_count{text})",
+            Match = $"sum  (increase(http_server_duration_sum{text}[23s]))/sum (increase(http_server_duration_count[23s]))",
         });
 
         if (spanResult.Result!.Length == 0 && durationResult.Result!.Length == 0)
@@ -142,33 +142,11 @@ public partial class TscTrace
 
     private string GetInterval(RequestTraceListDto query)
     {
-        var timeSpan = query.End - query.Start;
-        var minites = (int)Math.Floor(timeSpan.TotalMinutes);
-        if (minites - 20 <= 0)
-            return "10s";
-        if (minites - 60 <= 0)
-            return "1m";
-        if (minites - 600 <= 0)
-            return "5m";
-
-        var hours = (int)Math.Floor(timeSpan.TotalHours);
-        if (hours - 72 <= 0)
-            return "30m";
-
-        var days = (int)Math.Floor(timeSpan.TotalDays);
-        if (hours - 7 <= 0)
-            return "1h";
-
-        //if (hours - 120 <= 0)
-        //    return "6h";
-        //if (hours - 240 <= 0)
-        //    return "12h";
-
-
-        if (days - 30 <= 0)
-            return "1d";
-
-        return "1month";
+        var total = (long)Math.Floor((query.End - query.Start).TotalSeconds);
+        var step = total / 250;
+        if (step <= 0)
+            step = 1;
+        return $"{step}s";
     }
 
     private string GetFormat(RequestTraceListDto query)

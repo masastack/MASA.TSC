@@ -10,8 +10,6 @@ public partial class LogPanel
     string? _search;
     int _page = 1;
     int _pageSize = 10;
-    DateTime? _startTime;
-    DateTime? _endTime;
     object _option;
 
     string Search
@@ -21,7 +19,6 @@ public partial class LogPanel
         {
             _search = value;
             _page = 1;
-            //GetLogsAsync().ContinueWith(_ => InvokeAsync(StateHasChanged));
         }
     }
 
@@ -51,11 +48,19 @@ public partial class LogPanel
 
     long Total { get; set; }
 
-    List<LogModel> Logs { get; set; } = new();
+    List<LogModel> Logs { get; set; } = new();    
 
-    protected override async Task OnInitializedAsync()
+    async Task OnUpdate((DateTimeOffset start, DateTimeOffset end) times)
     {
+        StartTime = times.start.ToUniversalTime().UtcDateTime;
+        EndTime = times.end.ToUniversalTime().UtcDateTime;
         await GetLogsAsync();
+    }
+
+    async Task OnAutoUpdate((DateTimeOffset start, DateTimeOffset end) times)
+    {
+        await OnUpdate(times);
+        StateHasChanged();
     }
 
     async Task GetLogsAsync()
@@ -83,23 +88,18 @@ public partial class LogPanel
 
     async Task GenOption()
     {
-        // TODO: 解析data生成一下数据
-
-        DateTime end = EndTime ?? DateTime.UtcNow, start = StartTime ?? end.AddDays(-1);
-
-
-        var result=await ApiCaller.LogService.AggregateAsync<List<KeyValuePair<long,long>>>(new SimpleAggregateRequestDto
+        DateTime end = EndTime.Value , start = StartTime.Value;
+        var result = await ApiCaller.LogService.AggregateAsync<List<KeyValuePair<long, long>>>(new SimpleAggregateRequestDto
         {
             Start = start,
             End = end,
-            Name = "@timestamp", //ElasticConstant.Log.Timestamp,
+            Name = "@timestamp",
             Type = AggregateTypes.DateHistogram,
             Interval = "5m",
         });
 
-        string[] xAxisData = result?.Select(item => ToDateTimeStr(item.Key))?.ToArray()?? Array.Empty<string>();
-        long[] durations = result?.Select(item => item.Value)?.ToArray()??Array.Empty<long>();
-        int[] spans = { 110, 22, 323, 110, 210, 11, 11 };
+        string[] xAxisData = result?.Select(item => ToDateTimeStr(item.Key))?.ToArray() ?? Array.Empty<string>();
+        long[] durations = result?.Select(item => item.Value)?.ToArray() ?? Array.Empty<long>();        
 
         _option = new
         {
@@ -154,10 +154,10 @@ public partial class LogPanel
             {
                 new
                 {
-                    name = "span",
+                    name = "count",
                     type = "bar",
                     yAxisIndex = 0,
-                    data = (object)spans,
+                    data = (object)durations,
                     itemStyle = new
                     {
                         color = "#4318FF"
@@ -189,10 +189,10 @@ public partial class LogPanel
             },
             Grid = new
             {
-                x = 30,
-                x2 = 0,
+                x = "5%",
+                //x2 = 0,
                 y = 5,
-                y2 = 40
+                //y2 = 40
             }
         };
     }
