@@ -4,17 +4,20 @@
 using Google.Type;
 using Masa.Tsc.Service.Admin.Application.Metrics.Queries;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Masa.Tsc.Service.Admin.Application.Metrics;
 
 public class QueryHandler
 {
     private readonly IMasaPrometheusClient _prometheusClient;
+    private readonly IMultilevelCacheClient _multilevelCacheClient;
     private readonly ILogger _logger;
 
-    public QueryHandler(IMasaPrometheusClient masaPrometheusClient, ILogger<QueryHandler> logger)
+    public QueryHandler(IMasaPrometheusClient masaPrometheusClient, IMultilevelCacheClientFactory multilevelCacheClientFactory, ILogger<QueryHandler> logger)
     {
         _prometheusClient = masaPrometheusClient;
+        _multilevelCacheClient = multilevelCacheClientFactory.Create(MasaStackConsts.TSC_SYSTEM_SERVICE_APP_ID);
         _logger = logger;
     }
 
@@ -151,7 +154,7 @@ public class QueryHandler
         var index = 0;
         foreach (var name in query.Data.MetricNames)
         {
-            var metric = AppendCondition(name, query.Data.ServiceName, query.Data.Instance, query.Data.EndPoint);
+            var metric =await AppendCondition(name, query.Data.ServiceName, query.Data.Instance, query.Data.EndPoint);
             tasks[index] = _prometheusClient.QueryRangeAsync(new QueryRangeRequest
             {
                 End = query.Data.End.ToUnixTimestamp().ToString(),
@@ -172,7 +175,7 @@ public class QueryHandler
         var index = 0;
         foreach (var name in query.Data.Queries)
         {
-            var metric = AppendCondition(name, query.Data.ServiceName, query.Data.Instance, query.Data.EndPoint);
+            var metric = await AppendCondition(name, query.Data.ServiceName, query.Data.Instance, query.Data.EndPoint);
             tasks[index] = _prometheusClient.QueryAsync(new QueryRequest
             {
                 Time = query.Data.Time.ToUnixTimestamp().ToString(),
@@ -195,7 +198,7 @@ public class QueryHandler
         else if (query.Type == MetricValueTypes.Endpoint)
             metric = $"group by (http_target) (http_response_bucket{{}})";
 
-        metric = AppendCondition(metric, query.Service, default!, default!);
+        metric = await AppendCondition(metric, query.Service, default!, default!);
 
         var result = await _prometheusClient.QueryAsync(new QueryRequest
         {
@@ -208,29 +211,7 @@ public class QueryHandler
                 return;
             query.Result = result.Data.Result.Select(item => ((QueryResultInstantVectorResponse)item).Metric.Values.FirstOrDefault()?.ToString()).ToList()!;
         }
-    }
-
-    private string AppendCondition(string str, string service, string instance, string endpoint)
-    {
-        StringBuilder text = new StringBuilder();
-        if (!string.IsNullOrEmpty(service))
-            text.Append($"service_name=\"{service}\",");
-        if (!string.IsNullOrEmpty(instance))
-            text.Append($"service_instance_id=\"{instance}\",");
-        if (!string.IsNullOrEmpty(endpoint))
-            text.Append($"endpoint=\"{endpoint}\",");
-
-        if (text.Length == 0)
-            return str;
-
-        int position = str.IndexOf('{');
-        if (position > 0)
-        {
-            return str.Insert(position + 1, text.ToString());
-        }
-
-        return str;
-    }
+    }    
 
     private static Dictionary<string, Dictionary<string, List<string>>> ConverToKeyValues(IEnumerable<IDictionary<string, string>> sources)
     {
@@ -278,5 +259,91 @@ public class QueryHandler
         }
 
         return result;
+    }
+
+    private async Task<List<string>> GetAllMetricsAsync()
+    {
+        var data = await _multilevelCacheClient.GetAsync<List<string>>(MetricConstants.ALL_METRICS_KEY);
+        if (data == null)
+        {
+            var result = await _prometheusClient.LabelValuesQueryAsync(new() { Lable="__name__" });
+            if (result.Status == ResultStatuses.Success)
+            {
+                data = result.Data?.ToList() ?? new();
+            }
+        }
+        if (data != null)
+            await _multilevelCacheClient.SetAsync(MetricConstants.ALL_METRICS_KEY, data, new CacheEntryOptions(new DateTimeOffset(System.DateTime.UtcNow.AddMinutes(5))));
+
+        return data!;
+    }
+
+    private async Task<string> AppendCondition(string str, string service, string instance, string endpoint)
+    {
+        var metrics = await GetAllMetricsAsync();
+        if (metrics == null || !metrics.Any())
+            return str;
+
+        StringBuilder text = new StringBuilder();
+        if (!string.IsNullOrEmpty(service))
+            text.Append($"service_name=\"{service}\",");
+        if (!string.IsNullOrEmpty(instance))
+            text.Append($"service_instance_id=\"{instance}\",");
+        if (!string.IsNullOrEmpty(endpoint))
+            text.Append($"endpoint=\"{endpoint}\",");
+
+        if (text.Length == 0)
+            return str;
+
+        foreach (var metric in metrics)
+        {
+            if (ReplaceMetric(str, metric, text.ToString(), out var result))
+                str = result;
+        }
+
+        return str;
+    }
+
+    private bool ReplaceMetric(string str, string metric, string replace, out string result)
+    {
+        result = default!;
+        if (string.IsNullOrEmpty(replace))
+            return false;
+        int start = 0, itemLenth = metric.Length;
+        List<int> positions = new List<int>();
+        var not = new Regex("_[a-zA-Z0-9]");
+        do
+        {
+            var index = str.IndexOf(metric, start);
+            if (index < 0)
+                return false;
+
+            if ((index == 0 || index > 0 && !not.IsMatch(str[index - 1].ToString())) && (str.Length - index == 0 || str.Length - index > 0 && !not.IsMatch(str[index + 1].ToString())))
+                positions.Add(index);
+            start = index + itemLenth;
+            if (str.Length - start - itemLenth < 0)
+                break;
+        } while (true);
+
+        if (positions.Count == 0)
+            return false;
+
+        start = positions.Count - 1;
+        StringBuilder text = new StringBuilder(str);
+        do
+        {
+            var position = positions[start]+ itemLenth;            
+            bool has = str[start + itemLenth + 1] == '{';
+            if (!has)
+                text.Insert(position, '{');
+            text.Insert(position + (has ? 0 : 1), replace);
+            if (!has)
+                text.Insert(position + 1 + replace.Length, '}');
+            start--;
+        }
+        while (start >= 0);
+
+        result = text.ToString();
+        return true;
     }
 }
