@@ -154,7 +154,7 @@ public class QueryHandler
         var index = 0;
         foreach (var name in query.Data.MetricNames)
         {
-            var metric =await AppendCondition(name, query.Data.ServiceName, query.Data.Instance, query.Data.EndPoint);
+            var metric = await AppendCondition(name, query.Data.ServiceName, query.Data.Instance, query.Data.EndPoint);
             tasks[index] = _prometheusClient.QueryRangeAsync(new QueryRangeRequest
             {
                 End = query.Data.End.ToUnixTimestamp().ToString(),
@@ -211,7 +211,7 @@ public class QueryHandler
                 return;
             query.Result = result.Data.Result.Select(item => ((QueryResultInstantVectorResponse)item).Metric.Values.FirstOrDefault()?.ToString()).ToList()!;
         }
-    }    
+    }
 
     private static Dictionary<string, Dictionary<string, List<string>>> ConverToKeyValues(IEnumerable<IDictionary<string, string>> sources)
     {
@@ -266,7 +266,7 @@ public class QueryHandler
         var data = await _multilevelCacheClient.GetAsync<List<string>>(MetricConstants.ALL_METRICS_KEY);
         if (data == null)
         {
-            var result = await _prometheusClient.LabelValuesQueryAsync(new() { Lable="__name__" });
+            var result = await _prometheusClient.LabelValuesQueryAsync(new() { Lable = "__name__" });
             if (result.Status == ResultStatuses.Success)
             {
                 data = result.Data?.ToList() ?? new();
@@ -332,8 +332,8 @@ public class QueryHandler
         StringBuilder text = new StringBuilder(str);
         do
         {
-            var position = positions[start]+ itemLenth;            
-            bool has = str[start + itemLenth + 1] == '{';
+            var position = positions[start] + itemLenth;
+            bool has = position - itemLenth <= 0 ? false : str[start + itemLenth + 1] == '{';
             if (!has)
                 text.Insert(position, '{');
             text.Insert(position + (has ? 0 : 1), replace);
