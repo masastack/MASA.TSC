@@ -333,12 +333,15 @@ public class QueryHandler
         do
         {
             var position = positions[start] + itemLenth;
-            bool has = position - itemLenth <= 0 ? false : str[start + itemLenth + 1] == '{';
+            bool has = str.Length - position - 1 < 0 ? false : str[position] == '{';
             if (!has)
                 text.Insert(position, '{');
-            text.Insert(position + (has ? 0 : 1), replace);
+
+            text.Insert(position + 1, replace);
+
             if (!has)
                 text.Insert(position + 1 + replace.Length, '}');
+
             start--;
         }
         while (start >= 0);
