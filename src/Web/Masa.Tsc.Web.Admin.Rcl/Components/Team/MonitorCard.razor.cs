@@ -56,13 +56,13 @@ public partial class MonitorCard
     private void UpdateItems()
     {
         _items[0].ServiceTotal = _appMonitorDto.ServiceTotal;
-        _items[0].AppTotal = _appMonitorDto.AppTotal;
+        _items[0].AppTotal = _appMonitorDto.AppTotal;        
 
-        _items[1].ServiceTotal = _appMonitorDto.ServiceError;
-        _items[1].AppTotal = _appMonitorDto.AppError;
+        _items[1].ServiceTotal = _appMonitorDto.ServiceWarn;
+        _items[1].AppTotal = _appMonitorDto.AppWarn;
 
-        _items[2].ServiceTotal = _appMonitorDto.ServiceWarn;
-        _items[2].AppTotal = _appMonitorDto.AppWarn;
+        _items[2].ServiceTotal = _appMonitorDto.ServiceError;
+        _items[2].AppTotal = _appMonitorDto.AppError;
 
         _items[3].ServiceTotal = _appMonitorDto.Normal;
     }

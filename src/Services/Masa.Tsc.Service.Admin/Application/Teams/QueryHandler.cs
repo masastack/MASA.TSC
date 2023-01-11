@@ -242,7 +242,7 @@ public class QueryHandler
 
     private async Task<List<string>> GetErrorOrWarnAsync(bool isError, DateTime? start = default, DateTime? end = default)
     {
-        var services = (IEnumerable<string>)await _logService.AggregateAsync(new SimpleAggregateRequestDto
+      var obj=  await _logService.AggregateAsync(new SimpleAggregateRequestDto
         {
             Name = ElasticConstant.ServiceName,
             Start = start ?? DateTime.MinValue,
@@ -251,12 +251,13 @@ public class QueryHandler
             MaxCount = 999,
             Conditions = new FieldConditionDto[] {
                 new FieldConditionDto{
-                    Name="Resource.SeverityText",
+                    Name="SeverityText",
                      Type= ConditionTypes.Equal,
                      Value= isError?"Error":"Warn"
                 }
             }
         });
+        var services = (IEnumerable<string>)obj;
         return services?.ToList()!;
     }
 

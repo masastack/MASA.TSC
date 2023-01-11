@@ -16,11 +16,11 @@ public partial class Team
 
     protected override async void OnAfterRender(bool firstRender)
     {
-        if (firstRender)
-        {
-            await LoadData();
-            StateHasChanged();
-        }
+        //if (firstRender)
+        //{
+        //    await LoadData();
+        //    StateHasChanged();
+        //}
     }
 
     private async Task LoadData()
