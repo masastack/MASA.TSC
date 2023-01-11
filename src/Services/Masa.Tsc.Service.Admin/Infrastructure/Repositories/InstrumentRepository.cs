@@ -14,17 +14,17 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
 
     public async Task<Instrument> GetAsync(Guid id, Guid userId)
     {
-        return (await _context.Set<Instrument>().FirstOrDefaultAsync(item => item.Id == id && (item.IsGlobal || item.Creator == userId)))!;
+        return (await _context.Set<Instrument>().FirstOrDefaultAsync(item => item.Id == id))!;
     }
 
     public async Task<List<Instrument>> GetListAsync(IEnumerable<Guid> ids, Guid userId)
     {
-        return await _context.Set<Instrument>().Where(item => ids.Contains(item.Id) && (item.IsGlobal || item.Creator == userId)).ToListAsync();
+        return await _context.Set<Instrument>().Where(item => ids.Contains(item.Id)).ToListAsync();
     }
 
     public async Task<Instrument> GetDetailAsync(Guid Id, Guid userId)
     {
-        var instrument = await _context.Set<Instrument>().AsNoTracking().FirstAsync(item => item.Id == Id && (item.IsGlobal || item.Creator == userId));
+        var instrument = await _context.Set<Instrument>().AsNoTracking().FirstAsync(item => item.Id == Id);
         if (instrument == null)
             return default!;
 
