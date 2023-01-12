@@ -29,25 +29,25 @@ public partial class MonitorCard
                 {
                     Text="MONITORING",
                     Color="#7C4DFF",
-                    Icon="mdi-chart-line-variant"
+                    Icon="monitor"
                 },
                 new AppMonitorViewDto
                 {
-                    Text="WARN",
+                    Text="WARNS",
                     Color="#FF7D00",
-                    Icon="mdi-bell-ring"
+                    Icon="warning"
                 },
                 new AppMonitorViewDto
                 {
-                    Text="ERROR",
+                    Text="ERRORS",
                     Color="#FF5252",
-                    Icon="mdi-bell"
+                    Icon="error"
                 },
                 new AppMonitorViewDto
                 {
                     Text="NORMAL",
                     Color="#69F0AE",
-                    Icon="mdi-shield",
+                    Icon="default",
                     IsShowApp=false
                 }
             };
