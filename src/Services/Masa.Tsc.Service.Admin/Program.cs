@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 using Masa.BuildingBlocks.Dispatcher.IntegrationEvents;
+using MASA.PM.Service.Admin.Migrations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -115,6 +116,7 @@ var app = builder.Services
     .AddTopologyRepository()
     .AddServices(builder);
 
+await app.MigrateAsync();
 app.UseMasaExceptionHandler();
 
 // Configure the HTTP request pipeline.
