@@ -2,6 +2,8 @@
 @page "/team"
 @inherits TscComponentBase
 
+<PageTitle>@T("ProjectTeam")</PageTitle>
+
 <TeamSearch OnValueChanged="OnSearch" OnTabsChanged="OnTabsChange"></TeamSearch>
 @if(_isLoad)
 {
@@ -39,16 +41,16 @@ else
                         </div>
                     </CellBack>
                     <CellHoverTip>
-                        <div style="height:150px;background-color:transparent;">
-                            <MCard Height=128 Width=240 Class="emphasis2" Style="border-bottom-left-radius:20px;border-bottom-right-radius:20px;">
+                        <div style="min-height:150px;background-color:transparent;">
+                            <MCard Class="emphasis2" Style="border-bottom-left-radius:20px;border-bottom-right-radius:20px;min-width:240px;max-width:300px;">
                                 <MCardText Class="d-flex flex-column white--text body">
-                                    <span>@context.Name</span>
+                                    <span>@T("Project name")：@context.Name</span>
                                     <span>ID：@context.Id</span>
-                                    <span>@context.Apps.Count</span>
-                                    <p>@context.Description</p>
+                                    <span>@T("Application count")：@context.Apps.Count</span>
+                                    <p>@T("Description")：@context.Description</p>
                                 </MCardText>
                             </MCard>
-                            <div class="d-flex justify-center" style="margin-top: -10px;">
+                            <div class="d-flex justify-center" style="margin-top: -10px;margin-bottom:10px;">
                                 <div style="width: 0;height: 0;border-style: solid;border-width: 0 20px 20px 0;border-color: transparent transparent #323D6F transparent;transform: rotate(315deg);"></div>
                             </div>
                         </div>
