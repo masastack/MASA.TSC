@@ -1,7 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Google.Type;
 using Masa.Tsc.Service.Admin.Application.Metrics.Queries;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -13,6 +12,7 @@ public class QueryHandler
     private readonly IMasaPrometheusClient _prometheusClient;
     private readonly IMultilevelCacheClient _multilevelCacheClient;
     private readonly ILogger _logger;
+    private readonly object lockObj = new();
 
     public QueryHandler(IMasaPrometheusClient masaPrometheusClient, IMultilevelCacheClientFactory multilevelCacheClientFactory, ILogger<QueryHandler> logger)
     {
@@ -192,11 +192,11 @@ public class QueryHandler
     {
         var metric = "";
         if (query.Type == MetricValueTypes.Service)
-            metric = $"group by (service_name) (http_client_duration_bucket{{}})";
+            metric = $"group by (service_name) (http_client_duration_bucket)";
         else if (query.Type == MetricValueTypes.Instance)
-            metric = $"group by (service_instance_id) (http_client_duration_bucket{{}})";
+            metric = $"group by (service_instance_id) (http_client_duration_bucket)";
         else if (query.Type == MetricValueTypes.Endpoint)
-            metric = $"group by (http_target) (http_response_bucket{{}})";
+            metric = $"group by (http_target) (http_response_bucket)";
 
         metric = await AppendCondition(metric, query.Service, default!, default!);
 
@@ -263,7 +263,25 @@ public class QueryHandler
 
     private async Task<List<string>> GetAllMetricsAsync()
     {
-        var data = await _multilevelCacheClient.GetAsync<List<string>>(MetricConstants.ALL_METRICS_KEY);
+        List<string>? data = null;
+        lock (lockObj)
+        {
+            int max = 3;
+            do
+            {
+                try
+                {
+                    data = _multilevelCacheClient.Get<List<string>>(MetricConstants.ALL_METRICS_KEY);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("GetAllMetricsAsync", ex);
+                    max--;
+                    Task.WaitAll(Task.Delay(20));
+                }
+            } while (max > 0);
+        }
         if (data == null)
         {
             var result = await _prometheusClient.LabelValuesQueryAsync(new() { Lable = "__name__" });
@@ -273,8 +291,7 @@ public class QueryHandler
             }
         }
         if (data != null)
-            await _multilevelCacheClient.SetAsync(MetricConstants.ALL_METRICS_KEY, data, new CacheEntryOptions(new DateTimeOffset(System.DateTime.UtcNow.AddMinutes(5))));
-
+            await _multilevelCacheClient.SetAsync(MetricConstants.ALL_METRICS_KEY, data, new CacheEntryOptions(new DateTimeOffset(DateTime.UtcNow.AddMinutes(5))));
         return data!;
     }
 
@@ -284,7 +301,7 @@ public class QueryHandler
         if (metrics == null || !metrics.Any())
             return str;
 
-        StringBuilder text = new StringBuilder();
+        StringBuilder text = new();
         if (!string.IsNullOrEmpty(service))
             text.Append($"service_name=\"{service}\",");
         if (!string.IsNullOrEmpty(instance))
@@ -307,7 +324,7 @@ public class QueryHandler
     private bool ReplaceMetric(string str, string metric, string replace, out string result)
     {
         result = default!;
-        if (string.IsNullOrEmpty(replace))
+        if (string.IsNullOrEmpty(str) || string.IsNullOrEmpty(replace))
             return false;
         int start = 0, itemLenth = metric.Length;
         List<int> positions = new List<int>();

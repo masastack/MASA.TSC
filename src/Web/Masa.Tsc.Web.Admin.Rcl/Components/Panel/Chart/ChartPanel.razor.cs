@@ -71,7 +71,7 @@ public partial class ChartPanel
         {
             return await base.ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto()
             {
-                Time = ConfigurationRecord.StartTime.UtcDateTime,
+                Time = ConfigurationRecord.EndTime.UtcDateTime,
                 ServiceName = ConfigurationRecord.AppName,
                 Queries = Value.Metrics.Select(item => item.Name).ToList()
             });

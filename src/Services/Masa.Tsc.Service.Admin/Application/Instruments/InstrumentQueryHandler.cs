@@ -84,7 +84,7 @@ public class InstrumentQueryHandler
             IsRoot = instument.IsRoot,
             Layer = Enum.Parse<LayerTypes>(instument.Layer),
             Model = Enum.Parse<ModelTypes>(instument.Model),
-            Type = Enum.Parse<LabelTypes>(instument.Lable),
+            Type =instument.Lable,
             Order = instument.Sort
         };
     }

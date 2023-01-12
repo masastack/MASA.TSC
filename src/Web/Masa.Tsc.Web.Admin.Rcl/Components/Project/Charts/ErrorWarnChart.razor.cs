@@ -55,8 +55,8 @@ public partial class ErrorWarnChart
         var results = await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto
         {
             Queries = new List<string> {
-            $"sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\",service_name=\"{query.AppId}\"}}[{step}s]))",
-            $"sum by(service_name) (increase(http_server_duration_count{{service_name=\"{query.AppId}\"}}[{step}s]))"
+            $"sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"[{step}s]))",
+            $"sum by(service_name) (increase(http_server_duration_count[{step}s]))"
            },
             Time = query.End.Value,
         });

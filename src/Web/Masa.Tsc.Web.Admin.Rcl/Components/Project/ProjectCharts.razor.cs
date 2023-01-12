@@ -29,7 +29,7 @@ public partial class ProjectCharts
             {
                 new PanelMetricDto()
                 {
-                    Name = "topk(10, avg by(service_name) (http_server_duration_bucket))"
+                    Name = "topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[1m])),0.01)>0.01))"
                 }
             }
         };
@@ -43,7 +43,7 @@ public partial class ProjectCharts
             {
                 new PanelMetricDto()
                 {
-                    Name = "topk(10, count by(service_name) (increase(http_server_duration_count[5m])))"
+                    Name = "topk(10, sort_desc(max by(http_target) (http_response_bucket)))"
                 }
             }
         };       

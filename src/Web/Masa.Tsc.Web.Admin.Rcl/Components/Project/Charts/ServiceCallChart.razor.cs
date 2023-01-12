@@ -33,7 +33,7 @@ public partial class ServiceCallChart
         var result = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
-                $"sum by(service_name)(increase(http_server_duration_count{{service_name=\"{query.AppId}\"}}[1m]))"
+                $"sum by(service_name)(increase(http_server_duration_count[1m]))"
                 //$"sum by(service_name) (sum_over_time(http_server_duration_bucket{{service_name=\"{query.AppId}\"}}[10h]))/sum by(service_name)(count_over_time(http_server_duration_bucket{{service_name=\"{query.AppId}\"}}[10h]))"
             },
             Start = start,

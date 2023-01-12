@@ -63,7 +63,7 @@ public partial class ApdexChart
             query.End = DateTime.UtcNow;
         var data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
-            MetricNames = new List<string> { $"(count(http_server_duration_bucket{{service_name=\"{query.AppId}\"}}>1000 and http_server_duration_bucket{{service_name=\"{query.AppId}\"}}<=4000)*0.5+count(http_server_duration_bucket{{service_name=\"{query.AppId}\"}}<1000))/count(http_server_duration_bucket{{service_name=\"{query.AppId}\"}})" },
+            MetricNames = new List<string> { $"(count(http_server_duration_bucket>1000 and http_server_duration_bucket<=4000)*0.5+count(http_server_duration_bucket<1000))/count(http_server_duration_bucket)" },
             Start = query.Start.Value,
             End = query.End.Value,
             Step = "5m"
