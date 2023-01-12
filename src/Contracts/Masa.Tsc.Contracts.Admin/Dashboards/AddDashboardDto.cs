@@ -18,4 +18,6 @@ public class AddDashboardDto
     public ModelTypes Model { get; set; }
 
     public LabelTypes Type { get; set; }
+
+    public string Type2 { get; set; }
 }
