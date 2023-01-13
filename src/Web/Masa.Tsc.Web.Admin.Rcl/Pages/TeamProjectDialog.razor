@@ -17,7 +17,16 @@
                                 <AppAutoComplete Apps="Apps" @bind-Value="@ConfigurationRecord.AppName" @ref="AppAutoComplete" FillBackground=false />
                             </div>
                             <MChip Class="mx-6" Color="#05CD99" TextColor="white">@AppAutoComplete!.CurrentApp?.Type</MChip>
-                            <MLabel Class="regular2--text body2">@AppAutoComplete!.CurrentApp?.Identity</MLabel>
+                            <MTooltip Top>
+                                <ActivatorContent>
+                                    <MLabel @attributes="@context.Attrs" Class="regular2--text body2" Style="max-width: 200px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">
+                                        @AppAutoComplete!.CurrentApp?.Identity
+                                    </MLabel>
+                                </ActivatorContent>
+                                <ChildContent>
+                                    <span>@AppAutoComplete!.CurrentApp?.Identity</span>
+                                </ChildContent>
+                            </MTooltip>
                         </MCol>
                         <MCol Cols="6" Class="d-flex justify-end align-center">
                             <DateTimeRangeToolbar DefaultQuickRange="QuickRangeKey.Last15Minutes" OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
