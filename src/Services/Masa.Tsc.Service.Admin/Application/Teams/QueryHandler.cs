@@ -119,7 +119,8 @@ public class QueryHandler
 
         SetProjectErrorOrWarn(query, errors, true);
         SetProjectErrorOrWarn(query, warnings, false);
-
+        query.Result.Projects = query.Result.Projects.Where(p => p.Apps != null && p.Apps.Any()).ToList();
+        var appids = string.Join(",", query.Result.Projects.Select(p => string.Join(",", p.Apps.Select(app => app.Identity)))).Split(',');
         query.Result.Monitor.ServiceTotal = query.Result.Projects.Count;
         query.Result.Monitor.AppTotal = query.Result.Projects.Sum(p => p.Apps.Count);
         query.Result.Monitor.ServiceError = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Error);
@@ -127,7 +128,8 @@ public class QueryHandler
         query.Result.Monitor.ServiceWarn = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Warn);
         query.Result.Monitor.AppWarn = query.Result.Projects.Where(p => p.Status == MonitorStatuses.Warn).Sum(p => p.Apps.Count(a => a.Status == MonitorStatuses.Warn));
         query.Result.Monitor.Normal = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Normal);
-
+        query.Result.Monitor.ErrorCount = await GetErrorOrWarnAsync(true, appids, query.StartTime, query.EndTime);
+        query.Result.Monitor.WarnCount = await GetErrorOrWarnAsync(false, appids, query.StartTime, query.EndTime);
     }
 
     private static void SetProjectErrorOrWarn(TeamMonitorQuery query, List<string> appIds, bool isError)
@@ -242,7 +244,7 @@ public class QueryHandler
 
     private async Task<List<string>> GetErrorOrWarnAsync(bool isError, DateTime? start = default, DateTime? end = default)
     {
-      var obj=  await _logService.AggregateAsync(new SimpleAggregateRequestDto
+        var obj = await _logService.AggregateAsync(new SimpleAggregateRequestDto
         {
             Name = ElasticConstant.ServiceName,
             Start = start ?? DateTime.MinValue,
@@ -259,6 +261,31 @@ public class QueryHandler
         });
         var services = (IEnumerable<string>)obj;
         return services?.ToList()!;
+    }
+
+    private async Task<long> GetErrorOrWarnAsync(bool isError, IEnumerable<string> appids, DateTime? start = default, DateTime? end = default)
+    {
+        var obj = await _logService.AggregateAsync(new SimpleAggregateRequestDto
+        {
+            Name = ElasticConstant.ServiceName,
+            Start = start ?? DateTime.MinValue,
+            End = end ?? DateTime.MinValue,
+            Type = AggregateTypes.Count,
+            Conditions = new FieldConditionDto[] {
+                new FieldConditionDto{
+                    Name="SeverityText",
+                     Type= ConditionTypes.Equal,
+                     Value= isError?"Error":"Warn"
+                },
+                new FieldConditionDto
+                {
+                    Name=ElasticConstant.ServiceName,
+                    Type= ConditionTypes.In,
+                    Value=appids
+                }
+            }
+        });
+        return Convert.ToInt64(obj);
     }
 
     private UserDto ToUser(StaffModel model)

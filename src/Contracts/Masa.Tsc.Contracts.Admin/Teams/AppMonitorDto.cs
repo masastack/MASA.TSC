@@ -18,4 +18,8 @@ public class AppMonitorDto
     public int AppWarn { get; set; }
 
     public int Normal { get; set; }
+
+    public long ErrorCount { get; set; }
+
+    public long WarnCount { get; set; }
 }
