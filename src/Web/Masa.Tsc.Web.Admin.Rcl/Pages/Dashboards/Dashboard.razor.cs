@@ -104,7 +104,7 @@ public partial class Dashboard
         new() { Text = T(nameof(DashboardDto.Name)), Value = nameof(DashboardDto.Name), Sortable = false },
         new() { Text = T(nameof(DashboardDto.Folder)), Value = nameof(DashboardDto.Folder), Sortable = false },
         new() { Text = T(nameof(DashboardDto.Layer)), Value = nameof(DashboardDto.Layer), Sortable = false },
-        new() { Text = T(nameof(DashboardDto.Model)), Value = nameof(DashboardDto.Model), Sortable = false },
+        //new() { Text = T(nameof(DashboardDto.Model)), Value = nameof(DashboardDto.Model), Sortable = false },
         new() { Text = T(nameof(DashboardDto.IsRoot)), Value = nameof(DashboardDto.IsRoot), Sortable = false },
         new() { Text = T("Action"), Value = "Action", Sortable = false, Align = DataTableHeaderAlign.Center, Width = "105px" },
     };

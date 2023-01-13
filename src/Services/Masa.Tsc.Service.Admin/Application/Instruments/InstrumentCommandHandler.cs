@@ -29,7 +29,7 @@ public class InstrumentCommandHandler
             DirectoryId = command.Data.Folder,
             Model = command.Data.Model.ToString(),
             Sort = command.Data.Order,
-            Lable = command.Data.Type.ToString()
+            Lable = command.Data.Type
         };
         await _instrumentRepository.AddAsync(model);
     }

@@ -36,7 +36,8 @@ public class DirectoryQueryHandler
                         Name = instrument.Name,
                         IsRoot = instrument.IsRoot,
                         Layer = Enum.Parse<LayerTypes>(instrument.Layer),
-                        Model = Enum.Parse<ModelTypes>(instrument.Model)
+                        Model = Enum.Parse<ModelTypes>(instrument.Model),
+                        Type = instrument.Lable
                     })?.ToList()!
                 }).ToList(),
                 Total = data.Item1

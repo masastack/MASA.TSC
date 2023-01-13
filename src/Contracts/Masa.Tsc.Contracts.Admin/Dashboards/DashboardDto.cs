@@ -16,4 +16,6 @@ public class DashboardDto
     public LayerTypes Layer { get; set; }
 
     public ModelTypes Model { get; set; }
+
+    public string Type { get; set; }
 }
