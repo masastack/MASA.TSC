@@ -119,14 +119,18 @@ public class QueryHandler
 
         SetProjectErrorOrWarn(query, errors, true);
         SetProjectErrorOrWarn(query, warnings, false);
-        query.Result.Projects = query.Result.Projects.Where(p => p.Apps != null && p.Apps.Any()).ToList();
+        query.Result.Projects = query.Result.Projects.Where(p => p.Apps != null && p.Apps.Any()).OrderBy(p=>p.Name).ToList();
+        foreach (var project in query.Result.Projects)
+        {
+            project.Apps = project.Apps.OrderByDescending(app => app.Status).ThenBy(app => app.Name).ToList();
+        }
         var appids = string.Join(",", query.Result.Projects.Select(p => string.Join(",", p.Apps.Select(app => app.Identity)))).Split(',');
         query.Result.Monitor.ServiceTotal = query.Result.Projects.Count;
         query.Result.Monitor.AppTotal = query.Result.Projects.Sum(p => p.Apps.Count);
         query.Result.Monitor.ServiceError = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Error);
-        query.Result.Monitor.AppError = query.Result.Projects.Where(p => p.Status == MonitorStatuses.Error).Sum(p => p.Apps.Count(a => a.Status == MonitorStatuses.Error));
-        query.Result.Monitor.ServiceWarn = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Warn);
-        query.Result.Monitor.AppWarn = query.Result.Projects.Where(p => p.Status == MonitorStatuses.Warn).Sum(p => p.Apps.Count(a => a.Status == MonitorStatuses.Warn));
+        query.Result.Monitor.AppError = query.Result.Projects.Sum(p => p.Apps.Count(a => a.HasError));
+        query.Result.Monitor.ServiceWarn = query.Result.Projects.Count(m => m.HasWarning);
+        query.Result.Monitor.AppWarn = query.Result.Projects.Sum(p => p.Apps.Count(a => a.HasError));
         query.Result.Monitor.Normal = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Normal);
         query.Result.Monitor.ErrorCount = await GetErrorOrWarnAsync(true, appids, query.StartTime, query.EndTime);
         query.Result.Monitor.WarnCount = await GetErrorOrWarnAsync(false, appids, query.StartTime, query.EndTime);
@@ -153,19 +157,33 @@ public class QueryHandler
             if (appids.Contains(app.Identity))
             {
                 if (isError)
+                {
                     app.Status = MonitorStatuses.Error;
-                else if (app.Status == MonitorStatuses.Normal)
-                    app.Status = MonitorStatuses.Warn;
+                    app.HasError = true;
+                }
+                else
+                {
+                    if (!app.HasError)
+                        app.Status = MonitorStatuses.Warn;
+                    app.HasWarning = true;
+                }
             }
         }
     }
 
     private static void SetProjectStatus(ProjectOverviewDto project, bool isError)
     {
-        if (isError && project.Apps.Any(app => app.Status == MonitorStatuses.Error))
+        if (isError && project.Apps.Any(app => app.HasError))
+        {
             project.Status = MonitorStatuses.Error;
-        else if (!isError && project.Status == MonitorStatuses.Normal && project.Apps.Any(app => app.Status == MonitorStatuses.Warn))
-            project.Status = MonitorStatuses.Warn;
+            project.HasError = true;
+        }
+        else if (!isError && project.Apps.Any(app => app.HasWarning))
+        {
+            project.HasWarning = true;
+            if (!project.HasError)
+                project.Status = MonitorStatuses.Warn;
+        }
     }
 
     private async Task<List<ProjectOverviewDto>> GetAllProjects(List<Guid> teamids, List<string> appids)
@@ -196,9 +214,11 @@ public class QueryHandler
                 TeamId = project.TeamId
             };
 
-            if (apps != null && apps.Any())
-            {
-                model.Apps = apps.Where(a => a.ProjectId == project.Id && appids.Contains(a.Identity)).Select(a => new AppDto
+            var projectAppIds = apps.Where(a => a.ProjectId == project.Id).Select(app => app.Identity).ToList();
+            if (!projectAppIds.Any())
+                continue;
+            if (appids.Any(id => projectAppIds.Contains(id)))
+                model.Apps = apps.Where(a => a.ProjectId == project.Id).Select(a => new AppDto
                 {
                     Id = a.Id.ToString(),
                     Identity = a.Identity,
@@ -206,7 +226,6 @@ public class QueryHandler
                     ServiceType = a.ServiceType,
                     AppType = a.Type
                 }).ToList();
-            }
 
             result.Add(model);
         }
@@ -255,7 +274,7 @@ public class QueryHandler
                 new FieldConditionDto{
                     Name="SeverityText",
                      Type= ConditionTypes.Equal,
-                     Value= isError?"Error":"Warn"
+                     Value= isError?"Error":"Warning"
                 }
             }
         });
@@ -275,7 +294,7 @@ public class QueryHandler
                 new FieldConditionDto{
                     Name="SeverityText",
                      Type= ConditionTypes.Equal,
-                     Value= isError?"Error":"Warn"
+                     Value= isError?"Error":"Warning"
                 },
                 new FieldConditionDto
                 {

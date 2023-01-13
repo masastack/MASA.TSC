@@ -18,6 +18,7 @@ public partial class ErrorWarnChart
 
     private double _total;
     private EChartType _options = EChartConst.Pie;
+    private double[] values = new double[2];
 
     protected override void OnInitialized()
     {
@@ -60,8 +61,7 @@ public partial class ErrorWarnChart
            },
             Time = query.End.Value,
         });
-
-        double[] values = new double[2];
+      
         var index = 0;
         foreach (var item in results)
         {

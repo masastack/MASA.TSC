@@ -5,7 +5,7 @@
     <MRow Class="mx-6">
         @foreach (var item in _items)
         {
-            <MItem Value="@item.Text">
+            <MItem Value="@item.Value">
                 <MCol Class="mt-4" Cols="12" Style="@ItemStyle(item,context.Active)">
                     <MonitorItemCard Value=@item OnClick="@context.Toggle" />
                 </MCol>

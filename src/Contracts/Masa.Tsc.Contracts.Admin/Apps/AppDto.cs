@@ -16,4 +16,8 @@ public class AppDto
     public AppTypes AppType { get; set; }
 
     public MonitorStatuses Status { get; set; }
+
+    public bool HasError { get; set; }
+
+    public bool HasWarning { get; set; }
 }

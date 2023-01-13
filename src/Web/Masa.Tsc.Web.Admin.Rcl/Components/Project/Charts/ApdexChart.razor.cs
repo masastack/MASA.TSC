@@ -20,43 +20,43 @@ public partial class ApdexChart
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        _options.SetValue("grid.bottom", 20);
-        _options.SetValue("xAxis.splitLine.show", false);
-        _options.SetValue("xAxis.axisTick.show", false);
-        _options.SetValue("xAxis.axisLine.show", false);
-        _options.SetValue("xAxis.axisLabel.show", false);
-        _options.SetValue("yAxis.splitLine.show", false);
-        _options.SetValue("yAxis.axisTick.show", false);
-        _options.SetValue("yAxis.axisLine.show", false);
-        _options.SetValue("yAxis.axisLabel.show", false);
-        _options.SetValue("yAxis.splitArea.show", false);
-        _options.SetValue("series[0].lineStyle.normal", new
-        {
-            width = 8,
-            color = new
-            {
-                type = "linear",
+        //_options.SetValue("grid.bottom", 20);
+        //_options.SetValue("xAxis.splitLine.show", false);
+        //_options.SetValue("xAxis.axisTick.show", false);
+        //_options.SetValue("xAxis.axisLine.show", false);
+        //_options.SetValue("xAxis.axisLabel.show", false);
+        //_options.SetValue("yAxis.splitLine.show", false);
+        //_options.SetValue("yAxis.axisTick.show", false);
+        //_options.SetValue("yAxis.axisLine.show", false);
+        //_options.SetValue("yAxis.axisLabel.show", false);
+        //_options.SetValue("yAxis.splitArea.show", false);
+        //_options.SetValue("series[0].lineStyle.normal", new
+        //{
+        //    width = 8,
+        //    color = new
+        //    {
+        //        type = "linear",
 
-                colorStops = new List<object>
-                {
-              new
-              {
-                  offset = 0,
-                  color = "rgb(255,236,236)" // 0% 处的颜色
-              },
-              new
-              {
-                  offset = 1,
-                  color = "rgb(248,76,54)" // 100% 处的颜色
-              }
-            },
-                globalCoord = false // 缺省为 false
-            },
-            shadowColor = "rgba(72,216,191, 0.3)",
-            shadowBlur = 10,
-            shadowOffsetY = 20
-        });
-        _options.SetValue("series[0].smooth", true);
+        //        colorStops = new List<object>
+        //        {
+        //      new
+        //      {
+        //          offset = 0,
+        //          color = "rgb(255,236,236)" // 0% 处的颜色
+        //      },
+        //      new
+        //      {
+        //          offset = 1,
+        //          color = "rgb(248,76,54)" // 100% 处的颜色
+        //      }
+        //    },
+        //        globalCoord = false // 缺省为 false
+        //    },
+        //    shadowColor = "rgba(72,216,191, 0.3)",
+        //    shadowBlur = 10,
+        //    shadowOffsetY = 20
+        //});
+        //_options.SetValue("series[0].smooth", true);
         if (query.Start is null)
             query.Start = DateTime.UtcNow.AddDays(-1);
         if (query.End is null)

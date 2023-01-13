@@ -12,7 +12,7 @@ public partial class Team
     private TeamSearchModel? _teamSearchModel = null;
     private AppMonitorDto _appMonitorDto;
     private bool _isLoad = true;
-    private StringNumber _projectStatus ="";
+    private StringNumber _projectStatus = "";
 
     protected override async void OnAfterRender(bool firstRender)
     {
@@ -73,11 +73,22 @@ public partial class Team
     List<ProjectOverviewDto> GetViewData()
     {
         IEnumerable<ProjectOverviewDto>? result = _projects;
-        if (_projectStatus != "MONITORING" && string.IsNullOrEmpty(_projectStatus?.ToString()) is false)
+        if (_projectStatus != null && _projectStatus != "all" && Enum.TryParse<MonitorStatuses>((string)_projectStatus, true, out var type))
         {
-            result = result.Where(item => item.Status.ToString().Equals(_projectStatus.ToString(), StringComparison.OrdinalIgnoreCase));
+            switch (type)
+            {
+                case MonitorStatuses.Error:
+                    result = result.Where(item => item.HasError);
+                    break;
+                case MonitorStatuses.Warn:
+                    result = result.Where(item => item.HasWarning);
+                    break;
+                default:
+                    result = result.Where(item => !item.HasWarning && !item.HasError);
+                    break;
+            }
         }
-        if(_teamSearchModel?.ProjectType!="all" && string.IsNullOrEmpty(_teamSearchModel?.ProjectType) is false)
+        if (_teamSearchModel?.ProjectType != "all" && string.IsNullOrEmpty(_teamSearchModel?.ProjectType) is false)
         {
             result = result.Where(item => item.LabelName.Equals(_teamSearchModel.ProjectType, StringComparison.OrdinalIgnoreCase));
         }

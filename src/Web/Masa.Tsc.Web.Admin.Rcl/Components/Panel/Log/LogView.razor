@@ -1,12 +1,12 @@
 ﻿@inherits TscComponentBase
 
-@if(JsonObject is not null)
+@if (JsonObject is not null)
 {
     foreach (var (name, logTree) in JsonObject)
     {
-        if (logTree.IsValueType)
+        if (!string.IsNullOrEmpty(logTree.ToString()) && logTree.IsValueType)
         {
-             <div class="d-flex mb-4">
+            <div class="d-flex mb-4">
                 <div class="px-2 ml-4 mr-6 my-auto fill-background" style="border-radius: 6px;height: 25px;text-align:center;">
                     <span class="emphasis2--text btn">@name</span>
                 </div>
@@ -59,7 +59,7 @@
         }
     }
 }
-else if(JsonArray is not null)
+else if (JsonArray is not null)
 {
     foreach (var logTree in JsonArray)
     {

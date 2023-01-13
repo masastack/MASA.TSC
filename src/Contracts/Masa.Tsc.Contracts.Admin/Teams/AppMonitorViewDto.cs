@@ -7,11 +7,13 @@ public class AppMonitorViewDto
 {
     public int ServiceTotal { get; set; }
 
-    public int AppTotal { get; set; }
+    public long AppTotal { get; set; }
 
     public string Color { get; set; }
 
     public string Text { get; set; }
+
+    public string Value { get; set; }
 
     public string Icon { get; set; }
 

@@ -29,26 +29,30 @@ public partial class MonitorCard
                 {
                     Text="MONITORING",
                     Color="#7C4DFF",
-                    Icon="monitor"
+                    Icon="monitor",
+                    Value="all"
                 },
                 new AppMonitorViewDto
                 {
                     Text="WARNS",
                     Color="#FF7D00",
-                    Icon="warning"
+                    Icon="warning",
+                    Value=MonitorStatuses.Warn.ToString("G"),
                 },
                 new AppMonitorViewDto
                 {
                     Text="ERRORS",
                     Color="#FF5252",
-                    Icon="error"
+                    Icon="error",
+                    Value=MonitorStatuses.Error.ToString("G"),
                 },
                 new AppMonitorViewDto
                 {
                     Text="NORMAL",
                     Color="#69F0AE",
                     Icon="default",
-                    IsShowApp=false
+                    IsShowApp=false,
+                    Value=MonitorStatuses.Normal.ToString("G")
                 }
             };
     private AppMonitorDto _appMonitorDto = new();
@@ -59,10 +63,10 @@ public partial class MonitorCard
         _items[0].AppTotal = _appMonitorDto.AppTotal;        
 
         _items[1].ServiceTotal = _appMonitorDto.ServiceWarn;
-        _items[1].AppTotal = _appMonitorDto.AppWarn;
+        _items[1].AppTotal = _appMonitorDto.ErrorCount;
 
         _items[2].ServiceTotal = _appMonitorDto.ServiceError;
-        _items[2].AppTotal = _appMonitorDto.AppError;
+        _items[2].AppTotal = _appMonitorDto.WarnCount;
 
         _items[3].ServiceTotal = _appMonitorDto.Normal;
     }
