@@ -174,8 +174,8 @@ namespace Masa.Tsc.Service.Admin.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ExtensionData")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("Height")
                         .IsRequired()
@@ -243,8 +243,8 @@ namespace Masa.Tsc.Service.Admin.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<Guid>("PanelId")
                         .HasColumnType("uniqueidentifier");

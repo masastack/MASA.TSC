@@ -116,7 +116,7 @@ var app = builder.Services
     .AddTopologyRepository()
     .AddServices(builder);
 
-await app.MigrateAsync();
+await builder.Services.MigrateAsync();
 app.UseMasaExceptionHandler();
 
 // Configure the HTTP request pipeline.

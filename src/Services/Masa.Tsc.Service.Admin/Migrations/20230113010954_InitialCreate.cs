@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Masa.Tsc.Service.Admin.Migrations
 {
-    public partial class tsc_init : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -46,6 +46,49 @@ namespace Masa.Tsc.Service.Admin.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_IntegrationEventLog", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Panel",
+                schema: "tsc",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    InstrumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Height = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
+                    Width = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
+                    Left = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
+                    Top = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
+                    Index = table.Column<int>(type: "int", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ExtensionData = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Panel", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PanelMetric",
+                schema: "tsc",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PanelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Caculate = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    Color = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    Unit = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    Sort = table.Column<int>(type: "int", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    Icon = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PanelMetric", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -98,69 +141,6 @@ namespace Masa.Tsc.Service.Admin.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Panel",
-                schema: "tsc",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InstrumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
-                    Height = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
-                    Width = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
-                    Left = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
-                    Top = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
-                    Index = table.Column<int>(type: "int", nullable: false),
-                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ExtensionData = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    PanelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Panel", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Panel_Instrument_InstrumentId",
-                        column: x => x.InstrumentId,
-                        principalSchema: "tsc",
-                        principalTable: "Instrument",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Panel_Panel_PanelId",
-                        column: x => x.PanelId,
-                        principalSchema: "tsc",
-                        principalTable: "Panel",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PanelMetric",
-                schema: "tsc",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PanelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Caculate = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Color = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Unit = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false, defaultValue: ""),
-                    Sort = table.Column<int>(type: "int", nullable: false),
-                    Icon = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PanelMetric", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PanelMetric_Panel_PanelId",
-                        column: x => x.PanelId,
-                        principalSchema: "tsc",
-                        principalTable: "Panel",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Directory_Name",
                 schema: "tsc",
@@ -199,24 +179,6 @@ namespace Masa.Tsc.Service.Admin.Migrations
                 columns: new[] { "State", "TimesSent", "ModificationTime" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Panel_InstrumentId",
-                schema: "tsc",
-                table: "Panel",
-                column: "InstrumentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Panel_PanelId",
-                schema: "tsc",
-                table: "Panel",
-                column: "PanelId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PanelMetric_PanelId",
-                schema: "tsc",
-                table: "PanelMetric",
-                column: "PanelId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Setting_UserId",
                 schema: "tsc",
                 table: "Setting",
@@ -227,7 +189,15 @@ namespace Masa.Tsc.Service.Admin.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Instrument",
+                schema: "tsc");
+
+            migrationBuilder.DropTable(
                 name: "IntegrationEventLog",
+                schema: "tsc");
+
+            migrationBuilder.DropTable(
+                name: "Panel",
                 schema: "tsc");
 
             migrationBuilder.DropTable(
@@ -236,14 +206,6 @@ namespace Masa.Tsc.Service.Admin.Migrations
 
             migrationBuilder.DropTable(
                 name: "Setting",
-                schema: "tsc");
-
-            migrationBuilder.DropTable(
-                name: "Panel",
-                schema: "tsc");
-
-            migrationBuilder.DropTable(
-                name: "Instrument",
                 schema: "tsc");
 
             migrationBuilder.DropTable(

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Masa.Tsc.Service.Admin.Migrations
 {
     [DbContext(typeof(TscDbContext))]
-    [Migration("20230105033902_tsc-0105")]
-    partial class tsc0105
+    [Migration("20230113010954_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -176,8 +176,8 @@ namespace Masa.Tsc.Service.Admin.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ExtensionData")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("Height")
                         .IsRequired()
@@ -245,8 +245,8 @@ namespace Masa.Tsc.Service.Admin.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<Guid>("PanelId")
                         .HasColumnType("uniqueidentifier");
@@ -259,8 +259,6 @@ namespace Masa.Tsc.Service.Admin.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PanelId");
 
                     b.ToTable("PanelMetric", "tsc");
                 });
@@ -312,23 +310,9 @@ namespace Masa.Tsc.Service.Admin.Migrations
                     b.Navigation("Directory");
                 });
 
-            modelBuilder.Entity("Masa.Tsc.Service.Admin.Domain.Aggregates.PanelMetric", b =>
-                {
-                    b.HasOne("Masa.Tsc.Service.Admin.Domain.Aggregates.Panel", null)
-                        .WithMany("Metrics")
-                        .HasForeignKey("PanelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Masa.Tsc.Service.Admin.Domain.Aggregates.Directory", b =>
                 {
                     b.Navigation("Instruments");
-                });
-
-            modelBuilder.Entity("Masa.Tsc.Service.Admin.Domain.Aggregates.Panel", b =>
-                {
-                    b.Navigation("Metrics");
                 });
 #pragma warning restore 612, 618
         }
