@@ -7,10 +7,10 @@ public enum ModelTypes
 {
     All = 1,
     Endpoint,
-    EndpointRelation,
-    ProcessRelation,
+    //EndpointRelation,
+    //ProcessRelation,
     Service,
     ServiceInstance,
-    ServiceInstanceRelation,
-    ServiceRelation
+    //ServiceInstanceRelation,
+    //ServiceRelation
 }

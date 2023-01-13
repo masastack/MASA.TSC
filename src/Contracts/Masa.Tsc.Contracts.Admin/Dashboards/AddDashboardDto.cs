@@ -17,5 +17,5 @@ public class AddDashboardDto
 
     public ModelTypes Model { get; set; }
 
-    public string Type { get; set; }
+    public string Type { get; set; } = "";
 }
