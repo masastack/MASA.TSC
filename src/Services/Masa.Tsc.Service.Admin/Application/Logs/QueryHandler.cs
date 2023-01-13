@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Nest;
+
 namespace Masa.Tsc.Service.Admin.Application.Logs;
 
 public class QueryHandler
@@ -45,6 +47,16 @@ public class QueryHandler
     [EventHandler]
     public async Task GetPageListAsync(LogsQuery queryData)
     {
+        var conditions = new List<FieldConditionDto>();
+        if (!string.IsNullOrEmpty(queryData.JobTaskId))
+        {
+            conditions.Add(new FieldConditionDto
+            {
+                Name = "Attributes.TaskId.keyword",
+                Type = ConditionTypes.Equal,
+                Value = queryData.JobTaskId
+            });
+        }
         var data = await _logService.ListAsync(new BaseRequestDto
         {
             Start = queryData.Start,
@@ -52,9 +64,9 @@ public class QueryHandler
             Keyword = queryData.Query,
             Page = queryData.Page,
             PageSize = queryData.Size,
-            Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = queryData.IsDesc }
-        }
-        );
+            Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = queryData.IsDesc },
+            Conditions = conditions
+        });
         if (data == null)
             data = new PaginatedListBase<LogResponseDto>();
 

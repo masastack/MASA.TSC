@@ -1,6 +1,12 @@
 ﻿@page "/dashbord/log"
+@page "/dashbord/log/{TaskId}"
 @inject I18n I18n
 
 <PageTitle>@I18n.T("Log")</PageTitle>
 
-<LogPanel />
+<LogPanel TaskId="@TaskId" />
+
+@code {
+    [Parameter]
+    public string TaskId { get; set; }
+}

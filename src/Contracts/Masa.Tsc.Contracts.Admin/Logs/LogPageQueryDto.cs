@@ -14,4 +14,9 @@ public class LogPageQueryDto : Pagination<LogPageQueryDto>
     public bool IsAsc { get; set; }
 
     public string Duration { get; set; }
+
+    /// <summary>
+    ///  scheduler job taskid
+    /// </summary>
+    public string TaskId { get; set; }
 }

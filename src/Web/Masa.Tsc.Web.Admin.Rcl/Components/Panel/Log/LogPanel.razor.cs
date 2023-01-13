@@ -1,6 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Model;
 using Nest;
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Log;
@@ -18,9 +19,13 @@ public partial class LogPanel
         set
         {
             _search = value;
-            _page = 1;
+            TaskId =default!;
+            Page = 1;
         }
     }
+
+    [Parameter]
+    public string TaskId { get; set; }
 
     DateTime? StartTime { get; set; }
 
@@ -48,7 +53,7 @@ public partial class LogPanel
 
     long Total { get; set; }
 
-    List<LogModel> Logs { get; set; } = new();    
+    List<LogModel> Logs { get; set; } = new();
 
     async Task OnUpdate((DateTimeOffset start, DateTimeOffset end) times)
     {
@@ -65,14 +70,22 @@ public partial class LogPanel
 
     async Task GetLogsAsync()
     {
+        DateTime end = EndTime ?? default, start = StartTime ?? default;
+        if (!string.IsNullOrEmpty(TaskId))
+        {
+            end = DateTime.MinValue;
+            start = DateTime.MinValue;
+        }
+
         Loading = true;
         var query = new LogPageQueryDto
         {
             PageSize = _pageSize,
-            Start = StartTime ?? default,
-            End = EndTime ?? default,
+            Start = start,
+            End = end,
             Page = Page,
-            //Query = Search
+            TaskId = TaskId,
+            Query = _search!,
         };
         var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
         Logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
@@ -88,7 +101,19 @@ public partial class LogPanel
 
     async Task GenOption()
     {
-        DateTime end = EndTime.Value , start = StartTime.Value;
+        DateTime end = EndTime ?? default, start = StartTime ?? default;
+        var conditions = new List<FieldConditionDto>();
+        if (!string.IsNullOrEmpty(TaskId))
+        {
+            end = DateTime.MinValue;
+            start = DateTime.MinValue;
+            conditions.Add(new FieldConditionDto
+            {
+                Name = "Attributes.TaskId.keyword",
+                Type = ConditionTypes.Equal,
+                Value = TaskId
+            });
+        }
         var result = await ApiCaller.LogService.AggregateAsync<List<KeyValuePair<long, long>>>(new SimpleAggregateRequestDto
         {
             Start = start,
@@ -96,10 +121,12 @@ public partial class LogPanel
             Name = "@timestamp",
             Type = AggregateTypes.DateHistogram,
             Interval = "5m",
+            Keyword = _search!,
+            Conditions = conditions
         });
 
         string[] xAxisData = result?.Select(item => ToDateTimeStr(item.Key))?.ToArray() ?? Array.Empty<string>();
-        long[] durations = result?.Select(item => item.Value)?.ToArray() ?? Array.Empty<long>();        
+        long[] durations = result?.Select(item => item.Value)?.ToArray() ?? Array.Empty<long>();
 
         _option = new
         {
