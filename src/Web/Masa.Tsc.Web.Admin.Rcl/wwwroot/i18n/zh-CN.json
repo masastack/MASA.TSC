@@ -148,8 +148,7 @@
   "Service Apdex": "服务满意度",
   "Service Endpoint Load": "端点负载",
   "Service Slow Endpoint": "慢端点",
-  "call/min": "调用次数/每分钟"
-  "Description": "描述",
+  "call/min": "调用次数/每分钟",
   "No Data": "没有数据",
   "Topology": "拓扑图",
   "Text": "文本",

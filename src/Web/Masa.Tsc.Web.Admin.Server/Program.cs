@@ -43,7 +43,7 @@ var oidc = config.GetSection("$public.OIDC").Get<MasaOpenIdConnectOptions>();
 string authUrl = config.GetValue<string>("$public.AppSettings:AuthClient:Url");
 string mcUrl = config.GetValue<string>("$public.AppSettings:McClient:Url");
 string pmUrl = config.GetValue<string>("$public.AppSettings:PmClient:Url");
-await builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl, pmUrl);
+builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl, pmUrl);
 builder.Services.AddMasaOpenIdConnect(oidc);
 
 builder.Services.AddHttpContextAccessor();
