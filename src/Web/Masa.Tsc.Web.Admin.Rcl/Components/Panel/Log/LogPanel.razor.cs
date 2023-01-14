@@ -26,9 +26,11 @@ public partial class LogPanel
     [Parameter]
     public string TaskId { get; set; }
 
-    DateTime? StartTime { get; set; }
+    [Parameter]
+    public DateTime? StartTime { get; set; }
 
-    DateTime? EndTime { get; set; }
+    [Parameter]
+    public DateTime? EndTime { get; set; }
 
     int Page
     {

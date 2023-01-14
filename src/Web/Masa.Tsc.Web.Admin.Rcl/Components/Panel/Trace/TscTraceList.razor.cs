@@ -19,6 +19,7 @@ public partial class TscTraceList : TscComponentBase
     private int _total = 0;
     private int _page = 1;
     private int _pageSize = 10;
+    private TraceResponseDto? CurrentTrace;
 
     private List<DataTableHeader<TraceResponseDto>> _headers = new()
     {
@@ -64,6 +65,7 @@ public partial class TscTraceList : TscComponentBase
 
     private async Task OpenAsync(TraceResponseDto item)
     {
+        CurrentTrace = item;
         await _tscTraceDetail!.OpenAsync(item.TraceId);
     }
 

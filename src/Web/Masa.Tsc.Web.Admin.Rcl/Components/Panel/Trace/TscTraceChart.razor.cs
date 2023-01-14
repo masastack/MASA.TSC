@@ -126,7 +126,8 @@ public partial class TscTraceChart
 
     private async Task OnDateTimeAutoUpdate((DateTimeOffset start, DateTimeOffset end) range)
     {
-        await OnDateTimeUpdate(range);
-        StateHasChanged();
+        var localStart = new DateTime(range.start.UtcTicks + range.start.Offset.Ticks, DateTimeKind.Local);
+        var localEnd = new DateTime(range.end.UtcTicks + range.end.Offset.Ticks, DateTimeKind.Local);
+        await base.InvokeAsync(async () => await OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd)));
     }
 }

@@ -31,4 +31,4 @@
              Class="white px-6 py-3"
              OnChange="HandleOnPaginationUpdate" />
 
-<TscTraceDetail @ref="_tscTraceDetail"></TscTraceDetail>
+<TscTraceDetail Title="@CurrentTrace?.Resource["service.name"]?.ToString()" @ref="_tscTraceDetail"></TscTraceDetail>
