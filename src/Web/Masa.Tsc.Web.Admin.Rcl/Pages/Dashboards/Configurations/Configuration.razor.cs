@@ -61,8 +61,15 @@ public partial class Configuration
     {
         var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(ConfigurationRecord.DashboardId));
         ConfigurationRecord.Panels.Clear();
+        if(detail is not null)
+        {
+            ConfigurationRecord.ShowServiceCompontent = detail.Model != ModelTypes.All.ToString();
+            if (ConfigurationRecord.ShowServiceCompontent is false) ConfigurationRecord.AppName = "";
+        }
         if (detail?.Panels != null && detail.Panels.Any())
+        {
             ConfigurationRecord.Panels.AddRange(detail.Panels);
+        }
 
         if (ConfigurationRecord.Panels.Any() is false) ConfigurationRecord.IsEdit = true;
         Convert(ConfigurationRecord.Panels);

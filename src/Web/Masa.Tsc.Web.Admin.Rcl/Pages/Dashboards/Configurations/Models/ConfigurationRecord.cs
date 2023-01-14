@@ -21,6 +21,8 @@ public class ConfigurationRecord
 
     public bool IsEdit { get; set; }
 
+    public bool ShowServiceCompontent { get; set; }
+
     public void Clear()
     {
         Panels.Clear();
@@ -28,6 +30,7 @@ public class ConfigurationRecord
         Search = "";
         DashboardId = "";
         IsEdit = false;
+        ShowServiceCompontent = false;
         //StartTime = default;
         //EndTime = default;
     }
