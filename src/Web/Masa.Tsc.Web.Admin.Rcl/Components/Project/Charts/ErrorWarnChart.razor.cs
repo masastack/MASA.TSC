@@ -82,6 +82,7 @@ public partial class ErrorWarnChart
             _success = Math.Round(values[0] * 100 / values[1], 2);
         }
         _options.SetValue("tooltip.formatter", "{d}%");
+        _options.SetValue("legend.bottom", "1%");
         _options.SetValue("series[0].data", new object[] {GetModel(true,values[0]),
             GetModel(false,values[1]) });
     }
