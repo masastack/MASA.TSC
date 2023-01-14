@@ -158,5 +158,12 @@
   "In edit mode, click to switch to view mode": "处于编辑模式中,点击切换为查看模式",
   "In view mode, click to switch to edit mode": "处于查看模式中,点击切换为切换模式",
   "Are you sure switch view mode,unsaved data will be lost": "确定切换到查看模式中吗,未保存的数据将会丢失",
-  "Operation confirmation": "操作确认"
+  "Operation confirmation": "操作确认",
+  "WARNS": "警告",
+  "ERRORS": "异常",
+  "NORMAL": "正常",
+  "MONITORING": "监控",
+  "Project count": "项目数量",
+  "Service count": "服务数量",
+  "Log count": "日志数量"
 }

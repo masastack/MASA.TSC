@@ -11,11 +11,30 @@
         </MTooltip>
     </MCardTitle>
     <MCardText Class="flex-grow-1">
-        <MECharts @key=@Value.GetChartKey() Option="Value.GetChartOption()" />
+        @if (Option is null)
+        {
+            <div class="full-height d-flex">
+                <div class="ma-auto">@I18N.T("No Data")</div>
+            </div>
+        }
+        else
+        {
+            <MECharts @key=@Value.GetChartKey() Option="Option" />
+        }
     </MCardText>
 </MCard>
 
 @code {
+    [CascadingParameter]
+    public I18n I18N { get; set; }
+
     [Parameter]
     public IEChartPanelValue Value { get; set; }
+
+    object? Option { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        Option = Value.GetChartOption();
+    }
 }

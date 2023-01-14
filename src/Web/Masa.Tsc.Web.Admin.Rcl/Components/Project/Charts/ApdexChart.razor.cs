@@ -18,6 +18,8 @@ public partial class ApdexChart
 
     private EChartType _options = EChartConst.Line;
 
+    private List<QueryResultDataResponse>? _data;
+
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         //_options.SetValue("grid.bottom", 20);
@@ -61,16 +63,16 @@ public partial class ApdexChart
             query.Start = DateTime.UtcNow.AddDays(-1);
         if (query.End is null)
             query.End = DateTime.UtcNow;
-        var data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
+        _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> { $"round((count(http_server_duration_bucket>1000 and http_server_duration_bucket<=4000)*0.5+count(http_server_duration_bucket<1000))/count(http_server_duration_bucket),0.0001)" },
             Start = query.Start.Value,
             End = query.End.Value,
             Step = "5m"
         });
-        if (data[0] != null && data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && data[0].Result != null && data[0].Result.Any())
+        if (_data[0] != null && _data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && _data[0].Result != null && _data[0].Result.Any())
         {
-            var seriesData = ((QueryResultMatrixRangeResponse)data[0].Result.First()).Values.Select(items => Convert.ToDouble(items[1]) * 100).ToArray();
+            var seriesData = ((QueryResultMatrixRangeResponse)_data[0].Result.First()).Values.Select(items => Convert.ToDouble(items[1]) * 100).ToArray();
             Total = seriesData.Last();
             _options.SetValue("series[0].data", seriesData);
         }

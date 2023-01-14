@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards;
 
-public partial class ProjectSelect
+public partial class ProjectTypeSelect
 {
     [Parameter]
     public string Value { get; set; }
@@ -17,13 +17,13 @@ public partial class ProjectSelect
     [Parameter]
     public bool Readonly { get; set; }
 
-    protected List<ProjectDto> Projects { get; set; } = new();
+    protected List<KeyValuePair<string, string>> ProjectTypes { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        var data = await ApiCaller.ProjectService.GetProjectsAsync(CurrentUserId);
+        var data = await ApiCaller.ProjectService.GetProjectTypesAsync();
         if (data!= null)
-            Projects = data;
+            ProjectTypes = data;
 
         await base.OnInitializedAsync();
     }

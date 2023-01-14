@@ -4,7 +4,7 @@
 
 <div class="d-flex align-center">
     <div class="flex-grow-1">
-        <MTabs Class="transparent-tab" Value="@_value.ProjectType" ValueChanged=@(async (value)=>await OnTabsChange(projectType:value.ToString()))>
+        <MTabs Class="transparent-tab" Value="@_value.ProjectType" ValueChanged=@(async (value)=>await OnTabsChange(value.ToString()))>
             @foreach (var item in _projectTypes)
             {
                 <MTab Value=@item.Key>@item.Value</MTab>

@@ -7,19 +7,22 @@
 <AutoHeight Overflow AutoStyle="max-height: calc(100vh - 185px);height: 900px">
     <HeaderContent>
         <div class="d-flex mb-6">
-            <AppAutoComplete Value="@ServiceName" ValueChanged=ServiceNameChange FillBackground=false Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" />
+            @if(ConfigurationRecord.ShowServiceCompontent)
+            {
+                <AppAutoComplete Value="@ServiceName" ValueChanged=ServiceNameChange FillBackground=false Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" />
+            }
             <div style="width:100%;" class="d-flex">
                 <SearchTextField @bind-Value="@ConfigurationRecord.Search" FillBackground=false Clearable Class="mr-6 my-auto" />
                 <DateTimeRangeToolbar Class="mr-6 my-auto" DefaultQuickRange="QuickRangeKey.Last15Minutes" OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
             </div>
             <MTooltip Top>
                 <ActivatorContent>
-                    <div @attributes="@context.Attrs" class="mr-6 my-auto d-flex">
-                        <MSwitch Value="IsEdit" ValueChanged=SwitchEdit TValue="bool" LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="my-auto" />
+                    <div @attributes="@context.Attrs" @onclick="SwitchEdit" class="mr-6 my-auto d-flex">
+                        <MSwitch Value="ConfigurationRecord.IsEdit" Readonly TValue="bool" LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="my-auto" />
                     </div>                    
                 </ActivatorContent>
                 <ChildContent>
-                    @if (IsEdit)
+                    @if (ConfigurationRecord.IsEdit)
                     {
                         <span>@T("In edit mode, click to switch to view mode")</span>
                     }
@@ -29,17 +32,17 @@
                     }                    
                 </ChildContent>
             </MTooltip>
-            <SButton Icon Class="mr-3 my-auto" Style="@(IsEdit ?"":"visibility:hidden;")" OnClick="() => AddPanel()">
+            <SButton Icon Class="mr-3 my-auto" Style="@(ConfigurationRecord.IsEdit ?"":"visibility:hidden;")" OnClick="() => AddPanel()">
                 <SIcon Tooltip="@T("Add Panel")" Size=28>@IconConstants.Chart</SIcon>
             </SButton>
-            <SButton Icon Class="my-auto" Style="@(IsEdit ?"":"visibility:hidden;")" OnClick="SaveAsync">
+            <SButton Icon Class="my-auto" Style="@(ConfigurationRecord.IsEdit ?"":"visibility:hidden;")" OnClick="SaveAsync">
                 <SIcon Tooltip="@T("Save")" Size=28>@IconConstants.Save</SIcon>
             </SButton>
         </div>
     </HeaderContent>
     <AutoHeightContent>
         <DefaultCard Style="min-height: calc(100vh - 185px);">
-            <CascadingValue Value="IsEdit">
+            <CascadingValue Value="ConfigurationRecord.IsEdit">
                 <CascadingValue Value="PanelGrids" IsFixed>
                     <CascadingValue Value="ConfigurationRecord">
                         @if (ConfigurationRecord.Panels.Any())

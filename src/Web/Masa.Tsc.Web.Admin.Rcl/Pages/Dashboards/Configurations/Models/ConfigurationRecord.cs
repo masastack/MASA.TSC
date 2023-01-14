@@ -19,12 +19,18 @@ public class ConfigurationRecord
 
     public string? Key => AppName is null ? null : AppName + StartTime + EndTime;
 
+    public bool IsEdit { get; set; }
+
+    public bool ShowServiceCompontent { get; set; }
+
     public void Clear()
     {
         Panels.Clear();
         //AppName = "";
         Search = "";
         DashboardId = "";
+        IsEdit = false;
+        ShowServiceCompontent = false;
         //StartTime = default;
         //EndTime = default;
     }

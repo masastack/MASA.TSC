@@ -19,8 +19,6 @@ public partial class Configuration
 
     List<PanelGrids> PanelGrids { get; set; } = new();
 
-    bool IsEdit { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
         if (NavigationManager.Uri.Contains("record")) return;
@@ -28,7 +26,7 @@ public partial class Configuration
         ConfigurationRecord.AppName = ServiceName;
         if (ServiceName is null)
         {
-            ConfigurationRecord.Panels.Clear();
+            ConfigurationRecord.Clear();
             return;
         }       
 
@@ -63,10 +61,17 @@ public partial class Configuration
     {
         var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(ConfigurationRecord.DashboardId));
         ConfigurationRecord.Panels.Clear();
+        if(detail is not null)
+        {
+            ConfigurationRecord.ShowServiceCompontent = detail.Model != ModelTypes.All.ToString();
+            if (ConfigurationRecord.ShowServiceCompontent is false) ConfigurationRecord.AppName = "";
+        }
         if (detail?.Panels != null && detail.Panels.Any())
+        {
             ConfigurationRecord.Panels.AddRange(detail.Panels);
+        }
 
-        if (ConfigurationRecord.Panels.Any() is false) IsEdit = true;
+        if (ConfigurationRecord.Panels.Any() is false) ConfigurationRecord.IsEdit = true;
         Convert(ConfigurationRecord.Panels);
     }
 
@@ -111,7 +116,7 @@ public partial class Configuration
         }
         else
         {
-            await PanelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();// dont not remove
+            await PanelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();
             await Task.WhenAll(PanelGrids.Select(item => item.SavePanelGridAsync()));
         }
         await ApiCaller.InstrumentService.UpsertPanelAsync(Guid.Parse(ConfigurationRecord.DashboardId), ConfigurationRecord.Panels.ToArray());
@@ -124,19 +129,20 @@ public partial class Configuration
         NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName);
     }
 
-    async Task SwitchEdit(bool value)
+    async Task SwitchEdit()
     {
-        if(value is false)
+        if(ConfigurationRecord.IsEdit is true)
         {
             var confirm = await OpenConfirmDialog(T("Operation confirmation"), T("Are you sure switch view mode,unsaved data will be lost"), AlertTypes.Warning);
-            if(confirm)
+            if (confirm)
             {
-                IsEdit = false;
+                ConfigurationRecord.IsEdit = false;
             }
+            else ConfigurationRecord.IsEdit = true;
         }
         else
         {
-            IsEdit = true;
+            ConfigurationRecord.IsEdit = true;
         }
     }
 }

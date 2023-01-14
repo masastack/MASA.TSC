@@ -64,6 +64,12 @@ public partial class Team
         _viewProjects = GetViewData();
     }
 
+    private void OnSearchChange(TeamSearchModel query)
+    {
+        _teamSearchModel = query;
+        _viewProjects = GetViewData();
+    }
+
     void ProjectStatusChanged(StringNumber projectStatus)
     {
         _projectStatus = projectStatus;
@@ -91,6 +97,10 @@ public partial class Team
         if (_teamSearchModel?.ProjectType != "all" && string.IsNullOrEmpty(_teamSearchModel?.ProjectType) is false)
         {
             result = result.Where(item => item.LabelName.Equals(_teamSearchModel.ProjectType, StringComparison.OrdinalIgnoreCase));
+        }
+        if(string.IsNullOrEmpty(_teamSearchModel?.Keyword) is false)
+        {
+            result = result.Where(item => item.Name.Contains(_teamSearchModel.Keyword, StringComparison.OrdinalIgnoreCase) || item.Apps.Any(app => app.Name.Contains(_teamSearchModel.Keyword, StringComparison.OrdinalIgnoreCase)));
         }
         return result.ToList();
     }
