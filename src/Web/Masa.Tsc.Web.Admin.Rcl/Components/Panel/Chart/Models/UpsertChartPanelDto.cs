@@ -408,8 +408,9 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         return Key; //IsLoadChartData + ChartType;
     }
 
-    public object GetChartOption()
+    public object? GetChartOption()
     {
+        if (_chartData.Any(item => item.Result?.Any() is true) is false) return null;
         LoadChartData();
         LoadChartOption();
 

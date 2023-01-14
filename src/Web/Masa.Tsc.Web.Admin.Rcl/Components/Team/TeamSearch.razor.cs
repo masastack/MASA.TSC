@@ -13,7 +13,7 @@ public partial class TeamSearch
         set 
         {
             _search = value;
-            OnValueChange(text: value);
+            OnSearchChange(value);
         }
     }
 
@@ -22,6 +22,9 @@ public partial class TeamSearch
 
     [Parameter]
     public EventCallback<TeamSearchModel> OnTabsChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<TeamSearchModel> OnSearchChanged { get; set; }
 
     private TeamSearchModel _value = new() { ProjectType = "all" };
     private List<KeyValuePair<string, string>> _projectTypes = new() { KeyValuePair.Create("all", "All") };
@@ -66,6 +69,12 @@ public partial class TeamSearch
     async Task OnTabsChange(string projectType)
     {
         _value.ProjectType = projectType;
+        await OnTabsChanged.InvokeAsync(_value);
+    }
+
+    async Task OnSearchChange(string search)
+    {
+        _value.Keyword = search;
         await OnTabsChanged.InvokeAsync(_value);
     }
 

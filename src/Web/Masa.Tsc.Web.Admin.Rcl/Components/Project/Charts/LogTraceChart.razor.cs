@@ -80,7 +80,6 @@ public partial class LogTraceChart
         _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value)));
         _options.SetValue("series", dddd.Select(item => new {name=item.Key,type="line",data=item.Value }));
 
-
         await Task.CompletedTask;
     }
 
