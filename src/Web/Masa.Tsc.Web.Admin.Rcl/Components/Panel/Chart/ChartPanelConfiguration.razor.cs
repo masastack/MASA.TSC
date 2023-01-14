@@ -5,7 +5,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
 public partial class ChartPanelConfiguration : TscComponentBase
 {
-    List<string> _systemIdentities = new List<string>();
     List<StringNumber> _panelValues = new() { 1 };
     string _listType = string.Empty;
 

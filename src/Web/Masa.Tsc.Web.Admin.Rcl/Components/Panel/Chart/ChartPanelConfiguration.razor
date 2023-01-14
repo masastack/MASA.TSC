@@ -18,10 +18,7 @@
                     @if (Value.ChartType == "table")
                     {
                         <MCol Md="4">
-                            <SSelect @bind-Value="@Value.SystemIdentity"
-                                     Items="_systemIdentities"
-                                     ItemText="item => item"
-                                     ItemValue="item => item" />
+                            <ProjectSelect @bind-Value="@Value.SystemIdentity" />
                         </MCol>
                         <MCol Md="8">
                             <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>

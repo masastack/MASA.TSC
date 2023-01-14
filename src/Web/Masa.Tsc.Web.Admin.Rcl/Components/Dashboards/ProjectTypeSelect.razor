@@ -4,13 +4,13 @@
                ValueChanged="ValueChanged"
                ValueExpression="ValueExpression"
                TValue="string"
-               TItem="ProjectDto"
+               TItem="KeyValuePair<string, string>"
                TItemValue="string"
-               Items="Projects"
+               Items="ProjectTypes"
                Disabled=Readonly
                DebounceInterval=500
-               Label="@T("Project")"
-               ItemText="item => item.Name"
-               ItemValue="item => item.Identity"
+               Label="@T("Type")"
+               ItemText="f=>f.Value"
+               ItemValue="f=>f.Key"
                Class="@Class">
 </SSelect>
