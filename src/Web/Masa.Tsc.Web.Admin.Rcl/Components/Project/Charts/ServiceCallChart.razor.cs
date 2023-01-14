@@ -16,6 +16,8 @@ public partial class ServiceCallChart
 
     private EChartType _options = EChartConst.Line;
 
+    private List<QueryResultDataResponse>? _data;
+
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         if (query == null)
@@ -30,7 +32,7 @@ public partial class ServiceCallChart
         var step = (int)Math.Floor((end - start).TotalSeconds / 250);
         if (step - 5 < 0)
             step = 5;
-        var result = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
+        _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
                 $"sum by(service_name)(increase(http_server_duration_count[1m]))"
@@ -44,10 +46,10 @@ public partial class ServiceCallChart
         List<string> values = new();
         var timeSpans = new List<double>();
         
-        if (result[0] != null && result[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && result[0].Result != null && result[0].Result.Any())
+        if (_data[0] != null && _data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && _data[0].Result != null && _data[0].Result.Any())
         {
-            timeSpans.AddRange(((QueryResultMatrixRangeResponse)result[0].Result[0]).Values.Select(values => Convert.ToDouble(values[0])));
-            values = ((QueryResultMatrixRangeResponse)result[0].Result[0]).Values.Select(values => values[1].ToString()).ToList();
+            timeSpans.AddRange(((QueryResultMatrixRangeResponse)_data[0].Result[0]).Values.Select(values => Convert.ToDouble(values[0])));
+            values = ((QueryResultMatrixRangeResponse)_data[0].Result[0]).Values.Select(values => values[1].ToString()).ToList();
         }
        
         _options.SetValue("xAxis.data", timeSpans.Select(value=>ToDateTimeStr(value)));

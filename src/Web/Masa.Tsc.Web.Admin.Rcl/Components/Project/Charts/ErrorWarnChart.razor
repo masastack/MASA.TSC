@@ -1,5 +1,6 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscEChartBase
+
 <MCard Width="Width" Height="Height" Class="d-flex flex-column rounded-lg">
     <MCardTitle Class="d-flex justify-space-between">
         <MLabel Class="emphasis2--text h6">@Title</MLabel>
@@ -9,6 +10,12 @@
         @if (_isLoading)
         {
             @("Loading ...")
+        }
+        else if(_data?.Any() is not true)
+        {
+            <div class="full-height d-flex">
+                <div class="ma-auto">@T("No Data")</div>
+            </div>
         }
         else
         {

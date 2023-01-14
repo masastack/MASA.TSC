@@ -16,6 +16,8 @@ public partial class LogTraceChart
 
     private EChartType _options = EChartConst.Line;
 
+    private List<QueryResultDataResponse>? _data;
+
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         if (query == null)
@@ -30,7 +32,7 @@ public partial class LogTraceChart
         var step = (int)Math.Floor((end - start).TotalSeconds / 250);
         if (step - 5 < 0)
             step = 5;
-        var result = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
+        _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
                 "histogram_quantile(0.50,sum(increase(http_server_duration_bucket[1m])) by (le))",
@@ -49,7 +51,7 @@ public partial class LogTraceChart
 
         var legend = new string[] {"P50","P75","P90","P95","P99"};
         var index = 0;
-        foreach (var item in result)
+        foreach (var item in _data)
         {
             if (item != null && item.ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && item.Result != null && item.Result.Any())
             {
@@ -61,7 +63,7 @@ public partial class LogTraceChart
         timeSpans=timeSpans.Distinct().ToList();
         timeSpans.Sort();
         index = 0;
-        foreach (var item in result)
+        foreach (var item in _data)
         {
             if (item != null && item.ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && item.Result != null && item.Result.Any())
             {
@@ -70,6 +72,10 @@ public partial class LogTraceChart
             }
         }
 
+        _options.SetValue("grid", new 
+        {
+            x=60,x2=20
+        });
         _options.SetValue("legend.data", legend);
         _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value)));
         _options.SetValue("series", dddd.Select(item => new {name=item.Key,type="line",data=item.Value }));

@@ -19,7 +19,7 @@ public partial class Configuration
 
     List<PanelGrids> PanelGrids { get; set; } = new();
 
-    bool IsEdit { get; set; } = true;
+    bool IsEdit { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -32,7 +32,7 @@ public partial class Configuration
             return;
         }       
 
-        await GetPanelsAsync();
+        await GetPanelsAsync();      
     }
 
     protected override async Task OnParametersSetAsync()
@@ -66,6 +66,7 @@ public partial class Configuration
         if (detail?.Panels != null && detail.Panels.Any())
             ConfigurationRecord.Panels.AddRange(detail.Panels);
 
+        if (ConfigurationRecord.Panels.Any() is false) IsEdit = true;
         Convert(ConfigurationRecord.Panels);
     }
 
@@ -121,5 +122,21 @@ public partial class Configuration
     {
         ServiceName = serviceName;
         NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName);
+    }
+
+    async Task SwitchEdit(bool value)
+    {
+        if(value is false)
+        {
+            var confirm = await OpenConfirmDialog(T("Operation confirmation"), T("Are you sure switch view mode,unsaved data will be lost"), AlertTypes.Warning);
+            if(confirm)
+            {
+                IsEdit = false;
+            }
+        }
+        else
+        {
+            IsEdit = true;
+        }
     }
 }

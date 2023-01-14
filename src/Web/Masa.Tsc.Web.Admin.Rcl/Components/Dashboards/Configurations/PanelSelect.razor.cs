@@ -29,7 +29,7 @@ public partial class PanelSelect
                 PanelTypes.Topology,
                 PanelTypes.Log,
                 PanelTypes.Trace,
-                PanelTypes.Table
+                //PanelTypes.Table
             };
         }
         return new List<PanelTypes>();

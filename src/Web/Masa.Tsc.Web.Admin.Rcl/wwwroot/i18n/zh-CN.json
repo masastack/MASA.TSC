@@ -149,4 +149,15 @@
   "Service Endpoint Load": "端点负载",
   "Service Slow Endpoint": "慢端点",
   "call/min": "调用次数/每分钟"
+  "Description": "描述",
+  "No Data": "没有数据",
+  "Topology": "拓扑图",
+  "Text": "文本",
+  "Chart": "图表",
+  "Tabs": "标签页",
+  "Table": "表格",
+  "In edit mode, click to switch to view mode": "处于编辑模式中,点击切换为查看模式",
+  "In view mode, click to switch to edit mode": "处于查看模式中,点击切换为切换模式",
+  "Are you sure switch view mode,unsaved data will be lost": "确定切换到查看模式中吗,未保存的数据将会丢失",
+  "Operation confirmation": "操作确认"
 }

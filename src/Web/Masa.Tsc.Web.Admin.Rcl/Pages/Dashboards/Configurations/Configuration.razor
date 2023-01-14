@@ -12,16 +12,29 @@
                 <SearchTextField @bind-Value="@ConfigurationRecord.Search" FillBackground=false Clearable Class="mr-6 my-auto" />
                 <DateTimeRangeToolbar Class="mr-6 my-auto" DefaultQuickRange="QuickRangeKey.Last15Minutes" OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
             </div>
-            <MSwitch @bind-Value="IsEdit" LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="mr-6 my-auto" />
-            @if (IsEdit)
-            {
-                <SButton Icon Class="mr-3 my-auto" OnClick="() => AddPanel()">
-                    <SIcon Tooltip="@T("Add Panel")" Size=28>@IconConstants.Chart</SIcon>
-                </SButton>
-                <SButton Icon Class="my-auto" OnClick="SaveAsync">
-                    <SIcon Tooltip="@T("Save")" Size=28>@IconConstants.Save</SIcon>
-                </SButton>
-            }
+            <MTooltip Top>
+                <ActivatorContent>
+                    <div @attributes="@context.Attrs" class="mr-6 my-auto d-flex">
+                        <MSwitch Value="IsEdit" ValueChanged=SwitchEdit TValue="bool" LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="my-auto" />
+                    </div>                    
+                </ActivatorContent>
+                <ChildContent>
+                    @if (IsEdit)
+                    {
+                        <span>@T("In edit mode, click to switch to view mode")</span>
+                    }
+                    else
+                    {
+                        <span>@T("In view mode, click to switch to edit mode")</span>
+                    }                    
+                </ChildContent>
+            </MTooltip>
+            <SButton Icon Class="mr-3 my-auto" Style="@(IsEdit ?"":"visibility:hidden;")" OnClick="() => AddPanel()">
+                <SIcon Tooltip="@T("Add Panel")" Size=28>@IconConstants.Chart</SIcon>
+            </SButton>
+            <SButton Icon Class="my-auto" Style="@(IsEdit ?"":"visibility:hidden;")" OnClick="SaveAsync">
+                <SIcon Tooltip="@T("Save")" Size=28>@IconConstants.Save</SIcon>
+            </SButton>
         </div>
     </HeaderContent>
     <AutoHeightContent>

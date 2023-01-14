@@ -18,11 +18,12 @@ public partial class ErrorWarnChart
 
     private double _success;
     private EChartType _options = EChartConst.Pie;
+    private List<QueryResultDataResponse>? _data;
     private double[] values = new double[2];
 
     protected override void OnInitialized()
     {
-        _options.SetValue("legend", new { bottom = 10, left = "center" });
+        _options.SetValue("legend", new { bottom = 0, left = "center" });
         _options.SetValue("series[0]", new
         {
             type = "pie",
@@ -52,7 +53,7 @@ public partial class ErrorWarnChart
             query.Start = query.End.Value.AddDays(-1);
 
         var step = (long)Math.Floor((query.End.Value - query.Start.Value).TotalSeconds);
-        var results = await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto
+        _data = await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto
         {
             Queries = new List<string> {
             $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"[{step}s])),1)",
@@ -62,7 +63,7 @@ public partial class ErrorWarnChart
         });
       
         var index = 0;
-        foreach (var item in results)
+        foreach (var item in _data)
         {
             if (item != null && item.ResultType == ResultTypes.Vector && item.Result != null && item.Result.Any())
             {
