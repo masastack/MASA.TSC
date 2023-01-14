@@ -10,7 +10,7 @@
             <ServiceCallChart Title="@(T("Service Load")+"("+T("call/min")+")")" @ref="_traceLogChart" />
         </MCol>
         <MCol Cols="3">
-            <AvgResponseChart @ref="_avgResponseChart" Title="@(T("Service Avg Response Time")+"("+T("ms")+")")" />
+            <AvgResponseChart @ref="_avgResponseChart" Title="@T("Service Avg Response Time")" />
         </MCol>
         <MCol Cols="3">
             <ApdexChart Title="@(T("Service Apdex"))" @ref="_apdexChart" />

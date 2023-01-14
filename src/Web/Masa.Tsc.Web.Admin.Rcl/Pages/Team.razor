@@ -5,7 +5,7 @@
 <PageTitle>@T("ProjectTeam")</PageTitle>
 
 <TeamSearch OnValueChanged="OnSearch" OnTabsChanged="OnTabsChange" OnSearchChanged="OnSearchChange"></TeamSearch>
-@if(_isLoad)
+@if (_isLoad)
 {
     <div class="full-height full-width d-flex">
         <div class="ma-auto">加载中...</div>
@@ -17,7 +17,7 @@ else
         <MRow>
             <MCol Md="10">
                 <HoneyCombGrid Data="_viewProjects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor"
-                               OnItemClick="HandleOnItemClick" TItem="ProjectOverviewDto">
+                           OnItemClick="HandleOnItemClick" TItem="ProjectOverviewDto">
                     <CellBack>
                         <div class="d-flex flex-column align-center mx-2 pt-7">
                             <span class="d-inline-block text-truncate" style="width:120px;">@context.Name</span>
@@ -64,18 +64,22 @@ else
     </MCard>
 }
 
-<TeamProjectDialog @bind-Visible="_visible" ProjectId="@_selectedProjectId" TeamId="@_selectedTeamId" />
+<TeamProjectDialog @bind-Visible="_visible" ProjectId="@_selectedProjectId" TeamId="@_selectedTeamId" MonitorProjectCount="@_teamProjectCount" MonitorServiceCount="@_teamServiceCount" />
 @*<MLoading @bind-Value="_isLoad" />*@
 
 @code {
     private bool _visible;
     private string _selectedProjectId;
     private Guid _selectedTeamId;
+    private int _teamProjectCount = 0;
+    private int _teamServiceCount = 0;
 
     private void HandleOnItemClick(ProjectOverviewDto item)
     {
         _selectedProjectId = item.Identity;
         _selectedTeamId = item.TeamId;
+        _teamProjectCount = _projects.Count(p => p.TeamId == _selectedTeamId);
+        _teamServiceCount = _projects.Where(p => p.TeamId == _selectedTeamId).Sum(p=>p.Apps.Count);
         _visible = true;
     }
 

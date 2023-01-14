@@ -72,7 +72,7 @@ public partial class LogTraceChart
             }
         }
 
-        _options.SetValue("grid", new 
+        _options.SetValue("grid", new
         {
             x=60,x2=20,y2=20,y=25
         });

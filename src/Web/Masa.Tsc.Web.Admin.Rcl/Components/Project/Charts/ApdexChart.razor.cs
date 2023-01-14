@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using System;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class ApdexChart
@@ -14,7 +16,7 @@ public partial class ApdexChart
     [Parameter]
     public string Title { get; set; }
 
-    public double Total { get; set; }
+    public string Total { get; set; }
 
     private EChartType _options = EChartConst.Line;
 
@@ -22,43 +24,6 @@ public partial class ApdexChart
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        //_options.SetValue("grid.bottom", 20);
-        //_options.SetValue("xAxis.splitLine.show", false);
-        //_options.SetValue("xAxis.axisTick.show", false);
-        //_options.SetValue("xAxis.axisLine.show", false);
-        //_options.SetValue("xAxis.axisLabel.show", false);
-        //_options.SetValue("yAxis.splitLine.show", false);
-        //_options.SetValue("yAxis.axisTick.show", false);
-        //_options.SetValue("yAxis.axisLine.show", false);
-        //_options.SetValue("yAxis.axisLabel.show", false);
-        //_options.SetValue("yAxis.splitArea.show", false);
-        //_options.SetValue("series[0].lineStyle.normal", new
-        //{
-        //    width = 8,
-        //    color = new
-        //    {
-        //        type = "linear",
-
-        //        colorStops = new List<object>
-        //        {
-        //      new
-        //      {
-        //          offset = 0,
-        //          color = "rgb(255,236,236)" // 0% 处的颜色
-        //      },
-        //      new
-        //      {
-        //          offset = 1,
-        //          color = "rgb(248,76,54)" // 100% 处的颜色
-        //      }
-        //    },
-        //        globalCoord = false // 缺省为 false
-        //    },
-        //    shadowColor = "rgba(72,216,191, 0.3)",
-        //    shadowBlur = 10,
-        //    shadowOffsetY = 20
-        //});
-        //_options.SetValue("series[0].smooth", true);
         if (query.Start is null)
             query.Start = DateTime.UtcNow.AddDays(-1);
         if (query.End is null)
@@ -72,14 +37,18 @@ public partial class ApdexChart
         });
         if (_data[0] != null && _data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && _data[0].Result != null && _data[0].Result.Any())
         {
-            var seriesData = ((QueryResultMatrixRangeResponse)_data[0].Result.First()).Values.Select(items => Convert.ToDouble(items[1]) * 100).ToArray();
+            var seriesData = ((QueryResultMatrixRangeResponse)_data[0].Result.First()).Values.Select(items => (string)items[1]).ToArray();
+            var timeSpans = ((QueryResultMatrixRangeResponse)_data[0].Result.First()).Values.Select(items => Convert.ToDouble(items[0])).ToArray();
             Total = seriesData.Last();
+            _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value)));
             _options.SetValue("series[0].data", seriesData);
         }
         else
         {
-            _options.SetValue("series[0].data", new double[0]);
-            Total = 0;
+            _options.SetValue("xAxis.data", Array.Empty<string>());
+            _options.SetValue("series[0].data", Array.Empty<string>());
+            Total = "0";
         }
+
     }
 }

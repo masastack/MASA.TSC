@@ -24,13 +24,19 @@ public partial class TeamProjectDialog
     [Parameter]
     public Guid TeamId { get; set; }
 
+    [Parameter]
+    public int MonitorProjectCount { get; set; }
+
+    [Parameter]
+    public int MonitorServiceCount { get; set; }
+
     ConfigurationRecord ConfigurationRecord { get; set; } = new();
 
     AppAutoComplete AppAutoComplete { get; set; }
 
     List<AppDetailModel> Apps { get; set; } = new();
 
-    TeamDto Team { get; set; }
+    TeamDto Team { get; set; }    
 
     protected override async Task OnParametersSetAsync()
     {
@@ -46,6 +52,8 @@ public partial class TeamProjectDialog
                 Type = app.AppType,
                 ServiceType = app.ServiceType
             }).ToList();
+            Team.ProjectTotal = MonitorProjectCount;
+            Team.AppTotal= MonitorServiceCount;
             ConfigurationRecord.AppName = Apps.FirstOrDefault()?.Identity;
         }
     }
