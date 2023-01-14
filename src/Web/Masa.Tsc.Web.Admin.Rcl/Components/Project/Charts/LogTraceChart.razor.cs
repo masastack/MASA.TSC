@@ -74,7 +74,7 @@ public partial class LogTraceChart
 
         _options.SetValue("grid", new 
         {
-            x=60,x2=20
+            x=60,x2=20,y2=20,y=25
         });
         _options.SetValue("legend.data", legend);
         _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value)));
