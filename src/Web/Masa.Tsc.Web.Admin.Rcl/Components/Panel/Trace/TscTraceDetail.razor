@@ -2,7 +2,7 @@
 @using System.Globalization
 @inherits TscComponentBase
 
-<SSheetDialog Value="_dialogValue" ValueChanged="DialogValueChanged">
+<SSheetDialog Value="_dialogValue" ValueChanged="DialogValueChanged" Title="@Title">
     <div class="d-flex">
         <div class="pa-12" style="width:100%">
             <div class="d-flex mb-6">
@@ -184,6 +184,9 @@
 </SSheetDialog>
 
 @code {
+
+    [Parameter]
+    public string Title { get; set; }
 
     private void RenderItemLabel(RenderTreeBuilder __builder, TraceResponseTree item)
     {

@@ -4,6 +4,8 @@
 @page "/dashboard/configuration/{dashboardId}/{serviceName}"
 @inherits TscComponentBase
 
+<PageTitle>@T("Configure Dashboard")</PageTitle>
+
 <AutoHeight Overflow AutoStyle="max-height: calc(100vh - 185px);height: 900px">
     <HeaderContent>
         <div class="d-flex mb-6">
@@ -11,10 +13,13 @@
             {
                 <AppAutoComplete Value="@ServiceName" ValueChanged=ServiceNameChange FillBackground=false Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" />
             }
-            <div style="width:100%;" class="d-flex">
+            @*<SearchTextField @bind-Value="@ConfigurationRecord.Search" FillBackground=false Clearable Class="mr-6 my-auto" />*@
+@*            <div style="width:100%;" class="d-flex">
                 <SearchTextField @bind-Value="@ConfigurationRecord.Search" FillBackground=false Clearable Class="mr-6 my-auto" />
                 <DateTimeRangeToolbar Class="mr-6 my-auto" DefaultQuickRange="QuickRangeKey.Last15Minutes" OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
-            </div>
+            </div>*@
+            <MSpacer />
+            <DateTimeRangeToolbar Class="mr-6 my-auto" DefaultQuickRange="QuickRangeKey.Last15Minutes" OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
             <MTooltip Top>
                 <ActivatorContent>
                     <div @attributes="@context.Attrs" @onclick="SwitchEdit" class="mr-6 my-auto d-flex">

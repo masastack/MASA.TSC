@@ -12,18 +12,27 @@ public partial class TscTrace
     private string? _instance;
     private string? _endpoint;
     private string? _traceId;
-    private DateTime _startDateTime;
-    private DateTime _endDateTime;
 
     private int _page = 1;
     private int _pageSize = 10;
 
     private bool _loading;
 
+    [Parameter]
+    public DateTime StartDateTime { get; set; } = DateTime.Now.AddHours(-12);
+
+    [Parameter]
+    public DateTime EndDateTime { get; set; } = DateTime.Now;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SearchAsync();
+    }
+
     private async Task Search((DateTime start, DateTime end) dateTimes)
     {
-        _startDateTime = dateTimes.start;
-        _endDateTime = dateTimes.end;
+        StartDateTime = dateTimes.start;
+        EndDateTime = dateTimes.end;
 
         await SearchAsync();
     }
@@ -56,8 +65,8 @@ public partial class TscTrace
             Instance = _instance!,
             Endpoint = _endpoint!,
             TraceId = _traceId!,
-            Start = _startDateTime,
-            End = _endDateTime,
+            Start = StartDateTime,
+            End = EndDateTime,
             Page = _page,
             PageSize = _pageSize
         };
@@ -188,8 +197,8 @@ public partial class TscTrace
             Type = AggregateTypes.GroupBy,
             Service = string.Empty,
             Keyword = key,
-            Start = _startDateTime,
-            End = _endDateTime
+            Start = StartDateTime,
+            End = EndDateTime
         };
 
         return ApiCaller.TraceService.GetAttrValuesAsync(query);
@@ -203,8 +212,8 @@ public partial class TscTrace
             Type = AggregateTypes.GroupBy,
             Service = service,
             Keyword = key,
-            Start = _startDateTime,
-            End = _endDateTime
+            Start = StartDateTime,
+            End = EndDateTime
         };
 
         return ApiCaller.TraceService.GetAttrValuesAsync(query);
@@ -219,8 +228,8 @@ public partial class TscTrace
             Service = service,
             Instance = instance,
             Keyword = key,
-            Start = _startDateTime,
-            End = _endDateTime
+            Start = StartDateTime,
+            End = EndDateTime
         };
 
         return ApiCaller.TraceService.GetAttrValuesAsync(query);

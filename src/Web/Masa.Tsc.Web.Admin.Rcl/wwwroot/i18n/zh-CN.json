@@ -165,5 +165,7 @@
   "MONITORING": "监控",
   "Project count": "项目数量",
   "Service count": "服务数量",
-  "Log count": "日志数量"
+  "Log count": "日志数量",
+  "Configure Dashboard": "配置仪表盘",
+  "Configure Chart": "配置图表"
 }

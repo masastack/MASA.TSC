@@ -2,7 +2,9 @@
 
 <MRow>
     <MCol Md="12" Class="d-flex justify-end">
-        <MIcon>mdi-refresh</MIcon>
+        <SButton Icon OnClick="GetGetMetricsAsync">
+            <SIcon Tooltip="@T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon>
+        </SButton>
         <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg" OnClick="() => Cancel()">
             取消
         </SButton>

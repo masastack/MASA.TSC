@@ -3,6 +3,8 @@
 @page "/dashboard/configuration/chart/{dashboardId}/{serviceName}/{panelId}"
 @inherits TscComponentBase
 
+<PageTitle>@T("Configure Chart")</PageTitle>
+
 @if (Panel is not null)
 {
     <CascadingValue Value="ConfigurationRecord">

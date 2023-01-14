@@ -22,7 +22,7 @@
             }
             <SearchTextField @bind-Value="Search" Clearable FillBackground=false Class="my-auto" Style="flex:none;width: 300px !important;" />
             <MSpacer />
-            <SButton Icon OnClick=RefreshAsync Class="mr-6 my-auto"><SIcon Tooltip="@T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon></SButton>
+            @*<SButton Icon OnClick=RefreshAsync Class="mr-6 my-auto"><SIcon Tooltip="@T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon></SButton>*@
             <SButton OnClick="OpenAddFolderDialog" Small Class="mr-6 my-auto" Style="min-width:108px !important;">@T("Add folder")</SButton>
             <SButton OnClick="OpenAddDashboardDialog" Small Class="my-auto" Style="min-width:140px !important;">@T("Add dashboard")</SButton>
         </div>

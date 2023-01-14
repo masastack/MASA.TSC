@@ -26,9 +26,11 @@ public partial class LogPanel
     [Parameter]
     public string TaskId { get; set; }
 
-    DateTime? StartTime { get; set; }
+    [Parameter]
+    public DateTime? StartTime { get; set; } = DateTime.Now.AddHours(12);
 
-    DateTime? EndTime { get; set; }
+    [Parameter]
+    public DateTime? EndTime { get; set; } = DateTime.Now;
 
     int Page
     {
@@ -53,6 +55,11 @@ public partial class LogPanel
     long Total { get; set; }
 
     List<LogModel> Logs { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetLogsAsync();
+    }
 
     async Task OnUpdate((DateTimeOffset start, DateTimeOffset end) times)
     {
