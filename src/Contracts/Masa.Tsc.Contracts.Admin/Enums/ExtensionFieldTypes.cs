@@ -21,5 +21,6 @@ public enum ExtensionFieldTypes
     Legend,
     Toolbox,
     XAxis,
-    YAxis
+    YAxis,
+    Content
 }

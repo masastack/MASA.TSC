@@ -57,7 +57,7 @@
                     <TabsPanel Panel="context as UpsertTabsPanelDto" IsEditTabItem=IsEditTabItem />
                     break;
                 case PanelTypes.Text:
-                    <TextPanel IsEdit=IsEdit />
+                    <TextPanel Value=context IsEdit=IsEdit />
                     break;
                 case PanelTypes.Trace:
                     <TscTrace />
