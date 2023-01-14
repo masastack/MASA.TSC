@@ -114,9 +114,8 @@ public class Panel : AggregateRoot<Guid>
         {
             Metrics.Clear();
         }
-
-        if (update.ExtensionData != null && update.ExtensionData.Any())
-            ExtensionData = update.ExtensionData;
+        
+        ExtensionData = update.ExtensionData;
     }
 
     /// <summary>
