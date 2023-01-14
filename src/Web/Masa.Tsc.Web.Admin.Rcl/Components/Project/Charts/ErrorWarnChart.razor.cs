@@ -16,7 +16,7 @@ public partial class ErrorWarnChart
     [Parameter]
     public string Title { get; set; }
 
-    private double _total;
+    private double _success;
     private EChartType _options = EChartConst.Pie;
     private double[] values = new double[2];
 
@@ -41,10 +41,9 @@ public partial class ErrorWarnChart
         base.OnInitialized();
     }
 
-
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        _total = 0;
+        _success = 0;
         if (query == null)
             return;
         if (query.End == null)
@@ -56,8 +55,8 @@ public partial class ErrorWarnChart
         var results = await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto
         {
             Queries = new List<string> {
-            $"sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"[{step}s]))",
-            $"sum by(service_name) (increase(http_server_duration_count[{step}s]))"
+            $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"[{step}s])),1)",
+            $"round(sum by(service_name) (increase(http_server_duration_count[{step}s])),1)"
            },
             Time = query.End.Value,
         });
@@ -74,14 +73,12 @@ public partial class ErrorWarnChart
 
         if (values[1] == 0)
         {
-            values[0] = 100;
-            _total = 100;
+            values[0] = 1;
+            _success = 100;
         }
         else
         {
-            values[0] = Math.Round(values[0] * 100 / values[1], 4);
-            values[1] = 100 - values[0];
-            _total = values[0];
+            _success = Math.Round(values[0] * 100 / values[1], 2);
         }
         _options.SetValue("tooltip.formatter", "{d}%");
         _options.SetValue("series[0].data", new object[] {GetModel(true,values[0]),

@@ -19,12 +19,12 @@ public partial class ProjectCharts
 
     protected override void OnInitialized()
     {
-        _endpoint = new UpsertChartPanelDto(default)
+        _endpoint = new UpsertChartPanelDto(default!)
         {
             ChartType = "table",
             ListType = ListTypes.TopList,
-            Title = "Service Endpoint(calls/min)",
-            Description = "Service Endpoint(calls/min)",
+            Title = T("Service Endpoint Load")+ "("+T("calls/min") +")",
+            //Description = T("Service Endpoint") + "(" + T("calls/min") + ")",
             Metrics = new List<PanelMetricDto>
             {
                 new PanelMetricDto()
@@ -33,12 +33,12 @@ public partial class ProjectCharts
                 }
             }
         };
-        _slowEndpoint = new UpsertChartPanelDto(default)
+        _slowEndpoint = new UpsertChartPanelDto(default!)
         {
             ChartType = "table",
             ListType = ListTypes.TopList,
-            Title = "Service Slow Endpont(ms)",
-            Description = "Service Slow Endpont(ms)",
+            Title = T("Service Slow Endpoint")+"("+T("ms")+")",
+            //Description = "Service Slow Endpont(ms)",
             Metrics = new List<PanelMetricDto>
             {
                 new PanelMetricDto()

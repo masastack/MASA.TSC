@@ -12,7 +12,7 @@ public partial class AvgResponseChart : TscEChartBase
     public StringNumber Height { get; set; } = "100%";
 
     [Parameter]
-    public string Title { get; set; } = "服务平均响应(毫秒/秒)";
+    public string Title { get; set; }
 
     public double Total { get; set; } = 0;
 

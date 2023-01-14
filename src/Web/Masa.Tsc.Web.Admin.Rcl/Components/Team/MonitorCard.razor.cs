@@ -63,10 +63,10 @@ public partial class MonitorCard
         _items[0].AppTotal = _appMonitorDto.AppTotal;        
 
         _items[1].ServiceTotal = _appMonitorDto.ServiceWarn;
-        _items[1].AppTotal = _appMonitorDto.ErrorCount;
+        _items[1].AppTotal = _appMonitorDto.WarnCount;
 
         _items[2].ServiceTotal = _appMonitorDto.ServiceError;
-        _items[2].AppTotal = _appMonitorDto.WarnCount;
+        _items[2].AppTotal = _appMonitorDto.ErrorCount;
 
         _items[3].ServiceTotal = _appMonitorDto.Normal;
     }

@@ -4,19 +4,19 @@
 <div class="h-269" style="overflow-y: auto;overflow-x:hidden;">
     <MRow Style="background-color:#F0F3FA;" Class="@Class">
         <MCol Cols="3">
-            <ErrorWarnChart Title=@("Service Success Rate") @ref="_errorWarnChart" />
+            <ErrorWarnChart Title=@T("Service Success Rate") @ref="_errorWarnChart" />
         </MCol>
         <MCol Cols="9">
-            <ServiceCallChart Title="@("Service Load(调用次数/每分钟)")" @ref="_traceLogChart" />
+            <ServiceCallChart Title="@(T("Service Load")+"("+T("call/min")+")")" @ref="_traceLogChart" />
         </MCol>
         <MCol Cols="3">
-            <AvgResponseChart @ref="_avgResponseChart" />
+            <AvgResponseChart @ref="_avgResponseChart" Title="@(T("Service Avg Response Time")+"("+T("ms")+")")" />
         </MCol>
         <MCol Cols="3">
-            <ApdexChart Title="Apdex" @ref="_apdexChart" />
+            <ApdexChart Title="@(T("Service Apdex"))" @ref="_apdexChart" />
         </MCol>
         <MCol Cols="6">
-            <LogTraceChart Title="@("Service Response Time Percentile (ms)")" @ref="_traceLogChart1" />
+            <LogTraceChart Title="@(T("Service Response Time Percentile")+"("+T("ms")+")")" @ref="_traceLogChart1" />
         </MCol>
         <CascadingValue Value="ConfigurationRecord">
             <MCol Cols="6">
