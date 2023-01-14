@@ -46,7 +46,7 @@ public partial class ProjectCharts
                     Name = "topk(10, sort_desc(max by(http_target) (http_response_bucket)))"
                 }
             }
-        };       
+        };
     }
 
     protected override async Task OnParametersSetAsync()
@@ -70,12 +70,19 @@ public partial class ProjectCharts
             Start = ConfigurationRecord.StartTime.UtcDateTime,
             End = ConfigurationRecord.EndTime.UtcDateTime,
         };
-        var tasks = new List<Task>();
-        tasks.Add(_errorWarnChart?.OnLoadAsync(query));
-        tasks.Add(_traceLogChart?.OnLoadAsync(query));
-        tasks.Add(_traceLogChart1?.OnLoadAsync(query));
-        tasks.Add(_avgResponseChart?.OnLoadAsync(query));
-        tasks.Add(_apdexChart?.OnLoadAsync(query));   
+        var tasks = new List<Task>
+        {
+            _errorWarnChart?.OnLoadAsync(query),
+            _traceLogChart?.OnLoadAsync(query),
+            _traceLogChart1?.OnLoadAsync(query),
+            _avgResponseChart?.OnLoadAsync(query),
+            _apdexChart?.OnLoadAsync(query)
+        };
+        
         await Task.WhenAll(tasks);
+
+        //Task.WhenAll(tasks).ContinueWith(task => { 
+        //     InvokeAsync(()=>StateHasChanged())
+        //});
     }
 }

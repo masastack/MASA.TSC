@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Microsoft.EntityFrameworkCore;
+
 namespace Masa.Tsc.Service.Admin.Infrastructure.Repositories;
 
 public class DirectoryRepository : Repository<TscDbContext, Domain.Aggregates.Directory, Guid>, IDirectoryRepository
@@ -20,14 +22,22 @@ public class DirectoryRepository : Repository<TscDbContext, Domain.Aggregates.Di
     public async Task<Tuple<int, List<Domain.Aggregates.Directory>>> GetListIncludeInstrumentsAsync(Guid userId, int page, int pageSize, string keyword, bool isIncludeInstrument)
     {
         var start = page <= 1 ? 0 : (page - 1) * pageSize;
-        var dbSet = _context.Set<Domain.Aggregates.Directory>();
-        var query = dbSet.Skip(start).Take(pageSize);
-        if (!string.IsNullOrEmpty(keyword))
-            query = query.Where(m => m.Name.Contains(keyword));
-        var total = await query.CountAsync();
-        if (isIncludeInstrument)
-            query = query.Include(d => d.Instruments.OrderBy(d => d.Sort));
+        var query = _context.Set<Domain.Aggregates.Directory>().AsQueryable();
 
-        return Tuple.Create(total, await query.ToListAsync());
+        List<Domain.Aggregates.Directory> data;
+
+        if (isIncludeInstrument)
+            data = await query.Include(d => d.Instruments.Where(instrument => string.IsNullOrEmpty(keyword) || instrument.Name.Contains(keyword)).OrderBy(d => d.Sort)).ToListAsync();
+        else
+            data = await query.ToListAsync();
+
+        if (!string.IsNullOrEmpty(keyword))
+            data = data.Where(item => item.Instruments != null && item.Instruments.Any()).ToList();
+
+        var total = data.Count;
+        data = data.Skip(start).Take(pageSize).ToList();
+
+        var t = Tuple.Create(total, data);
+        return t;
     }
 }

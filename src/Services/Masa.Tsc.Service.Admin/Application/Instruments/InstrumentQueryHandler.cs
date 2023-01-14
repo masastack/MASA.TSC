@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Nest;
+
 namespace Masa.Tsc.Service.Admin.Application.Instruments;
 
 public class InstrumentQueryHandler
@@ -34,12 +36,10 @@ public class InstrumentQueryHandler
 
     private static Expression<Func<Instrument, bool>> Predicate(InstrumentListQuery query)
     {
-        Expression<Func<Instrument, bool>> condition;
+        Expression<Func<Instrument, bool>> condition = item => true;
 
         if (string.IsNullOrEmpty(query.Keyword))
-            condition = item => item.IsGlobal || item.Creator == query.UserId;
-        else
-            condition = item => (item.IsGlobal || item.Creator == query.UserId) && item.Name.Contains(query.Keyword);
+            condition = item=> item.Name.Contains(query.Keyword);
         return condition;
     }
 

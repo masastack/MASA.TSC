@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Force.DeepCloner;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Data.EChart;
 
 internal static class EChartConst
@@ -774,7 +776,7 @@ public class EChartType
     public string Src { get; set; }
 
     [JsonIgnore]
-    public object Option => Json;
+    public object Option=> Json.DeepClone();
 
     public JsonNode Json { get; set; }
 
