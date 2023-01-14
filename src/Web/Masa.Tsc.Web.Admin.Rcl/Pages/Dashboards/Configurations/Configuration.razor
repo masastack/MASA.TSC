@@ -15,14 +15,6 @@
             <MTooltip Top>
                 <ActivatorContent>
                     <div @attributes="@context.Attrs" @onclick="SwitchEdit" class="mr-6 my-auto d-flex">
-@*                        @if (ConfigurationRecord.IsEdit)
-                        {
-                            <MSwitch Value="true" Readonly LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="my-auto" />
-                        }
-                        else
-                        {
-                            <MSwitch Value="false" Readonly LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="my-auto" />
-                        }*@
                         <MSwitch Value="ConfigurationRecord.IsEdit" Readonly TValue="bool" LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="my-auto" />
                     </div>                    
                 </ActivatorContent>
