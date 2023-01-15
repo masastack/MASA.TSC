@@ -91,7 +91,8 @@ public partial class PanelGrids
 
     void OnResize(GridstackResizeEventArgs args)
     {
-        var panel = Panels.First(p => p.Id.ToString() == args.Id);
+        var panel = Panels.FirstOrDefault(p => p.Id.ToString() == args.Id);
+        if (panel is null) return;
         panel.W = args.Width;
         panel.H = args.Height;
     }

@@ -1,4 +1,4 @@
-﻿<MCard Height="410" Class="d-flex flex-column rounded-lg">
+﻿<MCard Class="d-flex flex-column rounded-lg full-height">
     <MCardTitle Class="d-flex justify-space-between">
         <MLabel Class="emphasis2--text h6">@Value.Title</MLabel>
         <MTooltip Top>
@@ -19,7 +19,7 @@
         }
         else
         {
-            <MECharts @ref=Chart Option="Option" />
+            <MECharts @key=Value.GetChartKey() Option="Option" />
         }
     </MCardText>
 </MCard>
@@ -33,19 +33,38 @@
 
     object? Option { get; set; }
     string? OldKey { get; set; }
-    MECharts Chart { get; set; }
+    public MECharts? Chart { get; set; }
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         Option = Value.GetChartOption();
-        var key = Value.GetChartKey() + Value.W + Value.H;
-        if (OldKey != key)
-        {
-            if (Chart is not null)
-            {
-                Chart.Resize(Value.W, Value.H);
-            }
-            OldKey = key;
-        }
+        //var key = Value.GetChartKey();
+        //if (OldKey != key)
+        //{
+        //    OldKey = key;
+        //    if (Chart is not null)
+        //    {
+        //        await Chart.SetOption(Option);
+        //    }
+        //}
+
+        //var key = Value.GetChartKey() + Value.W + Value.H;
+        //if (OldKey != key)
+        //{
+        //    if (Chart is not null)
+        //    {
+        //        await Task.Delay(500);
+        //        if (key == Value.GetChartKey() + Value.W + Value.H)
+        //        {
+        //            await Chart.Resize(Value.W, Value.H - 35);
+        //        }
+        //    }  
+        //    OldKey = key;
+        //}
     }
+
+    //protected override bool ShouldRender()
+    //{
+    //    return OldKey == Value.GetChartKey() + Value.W + Value.H;
+    //}
 }

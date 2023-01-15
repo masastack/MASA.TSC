@@ -1,4 +1,5 @@
-﻿@inherits TscComponentBase
+﻿@using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Modules.Echart
+@inherits TscComponentBase
 
 @if (IsLoading)
 {
@@ -8,9 +9,5 @@
 }
 else
 {
-    <div style="max-height:410;overflow-y:auto;">
-        <DynamicComponent Type="@CurrentDynamicComponent.ShowType" Parameters=CurrentDynamicComponent.Metadata />
-    </div>
+    <DynamicComponent Type="@CurrentDynamicComponent.ShowType" Parameters=CurrentDynamicComponent.Metadata />
 }
-
-
