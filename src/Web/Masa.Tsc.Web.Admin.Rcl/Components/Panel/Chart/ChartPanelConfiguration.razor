@@ -72,7 +72,7 @@
                                         <MCard Class="pa-2" Style="background-color:#F6F8FD">
                                             <MCardText>
                                                 <MRow>
-                                                    @if (Value.ChartType == "table" && Value.ListType != ListTypes.TopList)
+                                                    @if (Value.ChartType == "table")
                                                     {
                                                         <MCol Md="12">
                                                             <STextField BackgroundColor="white" @bind-Value="item.DisplayName" Label="列名" />
@@ -102,7 +102,14 @@
                                                 </MRow>
                                             </MCardText>
                                             <MCardActions Class="d-flex justify-space-between">
-                                                <SColorGroup @bind-Value="item.Color" Colors='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
+                                                @if (Value.ChartType == "table")
+                                                {
+                                                    <SColorGroup @bind-Value="item.Color" Colors='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
+                                                }
+                                                else
+                                                {
+                                                    <MSpacer />
+                                                }
                                                 <MIcon OnClick="() => Remove(item)" Color="red">mdi-delete</MIcon>
                                             </MCardActions>
                                         </MCard>
@@ -166,9 +173,9 @@
                                         <MCol Md="12">
                                             <ButtonGroupItem @bind-Value="@Value.ColumnAlignment" Label="Column alignment" Items='new List<string>{"auto","left","center","right"}' />
                                         </MCol>
-@*                                        <MCol Md="12">
+                                        <MCol Md="12">
                                             <SwitchItem Label="Enable pagination" @bind-Value="@Value.EnablePaginaton" />
-                                        </MCol>*@
+                                        </MCol>
                                     </MRow>
                                 </MExpansionPanelContent>
                             </MExpansionPanel>
