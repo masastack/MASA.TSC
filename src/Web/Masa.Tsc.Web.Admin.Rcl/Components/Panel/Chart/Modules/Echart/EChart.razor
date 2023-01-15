@@ -51,7 +51,7 @@
                 await Task.Delay(300);
                 if (key == Value.GetChartKey() + Value.W + Value.H)
                 {
-                    await Chart.Resize(Value.W, Value.H - 35);
+                    await Chart.Resize(Value.W-100, Value.H -120);
                 }
             }  
             OldKey = key;

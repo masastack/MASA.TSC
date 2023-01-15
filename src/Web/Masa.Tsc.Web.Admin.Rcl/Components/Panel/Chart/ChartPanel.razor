@@ -9,5 +9,13 @@
 }
 else
 {
-    <DynamicComponent Type="@CurrentDynamicComponent.ShowType" Parameters=CurrentDynamicComponent.Metadata />
+    @if (Value.ChartType == "table")
+    {
+        <ListPanel DataIsReady=!IsLoading Value="Value" IsEdit=ConfigurationRecord.IsEdit />
+    }
+    else
+    {
+        <EChart Value="Value" />
+    }
+    @*<DynamicComponent Type="@CurrentDynamicComponent.ShowType" Parameters=CurrentDynamicComponent.Metadata />*@
 }

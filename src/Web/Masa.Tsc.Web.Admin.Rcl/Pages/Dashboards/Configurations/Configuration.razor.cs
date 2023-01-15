@@ -1,4 +1,4 @@
-﻿// Copyright (c) MASA Stack All rights reserved.
+﻿    // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations;
@@ -59,8 +59,10 @@ public partial class Configuration
 
     async Task GetPanelsAsync()
     {
-        var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(ConfigurationRecord.DashboardId));
         ConfigurationRecord.Panels.Clear();
+        PanelGrids.Clear();
+        var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(ConfigurationRecord.DashboardId));
+        //ConfigurationRecord.Panels.Clear();
         if(detail is not null)
         {
             ConfigurationRecord.ShowServiceCompontent = detail.Model != ModelTypes.All.ToString();
@@ -73,7 +75,6 @@ public partial class Configuration
 
         if (ConfigurationRecord.Panels.Any() is false) ConfigurationRecord.IsEdit = true;
         Convert(ConfigurationRecord.Panels);
-        PanelGrids.Clear();
     }
 
     void Convert(List<UpsertPanelDto> panels, UpsertPanelDto? parentPanel = null)
