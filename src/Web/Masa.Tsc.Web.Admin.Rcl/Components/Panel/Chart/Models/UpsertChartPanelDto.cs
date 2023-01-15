@@ -401,11 +401,12 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
     {
         _chartData = chartData;
         IsLoadChartData = true;
+        Key = "DataChanged" + Guid.NewGuid();
     }
 
     public string GetChartKey()
     {
-        return Key; //IsLoadChartData + ChartType;
+        return Key;
     }
 
     public object? GetChartOption()

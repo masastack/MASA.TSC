@@ -39,13 +39,13 @@ public partial class Configuration
         {
             ConfigurationRecord.DashboardId = DashboardId;
             ConfigurationRecord.AppName = ServiceName;
-            PanelGrids.Clear();
+            //PanelGrids.Clear();
             await GetPanelsAsync();
         }
         else if(ServiceName is not null && ServiceName != ConfigurationRecord.AppName)
         {
             ConfigurationRecord.AppName = ServiceName;
-            await GetPanelsAsync();
+            //await GetPanelsAsync();
         }
     }
 
@@ -73,6 +73,7 @@ public partial class Configuration
 
         if (ConfigurationRecord.Panels.Any() is false) ConfigurationRecord.IsEdit = true;
         Convert(ConfigurationRecord.Panels);
+        PanelGrids.Clear();
     }
 
     void Convert(List<UpsertPanelDto> panels, UpsertPanelDto? parentPanel = null)
