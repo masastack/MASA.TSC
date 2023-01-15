@@ -18,6 +18,14 @@
         {
             @(context.Item.Timestamp.Format(CurrentTimeZone))
         }
+        else if (context.Header.Text == "Service")
+        {
+            @context.Item.Resource["service.name"]
+        }
+        else if (context.Header.Text == "Endpoint")
+        {
+            @context.Item.GetDispalyName()
+        }
         else
         {
             @context.Value
