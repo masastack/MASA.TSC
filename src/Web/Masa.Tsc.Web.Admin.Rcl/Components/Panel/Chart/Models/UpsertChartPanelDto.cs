@@ -416,7 +416,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         LoadChartOption();
 
         return EChartType.Json;
-    }
+    }   
 
     void LoadChartData()
     {

@@ -1,0 +1,84 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+
+<MCard Height="410" Class="d-flex flex-column">
+    <MCardTitle Class="d-flex justify-space-between">
+        <MLabel Class="emphasis2--text h6">@Value.Title</MLabel>
+        <MTooltip Top>
+            <ActivatorContent>
+                <MIcon @attributes="@context.Attrs">mdi-information-outline</MIcon>
+            </ActivatorContent>
+            <ChildContent>
+                <span>@Value.Description</span>
+            </ChildContent>
+        </MTooltip>
+    </MCardTitle>
+    <MCardText Class="flex-grow-1" Style="overflow-y: auto;">
+        <MSimpleTable>
+            @if (Value.ShowTableHeader)
+            {
+                <thead>
+                    <tr>
+                        <th class="text-left">
+                            Service
+                        </th>
+                        @foreach (var field in Value.Metrics)
+                        {
+                            <th class="text-left">
+                                @(string.IsNullOrWhiteSpace(field.Unit) ? @field.DisplayName : $"{@field.DisplayName}({field.Unit})")
+                            </th>
+                        }
+                    </tr>
+                </thead>
+            }
+            <tbody>
+                @foreach (var option in Value.GetTableOption().Skip((_page - 1) * _pageSize).Take(_pageSize))
+                {
+                    <tr>
+                        @foreach (var item in option)
+                        {
+                            @if (item.JumpId is not null)
+                            {
+                                <td @onclick="() => ToDashboardConfiguration(item)" class="@($"text-{Value.ColumnAlignment}") primary--text)">
+                                    @item.Text
+                                </td>
+                            }
+                            else
+                            {
+                                <td class="@($"text-{Value.ColumnAlignment}")">@item.Text</td>
+                            }
+                        }
+                    </tr>
+                }
+            </tbody>
+@*            @if (Value.ShowTableFooter)
+            {
+                <tfoot>
+                    <tr>
+                        <td>Sum</td>
+                        <td>$180</td>
+                    </tr>
+                </tfoot>
+            }*@
+        </MSimpleTable>
+        @if (Value.EnablePaginaton)
+        {
+            <SPagination @bind-Page="_page" @bind-PageSize=_pageSize Total=Value.GetTableOption().Count() />
+        }
+    </MCardText>
+</MCard>
+
+@code {
+    int _page = 1;
+    int _pageSize = 10;
+
+    [Parameter]
+    public ITablePanelValue Value { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    void ToDashboardConfiguration(Dessert dessert)
+    {
+        NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, dessert.Text);
+    }
+}
