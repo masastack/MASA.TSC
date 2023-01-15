@@ -7,8 +7,10 @@
     </div>
 }
 else
-{   
-    <DynamicComponent Type="@CurrentDynamicComponent.ShowType" Parameters=CurrentDynamicComponent.Metadata />
+{
+    <div style="max-height:410;overflow-y:auto;">
+        <DynamicComponent Type="@CurrentDynamicComponent.ShowType" Parameters=CurrentDynamicComponent.Metadata />
+    </div>
 }
 
 

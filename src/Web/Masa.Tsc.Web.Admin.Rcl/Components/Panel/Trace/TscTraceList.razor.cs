@@ -21,35 +21,14 @@ public partial class TscTraceList : TscComponentBase
     private int _pageSize = 10;
     private TraceResponseDto? CurrentTrace;
 
-    private List<DataTableHeader<TraceResponseDto>> _headers = new()
+    private List<DataTableHeader<TraceResponseDto>> _headers => new()
     {
-        new("Service", item => item.Resource["service.name"])
-        {
-            Align = DataTableHeaderAlign.Start,
-            Sortable = false
-        },
-        new("Endpoint", item => item.GetDispalyName())
-        {
-            Align = DataTableHeaderAlign.Start,
-            Sortable = false
-        },
-        new("Duration (ms)", item => item.Duration)
-        {
-            Align = DataTableHeaderAlign.Start,
-            Sortable = false
-        },
-        new("Timestamp", item => item.Timestamp)
-        {
-            Align = DataTableHeaderAlign.Start,
-            Sortable = false
-        },
-        new DataTableHeader<TraceResponseDto>
-        {
-            Text = "Operate",
-            Value = "Operate",
-            Align = DataTableHeaderAlign.Start,
-            Sortable = false
-        }
+        new() { Text = T("Service"), Value = "Service", Sortable = false },
+        new() { Text = T("TraceId"), Value = "TraceId", Sortable = false },
+        new() { Text = T("Endpoint"), Value = "Endpoint", Sortable = false },
+        new() { Text = T("Duration (ms)"), Value = "Duration", Sortable = false, Width="105px" },
+        new() { Text = T("Timestamp"), Value = "Timestamp", Sortable = false},
+        new() { Text = T("Operate"), Value = "Operate", Sortable = false, Align = DataTableHeaderAlign.Center, Width="105px" },
     };
 
     protected override void OnParametersSet()
