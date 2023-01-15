@@ -20,7 +20,7 @@ public class QueryHandler
     {
         var result = new TopologyResultDto();
         var services = (await _multilevelCacheClient.GetAsync<List<TraceServiceCache>>(TopologyConstants.TOPOLOGY_SERVICES_KEY))!;
-        var service = services.FirstOrDefault(m => m.Service == query.Data.ServiceName);
+        var service = services?.FirstOrDefault(m => m.Service == query.Data.ServiceName);
         if (service == null)
         {
             query.Result = result;
