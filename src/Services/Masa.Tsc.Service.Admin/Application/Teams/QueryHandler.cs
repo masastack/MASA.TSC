@@ -124,7 +124,7 @@ public class QueryHandler
         {
             project.Apps = project.Apps.OrderByDescending(app => app.Status).ThenBy(app => app.Name).ToList();
         }
-        var appids = string.Join(",", query.Result.Projects.Select(p => string.Join(",", p.Apps.Select(app => app.Identity)))).Split(',');
+        var appids = string.Join(",", query.Result.Projects.Select(p => string.Join(",", p.Apps.Select(app => app.Identity)))).Split(',').Where(s => s.Length > 0).ToArray();
         query.Result.Monitor.ServiceTotal = query.Result.Projects.Count;
         query.Result.Monitor.AppTotal = query.Result.Projects.Sum(p => p.Apps.Count);
         query.Result.Monitor.ServiceError = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Error);
