@@ -119,7 +119,7 @@ public class QueryHandler
 
         SetProjectErrorOrWarn(query, errors, true);
         SetProjectErrorOrWarn(query, warnings, false);
-        query.Result.Projects = query.Result.Projects.Where(p => p.Apps != null && p.Apps.Any()).OrderBy(p=>p.Name).ToList();
+        query.Result.Projects = query.Result.Projects.Where(p => p.Apps != null && p.Apps.Any()).OrderBy(p => p.Name).ToList();
         foreach (var project in query.Result.Projects)
         {
             project.Apps = project.Apps.OrderByDescending(app => app.Status).ThenBy(app => app.Name).ToList();
@@ -284,6 +284,8 @@ public class QueryHandler
 
     private async Task<long> GetErrorOrWarnAsync(bool isError, IEnumerable<string> appids, DateTime? start = default, DateTime? end = default)
     {
+        if (appids == null || !appids.Any())
+            return default;
         var obj = await _logService.AggregateAsync(new SimpleAggregateRequestDto
         {
             Name = ElasticConstant.ServiceName,
