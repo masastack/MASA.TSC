@@ -67,7 +67,7 @@ public class InstrumentCommandHandler
         if (entry == null)
             throw new UserFriendlyException($"instrument {command.InstumentId} is not exists");
         entry.UpdatePanels(command.Data);
-        await _instrumentRepository.UpdateAsync(entry);
+        await _instrumentRepository.UpdateDetailAsync(entry);
     }
     #endregion
 

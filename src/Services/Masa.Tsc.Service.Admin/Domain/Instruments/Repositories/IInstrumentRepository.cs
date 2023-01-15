@@ -11,5 +11,7 @@ public interface IInstrumentRepository : IRepository<Instrument>
 
     Task<Instrument> GetDetailAsync(Guid Id, Guid userId);
 
-    Task<Instrument> GetIncludePanelsAsync(Guid Id, Guid userId);   
+    Task<Instrument> GetIncludePanelsAsync(Guid Id, Guid userId);
+
+    Task<Instrument> UpdateDetailAsync(Instrument instrument);
 }

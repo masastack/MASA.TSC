@@ -35,11 +35,11 @@ public partial class LogTraceChart
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
-                "histogram_quantile(0.50,sum(increase(http_server_duration_bucket[1m])) by (le))",
-                "histogram_quantile(0.75,sum(increase(http_server_duration_bucket[1m])) by (le))",
-                "histogram_quantile(0.90,sum(increase(http_server_duration_bucket[1m])) by (le))",
-                "histogram_quantile(0.95,sum(increase(http_server_duration_bucket[1m])) by (le))",
-                "histogram_quantile(0.99,sum(increase(http_server_duration_bucket[1m])) by (le))"
+                "round(histogram_quantile(0.50,sum(increase(http_server_duration_bucket[1m])) by (le)),0.001)",
+                "round(histogram_quantile(0.75,sum(increase(http_server_duration_bucket[1m])) by (le)),0.001)",
+                "round(histogram_quantile(0.90,sum(increase(http_server_duration_bucket[1m])) by (le)),0.001)",
+                "round(histogram_quantile(0.95,sum(increase(http_server_duration_bucket[1m])) by (le)),0.001)",
+                "round(histogram_quantile(0.99,sum(increase(http_server_duration_bucket[1m])) by (le)),0.001)"
             },
             Start = start,
             End = end,

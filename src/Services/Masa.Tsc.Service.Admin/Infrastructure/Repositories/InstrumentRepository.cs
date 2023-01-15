@@ -60,7 +60,7 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
 
     #region update
 
-    public override async Task<Instrument> UpdateAsync(Instrument instrument, CancellationToken cancellationToken = default(CancellationToken))
+    public async Task<Instrument> UpdateDetailAsync(Instrument instrument)
     {
         var panels = GetAllPanels(instrument.Panels);
         var originalPanels = _context.Set<Panel>().AsNoTracking().Where(item => item.InstrumentId == instrument.Id).ToList();
