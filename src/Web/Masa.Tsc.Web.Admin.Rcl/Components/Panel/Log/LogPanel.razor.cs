@@ -38,6 +38,12 @@ public partial class LogPanel
     [Parameter]
     public bool PageMode { get; set; }
 
+    [Parameter]
+    public int Height { get; set; }
+
+    [Parameter]
+    public int Width { get; set; }
+
     int Page
     {
         get => _page;
@@ -62,6 +68,8 @@ public partial class LogPanel
 
     List<LogModel> Logs { get; set; } = new();
 
+    MECharts? MECharts { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await GetCompontentLogsAsync();
@@ -69,6 +77,10 @@ public partial class LogPanel
 
     protected override async Task OnParametersSetAsync()
     {
+        if(MECharts is not null && (Width,Height)!=(0,0))
+        {
+            await MECharts.Resize(Width, 300);
+        }
         await GetCompontentLogsAsync();
     }
 
@@ -169,11 +181,11 @@ public partial class LogPanel
                     crossStyle = new { color = "#A18BFF66" }
                 }
             },
-            legend = new
-            {
-                data = new[] { "count" },
-                bottom = true
-            },
+            //legend = new
+            //{
+            //    data = new[] { "count" },
+            //    bottom = true
+            //},
             xAxis = new[]
             {
                 new
@@ -246,10 +258,10 @@ public partial class LogPanel
             },
             Grid = new
             {
-                x = "5%",
-                //x2 = 0,
-                y = 5,
-                //y2 = 40
+                x = 60,
+                x2 = 50,
+                y = 10,
+                y2 = 50
             }
         };
     }

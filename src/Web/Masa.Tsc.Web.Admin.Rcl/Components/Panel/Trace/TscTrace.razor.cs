@@ -30,6 +30,12 @@ public partial class TscTrace
     [Parameter]
     public DateTime EndDateTime { get; set; }
 
+    [Parameter]
+    public int Height { get; set; }
+
+    [Parameter]
+    public int Width { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await CompontentSearchAsync();

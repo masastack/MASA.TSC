@@ -14,15 +14,25 @@ public partial class TscTraceChart
     [Parameter]
     public bool PageMode { get; set; }
 
+    [Parameter]
+    public int Height { get; set; }
+
+    [Parameter]
+    public int Width { get; set; }
+
     private static readonly QuickRangeKey s_defaultQuickRange = QuickRangeKey.Last1Hour;
 
     private object _option;
 
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
+    MECharts? MECharts { get; set; }
 
+    protected override async Task OnParametersSetAsync()
+    {
         _option = GenOption();
+        if (MECharts is not null && (Width, Height) != (0, 0))
+        {
+            await MECharts.Resize(Width, 300);
+        }
     }
 
     private object GenOption()
@@ -115,6 +125,13 @@ public partial class TscTraceChart
                     },
                     smooth = true
                 }
+            },
+            Grid = new
+            {
+                x = 70,
+                x2 = 70,
+                y = 10,
+                y2 = 50
             }
         };
     }
