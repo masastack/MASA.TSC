@@ -20,7 +20,7 @@ public partial class AvgResponseChart : TscEChartBase
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        var metric = $"round(avg by (service_name) (http_server_duration_bucket>10),1)";
+        var metric = $"round(avg by (service_name) (http_server_duration_bucket{{service_name=\"{query.AppId}\"}}>10),1)";
         Total = 0;
         var result = await ApiCaller.MetricService.GetQueryAsync(metric, query.End ?? DateTime.UtcNow);
         if (result != null && result.Result != null && result.Result.Any() && result.ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Vector)

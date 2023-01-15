@@ -59,6 +59,7 @@ public partial class ErrorWarnChart
             $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"[{step}s])),1)",
             $"round(sum by(service_name) (increase(http_server_duration_count[{step}s])),1)"
            },
+            ServiceName=query.AppId,
             Time = query.End.Value,
         });
       

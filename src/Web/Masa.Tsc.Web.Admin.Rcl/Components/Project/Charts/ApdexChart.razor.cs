@@ -30,9 +30,10 @@ public partial class ApdexChart
             query.End = DateTime.UtcNow;
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
-            MetricNames = new List<string> { $"round((count(http_server_duration_bucket>1000 and http_server_duration_bucket<=4000)*0.5+count(http_server_duration_bucket<1000))/count(http_server_duration_bucket),0.0001)" },
+            MetricNames = new List<string> { $"round((count(http_server_duration_bucket>1000 and http_server_duration_bucket<=4000)*0.5+count(http_server_duration_bucket<=1000))/count(http_server_duration_bucket),0.0001)" },
             Start = query.Start.Value,
             End = query.End.Value,
+            ServiceName=query.AppId,
             Step = "5m"
         });
         if (_data[0] != null && _data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && _data[0].Result != null && _data[0].Result.Any())

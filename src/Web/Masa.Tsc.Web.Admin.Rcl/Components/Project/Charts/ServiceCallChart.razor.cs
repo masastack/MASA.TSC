@@ -36,8 +36,8 @@ public partial class ServiceCallChart
         {
             MetricNames = new List<string> {
                 $"round(sum by(service_name)(increase(http_server_duration_count[1m])),0.01)"
-                //$"sum by(service_name) (sum_over_time(http_server_duration_bucket{{service_name=\"{query.AppId}\"}}[10h]))/sum by(service_name)(count_over_time(http_server_duration_bucket{{service_name=\"{query.AppId}\"}}[10h]))"
             },
+            ServiceName = query.AppId,
             Start = start,
             End = end,
             Step = step.ToString()

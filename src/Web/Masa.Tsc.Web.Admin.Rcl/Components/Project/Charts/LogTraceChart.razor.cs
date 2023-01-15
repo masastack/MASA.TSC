@@ -42,6 +42,7 @@ public partial class LogTraceChart
                 "round(histogram_quantile(0.99,sum(increase(http_server_duration_bucket[1m])) by (le)),0.001)"
             },
             Start = start,
+            ServiceName= query.AppId,
             End = end,
             Step = step.ToString()
         });
