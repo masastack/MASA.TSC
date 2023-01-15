@@ -26,4 +26,12 @@ public interface IPanelValue
     public List<PanelMetricDto> Metrics { get; set; }
 
     public Dictionary<ExtensionFieldTypes, object?> ExtensionData { get; set; }
+
+    #region ui
+
+    public int H { get; set; }
+
+    public int W { get; set; }
+
+    #endregion
 }

@@ -38,6 +38,12 @@ public class UpsertPanelDto
     [JsonIgnore]
     public UpsertPanelDto? ParentPanel { get; set; }
 
+    [JsonIgnore]
+    public int H { get; set; }
+
+    [JsonIgnore]
+    public int W { get; set; }
+
     public virtual UpsertPanelDto Clone(UpsertPanelDto panel)
     {
         Id = panel.Id;

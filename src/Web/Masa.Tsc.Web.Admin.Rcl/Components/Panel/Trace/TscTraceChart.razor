@@ -5,10 +5,12 @@
     <MCardTitle>
         <span>Trace</span>
         <MSpacer></MSpacer>
-@*        <DateTimeRangeToolbar
-            DefaultQuickRange="s_defaultQuickRange"
-            OnUpdate="OnDateTimeUpdate"
-            OnAutoUpdate="OnDateTimeAutoUpdate" />*@
+        @if (PageMode)
+        {
+            <DateTimeRangeToolbar DefaultQuickRange="s_defaultQuickRange"
+                                  OnUpdate="OnDateTimeUpdate"
+                                  OnAutoUpdate="OnDateTimeAutoUpdate" />
+        }
     </MCardTitle>
     <MCardText Class="pa-0">
         <MECharts Option="_option" Height="300"></MECharts>

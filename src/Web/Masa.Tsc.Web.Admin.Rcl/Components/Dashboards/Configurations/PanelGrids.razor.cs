@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Nest;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
 
 public partial class PanelGrids
@@ -80,14 +78,22 @@ public partial class PanelGrids
         Panels.Add(panel);
         if (panel.PanelType is PanelTypes.Chart)
         {
-            await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
-            NavigationManager.NavigateToConfigurationChart(panel.Id.ToString());
+            await ConfigurationChartPanel(panel);
         }
     }
 
-    void ConfigurationChartPanel(UpsertPanelDto panel)
+    async Task ConfigurationChartPanel(UpsertPanelDto panel)
     {
+        await PanelGridRange.First(item => item.ParentPanel is null).Gridstack!.Reload();
+        await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
         NavigationManager.NavigateToConfigurationChart(panel.Id.ToString());
+    }
+
+    void OnResize(GridstackResizeEventArgs args)
+    {
+        var panel = Panels.First(p => p.Id.ToString() == args.Id);
+        panel.W = args.Width;
+        panel.H = args.Height;
     }
 
     public async Task SavePanelGridAsync()

@@ -23,14 +23,20 @@ public partial class LogPanel
         }
     }
 
+    [CascadingParameter]
+    ConfigurationRecord? ConfigurationRecord { get; set; }
+
     [Parameter]
     public string TaskId { get; set; }
 
     [Parameter]
-    public DateTime? StartTime { get; set; } = DateTime.Now.AddHours(12);
+    public DateTime? StartTime { get; set; }
 
     [Parameter]
-    public DateTime? EndTime { get; set; } = DateTime.Now;
+    public DateTime? EndTime { get; set; }
+
+    [Parameter]
+    public bool PageMode { get; set; }
 
     int Page
     {
@@ -38,7 +44,7 @@ public partial class LogPanel
         set
         {
             _page = value;
-            GetLogsAsync().ContinueWith(_ => InvokeAsync(StateHasChanged));
+            GetPageLogsAsync().ContinueWith(_ => InvokeAsync(StateHasChanged));
         }
     }
 
@@ -48,7 +54,7 @@ public partial class LogPanel
         set
         {
             _pageSize = value;
-            GetLogsAsync().ContinueWith(_ => InvokeAsync(StateHasChanged));
+            GetPageLogsAsync().ContinueWith(_ => InvokeAsync(StateHasChanged));
         }
     }
 
@@ -58,14 +64,19 @@ public partial class LogPanel
 
     protected override async Task OnInitializedAsync()
     {
-        await GetLogsAsync();
+        await GetCompontentLogsAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await GetCompontentLogsAsync();
     }
 
     async Task OnUpdate((DateTimeOffset start, DateTimeOffset end) times)
     {
         StartTime = times.start.ToUniversalTime().UtcDateTime;
         EndTime = times.end.ToUniversalTime().UtcDateTime;
-        await GetLogsAsync();
+        await GetPageLogsAsync();
     }
 
     async Task OnAutoUpdate((DateTimeOffset start, DateTimeOffset end) times)
@@ -74,7 +85,20 @@ public partial class LogPanel
         StateHasChanged();
     }
 
-    async Task GetLogsAsync()
+    async Task GetCompontentLogsAsync()
+    {
+        if (PageMode is false && ConfigurationRecord is not null)
+        {
+            if((StartTime, EndTime) != (ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime))
+            {
+                StartTime = ConfigurationRecord.StartTime.UtcDateTime;
+                EndTime = ConfigurationRecord.EndTime.UtcDateTime;
+                await GetPageLogsAsync();
+            }
+        }
+    }
+
+    async Task GetPageLogsAsync()
     {
         DateTime end = EndTime ?? default, start = StartTime ?? default;
         if (!string.IsNullOrEmpty(TaskId))

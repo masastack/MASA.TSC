@@ -18,15 +18,26 @@ public partial class TscTrace
 
     private bool _loading;
 
-    [Parameter]
-    public DateTime StartDateTime { get; set; } = DateTime.Now.AddHours(-12);
+    [CascadingParameter]
+    ConfigurationRecord? ConfigurationRecord { get; set; }
 
     [Parameter]
-    public DateTime EndDateTime { get; set; } = DateTime.Now;
+    public bool PageMode { get; set; }
+
+    [Parameter]
+    public DateTime StartDateTime { get; set; }
+
+    [Parameter]
+    public DateTime EndDateTime { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await SearchAsync();
+        await CompontentSearchAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await CompontentSearchAsync();
     }
 
     private async Task Search((DateTime start, DateTime end) dateTimes)
@@ -34,7 +45,7 @@ public partial class TscTrace
         StartDateTime = dateTimes.start;
         EndDateTime = dateTimes.end;
 
-        await SearchAsync();
+        await PageSearchAsync();
     }
 
     private async Task Search((string? service, string? instance, string? endpoint, string? traceId) query)
@@ -44,7 +55,7 @@ public partial class TscTrace
         _endpoint = query.endpoint;
         _traceId = query.traceId;
 
-        await SearchAsync();
+        await PageSearchAsync();
     }
 
     private async Task Search((int page, int size) pagination)
@@ -52,10 +63,23 @@ public partial class TscTrace
         _page = pagination.page;
         _pageSize = pagination.size;
 
-        await SearchAsync();
+        await PageSearchAsync();
     }
 
-    private async Task SearchAsync()
+    async Task CompontentSearchAsync()
+    {
+        if (PageMode is false && ConfigurationRecord is not null)
+        {
+            if ((StartDateTime, EndDateTime) != (ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime))
+            {
+                StartDateTime = ConfigurationRecord.StartTime.UtcDateTime;
+                EndDateTime = ConfigurationRecord.EndTime.UtcDateTime;
+                await PageSearchAsync();
+            }
+        }
+    }
+
+    private async Task PageSearchAsync()
     {
         _loading = true;
 

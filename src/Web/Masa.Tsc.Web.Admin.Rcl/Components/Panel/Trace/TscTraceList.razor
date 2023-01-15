@@ -20,7 +20,9 @@
         }
         else if (context.Header.Text == "Service")
         {
-            @context.Item.Resource["service.name"]
+            <div class="hover-pointer" @onclick="@(() => OpenAsync(context.Item))">
+                @context.Item.Resource["service.name"]
+            </div>
         }
         else if (context.Header.Text == "Endpoint")
         {

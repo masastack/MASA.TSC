@@ -1,11 +1,11 @@
 ﻿@inherits TscComponentBase
 
-<MGridstack Items="Panels" Readonly="!IsEdit" @ref="@Gridstack" ItemKey="panel => panel.Id.ToString()" ItemStyle="@("border:solid #E4E8F3 1px;position:absolute;overflow:hiden;"+(IsEdit?"cursor: move;":""))" ItemPosition="panel => new(panel.Width,panel.Height,panel.X,panel.Y)" TItem="UpsertPanelDto">
-   <ItemContent>
-       <div style="height:35px;" class="d-flex">
-           <MSpacer />
-            @if (IsEdit)
-            {
+<MGridstack OnResize="OnResize" Items="Panels" Readonly="!IsEdit" @ref="@Gridstack" ItemKey="panel => panel.Id.ToString()" ItemStyle="@("border:solid #E4E8F3 1px;position:absolute;overflow:hiden;"+(IsEdit?"cursor: move;":""))" ItemPosition="panel => new(panel.Width,panel.Height,panel.X,panel.Y)" TItem="UpsertPanelDto">
+    <ItemContent>
+        @if (IsEdit)
+        {
+            <div style="height:35px;" class="d-flex">
+                <MSpacer />
                 <MMenu OpenOnHover OffsetY>
                     <ActivatorContent Context="menuContext">
                         <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
@@ -21,11 +21,11 @@
                                         @T("Add Tab Item")
                                     </MListItemTitle>
                                 </MListItem>
-                                <MListItem OnClick="() => EditEditTabItems()">
+                                @*<MListItem OnClick="() => EditEditTabItems()">
                                     <MListItemTitle>
                                         @T("Edit Tab Item")
                                     </MListItemTitle>
-                                </MListItem>
+                                </MListItem>*@
                                 <MListItem OnClick="() => AddChildPanel(context as UpsertTabsPanelDto)">
                                     <MListItemTitle>
                                         @T("Add Panel")
@@ -48,9 +48,9 @@
                         </MList>
                     </ChildContent>
                 </MMenu>
-            }
-        </div>
-        <div style="overflow:auto;max-height:calc(100% - 35px);">
+            </div>
+        }
+        <div style="overflow:auto;@(IsEdit?"max-height:calc(100% - 35px);":"max-height:calc(100%);")">
             @switch (context.PanelType)
             {
                 case PanelTypes.Tabs:
@@ -77,6 +77,6 @@
                 default:
                     break;
             }
-        </div>          
+        </div>
     </ItemContent>
 </MGridstack>

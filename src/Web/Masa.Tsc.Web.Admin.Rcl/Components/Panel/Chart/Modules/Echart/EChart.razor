@@ -19,7 +19,7 @@
         }
         else
         {
-            <MECharts @key=@Value.GetChartKey() Option="Option" />
+            <MECharts @ref=Chart Option="Option" />
         }
     </MCardText>
 </MCard>
@@ -32,9 +32,20 @@
     public IEChartPanelValue Value { get; set; }
 
     object? Option { get; set; }
+    string? OldKey { get; set; }
+    MECharts Chart { get; set; }
 
     protected override void OnParametersSet()
     {
         Option = Value.GetChartOption();
+        var key = Value.GetChartKey() + Value.W + Value.H;
+        if (OldKey != key)
+        {
+            if (Chart is not null)
+            {
+                Chart.Resize(Value.W, Value.H);
+            }
+            OldKey = key;
+        }
     }
 }

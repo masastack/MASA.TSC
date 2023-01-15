@@ -63,7 +63,7 @@
         </MSimpleTable>
         @if (Value.EnablePaginaton)
         {
-            <SPagination Class="mt-1" @bind-Page="_page" @bind-PageSize=_pageSize Total=Value.GetTableOption().Count() />
+            <SPagination Class="mt-1" @bind-Page="Page" @bind-PageSize=PageSize Total=Value.GetTableOption().Count() />
         }
     </MCardText>
 </MCard>
@@ -71,12 +71,37 @@
 @code {
     int _page = 1;
     int _pageSize = 10;
+    ListTypes oldListType;
+
+    int Page
+    {
+        get => _page;
+        set => _page = value;
+    }
+
+    int PageSize
+    {
+        get => _pageSize;
+        set
+        {
+            _page =1;
+            _pageSize = value;
+        }
+    }
 
     [Parameter]
     public ITablePanelValue Value { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (oldListType != Value.ListType)
+        {
+            _page = 1;
+        }
+    }
 
     string GetTextColorStyle(int index)
     {

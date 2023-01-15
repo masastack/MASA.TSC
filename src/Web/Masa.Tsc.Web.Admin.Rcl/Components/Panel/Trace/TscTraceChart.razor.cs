@@ -11,6 +11,9 @@ public partial class TscTraceChart
     [Parameter]
     public ValueTuple<string, string, string>[] Data { get; set; } = Array.Empty<(string, string, string)>();
 
+    [Parameter]
+    public bool PageMode { get; set; }
+
     private static readonly QuickRangeKey s_defaultQuickRange = QuickRangeKey.Last1Hour;
 
     private object _option;

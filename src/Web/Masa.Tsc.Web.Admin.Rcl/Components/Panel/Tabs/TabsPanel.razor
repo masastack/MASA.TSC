@@ -4,7 +4,11 @@
     @foreach (var tabItem in Panel.ChildPanels)
     {
         <MTab @key="tabItem.Id" Value="tabItem.Id.ToString()">
-            @if(IsEditTabItem)
+@*            @if(IsEditTabItem)
+            {
+                <MTextField Dense HideDetails="@("auto")" Style="width:60px;" @bind-Value="@tabItem.Title" />
+            }*@
+            @if (IsEdit && Panel.CurrentTabItem == tabItem)
             {
                 <MTextField Dense HideDetails="@("auto")" Style="width:60px;" @bind-Value="@tabItem.Title" />
             }
