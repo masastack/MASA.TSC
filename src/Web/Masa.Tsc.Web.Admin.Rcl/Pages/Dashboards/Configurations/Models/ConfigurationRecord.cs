@@ -17,7 +17,7 @@ public class ConfigurationRecord
 
     public DateTimeOffset EndTime { get; set; } = DateTimeOffset.UtcNow;
 
-    public string? Key => AppName is null ? null : AppName + StartTime + EndTime;
+    public string? Key => AppName + StartTime + EndTime;//AppName is null ? null : AppName + StartTime + EndTime;
 
     public bool IsEdit { get; set; }
 

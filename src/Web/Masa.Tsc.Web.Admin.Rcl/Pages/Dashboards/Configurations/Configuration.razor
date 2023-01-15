@@ -50,7 +50,7 @@
             <CascadingValue Value="ConfigurationRecord.IsEdit">
                 <CascadingValue Value="PanelGrids" IsFixed>
                     <CascadingValue Value="ConfigurationRecord">
-                        @if (ConfigurationRecord.Panels.Any())
+                        @if (ConfigurationRecord.Panels.Any() && (ConfigurationRecord.ShowServiceCompontent is false || string.IsNullOrEmpty(ConfigurationRecord.AppName) is false))
                         {
                             <PanelGrids @key="ConfigurationRecord.DashboardId" Panels="ConfigurationRecord.Panels" />
                         }
