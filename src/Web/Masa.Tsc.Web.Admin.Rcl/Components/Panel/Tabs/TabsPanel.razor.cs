@@ -21,7 +21,20 @@ public partial class TabsPanel
     StringNumber? CurrentTab
     {
         get => Panel.CurrentTabItem?.Id.ToString();
-        set => Panel.SetCurrentTabItem(Guid.Parse(value.ToString()));
+        set 
+        {
+            Panel.SetCurrentTabItem(Guid.Parse(value.ToString()));
+            if(Panel.CurrentTabItem is not null)
+            {
+                foreach(var child in Panel.CurrentTabItem.ChildPanels)
+                {
+                    if(child is UpsertChartPanelDto chartPanel)
+                    {
+                        chartPanel.SetChartKey("tabItem");
+                    }
+                }
+            }
+        }
     }
 
     protected override void OnParametersSet()

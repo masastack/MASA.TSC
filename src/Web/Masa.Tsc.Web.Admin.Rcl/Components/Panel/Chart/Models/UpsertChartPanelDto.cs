@@ -409,6 +409,11 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         return Key;
     }
 
+    public void SetChartKey(string key)
+    {
+        Key = key + Guid.NewGuid();
+    }
+
     public object? GetChartOption()
     {
         if (_chartData.Any(item => item?.Result?.Any() is true) is false) return null;
