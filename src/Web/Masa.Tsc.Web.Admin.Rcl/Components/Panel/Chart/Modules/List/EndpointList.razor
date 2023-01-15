@@ -76,6 +76,6 @@
 
     void ToDashboardConfiguration(string dashboardId, string serviceName)
     {
-        NavigationManager.NavigateToDashboardConfiguration(dashboardId, serviceName);
+        NavigationManager.NavigateToDashboardConfiguration(dashboardId, System.Web.HttpUtility.UrlEncode(serviceName));
     }
 }
