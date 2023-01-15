@@ -11,7 +11,7 @@
         {
             @("Loading ...")
         }
-        else if (_data?.Any() is not true)
+        else if (_data?.Any(item => item.Result?.Any() is false) is not true)
         {
             <div class="full-height d-flex">
                 <div class="ma-auto">@T("No Data")</div>

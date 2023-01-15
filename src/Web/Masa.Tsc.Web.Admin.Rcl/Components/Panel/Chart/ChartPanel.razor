@@ -11,7 +11,7 @@ else
 {
     @if (Value.ChartType == "table")
     {
-        <ListPanel DataIsReady=!IsLoading Value="Value" IsEdit=ConfigurationRecord.IsEdit />
+        <ListPanel DataIsReady=!IsLoading Value="Value" IsEdit=ConfigurationRecord.IsEdit ServiceName="@ConfigurationRecord.AppName" />
     }
     else
     {

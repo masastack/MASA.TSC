@@ -1,6 +1,13 @@
 ﻿@inherits TscComponentBase
 
-<Table Value="Value" IsEdit=IsEdit />
+@if(Value.ListType == ListTypes.TopList)
+{
+    <TopList Value=Value />
+}
+else
+{
+    <Table Value="Value" IsEdit=IsEdit />
+}
 @*<DynamicComponent Type="@CurrentComponentModule.ShowType" Parameters=CurrentComponentModule.Metadata />*@
 
 @code {
@@ -13,6 +20,9 @@
 
     [Parameter]
     public bool IsEdit { get; set; }
+
+    [Parameter]
+    public string ServiceName { get; set; }
 
     ListTypes? OldListType { get; set; }
 
@@ -54,9 +64,10 @@
     async Task<List<string>> GetServiceNames()
     {
         return await base.ApiCaller.MetricService.GetValues(new RequestMetricListDto
-            {
-                Type = GetMetricValueType()
-            });
+        {
+            Service = ServiceName,
+            Type = GetMetricValueType()
+        });
     }
 
     async Task<string> GetJumpId()
