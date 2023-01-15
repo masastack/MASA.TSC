@@ -39,7 +39,7 @@
                             var item = option[i];
                             @if (item.JumpId is not null)
                             {
-                                <td @onclick="() => ToDashboardConfiguration(item)" style="@GetTextColorStyle(i)" class="@($"text-{Value.ColumnAlignment}") primary--text)">
+                                <td @onclick="() => ToDashboardConfiguration(item)" style="@GetTextColorStyle(i)" class="@($"text-{Value.ColumnAlignment}") primary--text @(IsEdit?"":"hover-pointer")">
                                     @item.Text
                                 </td>
                             }
@@ -92,6 +92,9 @@
     [Parameter]
     public ITablePanelValue Value { get; set; }
 
+    [Parameter]
+    public bool IsEdit { get; set; }
+
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
@@ -123,6 +126,7 @@
 
     void ToDashboardConfiguration(Dessert dessert)
     {
+        if (IsEdit) return;
         NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, dessert.Text);
     }
 }

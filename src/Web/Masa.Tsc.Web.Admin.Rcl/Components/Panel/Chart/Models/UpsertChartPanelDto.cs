@@ -409,6 +409,11 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         return Key;
     }
 
+    public void SetChartKey(string key)
+    {
+        Key = key + Guid.NewGuid();
+    }
+
     public object? GetChartOption()
     {
         if (_chartData.Any(item => item?.Result?.Any() is true) is false) return null;
@@ -619,6 +624,14 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         EChartType.SetValue("tooltip.renderMode", Tooltip.RenderModel);
         EChartType.SetValue("tooltip.className", Tooltip.ClassName);
         EChartType.SetValue("tooltip.trigger", Tooltip.Trigger);
+
+        EChartType.SetValue("grid", new
+        {
+            x = 60,
+            x2 = 20,
+            y2 = 20,
+            y = 25
+        });
     }
 
     public List<List<Dessert>> GetTableOption()

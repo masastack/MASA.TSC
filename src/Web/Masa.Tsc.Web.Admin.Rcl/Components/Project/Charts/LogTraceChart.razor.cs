@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using YamlDotNet.Core.Tokens;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class LogTraceChart
@@ -80,7 +82,6 @@ public partial class LogTraceChart
         _options.SetValue("legend.data", legend);
         _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value)));
         _options.SetValue("series", dddd.Select(item => new {name=item.Key,type="line",data=item.Value }));
-
         await Task.CompletedTask;
     }
 

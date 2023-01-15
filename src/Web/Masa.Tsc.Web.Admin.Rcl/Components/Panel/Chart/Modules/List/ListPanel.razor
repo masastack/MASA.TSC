@@ -1,6 +1,14 @@
 ﻿@inherits TscComponentBase
 
-<DynamicComponent Type="@CurrentComponentModule.ShowType" Parameters=CurrentComponentModule.Metadata />
+@if(Value.ListType == ListTypes.TopList)
+{
+    <TopList Value=Value />
+}
+else
+{
+    <Table Value="Value" IsEdit=IsEdit />
+}
+@*<DynamicComponent Type="@CurrentComponentModule.ShowType" Parameters=CurrentComponentModule.Metadata />*@
 
 @code {
 
@@ -10,22 +18,28 @@
     [Parameter]
     public bool DataIsReady { get; set; }
 
+    [Parameter]
+    public bool IsEdit { get; set; }
+
+    [Parameter]
+    public string ServiceName { get; set; }
+
     ListTypes? OldListType { get; set; }
 
-    Dictionary<ListTypes, DynamicComponentDescription> ComponentModuleMap { get; set; }
+    //Dictionary<ListTypes, DynamicComponentDescription> ComponentModuleMap { get; set; }
 
-    DynamicComponentDescription CurrentComponentModule => ComponentModuleMap[Value.ListType];
+    //DynamicComponentDescription CurrentComponentModule => ComponentModuleMap[Value.ListType];
 
-    protected override void OnInitialized()
-    {
-        ComponentModuleMap = new()
-        {
-            [ListTypes.ServiceList] = new(typeof(Table), new() { ["Value"] = Value }),
-            [ListTypes.InstanceList] = new(typeof(Table), new() { ["Value"] = Value }),
-            [ListTypes.EndpointList] = new(typeof(Table), new() { ["Value"] = Value }),
-            [ListTypes.TopList] = new(typeof(TopList), new() { ["Value"] = Value })
-        };
-    }
+    //protected override void OnInitialized()
+    //{
+    //    ComponentModuleMap = new()
+    //    {
+    //        [ListTypes.ServiceList] = new(typeof(Table), new() { ["Value"] = Value, ["IsEdit"] = IsEdit }),
+    //        [ListTypes.InstanceList] = new(typeof(Table), new() { ["Value"] = Value, ["IsEdit"] = IsEdit }),
+    //        [ListTypes.EndpointList] = new(typeof(Table), new() { ["Value"] = Value, ["IsEdit"] = IsEdit }),
+    //        [ListTypes.TopList] = new(typeof(TopList), new() { ["Value"] = Value, ["IsEdit"] = IsEdit })
+    //    };
+    //}
 
     protected override async Task OnParametersSetAsync()
     {
@@ -51,6 +65,7 @@
     {
         return await base.ApiCaller.MetricService.GetValues(new RequestMetricListDto
         {
+            Service = ServiceName,
             Type = GetMetricValueType()
         });
     }
