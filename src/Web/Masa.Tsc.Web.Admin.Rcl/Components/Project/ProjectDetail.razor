@@ -15,11 +15,11 @@
             <span class="regular3--text body2">创建人</span>
             <MListItem Class="px-0 mt-2">
                 <MListItemAvatar>
-                    <MImage alt="Admin Avatar" Src="@Value.Creator.Avatar">
+                    <MImage alt="Admin Avatar" Src="@Value?.Creator?.Avatar">
                     </MImage>
                 </MListItemAvatar>
                 <MListItemContent>
-                    <MListItemTitle Class="regular--text body2">@Value.Creator.DisplayName</MListItemTitle>
+                    <MListItemTitle Class="regular--text body2">@Value?.Creator?.DisplayName</MListItemTitle>
                 </MListItemContent>
             </MListItem>
         </div>

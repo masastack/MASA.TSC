@@ -67,7 +67,7 @@ public class QueryHandler
 
     private async Task<UserDto> GetUserAsync(Guid creatorId)
     {
-        var creator = (await _authClient.UserService.GetUsersAsync(creatorId))?.First();
+        var creator = (await _authClient.UserService.GetUsersAsync(creatorId))?.FirstOrDefault();
         if (creator != null)
             return new UserDto
             {
