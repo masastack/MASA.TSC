@@ -5,12 +5,13 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscEChartBase : TscComponentBase
 {
-    protected bool _isLoading = true;
+    protected bool _isLoading;
 
     internal async Task OnLoadAsync(ProjectAppSearchModel query)
     {
+        _isLoading = true;
+        StateHasChanged();
         await LoadAsync(query);
-        await Task.Delay(200);
         _isLoading = false;
         StateHasChanged();
     }
