@@ -43,7 +43,7 @@ public partial class Team
             UserId = CurrentUserId
         });
 
-        _appMonitorDto = data.Monitor;
+        _appMonitorDto = data?.Monitor??new();
         if (data != null)
         {
             _projects = data.Projects;
