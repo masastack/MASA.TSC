@@ -39,10 +39,10 @@ public partial class LogPanel
     public bool PageMode { get; set; }
 
     [Parameter]
-    public int Height { get; set; }
+    public double Height { get; set; }
 
     [Parameter]
-    public int Width { get; set; }
+    public double Width { get; set; }
 
     int Page
     {

@@ -32,6 +32,7 @@
     public IEChartPanelValue Value { get; set; }
 
     object? Option { get; set; }
+    string Key => Value.GetChartKey() + Value.W + Value.H;
     string? OldKey { get; set; }
     public MECharts? Chart { get; set; }
 
@@ -43,23 +44,13 @@
     protected override async Task OnParametersSetAsync()
     {
         Option = Value.GetChartOption();
-        var key = Value.GetChartKey() + Value.W + Value.H;
-        if (OldKey != key)
+        if (OldKey != Key)
         {
+            OldKey = Key;
             if (Chart is not null && (Value.W, Value.H)!=(0,0))
             {
-                await Task.Delay(300);
-                if (key == Value.GetChartKey() + Value.W + Value.H)
-                {
-                    await Chart.Resize(Value.W-100, Value.H -120);
-                }
+                await Chart.Resize(Value.W, Value.H);
             }  
-            OldKey = key;
         }
     }
-
-    //protected override bool ShouldRender()
-    //{
-    //    return OldKey == Value.GetChartKey() + Value.W + Value.H;
-    //}
 }

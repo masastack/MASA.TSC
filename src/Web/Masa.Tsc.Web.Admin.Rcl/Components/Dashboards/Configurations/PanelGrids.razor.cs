@@ -93,8 +93,10 @@ public partial class PanelGrids
     {
         var panel = Panels.FirstOrDefault(p => p.Id.ToString() == args.Id);
         if (panel is null) return;
-        panel.W = args.Width;
-        panel.H = args.Height;
+        panel.W = args.Width - 32;
+        panel.H = args.Height - 135;
+
+        Console.WriteLine($"{args.Width} and {args.Height}");
     }
 
     public async Task SavePanelGridAsync()

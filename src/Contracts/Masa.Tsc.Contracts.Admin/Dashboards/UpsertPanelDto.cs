@@ -39,10 +39,10 @@ public class UpsertPanelDto
     public UpsertPanelDto? ParentPanel { get; set; }
 
     [JsonIgnore]
-    public int H { get; set; }
+    public double H { get; set; }
 
     [JsonIgnore]
-    public int W { get; set; }
+    public double W { get; set; }
 
     public virtual UpsertPanelDto Clone(UpsertPanelDto panel)
     {

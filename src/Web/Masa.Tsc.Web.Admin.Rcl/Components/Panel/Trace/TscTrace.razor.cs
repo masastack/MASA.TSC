@@ -31,10 +31,10 @@ public partial class TscTrace
     public DateTime EndDateTime { get; set; }
 
     [Parameter]
-    public int Height { get; set; }
+    public double Height { get; set; }
 
     [Parameter]
-    public int Width { get; set; }
+    public double Width { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

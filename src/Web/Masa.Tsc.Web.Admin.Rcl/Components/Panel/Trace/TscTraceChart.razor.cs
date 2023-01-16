@@ -15,10 +15,10 @@ public partial class TscTraceChart
     public bool PageMode { get; set; }
 
     [Parameter]
-    public int Height { get; set; }
+    public double Height { get; set; }
 
     [Parameter]
-    public int Width { get; set; }
+    public double Width { get; set; }
 
     private static readonly QuickRangeKey s_defaultQuickRange = QuickRangeKey.Last1Hour;
 

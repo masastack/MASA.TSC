@@ -29,9 +29,9 @@ public interface IPanelValue
 
     #region ui
 
-    public int H { get; set; }
+    public double H { get; set; }
 
-    public int W { get; set; }
+    public double W { get; set; }
 
     #endregion
 }
