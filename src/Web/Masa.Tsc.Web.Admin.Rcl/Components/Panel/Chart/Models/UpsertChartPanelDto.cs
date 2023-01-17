@@ -1,11 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using System.Linq;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Models;
 
-public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePanelValue, IEChartPanelValue
+public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPanelValue
 {
     public string Color
     {
@@ -421,7 +419,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
         LoadChartOption();
 
         return EChartType.Json;
-    }   
+    }
 
     void LoadChartData()
     {
@@ -434,8 +432,8 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             EChartType.Json["series"] = new JsonArray(data.Select(item => new JsonObject
             {
                 ["type"] = ChartType,
-                ["name"] = string.Join("-", item.Metric.Values),
-                ["data"] = new JsonArray(item.Values.Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), value[1].ToString()))
+                ["name"] = string.Join("-", item.Metric!.Values),
+                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), value[1].ToString()))
                                                     .ToArray())
             }).ToArray());
         }
@@ -444,7 +442,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             var data = GetMatrixRangeData();
             EChartType.Json["series"] = new JsonArray(data.Select(item => new JsonObject
             {
-                ["name"] = string.Join("-", item.Metric.Values),
+                ["name"] = string.Join("-", item.Metric!.Values),
                 ["type"] = "line",
                 ["stack"] = "Total",
                 ["areaStyle"] = new JsonObject(),
@@ -452,26 +450,26 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
                 {
                     ["focus"] = "series"
                 },
-                ["data"] = new JsonArray(item.Values.Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), value[1].ToString()))
+                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), value[1].ToString()))
                                                     .ToArray())
             }).ToArray());
         }
         else if (ChartType is "pie")
         {
             var data = GetInstantVectorData();
-            EChartType.Json["series"].AsArray().First()["data"] = new JsonArray(data.Select(item => new JsonObject
+            EChartType.Json["series"]!.AsArray().First()!["data"] = new JsonArray(data.Select(item => new JsonObject
             {
-                ["name"] = string.Join("-", item.Metric.Values),
-                ["value"] = item.Value[1].ToString()
+                ["name"] = string.Join("-", item.Metric!.Values),
+                ["value"] = item.Value![1].ToString()
             }).ToArray());
         }
         else if (ChartType is "gauge")
         {
             var data = GetInstantVectorData();
-            EChartType.Json["series"].AsArray().First()["data"] = new JsonArray(data.Take(1).Select(item => new JsonObject
+            EChartType.Json["series"]!.AsArray().First()!["data"] = new JsonArray(data.Take(1).Select(item => new JsonObject
             {
-                ["name"] = string.Join("-", item.Metric.Values),
-                ["value"] = item.Value[1].ToString(),
+                ["name"] = string.Join("-", item.Metric!.Values),
+                ["value"] = item.Value![1].ToString(),
                 ["title"] = new JsonObject()
                 {
                     ["offsetCenter"] = new JsonArray($"{GetPosition(data.IndexOf(item) + 1)}%", "80%")
@@ -499,7 +497,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             {
                 return 60 * index - 32 * Metrics.Count;
             }
-        }     
+        }
     }
 
     List<QueryResultMatrixRangeResponse> GetMatrixRangeData()
@@ -512,7 +510,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             {
                 if (item is not null)
                 {
-                    foreach (var result in item.Result)
+                    foreach (var result in item.Result!)
                     {
                         if (result is QueryResultMatrixRangeResponse matrix) data.Add(matrix);
                     }
@@ -533,7 +531,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             {
                 if (item is not null)
                 {
-                    foreach (var result in item.Result)
+                    foreach (var result in item.Result!)
                     {
                         if (result is QueryResultInstantVectorResponse matrix) data.Add(matrix);
                     }
@@ -554,7 +552,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             {
                 if (item is not null)
                 {
-                    data.Add(item.Result.Select(item => (QueryResultInstantVectorResponse)item).ToList());
+                    data.Add(item.Result!.Select(item => (QueryResultInstantVectorResponse)item).ToList());
                 }
             }
         }
@@ -570,7 +568,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
 
         if (ChartType is "line-area")
         {
-            var yAxis = EChartType.Json["yAxis"].AsArray().First()!;
+            var yAxis = EChartType.Json["yAxis"]!.AsArray().First()!;
             yAxis["show"] = YAxis.Show;
             yAxis["axisLine"] = new JsonObject
             {
@@ -584,7 +582,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             {
                 ["show"] = YAxis.ShowLabel
             };
-            var xAxis = EChartType.Json["xAxis"].AsArray().First()!;
+            var xAxis = EChartType.Json["xAxis"]!.AsArray().First()!;
             xAxis["show"] = XAxis.Show;
             xAxis["axisLine"] = new JsonObject
             {
@@ -651,7 +649,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
             {
                 var firstData = item.FirstOrDefault(e =>
                 {
-                    if (e.Metric?.TryGetValue(jumpName, out object serviceName) is true)
+                    if (e.Metric?.TryGetValue(jumpName, out var serviceName) is true)
                     {
                         return serviceName.ToString() == service;
                     }
@@ -659,7 +657,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
                 });
                 if (firstData is not null)
                 {
-                    return new Dessert { Text = firstData.Value[1].ToString() ?? "" };
+                    return new Dessert { Text = firstData.Value![1].ToString() ?? "" };
                 }
                 return new Dessert { Text = "" };
             }));
@@ -678,12 +676,12 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITopListPanelValue, ITablePan
 
         var data = GetTableInstantVectorData().FirstOrDefault();
         if (data is null) return;
-        _topListData.AddRange(data.Where(item => item.Value[1].ToString() !="NaN")
+        _topListData.AddRange(data.Where(item => item.Value![1].ToString() != "NaN")
                                 .Select(item => new TopListOption
                                 {
                                     Href = href,
-                                    Text = string.Join('-', item.Metric.Select(metric => metric.Value)),
-                                    Value = Convert.ToDouble(item.Value[1] ?? 0)
+                                    Text = string.Join('-', item.Metric!.Select(metric => metric.Value)),
+                                    Value = Convert.ToDouble(item.Value![1] ?? 0)
                                 }));
     }
 

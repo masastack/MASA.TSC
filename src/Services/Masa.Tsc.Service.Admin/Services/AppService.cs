@@ -7,7 +7,7 @@ public class AppService : ServiceBase
 {
     public AppService() : base("/api/app")
     {
-        
+
     }
 
     public async Task<List<AppDto>> GetListAsync([FromServices] IEventBus eventBus, string projectId)

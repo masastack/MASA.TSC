@@ -12,8 +12,8 @@ public class CommandHandler
     private readonly ITraceServiceStateRepository _traceServiceStateRepository;
     private readonly ILogger _logger;
 
-    private static List<TraceServiceCache> addNodes = new ();
-    private static List<TraceServiceRelation> addRestions = new ();
+    private static List<TraceServiceCache> addNodes = new();
+    private static List<TraceServiceRelation> addRestions = new();
     private static readonly ConcurrentQueue<TraceNodeCache> traceNodeQueue = new();
     private static bool _readComplete = false;
     private static Task _currentTask;

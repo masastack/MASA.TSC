@@ -64,30 +64,16 @@ public partial class SearchBar
         await SearchAsync();
     }
 
-    //protected override async Task OnParametersSetAsync()
-    //{
-    //    await SearchAsync();
-    //    await base.OnParametersSetAsync();
-    //}
-
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         await base.SetParametersAsync(parameters);
-        if (parameters.TryGetValue(nameof(Apps), out List<AppDto> apps))
-        {
-            if (apps != null && apps.Any() && string.IsNullOrEmpty(_value.AppId) || (apps == null || !apps.Any()) && !apps.Any(app => app.Identity == _value.AppId))
-                await SearchAsync();
-        }
-    }
+        if (parameters.TryGetValue(nameof(Apps), out List<AppDto> apps)
+            && apps != null && apps.Any()
+            && string.IsNullOrEmpty(_value.AppId) || (apps == null || !apps.Any())
+            && !apps.Any(app => app.Identity == _value.AppId))
 
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    if (firstRender && OnSearch.HasDelegate)
-    //    {
-    //        await SearchAsync();
-    //    }
-    //    await base.OnAfterRenderAsync(firstRender);
-    //}
+            await SearchAsync();
+    }
 
     private async Task OnSelectItemUpdate(AppDto item)
     {

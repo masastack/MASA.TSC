@@ -17,10 +17,12 @@
         //GlobalConfig.Loading = false;
         return Task.CompletedTask;
     }
-
+    
     private List<string> _whiteUrlRoutes = new()
     {
+        // for scheduler logs jump 
         "dashbord/log/*",
+        // for instrument like serviceList,endpointList,instanceList  jump to child instrument
         "dashbord/*"        
     };
 }

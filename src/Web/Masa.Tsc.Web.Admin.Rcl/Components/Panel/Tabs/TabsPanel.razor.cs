@@ -21,14 +21,14 @@ public partial class TabsPanel
     StringNumber? CurrentTab
     {
         get => Panel.CurrentTabItem?.Id.ToString();
-        set 
+        set
         {
-            Panel.SetCurrentTabItem(Guid.Parse(value.ToString()));
-            if(Panel.CurrentTabItem is not null)
+            Panel.SetCurrentTabItem(Guid.Parse(value.ToString()!));
+            if (Panel.CurrentTabItem is not null)
             {
-                foreach(var child in Panel.CurrentTabItem.ChildPanels)
+                foreach (var child in Panel.CurrentTabItem.ChildPanels)
                 {
-                    if(child is UpsertChartPanelDto chartPanel)
+                    if (child is UpsertChartPanelDto chartPanel)
                     {
                         chartPanel.SetChartKey("tabItem");
                     }

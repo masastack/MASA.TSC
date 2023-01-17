@@ -1,4 +1,4 @@
-﻿    // Copyright (c) MASA Stack All rights reserved.
+﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations;
@@ -28,21 +28,21 @@ public partial class Configuration
         {
             ConfigurationRecord.Clear();
             return;
-        }       
+        }
 
-        await GetPanelsAsync();      
+        await GetPanelsAsync();
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        if(ConfigurationRecord.DashboardId != DashboardId)
+        if (ConfigurationRecord.DashboardId != DashboardId)
         {
             ConfigurationRecord.DashboardId = DashboardId;
             ConfigurationRecord.AppName = ServiceName;
             //PanelGrids.Clear();
             await GetPanelsAsync();
         }
-        else if(ServiceName is not null && ServiceName != ConfigurationRecord.AppName)
+        else if (ServiceName is not null && ServiceName != ConfigurationRecord.AppName)
         {
             ConfigurationRecord.AppName = ServiceName;
             //await GetPanelsAsync();
@@ -63,7 +63,7 @@ public partial class Configuration
         PanelGrids.Clear();
         var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(ConfigurationRecord.DashboardId));
         //ConfigurationRecord.Panels.Clear();
-        if(detail is not null)
+        if (detail is not null)
         {
             ConfigurationRecord.ShowServiceCompontent = detail.Model != ModelTypes.All.ToString();
             if (ConfigurationRecord.ShowServiceCompontent is false) ConfigurationRecord.AppName = "";
@@ -84,8 +84,8 @@ public partial class Configuration
         var tabsPanels = panels.Where(panel => panel.PanelType == PanelTypes.Tabs).ToList();
         var tabItemPanels = panels.Where(panel => panel.PanelType == PanelTypes.TabItem).ToList();
         panels.RemoveAll(panel => panel.PanelType == PanelTypes.Chart || panel.PanelType == PanelTypes.Tabs || panel.PanelType == PanelTypes.TabItem);
-        panels.AddRange(chartPanels.Select(panel => new UpsertChartPanelDto(default).Clone(panel)));
-        panels.AddRange(tabsPanels.Select(panel => new UpsertTabsPanelDto(default).Clone(panel)));
+        panels.AddRange(chartPanels.Select(panel => new UpsertChartPanelDto(Guid.Empty).Clone(panel)));
+        panels.AddRange(tabsPanels.Select(panel => new UpsertTabsPanelDto(Guid.Empty).Clone(panel)));
         panels.AddRange(tabItemPanels.Select(panel => new UpsertTabItemPanelDto(parentPanel as UpsertTabsPanelDto).Clone(panel)));
         foreach (var panel in panels)
         {
@@ -112,7 +112,7 @@ public partial class Configuration
 
     async Task SaveAsync()
     {
-        if(ConfigurationRecord.Panels.Any() is false)
+        if (ConfigurationRecord.Panels.Any() is false)
         {
             PanelGrids.Clear();
         }
@@ -133,7 +133,7 @@ public partial class Configuration
 
     async Task SwitchEdit()
     {
-        if(ConfigurationRecord.IsEdit is true)
+        if (ConfigurationRecord.IsEdit is true)
         {
             var confirm = await OpenConfirmDialog(T("Operation confirmation"), T("Are you sure switch view mode,unsaved data will be lost"), AlertTypes.Warning);
             if (confirm)

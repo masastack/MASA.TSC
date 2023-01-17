@@ -776,7 +776,7 @@ public class EChartType
     public string Src { get; set; }
 
     [JsonIgnore]
-    public object Option=> Json.DeepClone();
+    public object Option => Json.DeepClone();
 
     public JsonNode Json { get; set; }
 

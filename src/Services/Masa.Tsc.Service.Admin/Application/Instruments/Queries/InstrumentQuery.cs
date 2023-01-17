@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Queries;
 
-public record InstrumentQuery(Guid Id,Guid UserId) : Query<UpdateDashboardDto>
+public record InstrumentQuery(Guid Id, Guid UserId) : Query<UpdateDashboardDto>
 {
     public override UpdateDashboardDto Result { get; set; }
 }

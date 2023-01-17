@@ -14,7 +14,7 @@ public class ProjectService : BaseService
 
     public async Task<List<ProjectDto>> GetProjectsAsync(Guid userId) => (await Caller.GetAsync<List<ProjectDto>>($"{RootPath}?userId={userId}"))!;
 
-    public async Task<TeamMonitorDto> OverviewAsync(RequestTeamMonitorDto model) =>  (await Caller.GetAsync<TeamMonitorDto>($"{RootPath}/overview", model))!;
+    public async Task<TeamMonitorDto> OverviewAsync(RequestTeamMonitorDto model) => (await Caller.GetAsync<TeamMonitorDto>($"{RootPath}/overview", model))!;
 
     public async Task<List<KeyValuePair<string, string>>> GetProjectTypesAsync()
     {

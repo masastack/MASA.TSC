@@ -1,5 +1,5 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
-// Licensed under the Apache License. See LICENSE.txt in the project root for license information.
+// Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 namespace Masa.Tsc.Contracts.Admin.Infrastructure.Options.Utils;
 
@@ -85,14 +85,14 @@ public static class FluentValidationExtensions
 
     public static IRuleBuilderOptions<T, string> MinLength<T>(this IRuleBuilder<T, string> ruleBuilder, int minimumLength, string propertyName = "{PropertyName}")
     {
-        return ruleBuilder.Must(value => string.IsNullOrEmpty(value) || value.Length>= minimumLength)
-                    .WithMessage($"Please enter a number greater than {minimumLength} of "+ propertyName);
+        return ruleBuilder.Must(value => string.IsNullOrEmpty(value) || value.Length >= minimumLength)
+                    .WithMessage($"Please enter a number greater than {minimumLength} of " + propertyName);
     }
-    
-    public static IRuleBuilderOptions<T, string> MaxLength<T>(this IRuleBuilder<T, string> ruleBuilder, int maximumLength,string propertyName = "{PropertyName}")
+
+    public static IRuleBuilderOptions<T, string> MaxLength<T>(this IRuleBuilder<T, string> ruleBuilder, int maximumLength, string propertyName = "{PropertyName}")
     {
         return ruleBuilder.MaximumLength(maximumLength)
-                    .WithMessage("Please enter a number less than {MaxLength} of "+ propertyName);
+                    .WithMessage("Please enter a number less than {MaxLength} of " + propertyName);
     }
 
     public static IRuleBuilderOptions<T, string> Port<T>(this IRuleBuilder<T, string> ruleBuilder)

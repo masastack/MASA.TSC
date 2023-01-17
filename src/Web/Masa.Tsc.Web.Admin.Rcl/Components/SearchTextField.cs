@@ -1,10 +1,10 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
-// Licensed under the Apache License. See LICENSE.txt in the project root for license information.
+// Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public class SearchTextField : STextField<string>
-{   
+{
     [Parameter]
     public bool FillBackground { get; set; } = true;
 
@@ -14,14 +14,15 @@ public class SearchTextField : STextField<string>
         Solo = true;
         Small = true;
         BackgroundColor = FillBackground ? "fill-background" : "white";
-        Style = "max-width:340px;";       
+        Style = "max-width:340px;";
         Placeholder = I18n!.T("Search");
         PrependInnerContent = builder =>
         {
             builder.OpenComponent<MIcon>(0);
             builder.AddAttribute(1, "Size", (StringNumber)16);
             builder.AddAttribute(2, "Class", "mr-2 emphasis2--text");
-            builder.AddAttribute(3, "ChildContent", (RenderFragment)delegate (RenderTreeBuilder builder2) {
+            builder.AddAttribute(3, "ChildContent", (RenderFragment)delegate (RenderTreeBuilder builder2)
+            {
                 builder2.AddContent(4, IconConstants.Search);
             });
             builder.CloseComponent();

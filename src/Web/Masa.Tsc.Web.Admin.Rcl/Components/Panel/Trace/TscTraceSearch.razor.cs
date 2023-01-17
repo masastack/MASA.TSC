@@ -53,7 +53,7 @@ public partial class TscTraceSearch
     private async Task SearchEndpoints(string key)
     {
         _endpointSearching = true;
-        _endpoints = (await QueryEndpoints(_service, _instance??string.Empty, key)).ToList();
+        _endpoints = (await QueryEndpoints(_service, _instance ?? string.Empty, key)).ToList();
         _endpointSearching = false;
     }
 

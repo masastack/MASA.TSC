@@ -36,7 +36,7 @@ public partial class TeamProjectDialog
 
     List<AppDetailModel> Apps { get; set; } = new();
 
-    TeamDto Team { get; set; }    
+    TeamDto Team { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -53,7 +53,7 @@ public partial class TeamProjectDialog
                 ServiceType = app.ServiceType
             }).ToList();
             Team.ProjectTotal = MonitorProjectCount;
-            Team.AppTotal= MonitorServiceCount;
+            Team.AppTotal = MonitorServiceCount;
             ConfigurationRecord.AppName = Apps.FirstOrDefault()?.Identity;
         }
     }

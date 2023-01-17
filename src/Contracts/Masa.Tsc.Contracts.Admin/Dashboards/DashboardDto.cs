@@ -9,7 +9,7 @@ public class DashboardDto
 
     public string Name { get; set; }
 
-    public FolderDto Folder {  get; set; }
+    public FolderDto Folder { get; set; }
 
     public bool IsRoot { get; set; }
 

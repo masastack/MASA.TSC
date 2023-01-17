@@ -3,7 +3,6 @@
 @inherits TscComponentBase
 
 <PageTitle>@T("ProjectTeam")</PageTitle>
-
 <TeamSearch OnValueChanged="OnSearch" OnTabsChanged="OnTabsChange" OnSearchChanged="OnSearchChange"></TeamSearch>
 @if (_isLoad)
 {
@@ -65,53 +64,3 @@ else
 }
 
 <TeamProjectDialog @bind-Visible="_visible" ProjectId="@_selectedProjectId" TeamId="@_selectedTeamId" MonitorProjectCount="@_teamProjectCount" MonitorServiceCount="@_teamServiceCount" />
-@*<MLoading @bind-Value="_isLoad" />*@
-
-@code {
-    private bool _visible;
-    private string _selectedProjectId;
-    private Guid _selectedTeamId;
-    private int _teamProjectCount = 0;
-    private int _teamServiceCount = 0;
-
-    private void HandleOnItemClick(ProjectOverviewDto item)
-    {
-        _selectedProjectId = item.Identity;
-        _selectedTeamId = item.TeamId;
-        _teamProjectCount = _projects.Count(p => p.TeamId == _selectedTeamId);
-        _teamServiceCount = _projects.Where(p => p.TeamId == _selectedTeamId).Sum(p=>p.Apps.Count);
-        _visible = true;
-    }
-
-    private string CellBackBackgroundStyle(ProjectOverviewDto overviewDto)
-    {
-        return overviewDto.Status switch
-        {
-            MonitorStatuses.Normal => "background: #E6FAF5;",
-            MonitorStatuses.Warn => "background: #FFF7E8;",
-            MonitorStatuses.Error => "background: #FFECE8;",
-            _ => ""
-        };
-    }
-
-    private string CellBorderColor(ProjectOverviewDto overviewDto)
-    {
-        return overviewDto.Status switch
-        {
-            MonitorStatuses.Normal => "#CDF5EB",
-            MonitorStatuses.Warn => "#FFE4BA",
-            MonitorStatuses.Error => "#FDCDC5",
-            _ => ""
-        };
-    }
-
-    private string ChipLabelColor(AppDto appDto)
-    {
-        return appDto.Status switch
-        {
-            MonitorStatuses.Warn => "#FF7D00",
-            MonitorStatuses.Error => "#FF5252",
-            _ => "#66BB6A"
-        };
-    }
-}

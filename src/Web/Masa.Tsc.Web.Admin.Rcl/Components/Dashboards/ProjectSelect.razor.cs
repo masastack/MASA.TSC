@@ -22,7 +22,7 @@ public partial class ProjectSelect
     protected override async Task OnInitializedAsync()
     {
         var data = await ApiCaller.ProjectService.GetProjectsAsync(CurrentUserId);
-        if (data!= null)
+        if (data != null)
             Projects = data;
 
         await base.OnInitializedAsync();

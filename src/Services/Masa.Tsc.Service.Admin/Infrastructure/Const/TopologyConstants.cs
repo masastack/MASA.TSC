@@ -29,7 +29,7 @@ internal static class TopologyConstants
     /// 拓朴图的es连接客户端名称
     /// </summary>
     public const string ES_CLINET_NAME = "masa.tsc.service.admin.topology";
-   
+
     public const string SERVICE_INDEX_NAME = "masa-stack-topology-service-v1";
 
     public const string SERVICE_RELATION_INDEX_NAME = "masa-stack-topology-service-relations-v1";

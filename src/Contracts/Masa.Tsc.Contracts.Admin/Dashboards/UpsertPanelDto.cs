@@ -59,7 +59,7 @@ public class UpsertPanelDto
         Metrics.Clear();
         Metrics.AddRange(panel.Metrics ?? new());
         ExtensionData.Clear();
-        if(panel.ExtensionData is not null)
+        if (panel.ExtensionData is not null)
         {
             foreach (var (key, value) in panel.ExtensionData)
             {

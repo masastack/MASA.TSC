@@ -23,7 +23,7 @@ public partial class ProjectCharts
         {
             ChartType = "table",
             ListType = ListTypes.TopList,
-            Title = T("Service Endpoint Load")+ "("+T("calls/min") +")",
+            Title = T("Service Endpoint Load") + "(" + T("calls/min") + ")",
             //Description = T("Service Endpoint") + "(" + T("calls/min") + ")",
             Metrics = new List<PanelMetricDto>
             {
@@ -37,7 +37,7 @@ public partial class ProjectCharts
         {
             ChartType = "table",
             ListType = ListTypes.TopList,
-            Title = T("Service Slow Endpoint")+"("+T("ms")+")",
+            Title = T("Service Slow Endpoint") + "(" + T("ms") + ")",
             //Description = "Service Slow Endpont(ms)",
             Metrics = new List<PanelMetricDto>
             {
@@ -64,25 +64,24 @@ public partial class ProjectCharts
 
     internal async Task OnLoadDataAsyc(ProjectAppSearchModel? query = null)
     {
-        query ??= new ()
+        query ??= new()
         {
-            AppId = ConfigurationRecord.AppName,
+            AppId = ConfigurationRecord.AppName!,
             Start = ConfigurationRecord.StartTime.UtcDateTime,
             End = ConfigurationRecord.EndTime.UtcDateTime,
         };
-        var tasks = new List<Task>
-        {
-            _errorWarnChart?.OnLoadAsync(query),
-            _traceLogChart?.OnLoadAsync(query),
-            _traceLogChart1?.OnLoadAsync(query),
-            _avgResponseChart?.OnLoadAsync(query),
-            _apdexChart?.OnLoadAsync(query)
-        };
-        
-        await Task.WhenAll(tasks);
+        var tasks = new List<Task>();
+        if (_errorWarnChart != null)
+            tasks.Add(_errorWarnChart.OnLoadAsync(query));
+        if (_traceLogChart != null)
+            tasks.Add(_traceLogChart.OnLoadAsync(query));
+        if (_traceLogChart1 != null)
+            tasks.Add(_traceLogChart1.OnLoadAsync(query));
+        if (_avgResponseChart != null)
+            tasks.Add(_avgResponseChart.OnLoadAsync(query));
+        if (_apdexChart != null)
+            tasks.Add(_apdexChart.OnLoadAsync(query));
 
-        //Task.WhenAll(tasks).ContinueWith(task => { 
-        //     InvokeAsync(()=>StateHasChanged())
-        //});
+        await Task.WhenAll(tasks);
     }
 }

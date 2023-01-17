@@ -60,7 +60,7 @@ public partial class MonitorCard
     private void UpdateItems()
     {
         _items[0].ServiceTotal = _appMonitorDto.ServiceTotal;
-        _items[0].AppTotal = _appMonitorDto.AppTotal;        
+        _items[0].AppTotal = _appMonitorDto.AppTotal;
 
         _items[1].ServiceTotal = _appMonitorDto.ServiceWarn;
         _items[1].AppTotal = _appMonitorDto.WarnCount;

@@ -2,7 +2,6 @@
 @page "/datav/example2"
 @inherits TscComponentBase
 
-<Navigation Href="/datav/example2"></Navigation>
 <TeamSearch OnValueChanged="OnSearch" OnLoadProjectsAsync="LoadProjectAsync"></TeamSearch>
 <MonitorCard Monitor=_monitor Error=_error Normal="_normal" Warn="_warn" />
 <ProjectHexagon Projects=_projects RowCount=4></ProjectHexagon>

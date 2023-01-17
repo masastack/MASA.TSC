@@ -11,7 +11,7 @@ public class AddDashboardDto
 
     public bool IsRoot { get; set; }
 
-    public int Order {  get; set; }
+    public int Order { get; set; }
 
     public LayerTypes Layer { get; set; }
 

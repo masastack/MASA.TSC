@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using System;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages;
 
 public partial class Team
@@ -14,13 +12,52 @@ public partial class Team
     private bool _isLoad = true;
     private StringNumber _projectStatus = "";
 
-    protected override async void OnAfterRender(bool firstRender)
+
+    private bool _visible;
+    private string _selectedProjectId;
+    private Guid _selectedTeamId;
+    private int _teamProjectCount = 0;
+    private int _teamServiceCount = 0;
+
+    private void HandleOnItemClick(ProjectOverviewDto item)
     {
-        //if (firstRender)
-        //{
-        //    await LoadData();
-        //    StateHasChanged();
-        //}
+        _selectedProjectId = item.Identity;
+        _selectedTeamId = item.TeamId;
+        _teamProjectCount = _projects.Count(p => p.TeamId == _selectedTeamId);
+        _teamServiceCount = _projects.Where(p => p.TeamId == _selectedTeamId).Sum(p => p.Apps.Count);
+        _visible = true;
+    }
+
+    private string CellBackBackgroundStyle(ProjectOverviewDto overviewDto)
+    {
+        return overviewDto.Status switch
+        {
+            MonitorStatuses.Normal => "background: #E6FAF5;",
+            MonitorStatuses.Warn => "background: #FFF7E8;",
+            MonitorStatuses.Error => "background: #FFECE8;",
+            _ => ""
+        };
+    }
+
+    private string CellBorderColor(ProjectOverviewDto overviewDto)
+    {
+        return overviewDto.Status switch
+        {
+            MonitorStatuses.Normal => "#CDF5EB",
+            MonitorStatuses.Warn => "#FFE4BA",
+            MonitorStatuses.Error => "#FDCDC5",
+            _ => ""
+        };
+    }
+
+    private string ChipLabelColor(AppDto appDto)
+    {
+        return appDto.Status switch
+        {
+            MonitorStatuses.Warn => "#FF7D00",
+            MonitorStatuses.Error => "#FF5252",
+            _ => "#66BB6A"
+        };
     }
 
     private async Task LoadData()
@@ -43,7 +80,7 @@ public partial class Team
             UserId = CurrentUserId
         });
 
-        _appMonitorDto = data?.Monitor??new();
+        _appMonitorDto = data?.Monitor ?? new();
         if (data != null)
         {
             _projects = data.Projects;
@@ -98,7 +135,7 @@ public partial class Team
         {
             result = result.Where(item => item.LabelName.Equals(_teamSearchModel.ProjectType, StringComparison.OrdinalIgnoreCase));
         }
-        if(string.IsNullOrEmpty(_teamSearchModel?.Keyword) is false)
+        if (string.IsNullOrEmpty(_teamSearchModel?.Keyword) is false)
         {
             result = result.Where(item => item.Name.Contains(_teamSearchModel.Keyword, StringComparison.OrdinalIgnoreCase) || item.Apps.Any(app => app.Name.Contains(_teamSearchModel.Keyword, StringComparison.OrdinalIgnoreCase)));
         }

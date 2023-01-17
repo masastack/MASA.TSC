@@ -20,6 +20,6 @@ public class InstrumentDetailDto
     public bool IsGlobal { get; set; }
 
     public bool IsRoot { get; set; }
-   
+
     public List<UpsertPanelDto> Panels { get; set; }
 }

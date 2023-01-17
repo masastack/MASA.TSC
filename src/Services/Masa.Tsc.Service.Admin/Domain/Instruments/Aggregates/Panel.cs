@@ -110,7 +110,7 @@ public class Panel : AggregateRoot<Guid>
         {
             Metrics.Clear();
         }
-        
+
         ExtensionData = update.ExtensionData;
     }
 

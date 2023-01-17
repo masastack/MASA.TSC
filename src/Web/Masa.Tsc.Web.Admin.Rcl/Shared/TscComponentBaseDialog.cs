@@ -37,8 +37,7 @@ public partial class TscComponentBase
         if (values[0] is not OperateCommand command)
             return;
 
-        //await CallParent(values);
-        if(!await ExecuteCommondAsync(command, values[1..]))
+        if (!await ExecuteCommondAsync(command, values[1..]))
             await OnCallParent(values);
     }
 

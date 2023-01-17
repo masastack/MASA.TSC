@@ -39,7 +39,7 @@ internal class TraceDetailModel : TraceTimeUsModel
         Current = value;
 
         var name = Current.Name;
-        Attributes =value.Attributes;
+        Attributes = value.Attributes;
         Resources = value.Resource;
 
         //if (Current.IsHttp(out var traceHttpDto))
@@ -52,7 +52,7 @@ internal class TraceDetailModel : TraceTimeUsModel
         Overview.Add("url", value.Name);
         var model = new TraceTimeUsModel(1)
         {
-            TimeUs =(long)Math.Floor((value.EndTimestamp - value.Timestamp).TotalMilliseconds)
+            TimeUs = (long)Math.Floor((value.EndTimestamp - value.Timestamp).TotalMilliseconds)
         };
         Overview.Add("duration", model.TimeUsString);
     }

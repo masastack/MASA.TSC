@@ -7,7 +7,7 @@ public class InstrumentService : ServiceBase
 {
     public InstrumentService() : base("/api/Instrument")
     {
-        App.MapPost($"{BaseUri}/set-root/{{id}}/{{isRoot}}", SetRootAsync);        
+        App.MapPost($"{BaseUri}/set-root/{{id}}/{{isRoot}}", SetRootAsync);
         App.MapPost($"{BaseUri}/upsert/{{instrumentId}}", UpsertAsync);
     }
 

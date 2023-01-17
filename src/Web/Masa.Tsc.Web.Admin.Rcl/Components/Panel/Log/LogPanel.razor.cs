@@ -18,7 +18,7 @@ public partial class LogPanel
         set
         {
             _search = value;
-            TaskId =default!;
+            TaskId = default!;
             Page = 1;
         }
     }
@@ -77,7 +77,7 @@ public partial class LogPanel
 
     protected override async Task OnParametersSetAsync()
     {
-        if(MECharts is not null && (Width,Height)!=(0,0))
+        if (MECharts is not null && (Width, Height) != (0, 0))
         {
             await MECharts.Resize(Width, 300);
         }
@@ -101,7 +101,7 @@ public partial class LogPanel
     {
         if (PageMode is false && ConfigurationRecord is not null)
         {
-            if((StartTime, EndTime) != (ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime))
+            if ((StartTime, EndTime) != (ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime))
             {
                 StartTime = ConfigurationRecord.StartTime.UtcDateTime;
                 EndTime = ConfigurationRecord.EndTime.UtcDateTime;

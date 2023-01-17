@@ -48,7 +48,7 @@ public class TraceResponseTimeline
     public double Percent { get; set; }
     public double marginLeft { get; set; }
 
-    public void Deconstruct(out bool Render, out double Percent, out double marginLeft  )
+    public void Deconstruct(out bool Render, out double Percent, out double marginLeft)
     {
         Render = this.Render;
         Percent = this.Percent;

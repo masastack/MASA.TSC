@@ -6,6 +6,6 @@ namespace Masa.Tsc.Contracts.Admin;
 public class CommonRemoveDto<T>
 {
     public IEnumerable<T> Ids { get; set; }
-    
+
     public Guid UserId { get; set; }
 }

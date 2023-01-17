@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Contracts.Admin.Enums;
-
 namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class InstrumentService : BaseService
@@ -17,7 +15,7 @@ public class InstrumentService : BaseService
 
     public async Task SetRootAsync(Guid id, bool isRoot = true) => await Caller.PostAsync($"{RootPath}/set-root/{id}/{isRoot}", default);
 
-    public async Task UpsertPanelAsync(Guid instrumentId,params UpsertPanelDto[] panels) => await Caller.PostAsync($"{RootPath}/upsert/{instrumentId}", panels);
+    public async Task UpsertPanelAsync(Guid instrumentId, params UpsertPanelDto[] panels) => await Caller.PostAsync($"{RootPath}/upsert/{instrumentId}", panels);
 
     public async Task<UpdateDashboardDto> GetAsync(Guid id) => (await Caller.GetAsync<UpdateDashboardDto>($"{RootPath}/{id}"))!;
 

@@ -5,7 +5,7 @@ namespace Masa.Tsc.Contracts.Admin.Enums;
 
 public enum InstrumentTypes
 {
-    System=1,
+    System = 1,
     K8s,
     K8sService,
     DataBase,

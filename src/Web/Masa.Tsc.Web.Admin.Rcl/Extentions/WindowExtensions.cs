@@ -2,7 +2,6 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 using BlazorComponent.Web;
-using Microsoft.JSInterop;
 using OneOf;
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;

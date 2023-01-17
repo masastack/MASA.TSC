@@ -2,7 +2,6 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 using Masa.Tsc.Contracts.Admin.Logs;
-using System.Text.Json.Nodes;
 
 namespace Masa.Tsc.ApiGateways.Caller.Services;
 

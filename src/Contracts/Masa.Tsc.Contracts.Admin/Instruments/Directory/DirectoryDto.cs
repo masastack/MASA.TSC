@@ -12,5 +12,5 @@ public class DirectoryDto
     public Guid ParentId { get; set; }
 
     public int Sort { get; set; }
-    
+
 }

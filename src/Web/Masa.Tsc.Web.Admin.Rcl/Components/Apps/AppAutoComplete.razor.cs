@@ -24,7 +24,7 @@ public partial class AppAutoComplete
 
     protected override async Task OnInitializedAsync()
     {
-        if(Apps is null)
+        if (Apps is null)
         {
             Apps = await PmClient.AppService.GetListAsync();
         }

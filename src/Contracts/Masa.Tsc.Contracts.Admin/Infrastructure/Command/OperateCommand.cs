@@ -6,7 +6,7 @@ namespace Masa.Tsc.Contracts.Admin.Infrastructure.Command;
 public sealed class OperateCommand : IEquatable<OperateCommand>
 {
     private static string[] _values;
-    private static Dictionary<string, OperateCommand> _dic=new Dictionary<string, OperateCommand>();
+    private static Dictionary<string, OperateCommand> _dic = new Dictionary<string, OperateCommand>();
 
     public string Value { get; private set; }
 
@@ -35,7 +35,7 @@ public sealed class OperateCommand : IEquatable<OperateCommand>
     public static bool Parse(object obj, out OperateCommand command)
     {
         command = default!;
-        if(obj == null) 
+        if (obj == null)
             return false;
         var value = obj.ToString();
         if (string.IsNullOrEmpty(value))
@@ -61,7 +61,7 @@ public sealed class OperateCommand : IEquatable<OperateCommand>
     {
         lock (_dic)
         {
-            if(!_dic.ContainsKey(name))             
+            if (!_dic.ContainsKey(name))
                 _dic.Add(name, new OperateCommand { Value = name });
 
             return _dic[name];

@@ -6,4 +6,4 @@ namespace Masa.Tsc.Service.Admin.Application.Topologies.Commands;
 /// <summary>
 /// start Topology create
 /// </summary>
-public record StartCommand(DateTime Start,DateTime End) : Command { }
+public record StartCommand(DateTime Start, DateTime End) : Command { }

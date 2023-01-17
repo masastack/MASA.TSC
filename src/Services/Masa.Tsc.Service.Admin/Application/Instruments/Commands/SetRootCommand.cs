@@ -3,4 +3,4 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 
-public record SetRootCommand(Guid Id, bool IsRoot,Guid UserId) : Command;
+public record SetRootCommand(Guid Id, bool IsRoot, Guid UserId) : Command;

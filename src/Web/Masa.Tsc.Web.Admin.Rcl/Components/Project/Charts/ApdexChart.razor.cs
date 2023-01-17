@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using System;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class ApdexChart
@@ -33,13 +31,13 @@ public partial class ApdexChart
             MetricNames = new List<string> { $"round((count(http_server_duration_bucket>1000 and http_server_duration_bucket<=4000)*0.5+count(http_server_duration_bucket<=1000))/count(http_server_duration_bucket),0.0001)" },
             Start = query.Start.Value,
             End = query.End.Value,
-            ServiceName=query.AppId,
+            ServiceName = query.AppId,
             Step = "5m"
         });
-        if (_data[0] != null && _data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && _data[0].Result != null && _data[0].Result.Any())
+        if (_data[0] != null && _data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && _data[0].Result != null && _data[0].Result!.Any())
         {
-            var seriesData = ((QueryResultMatrixRangeResponse)_data[0].Result.First()).Values.Select(items => (string)items[1]).ToArray();
-            var timeSpans = ((QueryResultMatrixRangeResponse)_data[0].Result.First()).Values.Select(items => Convert.ToDouble(items[0])).ToArray();
+            var seriesData = ((QueryResultMatrixRangeResponse)_data[0].Result!.First()).Values!.Select(items => (string)items[1]).ToArray();
+            var timeSpans = ((QueryResultMatrixRangeResponse)_data[0].Result!.First()).Values!.Select(items => Convert.ToDouble(items[0])).ToArray();
             Total = seriesData.Last();
             _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value)));
             _options.SetValue("series[0].data", seriesData);

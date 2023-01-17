@@ -249,7 +249,7 @@ public partial class TscTrace
         return ApiCaller.TraceService.GetAttrValuesAsync(query);
     }
 
-    private Task<IEnumerable<string>> QueryEndpoints(string service,string instance, string key)
+    private Task<IEnumerable<string>> QueryEndpoints(string service, string instance, string key)
     {
         var query = new SimpleAggregateRequestDto
         {

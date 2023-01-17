@@ -9,8 +9,8 @@ public partial class TopologyPanel
     int _depth = 1;
     string? oldConfigurationRecordKey;
 
-    int Depth 
-    { 
+    int Depth
+    {
         get => _depth;
         set
         {
@@ -32,7 +32,7 @@ public partial class TopologyPanel
 
     protected override async Task OnParametersSetAsync()
     {
-        if(oldConfigurationRecordKey != ConfigurationRecord.Key)
+        if (oldConfigurationRecordKey != ConfigurationRecord.Key)
         {
             oldConfigurationRecordKey = ConfigurationRecord.Key;
             await GetYopologyPanelData();
@@ -42,22 +42,22 @@ public partial class TopologyPanel
     async Task GetYopologyPanelData()
     {
         Data = new();
-        
+
         //var result =await ApiCaller.TopologyService.GetAsync("masa-tsc-service-admin", _depth, DateTime.Now.AddMonths(-3), DateTime.Now);
         var result = await ApiCaller.TopologyService.GetAsync(ConfigurationRecord.AppName, _depth, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
         if (result?.Data is null) return;
-        Data.Edges = result.Data.Select(item => new LinkTrackingTopologyEdgeViewModel 
+        Data.Edges = result.Data.Select(item => new LinkTrackingTopologyEdgeViewModel
         {
             Source = item.CurrentId,
             Target = item.DestId,
             Label = item.AvgLatency.ToString()
         }).ToList();
-        Data.Nodes = result.Services.Select(item => new LinkTrackingTopologyNodeViewModel 
+        Data.Nodes = result.Services.Select(item => new LinkTrackingTopologyNodeViewModel
         {
             Id = item.Id,
             Label = item.Name,
-            State=MonitorStatuses.Error,
-            X = Random.Shared.Next(-500,500),
+            State = MonitorStatuses.Error,
+            X = Random.Shared.Next(-500, 500),
             Y = Random.Shared.Next(-500, 500),
         }).ToList();
     }

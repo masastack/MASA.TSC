@@ -5,7 +5,7 @@ namespace Masa.Tsc.Contracts.Admin.Converters;
 
 public class PanelDtoConverter : JsonConverter<PanelDto>
 {
-    private static readonly string TYPE_KEY = nameof(PanelDto.Type).ToLower();   
+    private static readonly string TYPE_KEY = nameof(PanelDto.Type).ToLower();
 
     public override PanelDto? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

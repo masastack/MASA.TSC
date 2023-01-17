@@ -45,14 +45,14 @@ public partial class ServiceCallChart
 
         List<string> values = new();
         var timeSpans = new List<double>();
-        
+
         if (_data[0] != null && _data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && _data[0].Result != null && _data[0].Result.Any())
         {
-            timeSpans.AddRange(((QueryResultMatrixRangeResponse)_data[0].Result[0]).Values.Select(values => Convert.ToDouble(values[0])));
-            values = ((QueryResultMatrixRangeResponse)_data[0].Result[0]).Values.Select(values => values[1].ToString()).ToList();
+            timeSpans.AddRange(((QueryResultMatrixRangeResponse)_data[0].Result![0]).Values!.Select(values => Convert.ToDouble(values[0])));
+            values = ((QueryResultMatrixRangeResponse)_data[0].Result![0])!.Values!.Select(values => values[1].ToString()!).ToList();
         }
-       
-        _options.SetValue("xAxis.data", timeSpans.Select(value=>ToDateTimeStr(value)));
+
+        _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value)));
         _options.SetValue("series[0].data", values);
     }
 }

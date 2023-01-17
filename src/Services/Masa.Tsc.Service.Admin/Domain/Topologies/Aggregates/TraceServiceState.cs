@@ -2,7 +2,6 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 using Nest;
-using System.Text.Json.Serialization;
 
 namespace Masa.Tsc.Service.Admin.Domain.Topologies.Aggregates;
 

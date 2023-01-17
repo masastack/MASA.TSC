@@ -10,7 +10,7 @@ public partial class TeamSearch
     public string Search
     {
         get => _search;
-        set 
+        set
         {
             _search = value;
             OnSearchChange(value);
@@ -91,6 +91,6 @@ public partial class TeamSearch
         var (startTime, endTime) = times;
         _value.Start = startTime.UtcDateTime;
         _value.End = endTime.UtcDateTime;
-        await base.InvokeAsync(async() => await OnValueChanged.InvokeAsync(_value));
+        await base.InvokeAsync(async () => await OnValueChanged.InvokeAsync(_value));
     }
 }

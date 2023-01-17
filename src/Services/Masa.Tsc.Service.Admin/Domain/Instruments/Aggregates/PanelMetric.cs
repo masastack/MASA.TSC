@@ -9,7 +9,7 @@ public class PanelMetric : AggregateRoot<Guid>
 
     public PanelMetric(Guid id) : base(id) { }
 
-    public PanelMetric(Guid panelId,PanelMetricDto data)
+    public PanelMetric(Guid panelId, PanelMetricDto data)
     {
         PanelId = panelId;
         Update(data);
@@ -41,6 +41,6 @@ public class PanelMetric : AggregateRoot<Guid>
         Unit = data.Unit ?? string.Empty;
         Sort = data.Sort;
         Icon = data.Icon ?? string.Empty;
-        DisplayName= data.DisplayName ?? string.Empty;
+        DisplayName = data.DisplayName ?? string.Empty;
     }
 }

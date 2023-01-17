@@ -5,7 +5,7 @@ namespace Masa.Tsc.Contracts.Admin.Enums;
 
 public enum InstrumentModelTypes
 {
-    All=1,
+    All = 1,
     Service,
     ServiceInstance,
     Endpoint,

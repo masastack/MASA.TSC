@@ -5,8 +5,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Log;
 
 public partial class LogView
 {
-    string? _oldSearch;
-
     [Parameter]
     public Dictionary<string, LogTree>? JsonObject { get; set; }
 
@@ -36,7 +34,7 @@ public partial class LogView
 
     void ExpandTree(IEnumerable<LogTree> trees)
     {
-        if(trees.Any() is false) return;
+        if (trees.Any() is false) return;
         if (trees.Where(tree => tree.IsValueType && tree.Parent is not null).Any(tree => tree.ToString().Contains(Search!, StringComparison.OrdinalIgnoreCase)))
         {
             trees.First().Parent!.AutoExpanded = true;
@@ -49,7 +47,7 @@ public partial class LogView
                 tree.AutoExpanded = false;
             }
         }
-            
+
         foreach (var tree in trees.Where(tree => tree.IsValueType is false))
         {
             if (tree.IsObject)

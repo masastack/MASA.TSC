@@ -1,7 +1,5 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
-// Licensed under the Apache License. See LICENSE.txt in the project root for license information.
-
-using Microsoft.JSInterop;
+// Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
@@ -11,7 +9,6 @@ public partial class HexagonalMesh : BDomComponentBase
     public List<HexagonalMeshViewModel> Value { get; set; } = default!;
 
     private IJSObjectReference _helper = default!;
-    private bool _helperRendered = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -23,7 +20,6 @@ public partial class HexagonalMesh : BDomComponentBase
         }
 
         _helper = await Js.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/antv-g2/hexagonalMesh-helper.js");
-        _helperRendered = true;
 
         await InitChart();
         await AddPolygon();

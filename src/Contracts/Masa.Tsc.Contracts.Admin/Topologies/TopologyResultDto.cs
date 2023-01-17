@@ -13,7 +13,7 @@ public class TopologyResultDto
 }
 
 public class TopologyServiceDto
-{ 
+{
     public string Id { get; set; }
 
     public string Name { get; set; }
@@ -22,14 +22,14 @@ public class TopologyServiceDto
 }
 
 public class TopologyServiceRelationDto
-{ 
+{
     public string CurrentId { get; set; }
 
     public string DestId { get; set; }
 }
 
-public class TopologyServiceDataDto: TopologyServiceRelationDto
-{ 
+public class TopologyServiceDataDto : TopologyServiceRelationDto
+{
     public int CallsCount { get; set; }
 
     public int AvgLatency { get; set; }

@@ -36,7 +36,7 @@ public partial class PanelSelect
     }
 
     async Task SelectPanelAsync(PanelTypes type)
-    {       
+    {
         UpsertPanelDto panel = new();
         switch (type)
         {
@@ -44,13 +44,13 @@ public partial class PanelSelect
                 panel = new UpsertTabsPanelDto(PanelId);
                 break;
             case PanelTypes.Chart or PanelTypes.Table:
-                panel = new UpsertChartPanelDto(PanelId);               
+                panel = new UpsertChartPanelDto(PanelId);
                 break;
             default:
                 panel.Id = PanelId;
                 panel.PanelType = type;
                 break;
-        }        
+        }
 
         await OnSelect.InvokeAsync(panel);
     }

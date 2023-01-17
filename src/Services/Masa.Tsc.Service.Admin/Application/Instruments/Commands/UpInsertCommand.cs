@@ -3,4 +3,4 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Commands;
 
-public record UpInsertCommand(UpsertPanelDto[] Data,Guid InstumentId, Guid UserId) : Command;
+public record UpInsertCommand(UpsertPanelDto[] Data, Guid InstumentId, Guid UserId) : Command;

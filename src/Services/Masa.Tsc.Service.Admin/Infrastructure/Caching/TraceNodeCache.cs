@@ -31,5 +31,5 @@ internal class TraceNodeCache
 
     public bool IsSuccess { get; set; }
 
-    public long Duration =>(long)Math.Floor((End - Start).TotalMilliseconds);
+    public long Duration => (long)Math.Floor((End - Start).TotalMilliseconds);
 }

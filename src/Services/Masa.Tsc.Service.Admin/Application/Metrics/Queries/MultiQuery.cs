@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Metrics.Queries;
 
-public record MultiQuery(RequestMultiQueryDto Data) :Query<List<QueryResultDataResponse>>
+public record MultiQuery(RequestMultiQueryDto Data) : Query<List<QueryResultDataResponse>>
 {
     public override List<QueryResultDataResponse> Result { get; set; }
 }

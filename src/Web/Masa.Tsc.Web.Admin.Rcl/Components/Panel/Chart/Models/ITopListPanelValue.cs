@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Models;
 
-public interface ITopListPanelValue: IPanelValue
+public interface ITopListPanelValue : IPanelValue
 {
     public string Color { get; set; }
 
