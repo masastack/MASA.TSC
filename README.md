@@ -8,7 +8,7 @@
 
 MASA TSC主要负责对MASA整个系统中的项目/应用进行监测来排查故障情况，其中包含从项目维度视角来查看监测的故障情况。以及溯源到具体的链路日志中去。除了可以监控整个MASAS Stack的产品外，与PM进行组合使用，也可以将业务系统接入进来统一管理。
 
-![TSC](http://cdn.masastack.com/stack/doc/tsc/introduce.png)
+![TSC](http://cdn.masastack.com/stack/doc/tsc/introduce_1.png)
 
 ## MASA Stack 概览
 [传送门](https://github.com/masastack/MASA.Stack)
