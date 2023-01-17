@@ -1,10 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Nest;
-using static Nest.JoinField;
-using System.Collections.Generic;
-
 namespace Masa.Tsc.Service.Admin.Domain.Aggregates;
 
 public class Panel : AggregateRoot<Guid>

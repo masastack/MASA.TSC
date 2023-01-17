@@ -34,7 +34,7 @@ public class QueryHandler
 
             //所关联的服务id
             var serviceIds = GetServiceIds(findRelations);
-            result.Services = services.Where(item => serviceIds.Contains(item.Id)).Select(item => new TopologyServiceDto
+            result.Services = services!.Where(item => serviceIds.Contains(item.Id)).Select(item => new TopologyServiceDto
             {
                 Id = item.Id,
                 Name = item.Service,

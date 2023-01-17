@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Microsoft.EntityFrameworkCore;
-
 namespace Masa.Tsc.Service.Admin.Infrastructure.Repositories;
 
 public class DirectoryRepository : Repository<TscDbContext, Domain.Aggregates.Directory, Guid>, IDirectoryRepository
@@ -16,7 +14,7 @@ public class DirectoryRepository : Repository<TscDbContext, Domain.Aggregates.Di
 
     public async Task<Domain.Aggregates.Directory> GetIncludeInstrumentsAsync(Guid id)
     {
-        return (await _context.Set<Domain.Aggregates.Directory>().Where(item => item.Id == id).Include(d => d.Instruments.OrderBy(d => d.Sort)).FirstOrDefaultAsync())!;
+        return (await _context.Set<Domain.Aggregates.Directory>().Where(item => item.Id == id).Include(d => d.Instruments!.OrderBy(d => d.Sort)).FirstOrDefaultAsync())!;
     }
 
     public async Task<Tuple<int, List<Domain.Aggregates.Directory>>> GetListIncludeInstrumentsAsync(Guid userId, int page, int pageSize, string keyword, bool isIncludeInstrument)
@@ -27,7 +25,7 @@ public class DirectoryRepository : Repository<TscDbContext, Domain.Aggregates.Di
         List<Domain.Aggregates.Directory> data;
 
         if (isIncludeInstrument)
-            data = await query.Include(d => d.Instruments.Where(instrument => string.IsNullOrEmpty(keyword) || instrument.Name.Contains(keyword)).OrderBy(d => d.Sort)).ToListAsync();
+            data = await query.Include(d => d.Instruments!.Where(instrument => string.IsNullOrEmpty(keyword) || instrument.Name.Contains(keyword)).OrderBy(d => d.Sort)).ToListAsync();
         else
             data = await query.ToListAsync();
 

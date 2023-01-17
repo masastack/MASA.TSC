@@ -28,31 +28,22 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
         if (instrument == null)
             return default!;
 
-        try
+        var panels = await _context.Set<Panel>().AsNoTracking().Where(item => item.InstrumentId == Id).ToListAsync();
+        if (panels != null && panels.Any())
         {
-
-            var panels = await _context.Set<Panel>().AsNoTracking().Where(item => item.InstrumentId == Id).ToListAsync();
-            if (panels != null && panels.Any())
+            var panelIds = panels.Select(item => item.Id).ToList();
+            var metrics = await _context.Set<PanelMetric>().AsNoTracking().Where(item => panelIds.Contains(item.PanelId)).ToListAsync();
+            if (metrics != null && metrics.Any())
             {
-                var panelIds = panels.Select(item => item.Id).ToList();
-                var metrics = await _context.Set<PanelMetric>().AsNoTracking().Where(item => panelIds.Contains(item.PanelId)).ToListAsync();
-                if (metrics != null && metrics.Any())
+                foreach (var panel in panels)
                 {
-                    foreach (var panel in panels)
-                    {
-                        var matchMetrics = metrics.Where(item => item.PanelId == panel.Id).ToList();
-                        if (matchMetrics.Any())
-                            panel.Metrics = matchMetrics;
-                    }
+                    var matchMetrics = metrics.Where(item => item.PanelId == panel.Id).ToList();
+                    if (matchMetrics.Any())
+                        panel.Metrics = matchMetrics;
                 }
-
-                instrument.Panels = GetChildren(panels, Guid.Empty);
             }
-        }
-        catch (Exception ex)
-        {
 
-
+            instrument.Panels = GetChildren(panels, Guid.Empty);
         }
 
         return instrument;
@@ -157,47 +148,34 @@ public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, 
             return default!;
         if (list.Any(item => item.Type == PanelTypes.TabItem))
             list = list.OrderBy(item => item.Index).ToList();
-        var childrens = new List<Panel>();
         foreach (var panel in list)
         {
             var children = GetChildren(panels, panel.Id);
             if (children?.Any() is true)
-                panel.Panels=children;
-            //    childrens.AddRange(children);
+                panel.Panels = children;
         }
-
-        //if (childrens.Any())
-        //    list.AddRange(childrens);
-
         return list;
-    }
-
-    public async Task<Instrument> GetIncludePanelsAsync(Guid Id, Guid userId)
-    {
-        return await _context.Set<Instrument>().Where(item => item.Id == Id && (item.IsGlobal || item.Creator == userId))
-            .Include(d => d.Panels.OrderBy(d => d.Index)).FirstOrDefaultAsync()
-            ?? throw new UserFriendlyException("no data");
     }
 
     private List<Panel> GetAllPanels(List<Panel> panels)
     {
         if (panels == null || !panels.Any())
             return default!;
-        var ccc = new List<Panel>();
+        var result = new List<Panel>();
         foreach (var panel in panels)
         {
             var children = GetAllPanels(panel.Panels);
             if (children == null || !children.Any())
                 continue;
-            ccc.AddRange(children);
+            result.AddRange(children);
         }
-        ccc.InsertRange(0, panels);
-        return ccc;
+        result.InsertRange(0, panels);
+        return result;
     }
 
     private List<PanelMetric> GetAllMetrics(List<Panel> panels)
     {
-        if(panels==null||!panels.Any())
+        if (panels == null || !panels.Any())
             return default!;
         var result = new List<PanelMetric>();
         foreach (var panel in panels)

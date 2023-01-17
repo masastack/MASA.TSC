@@ -10,9 +10,9 @@ internal class TraceServiceStateRepository : ITraceServiceStateRepository
     private readonly IElasticClient _client;
     private readonly ILogger _logger;
 
-    public TraceServiceStateRepository(ILogger<TraceServiceStateRepository> logger, IElasticsearchFactory elasticsearchFactory)
+    public TraceServiceStateRepository(ILogger<TraceServiceStateRepository> logger, IElasticClientFactory elasticClientFactory)
     {
-        _client = elasticsearchFactory.CreateElasticClient(TopologyConstants.ES_CLINET_NAME);
+        _client = elasticClientFactory.Create(TopologyConstants.ES_CLINET_NAME);
         _logger = logger;
     }
 
@@ -44,7 +44,6 @@ internal class TraceServiceStateRepository : ITraceServiceStateRepository
         var serviceGroups = (BucketAggregate)response.Aggregations[nameof(TraceServiceState.ServiceId)];
         return SetServiceId(serviceGroups);
     }
-
 
     private List<TopologyServiceDataDto> SetServiceId(BucketAggregate aggResult)
     {

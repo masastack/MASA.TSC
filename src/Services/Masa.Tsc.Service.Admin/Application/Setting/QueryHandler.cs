@@ -18,7 +18,7 @@ public class QueryHandler
         var data = await _settingRepository.FindAsync(m => m.UserId == query.UserId);
         if (data is not null)
         {
-            query.Result = new SettingDto
+            query.Result = new ()
             {
                 Interval = data.Interval,
                 IsEnable = data.IsEnable,
@@ -29,7 +29,7 @@ public class QueryHandler
         }
         else
         {
-            query.Result = new SettingDto();
+            query.Result = new ();
         }
     }
 }

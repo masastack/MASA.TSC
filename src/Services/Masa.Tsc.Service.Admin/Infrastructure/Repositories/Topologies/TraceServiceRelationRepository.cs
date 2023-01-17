@@ -10,9 +10,9 @@ public class TraceServiceRelationRepository : ITraceServiceRelationRepository
     private readonly IElasticClient _client;
     private readonly ILogger _logger;
 
-    public TraceServiceRelationRepository(ILogger<TraceServiceRelationRepository> logger, IElasticsearchFactory elasticsearchFactory)
+    public TraceServiceRelationRepository(ILogger<TraceServiceRelationRepository> logger, IElasticClientFactory  elasticClientFactory)
     {
-        _client = elasticsearchFactory.CreateElasticClient(TopologyConstants.ES_CLINET_NAME);
+        _client = elasticClientFactory.Create(TopologyConstants.ES_CLINET_NAME);
         _logger = logger;
     }
 

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Nest;
-
 namespace Masa.Tsc.Service.Admin.Application.Instruments;
 
 public class InstrumentQueryHandler
@@ -39,35 +37,26 @@ public class InstrumentQueryHandler
         Expression<Func<Instrument, bool>> condition = item => true;
 
         if (string.IsNullOrEmpty(query.Keyword))
-            condition = item=> item.Name.Contains(query.Keyword);
+            condition = item => item.Name.Contains(query.Keyword);
         return condition;
     }
 
     [EventHandler]
     public async Task GetDetailAsync(InstrumentDetailQuery query)
     {
-        try
+        var dto = await _instrumentRepository.GetDetailAsync(query.Id, query.UserId);
+        query.Result = new InstrumentDetailDto
         {
-            var dto = await _instrumentRepository.GetDetailAsync(query.Id, query.UserId);
-
-            query.Result = new InstrumentDetailDto
-            {
-                Id = dto.Id,
-                Name = dto.Name,
-                DirecotryId = dto.DirectoryId,
-                IsGlobal = dto.IsGlobal,
-                IsRoot = dto.IsRoot,
-                Layer = dto.Layer,
-                Model = dto.Model,
-                Sort = dto.Sort,
-                Panels = ConvertPanels(dto.Panels)
-            };
-        }
-        catch (Exception ex)
-        {
-
-
-        }
+            Id = dto.Id,
+            Name = dto.Name,
+            DirecotryId = dto.DirectoryId,
+            IsGlobal = dto.IsGlobal,
+            IsRoot = dto.IsRoot,
+            Layer = dto.Layer,
+            Model = dto.Model,
+            Sort = dto.Sort,
+            Panels = ConvertPanels(dto.Panels)
+        };
     }
 
     [EventHandler]
@@ -84,7 +73,7 @@ public class InstrumentQueryHandler
             IsRoot = instument.IsRoot,
             Layer = Enum.Parse<LayerTypes>(instument.Layer),
             Model = Enum.Parse<ModelTypes>(instument.Model),
-            Type =instument.Lable,
+            Type = instument.Lable,
             Order = instument.Sort
         };
     }
@@ -112,7 +101,7 @@ public class InstrumentQueryHandler
                     Caculate = item.Caculate,
                     Color = item.Color,
                     Icon = item.Icon,
-                    DisplayName= item.DisplayName,
+                    DisplayName = item.DisplayName,
                     Id = item.Id,
                     Name = item.Name,
                     Sort = item.Sort,

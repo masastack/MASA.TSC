@@ -38,6 +38,7 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
         Lable = dashbord.Type.ToString();
         Sort = dashbord.Order;
         DirectoryId = dashbord.Folder;
+        IsRoot= dashbord.IsRoot;
     }
 
     public void UpdatePanels(UpsertPanelDto[] data)

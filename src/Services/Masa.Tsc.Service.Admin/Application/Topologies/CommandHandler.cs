@@ -12,12 +12,12 @@ public class CommandHandler
     private readonly ITraceServiceStateRepository _traceServiceStateRepository;
     private readonly ILogger _logger;
 
-    private static List<TraceServiceCache> addNodes = new List<TraceServiceCache>();
-    private static List<TraceServiceRelation> addRestions = new List<TraceServiceRelation>();
-    private static ConcurrentQueue<TraceNodeCache> traceNodeQueue = new();
+    private static List<TraceServiceCache> addNodes = new ();
+    private static List<TraceServiceRelation> addRestions = new ();
+    private static readonly ConcurrentQueue<TraceNodeCache> traceNodeQueue = new();
     private static bool _readComplete = false;
     private static Task _currentTask;
-    private static CancellationTokenSource  _tokenSource = new ();
+    private static CancellationTokenSource _tokenSource = new();
 
     public CommandHandler(ITraceService traceService,
         IMultilevelCacheClientFactory multilevelCacheClientFactory,
@@ -37,7 +37,7 @@ public class CommandHandler
     [EventHandler]
     public async Task StartAsync(StartCommand command)
     {
-        if(_currentTask!=null)
+        if (_currentTask != null)
             throw new UserFriendlyException("Task has running !");
 
         _currentTask = Task.Factory.StartNew(async () =>
@@ -93,9 +93,10 @@ public class CommandHandler
             finally
             {
                 _logger.LogInformation("StartAsync finally");
-                _currentTask = null;
+                _currentTask = default!;
             }
-        }, cancellationToken: _tokenSource.Token, TaskCreationOptions.LongRunning,TaskScheduler.Current);
+        }, cancellationToken: _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        await Task.CompletedTask;
     }
 
     private async Task GetTraceDataAsync(DateTime start, DateTime end)
@@ -141,7 +142,7 @@ public class CommandHandler
                 total = result.Total;
             }
             current += result?.Result?.Count ?? 0;
-            SetTraceQueue(result.Result!);
+            SetTraceQueue(result?.Result!);
             _logger.LogInformation($"GetAllTraceDataAsync total: {total}, current: {current}");
         }
         while (!isEnd);
@@ -191,7 +192,7 @@ public class CommandHandler
     }
 
     private async Task<List<string>> SaveTraceCacheAsync()
-    {        
+    {
         var dicValues = new Dictionary<string, List<TraceNodeCache>>();
         var addKeys = new List<string>();
         do
@@ -227,7 +228,7 @@ public class CommandHandler
             {
                 var sliceKeys = addKeys.Skip(start).Take(size).ToList();
                 var result = await _multilevelCacheClient.GetListAsync<List<TraceNodeCache>>(sliceKeys);
-                if (result == null || !result.Any())
+                if (result != null && !result.Any())
                 {
                     foreach (var items in result)
                     {

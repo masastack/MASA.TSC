@@ -14,17 +14,13 @@ public static class TraceResponseDtoExtenstion
         if (dto.IsWeb())
             return TraceNodeTypes.Web;
         if (dto.IsDapr())
-            return TraceNodeTypes.Dapr;        
+            return TraceNodeTypes.Dapr;
         return default;
     }
 
     public static bool IsApi(this TraceResponseDto dto)
     {
-        if (dto.TryParseHttp(out var http))
-        { 
-            
-        }
-        return true;
+        return dto.TryParseHttp(out var _);
     }
 
     public static bool IsDapr(this TraceResponseDto dto)

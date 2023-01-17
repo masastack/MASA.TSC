@@ -5,14 +5,10 @@ namespace Masa.Tsc.Service.Admin.Application.Instruments;
 
 public class InstrumentCommandHandler
 {
-    private readonly IDirectoryRepository _directoryRepository;
     private readonly IInstrumentRepository _instrumentRepository;
 
-    public InstrumentCommandHandler(IDirectoryRepository directoryRepository,
-    IInstrumentRepository instrumentRepository
-        )
+    public InstrumentCommandHandler(IInstrumentRepository instrumentRepository)
     {
-        _directoryRepository = directoryRepository;
         _instrumentRepository = instrumentRepository;
     }
 
@@ -78,7 +74,7 @@ public class InstrumentCommandHandler
     {
         var list = await _instrumentRepository.GetListAsync(command.InstrumentIds, command.UserId);
         if (list == null || !list.Any())
-            throw new UserFriendlyException("数据不存在");       
+            throw new UserFriendlyException("数据不存在");
         await _instrumentRepository.RemoveRangeAsync(list);
     }
     #endregion    

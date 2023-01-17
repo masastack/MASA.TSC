@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Service.Admin.Application.Projects.Queries;
-
 namespace Masa.Tsc.Service.Admin.Application.Projects;
 
 public class QueryHandler
@@ -29,17 +27,7 @@ public class QueryHandler
 
         query.Result = new ProjectDto
         {
-            // Apps=apps?.Select(a=>new AppDto { })
-            //Creator = new UserDto
-            //{
-            //    Account = creator.Account,
-            //    Avatar = creator.Avatar,
-            //    DisplayName = creator.DisplayName,
-            //    Gender = creator.Gender,
-            //    Id = creator.Id,
-            //    Name = creator.Name,
-            //}
-            TeamId = team.Id,
+            TeamId = team?.Id ?? Guid.Empty,
             Id = project.Identity,
             Description = project.Description,
             Identity = project.Identity,
@@ -59,10 +47,7 @@ public class QueryHandler
                 Id = creator.Id,
                 Name = creator.Name!,
             };
-
-
     }
-
 
     [EventHandler]
     public async Task GetProjectsAsync(ProjectsQuery query)

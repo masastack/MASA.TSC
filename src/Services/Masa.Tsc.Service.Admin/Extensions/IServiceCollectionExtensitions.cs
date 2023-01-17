@@ -12,8 +12,8 @@ public static class IServiceCollectionExtensitions
               options.UseNodes(elasearchUrls);
           });
 
-        var fatory = services.BuildServiceProvider().GetRequiredService<IElasticsearchFactory>();
-        var client = fatory.CreateElasticClient(TopologyConstants.ES_CLINET_NAME);
+        var fatory = services.BuildServiceProvider().GetRequiredService<IElasticClientFactory>();
+        var client = fatory.Create(TopologyConstants.ES_CLINET_NAME);
         var rep = client.Indices.Exists(TopologyConstants.SERVICE_INDEX_NAME);
         if (!rep.Exists)
             client.Indices.Create(TopologyConstants.SERVICE_INDEX_NAME, c => c.Map<TraceServiceNode>(m => m.AutoMap()));
