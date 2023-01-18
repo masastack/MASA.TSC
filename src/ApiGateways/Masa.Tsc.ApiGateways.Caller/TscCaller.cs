@@ -12,7 +12,6 @@ public class TscCaller
         TeamService = new TeamService(caller, tokenProvider);
         LogService = new LogService(caller, tokenProvider);
         TraceService = new TraceService(caller, tokenProvider);
-        SettingService = new SettingService(caller, tokenProvider);
         DirectoryService = new DirectoryService(caller, tokenProvider);
         InstrumentService = new InstrumentService(caller, tokenProvider);
         PanelService = new PanelService(caller, tokenProvider);
@@ -29,8 +28,6 @@ public class TscCaller
     public LogService LogService { get; private init; }
 
     public TraceService TraceService { get; private init; }
-
-    public SettingService SettingService { get; private init; }
 
     public DirectoryService DirectoryService { get; private init; }
 

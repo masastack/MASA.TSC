@@ -44,7 +44,6 @@ global using Masa.Tsc.Service.Admin.Application.Metrics;
 global using Masa.Tsc.Service.Admin.Application.Metrics.Queries;
 global using Masa.Tsc.Service.Admin.Application.Projects;
 global using Masa.Tsc.Service.Admin.Application.Projects.Queries;
-global using Masa.Tsc.Service.Admin.Application.Setting;
 global using Masa.Tsc.Service.Admin.Application.Teams;
 global using Masa.Tsc.Service.Admin.Application.Topologies.Commands;
 global using Masa.Tsc.Service.Admin.Application.Topologies.Query;
