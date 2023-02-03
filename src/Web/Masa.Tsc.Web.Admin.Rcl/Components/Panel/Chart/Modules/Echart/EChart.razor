@@ -1,0 +1,56 @@
+﻿<MCard Class="d-flex flex-column rounded-lg full-height">
+    <MCardTitle Class="d-flex justify-space-between">
+        <MLabel Class="emphasis2--text h6">@Value.Title</MLabel>
+        <MTooltip Top>
+            <ActivatorContent>
+                <MIcon @attributes="@context.Attrs">mdi-information-outline</MIcon>
+            </ActivatorContent>
+            <ChildContent>
+                <span>@Value.Description</span>
+            </ChildContent>
+        </MTooltip>
+    </MCardTitle>
+    <MCardText Class="flex-grow-1">
+        @if (Option is null)
+        {
+            <div class="full-height d-flex">
+                <div class="ma-auto">@I18N.T("No Data")</div>
+            </div>
+        }
+        else
+        {
+            <MECharts @key=Value.GetChartKey() Option="Option" @ref=Chart />
+        }
+    </MCardText>
+</MCard>
+
+@code {
+    [CascadingParameter]
+    public I18n I18N { get; set; }
+
+    [Parameter]
+    public IEChartPanelValue Value { get; set; }
+
+    object? Option { get; set; }
+    string Key => Value.GetChartKey() + Value.W + Value.H;
+    string? OldKey { get; set; }
+    public MECharts? Chart { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Option = Value.GetChartOption();
+        if (OldKey != Key)
+        {
+            OldKey = Key;
+            if (Chart is not null && (Value.W, Value.H)!=(0,0))
+            {
+                await Chart.Resize(Value.W, Value.H);
+            }  
+        }
+    }
+}

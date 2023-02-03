@@ -5,25 +5,28 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class TraceService : BaseService
 {
-    public TraceService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/trace",tokenProvider) { }
+    public TraceService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/trace", tokenProvider) { }
 
-    public async Task<IEnumerable<object>> GetAsync(string traceId)
+    public async Task<IEnumerable<TraceResponseDto>> GetAsync(string traceId)
     {
-        return (await Caller.GetAsync<IEnumerable<object>>($"{RootPath}/{traceId}"))!;
+        return await Caller.GetAsync<IEnumerable<TraceResponseDto>>($"{RootPath}/{traceId}") ?? Array.Empty<TraceResponseDto>();
     }
 
-    public async Task<PaginationDto<object>> GetListAsync(RequestTraceListDto model)
+    public async Task<PaginatedListBase<TraceResponseDto>> GetListAsync(RequestTraceListDto model, CancellationToken? token = null)
     {
-        return (await Caller.GetAsync<PaginationDto<object>>($"{RootPath}/list", model))!;
+        return await Caller.GetAsync<PaginatedListBase<TraceResponseDto>>($"{RootPath}/list", model, token ?? default) ?? new PaginatedListBase<TraceResponseDto>();
     }
 
-    public async Task<IEnumerable<string>> GetAttrValuesAsync(RequestAttrDataDto model)
+    public async Task<IEnumerable<string>> GetAttrValuesAsync(SimpleAggregateRequestDto model)
     {
-        return (await Caller.GetByBodyAsync<IEnumerable<string>>($"{RootPath}/attr-values", model))!;
+        return await Caller.GetByBodyAsync<IEnumerable<string>>($"{RootPath}/attr-values", model) ?? Array.Empty<string>();
     }
 
-    public async Task<ChartLineDataDto<ChartPointDto>> AggregateAsync(RequestAggregationDto model)
+    public async Task<TResult> AggregateAsync<TResult>(SimpleAggregateRequestDto model)
     {
-        return (await Caller.GetByBodyAsync<ChartLineDataDto<ChartPointDto>>($"{RootPath}/aggregate", model))!;
+        var str = await Caller.GetByBodyAsync<string>($"{RootPath}/aggregate", model);
+        if (string.IsNullOrEmpty(str))
+            return default!;
+        return JsonSerializer.Deserialize<TResult>(str)!;
     }
 }

@@ -1,8 +1,0 @@
-.rollout:
-  tags:
-    - linux-shell
-  image: registry.cn-hangzhou.aliyuncs.com/masa/library:kubectl-shell-v1.21.1
-  script:
-    - echo $KUBECONFIG| base64 -d > ./config
-    - kubectl --kubeconfig ./config rollout undo deployment/$PROJECT_NAME -n $NAMESPACE
-  when: manual

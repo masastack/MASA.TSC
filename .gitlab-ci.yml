@@ -1,29 +1,114 @@
-include: 'devops/**/*.yml'
-
 stages:
-  # - sornarqube
-  - build-docker-image-dev
+#   - sonarqube
+  - docker-dev
   - deploy-dev
   - deploy-test
-  - rollout-dev
-  - rollout-test
-  - build-docker-image-prd
-  - deploy-staging
-  - rollout-staging
+  - docker-prd
   - deploy-prd
-  - rollout-prd
-  
-  
-variables: 
-  PRD_REPLICAS: 2
 
-  DEV_REPLICAS: 1
-  
-  REGISTRY_URL: registry.cn-hangzhou.aliyuncs.com
-  #REGISTRY_URL: reg.lonsid.cn
-  REGISTRY_WAREHOUSE: masa
 
-  #K8S_IMAGEPULLSECRETSPULL: reg.lonsid.cn
-  K8S_IMAGEPULLSECRETSPULL: aliregistry
-  SECRET_TLS: masastack
+variables:
+  TSC_Service_Name: masa-tsc-service
+  TSC_Web_Name: masa-tsc-web-admin
+  TSCWebDockerFile: ./src/Web/Masa.Tsc.Web.Admin.Server/Dockerfile
+  TSCServiceDockerFile: ./src/Services/Masa.Tsc.Service.Admin/Dockerfile
   
+  NAMESPACE_DEV: masa-tsc-dev
+  WebDomain_dev: tsc-develop.masastack.com
+  ServiceDomain_dev: tsc-service-develop.masastack.com
+  
+
+  TSC_Service_Image: $CI_ALI_REGISTRY_DOMAIN/masa/$TSC_Service_Name:dev-$CI_PIPELINE_ID
+  TSC_Web_Image: $CI_ALI_REGISTRY_DOMAIN/masa/$TSC_Web_Name:dev-$CI_PIPELINE_ID
+
+  NAMESPACE_STAGING: masa-tsc-staging
+  WebDomain_staging: tsc-staging.masastack.com
+  ServiceDomain_staging: tsc-service-staging.masastack.com
+  
+  # NAMESPACE_PRD: TSC
+docker-dev:
+  stage: docker-dev
+  tags:
+    - linux-shell
+  before_script:
+    - docker login -u $CI_ALI_REGISTRY_USER -p $CI_ALI_REGISTRY_PASSWD $CI_ALI_REGISTRY_DOMAIN 
+  only:
+    - develop  
+  script:
+    - docker build -f $TSCWebDockerFile -t $TSC_Web_Image .
+    - docker push $TSC_Web_Image 
+    - docker build -f $TSCServiceDockerFile -t $TSC_Service_Image .
+    - docker push $TSC_Service_Image
+  after_script:
+    - docker rmi $TSC_Service_Image   
+    - docker rmi $TSC_Web_Image
+
+
+deploy-dev:
+  stage: deploy-dev
+  image: registry.cn-hangzhou.aliyuncs.com/masa/library:helm3_latest
+  variables:
+    EnviromentPath: Develop
+  tags:
+    - ydy-runner
+  only:
+    - develop  
+  script:
+    - ls
+    - pwd 
+    - echo $EnviromentPath
+    - echo $KUBE_CONFIG_DEV_YDY | base64 -d > ./config
+    - cat ./config
+    - helm version 
+    - helm --kubeconfig ./config list   -n $NAMESPACE_DEV 
+    - helm upgrade --install $TSC_Service_Name ./charts/masa-service --set domain.name=$ServiceDomain_dev  --set domain.secret=masastack  --set service.port=80  --set environment.path=$EnviromentPath --set image.tag=dev-$CI_PIPELINE_ID -n $NAMESPACE_DEV  
+    - helm upgrade --install $TSC_Web_Name ./charts/masa-service  --set domain.name=$WebDomain_dev  --set domain.secret=masastack  --set service.port=443  --set environment.path=$EnviromentPath --set image.tag=dev-$CI_PIPELINE_ID -n $NAMESPACE_DEV 
+
+
+deploy-staging:
+  stage: deploy-test
+  image: registry.cn-hangzhou.aliyuncs.com/masa/library:helm3_latest
+  variables:
+    EnviromentPath: Staging
+  tags:
+    - ydy-runner
+  only:
+    - develop  
+  script:
+    - ls
+    - pwd 
+    - echo $EnviromentPath
+    - echo $KUBE_CONFIG_DEV_YDY | base64 -d > ./config
+    - cat ./config
+    - helm version 
+    - helm --kubeconfig ./config list   -n $NAMESPACE_STAGING
+    - helm upgrade --install $TSC_Service_Name ./charts/masa-service --set domain.name=$ServiceDomain_staging  --set domain.secret=masastack  --set service.port=80  --set environment.path=$EnviromentPath --set image.tag=dev-$CI_PIPELINE_ID -n $NAMESPACE_STAGING  
+    - helm upgrade --install $TSC_Web_Name ./charts/masa-service  --set domain.name=$WebDomain_staging  --set domain.secret=masastack  --set service.port=443  --set environment.path=$EnviromentPath --set image.tag=dev-$CI_PIPELINE_ID -n $NAMESPACE_STAGING  
+
+
+# include: 'devops/**/*.yml'
+
+# stages:
+#   - sornarqube
+#   - build-docker-image-dev
+#   - deploy-dev
+#   - deploy-test
+#   - deploy-staging
+#   - build-docker-image-prd
+#   - deploy-prd
+#   - rollout-dev
+#   - rollout-test
+#   - rollout-staging
+#   - rollout-prd
+# variables: 
+#   PRD_REPLICAS: 2
+
+#   DEV_REPLICAS: 1
+
+#   REGISTRY_URL: registry.cn-hangzhou.aliyuncs.com
+#   # HARBOR_URL: reg.lonsid.cn
+#   REGISTRY_WAREHOUSE: masa
+
+#   K8S_IMAGEPULLSECRETSPULL: aliregistry
+#   SECRET_TLS: lonsid-cn
+

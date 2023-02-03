@@ -1,117 +1,252 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@using System.Globalization
 @inherits TscComponentBase
-<MContainer>
-    @if (_isLoading)
-    {
-        <MRow>
-            <MCol>
-                Loading ...
-            </MCol>
-        </MRow>
-    }
-    else
-    {
-        <MRow>
-            <MCol Cols="12">
-                <MLabel>@_overView.Name</MLabel>
-            </MCol>
-        </MRow>
-        <MRow>
-            <MCol Class="py-0 my-0" Cols="2">
-                <MAutocomplete Items="_overView.Services"
-                           Dense
-                           TItem=TraceOverviewServiceModel
-                           TValue=string
-                           ItemValue="item=>item.Name"
-                           ItemText="item=>item.Name"
-                           TItemValue=string @bind-Value="_overView.SearchName"></MAutocomplete>
-            </MCol>
-        </MRow>
-        <MRow>
-            <MCol Cols="12" Class="d-flex justify-start">
-                <MCard Class="yellow rounded-md-1 body-2 ml-2  pt-1 px-6 rounded-md-1 blue-grey darken-1 white-text" Height="28">起始点 </MCard>
-                <MCard Class="pl-2 pt-1 body-1" style="background:none" Height="28">@_overView.Start.Format(CurrentTimeZone)</MCard>
-                <MCard Class="yellow rounded-md-1 body-2 ml-2  pt-1 px-6 rounded-md-1 blue-grey darken-1 white-text" Height="28">时间</MCard>
-                <MCard Class="pl-2 pt-1 body-1" style="background:none" Height="28">@_overView.TimeUsString</MCard>
-                <MCard Class="yellow rounded-md-1 body-2 ml-2  pt-1 px-6 rounded-md-1 blue-grey darken-1 white-text" Height="28">跨度</MCard>
-                <MCard Class="pl-2 pt-1 body-1" style="background:none" Height="28">@_overView.Total</MCard>
-            </MCol>
-        </MRow>
-        <MRow>
-            <MCol Cols="12" Class="d-flex flex-wrap">
-                @foreach (var item in _overView.Services)
-                {
-                    <MLabel Class="pa-2 mr-2 mb-2 rounded-lg" Style="@($"border:solid 1px {item.Color};color:{item.Color}")"><MIcon Class="pr-1" Color="@item.Color" XSmall>fas fa-cirle</MIcon>@item.Name</MLabel>
-                }
-            </MCol>
-        </MRow>
 
-        <MRow>
-            <MCol Cols="8">
-                <TreeTable Expand=true KeyFunc=@_keyFunc ParentFunc=@_parentFunc Items="_items" OnRowClick="OnChangeRecordAsync" OverViewData="_overView"></TreeTable>
-            </MCol>
-            <MCol Cols="4">
-                <MContainer>
-                    <MRow>
-                        <MCol Cols=12>
-                            <MCard Class="rounded-0">
-                                <MCardText Class="pa-0 ma-0">
-                                    @foreach (var item in _selectItem.Overview)
+<SSheetDialog Value="_dialogValue" ValueChanged="DialogValueChanged" Title="@Title">
+    <div class="d-flex">
+        <div class="pa-12" style="width:100%">
+            <div class="d-flex mb-6">
+                <SSearch Dense Style="max-width:300px"></SSearch>
+                <MSpacer></MSpacer>
+                @if (_rootTreeItem is not null)
+                {
+                    <div class="d-flex align-center">
+                        <div class="mr-6">
+                            <MChip Label Small Color="emphasis2 mr-3" Dark>起始点</MChip>
+                            <span class="regular--text">@_rootTreeItem.Timestamp</span>
+                        </div>
+                        <div class="mr-6">
+                            <MChip Label Small Color="emphasis2 mr-3" Dark>持续时间</MChip>
+                            <span class="regular--text">@FormatDuration(_rootTreeItem.DoubleDuration)</span>
+                        </div>
+                        <div>
+                            <MChip Label Small Color="emphasis2 mr-3" Dark>跨度</MChip>
+                            <span class="regular--text">@_count</span>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="mb-6">
+                @foreach (var timelines in _timelinesView)
+                {
+                    double sumOfMarginLeft = 0;
+
+                    <div class="trace-timelines mb-2">
+                        @foreach (var timeline in timelines)
+                        {
+                            if (timeline.marginLeft > 0)
+                            {
+                                var marginLeft = timeline.marginLeft - sumOfMarginLeft;
+                                sumOfMarginLeft += timeline.marginLeft + timeline.Percent;
+
+                                <div style="width: @(marginLeft * 100)%"></div>
+                            }
+
+                            <div class="trace-timeline__section" style="width: @(timeline.Percent * 100)%;">
+                                <div class="trace-timeline__background">
+                                    <div class="trace-timeline__leaner @(timeline.Render ? "" : "d-none")"></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                @if (_rootTreeItem is not null)
+                {
+                    var scale = Math.Ceiling(_rootTreeItem.Duration / 5d);
+
+                    <div class="trace-timelines-view">
+                        <div class="trace-timelines-view__line">
+                            <div class="trace-timelines-view__line-item body2" style="left: 0;">0</div>
+                            <div class="trace-timelines-view__line-item body2" style="left: 20%;">@(FormatDuration(scale * 1))</div>
+                            <div class="trace-timelines-view__line-item body2" style="left: 40%;">@(FormatDuration(scale * 2))</div>
+                            <div class="trace-timelines-view__line-item body2" style="left: 60%;">@(FormatDuration(scale * 3))</div>
+                            <div class="trace-timelines-view__line-item body2" style="left: 80%;">@(FormatDuration(scale * 4))</div>
+                            <div class="trace-timelines-view__line-item body2" style="right: 0;">@(FormatDuration(_rootTreeItem.Duration))</div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <MTreeview Items="@_treeData"
+                       ItemChildren="item => item.Children"
+                       ItemText="item => item.Name"
+                       ItemKey="item => item.SpanId"
+                       TItem="TraceResponseTree"
+                       TKey="string"
+                       OpenAll
+                       Activatable
+                       @bind-Active="_actives"
+                       OnActiveUpdate="OnActiveUpdate"
+                       Class="flex-fill overflow-y-auto"
+                       Style='@($"height: calc(100vh - {_timelinesView.Count * 20 + 254}px)")'
+                       @key="@_treeData">
+                <LabelContent>
+                    <MListItem Dense>
+                        <MListItemContent>
+                            <div class="d-flex align-center">
+                                @{
+                                    int level = context.Item.Level - 1;
+
+                                    <div style="min-width:calc(542px - @(level * 24)px)">
+                                        @context.Item.Name
+                                        @{
+                                            if (context.Item.Resource.ContainsKey("service.name"))
+                                            {
+                                                <div>
+                                                    @context.Item.Resource["service.name"]
+                                                    @((RenderFragment)(labelBuilder => RenderItemLabel(labelBuilder, context.Item)))
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                }
+                                <div class="trace-timelines">
+                                    @foreach (var timeline in context.Item.Timelines)
                                     {
-                                        <MListItem Style="min-height:24px">@item.Value</MListItem>
+                                        if (timeline.marginLeft > 0)
+                                        {
+                                            <div style="width: @(timeline.marginLeft * 100)%"></div>
+                                        }
+                                        <div class="trace-timeline__section" style="width: @(timeline.Percent * 100)%;">
+                                            <div class="trace-timeline__background">
+                                                <div class="trace-timeline__leaner @(timeline.Render ? "" : "d-none")"></div>
+                                            </div>
+                                        </div>
                                     }
-                                </MCardText>
-                            </MCard>
-                        </MCol>
-                    </MRow>
-                    <MRow>
-                        <MCol Class="ma-0 py-0" Cols=12>
-                            <MCard Class="rounded-0">
-                                <MTabs SliderColor="gray" @bind-Value=_tabIndex>
-                                    <MTab Value="@("attr")">属性</MTab>
-                                    <MTab Value="@("resource")">资源</MTab>
-                                    <MTab Value="@("detail")">详情</MTab>
-                                    <MTab Value="@("log")">日志</MTab>
-                                </MTabs>
-                            </MCard>
-                        </MCol>
-                    </MRow>
-                    <MRow>
-                        <MCol Class="py-0" Cols=12>
-                            <MTabsItems Value=@_tabIndex Style="border:1px solid gray;">
-                                <MTabItem Value="@("attr")">
-                                    <MCard>
-                                        <MCardText Class="overflow-y-auto" Style="max-height:400px;">
-                                            <TscKeyValue Value="_selectItem.Attributes" WordBreak=true></TscKeyValue>
-                                        </MCardText>
-                                    </MCard>
-                                </MTabItem>
-                                <MTabItem Value="@("resource")">
-                                    <MCard>
-                                        <MCardText Class="overflow-y-auto" Style="max-height:400px;">
-                                            <TscKeyValue Value="_selectItem.Resources" WordBreak=true></TscKeyValue>
-                                        </MCardText>
-                                    </MCard>
-                                </MTabItem>
-                                <MTabItem Value="@("detail")">
-                                    <MCard>
-                                        <MCardText Class="overflow-y-auto" Style="max-height:400px;">
-                                            <TscKeyValue Value="_selectItem.Current" WordBreak=true></TscKeyValue>
-                                        </MCardText>
-                                    </MCard>
-                                </MTabItem>
-                                <MTabItem Value="@("log")">
-                                    <MCard>
-                                        <MCardText Class="overflow-y-auto" Style="max-height:400px;">
-                                            <TscKeyValue Value="_selectItem.Logs" WordBreak=true></TscKeyValue>
-                                        </MCardText>
-                                    </MCard>
-                                </MTabItem>
-                            </MTabsItems>
-                        </MCol>
-                    </MRow>
-                </MContainer>
-            </MCol>
-        </MRow>
+                                </div>
+                                <div class="d-inline-block ml-2" style="min-width: 52px;">
+                                    @FormatDuration(context.Item.DoubleDuration)
+                                </div>
+                            </div>
+                        </MListItemContent>
+                    </MListItem>
+                </LabelContent>
+            </MTreeview>
+        </div>
+
+        <MDivider Vertical Class="mx-0" Style="height:100vh" />
+
+        @if (_activeTreeItem is not null)
+        {
+            var detail = _activeTreeItem.ToDictionary(nameof(TraceResponseTree.Children), nameof(TraceResponseTree.Attributes), nameof(TraceResponseTree.Resource), nameof(TraceResponseTree.Timelines), nameof(TraceResponseTree.Level), nameof(TraceResponseTree.DoubleDuration));
+
+            <div class="pa-12" style="width:430px">
+                <MList Dense Class="emphasis2 mb-4 rounded" Dark>
+                    <MListItem Dense>
+                        <MListItemContent>
+                            <MListItemTitle>SelfDuration</MListItemTitle>
+                        </MListItemContent>
+                        <MListItemAction>
+                            <MListItemActionText>
+                                @FormatDuration(_activeTreeItem.DoubleDuration)
+                            </MListItemActionText>
+                        </MListItemAction>
+                    </MListItem>
+                    <MListItem Dense>
+                        <MListItemContent>
+                            <MListItemTitle>TotalDuration</MListItemTitle>
+                        </MListItemContent>
+                        <MListItemAction>
+                            <MListItemActionText>
+                                @FormatDuration(_rootTreeItem!.DoubleDuration)
+                            </MListItemActionText>
+                        </MListItemAction>
+                    </MListItem>
+                </MList>
+                <div>
+                    <MTabs @bind-Value="_tabValue" FixedTabs ShowArrows="false">
+                        <MTab>attr(@_activeTreeItem.Attributes.Count)</MTab>
+                        <MTab>res(@_activeTreeItem.Resource.Count)</MTab>
+                        <MTab>dt(@detail.Count)</MTab>
+                        <MTab>logs</MTab>
+                    </MTabs>
+                    <MTabsItems Value="_tabValue">
+                        <MTabItem>
+                            @((RenderFragment)(dictRender => RenderDictionary(dictRender, _activeTreeItem.Attributes)))
+                        </MTabItem>
+                        <MTabItem>
+                            @((RenderFragment)(dictRender => RenderDictionary(dictRender, _activeTreeItem.Resource)))
+                        </MTabItem>
+                        <MTabItem>
+                            @((RenderFragment)(dictRender => RenderDictionary(dictRender, detail)))
+                        </MTabItem>
+                        <MTabItem>
+                            TODO
+                        </MTabItem>
+                    </MTabsItems>
+                </div>
+            </div>
+        }
+
+    </div>
+</SSheetDialog>
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; }
+
+    private void RenderItemLabel(RenderTreeBuilder __builder, TraceResponseTree item)
+    {
+        const string dbKey = "db.system";
+        const string httpKey = "http.method";
+
+        string? label = null;
+        if (item.Attributes.ContainsKey(dbKey))
+        {
+            label = item.Attributes[dbKey].ToString();
+        }
+        else if (item.Attributes.ContainsKey(httpKey))
+        {
+            // label = item.Attributes[httpKey].ToString();
+            label = "HTTP";
+        }
+
+        if (label is null)
+        {
+            return;
+        }
+
+        <MChip Label XSmall Class="ml-1" Color="#05CD99" Dark>@label</MChip>
     }
-</MContainer>
+
+    private void RenderDictionary(RenderTreeBuilder __builder, IDictionary<string, object> dictionary)
+    {
+        @foreach (var item in dictionary)
+        {
+            string value;
+            if (item.Value is DateTime _value)
+            {
+                value = _value.ToString("yyyy/MM/dd HH:mm:ss.fff");
+            }
+            else
+            {
+                value = item.Value.ToString();
+            }
+
+            <MListItem Class="pa-0">
+                <MListItemContent>
+                    <MListItemTitle>@item.Key</MListItemTitle>
+                </MListItemContent>
+                <MListItemAction Style="max-width: 38%">
+                    <EllipsisText TooltipStyle="white-space: pre-wrap;">
+                        <ActivatorContent>
+                            <MListItemActionText Class="text-truncate text-right"
+                                                 Style="width: 100%; cursor: auto;"
+                                                 RefBack="@context.Ref"
+                                                 @attributes="@context.Attrs">
+                                @value
+                            </MListItemActionText>
+                        </ActivatorContent>
+                        <ChildContent>
+                            @value
+                        </ChildContent>
+                    </EllipsisText>
+                </MListItemAction>
+            </MListItem>
+        }
+    }
+
+}

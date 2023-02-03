@@ -1,22 +1,18 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<MRow Class="blue lighten-3" Style="height:36px">
-    <MCol Class="d-flex justify-start ma-0 pa-0">
-        <MLabel Class="pa-0 mt-3 ml-4">Trace</MLabel>
-    </MCol>
-    <MCol Class="d-flex justify-end ma-0 pa-0 pt-1">
-        @foreach (var item in _chartOptions)
+<MCard Style="border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important;">
+    <MCardTitle>
+        <span>Trace</span>
+        <MSpacer></MSpacer>
+        @if (PageMode)
         {
-            bool isActive = item.Item3 == _chartIndex;
-
-            <MButton Class="trace-chart-btn rounded-0" Small IsActive=isActive ActiveClass="trace-chart-btn-active" OnClick="async ()=>await OnChartSwtich(item.Item3)">
-                <MIcon Size=18 Color="trace-chart-btn">@item.Item2</MIcon>
-                @item.Item1
-            </MButton>
+            <DateTimeRangeToolbar DefaultQuickRange="s_defaultQuickRange"
+                                  OnUpdate="OnDateTimeUpdate"
+                                  OnAutoUpdate="OnDateTimeAutoUpdate" />
         }
-    </MCol>
-</MRow>
-<MRow>
-    <MECharts Class="mt-4" Option="_options" Width="Width" Height="Height"></MECharts>
-</MRow>
+    </MCardTitle>
+    <MCardText Class="pa-0">
+        <MECharts @ref=MECharts Option="_option" Height="300"></MECharts>
+    </MCardText>
+</MCard>

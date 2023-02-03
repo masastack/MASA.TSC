@@ -17,5 +17,7 @@ public class ProjectDto
 
     public string LabelName { get; set; }
 
-    public List<AppDto> Apps { get; set; }
+    public List<AppDto> Apps { get; set; } = new();
+
+    public UserDto Creator { get; set; }
 }

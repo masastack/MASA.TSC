@@ -1,22 +1,31 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscEChartBase
-<MCard Class="flex-col col-3 rounded-1">
-    <MCardText Class="pa-0 ma-0">
-        <MRow>
-            <MCol Cols="5">
-                <div class="flex-col col-12 text-h6 font-weight-black text-center">@Title</div>
-                <div class="flex-clo col-12 text-h6 font-weight-black text-center">@_total</div>
-                <div class="flex-col col-12">@SubText</div>
-            </MCol>
-            <MCol Cols="7" Class="pa-0 ma-0">
-                @if (_isLoading)
-                {
-                    @("Loading ...")
-                }else
-                {
-                    <MECharts Class="mt-4" Option="(object)_options" Width="Width" Height="Height"></MECharts>
-                }
-            </MCol>
-        </MRow>
+
+<MCard Width="Width" Height="Height" Class="d-flex flex-column rounded-lg">
+    <MCardTitle Class="d-flex justify-space-between">
+        <MLabel Class="emphasis2--text h6">@Title</MLabel>
+        <MLabel Class="emphasis2--text h6">@_success.ToString("0.##")%</MLabel>
+    </MCardTitle>
+    <MCardText Class="flex-grow-1 pb-0">
+        @if (_isLoading)
+        {
+            <div class="d-flex full-height full-width">
+                <div class="ma-auto">@T("Loading data")</div>
+            </div>
+        }
+        else if (_data?.Any(item => item?.Result?.Any() is true) is false)
+        {
+            <div class="full-height d-flex">
+                <div class="ma-auto">@T("No Data")</div>
+            </div>
+        }
+        else
+        {
+            <MECharts Option="_options.Option" Width="@("100%")" Height="@("100%")"></MECharts>
+        }
     </MCardText>
+    <MCardActions Class="regular3--text body2 text-center px-4">
+        该服务目前时间段内平均成功率@(_success)%<br />
+        该服务目前时间段内平均失败率@(100 - _success)%
+    </MCardActions>
 </MCard>

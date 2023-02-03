@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
-public class EChartOptionItemStyle
+internal class EChartOptionItemStyle
 {
     public string BorderColor { get; set; }
 

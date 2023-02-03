@@ -1,0 +1,82 @@
+﻿@inherits TscComponentBase
+
+<MGridstack OnResize="OnResize" Items="Panels" Readonly="!IsEdit" @ref="@Gridstack" ItemKey="panel => panel.Id.ToString()" ItemStyle="@("border:solid #E4E8F3 1px;position:absolute;overflow:hiden;"+(IsEdit?"cursor: move;":""))" ItemPosition="panel => new(panel.Width,panel.Height,panel.X,panel.Y)" TItem="UpsertPanelDto">
+    <ItemContent>
+        @if (IsEdit)
+        {
+            <div style="height:35px;" class="d-flex">
+                <MSpacer />
+                <MMenu OpenOnHover OffsetY>
+                    <ActivatorContent Context="menuContext">
+                        <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
+                            <SIcon Size="24">@IconConstants.More</SIcon>
+                        </SButton>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <MList>
+                            @if (context.PanelType == PanelTypes.Tabs)
+                            {
+                                <MListItem OnClick="() => AddTabItem(context as UpsertTabsPanelDto)">
+                                    <MListItemTitle>
+                                        @T("Add Tab Item")
+                                    </MListItemTitle>
+                                </MListItem>
+                                @*<MListItem OnClick="() => EditEditTabItems()">
+                                    <MListItemTitle>
+                                        @T("Edit Tab Item")
+                                    </MListItemTitle>
+                                </MListItem>*@
+                                <MListItem OnClick="() => AddChildPanel(context as UpsertTabsPanelDto)">
+                                    <MListItemTitle>
+                                        @T("Add Panel")
+                                    </MListItemTitle>
+                                </MListItem>
+                            }
+                            else if (context.PanelType == PanelTypes.Chart)
+                            {
+                                <MListItem OnClick="() => ConfigurationChartPanel(context)">
+                                    <MListItemTitle>
+                                        @T("Edit Panel")
+                                    </MListItemTitle>
+                                </MListItem>
+                            }
+                            <MListItem OnClick="() => RemovePanel(context)">
+                                <MListItemTitle>
+                                    @T("Remove Panel")
+                                </MListItemTitle>
+                            </MListItem>
+                        </MList>
+                    </ChildContent>
+                </MMenu>
+            </div>
+        }
+        <div style="overflow:auto;@(IsEdit?"height:calc(100% - 35px);":"height:calc(100%);")">
+            @switch (context.PanelType)
+            {
+                case PanelTypes.Tabs:
+                    <TabsPanel Panel="context as UpsertTabsPanelDto" IsEditTabItem=IsEditTabItem />
+                    break;
+                case PanelTypes.Text:
+                    <TextPanel Value=context IsEdit=IsEdit />
+                    break;
+                case PanelTypes.Trace:
+                    <TscTrace Width="context.W" Height="context.H" />
+                    break;
+                case PanelTypes.Topology:
+                    <TopologyPanel />
+                    break;
+                case PanelTypes.Chart or PanelTypes.Table:
+                    <ChartPanel Value="context as UpsertChartPanelDto" />
+                    break;
+                case PanelTypes.Log:
+                    <LogPanel Width="context.W" Height="context.H" />
+                    break;
+                case PanelTypes.Select:
+                    <PanelSelect PanelId="context.Id" OnSelect="ReplacePanel" />
+                    break;
+                default:
+                    break;
+            }
+        </div>
+    </ItemContent>
+</MGridstack>

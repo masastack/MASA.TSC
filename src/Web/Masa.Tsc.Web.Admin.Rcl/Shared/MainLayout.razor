@@ -1,8 +1,9 @@
 ﻿@inherits LayoutComponentBase
 
-<SLayout AppId="@MasaStackConsts.TSC_SYSTEM_WEB_APP_ID" OnErrorAsync="OnError"
+<SLayout AppId="@MasaStackConsts.TSC_SYSTEM_WEB_APP_ID" OnErrorAsync="OnError" Exact=false
         Logo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo-h-en.png"
-        MiniLogo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo.png">
+        MiniLogo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo.png"
+         WhiteUris="_whiteUrlRoutes">
         @Body
 </SLayout>
 
@@ -16,4 +17,12 @@
         //GlobalConfig.Loading = false;
         return Task.CompletedTask;
     }
+    
+    private List<string> _whiteUrlRoutes = new()
+    {
+        // for scheduler logs jump 
+        "dashbord/log/*",
+        // for instrument like serviceList,endpointList,instanceList  jump to child instrument
+        "dashbord/*"        
+    };
 }

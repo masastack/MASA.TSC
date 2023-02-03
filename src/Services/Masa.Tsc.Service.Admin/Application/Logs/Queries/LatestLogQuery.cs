@@ -3,15 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Logs;
 
-public record LatestLogQuery : Query<object>
+public record LatestLogQuery(DateTime Start, DateTime End, string Query, bool IsDesc = true) : Query<LogResponseDto>
 {
-    public string Query { get; set; }
-
-    public DateTime Start { get; set; }
-
-    public DateTime End { get; set; }
-
-    public bool IsDesc { get; set; } = true;
-
-    public override object Result { get; set; }
+    public override LogResponseDto Result { get; set; }
 }

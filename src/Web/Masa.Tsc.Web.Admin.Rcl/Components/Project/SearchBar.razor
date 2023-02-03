@@ -1,22 +1,20 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<MRow Class="ma-0 pa-0">
-    <MCol Cols="6" Class="d-flex ma-0 pa-0 overflow-hidden" Style="height:44px">
-        <MAutocomplete TItem="AppDto" TItemValue=string TValue=string @bind-Value=@Value.AppId Items=Apps ItemText="r=>r.Name" ItemValue="r=>r.Identity" Class="flex-row col-4 pa-0" Outlined Dense />
-        <MLabel Class="rounded-lg text-no-wrap ml-1 my-2 py-2 px-1" Color="white-text" Style="background-color:#5470c6">Service ID:</MLabel>
-        <MLabel Class="text-no-wrap ml-3 my-2 py-2">@AppId</MLabel>
+<MRow Class="@Class">
+    <MCol Cols="6" Class="d-flex justify-start align-center">
+        <div style="width:210px;">
+            <SAutoComplete TItem="AppDto" TItemValue=string TValue=string OnSelectedItemUpdate="OnSelectItemUpdate"
+                           Items=Apps ItemText="r=>r.Name" ItemValue="r=>r.Identity" Outlined Dense Value="_value.AppId"
+                           Style="background-color:white;" />
+        </div>
+        <MChip Class="mx-6" Color="#05CD99" TextColor="white">@GetApp()?.AppType</MChip>
+        <MLabel Class="regular2--text body2">@_value.AppId</MLabel>
     </MCol>
-    <MCol Cols="6" Class="d-flex justify-end ma-0 pa-0 overflow-hidden" Style="height:44px">
-        <SDateTimeRangePicker StartTime=@Value.Start EndTime=@Value.End Class="ma-0 pa-0 pl-3 pt-2"></SDateTimeRangePicker>
-        <MSelect @bind-Value=@Value.Interval Class="col-2"
-                 Items="@_selectDataSource"
-                 ItemText="u => u"
-                 ItemValue="u => u" Dense Outlined SmallChips>
-        </MSelect>
-        <MButton OnClick="SearchAsync" Class="px-2" Outlined Style="min-width:20px;border:none">
-            <MIcon Color="#5470c6">@_searchIconClass</MIcon>
-        </MButton>
-        <MButton Outlined>查看/详情</MButton>
+    <MCol Cols="6" Class="d-flex justify-end align-center">
+        <DateTimeRangeToolbar OnUpdate="UpdateTimeAsync" />
+        <SButton Class="ml-6" Small BorderRadiusClass="rounded-lg">
+            查看详情
+        </SButton>
     </MCol>
 </MRow>

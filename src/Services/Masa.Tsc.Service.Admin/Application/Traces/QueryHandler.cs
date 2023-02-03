@@ -1,155 +1,114 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Nest;
-
 namespace Masa.Tsc.Service.Admin.Application.Traces;
 
 public class QueryHandler
 {
-    private readonly IElasticClient _elasticClient;
-    private readonly IServiceProvider _provider;
-    private readonly ILogger _logger;
+    private readonly ITraceService _traceService;
 
-    public QueryHandler(IServiceProvider provider, IElasticClient elasticClient, ILogger<QueryHandler> logger)
+    public QueryHandler(ITraceService traceService)
     {
-        _provider = provider;
-        _elasticClient = elasticClient;
-        _logger = logger;
+        _traceService = traceService;
     }
 
     [EventHandler]
     public async Task GetDetailAsync(TraceDetailQuery query)
     {
-        await _elasticClient.SearchAsync<object, TraceDetailQuery>($"{ElasticConst.TraceIndex},{ElasticConst.SpanIndex}", query,
-            condition: (container, q) => container.Term(t => t.Field(ElasticConst.TRACE_ID).Value(q.TraceId)),
-            sort: (sort, q) => sort.Ascending(ElasticConst.TraceTimestamp),
-            page: () => ValueTuple.Create(false, 0, ElasticConst.MAX_DATA_COUNT - 1),
-            result: (rep, q) => q.Result = rep.Documents!,
-            logger: _logger);
+        query.Result = await _traceService.GetAsync(query.TraceId);
+        if (query.Result == null)
+            query.Result = Array.Empty<TraceResponseDto>();
     }
 
     [EventHandler]
     public async Task GetListAsync(TraceListQuery query)
     {
-        await _elasticClient.SearchAsync<object, TraceListQuery>($"{ElasticConst.TraceIndex}", query,
-            condition: (container, q) =>
+        var queryDto = new BaseRequestDto
+        {
+            End = query.End,
+            //Endpoint = query.Endpoint,
+            Instance = query.Instance,
+            Page = query.Page,
+            Service = query.Service,
+            PageSize = query.Size,
+            Start = query.Start,
+            TraceId = query.TraceId,
+            Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = false }
+        };
+        if (!string.IsNullOrEmpty(query.Endpoint))
+        {
+            var list = queryDto.Conditions?.ToList() ?? new();
+            var endpointCondition = new FieldConditionDto
             {
-                var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
-                if (!string.IsNullOrEmpty(query.TraceId))
-                {
-                    list.Add(t => t.Term(f => f.Value(q.TraceId).Field(ElasticConst.TRACE_ID)));
-                }
-                if (!string.IsNullOrEmpty(q.Service))
-                {
-                    list.Add(t => t.Term(f => f.Value(q.Service).Field(ElasticConst.TRACE_SERVICE_NAME)));
-                }
-                if (!string.IsNullOrEmpty(q.Instance))
-                {
-                    list.Add(t => t.Term(f => f.Value(q.Instance).Field(ElasticConst.TRACE_INSTANCE_NAME)));
-                }
-                if (!string.IsNullOrEmpty(q.Service))
-                {
-                    list.Add(t => t.Term(f => f.Value(q.Endpoint).Field(ElasticConst.TRACE_ENDPOINT_NAME)));
-                }
+                Name = "Attributes.http.url",
+                Type = ConditionTypes.Equal,
+                Value = query.Endpoint
+            };
+            list.Add(endpointCondition);
+            queryDto.Conditions = list;
+        }
 
-                list.Add(t => t.DateRange(f => f.LessThan(q.End).GreaterThan(q.Start).Field(ElasticConst.TraceTimestamp)));
-                return container.Bool(t => t.Must(list));
-            },
-            sort: (sort, q) => sort.Ascending(ElasticConst.TraceTimestamp),
-            page: () => ValueTuple.Create(true, query.Page, query.Size),
-            result: (rep, q) => q.Result = new PaginationDto<object>(rep.Total, rep.Documents?.ToList()!),
-            logger: _logger);
+        query.Result = await _traceService.ListAsync(queryDto);
+        if (query.Result == null)
+            query.Result = new PaginatedListBase<TraceResponseDto>();
     }
 
     [EventHandler]
     public async Task GetAttrValuesAsync(TraceAttrValuesQuery query)
     {
-        await _elasticClient.SearchAsync<object, TraceAttrValuesQuery>($"{ElasticConst.TraceIndex},{ElasticConst.SpanIndex}", query,
-            condition: (container, q) =>
+        var list = query.Data.Conditions?.ToList() ?? new();
+        if (string.IsNullOrEmpty(query.Data.Service))
+        {
+            query.Data.Name = ElasticConstant.ServiceName;
+            if (!string.IsNullOrEmpty(query.Data.Keyword))
             {
-                var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
-                if (query.Queries != null)
+                list.Add(new FieldConditionDto
                 {
-                    foreach (var item in q.Queries)
-                    {
-                        list.Add(t => t.Term(f => f.Value(item.Value).Field(item.Key)));
-                    }
-                }
-                if (!string.IsNullOrEmpty(query.Keyword))
+                    Name = ElasticConstant.ServiceName,
+                    Type = ConditionTypes.Regex,
+                    Value = $"*{query.Data.Keyword}*"
+                });
+            }
+        }
+        else if (query.Data.Instance == null)
+        {
+            query.Data.Name = ElasticConstant.ServiceInstance;
+            if (!string.IsNullOrEmpty(query.Data.Keyword))
+            {
+                list.Add(new FieldConditionDto
                 {
-                    list.Add(t => t.Wildcard(f => f.Value($"{q.Keyword}*").Field(q.Name)));
-                }
+                    Name = ElasticConstant.ServiceInstance,
+                    Type = ConditionTypes.Regex,
+                    Value = $"*{query.Data.Keyword}*"
+                });
+            }
+        }
+        else
+        {
+            // ElasticConstant.Endpoint;
+            query.Data.Name = "Attributes.http.url";
+            if (!string.IsNullOrEmpty(query.Data.Keyword))
+            {
+                list.Add(new FieldConditionDto
+                {
+                    Name = ElasticConstant.Endpoint,
+                    Type = ConditionTypes.Regex,
+                    Value = $"*{query.Data.Keyword}*"
+                });
+            }
+        }
+        query.Data.Conditions = list;
+        query.Data.Keyword = default!;
 
-                list.Add(t => t.DateRange(f => f.LessThan(q.End).GreaterThan(q.Start).Field(ElasticConst.TraceTimestamp)));
-                return container.Bool(t => t.Must(list));
-            },
-            aggregate: (agg, q) => agg.Terms(q.Name, f => f.Field(q.Name).Size(q.Limit)),
-            sort: (sort, q) => sort.Ascending(q.Name),
-            result: (rep, q) =>
-            {
-                var bucket = (BucketAggregate)rep.Aggregations[q.Name];
-                var data = bucket.Items.Select(item => ((KeyedBucket<object>)item).Key.ToString()).ToList();
-                data.Sort();
-                q.Result = data!;
-            },
-            page: () => ValueTuple.Create(false, 0, query.Limit),
-            logger: _logger);
+        query.Result = (IEnumerable<string>)await _traceService.AggregateAsync(query.Data);
+        if (query.Result == null)
+            query.Result = Array.Empty<string>();
     }
 
     [EventHandler]
     public async Task AggregateAsync(TraceAggregationQuery query)
     {
-        string index = string.Empty;
-        var find = query.Queries.FirstOrDefault(item => string.Equals(item.Key, "isSpan", StringComparison.CurrentCultureIgnoreCase));
-        if (!string.IsNullOrEmpty(find.Key))
-        {
-            if (bool.Parse(find.Value))
-                index += $",{ElasticConst.SpanIndex}";
-            query.Queries.Remove(find.Key);
-        }
-        find = query.Queries.FirstOrDefault(item => string.Equals(item.Key, "isTrace", StringComparison.CurrentCultureIgnoreCase));
-        if (!string.IsNullOrEmpty(find.Key))
-        {
-            if (bool.Parse(find.Value))
-                index += $",{ElasticConst.SpanIndex}";
-            query.Queries.Remove(find.Key);
-        }
-        if (index.Length > 0)
-        {
-            index = index[1..];
-        }
-        else
-        {
-            index = $"{ElasticConst.TraceIndex},{ElasticConst.SpanIndex}";
-        }
-
-        await _elasticClient.SearchAsync<object, TraceAggregationQuery>(index, query,
-            condition: (container, q) =>
-            {
-                var list = new List<Func<QueryContainerDescriptor<object>, QueryContainer>>();
-                foreach (var item in q.Queries)
-                {
-                    list.Add(t => t.Term(f => f.Value(item.Value).Field(item.Key)));
-                }
-
-                list.Add(t => t.DateRange(f => f.LessThan(q.End).GreaterThan(q.Start).Field(ElasticConst.TraceTimestamp)));
-                return container.Bool(t => t.Must(list));
-            },
-            sort: (sort, q) => sort.Descending(ElasticConst.TraceTimestamp),
-            result: (rep, q) =>
-            {
-                var data = IElasticClientExtenstion.AggResult(rep, q.Fields);
-                q.Result = new ChartLineDataDto<ChartPointDto>();
-                if (data != null && data.Any())
-                    q.Result.Data = data.Select(item => new ChartPointDto
-                    {
-                        X = item.Key,
-                        Y = item.Value,
-                    });
-            },
-            aggregate: (agg, q) => IElasticClientExtenstion.Aggregation(agg, q.Fields, q.Interval),
-            logger: _logger);
+        var data = await _traceService.AggregateAsync(query.Data);
+        query.Result = data;
     }
-
 }

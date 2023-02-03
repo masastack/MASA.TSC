@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Traces;
 
-public record TraceAggregationQuery(bool IsTrace, bool IsSpan, IEnumerable<RequestFieldAggregationDto> Fields, Dictionary<string, string> Queries, DateTime Start, DateTime End, string Interval) : Query<ChartLineDataDto<ChartPointDto>>
+public record TraceAggregationQuery(SimpleAggregateRequestDto Data) : Query<object>
 {
-    public override ChartLineDataDto<ChartPointDto> Result { get; set; }
+    public override object Result { get; set; }
 }

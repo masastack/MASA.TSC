@@ -9,46 +9,35 @@
 
 	<ItemGroup>
 		<Compile Remove="Application\Apps\**" />
-		<Compile Remove="Domain\Instruments\Events\**" />
 		<Compile Remove="Domain\Instruments\Services\**" />
-		<Compile Remove="Domain\Projects\Events\**" />
-		<Compile Remove="Domain\Projects\Service\**" />
-		<Compile Remove="Domain\Teams\Events\**" />
-		<Compile Remove="Domain\Teams\Service\**" />
+		<Compile Remove="Domain\Projects\**" />
+		<Compile Remove="Domain\Teams\**" />
 		<Content Remove="Application\Apps\**" />
-		<Content Remove="Domain\Instruments\Events\**" />
 		<Content Remove="Domain\Instruments\Services\**" />
-		<Content Remove="Domain\Projects\Events\**" />
-		<Content Remove="Domain\Projects\Service\**" />
-		<Content Remove="Domain\Teams\Events\**" />
-		<Content Remove="Domain\Teams\Service\**" />
+		<Content Remove="Domain\Projects\**" />
+		<Content Remove="Domain\Teams\**" />
 		<EmbeddedResource Remove="Application\Apps\**" />
-		<EmbeddedResource Remove="Domain\Instruments\Events\**" />
 		<EmbeddedResource Remove="Domain\Instruments\Services\**" />
-		<EmbeddedResource Remove="Domain\Projects\Events\**" />
-		<EmbeddedResource Remove="Domain\Projects\Service\**" />
-		<EmbeddedResource Remove="Domain\Teams\Events\**" />
-		<EmbeddedResource Remove="Domain\Teams\Service\**" />
+		<EmbeddedResource Remove="Domain\Projects\**" />
+		<EmbeddedResource Remove="Domain\Teams\**" />
 		<None Remove="Application\Apps\**" />
-		<None Remove="Domain\Instruments\Events\**" />
 		<None Remove="Domain\Instruments\Services\**" />
-		<None Remove="Domain\Projects\Events\**" />
-		<None Remove="Domain\Projects\Service\**" />
-		<None Remove="Domain\Teams\Events\**" />
-		<None Remove="Domain\Teams\Service\**" />
+		<None Remove="Domain\Projects\**" />
+		<None Remove="Domain\Teams\**" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Masa.BuildingBlocks.Dispatcher.Events" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Configuration" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.Configuration.ConfigurationApi.Dcc" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.BuildingBlocks.Ddd.Domain" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.Ddd.Domain" Version="$(MasaFrameworkPackageVersion)" />		
+		<PackageReference Include="Masa.Contrib.Ddd.Domain" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Exceptions" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Utils.Data.Elasticsearch" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Utils.Data.Prometheus" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Tsc" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.Elasticsearch" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.Dapr" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.ReadWriteSplitting.Cqrs" Version="$(MasaFrameworkPackageVersion)" />
@@ -57,16 +46,18 @@
 		<PackageReference Include="Masa.Contrib.Data.EFCore.SqlServer" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Data.UoW.EFCore" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Isolation.UoW.EFCore" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.Data.Contracts.EFCore" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Data.Contracts" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Isolation.MultiEnvironment" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.Authentication.Identity" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Utils.Caching.DistributedMemory" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Utils.Caching.Redis" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="MASA.Utils.Configuration.Json" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Utils.Development.Dapr.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Utils.Exceptions" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Development.DaprStarter.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
+		<!--<PackageReference Include="Masa.Utils.Caching.DistributedMemory" Version="0.6.0-preview.13" />
+		<PackageReference Include="Masa.Utils.Caching.Redis" Version="0.6.0-preview.13" />-->
+		<PackageReference Include="MASA.Utils.Configuration.Json" Version="$(MasaFrameworkPackageVersion)" />	
 		<PackageReference Include="Masa.Utils.Extensions.Enums" Version="$(MasaFrameworkPackageVersion)" />	
 		
+		<PackageReference Include="Masa.Utils.Caching.DistributedMemory" Version="0.6.0-preview.13" />
+		<PackageReference Include="Masa.Utils.Caching.Redis" Version="0.6.0-preview.13" />
+		<PackageReference Include="MASA.Utils.Configuration.Json" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Utils.Extensions.Enums" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.6" />
@@ -83,20 +74,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Application\Instruments\Queries\" />
-		<Folder Include="Domain\Projects\Repositories\" />
-		<Folder Include="Domain\Teams\Repositories\" />
 		<Folder Include="Migrations\" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<!--<ProjectReference Include="..\..\..\..\MASA.Framework\src\Contrib\Authentication\Identity\Masa.Contrib.Authentication.Identity\Masa.Contrib.Authentication.Identity.csproj" />-->
 		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
-		<ProjectReference Include="..\Masa.Tsc.Services.Observability\Masa.Tsc.Services.Observability.csproj" />
+		<!--<ProjectReference Include="..\Masa.Tsc.Services.Observability\Masa.Tsc.Services.Observability.csproj" />-->
 	</ItemGroup>
 
 	<ItemGroup>
 		<None Update="Dockerfile">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 </Project>

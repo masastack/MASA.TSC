@@ -1,3 +1,16 @@
 ﻿@page "/dashbord/log"
+@page "/dashbord/log/{TaskId}"
+@inject I18n I18n
 
-<TscLog/>
+<PageTitle>@I18n.T("Log")</PageTitle>
+
+<LogPanel PageMode=true TaskId="@TaskId" />
+
+@code {
+
+    /// <summary>
+    /// scheduler job taskId
+    /// </summary>
+    [Parameter]
+    public string TaskId { get; set; }
+}

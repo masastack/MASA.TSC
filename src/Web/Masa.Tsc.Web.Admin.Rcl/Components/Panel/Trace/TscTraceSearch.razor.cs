@@ -5,143 +5,70 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceSearch
 {
-    [Parameter]
-    public Func<string, string, string, string, DateTime, DateTime, Task> OnSearchAsync { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback<(string?, string?, string?, string?)> OnQueryUpdate { get; set; }
 
-    private bool _isLoading = false;
-    private List<string> _services = default!;
-    private List<string> _instances = default!;
-    private List<string> _endpoints = default!;
+    [Parameter, EditorRequired]
+    public Func<string, Task<IEnumerable<string>>> QueryServices { get; set; }
 
-    private string _service = default!;
-    private string _instance = default!;
-    private string _endpoint = default!;
-    private string _keyword = default!;
-    private DateTime? _start;
-    private DateTime? _end;
+    [Parameter, EditorRequired]
+    public Func<string, string, Task<IEnumerable<string>>> QueryInstances { get; set; }
+
+    [Parameter, EditorRequired]
+    public Func<string, string, string, Task<IEnumerable<string>>> QueryEndpoints { get; set; }
+
+    private List<string> _services = new();
+    private List<string> _instances = new();
+    private List<string> _endpoints = new();
+
+    private string _service = string.Empty;
+    private string _instance = string.Empty;
+    private string? _endpoint;
+    private string? _keyword;
+
+    private bool _serviceSearching;
+    private bool _instanceSearching;
+    private bool _endpointSearching;
 
     protected override async Task OnInitializedAsync()
     {
+        await SearchServices(default!);
         await base.OnInitializedAsync();
-        _instances = new List<string>();
-        _endpoints = new List<string>();
-        await SearchAsync();
     }
 
-    private async Task UpdateSearchInputAsync(int type, string val)
+    private async Task SearchServices(string key)
     {
-        if (_isLoading || string.IsNullOrEmpty(val))
-        {
-            return;
-        }
-
-        _isLoading = true;
-        CheckTime();
-        var query = new RequestAttrDataDto
-        {
-            End = TimeZoneInfo.ConvertTime(_end!.Value, CurrentTimeZone),
-            Start = TimeZoneInfo.ConvertTime(_start!.Value, CurrentTimeZone),
-            Keyword = val,
-            Max = 10
-        };
-
-        IEnumerable<string> data;
-        switch (type)
-        {
-            case 1:
-                query.Name = "service.name";
-                data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
-                _services = data.ToList();
-                break;
-            case 2:
-                query.Query = new Dictionary<string, string> {
-                    {"service.name",_service}
-                };
-                query.Name = "service.node.name";
-                data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
-                _instances = data.ToList();
-                break;
-            case 3:
-                query.Query = new Dictionary<string, string> {
-                    {"service.name",_service},
-                    {"service.node.name",_instance}
-                };
-                query.Name = "transaction.name";
-                data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
-                _endpoints = data.ToList();
-                break;
-        }
-        //StateHasChanged();
-        _isLoading = false;
-        await Task.CompletedTask;
+        _serviceSearching = true;
+        _services = (await QueryServices.Invoke(key)).ToList();
+        _serviceSearching = false;
     }
 
-    private async Task UpdateItemAsync(int type, string value)
+    private async Task SearchInstances(string key)
     {
-        if (_isLoading || string.IsNullOrEmpty(value))
-            return;
-
-        _isLoading = true;
-        CheckTime();
-        var query = new RequestAttrDataDto
-        {
-            End = TimeZoneInfo.ConvertTime(_end!.Value, CurrentTimeZone),
-            Start = TimeZoneInfo.ConvertTime(_start!.Value, CurrentTimeZone),
-            Max = 10
-        };
-        IEnumerable<string> data;
-        switch (type)
-        {
-            case 1:
-            case 2:
-                if (type == 1)
-                {
-                    query.Query = new Dictionary<string, string> {
-                    {"service.name",_service}
-                };
-                    query.Name = "service.node.name";
-                    data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
-                    _instances = data.ToList();
-                }
-
-                query.Query = new Dictionary<string, string> {
-                    {"service.name",_service},
-                    {"service.node.name",_instance}
-                };
-                query.Name = "transaction.name";
-                data = (await ApiCaller.TraceService.GetAttrValuesAsync(query))!;
-                _endpoints = data.ToList();
-                break;
-        }
-
-        _isLoading = false;
-        await Task.CompletedTask;
+        _instanceSearching = true;
+        _instances = (await QueryInstances(_service, key)).ToList();
+        _instanceSearching = false;
     }
 
-    private async Task SearchAsync()
+    private async Task SearchEndpoints(string key)
     {
-        CheckTime();
-        _services = (await ApiCaller.TraceService.GetAttrValuesAsync(new RequestAttrDataDto
-        {
-            End = TimeZoneInfo.ConvertTime(_end!.Value, CurrentTimeZone),
-            Start = TimeZoneInfo.ConvertTime(_start!.Value, CurrentTimeZone),
-            Name = "service.name",
-            Max = 10
-        })).ToList();
-
-        if (OnSearchAsync is not null)
-        {
-            await OnSearchAsync.Invoke(_service, _instance, _endpoint, _keyword, TimeZoneInfo.ConvertTime(_start.Value, CurrentTimeZone), TimeZoneInfo.ConvertTime(_end.Value, CurrentTimeZone));
-        }
+        _endpointSearching = true;
+        _endpoints = (await QueryEndpoints(_service, _instance ?? string.Empty, key)).ToList();
+        _endpointSearching = false;
     }
 
-    private void CheckTime()
+    private void KeywordChanged(string? val)
     {
-        if (!_start.HasValue || !_end.HasValue)
+        _keyword = val;
+        Query();
+    }
+
+    private void Query()
+    {
+        NextTick(async () =>
         {
-            var time = TimeZoneInfo.ConvertTime(DateTime.Now, CurrentTimeZone);
-            _start = time.Date;
-            _end = time;
-        }
+            await OnQueryUpdate.InvokeAsync((_service, _instance, _endpoint, _keyword));
+            StateHasChanged();
+        });
     }
 }

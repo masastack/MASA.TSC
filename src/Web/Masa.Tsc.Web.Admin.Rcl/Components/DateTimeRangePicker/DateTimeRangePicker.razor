@@ -1,0 +1,60 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@inherits TscComponentBase
+
+<MMenu Value="_menuValue" ValueChanged="MenuValueChanged"
+       OffsetY NudgeBottom="8" OpenOnClick CloseOnContentClick="false"
+       ContentClass="px-6 py-4 white" ContentStyle="border-radius:16px">
+    <ActivatorContent>
+        <div class="d-inline-flex align-center">
+            <MButton Text Small Class="d-flex align-center mr-1"
+                     Style="font-size: 14px;"
+                     @attributes="@context.Attrs">
+                <MIcon Size="20" Class="mr-2">mdi-calendar</MIcon>
+                <div>@FormatDateTime(StartDateTime)</div>
+                <MDivider Vertical Class="mx-2" Style="align-self: auto; height: 14px;" />
+                <div>@FormatDateTime(EndDateTime)</div>
+            </MButton>
+            <MChip Label Small Color="secondary">@(_offset.Hours > 0 ? $"+{_offset.Hours}" : _offset.Hours.ToString())</MChip>
+        </div>
+    </ActivatorContent>
+    <ChildContent>
+        <div class="date-time-offset-picker__content mb-4 d-flex" style="width: 580px">
+            <MDatePicker Value="@_internalStartDate" ValueChanged="InternalStartDateChanged" TValue="DateOnly"
+                         NoTitle FullWidth Class="mr-3 ml-n2"
+                         AllowedDates="val => val <= _internalEndDate">
+                <TimeSelector Value="@_internalStartTime" ValueChanged="InternalStartTimeChanged"></TimeSelector>
+            </MDatePicker>
+            <MDatePicker Value="@_internalEndDate" ValueChanged="InternalEndDateChanged" TValue="DateOnly"
+                         NoTitle FullWidth Class="ml-3 mr-n2"
+                         AllowedDates="val => val >= _internalStartDate">
+                <TimeSelector Value="@_internalEndTime" ValueChanged="InternalEndTimeChanged"></TimeSelector>
+            </MDatePicker>
+        </div>
+        <div class="text-right mb-4">
+            <MSelect @bind-Value="@_internalOffset"
+                     Items="_systemTimeZones"
+                     ItemText='item => item.DisplayName'
+                     ItemValue="item => item.BaseUtcOffset"
+                     TValue="TimeSpan"
+                     TItem="TimeZoneInfo"
+                     TItemValue="TimeSpan"
+                     Dense
+                     Outlined
+                     HideDetails="true"
+                     Class="d-inline-block"
+                     Style="width:316px"
+                     OnSelectedItemUpdate="OnInternalOffsetUpdated">
+            </MSelect>
+        </div>
+        <MDivider />
+        <div class="d-flex justify-space-between align-center pt-4">
+            <div>
+                @FormatDateTime(_internalStartDateTime) to @FormatDateTime(_internalEndDateTime)
+            </div>
+            <div>
+                <MButton Color="primary" Outlined OnClick="() => _menuValue = false">Cancel</MButton>
+                <MButton Color="primary" OnClick="HandleOnConfirm">Confirm</MButton>
+            </div>
+        </div>
+    </ChildContent>
+</MMenu>

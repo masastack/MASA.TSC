@@ -1,0 +1,82 @@
+﻿@page "/dashboard/configuration/chart/{panelId}"
+@page "/dashboard/configuration/chart/{dashboardId}/{panelId}"
+@page "/dashboard/configuration/chart/{dashboardId}/{serviceName}/{panelId}"
+@inherits TscComponentBase
+
+<PageTitle>@T("Configure Chart")</PageTitle>
+
+@if (Panel is not null)
+{
+    <CascadingValue Value="ConfigurationRecord">
+        <ChartPanelConfiguration ServiceName="@ServiceName" DashboardId="@DashboardId" Value="Panel" />
+    </CascadingValue>
+}
+
+@code {
+    [Inject]
+    ConfigurationRecord ConfigurationRecord { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    [Parameter]
+    public string? DashboardId { get; set; }
+
+    [Parameter]
+    public string? ServiceName { get; set; }
+
+    [Parameter]
+    public string PanelId { get; set; }
+
+    public bool ReLoad { get; set; }
+
+    UpsertChartPanelDto? Panel { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (DashboardId is null) return;
+        if (string.IsNullOrEmpty(ConfigurationRecord.DashboardId) is false)
+        {
+            Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException("find panel error");
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        if(ReLoad)
+        {
+            Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException("find panel error");
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (string.IsNullOrEmpty(ConfigurationRecord.DashboardId))
+        {
+            NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName);
+        }
+        else if(DashboardId is null)
+        {
+            ReLoad = true;
+            NavigationManager.NavigateToConfigurationChart(ConfigurationRecord.DashboardId, PanelId, ConfigurationRecord.AppName);
+        }
+    }
+
+    UpsertPanelDto? FindPanel(List<UpsertPanelDto> panels)
+    {
+        foreach (var panel in panels)
+        {
+            if (panel.Id == Guid.Parse(PanelId!))
+            {
+                return panel;
+            }
+            if (panel.ChildPanels.Any())
+            {
+                var data = FindPanel(panel.ChildPanels);
+                if (data is not null) return data;
+            }
+        }
+
+        return default;
+    }
+}

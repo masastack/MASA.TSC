@@ -5,18 +5,26 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscEChartBase : TscComponentBase
 {
-    protected bool _isLoading = true;
+    protected bool _isLoading;
 
-    public async Task OnLoadAsync(ProjectAppSearchModel query)
+    internal async Task OnLoadAsync(ProjectAppSearchModel query)
     {
+        _isLoading = true;
+        StateHasChanged();
         await LoadAsync(query);
         _isLoading = false;
         StateHasChanged();
     }
 
-    protected virtual async Task LoadAsync(ProjectAppSearchModel query)
+    internal virtual async Task LoadAsync(ProjectAppSearchModel query)
     {
-        Thread.Sleep(200);
+        await Task.Delay(200);
         await Task.CompletedTask;
+    }
+
+    protected string ToDateTimeStr(double value)
+    {
+        var millionSeconds = (long)Math.Floor(value * 1000);
+        return millionSeconds.ToDateTime().Format(CurrentTimeZone);
     }
 }

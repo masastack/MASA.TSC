@@ -5,35 +5,17 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class DirectoryService : BaseService
 {
-    public DirectoryService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/Instrument/directory",tokenProvider) { }
+    public DirectoryService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/Instrument/directory", tokenProvider) { }
 
-    public async Task<IEnumerable<KeyValuePair<string, string>>> AggregateAsync(RequestAggregationDto param)
-    {
-        return (await Caller.GetByBodyAsync<IEnumerable<KeyValuePair<string, string>>>($"{RootPath}/aggregate", param))!;
-    }
+    public async Task<IEnumerable<DirectoryTreeDto>> GetTreeAsync(bool isContainsInstrument = true) => (await Caller.GetAsync<IEnumerable<DirectoryTreeDto>>($"{RootPath}/tree/{isContainsInstrument}"))!;
 
-    public async Task<IEnumerable<DirectoryTreeDto>> GetTreeAsync(Guid userId)
-    {
-        return (await Caller.GetAsync<IEnumerable<DirectoryTreeDto>>($"{RootPath}/tree/{userId}"))!;
-    }
+    public async Task<PaginatedListBase<FolderDto>> GetListAsync(int page, int pageSize, string? keyword = default, bool isIncludeInstrument = true) => (await Caller.GetAsync<PaginatedListBase<FolderDto>>($"{RootPath}/list", new { page, pageSize, keyword, isIncludeInstrument }))!;
 
-    public async Task<DirectoryDto> GetAsync(Guid userId, Guid id)
-    {
-        return (await Caller.GetAsync<DirectoryDto>($"{RootPath}/{userId}/{id}"))!;
-    }
+    public async Task<UpdateFolderDto> GetAsync(Guid id) => (await Caller.GetAsync<UpdateFolderDto>($"{RootPath}?id={id}"))!;
 
-    public async Task AddAsync(AddDirectoryDto param)
-    {
-        await Caller.PostAsync($"{RootPath}", param);
-    }
+    public async Task AddAsync(AddFolderDto param) => await Caller.PostAsync($"{RootPath}", param);
 
-    public async Task UpdateAsync(UpdateDirectoryDto param)
-    {
-        await Caller.PutAsync($"{RootPath}", param);
-    }
+    public async Task UpdateAsync(UpdateFolderDto param) => await Caller.PutAsync($"{RootPath}", param);
 
-    public async Task DeleteAsync(Guid id, Guid userId)
-    {
-        await Caller.DeleteAsync($"{RootPath}/{id}/{userId}", default);
-    }
+    public async Task DeleteAsync(Guid id) => await Caller.DeleteAsync($"{RootPath}?id={id}", default);
 }

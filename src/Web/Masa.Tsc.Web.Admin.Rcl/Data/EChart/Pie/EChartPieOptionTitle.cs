@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data
 {
-    public class EChartPieOptionTitle
+    internal class EChartPieOptionTitle
     {
         [JsonPropertyName("text")]
         public string Title { get; set; }

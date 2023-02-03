@@ -1,11 +1,11 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.ApiGateways.Caller.Extensions;
+namespace Masa.Tsc.ApiGateways.Caller;
 
 public static class ServiceExtensions
 {
-    private const string DEFAULT_CLIENT_NAME = "masa.tsc.apigateways.caller";
+    internal const string DEFAULT_CLIENT_NAME = "masa.tsc.apigateways.caller";
 
     public static IServiceCollection AddTscApiCaller(this IServiceCollection services, string tscApiUrl)
     {
@@ -17,7 +17,6 @@ public static class ServiceExtensions
         }
         catch
         {
-
             services.AddCaller(builder =>
             {
                 builder.UseHttpClient(DEFAULT_CLIENT_NAME, options =>
@@ -26,10 +25,10 @@ public static class ServiceExtensions
                  });
             });
 
-            services.AddSingleton(serviceProvider =>
+            services.AddScoped(serviceProvider =>
             {
                 var caller = serviceProvider.GetRequiredService<ICallerFactory>().Create(DEFAULT_CLIENT_NAME);
-                var client = new TscCaller(caller, serviceProvider.GetRequiredService<TokenProvider>());
+                var client = new TscCaller(serviceProvider, caller, serviceProvider.GetRequiredService<TokenProvider>());
                 return client;
             });
         }

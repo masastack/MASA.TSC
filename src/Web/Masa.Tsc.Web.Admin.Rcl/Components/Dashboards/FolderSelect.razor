@@ -1,0 +1,17 @@
+﻿@inherits TscComponentBase
+
+<SAutoComplete Value="Value"
+               ValueChanged="ValueChanged"
+               ValueExpression="ValueExpression"
+               TValue="Guid"
+               TItem="FolderDto"
+               TItemValue="Guid"
+               Items="Folders"
+               Disabled=Readonly
+               DebounceInterval=500
+               Label="@T("Folder")"
+               ItemText="f=>f.Name"
+               ItemValue="f=>f.Id"
+               Required
+               Class="@Class">
+</SAutoComplete>

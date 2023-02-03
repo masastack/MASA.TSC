@@ -1,9 +1,15 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<div class="d-flex justify-center pt-5">
-    @foreach (var item in Data)
-    {
-        <MonitorItemCard Value=@item />
-    }
-</div>
+<MItemGroup Value="Value" ValueChanged="ValueChanged">
+    <MRow Class="mx-6">
+        @foreach (var item in _items)
+        {
+            <MItem Value="@item.Value">
+                <MCol Class="mt-4" Cols="12" Style="@ItemStyle(item,context.Active)">
+                    <MonitorItemCard Value=@item OnClick="@context.Toggle" />
+                </MCol>
+            </MItem>
+        }
+    </MRow>
+</MItemGroup>

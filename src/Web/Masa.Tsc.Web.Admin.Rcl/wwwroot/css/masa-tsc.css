@@ -1109,3 +1109,18 @@ input::-webkit-input-placeholder {
     letter-spacing: 0 !important;
     text-transform: none !important;
 }
+
+.g2-tooltip {
+    position: absolute;
+    visibility: hidden;
+    border: 1px solid #efefef;
+    background-color: white;
+    color: #000;
+    opacity: 0.8;
+    padding: 5px 15px;
+    transition: top 200ms,left 200ms
+}
+
+.g2-tooltip-list {
+    margin: 10px
+}

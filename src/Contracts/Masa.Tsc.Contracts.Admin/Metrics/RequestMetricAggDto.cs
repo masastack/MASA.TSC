@@ -7,6 +7,9 @@ public class RequestMetricAggDto
 {
     public string Match { get; set; }
 
+    public string Step { get; set; }
+
+    [Obsolete("please set to `Match`")]
     public IEnumerable<string> Labels { get; set; }
 
     public DateTime Start { get; set; }

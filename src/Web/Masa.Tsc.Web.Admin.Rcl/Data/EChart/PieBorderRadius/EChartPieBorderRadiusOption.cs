@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
-public class EChartPieBorderRadiusOption
+internal class EChartPieBorderRadiusOption
 {
     public static object Tooltip => new
     {

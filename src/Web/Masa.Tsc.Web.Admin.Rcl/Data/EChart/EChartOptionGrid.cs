@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
-public class EChartOptionGrid
+internal class EChartOptionGrid
 {
     public bool ContainLabel { get; set; }
 

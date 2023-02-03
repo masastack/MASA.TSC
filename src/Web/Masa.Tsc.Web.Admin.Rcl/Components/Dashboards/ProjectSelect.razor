@@ -1,0 +1,16 @@
+﻿@inherits TscComponentBase
+
+<SSelect Value="Value"
+               ValueChanged="ValueChanged"
+               ValueExpression="ValueExpression"
+               TValue="string"
+               TItem="ProjectDto"
+               TItemValue="string"
+               Items="Projects"
+               Disabled=Readonly
+               DebounceInterval=500
+               Label="@T("Project")"
+               ItemText="item => item.Name"
+               ItemValue="item => item.Identity"
+               Class="@Class">
+</SSelect>

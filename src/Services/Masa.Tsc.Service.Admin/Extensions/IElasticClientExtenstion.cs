@@ -1,86 +1,95 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Nest;
+namespace Nest;
 
-namespace Masa.Tsc.Service.Admin;
-
-internal class IElasticClientExtenstion
+internal static class IElasticClientExtenstion
 {
-    public static IAggregationContainer Aggregation(AggregationContainerDescriptor<object> aggContainer, IEnumerable<RequestFieldAggregationDto> FieldMaps, string? inertval = null, bool isDesc = true, string? sortField = null)
+    /// <summary>
+    /// 批量数据插入
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="client"></param>
+    /// <param name="data"></param>
+    /// <param name="indexName"></param>
+    /// <param name="logger"></param>
+    /// <returns></returns>
+    public static async Task BulkAllAsync<T>(this IElasticClient client, IEnumerable<T> data, string indexName, ILogger logger) where T : class
     {
-        if (FieldMaps == null || !FieldMaps.Any())
-            return aggContainer;
+        int numberOfSlices = Environment.ProcessorCount;
+        if (numberOfSlices <= 1)
+            numberOfSlices = 2;
+        int size = 1000;
+        var bulkAllObservable = client.BulkAll(data, buk => buk.Index(indexName)
+         .Size(size)
+         .MaxDegreeOfParallelism(numberOfSlices)
+         .BackOffRetries(3)
+         .BackOffTime(TimeSpan.FromSeconds(10))
+         .RefreshOnCompleted()
+         .BufferToBulk((r, buffer) => r.IndexMany(buffer)));
 
-        foreach (var item in FieldMaps)
-        {
-            switch (item.AggegationType)
+        var name = typeof(T).Name;
+        var waitHandle = new ManualResetEvent(false);
+        ExceptionDispatchInfo? info = null;
+
+        var scrollAllObserver = new BulkAllObserver(
+            onNext: response =>
             {
-                case AggregationTypes.Count:
-                    {
-                        aggContainer.ValueCount(item.Alias, agg => agg.Field(item.Name));
-                    }
-                    break;
-                case AggregationTypes.Sum:
-                    {
-                        aggContainer.Sum(item.Alias, agg => agg.Field(item.Name));
-                    }
-                    break;
-                case AggregationTypes.Avg:
-                    {
-                        aggContainer.Average(item.Alias, agg => agg.Field(item.Name));
-                    }
-                    break;
-                case AggregationTypes.DistinctCount:
-                    {
-                        aggContainer.Cardinality(item.Alias, agg => agg.Field(item.Name));
-                    }
-                    break;
-                case AggregationTypes.Histogram:
-                    {
-                        aggContainer.Histogram(item.Alias, agg => agg.Field(item.Name).Interval(Convert.ToDouble(inertval)).Order(isDesc ? HistogramOrder.KeyDescending : HistogramOrder.KeyAscending));
-                    }
-                    break;
-                case AggregationTypes.DateHistogram:
-                    {
-                        aggContainer.DateHistogram(item.Alias, agg => agg.Field(item.Name).FixedInterval(new Time(inertval)).Order(isDesc ? HistogramOrder.KeyDescending : HistogramOrder.KeyAscending));
-                    }
-                    break;
+                logger.LogInformation($"{name} bulk insert: Indexed {response.Page * size} with {response.Retries} retries");
+            },
+            onError: ex =>
+            {
+                logger.LogError($"{name} bulk all Error : {0}", ex);
+                info = ExceptionDispatchInfo.Capture(ex);
+                waitHandle.Set();
+            },
+            onCompleted: () =>
+            {
+                logger.LogInformation($"{name} bulk all successed.");
+                waitHandle.Set();
             }
-        }
-        return aggContainer;
+        );
+
+        bulkAllObservable.Subscribe(scrollAllObserver);
+        waitHandle.WaitOne();
+        info?.Throw();
+        await Task.CompletedTask;
     }
 
-    public static Dictionary<string, string>? AggResult(ISearchResponse<object> response, IEnumerable<RequestFieldAggregationDto> FieldMaps)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="client"></param>
+    /// <param name="indexName"></param>
+    /// <param name="scroll"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<T>> ScrollAllAsync<T>(this IElasticClient client, string indexName, string scroll) where T : class
     {
-        if (response.Aggregations == null || !response.Aggregations.Any())
-            return null;
-
-        var result = new Dictionary<string, string>();
-        foreach (var item in response.Aggregations)
+        ISearchResponse<T> searchResponse;
+        string scrollId = default!;
+        List<T> result = new();
+        bool isEnd = false;
+        int pageSize = 5000;
+        do
         {
-            var requestField = FieldMaps.First(m => m.Alias == item.Key);
-            if (requestField.AggegationType - AggregationTypes.DistinctCount <= 0 && item.Value is ValueAggregate value && value != null)
+            if (string.IsNullOrEmpty(scrollId))
             {
-                string temp = default!;
-                if (!string.IsNullOrEmpty(value.ValueAsString))
-                    temp = value.ValueAsString;
-                else if (value.Value.HasValue)
-                    temp = value.Value.Value.ToString();
-
-                if (string.IsNullOrEmpty(temp))
-                    continue;
-
-                result.Add(item.Key, temp);
+                searchResponse = await client.SearchAsync<T>(searchDescriptor => searchDescriptor.Index(indexName).Scroll(scroll).Size(pageSize));
+                scrollId = searchResponse.ScrollId;
             }
-            else if (requestField.AggegationType == AggregationTypes.DateHistogram && item.Value is BucketAggregate bucketAggregate)
+            else
             {
-                foreach (DateHistogramBucket bucket in bucketAggregate.Items)
-                {
-                    result.Add(bucket.KeyAsString, (bucket.DocCount ?? 0).ToString());
-                }
+                searchResponse = await client.ScrollAsync<T>(scroll, scrollId);
             }
-        }
+            if (!searchResponse.IsValid)
+                break;
+            if (!searchResponse.Documents.Any() || searchResponse.Documents.Count - pageSize < 0)
+                isEnd = true;
+            if (searchResponse.Documents.Any())
+                result.AddRange(searchResponse.Documents);
+        } while (!isEnd);
+
         return result;
     }
 }

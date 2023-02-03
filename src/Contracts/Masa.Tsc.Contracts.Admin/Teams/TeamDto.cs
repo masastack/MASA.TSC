@@ -20,7 +20,4 @@ public class TeamDto
     public int AppTotal { get; set; }
 
     public ProjectDto CurrentProject { get; set; }
-
-    public string CurrentAppId { get; set; }
 }
-

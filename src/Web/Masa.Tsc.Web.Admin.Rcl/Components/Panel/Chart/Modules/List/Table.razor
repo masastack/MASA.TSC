@@ -1,0 +1,132 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+
+<MCard MinHeight="410" Class="d-flex flex-column">
+    <MCardTitle Class="d-flex justify-space-between">
+        <MLabel Class="emphasis2--text h6">@Value.Title</MLabel>
+        <MTooltip Top>
+            <ActivatorContent>
+                <MIcon @attributes="@context.Attrs">mdi-information-outline</MIcon>
+            </ActivatorContent>
+            <ChildContent>
+                <span>@Value.Description</span>
+            </ChildContent>
+        </MTooltip>
+    </MCardTitle>
+    <MCardText Class="flex-grow-1" Style="overflow-y: auto;">
+        <MSimpleTable Height="@("calc(100vh - 420px) !important")">
+            @if (Value.ShowTableHeader)
+            {
+                <thead>
+                    <tr>
+                        <th class="text-left">
+                            @GetFirstHeaderName()
+                        </th>
+                        @foreach (var field in Value.Metrics)
+                        {
+                            <th class="text-left" style="@(string.IsNullOrEmpty(field.Color)?"":$"color:{field.Color} !important;")">
+                                @(string.IsNullOrWhiteSpace(field.Unit) ? @field.DisplayName : $"{@field.DisplayName}({field.Unit})")
+                            </th>
+                        }
+                    </tr>
+                </thead>
+            }
+            <tbody>
+                @foreach (var option in Value.GetTableOption().Skip((_page - 1) * _pageSize).Take(_pageSize))
+                {
+                    <tr>
+                        @for (int i = 0; i < option.Count; i++)
+                        {
+                            var item = option[i];
+                            @if (item.JumpId is not null)
+                            {
+                                <td @onclick="() => ToDashboardConfiguration(item)" style="@GetTextColorStyle(i)" class="@($"text-{Value.ColumnAlignment}") primary--text @(IsEdit?"":"hover-pointer")">
+                                    @item.Text
+                                </td>
+                            }
+                            else
+                            {
+                                <td style="@GetTextColorStyle(i)" class="@($"text-{Value.ColumnAlignment}")">@item.Text</td>
+                            }
+                        }
+                    </tr>
+                }
+            </tbody>
+@*            @if (Value.ShowTableFooter)
+            {
+                <tfoot>
+                    <tr>
+                        <td>Sum</td>
+                        <td>$180</td>
+                    </tr>
+                </tfoot>
+            }*@
+        </MSimpleTable>
+        @if (Value.EnablePaginaton)
+        {
+            <SPagination Class="mt-1" @bind-Page="Page" @bind-PageSize=PageSize Total=Value.GetTableOption().Count() />
+        }
+    </MCardText>
+</MCard>
+
+@code {
+    int _page = 1;
+    int _pageSize = 10;
+    ListTypes oldListType;
+
+    int Page
+    {
+        get => _page;
+        set => _page = value;
+    }
+
+    int PageSize
+    {
+        get => _pageSize;
+        set
+        {
+            _page =1;
+            _pageSize = value;
+        }
+    }
+
+    [Parameter]
+    public ITablePanelValue Value { get; set; }
+
+    [Parameter]
+    public bool IsEdit { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (oldListType != Value.ListType)
+        {
+            _page = 1;
+        }
+    }
+
+    string GetTextColorStyle(int index)
+    {
+        if (index == 0) return "";
+        var metric = Value.Metrics[index - 1];
+        return string.IsNullOrEmpty(metric.Color) ? "" : $"color:{metric.Color} !important;";
+    }
+
+    string GetFirstHeaderName()
+    {
+        return Value.ListType switch
+        {
+            ListTypes.ServiceList => "Service",
+            ListTypes.InstanceList => "Instance",
+            ListTypes.EndpointList => "Endpoint",
+            _ => ""
+        };
+    }
+
+    void ToDashboardConfiguration(Dessert dessert)
+    {
+        if (IsEdit) return;
+        NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, dessert.Text);
+    }
+}

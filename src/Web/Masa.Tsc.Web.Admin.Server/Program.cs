@@ -1,36 +1,55 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.BuildingBlocks.Configuration;
-using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
-using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
-using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
+using Masa.Stack.Components.Extensions.OpenIdConnect;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.AddObservable();
+builder.Services.AddObservable(builder.Logging, builder.Configuration, true);
+string tscUrl = builder.Configuration["Masa:Tsc:ServiceBaseAddress"];
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
+builder.Services.Configure<JsonOptions>(option =>
+{
+    option.JsonSerializerOptions.Converters.Add(new QueryResultDataResponseConverter());
+});
+
 builder.WebHost.UseKestrel(option =>
 {
     option.ConfigureHttpsDefaults(options =>
-    options.ServerCertificate = new X509Certificate2(Path.Combine("Certificates", "7348307__lonsid.cn.pfx"), "cqUza0MN"));
+    {
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TLS_NAME")))
+        {
+            options.ServerCertificate = new X509Certificate2(Path.Combine("Certificates", "7348307__lonsid.cn.pfx"), "cqUza0MN");
+        }
+        else
+        {
+            options.ServerCertificate = X509Certificate2.CreateFromPemFile("./ssl/tls.crt", "./ssl/tls.key");
+        }
+        options.CheckCertificateRevocation = false;
+    });
 });
 
-builder.AddMasaConfiguration(configurationBuilder =>
+var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
+builder.Services.AddDccClient(dccConfig.RedisOptions);
+builder.Services.AddMasaConfiguration(configurationBuilder =>
 {
-    configurationBuilder.UseDcc(builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>(), default, default);
+    configurationBuilder.UseDcc(dccConfig, default, default);
 });
+IConfiguration config = builder.Services.GetMasaConfiguration().ConfigurationApi.GetPublic();
 
-var publicConfiguration = builder.GetMasaConfiguration().ConfigurationApi.GetPublic();
-var oidc = builder.GetMasaConfiguration().Local.GetSection("Masa:Oidc").Get<MasaOpenIdConnectOptions>();
-string authUrl = builder.GetMasaConfiguration().Local.GetValue<string>("Masa:Auth:ServiceBaseAddress");
-string mcUrl = publicConfiguration.GetValue<string>("$public.AppSettings:McClient:Url");
-builder.Services.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl).AddMasaOpenIdConnect(oidc);
+var oidc = config.GetSection("$public.OIDC").Get<MasaOpenIdConnectOptions>();
+string authUrl = config.GetValue<string>("$public.AppSettings:AuthClient:Url");
+string mcUrl = config.GetValue<string>("$public.AppSettings:McClient:Url");
+string pmUrl = config.GetValue<string>("$public.AppSettings:PmClient:Url");
+builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl, pmUrl);
+builder.Services.AddMasaOpenIdConnect(oidc);
+
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<TokenProvider>();
-builder.Services.AddScoped<TscCaller>();
+builder.Services.AddTscApiCaller(tscUrl);
+
+builder.Services.AddRcl();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 var app = builder.Build();

@@ -7,19 +7,18 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Instruments\Query\**" />
-	  <EmbeddedResource Remove="Instruments\Query\**" />
-	  <None Remove="Instruments\Query\**" />
+		<Compile Remove="Instruments\Query\**" />
+		<EmbeddedResource Remove="Instruments\Query\**" />
+		<None Remove="Instruments\Query\**" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<!--<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth" Version="0.6.0-preview.1" />
-		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Auth.Contracts" Version="0.6.0-preview.1" />
-		<PackageReference Include="Masa.BuildingBlocks.BasicAbility.Pm" Version="0.6.0-preview.1" />
-		<PackageReference Include="Masa.Contrib.Identity.IdentityModel" Version="0.6.0-preview.1" />-->
+		<PackageReference Include="FluentValidation" Version="11.4.0" />
 		<PackageReference Include="Masa.Contrib.Authentication.Identity" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Pm" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Configuration.ConfigurationApi.Dcc" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Auth" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Pm" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Utils.Data.Prometheus" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Util.Reflection" Version="1.0.3" />
 	</ItemGroup>

@@ -5,168 +5,184 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceDetail
 {
-    [Parameter]
-    public string TraceId { get { return _traceId; } set { _traceId = value; _tabIndex = "attr"; } }
+    private bool _dialogValue;
+    private StringNumber _tabValue;
 
-    private StringNumber _tabIndex = "attr";
-    private IEnumerable<object> _items = new List<object>();
-    private bool _isLoading = true;
-    private string _traceId = default!;
-    private TraceDetailModel _selectItem;
-    private TraceOverviewModel _overView = new TraceOverviewModel();
+    private List<TraceResponseTree> _treeData = new();
+    private List<string>? _actives;
+    private TraceResponseTree? _activeTreeItem;
+    private TraceResponseTree? _rootTreeItem;
+    private int _count;
+    private List<List<TraceResponseTimeline>> _timelinesView = new();
 
-    private Func<object, long> _timeUsFunc = obj =>
+    internal async Task OpenAsync(string traceId)
     {
-        var dic = (Dictionary<string, object>)obj;
-        dic = (Dictionary<string, object>)(dic.ContainsKey("transaction") ? dic["transaction"] : dic["span"]);
-        return Convert.ToInt64(((Dictionary<string, object>)dic["duration"])["us"]);
-
-    };
-    private Func<object, DateTime> _timeFunc = obj =>
-    {
-        var dic = (Dictionary<string, object>)obj;
-        return DateTime.Parse(dic["@timestamp"].ToString()!);
-    };
-    private Func<object, string> _keyFunc { get; set; } = item =>
-    {
-        var dic = (Dictionary<string, object>)item;
-        return (dic.ContainsKey("transaction") ? GetDictionaryValue(dic, "transaction.id") : GetDictionaryValue(dic, "span.id")).ToString();
-    };
-    private Func<object, string> _parentFunc { get; set; } = item => GetDictionaryValue((Dictionary<string, object>)item, "parent.id")?.ToString() ?? string.Empty;     
-
-    private List<DataTableHeader<Dictionary<string, object>>> _headers = new()
-    {
-        new("Service", item => ((Dictionary<string, object>)item["service"])["name"])
-        {
-            Align = "start",
-            Sortable = false
-        },
-        new("Endpoint", item => ((Dictionary<string, object>)item["transaction"])["name"])
-        {
-            Align = "start",
-            Sortable = false
-        },
-        new("Duration (ms)", item => ((Dictionary<string, object>)((Dictionary<string, object>)item["transaction"])["duration"])["us"])
-        {
-            Align = "start",
-            Sortable = false
-        },
-        new("Timestamp", item => item["@timestamp"])
-        {
-            Align = "start",
-            Sortable = false
-        },
-        new("EndTime", item => ((Dictionary<string, object>)item["transaction"])["name"])
-        {
-            Align = "start",
-            Sortable = false
-        }
-    };
-
-    protected override async Task OnParametersSetAsync()
-    {
-        _isLoading = true;
-        var data = await ApiCaller.TraceService.GetAsync(TraceId);
-        if (data == null)
-            return;
-
-        _items = data.Select(item => (object)((JsonElement)item).ToKeyValuePairs()!);
-        SetDeeep();
-        SetOverview();
-        await OnChangeRecordAsync(_items.FirstOrDefault()!);
-        await base.OnParametersSetAsync();
-        _isLoading = false;
-    }
-
-    private async Task OnChangeRecordAsync(object item)
-    {
-        _selectItem = new TraceDetailModel((Dictionary<string, object>)item);
+        _tabValue = 0;
+        _dialogValue = true;
         StateHasChanged();
-        await Task.CompletedTask;
+
+        await QueryTraceDetailAndToTree(traceId);
+        StateHasChanged();
     }
 
-    private static string CreateColor()
+    private void DialogValueChanged(bool val)
     {
-        int length = 6;
-        var bytes = new int[length];
-        var index = 0;
-        do
+        _dialogValue = val;
+
+        if (!val)
         {
-            bytes[index] = Random.Shared.Next(0, 16);
-            index++;
-        } while (length - index > 0);
-        return $"#{string.Join("", bytes.Select(b => b.ToString("X")))}";
+            _activeTreeItem = null;
+            _rootTreeItem = null;
+            _treeData.Clear();
+            _timelinesView.Clear();
+        }
     }
 
-    private void SetDeeep()
+    private async Task QueryTraceDetailAndToTree(string traceId)
     {
-        if (_items == null || !_items.Any())
-            return;
-        _overView.SpansDeeps.Clear();
-        _overView.SpanChildren.Clear();
+        var data = await ApiCaller.TraceService.GetAsync(traceId);
 
-        var list = new List<object>();
-        foreach (var item in _items)
+        _count = data.Count() - 1;
+        if (_count == -1)
         {
-            string id = _keyFunc(item), parentId = _parentFunc(item);
-            long us = _timeUsFunc(item);
-            DateTime time = _timeFunc(item);
+            _count = 0;
+        }
 
-            if (_overView.SpansDeeps.ContainsKey(id))
-                continue;
-            list.Add(item);
-            int deep = 0;
-            bool isTransaction = ((Dictionary<string, object>)item).ContainsKey("transaction");
-            string name = GetDictionaryValue(item, "service.name").ToString()!;
+        _treeData = ToTree(data.OrderBy(item => item.Timestamp), null);
+        _timelinesView.Clear();
+        if (_treeData.Any())
+        {
+            _rootTreeItem = _treeData.First();
+            _activeTreeItem = _treeData.First();
+            _actives = new List<string>() { _activeTreeItem.SpanId };
 
-            var add = new TraceTableLineModel
+            _timelinesView.Add(_rootTreeItem.Timelines);
+
+            if (_rootTreeItem.Children is not null)
             {
-                Id = id,
-                ParentId = parentId,
-                Time = time,
-                Deep = deep,
-                IsTransaction = isTransaction,
-                ServiceName = name,
-                TimeUs = us
-            };
+                Test(_rootTreeItem.Children, 2);
+            }
 
-            if (string.IsNullOrEmpty(parentId))
-                _overView.SpansDeeps.Add(id, add);
+            void Test(List<TraceResponseTree> trees, int level)
+            {
+                if (_timelinesView.Count < level)
+                {
+                    _timelinesView.Add(new List<TraceResponseTimeline>());
+                }
+
+                var timelines = _timelinesView[level - 1];
+
+                foreach (var tree in trees)
+                {
+                    timelines.AddRange(tree.Timelines);
+
+                    if (tree.Children is null || tree.Children.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    Test(tree.Children, level + 1);
+                }
+            }
+        }
+    }
+
+    private void OnActiveUpdate(List<TraceResponseTree> items)
+    {
+        if (items.Count == 0)
+        {
+            return;
+        }
+
+        _activeTreeItem = items.First();
+    }
+
+    private List<TraceResponseTree> ToTree(IEnumerable<TraceResponseDto> items, TraceResponseTree? parent, TraceResponseTree? root = null,
+        double parentLeft = 0)
+    {
+        int parentLevel = parent?.Level ?? 0;
+        string? parentSpanId = parent?.SpanId;
+
+        var currentLevel = parentLevel + 1;
+        var found = items.Where(item => item.ParentSpanId == parentSpanId);
+        var nodes = found.Select(item => new TraceResponseTree(item, currentLevel)).ToList();
+
+        foreach (var node in nodes)
+        {
+            var restItems = items.Except(found).ToList();
+            node.Children ??= new();
+
+            double internalParentLeft = parentLeft;
+            if (parent is not null)
+            {
+                internalParentLeft += (node.Timestamp - parent.Timestamp).TotalMilliseconds;
+            }
+
+            root ??= node;
+
+            if (restItems.Any())
+            {
+                var children = ToTree(restItems, node, root, internalParentLeft).OrderBy(u => u.Timestamp).ToList();
+
+                node.Children.AddRange(children);
+
+                var lastTimestamp = node.Timestamp;
+                foreach (var (child, index) in children.Select((child, index) => (child, index)))
+                {
+                    var duration = (child.Timestamp - lastTimestamp).TotalMilliseconds;
+
+                    if (index == 0 && internalParentLeft > 0)
+                    {
+                        var marginLeft = internalParentLeft / root.DoubleDuration;
+                        node.Timelines.Add(new TraceResponseTimeline(true, duration / root.DoubleDuration, marginLeft));
+                    }
+                    else
+                    {
+                        node.Timelines.Add(new TraceResponseTimeline(true, duration / root.DoubleDuration));
+                    }
+
+                    var childDuration = child.DoubleDuration;
+                    node.Timelines.Add(new TraceResponseTimeline(false, childDuration / root.DoubleDuration));
+
+                    lastTimestamp = child.EndTimestamp;
+                }
+
+                if (lastTimestamp < node.EndTimestamp)
+                {
+                    var duration = (node.EndTimestamp - lastTimestamp).TotalMilliseconds;
+                    node.Timelines.Add(new TraceResponseTimeline(true, duration / root.DoubleDuration));
+                }
+            }
+            else if (parent is not null)
+            {
+                var marginLeft = internalParentLeft / root.DoubleDuration;
+
+                var durationPercent = (node.DoubleDuration / root.DoubleDuration);
+                node.Timelines.Add(new TraceResponseTimeline(true, durationPercent, marginLeft));
+            }
             else
             {
-                if (_overView.SpansDeeps.ContainsKey(parentId))
-                    deep = _overView.SpansDeeps[parentId].Deep;
-
-                deep++;
-
-                add.Deep = deep;
-                _overView.SpansDeeps.Add(id, add);
-
-                if (_overView.SpanChildren.ContainsKey(parentId))
-                    _overView.SpanChildren[parentId].Add(id);
-                else
-                    _overView.SpanChildren.Add(parentId, new List<string> { id });
+                node.Timelines.Add(new TraceResponseTimeline(true, 1));
             }
         }
 
-        var sortIds = _overView.SpansDeeps.Values.OrderBy(item => item.Time).ThenBy(item => item.Deep).Select(item => item.Id).ToList();
-        _items = list.OrderBy(item => sortIds.IndexOf(_keyFunc(item)));
+        return nodes;
     }
 
-    private void SetOverview()
+    private static string FormatDuration(double duration)
     {
-        _overView.Total = _items.Count();
-        _overView.SearchName = default!;
-        var data = _overView.SpansDeeps.Where(item => item.Value.IsTransaction && !_overView.SpansDeeps.ContainsKey(item.Value.ParentId)).ToList();
-        DateTime start = data.Min(item => item.Value.Time);
-        long total = data.Sum(item => item.Value.TimeUs);
-        _overView.Start = start;
-        _overView.TimeUs = total;
-        _overView.Name = GetDictionaryValue(_items.First(), "transaction.name").ToString()!;        
-        _overView.Services = _overView.SpansDeeps.Values.Select(item => item.ServiceName).Distinct().Select(item => new TraceOverviewServiceModel
+        var ms = (long)Math.Ceiling(duration);
+
+        if (ms < 1000)
         {
-            Name = item,
-            Color = CreateColor()
-        }).ToList();
+            return $"{ms}ms";
+        }
+
+        if (ms < 60000)
+        {
+            return $"{(ms / 1000d):F}s";
+        }
+
+        return $"{(ms / 60000d):F}m";
     }
 }

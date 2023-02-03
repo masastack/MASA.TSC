@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
-public class EChartPieOption
+internal class EChartPieOption
 {
     public EChartPieOptionTitle Title { get; set; }
 

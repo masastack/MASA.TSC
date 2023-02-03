@@ -1,0 +1,60 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+
+<MCard Class="d-flex flex-column" MinHeight="410" MaxHeight="410" Height="@("100%")">
+    <MCardTitle Class="d-flex justify-space-between">
+        <MLabel Class="emphasis2--text h6">@Value.Title</MLabel>
+        <MTooltip Top>
+            <ActivatorContent>
+                <MIcon @attributes="@context.Attrs">mdi-information-outline</MIcon>
+            </ActivatorContent>
+            <ChildContent>
+                <span>@Value.Description</span>
+            </ChildContent>
+        </MTooltip>
+    </MCardTitle>
+    <MCardText Class="flex-grow-1" Style="overflow-y: auto;">
+        @if (Value.GetTopListOption().Any() is false)
+        {
+            <div class="full-height d-flex">
+                <div class="ma-auto">@I18n.T("No Data")</div>
+            </div>
+        }
+        else
+        {
+            <MList>
+                @foreach (var item in Value.GetTopListOption())
+                {
+                    <MListItem Class="px-0" Dense OnClick="() => ToDashboardConfiguration(item.Href)">
+                        <MListItemAvatar Style="background: #F4F1FF;border-radius: 10px;">
+                            <span>@item.Value</span>
+                        </MListItemAvatar>
+                        <MListItemContent>
+                            <MListItemTitle Class="d-flex justify-space-between">
+                                <MLabel Class="body2 regular2--text d-inline-block text-truncate">@item.Text</MLabel>
+                            </MListItemTitle>
+                            <MListItemSubtitle>
+                                <MProgressLinear Height="8" Color="@(Value.Color as string)" Rounded Value="@item.Value"></MProgressLinear>
+                            </MListItemSubtitle>
+                        </MListItemContent>
+                    </MListItem>
+                }
+            </MList>
+        }
+    </MCardText>
+</MCard>
+
+@code {
+    [Parameter]
+    public ITopListPanelValue Value { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    [CascadingParameter]
+    public I18n I18n { get; set; }
+
+    void ToDashboardConfiguration(string href)
+    {
+        //NavigationManager.NavigateTo(href); //todo: remove annotate
+    }
+}

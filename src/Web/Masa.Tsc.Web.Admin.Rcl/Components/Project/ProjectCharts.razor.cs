@@ -5,47 +5,83 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class ProjectCharts
 {
-    private ErrorWarnChart _errorWarnChart;
-    private ErrorWarnChart _warnErrorChart;
-    private LogTraceChart _logTraceChart;
-    private LogTraceChart _traceLogChart;
-    private ObserveChart _observeChart;
-    private GrowthChart _growthChart;
-    private LogTraceStatiscChart _traceErrorChart;
-    private LogTraceStatiscChart _traceWarnChart;
-    private LogTraceStatiscChart _logErrorChart;
-    private LogTraceStatiscChart _logWarnChart;
+    private ErrorWarnChart? _errorWarnChart;
+    private ServiceCallChart? _traceLogChart;
+    private LogTraceChart? _traceLogChart1;
+    private AvgResponseChart? _avgResponseChart;
+    private ApdexChart? _apdexChart;
+    private UpsertChartPanelDto _endpoint;
+    private UpsertChartPanelDto _slowEndpoint;
+    string? _oldConfigRecordKey;
 
-    protected override Task OnAfterRenderAsync(bool firstRender)
+    [Parameter]
+    public ConfigurationRecord ConfigurationRecord { get; set; }
+
+    protected override void OnInitialized()
     {
-        if (firstRender)
-        {           
-            //StateHasChanged();
+        _endpoint = new UpsertChartPanelDto(default!)
+        {
+            ChartType = "table",
+            ListType = ListTypes.TopList,
+            Title = T("Service Endpoint Load") + "(" + T("calls/min") + ")",
+            //Description = T("Service Endpoint") + "(" + T("calls/min") + ")",
+            Metrics = new List<PanelMetricDto>
+            {
+                new PanelMetricDto()
+                {
+                    Name = "topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[1m])),0.01)>0.01))"
+                }
+            }
+        };
+        _slowEndpoint = new UpsertChartPanelDto(default!)
+        {
+            ChartType = "table",
+            ListType = ListTypes.TopList,
+            Title = T("Service Slow Endpoint") + "(" + T("ms") + ")",
+            //Description = "Service Slow Endpont(ms)",
+            Metrics = new List<PanelMetricDto>
+            {
+                new PanelMetricDto()
+                {
+                    Name = "topk(10, sort_desc(max by(http_target) (http_response_bucket)))"
+                }
+            }
+        };
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_oldConfigRecordKey != ConfigurationRecord.Key)
+        {
+            var back = _oldConfigRecordKey;
+            _oldConfigRecordKey = ConfigurationRecord.Key;
+            if (back is not null)
+            {
+                await OnLoadDataAsyc();
+            }
         }
-        return base.OnAfterRenderAsync(firstRender);
     }
 
-    public async Task OnSearchAsync()
+    internal async Task OnLoadDataAsyc(ProjectAppSearchModel? query = null)
     {
-        await Task.CompletedTask;
-    }
+        query ??= new()
+        {
+            AppId = ConfigurationRecord.AppName!,
+            Start = ConfigurationRecord.StartTime.UtcDateTime,
+            End = ConfigurationRecord.EndTime.UtcDateTime,
+        };
+        var tasks = new List<Task>();
+        if (_errorWarnChart != null)
+            tasks.Add(_errorWarnChart.OnLoadAsync(query));
+        if (_traceLogChart != null)
+            tasks.Add(_traceLogChart.OnLoadAsync(query));
+        if (_traceLogChart1 != null)
+            tasks.Add(_traceLogChart1.OnLoadAsync(query));
+        if (_avgResponseChart != null)
+            tasks.Add(_avgResponseChart.OnLoadAsync(query));
+        if (_apdexChart != null)
+            tasks.Add(_apdexChart.OnLoadAsync(query));
 
-    private ProjectAppSearchModel _query;
-
-    public async Task OnLoadDataAsyc(ProjectAppSearchModel query)
-    {
-        _query= query;
-        var tasks=new List<Task>();
-        tasks.Add(_errorWarnChart.OnLoadAsync(query));
-        tasks.Add(_warnErrorChart.OnLoadAsync(query));
-        tasks.Add(_logTraceChart.OnLoadAsync(query));
-        tasks.Add(_traceLogChart.OnLoadAsync(query));
-        tasks.Add(_observeChart.OnLoadAsync(query));
-        tasks.Add(_growthChart.OnLoadAsync(query));
-        tasks.Add(_traceErrorChart.OnLoadAsync(query));
-        tasks.Add(_traceWarnChart.OnLoadAsync(query));
-        tasks.Add(_logErrorChart.OnLoadAsync(query));
-        tasks.Add(_logWarnChart.OnLoadAsync(query));
         await Task.WhenAll(tasks);
     }
 }

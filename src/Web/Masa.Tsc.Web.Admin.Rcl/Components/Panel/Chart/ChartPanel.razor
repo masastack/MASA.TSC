@@ -1,0 +1,21 @@
+﻿@using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Modules.Echart
+@inherits TscComponentBase
+
+@if (IsLoading)
+{
+    <div class="d-flex full-height full-width white" style="border-radius: 8px;">
+        <div class="ma-auto">@T("Loading data")</div>
+    </div>
+}
+else
+{
+    @if (Value.ChartType == "table")
+    {
+        <ListPanel DataIsReady=!IsLoading Value="Value" IsEdit=ConfigurationRecord.IsEdit ServiceName="@ConfigurationRecord.AppName" />
+    }
+    else
+    {
+        <EChart Value="Value" />
+    }
+    @*<DynamicComponent Type="@CurrentDynamicComponent.ShowType" Parameters=CurrentDynamicComponent.Metadata />*@
+}

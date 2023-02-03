@@ -1,72 +1,72 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-//using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
-//using MASA.BuildingBlocks.Dispatcher.Events;
-//using MASA.Utils.Data.Elasticsearch;
-
-using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Provider;
-using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
-using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
-using Masa.Contrib.Data.UoW.EFCore;
-
 var builder = WebApplication.CreateBuilder(args);
-//builder.AddMasaConfiguration(configurationBuilder =>
-//{
-//    configurationBuilder.UseDcc();
-//});
 
 var elasearchUrls = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<string[]>();
-builder.Configuration.ConfigureElasticIndex();
+builder.Services.AddElasticClientLogAndTrace(elasearchUrls, builder.Configuration.GetSection("Masa:Elastic:logIndex").Get<string>(), builder.Configuration.GetSection("Masa:Elastic:traceIndex").Get<string>())
+    .AddObservable(builder.Logging, builder.Configuration, false)
+    .AddPrometheusClient(builder.Configuration.GetSection("Masa:Prometheus").Value)
+    .AddTopology(elasearchUrls);
+builder.Services.AddDaprClient();
+var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
 
-builder.Services.AddCaller(option =>
-{
-    option.UseHttpClient(ElasticConst.ES_HTTP_CLIENT_NAME, builder =>
-     {
-         builder.BaseAddress = elasearchUrls[0];
-     });
-});
-builder.Services.AddElasticsearchClient("tsclog", elasearchUrls);
-builder.AddObservable();
+RedisConfigurationOptions redis;
+if (builder.Environment.IsDevelopment())
+    redis = builder.Configuration.GetSection("redis:RedisOptions").Get<RedisConfigurationOptions>();
+else
+    redis = dccConfig.RedisOptions;
 
-builder.AddMasaConfiguration(configurationBuilder =>
-{
-    configurationBuilder.UseDcc(builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>(), default, default);
-});
-//#if DEBUG
+builder.Services.AddHttpContextAccessor()
+    .AddMasaConfiguration(configurationBuilder => configurationBuilder.UseDcc(dccConfig, default, default));
+IConfiguration config = builder.Services.GetMasaConfiguration().ConfigurationApi.GetPublic();
+
+#if DEBUG
 //builder.Services.AddDaprStarter(opt =>
 //{
 //    opt.DaprHttpPort = 3600;
 //    opt.DaprGrpcPort = 3601;
 //});
-//#endif
-builder.Services.AddDaprClient();
-builder.Services.AddPrometheusClient(builder.GetMasaConfiguration().Local.GetSection("Masa:Prometheus").Value);
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer("Bearer", options =>
-{
-    options.Authority = builder.GetMasaConfiguration().Local.GetValue<string>("IdentityServerUrl");
-    options.RequireHttpsMetadata = false;
-    //options.Audience = "";
-    options.TokenValidationParameters.ValidateAudience = false;
-    options.MapInboundClaims = false;
-});
+#endif
 
-builder.Services.AddMasaIdentityModel(options =>
+builder.Services.AddAuthorization()
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = config.GetValue<string>("$public.AppSettings:IdentityServerUrl");
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters.ValidateAudience = false;
+        options.MapInboundClaims = false;
+    });
+builder.Services.AddMasaIdentity(options =>
 {
     options.Environment = "environment";
     options.UserName = "name";
     options.UserId = "sub";
-});
-
-builder.Services.AddScoped<TokenProvider>();
-builder.Services.AddAuthClient(builder.GetMasaConfiguration().Local["Masa:Auth:ServiceBaseAddress"]);
-builder.Services.AddPmClient(builder.GetMasaConfiguration().Local["Masa:Pm:ServiceBaseAddress"]);
+    options.Mapping(nameof(MasaUser.CurrentTeamId), IdentityClaimConsts.CURRENT_TEAM);
+    options.Mapping(nameof(MasaUser.StaffId), IdentityClaimConsts.STAFF);
+    options.Mapping(nameof(MasaUser.Account), IdentityClaimConsts.ACCOUNT);
+})
+    .AddScoped(service =>
+    {
+        var content = service.GetRequiredService<IHttpContextAccessor>();
+        if (content.HttpContext != null && AuthenticationHeaderValue.TryParse(content.HttpContext.Request.Headers.Authorization.ToString(), out var auth) && auth != null)
+            return new TokenProvider { AccessToken = auth?.Parameter };
+        return default!;
+    })
+    .AddAuthClient(config["$public.AppSettings:AuthClient:Url"], dccConfig.RedisOptions)
+    .AddPmClient(config["$public.AppSettings:PmClient:Url"])
+    .AddMultilevelCache(MasaStackConsts.TSC_SYSTEM_SERVICE_APP_ID,
+        distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
+        multilevelCacheOptions =>
+        {
+            multilevelCacheOptions.SubscribeKeyPrefix = MasaStackConsts.TSC_SYSTEM_ID;
+            multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
+        });
 
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -98,22 +98,30 @@ var app = builder.Services
         });
     })
     .AddTransient(typeof(IMiddleware<>), typeof(LogMiddleware<>))
-    .AddIntegrationEventBus<IntegrationEventLogService>(options =>
-    {
-        options.UseDapr()
-        .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer().UseFilter())
-        .UseEventLog<TscDbContext>()
-        .UseEventBus()
-        .UseRepository<TscDbContext>();
-    })
+    .AddDomainEventBus(dispatcherOptions =>
+        {
+            dispatcherOptions
+                .UseIntegrationEventBus(options =>
+                {
+                    options.UseDapr()
+                    .UseEventLog<TscDbContext>()
+                    .UseEventBus();
+                })
+                .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer().UseFilter())
+                .UseRepository<TscDbContext>();
+        })
+    .AddTopologyRepository()
     .AddServices(builder);
 
+await builder.Services.MigrateAsync();
+app.UseMasaExceptionHandler();
+
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
+app.UseSwaggerUI();
+//}
 app.UseRouting();
 
 app.UseAuthentication();
@@ -125,5 +133,4 @@ app.UseEndpoints(endpoints =>
     endpoints.MapSubscribeHandler();
 });
 app.UseHttpsRedirection();
-
 app.Run();

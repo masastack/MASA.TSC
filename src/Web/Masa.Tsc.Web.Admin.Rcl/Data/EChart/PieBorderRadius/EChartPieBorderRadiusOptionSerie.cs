@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
-public class EChartPieBorderRadiusOptionSerie
+internal class EChartPieBorderRadiusOptionSerie
 {
     public string Name { get; set; }
 
@@ -22,7 +22,7 @@ public class EChartPieBorderRadiusOptionSerie
     public IEnumerable<EChartOptionSerieData> Data { get; set; }
 }
 
-public class EChartPieBorderRadiusOptionSerieItemSyle
+internal class EChartPieBorderRadiusOptionSerieItemSyle
 {
     public int BorderRadius { get; set; }
 
@@ -31,7 +31,7 @@ public class EChartPieBorderRadiusOptionSerieItemSyle
     public int BorderWidth { get; set; }
 }
 
-public class EChartPieBorderRadiusOptionLabel
+internal class EChartPieBorderRadiusOptionLabel
 {
     public bool Show { get; set; }
 
@@ -44,12 +44,12 @@ public class EChartPieBorderRadiusOptionLabel
     public string FontWeight { get; set; }
 }
 
-public class EChartPieBorderRadiusOptionEmphasis
+internal class EChartPieBorderRadiusOptionEmphasis
 {
     public EChartPieBorderRadiusOptionEmphasisLabel Label { get; set; }
 }
 
-public class EChartPieBorderRadiusOptionEmphasisLabel
+internal class EChartPieBorderRadiusOptionEmphasisLabel
 {
     public bool Show { get; set; }
 

@@ -9,9 +9,13 @@ public class Directory : AggregateRoot<Guid>
 
     public string Name { get; set; }
 
-    public int Sort { get; set; }
-
     public Guid ParentId { get; set; } = Guid.Empty;
 
+    public List<Instrument>? Instruments { get; set; }
 
+    public void Update(string name)
+    {
+        if (!string.IsNullOrEmpty(name) && !string.Equals(Name, name))
+            Name = name;
+    }
 }

@@ -5,9 +5,9 @@ namespace Masa.Tsc.Contracts.Admin;
 
 public class RequestTeamMonitorDto : FromUri<RequestTeamMonitorDto>
 {
-    public long StartTime { get; set; }
+    public DateTime StartTime { get; set; }
 
-    public long EndTime { get; set; }
+    public DateTime EndTime { get; set; }
 
     public string Keyword { get; set; }
 

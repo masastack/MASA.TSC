@@ -1,0 +1,41 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+
+<MRow>
+    <MCol Md="4">
+        <MCard Class="pa-2" Style="background-color:#F6F8FD">
+            <MCardText>
+                <MRow>
+                    <MCol Md="12">
+                        <STextField BackgroundColor="white" @bind-Value="_value.Name" Label="指标名称" />
+                    </MCol>
+                    <MCol Md="12">
+                        <STextField BackgroundColor="white" @bind-Value="_value.Range" Label="取值范围" />
+                    </MCol>
+                    <MCol Md="12">
+                        <STextField BackgroundColor="white" @bind-Value="_value.Unit" Label="单位" />
+                    </MCol>
+                </MRow>
+            </MCardText>
+        </MCard>
+    </MCol>
+</MRow>
+
+@code {
+    [Parameter]
+    public List<PanelMetricDto> Values { get; set; } = new();
+
+    private PanelMetricDto _value = new();
+
+    public override Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.TryGetValue<List<PanelMetricDto>>(nameof(Values), out var values))
+        {
+            Values = values;
+            if (!Values.Any())
+            {
+                Values.Add(_value);
+            }
+        }
+        return base.SetParametersAsync(parameters);
+    }
+}

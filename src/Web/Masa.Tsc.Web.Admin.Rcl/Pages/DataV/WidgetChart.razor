@@ -1,0 +1,42 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@page "/datav/example3"
+@page "/datav/dashboard/example3/{panelId}"
+@inherits TscComponentBase
+
+<ChartPanelConfiguration Value="Panel" />
+
+@code {
+    [Inject]
+    List<UpsertPanelDto> Panels { get; set; }
+
+    [Parameter]
+    public string? PanelId { get; set; }
+
+    public UpsertChartPanelDto Panel { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (PanelId is not null)
+            Panel = FindPanel(Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException("find panel error");
+        else
+            Panel = new UpsertChartPanelDto(default);
+    }
+
+    UpsertPanelDto? FindPanel(List<UpsertPanelDto> panels)
+    {
+        foreach(var panel in panels)
+        {
+            if (panel.Id == Guid.Parse(PanelId!))
+            {
+                return panel;
+            }
+            if(panel.ChildPanels.Any())
+            {
+                var data = FindPanel(panel.ChildPanels);
+                if (data is not null) return data;
+            }
+        }
+
+        return default;
+    }
+}

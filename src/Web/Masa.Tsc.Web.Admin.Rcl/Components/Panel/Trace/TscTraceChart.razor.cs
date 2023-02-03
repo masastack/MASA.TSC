@@ -4,234 +4,150 @@
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceChart
-{    
+{
     [Parameter]
-    public StringNumber Width { get; set; } = "100%";
-
-    [Parameter]
-    public StringNumber Height { get; set; } = 300;
+    public EventCallback<(DateTime, DateTime)> OnDateTimeRangeUpdate { get; set; }
 
     [Parameter]
-    public RequestTraceListDto Query { get; set; } = default!;
+    public ValueTuple<string, string, string>[] Data { get; set; } = Array.Empty<(string, string, string)>();
 
-    private List<ValueTuple<string, string,int>> _chartOptions = new List<ValueTuple<string, string,int>> {
-        ValueTuple.Create("Histogram","mdi-table-of-contents",1),
-        ValueTuple.Create("Statistics","mdi-poll",2),
-        ValueTuple.Create("Table","mdi-view-week-outline",3)
-    };
+    [Parameter]
+    public bool PageMode { get; set; }
 
+    [Parameter]
+    public double Height { get; set; }
 
-    private object _options = new object();
-    private int _chartIndex = 1;
+    [Parameter]
+    public double Width { get; set; }
 
-    private void ConvertOption(string[] xPoints, IEnumerable<ChartViewDto> data)
+    private static readonly QuickRangeKey s_defaultQuickRange = QuickRangeKey.Last1Hour;
+
+    private object _option;
+
+    MECharts? MECharts { get; set; }
+
+    protected override async Task OnParametersSetAsync()
     {
-        _options = new
+        _option = GenOption();
+        if (MECharts is not null && (Width, Height) != (0, 0))
         {
-            Legend = new
-            {
-                Data = data.Select(x => x.Title),
-            },
-            XAxis = new
-            {
-                Data = xPoints
-            },
-            YAxis = new { },
-            Series =
-            data.Select(item => new
-            {
-                Name = item.Title,
-                Type = item.ChartType,
-                Data = item.Data
-            })
-
-
-            //new[]
-            //{
-            //    new
-            //    {
-            //        Name= "Span个数",
-            //        Type= "bar",
-            //        Data= new []{ 5, 20, 3600, 100000, 10, 20 }
-            //    },
-            //    new
-            //    {
-            //        Name= "延迟时间",
-            //        Type= "line",
-            //        Data= new []{ 20, 20, 3006, 10, 10, 20 }
-            //    }
-            //}
-        };
+            await MECharts.Resize(Width, 300);
+        }
     }
 
-    private async Task OnChartSwtich(int index)
-    { 
-        _chartIndex = index;
-        StateHasChanged();
-    }
-
-    //public async Task LoadAsync()
-    //{
-    //    var data = await ApiCaller.TraceService.GetAggregateAsync(new RequestAggregationDto
-    //    {
-    //        End = Query.End,
-    //        Start = Query.Start,
-    //        FieldMaps = new RequestFieldAggregationDto[] {
-    //            new RequestFieldAggregationDto{
-    //                 AggegationType= Contracts.Admin.Enums.AggregationTypes.Count,
-    //                 Name="span.id",
-    //                 Alias="span_counts"
-    //            }
-    //        },
-    //        Queries = ConvertToQueries(),
-    //        Interval = GetInterval(),
-    //    });
-
-    //    var xPointes = data.List.Select(item => item.X).ToArray();
-
-    //    var list = new List<ChartViewDto>()
-    //    {
-    //        new ChartViewDto{
-    //            Title="Span Count",
-    //            ChartType="bar",
-    //            Pointes=data.List.Select(item=>item.Y).ToArray(),
-    //        }
-    //    };
-
-    //    foreach (var item in data.List)
-    //    {
-
-    //    }
-
-    //    await Task.CompletedTask;
-    //}
-
-    public async Task LoadAsync()
+    private object GenOption()
     {
-        var data = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
-        {
-            End = Query.End,
-            Start = Query.Start,
-            FieldMaps = new RequestFieldAggregationDto[] {
-                new RequestFieldAggregationDto{
-                     AggegationType= AggregationTypes.DateHistogram,
-                     Name="@timestamp",
-                     Alias="Span Count",
-                }
-            },
-            Queries = ConvertToQueries(isSpan: true),
-            Interval = GetInterval(),
-        });
+        if (Data == null)
+            return new object();
 
-        var data2 = await ApiCaller.TraceService.AggregateAsync(new RequestAggregationDto
+        return new
         {
-            End = Query.End,
-            Start = Query.Start,
-            FieldMaps = new RequestFieldAggregationDto[] {
-                new RequestFieldAggregationDto{
-                     AggegationType= AggregationTypes.DateHistogram,
-                     Name="@timestamp",
-                     Alias="Trace Count",
+            tooltip = new
+            {
+                trigger = "axis",
+                axisPointer = new
+                {
+                    type = "cross",
+                    crossStyle = new { color = "#A18BFF66" }
                 }
             },
-            Queries = ConvertToQueries(isTrace: true),
-            Interval = GetInterval(),
-        });
-        if (data.Data == null || !data.Data.Any())
-            return;
-        var xPoints = data.Data.Select(item => DateTime.Parse(item.X).Format(CurrentTimeZone, GetFormat())).ToArray();
-        List<ChartViewDto> list = new()
-        {
-            new ChartViewDto
+            legend = new
             {
-                Title = "Span Count",
-                ChartType = "bar",
-                Data = data.Data.Select(item => item.Y).ToArray(),
+                data = new[] { "span", "duration" },
+                bottom = true
             },
-            new ChartViewDto
+            xAxis = new[]
             {
-                Title = "Trace Count",
-                ChartType = "bar",
-                Data = data2.Data.Select(item => item.Y).ToArray(),
+                new
+                {
+                    type = "category",
+                    data = Data.Select(item=>item.Item1),
+                    axisPointer = new
+                    {
+                        type = "shadow"
+                    }
+                },
+            },
+            yAxis = new[]
+            {
+                new
+                {
+                    type = "value",
+                    name = "span",
+                    axisLabel = new
+                    {
+                        formatter = "{value}"
+                    }
+                },
+                new
+                {
+                    type = "value",
+                    name = "duration",
+                    axisLabel = new
+                    {
+                        formatter = "{value} ms"
+                    }
+                },
+            },
+            series = new[]
+            {
+                new
+                {
+                    name = "span",
+                    type = "bar",
+                    yAxisIndex = 0,
+                    data = Data.Select(item=>item.Item2),
+                    itemStyle = new
+                    {
+                        color = "#4318FF"
+                    },
+                    lineStyle = new
+                    {
+                        color = "",
+                        type = ""
+                    },
+                    smooth = false
+                },
+                new
+                {
+                    name = "duration",
+                    type = "line",
+                    yAxisIndex = 1,
+                    data = Data.Select(item=>item.Item3),
+                    itemStyle = new
+                    {
+                        color = ""
+                    },
+                    lineStyle = new
+                    {
+                        color = "#A18BFF",
+                        type = "dashed"
+                    },
+                    smooth = true
+                }
+            },
+            Grid = new
+            {
+                x = 70,
+                x2 = 70,
+                y = 10,
+                y2 = 50
             }
         };
-
-        ConvertOption(xPoints, list);
-        StateHasChanged();
-        await Task.CompletedTask;
     }
 
-    private string GetInterval()
+    private async Task OnDateTimeUpdate((DateTimeOffset start, DateTimeOffset end) range)
     {
-        var minites = (int)Math.Round((Query.End - Query.Start).TotalMinutes, 0);
-        if (minites - 20 <= 0)
-            return "1m";
-        if (minites - 100 <= 0)
-            return "5m";
-        if (minites - 210 <= 0)
-            return "15m";
-        if (minites - 600 <= 0)
-            return "30m";
+        var localStart = new DateTime(range.start.UtcTicks + range.start.Offset.Ticks, DateTimeKind.Local);
+        var localEnd = new DateTime(range.end.UtcTicks + range.end.Offset.Ticks, DateTimeKind.Local);
 
-        var hours = minites / 60;
-        if (hours - 20 <= 0)
-            return "1h";
-        if (hours - 60 <= 0)
-            return "3h";
-        if (hours - 120 <= 0)
-            return "6h";
-        if (hours - 240 <= 0)
-            return "12h";
-
-        var days = hours / 24;
-        if (days - 20 <= 0)
-            return "1d";
-
-        return "1month";
+        await OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd));
     }
 
-    private string GetFormat()
+    private async Task OnDateTimeAutoUpdate((DateTimeOffset start, DateTimeOffset end) range)
     {
-        var minites = (int)Math.Round((Query.End - Query.Start).TotalMinutes, 0);
-        if (minites - 20 <= 0)
-            return "HH:mm";
-        if (minites - 100 <= 0)
-            return "HH:mm";
-        if (minites - 210 <= 0)
-            return "HH:mm";
-        if (minites - 600 <= 0)
-            return "HH:mm";
-
-        var hours = minites / 60;
-        if (hours - 20 <= 0)
-            return "dd H";
-        if (hours - 60 <= 0)
-            return "dd H";
-        if (hours - 120 <= 0)
-            return "dd H";
-        if (hours - 240 <= 0)
-            return "dd H";
-
-        var days = hours / 24;
-        if (days - 20 <= 0)
-            return "MM-dd";
-
-        return "yy-MM";
-    }
-
-    private Dictionary<string, string> ConvertToQueries(bool isSpan = false, bool isTrace = false)
-    {
-        var dic = new Dictionary<string, string>();
-        if (Query.Service != null)
-            dic.Add("service.name", Query.Service);
-        if (Query.Instance != null)
-            dic.Add("service.node", Query.Instance);
-        if (Query.Endpoint != null)
-            dic.Add("transaction.name", Query.Endpoint);
-
-        dic.Add("isTrace", isTrace.ToString().ToLower());
-        dic.Add("isSpan", isSpan.ToString().ToLower());
-
-        return dic;
+        var localStart = new DateTime(range.start.UtcTicks + range.start.Offset.Ticks, DateTimeKind.Local);
+        var localEnd = new DateTime(range.end.UtcTicks + range.end.Offset.Ticks, DateTimeKind.Local);
+        await base.InvokeAsync(async () => await OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd)));
     }
 }

@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
-public class EChartLineOptionSerie
+internal class EChartLineOptionSerie
 {
     public string Name { get; set; }
 

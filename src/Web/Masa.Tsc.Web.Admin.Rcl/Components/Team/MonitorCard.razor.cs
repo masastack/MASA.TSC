@@ -6,61 +6,78 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class MonitorCard
 {
     [Parameter]
-    public int Error { get { return GetValue(2); } set { SetData(value, 2); } }
-
-    [Parameter]
-    public int Monitor { get { return GetValue(0); } set { SetData(value, 0); } }
-
-    [Parameter]
-    public int Normal { get { return GetValue(3); } set { SetData(value, 3); } }
-
-    [Parameter]
-    public int Warn { get { return GetValue(1); } set { SetData(value, 1); } }
-
-    /// <summary>
-    /// 0monitor 1warn 2error 3normal 
-    /// </summary>
-    public List<AppMonitorViewDto> Data { get; set; } = new List<AppMonitorViewDto>
-        {
-            new AppMonitorViewDto
-            {
-                Name="MONITORING",
-                Color="#A3AED0",
-                Total=0,
-                Icon="mdi-chart-line-variant"
-            },
-            new AppMonitorViewDto
-            {
-                Name="WARN",
-                Color="#C07401",
-                Total=0,
-                Icon="mdi-bell-ring"
-            },
-            new AppMonitorViewDto
-            {
-                Name="ERROR",
-                Color="#F80E1C",
-                Total=0,
-                Icon="mdi-bell"
-            },
-            new AppMonitorViewDto
-            {
-                Name="NORMAL",
-                Color="#299F00",
-                Total=0,
-                Icon="mdi-shield"
-            }
-        };
-
-    private void SetData(int value, int index)
+    public AppMonitorDto Data
     {
-        AppMonitorViewDto item = Data[index];
-        item.Total = value;
+        get { return _appMonitorDto; }
+        set
+        {
+            if (value == null) return;
+            _appMonitorDto = value;
+            UpdateItems();
+        }
     }
 
-    private int GetValue(int index)
+    [Parameter]
+    public StringNumber Value { get; set; }
+
+    [Parameter]
+    public EventCallback<StringNumber> ValueChanged { get; set; }
+
+    private List<AppMonitorViewDto> _items { get; set; } = new List<AppMonitorViewDto>
+            {
+                new AppMonitorViewDto
+                {
+                    Text="MONITORING",
+                    Color="#7C4DFF",
+                    Icon="monitor",
+                    Value="all"
+                },
+                new AppMonitorViewDto
+                {
+                    Text="WARNS",
+                    Color="#FF7D00",
+                    Icon="warning",
+                    Value=MonitorStatuses.Warn.ToString("G"),
+                },
+                new AppMonitorViewDto
+                {
+                    Text="ERRORS",
+                    Color="#FF5252",
+                    Icon="error",
+                    Value=MonitorStatuses.Error.ToString("G"),
+                },
+                new AppMonitorViewDto
+                {
+                    Text="NORMAL",
+                    Color="#69F0AE",
+                    Icon="default",
+                    IsShowApp=false,
+                    Value=MonitorStatuses.Normal.ToString("G")
+                }
+            };
+    private AppMonitorDto _appMonitorDto = new();
+
+    private void UpdateItems()
     {
-        return Data[index].Total;
+        _items[0].ServiceTotal = _appMonitorDto.ServiceTotal;
+        _items[0].AppTotal = _appMonitorDto.AppTotal;
+
+        _items[1].ServiceTotal = _appMonitorDto.ServiceWarn;
+        _items[1].AppTotal = _appMonitorDto.WarnCount;
+
+        _items[2].ServiceTotal = _appMonitorDto.ServiceError;
+        _items[2].AppTotal = _appMonitorDto.ErrorCount;
+
+        _items[3].ServiceTotal = _appMonitorDto.Normal;
+    }
+
+    private string ItemStyle(AppMonitorViewDto appMonitor, bool active)
+    {
+        if (active)
+        {
+            return $"border: 1px solid {appMonitor.Color};border-radius: 16px;";
+        }
+        return "border: 1px solid #E4E8F3;border-radius: 16px;";
     }
 }
 

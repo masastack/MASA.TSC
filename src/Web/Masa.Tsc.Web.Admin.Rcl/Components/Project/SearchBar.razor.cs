@@ -6,34 +6,33 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class SearchBar
 {
     [Parameter]
-    public List<AppDto> Apps { get; set; } = new List<AppDto>
+    public List<AppDto> Apps
     {
-        new AppDto
+        get { return _apps; }
+        set
         {
-            Name="aaa",
-            Identity="111"
-        }
-    };
-
-    [Parameter]
-    public string AppId
-    {
-        get { return _value.AppId; }
-        set { 
-            _defaultAppId = value;
-            if(_value.AppId==null)
-                _value.AppId = _defaultAppId;
+            _apps = value ?? new();
+            if (_apps != null && _apps.Any())
+            {
+                var appid = _apps.First().Identity;
+                if (string.IsNullOrEmpty(_value.AppId) || _value.AppId != appid)
+                    _value.AppId = appid;
+            }
+            else
+                _value.AppId = default!;
         }
     }
 
-    [Parameter]
+    //[Parameter]
     public ProjectAppSearchModel Value
     {
         get { return _value; }
         set
         {
             if (value != null)
+            {
                 _value = value;
+            }
             else
             {
                 _value.AppId = default!;
@@ -47,39 +46,39 @@ public partial class SearchBar
     [Parameter]
     public EventCallback<ProjectAppSearchModel> OnSearch { get; set; }
 
-    private string _searchIconClass = "fas fa-rotate";
-    private bool _loading = false;
     private ProjectAppSearchModel _value = new();
-    private string _defaultAppId;
-    private List<string> _selectDataSource = new List<string>
-    {
-        "15分钟",
-        "30分钟",
-        "1小时",
-        "5小时"
-    };
+    private List<AppDto> _apps = new();
+
+    private AppDto GetApp() => Apps?.FirstOrDefault(item => item.Identity == _value.AppId);
 
     private async Task SearchAsync()
     {
-        //_searchIconClass = "fas fa-circle-notch fa-spin";
-        //StateHasChanged();
-        _loading = true;
         if (OnSearch.HasDelegate)
             await OnSearch.InvokeAsync(Value);
-        _loading = false;
-        //Thread.Sleep(500);
-        //_searchIconClass = "fas fa-rotate";
-        //StateHasChanged();
-        //await Task.CompletedTask;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async Task UpdateTimeAsync((DateTimeOffset start, DateTimeOffset end) times)
     {
-        if (firstRender)
-        {
-            if (OnSearch.HasDelegate)
-                await OnSearch.InvokeAsync(Value);
-        }
-        await base.OnAfterRenderAsync(firstRender);
+        _value.Start = times.start.ToUniversalTime().UtcDateTime;
+        _value.End = times.end.ToUniversalTime().UtcDateTime;
+        await SearchAsync();
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        if (parameters.TryGetValue(nameof(Apps), out List<AppDto> apps)
+            && apps != null && apps.Any()
+            && string.IsNullOrEmpty(_value.AppId) || (apps == null || !apps.Any())
+            && !apps.Any(app => app.Identity == _value.AppId))
+
+            await SearchAsync();
+    }
+
+    private async Task OnSelectItemUpdate(AppDto item)
+    {
+        _value.AppId = item.Identity;
+        StateHasChanged();
+        await SearchAsync();
     }
 }

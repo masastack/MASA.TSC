@@ -6,94 +6,50 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TscTraceList : TscComponentBase
 {
     [Parameter]
-    public RequestTraceListDto Query { get; set; } = default!;
+    public EventCallback<(int page, int size)> OnPaginationUpdate { get; set; }
 
-    private IEnumerable<Dictionary<string, object>> _data = new List<Dictionary<string, object>>();
+    [Parameter]
+    public PaginatedListBase<TraceResponseDto>? SearchResult { get; set; }
+
+    [Parameter]
+    public bool SearchLoading { get; set; }
+
+    private TscTraceDetail? _tscTraceDetail;
+    private IEnumerable<TraceResponseDto> _data = new List<TraceResponseDto>();
     private int _total = 0;
-    private MDataTable<Dictionary<string, object>> _mDataTable = default!;
-    private bool _isLoading = true;
-    private string _selectTraceId = default!;
-    private bool _showDialog = false;
-    private List<DataTableHeader<Dictionary<string, object>>> _headers = new()
+    private int _page = 1;
+    private int _pageSize = 10;
+    private TraceResponseDto? CurrentTrace;
+
+    private List<DataTableHeader<TraceResponseDto>> _headers => new()
     {
-        new("Service", item => ((Dictionary<string, object>)item["service"])["name"])
-        {
-            Align = "start",
-            Sortable = false
-        },
-        new("Endpoint", item => ((Dictionary<string, object>)item["transaction"])["name"])
-        {
-            Align = "start",
-            Sortable = false
-        },
-        new("Duration (ms)", item => ((Dictionary<string, object>)((Dictionary<string, object>)item["transaction"])["duration"])["us"])
-        {
-            Align = "start",
-            Sortable = false
-        },
-        new("Timestamp", item => item["@timestamp"])
-        {
-            Align = "start",
-            Sortable = false
-        },
-        new DataTableHeader<Dictionary<string, object>>
-        {
-            Text = "Operate",
-            Value = "Operate",
-            Align = "start",
-            Sortable = false
-        }
+        new() { Text = T("Service"), Value = "Service", Sortable = false },
+        new() { Text = T("TraceId"), Value = "TraceId", Sortable = false },
+        new() { Text = T("Endpoint"), Value = "Endpoint", Sortable = false },
+        new() { Text = T("Duration (ms)"), Value = "Duration", Sortable = false, Width="105px" },
+        new() { Text = T("Timestamp"), Value = "Timestamp", Sortable = false},
+        new() { Text = T("Operate"), Value = "Operate", Sortable = false, Align = DataTableHeaderAlign.Center, Width="105px" },
     };
 
-    protected override Task OnInitializedAsync()
+    protected override void OnParametersSet()
     {
-        return base.OnInitializedAsync();
-    }
+        base.OnParametersSet();
 
-    private async Task OpenAsync(Dictionary<string, object> item)
-    {
-        _selectTraceId = GetDictionaryValue(item, "trace.id").ToString()!;
-        _showDialog = true;
-        await Task.CompletedTask;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
+        if (SearchResult is not null)
         {
-            _isLoading = false;
-            await QueryAsync();
+            _total = (int)SearchResult.Total;
+            _data = SearchResult.Result;
         }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
-    private async Task OnUpdateOptionsAsync(DataOptions options)
+    private async Task OpenAsync(TraceResponseDto item)
     {
-        Query.Page = options.Page;
-        Query.PageSize = options.ItemsPerPage;
-        await QueryAsync(false);
+        CurrentTrace = item;
+        await _tscTraceDetail!.OpenAsync(item.TraceId);
     }
 
-    private void OnItemSelect(Dictionary<string, object> item, bool selected)
+    private async Task HandleOnPaginationUpdate((int page, int pageSize) pagination)
     {
-        OpenAsync(item).Wait();
-    }
-
-    public async Task QueryAsync(bool isStateChange = true)
-    {
-        if (isStateChange)
-        {
-            _mDataTable.Options.Page = 1;
-            Query.Page = 1;
-        }
-
-        if (_isLoading) return;
-        _isLoading = true;
-        var data = await ApiCaller.TraceService.GetListAsync(Query);
-        _total = (int)data.Total;
-        _data = data.Items.Select(item => ((Dictionary<string, object>)((JsonElement)item).ToKeyValuePairs()!)).ToList();
-        _isLoading = false;
-        if (isStateChange)
-            StateHasChanged();
+        await OnPaginationUpdate.InvokeAsync(pagination);
     }
 }

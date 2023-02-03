@@ -1,5 +1,5 @@
-﻿@using Microsoft.AspNetCore.Components.Web
-@namespace Masa.Tsc.Admin.Server.Pages
+﻿@namespace Masa.Tsc.Admin.Server.Pages
+@using Microsoft.AspNetCore.Components.Web
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
@@ -8,24 +8,40 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="https://cdn.masastack.com/stack/images/logo/MASAStack/logo16_16.png">
     <base href="~/" />
-    <link href="css/app.css" rel="stylesheet" />
     <link href="_content/Masa.Blazor/css/masa-blazor.min.css" rel="stylesheet">
+    <link href="_content/Masa.Stack.Components/css/standard.css" rel="stylesheet">
     <link href="_content/Masa.Stack.Components/css/app.css" rel="stylesheet">
     <link href="https://cdn.masastack.com/npm/@("@mdi")/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="https://cdn.masastack.com/npm/materialicons/materialicons.css" rel="stylesheet">
     <link href="https://cdn.masastack.com/npm/fontawesome/v5.0.13/css/all.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.masastack.com/stack/fonts/roboto/font-roboto.css">
-    <link href="_content/Masa.Stack.Components/css/app.css" rel="stylesheet">
-    @*<link href="_content/Masa.Tsc.Web.Admin.Rcl/css/masa-tsc.css" rel="stylesheet" />*@
+    <link href="https://cdn.masastack.com/npm/quill/1.3.6/quill.snow.css" rel="stylesheet">
+    <link href="https://cdn.masastack.com/npm/quill/1.3.6/quill.bubble.css" rel="stylesheet">
+    <link href="https://cdn.masastack.com/npm/quill/1.3.6/quill-emoji.css" rel="stylesheet">
+    <link href="https://cdn.masastack.com/npm/quill/1.3.6/quilljs-markdown-common-style.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/gridstack.js/7.1.0/gridstack.min.css" rel="stylesheet">
     <link href="_content/Masa.Tsc.Web.Admin.Rcl/css/tsc.css" rel="stylesheet" />
+    <link href="Masa.Tsc.Web.Admin.Server.styles.css" rel="stylesheet">
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
 </head>
 
 <body>
+
     @RenderBody()
     <script src="_framework/blazor.server.js"></script>
     <script src="_content/BlazorComponent/js/blazor-component.js"></script>
+    <script src="_content/Masa.Stack.Components/js/components.js"></script>
+    <script src="https://cdn.masastack.com/npm/aliyun/aliyun-oss-sdk.min.js"></script>
+    <script src="_content/Masa.Stack.Components/js/oss/upload.js"></script>
     <script src="https://cdn.masastack.com/npm/echarts/5.1.1/echarts.min.js"></script>
+    <script src="https://cdn.masastack.com/npm/quill/1.3.6/quill.js"></script>
+    <script src="https://cdn.masastack.com/npm/quill/1.3.6/quilljs-markdown.js"></script>
+    <script src="https://cdn.masastack.com/npm/quill/1.3.6/quill-emoji.js"></script>
+    <script src="https://cdn.masastack.com/npm/sortable/Sortable.min.js"></script>
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script>
+    <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g2-3.5.5/dist/g2.min.js"></script>
+    <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.data-set-0.10.1/dist/data-set.min.js"></script>
 </body>
 </html>

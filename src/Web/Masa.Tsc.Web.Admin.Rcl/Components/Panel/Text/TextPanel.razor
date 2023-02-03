@@ -1,0 +1,25 @@
+﻿@if(IsEdit)
+{
+    <MEditor @ref="_editor" Value="@Content" ValueChanged="ContentChanged" Placeholder="请输入内容" ContentStyle="height:200px;" />
+}
+else
+{
+    @(new MarkupString(Content))
+}
+
+@code {
+    private MEditor _editor;
+
+    [Parameter]
+    public bool IsEdit { get; set; }
+
+    [Parameter]
+    public UpsertPanelDto Value { get; set; }
+
+    string Content => Value[ExtensionFieldTypes.Content]?.ToString()??"";
+
+    void ContentChanged(string content)
+    {
+        Value[ExtensionFieldTypes.Content] = content;
+    }
+}

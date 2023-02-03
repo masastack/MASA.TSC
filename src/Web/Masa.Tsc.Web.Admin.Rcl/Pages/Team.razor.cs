@@ -5,36 +5,71 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages;
 
 public partial class Team
 {
-    private List<ProjectOverviewDto> _projects = default!;
+    private List<ProjectOverviewDto> _projects = new();
+    private List<ProjectOverviewDto> _viewProjects = new();
     private TeamSearchModel? _teamSearchModel = null;
-    private int _error, _warn, _monitor, _normal;
+    private AppMonitorDto _appMonitorDto;
     private bool _isLoad = true;
+    private StringNumber _projectStatus = "";
 
-    protected override async Task OnParametersSetAsync()
+
+    private bool _visible;
+    private string _selectedProjectId;
+    private Guid _selectedTeamId;
+    private int _teamProjectCount = 0;
+    private int _teamServiceCount = 0;
+
+    private void HandleOnItemClick(ProjectOverviewDto item)
     {
-        await base.OnParametersSetAsync();
+        _selectedProjectId = item.Identity;
+        _selectedTeamId = item.TeamId;
+        _teamProjectCount = _projects.Count(p => p.TeamId == _selectedTeamId);
+        _teamServiceCount = _projects.Where(p => p.TeamId == _selectedTeamId).Sum(p => p.Apps.Count);
+        _visible = true;
     }
 
-    protected override async void OnAfterRender(bool firstRender)
+    private string CellBackBackgroundStyle(ProjectOverviewDto overviewDto)
     {
-        if (_isLoad)
+        return overviewDto.Status switch
         {
-            await LoadData();
-            StateHasChanged();
-            _isLoad = false;
-        }
-        base.OnAfterRender(firstRender);
+            MonitorStatuses.Normal => "background: #E6FAF5;",
+            MonitorStatuses.Warn => "background: #FFF7E8;",
+            MonitorStatuses.Error => "background: #FFECE8;",
+            _ => ""
+        };
+    }
+
+    private string CellBorderColor(ProjectOverviewDto overviewDto)
+    {
+        return overviewDto.Status switch
+        {
+            MonitorStatuses.Normal => "#CDF5EB",
+            MonitorStatuses.Warn => "#FFE4BA",
+            MonitorStatuses.Error => "#FDCDC5",
+            _ => ""
+        };
+    }
+
+    private string ChipLabelColor(AppDto appDto)
+    {
+        return appDto.Status switch
+        {
+            MonitorStatuses.Warn => "#FF7D00",
+            MonitorStatuses.Error => "#FF5252",
+            _ => "#66BB6A"
+        };
     }
 
     private async Task LoadData()
     {
-        long start = 0, end = 0;
+        _isLoad = true;
+        DateTime start = DateTime.MinValue, end = DateTime.MinValue;
         if (_teamSearchModel != null)
         {
             if (_teamSearchModel.Start.HasValue)
-                start = _teamSearchModel.Start.Value.ToUnixTimestamp();
+                start = _teamSearchModel.Start.Value;
             if (_teamSearchModel.End.HasValue)
-                end = _teamSearchModel.End.Value.ToUnixTimestamp();
+                end = _teamSearchModel.End.Value;
         }
         var data = await ApiCaller.ProjectService.OverviewAsync(new RequestTeamMonitorDto
         {
@@ -45,42 +80,65 @@ public partial class Team
             UserId = CurrentUserId
         });
 
-
+        _appMonitorDto = data?.Monitor ?? new();
         if (data != null)
         {
-            _error = data.Monitor.Error;
-            _warn = data.Monitor.Warn;
-            _monitor = data.Monitor.Total;
-            _normal = data.Monitor.Normal;
             _projects = data.Projects;
+            _viewProjects = GetViewData();
         }
-    }
-
-    private async Task<IEnumerable<ProjectDto>> LoadProjectAsync()
-    {
-        if (_projects == null)
-        {
-            await LoadData();
-        }
-
-        if (_projects == null || !_projects.Any())
-            return default!;
-        return _projects.Select(x => new ProjectDto
-        {
-            Id = x.Id,
-            Name = x.Name,
-            Description = x.Description,
-            Identity = x.Identity,
-            LabelName = x.LabelName,
-            TeamId = x.TeamId,
-            Apps = x.Apps,
-        });
+        _isLoad = false;
     }
 
     private async Task OnSearch(TeamSearchModel query)
     {
         _teamSearchModel = query;
-        await LoadData();        
-        StateHasChanged();
+        await LoadData();
+    }
+
+    private void OnTabsChange(TeamSearchModel query)
+    {
+        _teamSearchModel = query;
+        _viewProjects = GetViewData();
+    }
+
+    private void OnSearchChange(TeamSearchModel query)
+    {
+        _teamSearchModel = query;
+        _viewProjects = GetViewData();
+    }
+
+    void ProjectStatusChanged(StringNumber projectStatus)
+    {
+        _projectStatus = projectStatus;
+        _viewProjects = GetViewData();
+    }
+
+    List<ProjectOverviewDto> GetViewData()
+    {
+        IEnumerable<ProjectOverviewDto>? result = _projects;
+        if (_projectStatus != null && _projectStatus != "all" && Enum.TryParse<MonitorStatuses>((string)_projectStatus, true, out var type))
+        {
+            switch (type)
+            {
+                case MonitorStatuses.Error:
+                    result = result.Where(item => item.HasError);
+                    break;
+                case MonitorStatuses.Warn:
+                    result = result.Where(item => item.HasWarning);
+                    break;
+                default:
+                    result = result.Where(item => !item.HasWarning && !item.HasError);
+                    break;
+            }
+        }
+        if (_teamSearchModel?.ProjectType != "all" && string.IsNullOrEmpty(_teamSearchModel?.ProjectType) is false)
+        {
+            result = result.Where(item => item.LabelName.Equals(_teamSearchModel.ProjectType, StringComparison.OrdinalIgnoreCase));
+        }
+        if (string.IsNullOrEmpty(_teamSearchModel?.Keyword) is false)
+        {
+            result = result.Where(item => item.Name.Contains(_teamSearchModel.Keyword, StringComparison.OrdinalIgnoreCase) || item.Apps.Any(app => app.Name.Contains(_teamSearchModel.Keyword, StringComparison.OrdinalIgnoreCase)));
+        }
+        return result.ToList();
     }
 }

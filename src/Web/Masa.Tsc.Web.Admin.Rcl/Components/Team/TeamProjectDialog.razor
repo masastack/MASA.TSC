@@ -1,0 +1,43 @@
+﻿@inherits TscComponentBase
+@namespace Masa.Tsc.Web.Admin.Rcl.Components
+
+@if (Team != null)
+{
+    <SSheetDialog Value=Visible ValueChanged=VisibleChanged Title="@Team.CurrentProject.Name">
+        <MCard Style="background-color:#F0F3FA;border-top-left-radius: 20px;border-top-right-radius: 20px;" Class="full-height">
+            <MRow NoGutters Class="full-height">
+                <MCol Style="background-color:white;border-top-left-radius: 20px;" Cols="2" Class="d-flex flex-column justify-space-between pa-6 pb-8">
+                    <ProjectDetail Value=@Team.CurrentProject></ProjectDetail>
+                    <TeamDetail Value=@Team></TeamDetail>
+                </MCol>
+                <MCol Cols="10" Class="pa-8">
+                    <MRow Class="@Class">
+                        <MCol Cols="6" Class="d-flex justify-start align-center">
+                            <div style="width:210px;">
+                                <AppAutoComplete Apps="Apps" @bind-Value="@ConfigurationRecord.AppName" @ref="AppAutoComplete" FillBackground=false />
+                            </div>
+                            <MChip Class="mx-6" Color="#05CD99" TextColor="white">@AppAutoComplete!.CurrentApp?.Type</MChip>
+                            <MTooltip Top>
+                                <ActivatorContent>
+                                    <MLabel @attributes="@context.Attrs" Class="regular2--text body2" Style="max-width: 200px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">
+                                        @AppAutoComplete!.CurrentApp?.Identity
+                                    </MLabel>
+                                </ActivatorContent>
+                                <ChildContent>
+                                    <span>@AppAutoComplete!.CurrentApp?.Identity</span>
+                                </ChildContent>
+                            </MTooltip>
+                        </MCol>
+                        <MCol Cols="6" Class="d-flex justify-end align-center">
+                            <DateTimeRangeToolbar DefaultQuickRange="QuickRangeKey.Last15Minutes" OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
+                            <SButton OnClick=NavigateToDashboardConfiguration Class="ml-6" Small BorderRadiusClass="rounded-lg">
+                                查看详情
+                            </SButton>
+                        </MCol>
+                    </MRow>
+                    <ProjectCharts Class="mt-2" ConfigurationRecord="ConfigurationRecord"/>
+                </MCol>
+            </MRow>
+        </MCard>
+    </SSheetDialog>
+}
