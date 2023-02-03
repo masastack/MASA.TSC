@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<AutoHeight AutoClass="mt-6 full-height" AutoStyle="max-height: calc(100vh - 245px);" Overflow>
+<AutoHeight AutoClass="mt-6 full-height" AutoStyle="height: calc(100vh - 245px);">
     <HeaderContent>
         <div class="d-flex">
             <SearchTextField @bind-Value="@Search" FillBackground=false Clearable Class="my-auto" />
@@ -16,17 +16,19 @@
         {
             <MCard Rounded=true Class="px-6 mb-1" Style="border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important;">
                 <MCardTitle>
-                    <span>Log</span>                   
+                    <span>Log</span>
                 </MCardTitle>
                 <MCardText Class="pa-0">
+
                     <MDivider Class="mb-10" />
-                    <MECharts @ref=MECharts Option="_option" Width="@("100%")" Height="300" />
+                    <MECharts @ref=MECharts Option="_option" Width="@("100%")" Height="285" />
                 </MCardText>
             </MCard>
         }
-        <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="Logs" Class="pa-6 m-sheet theme--light" Style="border-bottom-left-radius: 20px ; border-bottom-right-radius: 20px ;">
+        <MCard Height="300" Class="overflow-hidden" Style="border-radius:0 !important">
+        <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="Logs" Class="pa-6 pb-0 m-sheet theme--light">
             <ItemContent>
-                <dvi class="d-flex">
+                <div class="d-flex">
                     <div style="min-width:234px;">
                         <div class="h5 regular--text">@context.Timestamp.ToString("MM-dd HH:mm:ss")</div>
                         <div class="mt-2 body regular3--text">@context.Timestamp.ToString("yyyy")</div>
@@ -34,12 +36,16 @@
                     <div class="full-widthh">
                         <LogView Search="@Search" JsonObject="context.ExtensionData" />
                     </div>
-                </dvi>
-                <MDivider Class="mb-6" />
+                </div>
+                @if (Logs != null && !Logs.Last().Equals(context))
+                {
+                    <MDivider Class="mb-6" />
+                }
             </ItemContent>
         </MVirtualScroll>
+        </MCard>
+        <MCard Rounded=true Class="px-6 py-2" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
+            <SPagination Class="mt-2" @bind-Page="Page" @bind-PageSize=PageSize Total=Total />
+        </MCard>
     </AutoHeightContent>
-    <FooterContent>
-        <SPagination Class="mt-6" @bind-Page="Page" @bind-PageSize=PageSize Total=Total />
-    </FooterContent>
 </AutoHeight>

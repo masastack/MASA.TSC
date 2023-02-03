@@ -15,6 +15,7 @@ public partial class TscTrace
 
     private int _page = 1;
     private int _pageSize = 10;
+    private bool _isDesc = true;
 
     private bool _loading;
 
@@ -29,12 +30,6 @@ public partial class TscTrace
 
     [Parameter]
     public DateTime EndDateTime { get; set; }
-
-    [Parameter]
-    public double Height { get; set; }
-
-    [Parameter]
-    public double Width { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,11 +59,11 @@ public partial class TscTrace
         await PageSearchAsync();
     }
 
-    private async Task Search((int page, int size) pagination)
+    private async Task Search((int page, int size, bool desc) pagination)
     {
         _page = pagination.page;
         _pageSize = pagination.size;
-
+        _isDesc = pagination.desc;
         await PageSearchAsync();
     }
 
@@ -98,7 +93,8 @@ public partial class TscTrace
             Start = StartDateTime,
             End = EndDateTime,
             Page = _page,
-            PageSize = _pageSize
+            PageSize = _pageSize,
+            IsDesc= _isDesc,
         };
 
         _queryResult = await ApiCaller.TraceService.GetListAsync(query);
