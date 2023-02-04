@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<AutoHeight AutoClass="mt-6 full-height" AutoStyle="height: calc(100vh - 245px);">
+<AutoHeight AutoClass="mt-6 full-height">
     <HeaderContent>
         <div class="d-flex">
             <SearchTextField @bind-Value="@Search" FillBackground=false Clearable Class="my-auto" />
@@ -25,7 +25,7 @@
                 </MCardText>
             </MCard>
         }
-        <MCard Height="300" Class="overflow-hidden" Style="border-radius:0 !important">
+        <MCard Class="overflow-hidden" Style="border-radius:0 !important;height: calc(100vh - 640px);">
         <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="Logs" Class="pa-6 pb-0 m-sheet theme--light">
             <ItemContent>
                 <div class="d-flex">

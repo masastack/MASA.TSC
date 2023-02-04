@@ -32,7 +32,7 @@ public partial class ApdexChart
             Start = query.Start.Value,
             End = query.End.Value,
             ServiceName = query.AppId,
-            Step = "5m"
+            Step =query.Start.Value.Interval(query.End.Value)
         });
         if (_data[0] != null && _data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && _data[0].Result != null && _data[0].Result!.Any())
         {

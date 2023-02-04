@@ -83,7 +83,7 @@ public partial class ChartPanel
                 Start = ConfigurationRecord.StartTime.UtcDateTime,
                 End = ConfigurationRecord.EndTime.UtcDateTime,
                 ServiceName = ConfigurationRecord.AppName,
-                Step = "5s",
+                Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
                 MetricNames = Value.Metrics.Select(item => item.Name).ToList()
             });
         }

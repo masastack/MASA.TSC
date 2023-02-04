@@ -106,7 +106,7 @@ public partial class TscTrace
 
     private async Task GetChartDataAsync(RequestTraceListDto query)
     {
-        var interval = GetInterval(query);
+        var interval = query.Start.Interval(query.End);
 
         string text = "";
         if (!string.IsNullOrEmpty(query.Service))
@@ -152,7 +152,7 @@ public partial class TscTrace
 
         ValueTuple<string, string, string>[] values = new (string, string, string)[currentArray.Length];
         var index = 0;
-        var fmt = GetFormat(query);
+        var fmt = GetFormat();
         foreach (var item in currentArray!)
         {
             if (hasFirst)
@@ -169,50 +169,14 @@ public partial class TscTrace
             var timeSpan = (long)Math.Floor(Convert.ToDouble(item[0]) * 1000);
             var time = timeSpan.ToDateTime();
             values[index].Item1 = time.Format(CurrentTimeZone, fmt);
-            //values[index].Item1 = timeSpan.ToString();
             index++;
         }
         _chartData = values;
     }
 
-    private string GetInterval(RequestTraceListDto query)
+    private string GetFormat()
     {
-        var total = (long)Math.Floor((query.End - query.Start).TotalSeconds);
-        var step = total / 250;
-        if (step <= 0)
-            step = 1;
-        return $"{step}s";
-    }
-
-    private string GetFormat(RequestTraceListDto query)
-    {
-        return "yyyy-MM-dd HH:mm:ss";
-        //var timeSpan = query.End - query.Start;
-        //var minites = (int)Math.Floor(timeSpan.TotalMinutes);
-        //if (minites - 20 <= 0)
-        //    return "HH:mm";
-        //if (minites - 100 <= 0)
-        //    return "HH:mm";
-        //if (minites - 210 <= 0)
-        //    return "HH:mm";
-        //if (minites - 600 <= 0)
-        //    return "HH:mm";
-
-        //var hours = (int)Math.Floor(timeSpan.TotalHours);
-        //if (hours - 20 <= 0)
-        //    return "dd H";
-        //if (hours - 60 <= 0)
-        //    return "dd H";
-        //if (hours - 120 <= 0)
-        //    return "dd H";
-        //if (hours - 240 <= 0)
-        //    return "dd H";
-
-        //var days = (int)Math.Floor(timeSpan.TotalDays);
-        //if (days - 20 <= 0)
-        //    return "MM-dd";
-
-        //return "yy-MM";
+        return "yyyy-MM-dd HH:mm:ss";        
     }
 
     private Task<IEnumerable<string>> QueryServices(string key)

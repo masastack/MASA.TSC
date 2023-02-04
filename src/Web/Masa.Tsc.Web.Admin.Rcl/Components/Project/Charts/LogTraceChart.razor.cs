@@ -29,9 +29,7 @@ public partial class LogTraceChart
         if (query.End.HasValue)
             end = query.End.Value;
 
-        var step = (int)Math.Floor((end - start).TotalSeconds / 250);
-        if (step - 5 < 0)
-            step = 5;
+        var step = start.Interval(end);
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
@@ -44,7 +42,7 @@ public partial class LogTraceChart
             Start = start,
             ServiceName = query.AppId,
             End = end,
-            Step = step.ToString()
+            Step = step
         });
 
         Dictionary<string, List<string>> dddd = new Dictionary<string, List<string>>();
