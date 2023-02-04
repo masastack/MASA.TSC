@@ -31,7 +31,8 @@ public class QueryHandler
             Id = project.Identity,
             Description = project.Description,
             Identity = project.Identity,
-            LabelName = project.Name,
+            //LabelName = project.LabelCode,
+            LabelCode=project.LabelCode,
             Name = project.Name
         };
 
@@ -79,7 +80,8 @@ public class QueryHandler
                 Identity = project.Identity,
                 Name = project.Name,
                 Description = project.Description,
-                LabelName = project.LabelName
+                LabelName = project.LabelName,
+                LabelCode= project.LabelCode,
             });
         }
 

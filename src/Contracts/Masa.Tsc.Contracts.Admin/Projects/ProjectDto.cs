@@ -15,6 +15,8 @@ public class ProjectDto
 
     public string Description { get; set; }
 
+    public string LabelCode { get; set; }
+
     public string LabelName { get; set; }
 
     public List<AppDto> Apps { get; set; } = new();

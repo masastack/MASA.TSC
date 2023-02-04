@@ -54,6 +54,7 @@ public class QueryHandler
                     Identity = project.Identity,
                     Name = project.Name,
                     LabelName = project.LabelName,
+                    LabelCode= project.LabelCode,
                     Id = project.Id.ToString()
                 };
 
@@ -210,6 +211,7 @@ public class QueryHandler
                 Description = project.Description,
                 Identity = project.Identity,
                 LabelName = project.LabelName,
+                LabelCode= project.LabelCode,
                 Name = project.Name,
                 TeamId = project.TeamId
             };

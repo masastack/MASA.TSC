@@ -72,6 +72,7 @@ public partial class Example2
             Description = x.Description,
             Identity = x.Identity,
             LabelName = x.LabelName,
+            LabelCode= x.LabelCode,
             TeamId = x.TeamId,
             Apps = x.Apps,
         });
