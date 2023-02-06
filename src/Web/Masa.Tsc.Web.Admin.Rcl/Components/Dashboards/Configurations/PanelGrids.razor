@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<MGridstack OnResize="OnResize" Items="Panels" Readonly="!IsEdit" @ref="@Gridstack" ItemKey="panel => panel.Id.ToString()" ItemStyle="@("border:solid #E4E8F3 1px;position:absolute;overflow:hiden;"+(IsEdit?"cursor: move;":""))" ItemPosition="panel => new(panel.Width,panel.Height,panel.X,panel.Y)" TItem="UpsertPanelDto">
+<MGridstack Items="Panels" Readonly="!IsEdit" @ref="@Gridstack" ItemKey="panel => panel.Id.ToString()" ItemStyle="@("border:solid #E4E8F3 1px;position:absolute;overflow:hidden;"+(IsEdit?"cursor: move;":""))" ItemPosition="panel => new(panel.Width,panel.Height,panel.X,panel.Y)" TItem="UpsertPanelDto">
     <ItemContent>
         @if (IsEdit)
         {
@@ -50,7 +50,7 @@
                 </MMenu>
             </div>
         }
-        <div style="overflow:auto;@(IsEdit?"height:calc(100% - 35px);":"height:calc(100%);")">
+        <div style="@(context.PanelType==PanelTypes.Chart?"":"overflow:auto;") @(IsEdit?"height:calc(100% - 35px);":"height:calc(100%);")">
             @switch (context.PanelType)
             {
                 case PanelTypes.Tabs:

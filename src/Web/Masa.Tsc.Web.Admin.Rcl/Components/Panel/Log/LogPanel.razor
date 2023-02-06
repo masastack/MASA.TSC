@@ -21,7 +21,9 @@
                 <MCardText Class="pa-0">
 
                     <MDivider Class="mb-10" />
-                    <MECharts @ref=MECharts Option="_option" Width="@("100%")" Height="285" />
+                    <AutoResize OnResize="ResizeEChartAsync" Delay="200">
+                        <MECharts @key="@key" @ref=MECharts Option="_option" Width="@("100%")" Height="300" />
+                    </AutoResize>                    
                 </MCardText>
             </MCard>
         }

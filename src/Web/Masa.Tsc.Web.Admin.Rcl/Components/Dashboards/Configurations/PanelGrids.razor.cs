@@ -95,8 +95,6 @@ public partial class PanelGrids
         if (panel is null) return;
         panel.W = args.Width - 32;
         panel.H = args.Height - 135;
-
-        Console.WriteLine($"{args.Width} and {args.Height}");
     }
 
     public async Task SavePanelGridAsync()
