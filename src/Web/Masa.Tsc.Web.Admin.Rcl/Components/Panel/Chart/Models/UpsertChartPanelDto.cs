@@ -622,6 +622,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         EChartType.SetValue("tooltip.renderMode", Tooltip.RenderModel);
         EChartType.SetValue("tooltip.className", Tooltip.ClassName);
         EChartType.SetValue("tooltip.trigger", Tooltip.Trigger);
+        EChartType.SetValue("tooltip.confine", true);
 
         EChartType.SetValue("grid", new
         {

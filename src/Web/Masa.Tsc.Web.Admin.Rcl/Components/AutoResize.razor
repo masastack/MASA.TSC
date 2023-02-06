@@ -1,0 +1,37 @@
+﻿@inject IJSRuntime JS
+
+<div style="height:100%;width:100%;" @ref="_elementRef">
+    @ChildContent
+</div>
+
+@code {
+    private ElementReference _elementRef;
+    private DotNetObjectReference<AutoResize>? _objRef;
+
+    [Parameter]
+    public int Delay { get; set; } = 100;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback<(double width, double height)> OnResize { get; set; }
+
+    [JSInvokable]
+    public async Task ResizeAsync(double width, double height)
+    {
+        if (OnResize.HasDelegate)
+            await OnResize.InvokeAsync((width,height));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("assignDotNetHelper", _elementRef, _objRef, Delay);
+        }
+    }
+
+    public void Dispose() => _objRef?.Dispose();
+}
