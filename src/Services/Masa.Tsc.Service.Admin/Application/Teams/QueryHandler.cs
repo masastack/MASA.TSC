@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Elasticsearch.Net;
+
 namespace Masa.Tsc.Service.Admin.Application.Teams;
 
 public class QueryHandler
@@ -9,16 +11,19 @@ public class QueryHandler
     private readonly IPmClient _pmClient;
     private readonly ILogService _logService;
     private readonly ITraceService _traceService;
+    private readonly IMasaPrometheusClient _prometheusClient;
 
     public QueryHandler(IPmClient pmClient,
         IAuthClient authClient,
         ILogService logService,
+        IMasaPrometheusClient prometheusClient,
         ITraceService traceService)
     {
         _authClient = authClient;
         _pmClient = pmClient;
         _logService = logService;
         _traceService = traceService;
+        _prometheusClient = prometheusClient;
     }
 
     [EventHandler]
@@ -54,7 +59,7 @@ public class QueryHandler
                     Identity = project.Identity,
                     Name = project.Name,
                     LabelName = project.LabelName,
-                    LabelCode= project.LabelCode,
+                    LabelCode = project.LabelCode,
                     Id = project.Id.ToString()
                 };
 
@@ -115,8 +120,7 @@ public class QueryHandler
             Monitor = new AppMonitorDto()
         };
 
-        var errors = await GetErrorOrWarnAsync(true, query.StartTime, query.EndTime);
-        var warnings = await GetErrorOrWarnAsync(false, query.StartTime, query.EndTime);
+        var (errors, warnings) = await GetProjectErrorAndWarnAsync(query.StartTime, query.EndTime);
 
         SetProjectErrorOrWarn(query, errors, true);
         SetProjectErrorOrWarn(query, warnings, false);
@@ -133,8 +137,20 @@ public class QueryHandler
         query.Result.Monitor.ServiceWarn = query.Result.Projects.Count(m => m.HasWarning);
         query.Result.Monitor.AppWarn = query.Result.Projects.Sum(p => p.Apps.Count(a => a.HasError));
         query.Result.Monitor.Normal = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Normal);
-        query.Result.Monitor.ErrorCount = await GetErrorOrWarnAsync(true, appids, query.StartTime, query.EndTime);
-        query.Result.Monitor.WarnCount = await GetErrorOrWarnAsync(false, appids, query.StartTime, query.EndTime);
+
+        var (errorCount, warnCount) = await GetErrorAndWarnCountAsync(query.StartTime, query.EndTime, appids);
+        query.Result.Monitor.ErrorCount = errorCount;
+        query.Result.Monitor.WarnCount = warnCount;
+    }
+
+    private async Task<(List<string>, List<string>)> GetProjectErrorAndWarnAsync(DateTime start, DateTime end)
+    {
+        var tasks = new Task<List<string>>[] {
+            GetErrorOrWarnAsync(true, start, end),
+            GetErrorOrWarnAsync(false, start, end)
+        };
+        var queryResult = await Task.WhenAll(tasks);
+        return (queryResult[0], queryResult[1]);
     }
 
     private static void SetProjectErrorOrWarn(TeamMonitorQuery query, List<string> appIds, bool isError)
@@ -211,7 +227,7 @@ public class QueryHandler
                 Description = project.Description,
                 Identity = project.Identity,
                 LabelName = project.LabelName,
-                LabelCode= project.LabelCode,
+                LabelCode = project.LabelCode,
                 Name = project.Name,
                 TeamId = project.TeamId
             };
@@ -237,29 +253,40 @@ public class QueryHandler
 
     private async Task<List<string>> GetAllMonitServicesAsync(DateTime? start = default, DateTime? end = default)
     {
-        var logServices = (IEnumerable<string>)await _logService.AggregateAsync(new SimpleAggregateRequestDto
-        {
-            Name = ElasticConstant.ServiceName,
-            Start = start ?? DateTime.MinValue,
-            End = end ?? DateTime.MinValue,
-            Type = AggregateTypes.GroupBy,
-            MaxCount = 999
-        });
-
-        var traceServices = (IEnumerable<string>)await _traceService.AggregateAsync(new SimpleAggregateRequestDto
-        {
-            Name = ElasticConstant.ServiceName,
-            Start = start ?? DateTime.MinValue,
-            End = end ?? DateTime.MinValue,
-            Type = AggregateTypes.GroupBy,
-            MaxCount = 999
-        });
+        var tasks = new Task<object>[] {
+            _logService.AggregateAsync(new SimpleAggregateRequestDto
+            {
+                Name = ElasticConstant.ServiceName,
+                Start = start ?? DateTime.MinValue,
+                End = end ?? DateTime.MinValue,
+                Type = AggregateTypes.GroupBy,
+                MaxCount = 999
+            }),
+                _traceService.AggregateAsync(new SimpleAggregateRequestDto
+            {
+                Name = ElasticConstant.ServiceName,
+                Start = start ?? DateTime.MinValue,
+                End = end ?? DateTime.MinValue,
+                Type = AggregateTypes.GroupBy,
+                MaxCount = 999
+            })
+        };
+        var queryResult = await Task.WhenAll(tasks);
 
         var result = new List<string>();
-        if (logServices != null && logServices.Any())
+        if (queryResult[0] is IEnumerable<string> logServices && logServices.Any())
             result.AddRange(logServices);
-        if (traceServices != null && traceServices.Any())
+        if (queryResult[0] is IEnumerable<string> traceServices && traceServices.Any())
             result.AddRange(traceServices);
+
+        var metricServices = await _prometheusClient.QueryAsync(new QueryRequest
+        {
+            Query = "group by(service_name) (http_server_duration_sum)"
+        });
+        if (metricServices.Status == ResultStatuses.Success && metricServices.Data!.Result != null && metricServices.Data.Result.Any() && metricServices.Data.ResultType == ResultTypes.Vector)
+        {
+            result.AddRange(metricServices.Data!.Result.Select(item => ((QueryResultInstantVectorResponse)item).Metric!["service_name"].ToString()!));
+        }
         return result.Distinct().ToList();
     }
 
@@ -284,7 +311,17 @@ public class QueryHandler
         return services?.ToList()!;
     }
 
-    private async Task<long> GetErrorOrWarnAsync(bool isError, IEnumerable<string> appids, DateTime? start = default, DateTime? end = default)
+    private async Task<(long, long)> GetErrorAndWarnCountAsync(DateTime start, DateTime end, IEnumerable<string> appids)
+    {
+        var tasks = new Task<long>[] {
+            GetErrorOrWarnCountAsync(true, appids, start, end),
+            GetErrorOrWarnCountAsync(false, appids, start, end)
+        };        
+        var queryResult = await Task.WhenAll(tasks);
+        return (queryResult[0], queryResult[1]);
+    }
+
+    private async Task<long> GetErrorOrWarnCountAsync(bool isError, IEnumerable<string> appids, DateTime? start = default, DateTime? end = default)
     {
         if (appids == null || !appids.Any())
             return default;

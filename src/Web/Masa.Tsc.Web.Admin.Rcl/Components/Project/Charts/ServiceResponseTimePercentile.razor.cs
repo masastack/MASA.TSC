@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
-public partial class LogTraceChart
+public partial class ServiceResponseTimePercentile
 {
     [Parameter]
     public StringNumber Width { get; set; } = "100%";
@@ -15,29 +15,20 @@ public partial class LogTraceChart
     public string Title { get; set; }
 
     private EChartType _options = EChartConst.Line;
-
     private List<QueryResultDataResponse>? _data;
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        if (query == null)
-            return;
-        DateTime start = DateTime.UtcNow.AddDays(-1);
-        DateTime end = DateTime.UtcNow;
-        if (query.Start.HasValue)
-            start = query.Start.Value;
-        if (query.End.HasValue)
-            end = query.End.Value;
-
+        DateTime start = query.Start!.Value, end = query.End!.Value;
         var step = start.Interval(end);
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
-                "round(histogram_quantile(0.50,sum(increase(http_server_duration_bucket[1m])) by (le)),0.001)",
-                "round(histogram_quantile(0.75,sum(increase(http_server_duration_bucket[1m])) by (le)),0.001)",
-                "round(histogram_quantile(0.90,sum(increase(http_server_duration_bucket[1m])) by (le)),0.001)",
-                "round(histogram_quantile(0.95,sum(increase(http_server_duration_bucket[1m])) by (le)),0.001)",
-                "round(histogram_quantile(0.99,sum(increase(http_server_duration_bucket[1m])) by (le)),0.001)"
+                $"round(histogram_quantile(0.50,sum(increase(http_server_duration_bucket[5m])) by (le)),0.01)",
+                $"round(histogram_quantile(0.75,sum(increase(http_server_duration_bucket[5m])) by (le)),0.01)",
+                $"round(histogram_quantile(0.90,sum(increase(http_server_duration_bucket[5m])) by (le)),0.01)",
+                $"round(histogram_quantile(0.95,sum(increase(http_server_duration_bucket[5m])) by (le)),0.01)",
+                $"round(histogram_quantile(0.99,sum(increase(http_server_duration_bucket[5m])) by (le)),0.01)"
             },
             Start = start,
             ServiceName = query.AppId,
@@ -45,7 +36,7 @@ public partial class LogTraceChart
             Step = step
         });
 
-        Dictionary<string, List<string>> dddd = new Dictionary<string, List<string>>();
+        Dictionary<string, List<string>> dddd = new();
         var timeSpans = new List<double>();
 
         var legend = new string[] { "P50", "P75", "P90", "P95", "P99" };
@@ -80,6 +71,5 @@ public partial class LogTraceChart
         _options.SetValue("legend.data", legend);
         _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value)));
         _options.SetValue("series", dddd.Select(item => new { name = item.Key, type = "line", data = item.Value }));
-        await Task.CompletedTask;
     }
 }

@@ -1,7 +1,7 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<div class="h-269" style="overflow-y: auto;overflow-x:hidden;">
+<div class="h-269">
     <MRow Style="background-color:#F0F3FA;" Class="@Class">
         <MCol Cols="3">
             <ErrorWarnChart Title=@T("Service Success Rate") @ref="_errorWarnChart" />
@@ -10,20 +10,20 @@
             <ServiceCallChart Title="@(T("Service Load")+"("+T("call/min")+")")" @ref="_traceLogChart" />
         </MCol>
         <MCol Cols="3">
-            <AvgResponseChart @ref="_avgResponseChart" Title="@T("Service Avg Response Time")" />
+            <ServiceResponseAvgTime @ref="_serviceResponseAvgTime" Title="@T("Service Avg Response Time")" />
         </MCol>
         <MCol Cols="3">
             <ApdexChart Title="@(T("Service Apdex"))" @ref="_apdexChart" />
         </MCol>
         <MCol Cols="6">
-            <LogTraceChart Title="@(T("Service Response Time Percentile")+"("+T("ms")+")")" @ref="_traceLogChart1" />
+            <ServiceResponseTimePercentile Title="@(T("Service Response Time Percentile")+"("+T("ms")+")")" @ref="_serviceResponseTimePercentile" />
         </MCol>
         <CascadingValue Value="ConfigurationRecord">
-            <MCol Cols="6">
-                <ChartPanel Value="_endpoint" />
+            <MCol Cols="6" Style="@("height:calc(100vh - 532px -258px);max-height:600px;min-height:248px")">
+                <ChartPanel Value="_endpoint" Class="rounded-lg" />
             </MCol>
-            <MCol Cols="6">
-                <ChartPanel Value="_slowEndpoint" />
+            <MCol Cols="6" Style="@("height:calc(100vh - 532px - 258px);max-height:600px;min-height:248px")">
+                <ChartPanel Value="_slowEndpoint" Class="rounded-lg" />
             </MCol>
         </CascadingValue>
     </MRow>

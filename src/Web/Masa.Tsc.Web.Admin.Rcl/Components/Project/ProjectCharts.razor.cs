@@ -7,8 +7,8 @@ public partial class ProjectCharts
 {
     private ErrorWarnChart? _errorWarnChart;
     private ServiceCallChart? _traceLogChart;
-    private LogTraceChart? _traceLogChart1;
-    private AvgResponseChart? _avgResponseChart;
+    private ServiceResponseTimePercentile? _serviceResponseTimePercentile;
+    private ServiceResponseAvgTime? _serviceResponseAvgTime;
     private ApdexChart? _apdexChart;
     private UpsertChartPanelDto _endpoint;
     private UpsertChartPanelDto _slowEndpoint;
@@ -19,7 +19,10 @@ public partial class ProjectCharts
 
     protected override void OnInitialized()
     {
-        _endpoint = new UpsertChartPanelDto(default!)
+        DateTime start = ConfigurationRecord.StartTime.UtcDateTime,
+            end = ConfigurationRecord.EndTime.UtcDateTime;
+        var step = start.Interval(end);
+        _endpoint = new UpsertChartPanelDto(Guid.Empty)
         {
             ChartType = "table",
             ListType = ListTypes.TopList,
@@ -29,11 +32,12 @@ public partial class ProjectCharts
             {
                 new PanelMetricDto()
                 {
-                    Name = "topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[1m])),0.01)>0.01))"
+                    Name = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{step}])),0.01)>0.01))"
                 }
-            }
+            },
+            Height=2,
         };
-        _slowEndpoint = new UpsertChartPanelDto(default!)
+        _slowEndpoint = new UpsertChartPanelDto(Guid.Empty)
         {
             ChartType = "table",
             ListType = ListTypes.TopList,
@@ -64,7 +68,7 @@ public partial class ProjectCharts
 
     internal async Task OnLoadDataAsyc(ProjectAppSearchModel? query = null)
     {
-        query ??= new()
+       query = new()
         {
             AppId = ConfigurationRecord.AppName!,
             Start = ConfigurationRecord.StartTime.UtcDateTime,
@@ -75,10 +79,10 @@ public partial class ProjectCharts
             tasks.Add(_errorWarnChart.OnLoadAsync(query));
         if (_traceLogChart != null)
             tasks.Add(_traceLogChart.OnLoadAsync(query));
-        if (_traceLogChart1 != null)
-            tasks.Add(_traceLogChart1.OnLoadAsync(query));
-        if (_avgResponseChart != null)
-            tasks.Add(_avgResponseChart.OnLoadAsync(query));
+        if (_serviceResponseTimePercentile != null)
+            tasks.Add(_serviceResponseTimePercentile.OnLoadAsync(query));
+        if (_serviceResponseAvgTime != null)
+            tasks.Add(_serviceResponseAvgTime.OnLoadAsync(query));
         if (_apdexChart != null)
             tasks.Add(_apdexChart.OnLoadAsync(query));
 

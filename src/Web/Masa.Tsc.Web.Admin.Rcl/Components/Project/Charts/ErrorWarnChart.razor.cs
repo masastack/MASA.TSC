@@ -56,7 +56,7 @@ public partial class ErrorWarnChart
         _data = await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto
         {
             Queries = new List<string> {
-            $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"[{step}s])),1)",
+            $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"}}[{step}s])),1)",
             $"round(sum by(service_name) (increase(http_server_duration_count[{step}s])),1)"
            },
             ServiceName = query.AppId,
@@ -69,7 +69,7 @@ public partial class ErrorWarnChart
             if (item != null && item.ResultType == ResultTypes.Vector && item.Result != null && item.Result.Any())
             {
                 var first = (QueryResultInstantVectorResponse)item.Result.First();
-                values[index++] = Convert.ToDouble(first.Value[1]);
+                values[index++] = Convert.ToDouble(first.Value![1]);
             }
         }
 
@@ -85,7 +85,7 @@ public partial class ErrorWarnChart
         _options.SetValue("tooltip.formatter", "{d}%");
         _options.SetValue("legend.bottom", "1%");
         _options.SetValue("series[0].data", new object[] {GetModel(true,values[0]),
-            GetModel(false,values[1]) });
+            GetModel(false,values[1]-values[0]) });
     }
 
     private static object GetModel(bool isSuccess, double value)
