@@ -79,5 +79,5 @@ window.onelresize = (el, handler, delay) => {
     window.setTimeout(() => {
         expand.scrollTop = shrink.scrollTop = maxHeight
         expand.scrollLeft = shrink.scrollLeft = maxWidth
-    }, 200);
+    }, 1000);
 };
