@@ -43,6 +43,11 @@ public partial class TabsPanel
             OpenErrorMessage("Invalid tabs panel");
     }
 
+    void AddTabItem()
+    {
+        Panel.AddTabItem();
+    }
+
     void CloseTabItem(UpsertPanelDto panel)
     {
         RemovePanelGrid(panel);

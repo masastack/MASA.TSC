@@ -42,10 +42,10 @@
                         </MCol>
                     }
                     <MCol Md="4">
-                        <STextField @bind-Value="@Value.Title" Label="Title" />
+                        <STextField @bind-Value="@Value.Title" />
                     </MCol>
                     <MCol Md="8">
-                        <STextField @bind-Value="@Value.Description" Label="Description" />
+                        <STextField @bind-Value="@Value.Description" />
                     </MCol>
                     <MCol Md="12">
                         <MRow>
@@ -132,7 +132,7 @@
     <MCol Cols="4">
         <MCard>
             <MCardText>
-                <MExpansionPanels @bind-Values=_panelValues Multiple Style="z-index:auto !important;">
+                <MExpansionPanels @bind-Values=_panelValues Multiple Style="z-index:auto !important;max-height:855px;overflow:auto;">
                     <MExpansionPanel Value="1">
                         <MExpansionPanelHeader Class="emphasis2--text h6">Visualization</MExpansionPanelHeader>
                         <MExpansionPanelContent>

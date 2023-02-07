@@ -16,14 +16,9 @@
                         <MList>
                             @if (context.PanelType == PanelTypes.Tabs)
                             {
-                                <MListItem OnClick="() => AddTabItem(context as UpsertTabsPanelDto)">
+@*                                <MListItem OnClick="() => AddTabItem(context as UpsertTabsPanelDto)">
                                     <MListItemTitle>
                                         @T("Add Tab Item")
-                                    </MListItemTitle>
-                                </MListItem>
-                                @*<MListItem OnClick="() => EditEditTabItems()">
-                                    <MListItemTitle>
-                                        @T("Edit Tab Item")
                                     </MListItemTitle>
                                 </MListItem>*@
                                 <MListItem OnClick="() => AddChildPanel(context as UpsertTabsPanelDto)">
