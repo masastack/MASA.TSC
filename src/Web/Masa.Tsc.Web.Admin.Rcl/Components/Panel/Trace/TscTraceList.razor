@@ -7,7 +7,8 @@
             Items="_data"
             TItem="TraceResponseDto"
             Loading="@Loading"
-            Height='"calc(100vh - 605px)"' SortBy="_sortBy" SortDesc="_sortDesc" OnOptionsUpdate="OnOptionsUpdate">
+            Style="@(PageMode ? "" : "height:calc(100% - 475px);")"
+            Height='@(PageMode ? "calc(100vh - 605px)" : "calc(100%);")' SortBy="_sortBy" SortDesc="_sortDesc" OnOptionsUpdate="OnOptionsUpdate">
     <ItemColContent>
         <div class="hover-pointer" @onclick="e=> OpenAsync(context.Item)">
             @if (context.Header.Value == "Operate")

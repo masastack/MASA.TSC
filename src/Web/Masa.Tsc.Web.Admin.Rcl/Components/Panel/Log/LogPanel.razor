@@ -25,7 +25,7 @@
                 <DateTimeRangeToolbar Class="mr-6 my-auto" OnUpdate="OnUpdate" OnAutoUpdate="OnAutoUpdate" />
             }
         </div>
-        <MCard Class="overflow-hidden" Style="border-radius:0 !important;height: calc(100vh - 612px);">
+        <MCard Class="overflow-hidden" Style="@("border-radius:0 !important;"+ (PageMode ? "height: calc(100vh - 612px)" : "height: calc(100% - 120px)"))">
             <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="Logs" Class="pa-6 pt-5 pb-0 m-sheet theme--light">
                 <ItemContent>
                     <div class="d-flex">
