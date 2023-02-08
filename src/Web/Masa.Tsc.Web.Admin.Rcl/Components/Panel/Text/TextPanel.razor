@@ -1,6 +1,6 @@
 ﻿@if(IsEdit)
 {
-    <MEditor @ref="_editor" Value="@Content" ValueChanged="ContentChanged" Placeholder="请输入内容" ContentStyle="height:200px;" />
+    <MEditor @ref="_editor" Class="full-height" Value="@Content" ValueChanged="ContentChanged" Placeholder="请输入内容" ContentStyle="height:calc(100% - 43px);" />
 }
 else
 {

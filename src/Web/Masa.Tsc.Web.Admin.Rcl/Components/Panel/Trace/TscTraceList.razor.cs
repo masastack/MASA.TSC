@@ -16,6 +16,9 @@ public partial class TscTraceList : TscComponentBase
     [Parameter]
     public bool SearchLoading { get; set; }
 
+    [Parameter]
+    public bool PageMode { get; set; }
+
     private TscTraceDetail? _tscTraceDetail;
     private IEnumerable<TraceResponseDto> _data = new List<TraceResponseDto>();
     private int _total = 0;

@@ -138,6 +138,7 @@ public partial class Configuration
             {
                 ConfigurationRecord.UpdateKey();
                 await GetPanelsAsync();
+                Convert(ConfigurationRecord.Panels);
                 ConfigurationRecord.IsEdit = false;
             }
             else ConfigurationRecord.IsEdit = true;
