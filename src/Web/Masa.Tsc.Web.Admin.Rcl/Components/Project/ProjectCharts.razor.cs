@@ -19,38 +19,7 @@ public partial class ProjectCharts
 
     protected override void OnInitialized()
     {
-        DateTime start = ConfigurationRecord.StartTime.UtcDateTime,
-            end = ConfigurationRecord.EndTime.UtcDateTime;
-        var step = start.Interval(end);
-        _endpoint = new UpsertChartPanelDto(Guid.Empty)
-        {
-            ChartType = "table",
-            ListType = ListTypes.TopList,
-            Title = T("Service Endpoint Load") + "(" + T("calls/min") + ")",
-            //Description = T("Service Endpoint") + "(" + T("calls/min") + ")",
-            Metrics = new List<PanelMetricDto>
-            {
-                new PanelMetricDto()
-                {
-                    Name = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{step}])),0.01)>0.01))"
-                }
-            },
-            Height=2,
-        };
-        _slowEndpoint = new UpsertChartPanelDto(Guid.Empty)
-        {
-            ChartType = "table",
-            ListType = ListTypes.TopList,
-            Title = T("Service Slow Endpoint") + "(" + T("ms") + ")",
-            //Description = "Service Slow Endpont(ms)",
-            Metrics = new List<PanelMetricDto>
-            {
-                new PanelMetricDto()
-                {
-                    Name = "topk(10, sort_desc(max by(http_target) (http_response_bucket)))"
-                }
-            }
-        };
+        UpSetMetrics();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -68,12 +37,13 @@ public partial class ProjectCharts
 
     internal async Task OnLoadDataAsyc(ProjectAppSearchModel? query = null)
     {
-       query = new()
+        query = new()
         {
             AppId = ConfigurationRecord.AppName!,
             Start = ConfigurationRecord.StartTime.UtcDateTime,
             End = ConfigurationRecord.EndTime.UtcDateTime,
         };
+        UpSetMetrics();
         var tasks = new List<Task>();
         if (_errorWarnChart != null)
             tasks.Add(_errorWarnChart.OnLoadAsync(query));
@@ -87,5 +57,45 @@ public partial class ProjectCharts
             tasks.Add(_apdexChart.OnLoadAsync(query));
 
         await Task.WhenAll(tasks);
+    }
+
+    private void UpSetMetrics()
+    {
+        DateTime start = ConfigurationRecord.StartTime.UtcDateTime,
+            end = ConfigurationRecord.EndTime.UtcDateTime;
+        var step = start.Interval(end);
+        if (_endpoint == null)
+            _endpoint = new UpsertChartPanelDto(Guid.Empty)
+            {
+                ChartType = "table",
+                ListType = ListTypes.TopList,
+                Title = T("Service Endpoint Load") + "(" + T("calls/min") + ")",
+                //Description = T("Service Endpoint") + "(" + T("calls/min") + ")",
+                Metrics = new List<PanelMetricDto>
+                {
+                    new PanelMetricDto()
+                    {
+                        Name = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{step}])),0.01)>0.01))"
+                    }
+                }
+            };
+        else
+            _endpoint.Metrics[0].Name = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{step}])),0.01)>0.01))";
+
+        if (_slowEndpoint == null)
+            _slowEndpoint = new UpsertChartPanelDto(Guid.Empty)
+            {
+                ChartType = "table",
+                ListType = ListTypes.TopList,
+                Title = T("Service Slow Endpoint") + "(" + T("ms") + ")",
+                //Description = "Service Slow Endpont(ms)",
+                Metrics = new List<PanelMetricDto>
+                {
+                    new PanelMetricDto()
+                    {
+                        Name = "topk(10, sort_desc(max by(http_target) (http_response_bucket)))"
+                    }
+                }
+            };
     }
 }

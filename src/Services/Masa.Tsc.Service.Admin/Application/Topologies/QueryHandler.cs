@@ -42,7 +42,29 @@ public class QueryHandler
             }).ToList();
             result.Relations = relations.Select(item => new TopologyServiceRelationDto { CurrentId = item.ServiceId, DestId = item.DestServiceId }).ToList();
             if (serviceIds.Any())
+            {
                 result.Data = await _traceServiceStateRepository.GetServiceTermsDataAsync(query.Data.Start, query.Data.End, serviceIds.ToArray());
+                if (result.Data != null && result.Data.Any())
+                {
+                    var notExists = result.Relations.Where(r => !result.Data.Any(item => item.DestId == r.DestId && item.CurrentId == r.CurrentId)).ToList();
+                    if (notExists.Any())
+                        result.Data.AddRange(notExists.Select(r => new TopologyServiceDataDto
+                        {
+                            DestId = r.DestId,
+                            CurrentId = r.CurrentId,
+                        }));
+                }
+            }
+
+            if (result.Data == null || !result.Data.Any())
+            {
+                result.Data = result.Relations.Select(r => new TopologyServiceDataDto
+                {
+                    DestId = r.DestId,
+                    CurrentId = r.CurrentId,
+                }).ToList();
+            }
+
             query.Result = result;
         }
     }
