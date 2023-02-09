@@ -16,7 +16,6 @@ public partial class TscTrace
     private int _page = 1;
     private int _pageSize = 10;
     private bool _isDesc = true;
-
     private bool _loading;
 
     [CascadingParameter]
@@ -108,33 +107,17 @@ public partial class TscTrace
     {
         var interval = query.Start.Interval(query.End);
 
-        string text = "";
-        if (!string.IsNullOrEmpty(query.Service))
-        {
-            text += $",service_name=\"{query.Service}\"";
-        }
-        if (!string.IsNullOrEmpty(query.Instance))
-        {
-            text += $",instance=\"{query.Instance}\"";
-        }
-        if (!string.IsNullOrEmpty(text))
-            text = $"{{{text[1..]}}}";
-
-        var spanResult = await ApiCaller.MetricService.GetQueryRangeAsync(new RequestMetricAggDto
-        {
-            End = query.End,
-            Start = query.Start,
-            Step = interval,
-            Match = $"sum (increase(http_server_duration_count{text}[23s]))",
+        var queryResult = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto { 
+            Instance=query.Instance,
+            ServiceName=query.Service,
+            Start=query.Start,
+            End=query.End,
+            Step=interval,
+            MetricNames=new List<string> { $"round(sum (increase(http_server_duration_count[{interval}])),1)", $"round(sum (increase(http_server_duration_sum[{interval}]))/sum (increase(http_server_duration_count[{interval}])),1)" }
         });
 
-        var durationResult = await ApiCaller.MetricService.GetQueryRangeAsync(new RequestMetricAggDto
-        {
-            End = query.End,
-            Start = query.Start,
-            Step = interval,
-            Match = $"sum  (increase(http_server_duration_sum{text}[23s]))/sum (increase(http_server_duration_count[23s]))",
-        });
+        var spanResult = queryResult[0];
+        var durationResult = queryResult[1];
 
         if (spanResult.Result!.Length == 0 && durationResult.Result!.Length == 0)
         {
@@ -176,7 +159,7 @@ public partial class TscTrace
 
     private string GetFormat()
     {
-        return "yyyy-MM-dd HH:mm:ss";        
+        return "yyyy-MM-dd HH:mm:ss";
     }
 
     private Task<IEnumerable<string>> QueryServices(string key)
