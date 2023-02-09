@@ -33,7 +33,7 @@ public class QueryHandler
             PageSize = query.Size,
             Start = query.Start,
             TraceId = query.TraceId,
-            Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = false }
+            Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = query.IsDesc }
         };
         if (!string.IsNullOrEmpty(query.Endpoint))
         {

@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 var elasearchUrls = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<string[]>();
 builder.Services.AddElasticClientLogAndTrace(elasearchUrls, builder.Configuration.GetSection("Masa:Elastic:logIndex").Get<string>(), builder.Configuration.GetSection("Masa:Elastic:traceIndex").Get<string>())
     .AddObservable(builder.Logging, builder.Configuration, false)
-    .AddPrometheusClient(builder.Configuration.GetSection("Masa:Prometheus").Value)
+    .AddPrometheusClient(builder.Configuration.GetSection("Masa:Prometheus").Value,10)
     .AddTopology(elasearchUrls);
 builder.Services.AddDaprClient();
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();

@@ -24,9 +24,12 @@ public partial class PanelGrids
 
     public MGridstack<UpsertPanelDto>? Gridstack;
 
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
-        PanelGridRange.Add(this);
+        if(PanelGridRange.Contains(this) is false)
+        {
+            PanelGridRange.Add(this);
+        }
     }
 
     void AddChildPanel(UpsertTabsPanelDto? panel)
@@ -95,8 +98,6 @@ public partial class PanelGrids
         if (panel is null) return;
         panel.W = args.Width - 32;
         panel.H = args.Height - 135;
-
-        Console.WriteLine($"{args.Width} and {args.Height}");
     }
 
     public async Task SavePanelGridAsync()

@@ -22,17 +22,18 @@ public partial class ApdexChart
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        if (query.Start is null)
-            query.Start = DateTime.UtcNow.AddDays(-1);
-        if (query.End is null)
-            query.End = DateTime.UtcNow;
+        var step = query.Start!.Value.Interval(query.End!.Value);
+        string metric = $@"round((sum(rate(http_server_duration_bucket{{le=""250""}}[{step}])) by (service_name) + 
+                                 sum(rate(http_server_duration_bucket{{le=""1000""}}[{step}])) by (service_name)
+                               ) /2/sum(rate(http_server_duration_bucket{{le=""+Inf""}}[{step}])) by (service_name),0.0001)";
+
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
-            MetricNames = new List<string> { $"round((count(http_server_duration_bucket>1000 and http_server_duration_bucket<=4000)*0.5+count(http_server_duration_bucket<=1000))/count(http_server_duration_bucket),0.0001)" },
+            MetricNames = new List<string> { metric },
             Start = query.Start.Value,
             End = query.End.Value,
             ServiceName = query.AppId,
-            Step = "5m"
+            Step = step
         });
         if (_data[0] != null && _data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && _data[0].Result != null && _data[0].Result!.Any())
         {

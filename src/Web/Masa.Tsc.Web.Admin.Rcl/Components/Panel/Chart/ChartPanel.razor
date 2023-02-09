@@ -7,15 +7,11 @@
         <div class="ma-auto">@T("Loading data")</div>
     </div>
 }
+@if (Value.ChartType == "table")
+{
+    <ListPanel DataIsReady=!IsLoading Value="Value" IsEdit=ConfigurationRecord.IsEdit ServiceName="@ConfigurationRecord.AppName" />
+}
 else
 {
-    @if (Value.ChartType == "table")
-    {
-        <ListPanel DataIsReady=!IsLoading Value="Value" IsEdit=ConfigurationRecord.IsEdit ServiceName="@ConfigurationRecord.AppName" />
-    }
-    else
-    {
-        <EChart Value="Value" />
-    }
-    @*<DynamicComponent Type="@CurrentDynamicComponent.ShowType" Parameters=CurrentDynamicComponent.Metadata />*@
+    <EChart Value="Value" />
 }

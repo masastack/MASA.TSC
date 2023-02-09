@@ -39,13 +39,11 @@ public partial class Configuration
         {
             ConfigurationRecord.DashboardId = DashboardId;
             ConfigurationRecord.AppName = ServiceName;
-            //PanelGrids.Clear();
             await GetPanelsAsync();
         }
         else if (ServiceName is not null && ServiceName != ConfigurationRecord.AppName)
         {
             ConfigurationRecord.AppName = ServiceName;
-            //await GetPanelsAsync();
         }
     }
 
@@ -138,6 +136,9 @@ public partial class Configuration
             var confirm = await OpenConfirmDialog(T("Operation confirmation"), T("Are you sure switch view mode,unsaved data will be lost"), AlertTypes.Warning);
             if (confirm)
             {
+                ConfigurationRecord.UpdateKey();
+                await GetPanelsAsync();
+                Convert(ConfigurationRecord.Panels);
                 ConfigurationRecord.IsEdit = false;
             }
             else ConfigurationRecord.IsEdit = true;

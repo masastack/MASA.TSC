@@ -7,38 +7,35 @@
             Items="_data"
             TItem="TraceResponseDto"
             Loading="@Loading"
-            Class="rounded-t-0"
-            Height='"calc(100vh - 620px)"'>
+            Style="@(PageMode ? "" : "height:calc(100% - 475px);")"
+            Height='@(PageMode ? "calc(100vh - 605px)" : "calc(100%);")' SortBy="_sortBy" SortDesc="_sortDesc" OnOptionsUpdate="OnOptionsUpdate">
     <ItemColContent>
-        @if (context.Header.Value == "Operate")
-        {
-            <MIcon OnClick="@(() => OpenAsync(context.Item))">mdi-view-headline</MIcon>
-        }
-        else if (context.Header.Text == "Timestamp")
-        {
-            @(context.Item.Timestamp.Format(CurrentTimeZone))
-        }
-        else if (context.Header.Text == "Service")
-        {
-            <div class="hover-pointer" @onclick="@(() => OpenAsync(context.Item))">
+        <div class="hover-pointer" @onclick="e=> OpenAsync(context.Item)">
+            @if (context.Header.Value == "Operate")
+            {
+                <MIcon OnClick="@(() => OpenAsync(context.Item))">mdi-view-headline</MIcon>
+            }
+            else if (context.Header.Text == "Timestamp")
+            {
+                @(context.Item.Timestamp.Format(CurrentTimeZone))
+            }
+            else if (context.Header.Text == "Service")
+            {
                 @context.Item.Resource["service.name"]
-            </div>
-        }
-        else if (context.Header.Text == "Endpoint")
-        {
-            @context.Item.GetDispalyName()
-        }
-        else
-        {
-            @context.Value
-        }
+            }
+            else if (context.Header.Text == "Endpoint")
+            {
+                @context.Item.GetDispalyName()
+            }
+            else
+            {
+                @context.Value
+            }
+        </div>
     </ItemColContent>
 </SDataTable>
 
-<SPagination @bind-Page="_page"
-             @bind-PageSize="_pageSize" 
-             Total="_total"
-             Class="white px-6 py-3"
-             OnChange="HandleOnPaginationUpdate" />
-
+<MCard Rounded=true Class="px-6 py-2" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
+    <SPagination Class="mt-2" @bind-Page="_page" @bind-PageSize=_pageSize Total=_total OnChange="HandleOnPaginationUpdate" />
+</MCard>
 <TscTraceDetail Title="@CurrentTrace?.Resource["service.name"]?.ToString()" @ref="_tscTraceDetail"></TscTraceDetail>

@@ -17,11 +17,15 @@ public class ConfigurationRecord
 
     public DateTimeOffset EndTime { get; set; } = DateTimeOffset.UtcNow;
 
-    public string? Key => AppName + StartTime + EndTime;//AppName is null ? null : AppName + StartTime + EndTime;
+    public string? Key => AppName + StartTime + EndTime + RandomStr;
 
     public bool IsEdit { get; set; }
 
     public bool ShowServiceCompontent { get; set; }
+
+    string RandomStr { get; set; } = "";
+
+    public void UpdateKey() => RandomStr = Guid.NewGuid().ToString();
 
     public void Clear()
     {

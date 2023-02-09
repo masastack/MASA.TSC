@@ -17,18 +17,8 @@ public partial class ChartPanel
 
     string? OldConfigRecordKey { get; set; }
 
-    //Dictionary<string, DynamicComponentDescription> DynamicComponentMap { get; set; }
-
-    //DynamicComponentDescription CurrentDynamicComponent => DynamicComponentMap.ContainsKey(Value.ChartType) ? DynamicComponentMap[Value.ChartType] : DynamicComponentMap["e-chart"];
-
     protected override async Task OnInitializedAsync()
     {
-        //DynamicComponentMap = new()
-        //{
-        //    ["table"] = new(typeof(ListPanel), new() { ["Value"] = Value, ["DataIsReady"] = !IsLoading }),
-        //    ["e-chart"] = new(typeof(EChart), new() { ["Value"] = Value }),
-        //};
-
         await ReloadAsync();
     }
 
@@ -83,7 +73,7 @@ public partial class ChartPanel
                 Start = ConfigurationRecord.StartTime.UtcDateTime,
                 End = ConfigurationRecord.EndTime.UtcDateTime,
                 ServiceName = ConfigurationRecord.AppName,
-                Step = "5s",
+                Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
                 MetricNames = Value.Metrics.Select(item => item.Name).ToList()
             });
         }

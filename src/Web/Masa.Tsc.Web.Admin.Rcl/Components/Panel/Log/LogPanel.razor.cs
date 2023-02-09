@@ -84,6 +84,12 @@ public partial class LogPanel
         await GetCompontentLogsAsync();
     }
 
+    string key = "";
+    protected async Task ResizeEChartAsync()
+    {
+        key = Guid.NewGuid().ToString();
+    }
+
     async Task OnUpdate((DateTimeOffset start, DateTimeOffset end) times)
     {
         StartTime = times.start.ToUniversalTime().UtcDateTime;
@@ -258,10 +264,10 @@ public partial class LogPanel
             },
             Grid = new
             {
-                x = 60,
-                x2 = 50,
+                x = 70,
+                x2 = 70,
                 y = 10,
-                y2 = 50
+                y2 = 30
             }
         };
     }

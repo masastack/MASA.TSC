@@ -1,45 +1,51 @@
 ﻿@inherits TscComponentBase
 
-<AutoHeight AutoClass="mt-6 full-height" AutoStyle="max-height: calc(100vh - 245px);" Overflow>
+<AutoHeight AutoClass="full-height">
     <HeaderContent>
-        <div class="d-flex">
-            <SearchTextField @bind-Value="@Search" FillBackground=false Clearable Class="my-auto" />
-            <MSpacer />
+        @if (_option is not null)
+        {
+            <MCard Rounded=true Style="border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important;">
+                <MCardTitle>
+                    <span>Log</span>
+                </MCardTitle>
+                <MCardText Class="pa-0">
+                    <MDivider Class="mb-6" />
+                    <AutoResize OnResize="ResizeEChartAsync" Delay="300">
+                        <MECharts @key="@key" @ref=MECharts Option="_option" Width="@("100%")" Height="280" />
+                    </AutoResize>
+                </MCardText>
+            </MCard>
+        }
+    </HeaderContent>
+    <AutoHeightContent>
+        <div class="d-flex px-6 py-2 my-1" style="background: #FFFFFF;">
+            <SearchTextField FullWidth @bind-Value="@Search" Small Clearable Class="my-auto mr-6" style="max-width:100%;" />
             @if (PageMode)
             {
                 <DateTimeRangeToolbar Class="mr-6 my-auto" OnUpdate="OnUpdate" OnAutoUpdate="OnAutoUpdate" />
             }
         </div>
-    </HeaderContent>
-    <AutoHeightContent>
-        @if (_option is not null)
-        {
-            <MCard Rounded=true Class="px-6 mb-1" Style="border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important;">
-                <MCardTitle>
-                    <span>Log</span>                   
-                </MCardTitle>
-                <MCardText Class="pa-0">
-                    <MDivider Class="mb-10" />
-                    <MECharts @ref=MECharts Option="_option" Width="@("100%")" Height="300" />
-                </MCardText>
-            </MCard>
-        }
-        <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="Logs" Class="pa-6 m-sheet theme--light" Style="border-bottom-left-radius: 20px ; border-bottom-right-radius: 20px ;">
-            <ItemContent>
-                <dvi class="d-flex">
-                    <div style="min-width:234px;">
-                        <div class="h5 regular--text">@context.Timestamp.ToString("MM-dd HH:mm:ss")</div>
-                        <div class="mt-2 body regular3--text">@context.Timestamp.ToString("yyyy")</div>
+        <MCard Class="overflow-hidden" Style="@("border-radius:0 !important;"+ (PageMode ? "height: calc(100vh - 612px)" : "height: calc(100% - 120px)"))">
+            <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="Logs" Class="pa-6 pt-5 pb-0 m-sheet theme--light">
+                <ItemContent>
+                    <div class="d-flex">
+                        <div style="min-width:234px;">
+                            <div class="h5 regular--text">@context.Timestamp.ToString("MM-dd HH:mm:ss")</div>
+                            <div class="mt-2 body regular3--text">@context.Timestamp.ToString("yyyy")</div>
+                        </div>
+                        <div class="full-widthh">
+                            <LogView Search="@Search" JsonObject="context.ExtensionData" />
+                        </div>
                     </div>
-                    <div class="full-widthh">
-                        <LogView Search="@Search" JsonObject="context.ExtensionData" />
-                    </div>
-                </dvi>
-                <MDivider Class="mb-6" />
-            </ItemContent>
-        </MVirtualScroll>
+                    @if (Logs != null && !Logs.Last().Equals(context))
+                    {
+                        <MDivider Class="mb-6" />
+                    }
+                </ItemContent>
+            </MVirtualScroll>
+        </MCard>
+        <MCard Rounded=true Class="px-6 py-2" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
+            <SPagination Class="mt-2" @bind-Page="Page" @bind-PageSize=PageSize Total=Total />
+        </MCard>
     </AutoHeightContent>
-    <FooterContent>
-        <SPagination Class="mt-6" @bind-Page="Page" @bind-PageSize=PageSize Total=Total />
-    </FooterContent>
 </AutoHeight>

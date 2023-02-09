@@ -133,7 +133,7 @@ public partial class Team
         }
         if (_teamSearchModel?.ProjectType != "all" && string.IsNullOrEmpty(_teamSearchModel?.ProjectType) is false)
         {
-            result = result.Where(item => item.LabelName.Equals(_teamSearchModel.ProjectType, StringComparison.OrdinalIgnoreCase));
+            result = result.Where(item => item.LabelCode.Equals(_teamSearchModel.ProjectType, StringComparison.OrdinalIgnoreCase));
         }
         if (string.IsNullOrEmpty(_teamSearchModel?.Keyword) is false)
         {

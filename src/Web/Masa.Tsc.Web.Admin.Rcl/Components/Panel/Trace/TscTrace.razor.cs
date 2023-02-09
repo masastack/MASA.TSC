@@ -15,7 +15,7 @@ public partial class TscTrace
 
     private int _page = 1;
     private int _pageSize = 10;
-
+    private bool _isDesc = true;
     private bool _loading;
 
     [CascadingParameter]
@@ -29,12 +29,6 @@ public partial class TscTrace
 
     [Parameter]
     public DateTime EndDateTime { get; set; }
-
-    [Parameter]
-    public double Height { get; set; }
-
-    [Parameter]
-    public double Width { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,11 +58,11 @@ public partial class TscTrace
         await PageSearchAsync();
     }
 
-    private async Task Search((int page, int size) pagination)
+    private async Task Search((int page, int size, bool desc) pagination)
     {
         _page = pagination.page;
         _pageSize = pagination.size;
-
+        _isDesc = pagination.desc;
         await PageSearchAsync();
     }
 
@@ -98,7 +92,8 @@ public partial class TscTrace
             Start = StartDateTime,
             End = EndDateTime,
             Page = _page,
-            PageSize = _pageSize
+            PageSize = _pageSize,
+            IsDesc= _isDesc,
         };
 
         _queryResult = await ApiCaller.TraceService.GetListAsync(query);
@@ -110,35 +105,19 @@ public partial class TscTrace
 
     private async Task GetChartDataAsync(RequestTraceListDto query)
     {
-        var interval = GetInterval(query);
+        var interval = query.Start.Interval(query.End);
 
-        string text = "";
-        if (!string.IsNullOrEmpty(query.Service))
-        {
-            text += $",service_name=\"{query.Service}\"";
-        }
-        if (!string.IsNullOrEmpty(query.Instance))
-        {
-            text += $",instance=\"{query.Instance}\"";
-        }
-        if (!string.IsNullOrEmpty(text))
-            text = $"{{{text[1..]}}}";
-
-        var spanResult = await ApiCaller.MetricService.GetQueryRangeAsync(new RequestMetricAggDto
-        {
-            End = query.End,
-            Start = query.Start,
-            Step = interval,
-            Match = $"sum (increase(http_server_duration_count{text}[23s]))",
+        var queryResult = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto { 
+            Instance=query.Instance,
+            ServiceName=query.Service,
+            Start=query.Start,
+            End=query.End,
+            Step=interval,
+            MetricNames=new List<string> { $"round(sum (increase(http_server_duration_count[{interval}])),1)", $"round(sum (increase(http_server_duration_sum[{interval}]))/sum (increase(http_server_duration_count[{interval}])),1)" }
         });
 
-        var durationResult = await ApiCaller.MetricService.GetQueryRangeAsync(new RequestMetricAggDto
-        {
-            End = query.End,
-            Start = query.Start,
-            Step = interval,
-            Match = $"sum  (increase(http_server_duration_sum{text}[23s]))/sum (increase(http_server_duration_count[23s]))",
-        });
+        var spanResult = queryResult[0];
+        var durationResult = queryResult[1];
 
         if (spanResult.Result!.Length == 0 && durationResult.Result!.Length == 0)
         {
@@ -156,7 +135,7 @@ public partial class TscTrace
 
         ValueTuple<string, string, string>[] values = new (string, string, string)[currentArray.Length];
         var index = 0;
-        var fmt = GetFormat(query);
+        var fmt = GetFormat();
         foreach (var item in currentArray!)
         {
             if (hasFirst)
@@ -173,50 +152,14 @@ public partial class TscTrace
             var timeSpan = (long)Math.Floor(Convert.ToDouble(item[0]) * 1000);
             var time = timeSpan.ToDateTime();
             values[index].Item1 = time.Format(CurrentTimeZone, fmt);
-            //values[index].Item1 = timeSpan.ToString();
             index++;
         }
         _chartData = values;
     }
 
-    private string GetInterval(RequestTraceListDto query)
-    {
-        var total = (long)Math.Floor((query.End - query.Start).TotalSeconds);
-        var step = total / 250;
-        if (step <= 0)
-            step = 1;
-        return $"{step}s";
-    }
-
-    private string GetFormat(RequestTraceListDto query)
+    private string GetFormat()
     {
         return "yyyy-MM-dd HH:mm:ss";
-        //var timeSpan = query.End - query.Start;
-        //var minites = (int)Math.Floor(timeSpan.TotalMinutes);
-        //if (minites - 20 <= 0)
-        //    return "HH:mm";
-        //if (minites - 100 <= 0)
-        //    return "HH:mm";
-        //if (minites - 210 <= 0)
-        //    return "HH:mm";
-        //if (minites - 600 <= 0)
-        //    return "HH:mm";
-
-        //var hours = (int)Math.Floor(timeSpan.TotalHours);
-        //if (hours - 20 <= 0)
-        //    return "dd H";
-        //if (hours - 60 <= 0)
-        //    return "dd H";
-        //if (hours - 120 <= 0)
-        //    return "dd H";
-        //if (hours - 240 <= 0)
-        //    return "dd H";
-
-        //var days = (int)Math.Floor(timeSpan.TotalDays);
-        //if (days - 20 <= 0)
-        //    return "MM-dd";
-
-        //return "yy-MM";
     }
 
     private Task<IEnumerable<string>> QueryServices(string key)

@@ -332,7 +332,7 @@ public class QueryHandler
         {
             var index = str.IndexOf(metric, start);
             if (index < 0)
-                return false;
+                break;
 
             if ((index == 0 || index > 0 && !not.IsMatch(str[index - 1].ToString())) && (str.Length - index == 0 || str.Length - index > 0 && !not.IsMatch(str[index + 1].ToString())))
                 positions.Add(index);
