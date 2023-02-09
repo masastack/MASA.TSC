@@ -24,16 +24,16 @@ public partial class TabsPanel
         set
         {
             Panel.SetCurrentTabItem(Guid.Parse(value.ToString()!));
-            if (Panel.CurrentTabItem is not null)
-            {
-                foreach (var child in Panel.CurrentTabItem.ChildPanels)
-                {
-                    if (child is UpsertChartPanelDto chartPanel)
-                    {
-                        chartPanel.SetChartKey("tabItem");
-                    }
-                }
-            }
+            //if (Panel.CurrentTabItem is not null)
+            //{
+            //    foreach (var child in Panel.CurrentTabItem.ChildPanels)
+            //    {
+            //        if (child is UpsertChartPanelDto chartPanel)
+            //        {
+            //            chartPanel.SetChartKey("tabItem");
+            //        }
+            //    }
+            //}
         }
     }
 

@@ -38,12 +38,6 @@ public partial class LogPanel
     [Parameter]
     public bool PageMode { get; set; }
 
-    [Parameter]
-    public double Height { get; set; }
-
-    [Parameter]
-    public double Width { get; set; }
-
     int Page
     {
         get => _page;
@@ -70,24 +64,15 @@ public partial class LogPanel
 
     MECharts? MECharts { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await GetCompontentLogsAsync();
-    }
-
     protected override async Task OnParametersSetAsync()
     {
-        if (MECharts is not null && (Width, Height) != (0, 0))
-        {
-            await MECharts.Resize(Width, 300);
-        }
         await GetCompontentLogsAsync();
     }
 
-    string key = "";
     protected async Task ResizeEChartAsync()
     {
-        key = Guid.NewGuid().ToString();
+        if(MECharts is not null)
+            await MECharts.Resize();
     }
 
     async Task OnUpdate((DateTimeOffset start, DateTimeOffset end) times)
