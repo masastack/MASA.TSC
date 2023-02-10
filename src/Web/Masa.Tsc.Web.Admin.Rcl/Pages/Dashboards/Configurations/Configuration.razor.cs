@@ -92,9 +92,13 @@ public partial class Configuration
         }
     }
 
-    void AddPanel()
+    async Task AddPanel()
     {
-        ConfigurationRecord.Panels.Insert(0, new());
+        ConfigurationRecord.Panels.Insert(0, new() 
+        {
+            X = 5,Y=-1,Width = 10
+        });
+        await PanelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();
     }
 
     void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)

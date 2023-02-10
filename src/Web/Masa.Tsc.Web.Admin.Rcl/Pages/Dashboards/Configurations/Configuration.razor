@@ -37,7 +37,7 @@
                     }                    
                 </ChildContent>
             </MTooltip>
-            <SButton Icon Class="mr-3 my-auto" Style="@(ConfigurationRecord.IsEdit ?"":"visibility:hidden;")" OnClick="() => AddPanel()">
+            <SButton Icon Class="mr-3 my-auto" Style="@(ConfigurationRecord.IsEdit ?"":"visibility:hidden;")" OnClick="AddPanel">
                 <SIcon Tooltip="@T("Add Panel")" Size=28>@IconConstants.Chart</SIcon>
             </SButton>
             <SButton Icon Class="my-auto" Style="@(ConfigurationRecord.IsEdit ?"":"visibility:hidden;")" OnClick="SaveAsync">

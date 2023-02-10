@@ -1,17 +1,52 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Contracts.Admin.Enums;
+
 namespace Masa.Tsc.Contracts.Admin.Dashboards;
 
 public class UpsertPanelDto
 {
+    PanelTypes _panelType;
+
     public Guid Id { get; set; } = Guid.NewGuid();
 
     public string Title { get; set; }
 
     public string Description { get; set; }
 
-    public PanelTypes PanelType { get; set; }
+    public PanelTypes PanelType
+    {
+        get => _panelType;
+        set
+        {
+            _panelType = value;
+            switch (value)
+            {
+                case PanelTypes.Tabs:
+                    Width = 12;
+                    Height = 6;
+                    break;
+                case PanelTypes.Chart:
+                    Width = 12;
+                    Height = 5;
+                    break;
+                case PanelTypes.Log:
+                    Width = 12;
+                    Height = 10;
+                    break;
+                case PanelTypes.Trace:
+                    Width = 12;
+                    Height = 9;
+                    break;
+                case PanelTypes.Topology:
+                    Width = 12;
+                    Height = 9;
+                    break;
+                default: break;
+            }
+        }
+    }
 
     public int Width { get; set; } = 5;
 

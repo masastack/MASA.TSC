@@ -75,10 +75,12 @@ public partial class PanelGrids
         var data = Panels.First(p => p.Id == panel.Id);
         panel.X = data.X;
         panel.Y = data.Y;
-        panel.Width = data.Width;
-        panel.Height = data.Height;
+        //panel.Width = data.Width;
+        //panel.Height = data.Height;
+        panel.Id = Guid.NewGuid();
         Panels.Remove(data);
         Panels.Add(panel);
+        await PanelGridRange.First(item => item.ParentPanel is null).Gridstack!.Reload();
         if (panel.PanelType is PanelTypes.Chart)
         {
             await ConfigurationChartPanel(panel);
@@ -86,8 +88,7 @@ public partial class PanelGrids
     }
 
     async Task ConfigurationChartPanel(UpsertPanelDto panel)
-    {
-        await PanelGridRange.First(item => item.ParentPanel is null).Gridstack!.Reload();
+    {        
         await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
         NavigationManager.NavigateToConfigurationChart(panel.Id.ToString());
     }

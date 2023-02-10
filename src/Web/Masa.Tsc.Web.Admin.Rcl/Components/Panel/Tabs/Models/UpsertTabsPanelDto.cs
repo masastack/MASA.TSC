@@ -17,7 +17,7 @@ public class UpsertTabsPanelDto : UpsertPanelDto
     {
         Id = id;
         PanelType = PanelTypes.Tabs;
-        AddTabItem();
+        AddTabItem();       
     }
 
     public void AddTabItem()
