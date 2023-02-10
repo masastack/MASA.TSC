@@ -19,14 +19,76 @@ public partial class TopologyPanel
         }
     }
 
+    Antvg6Option Antvg6Option { get; set; } = new();
+
     [CascadingParameter]
     ConfigurationRecord ConfigurationRecord { get; set; }
-
-    LinkTrackingTopologyViewModel Data { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         oldConfigurationRecordKey = ConfigurationRecord.Key;
+        Antvg6Option.Option = new
+        {
+            container = "mountNode",
+            //linkCenter = true,
+            fitView = true,
+            fitViewPadding = new[] { 20, 40, 50, 20 },
+            animate = true,
+            modes = new
+            {
+                Default = new[] { "drag-node" },
+            },
+            defaultNode = new
+            {
+                type = "image",
+                img = "https://g.alicdn.com/cm-design/arms-trace/1.0.155/styles/armsTrace/images/TAIR.png",
+                size = 80,
+                labelCfg = new
+                {
+                    position = "bottom"
+                }
+            },
+            defaultEdge = new
+            {
+                type = "line-dash",
+                //curveOffset = 1,
+                // 边上的标签文本配置
+                labelCfg = new
+                {
+                    autoRotate = true, // 边上的标签文本根据边的方向旋转
+                },
+                style = new
+                {
+                    //lineAppendWidth = 10,
+                    lineWidth = 1,
+                    //stroke = "#bae7ff",
+                    endArrow = new
+                    {
+                        path = "M 0,0 L 8,4 L 8,-4 Z",
+                        fill = "#e2e2e2",
+                    },
+                },
+            },
+            layout = new
+            {
+                // Object，可选，布局的方法及其配置项，默认为 random 布局。
+                type = "dagre", // 指定为力导向布局
+                preventOverlap = true, // 防止节点重叠
+                linkDistance = 1000, // 指定边距离为100
+            },
+            animateCfg = new
+            {
+                duration = 100, // Number，一次动画的时长
+                easing = "linearEasing", // String，动画函数
+            }
+        };
+        Antvg6Option.PluginOption = new Antvg6PluginOption
+        {
+            UseEdgeTooltip = true,
+            UseNodeTooltip = true,
+            NodeTooltipFormatText = @"function nodeTooltipFormatText(model){return model.label;}",
+            EdgeTooltipFormatText = @"function edgeTooltipFormatText(model){return 'source: ' + model.source + '<br/> target: ' + model.target + '<br/> count: ' + model.label;}"
+        };
         await GetYopologyPanelData();
     }
 
@@ -41,149 +103,27 @@ public partial class TopologyPanel
 
     async Task GetYopologyPanelData()
     {
-        Data = new();
-
-        //var result =await ApiCaller.TopologyService.GetAsync("masa-tsc-service-admin", _depth, DateTime.Now.AddMonths(-3), DateTime.Now);
         var result = await ApiCaller.TopologyService.GetAsync(ConfigurationRecord.AppName, _depth, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
         if (result?.Data is null) return;
-        Data.Edges = result.Data.Select(item => new LinkTrackingTopologyEdgeViewModel
+        Antvg6Option.Data = new
         {
-            Source = item.CurrentId,
-            Target = item.DestId,
-            Label = item.AvgLatency.ToString()
-        }).ToList();
-        Data.Nodes = result.Services.Select(item => new LinkTrackingTopologyNodeViewModel
-        {
-            Id = item.Id,
-            Label = item.Name,
-            State = MonitorStatuses.Error,
-            X = Random.Shared.Next(-500, 500),
-            Y = Random.Shared.Next(-500, 500),
-        }).ToList();
+            nodes = result.Services.Select(item => new 
+            {
+                id = item.Id,
+                label = item.Name
+            }),
+            edges = result.Data.Select(item => new
+            {
+                source = item.CurrentId,
+                target = item.DestId,
+                label = item.AvgLatency.ToString()
+            }),
+        };
     }
 
     async Task RefreshAsync()
     {
-        _depth = 1;
+        //_depth = 1;
         await GetYopologyPanelData();
     }
 }
-
-//Data.Edges = new List<LinkTrackingTopologyEdgeViewModel>
-//{
-//    new LinkTrackingTopologyEdgeViewModel
-//    {
-//        Source="1",
-//        Target="0",
-//        Label="11"
-//    },
-//    new LinkTrackingTopologyEdgeViewModel
-//    {
-//        Source="0",
-//        Target="2",
-//        Label="12"
-//    },
-//    new LinkTrackingTopologyEdgeViewModel
-//    {
-//        Source="0",
-//        Target="3",
-//        Label="13"
-//    },
-//    new LinkTrackingTopologyEdgeViewModel
-//    {
-//        Source="0",
-//        Target="4",
-//        Label="14"
-//    },
-//    new LinkTrackingTopologyEdgeViewModel
-//    {
-//        Source="1",
-//        Target="2",
-//        Label="15"
-//    },
-//    new LinkTrackingTopologyEdgeViewModel
-//    {
-//        Source="5",
-//        Target="1",
-//        Label="16"
-//    },
-//    new LinkTrackingTopologyEdgeViewModel
-//    {
-//        Source="4",
-//        Target="6",
-//        Label="17"
-//    },
-//    new LinkTrackingTopologyEdgeViewModel
-//    {
-//        Source="7",
-//        Target="5",
-//        Label="18"
-//    },
-//};
-//Data.Nodes = new List<LinkTrackingTopologyNodeViewModel>
-//{
-//    new LinkTrackingTopologyNodeViewModel{
-//        Id="0",
-//        Label="EShop-Order",
-//        Depth=0,
-//        State=MonitorStatuses.Normal,
-//        X=0,
-//        Y=0
-//    },
-//    new LinkTrackingTopologyNodeViewModel{
-//        Id="1",
-//        Label="EShop-ApI",
-//        Depth=0,
-//        State=MonitorStatuses.Normal,
-//        X=-200,
-//        Y=0
-//    },
-//    new LinkTrackingTopologyNodeViewModel{
-//        Id="2",
-//        Label="EShop-Product",
-//        Depth=0,
-//        State=MonitorStatuses.Normal,
-//        X=200,
-//        Y=100
-//    },
-//    new LinkTrackingTopologyNodeViewModel{
-//        Id="3",
-//        Label="EShop-Sql",
-//        Depth=0,
-//        State=MonitorStatuses.Normal,
-//        X=300,
-//        Y=-150
-//    },
-//    new LinkTrackingTopologyNodeViewModel{
-//        Id="4",
-//        Label="EShop-Payment",
-//        Depth=0,
-//        State=MonitorStatuses.Warn,
-//        X=200,
-//        Y=50
-//    },
-//    new LinkTrackingTopologyNodeViewModel{
-//        Id="5",
-//        Label="Api-gateway",
-//        Depth=0,
-//        State=MonitorStatuses.Error,
-//        X=-300,
-//        Y=50
-//    },
-//    new LinkTrackingTopologyNodeViewModel{
-//        Id="6",
-//        Label="EShop-Yun",
-//        Depth=0,
-//        State=MonitorStatuses.Error,
-//        X=500,
-//        Y=50
-//    },
-//    new LinkTrackingTopologyNodeViewModel{
-//        Id="7",
-//        Label="EShop-App",
-//        Depth=0,
-//        State=MonitorStatuses.Normal,
-//        X=-500,
-//        Y=-50
-//    },
-//};

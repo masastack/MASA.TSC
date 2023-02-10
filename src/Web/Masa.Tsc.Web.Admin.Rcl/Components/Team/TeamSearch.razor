@@ -2,7 +2,7 @@
 @implements IDisposable
 @inherits TscComponentBase
 
-<div class="d-flex align-center">
+<div class="d-flex align-center" style="overflow:auto;">
     <div class="flex-grow-1">
         <MTabs Class="transparent-tab" Value="@_value.ProjectType" ValueChanged=@(async (value)=>await OnTabsChange(value.ToString()!))>
             @foreach (var item in _projectTypes)
@@ -11,7 +11,7 @@
             }
         </MTabs>
     </div>
-    <div style="width:300px;" class="mx-6">
+    <div class="mx-6">
         <SearchTextField Style="width:220px;border-radius: 10px !important;" @bind-Value="@Search" FillBackground=false Clearable />
     </div>
     <DateTimeRangeToolbar DefaultQuickRange="QuickRangeKey.Last6Hours" OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" />

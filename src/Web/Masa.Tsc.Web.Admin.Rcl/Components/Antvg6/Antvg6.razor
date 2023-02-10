@@ -1,0 +1,47 @@
+﻿@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div style="height:100%;width:100%;" @ref="_elementRef"></div>
+
+@code {
+    ElementReference? _elementRef;
+    IJSObjectReference? _helper;
+    object? _oldData;
+
+    [Parameter]
+    public Antvg6Option? Value { get; set; }
+
+    bool HasRendered { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_helper is not null)
+        {
+            if (HasRendered is false && Value.Data is not null && Value.Option is not null)
+            {
+                await _helper.InvokeVoidAsync("init", _elementRef, Value.Option, Value.Data, Value.PluginOption);
+                _oldData = Value.Data;
+                HasRendered = true;
+            }
+            if (Value.Data != _oldData)
+            {
+                await _helper.InvokeVoidAsync("render", _elementRef, Value.Data);
+                _oldData = Value.Data;
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _helper = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/antv-g6.js");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_helper is not null)
+            await _helper.DisposeAsync();
+    }
+}

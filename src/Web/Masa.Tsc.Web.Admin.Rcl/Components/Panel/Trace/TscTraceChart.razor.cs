@@ -35,6 +35,12 @@ public partial class TscTraceChart
         }
     }
 
+    protected async Task ResizeEChartAsync()
+    {
+        if (MECharts is not null)
+            await MECharts.Resize();
+    }
+
     private object GenOption()
     {
         if (Data == null)
