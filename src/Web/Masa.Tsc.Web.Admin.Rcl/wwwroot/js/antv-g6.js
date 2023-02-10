@@ -13,7 +13,7 @@ G6.registerEdge(
                     x: startPoint.x,
                     y: startPoint.y,
                     fill: 'blue',
-                    r: 3,
+                    r: 3,                 
                 },
                 // 在 G6 3.3 及之后的版本中，必须指定 name，可以是任意字符串，但需要在同一个自定义元素类型中保持唯一性
                 name: 'circle-shape',
@@ -48,6 +48,8 @@ G6.registerEdge(
         afterDraw(cfg, group) {
             // 获得该边的第一个图形，这里是边的 path
             const shape = group.get('children')[0];
+            shape.attrs.lineAppendWidth = 40;
+            debugger;
             let index = 0;
             // 边 path 图形的动画
             shape.animate(
@@ -58,7 +60,7 @@ G6.registerEdge(
                     }
                     const res = {
                         lineDash,
-                        lineDashOffset: -index,
+                        lineDashOffset: -index
                     };
                     // 返回需要修改的参数集，这里修改了 lineDash,lineDashOffset
                     return res;
@@ -67,15 +69,47 @@ G6.registerEdge(
                     repeat: true, // 动画重复
                     duration: 3000, // 一次动画的时长为 3000
                 },
-            );
+            );           
         },
     },
-    'cubic',
+    'quadratic',
 ); // 该自定义边继承了内置三阶贝塞尔曲线边 cubic
 
-export function render (elementRef, option, data) {
+export function init(elementRef, option, data, pluginOption) {
+    if (pluginOption.useNodeTooltip) {
+        option.modes.default.push({
+            type: 'tooltip', // 提示框
+            formatText(model) {
+                return eval(`(${pluginOption.nodeTooltipFormatText})(model)`);
+            },
+        });
+    }
+    if (pluginOption.useEdgeTooltip) {
+        option.modes.default.push({
+            type: 'edge-tooltip', // 边提示框
+            formatText(model) {
+                return eval(`(${pluginOption.edgeTooltipFormatText})(model)`);
+            }
+        });
+    }
     option.container = elementRef;
     const graph = new G6.Graph(option);
-    graph.data(data); // 加载远程数据
+    elementRef.graph = graph;
+    graph.on('edge:mouseenter', (ev) => {
+        const edge = ev.item;
+        graph.setItemState(edge, 'active', true);
+    });
+
+    graph.on('edge:mouseleave', (ev) => {
+        const edge = ev.item;
+        graph.setItemState(edge, 'active', false);
+    });
+    graph.data(data); // 加载数据
+    graph.render(); // 渲染
+};
+
+export function render(elementRef, data) {
+    const graph = elementRef.graph;
+    graph.data(data); // 加载数据
     graph.render(); // 渲染
 };

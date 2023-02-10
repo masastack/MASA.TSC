@@ -19,51 +19,7 @@ public partial class TopologyPanel
         }
     }
 
-    object G6Option { get; set; } = new
-    {
-        container = "mountNode",
-        fitView = true,
-        fitViewPadding = new[] { 20, 40, 50, 20 },
-        animate = true,
-        modes = new
-        {
-            Default = new[] { "drag-node" },
-        },
-        defaultNode = new
-        {
-            type = "image",
-            img = "https://g.alicdn.com/cm-design/arms-trace/1.0.155/styles/armsTrace/images/TAIR.png",
-            size = 80,
-            labelCfg = new
-            {
-                position = "bottom"
-            }
-        },
-        defaultEdge = new
-        {
-            type = "line-dash",
-            lineWidth = 10,
-            // 边上的标签文本配置
-            labelCfg = new
-            {
-                autoRotate = true, // 边上的标签文本根据边的方向旋转
-            },
-        },
-        layout = new
-        {
-            // Object，可选，布局的方法及其配置项，默认为 random 布局。
-            type = "dagre", // 指定为力导向布局
-            preventOverlap = true, // 防止节点重叠
-            linkDistance = 1000, // 指定边距离为100
-        },
-        animateCfg = new
-        {
-            duration = 100, // Number，一次动画的时长
-            easing = "linearEasing", // String，动画函数
-        }
-    };
-
-    object? G6Data { get; set; }
+    Antvg6Option Antvg6Option { get; set; } = new();
 
     [CascadingParameter]
     ConfigurationRecord ConfigurationRecord { get; set; }
@@ -71,6 +27,68 @@ public partial class TopologyPanel
     protected override async Task OnInitializedAsync()
     {
         oldConfigurationRecordKey = ConfigurationRecord.Key;
+        Antvg6Option.Option = new
+        {
+            container = "mountNode",
+            //linkCenter = true,
+            fitView = true,
+            fitViewPadding = new[] { 20, 40, 50, 20 },
+            animate = true,
+            modes = new
+            {
+                Default = new[] { "drag-node" },
+            },
+            defaultNode = new
+            {
+                type = "image",
+                img = "https://g.alicdn.com/cm-design/arms-trace/1.0.155/styles/armsTrace/images/TAIR.png",
+                size = 80,
+                labelCfg = new
+                {
+                    position = "bottom"
+                }
+            },
+            defaultEdge = new
+            {
+                type = "line-dash",
+                //curveOffset = 1,
+                // 边上的标签文本配置
+                labelCfg = new
+                {
+                    autoRotate = true, // 边上的标签文本根据边的方向旋转
+                },
+                style = new
+                {
+                    //lineAppendWidth = 10,
+                    lineWidth = 1,
+                    //stroke = "#bae7ff",
+                    endArrow = new
+                    {
+                        path = "M 0,0 L 8,4 L 8,-4 Z",
+                        fill = "#e2e2e2",
+                    },
+                },
+            },
+            layout = new
+            {
+                // Object，可选，布局的方法及其配置项，默认为 random 布局。
+                type = "dagre", // 指定为力导向布局
+                preventOverlap = true, // 防止节点重叠
+                linkDistance = 1000, // 指定边距离为100
+            },
+            animateCfg = new
+            {
+                duration = 100, // Number，一次动画的时长
+                easing = "linearEasing", // String，动画函数
+            }
+        };
+        Antvg6Option.PluginOption = new Antvg6PluginOption
+        {
+            UseEdgeTooltip = true,
+            UseNodeTooltip = true,
+            NodeTooltipFormatText = @"function nodeTooltipFormatText(model){return model.label;}",
+            EdgeTooltipFormatText = @"function edgeTooltipFormatText(model){return 'source: ' + model.source + '<br/> target: ' + model.target + '<br/> count: ' + model.label;}"
+        };
         await GetYopologyPanelData();
     }
 
@@ -87,25 +105,25 @@ public partial class TopologyPanel
     {
         var result = await ApiCaller.TopologyService.GetAsync(ConfigurationRecord.AppName, _depth, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
         if (result?.Data is null) return;
-        G6Data = new
+        Antvg6Option.Data = new
         {
             nodes = result.Services.Select(item => new 
             {
                 id = item.Id,
                 label = item.Name
             }),
-            edges = result.Relations.Select(item => new
+            edges = result.Data.Select(item => new
             {
                 source = item.CurrentId,
                 target = item.DestId,
-                //label = item.AvgLatency.ToString()
+                label = item.AvgLatency.ToString()
             }),
         };
     }
 
     async Task RefreshAsync()
     {
-        _depth = 1;
+        //_depth = 1;
         await GetYopologyPanelData();
     }
 }
