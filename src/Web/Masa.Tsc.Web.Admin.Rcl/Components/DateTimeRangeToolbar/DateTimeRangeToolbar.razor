@@ -3,9 +3,11 @@
 @implements IDisposable
 @inject I18n I18n
 
-<div class="d-inline-flex align-center rounded px-4 @Class"
+<div class="d-inline-flex align-center rounded-lg px-4 @Class"
      style="border:1px solid #E4E8F3; height: 40px; background-color:white;">
     <DateTimeRangePicker @bind-StartDateTime="_startDateTime"
+                         StartTimeLimit="StartTimeLimit"
+                         EndTimeLimit="EndTimeLimit"
                          @bind-EndDateTime="_endDateTime"
                          OnConfirm="OnAbsoluteDateTimeUpdated" />
 
@@ -69,6 +71,12 @@
 
     [Parameter]
     public EventCallback<(DateTimeOffset, DateTimeOffset)> OnAutoUpdate { get; set; }
+
+    [Parameter]
+    public Func<DateOnly, DateOnly, bool> StartTimeLimit { get; set; }
+
+    [Parameter]
+    public Func<DateOnly, DateOnly, bool> EndTimeLimit { get; set; }
 
     [Parameter]
     public string Class { get; set; }
@@ -186,7 +194,7 @@
             }
             else
             {
-                
+
                 await OnUpdate.InvokeAsync((_startDateTime, _endDateTime));
             }
         }
@@ -219,9 +227,9 @@
         if (_timer == null)
         {
             _timer = new()
-            {
-                Interval = item.TimeSpan.TotalMilliseconds
-            };
+                {
+                    Interval = item.TimeSpan.TotalMilliseconds
+                };
 
             _timer.Elapsed += TimerOnElapsed;
         }

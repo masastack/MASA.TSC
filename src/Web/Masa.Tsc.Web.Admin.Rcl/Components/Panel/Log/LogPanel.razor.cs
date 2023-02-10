@@ -10,7 +10,7 @@ public partial class LogPanel
     string? _search;
     int _page = 1;
     int _pageSize = 10;
-    object _option;
+    object _option = new object();
 
     string Search
     {
@@ -127,9 +127,9 @@ public partial class LogPanel
         Loading = false;
     }
 
-    protected string ToDateTimeStr(long value)
+    protected string ToDateTimeStr(long value, string format)
     {
-        return value.ToDateTime().Format(CurrentTimeZone);
+        return value.ToDateTime().Format(CurrentTimeZone, format);
     }
 
     async Task GenOption()
@@ -158,7 +158,8 @@ public partial class LogPanel
             Conditions = conditions
         });
 
-        string[] xAxisData = result?.Select(item => ToDateTimeStr(item.Key))?.ToArray() ?? Array.Empty<string>();
+        var format = start.Format(end);
+        string[] xAxisData = result?.Select(item => ToDateTimeStr(item.Key, format))?.ToArray() ?? Array.Empty<string>();
         long[] durations = result?.Select(item => item.Value)?.ToArray() ?? Array.Empty<long>();
 
         _option = new
@@ -172,11 +173,6 @@ public partial class LogPanel
                     crossStyle = new { color = "#A18BFF66" }
                 }
             },
-            //legend = new
-            //{
-            //    data = new[] { "count" },
-            //    bottom = true
-            //},
             xAxis = new[]
             {
                 new
@@ -194,27 +190,17 @@ public partial class LogPanel
                 new
                 {
                     type = "value",
-                    name = "span",
                     axisLabel = new
                     {
-                        formatter = "{value}"
+                        formatter = $"{{value}} {T("条")}"
                     }
-                },
-                //new
-                //{
-                //    type = "value",
-                //    name = "duration",
-                //    axisLabel = new
-                //    {
-                //        formatter = "{value} ms"
-                //    }
-                //},
+                }
             },
             series = new[]
             {
                 new
                 {
-                    name = "count",
+                    name = "total count",
                     type = "bar",
                     yAxisIndex = 0,
                     data = (object)durations,
@@ -222,37 +208,14 @@ public partial class LogPanel
                     {
                         color = "#4318FF"
                     },
-                    lineStyle = new
-                    {
-                        color = "",
-                        type = ""
-                    },
                     smooth = false
-                },
-                //new
-                //{
-                //    name = "duration",
-                //    type = "line",
-                //    yAxisIndex = 1,
-                //    data = (object)durations,
-                //    itemStyle = new
-                //    {
-                //        color = ""
-                //    },
-                //    lineStyle = new
-                //    {
-                //        color = "#A18BFF",
-                //        type = "dashed"
-                //    },
-                //    smooth = true
-                //}
+                }
             },
-            Grid = new
-            {
-                x = 70,
-                x2 = 70,
-                y = 10,
-                y2 = 30
+            grid=new{
+                top=10,
+                left=80,
+                right=20,
+                bottom=40
             }
         };
     }

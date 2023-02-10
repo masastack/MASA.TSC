@@ -17,6 +17,9 @@ public partial class LogView
     [Parameter]
     public bool CloseAotoExpand { get; set; }
 
+    [Parameter]
+    public bool Small { get; set; }
+
     protected override void OnParametersSet()
     {
         //if(CloseAotoExpand is false && string.IsNullOrEmpty(Search) is false && Search != _oldSearch)
@@ -60,4 +63,8 @@ public partial class LogView
             }
         }
     }
+
+    string MarginRightClass => Small ? "mr-1" : "mr-6";
+
+    string MarginLeftClass => Small ? "" : "ml-4";
 }

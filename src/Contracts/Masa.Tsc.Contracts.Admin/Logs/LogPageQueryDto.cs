@@ -15,6 +15,8 @@ public class LogPageQueryDto : Pagination<LogPageQueryDto>
 
     public string Duration { get; set; }
 
+    public string SpanId { get; set; }
+
     /// <summary>
     ///  scheduler job taskid
     /// </summary>

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using System.Diagnostics;
+
 namespace Masa.Tsc.Service.Admin.Services;
 
 public class LogService : ServiceBase
@@ -36,7 +38,7 @@ public class LogService : ServiceBase
 
     private async Task<PaginatedListBase<LogResponseDto>> GetPageAsync([FromServices] IEventBus eventBus, LogPageQueryDto param)
     {
-        var query = new LogsQuery(param.Query, param.Start, param.End, param.Page, param.PageSize, param.IsAsc, JobTaskId: param.TaskId);
+        var query = new LogsQuery(param.Query, param.Start, param.End, param.Page, param.PageSize, param.IsAsc, JobTaskId: param.TaskId,SpanId:param.SpanId);
         await eventBus.PublishAsync(query);
         return query.Result;
     }

@@ -49,8 +49,8 @@ public partial class ServiceCallChart
             timeSpans.AddRange(((QueryResultMatrixRangeResponse)_data[0].Result![0]).Values!.Select(values => Convert.ToDouble(values[0])));
             values = ((QueryResultMatrixRangeResponse)_data[0].Result![0])!.Values!.Select(values => values[1].ToString()!).ToList();
         }
-
-        _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value)));
+        var format = start.Format(end);
+        _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value,format)));
         _options.SetValue("series[0].data", values);
     }
 }

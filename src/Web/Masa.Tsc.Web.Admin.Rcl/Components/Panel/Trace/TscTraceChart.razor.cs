@@ -82,7 +82,7 @@ public partial class TscTraceChart
                     name = "span",
                     axisLabel = new
                     {
-                        formatter = "{value}"
+                        formatter = "{value} 条"
                     }
                 },
                 new

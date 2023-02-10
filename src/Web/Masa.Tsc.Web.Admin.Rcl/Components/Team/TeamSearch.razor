@@ -2,17 +2,13 @@
 @implements IDisposable
 @inherits TscComponentBase
 
-<div class="d-flex align-center" style="overflow:auto;">
-    <div class="flex-grow-1">
-        <MTabs Class="transparent-tab" Value="@_value.ProjectType" ValueChanged=@(async (value)=>await OnTabsChange(value.ToString()!))>
-            @foreach (var item in _projectTypes)
-            {
-                <MTab Value=@item.Key>@item.Value</MTab>
-            }
-        </MTabs>
-    </div>
-    <div class="mx-6">
-        <SearchTextField Style="width:220px;border-radius: 10px !important;" @bind-Value="@Search" FillBackground=false Clearable />
-    </div>
+<div class="d-flex align-center">
+    <SLabeledRadioGroup Value="@_value.ProjectType" ValueChanged=@(async (string value)=>await OnTabsChange(value)) Dense>
+        @foreach (var item in _projectTypes)
+        {
+            <SLabeledRadio Value="item.Key">@item.Value</SLabeledRadio>
+        }
+    </SLabeledRadioGroup>
+    <SearchTextField Class="rounded-lg flex-grow-1 mx-8" Style="min-width:120px" @bind-Value="@Search" FillBackground=false Clearable />
     <DateTimeRangeToolbar DefaultQuickRange="QuickRangeKey.Last6Hours" OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
 </div>

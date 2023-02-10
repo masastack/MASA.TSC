@@ -1,6 +1,10 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Stack.Components;
+using Masa.Tsc.Web.Admin.Rcl.Pages;
+using Nest;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceDetail
@@ -14,6 +18,8 @@ public partial class TscTraceDetail
     private TraceResponseTree? _rootTreeItem;
     private int _count;
     private List<List<TraceResponseTimeline>> _timelinesView = new();
+    private List<LogModel> _logs = new();
+    private bool _loadLogs = false;
 
     internal async Task OpenAsync(string traceId)
     {
@@ -87,13 +93,25 @@ public partial class TscTraceDetail
         }
     }
 
-    private void OnActiveUpdate(List<TraceResponseTree> items)
+    private async Task OnTabValueChange(StringNumber value)
     {
+        _tabValue = value;
+        if (_tabValue.AsT1 == 3)
+            await LoadSpanLogsAsync(_activeTreeItem?.SpanId);
+    }
+
+    private async Task OnActiveUpdate(List<TraceResponseTree> items)
+    {
+        _loadLogs = false;
+        if (_tabValue.AsT1 == 3)
+        {
+            await LoadSpanLogsAsync(items.FirstOrDefault()?.SpanId);
+        }
+
         if (items.Count == 0)
         {
             return;
         }
-
         _activeTreeItem = items.First();
     }
 
@@ -167,6 +185,29 @@ public partial class TscTraceDetail
         }
 
         return nodes;
+    }
+
+    private async Task LoadSpanLogsAsync(string? spanId)
+    {
+        if (_loadLogs)
+            return;
+        _loadLogs = true;
+        if (string.IsNullOrEmpty(spanId))
+        {
+            _logs.Clear();
+            return;
+        }
+
+        Loading = true;
+        var query = new LogPageQueryDto
+        {
+            PageSize = 9999,
+            Page = 1,
+            SpanId = spanId
+        };
+        var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
+        _logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
+        Loading = false;
     }
 
     private static string FormatDuration(double duration)

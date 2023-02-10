@@ -135,7 +135,7 @@ public partial class TscTrace
 
         ValueTuple<string, string, string>[] values = new (string, string, string)[currentArray.Length];
         var index = 0;
-        var fmt = GetFormat();
+        var fmt = query.Start.Format(query.End);
         foreach (var item in currentArray!)
         {
             if (hasFirst)
@@ -155,12 +155,7 @@ public partial class TscTrace
             index++;
         }
         _chartData = values;
-    }
-
-    private string GetFormat()
-    {
-        return "yyyy-MM-dd HH:mm:ss";
-    }
+    }    
 
     private Task<IEnumerable<string>> QueryServices(string key)
     {

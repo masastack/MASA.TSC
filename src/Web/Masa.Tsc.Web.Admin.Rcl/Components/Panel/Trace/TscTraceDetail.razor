@@ -6,7 +6,7 @@
     <div class="d-flex">
         <div class="pa-12" style="width:100%">
             <div class="d-flex mb-6">
-                <SSearch Dense Style="max-width:300px"></SSearch>
+                <SearchTextField FullWidth Small Clearable Class="my-auto mr-6" Style="max-width:300px" />
                 <MSpacer></MSpacer>
                 @if (_rootTreeItem is not null)
                 {
@@ -156,11 +156,11 @@
                     </MListItem>
                 </MList>
                 <div>
-                    <MTabs @bind-Value="_tabValue" FixedTabs ShowArrows="false">
+                    <MTabs ValueChanged="OnTabValueChange" FixedTabs ShowArrows="false">
                         <MTab>attr(@_activeTreeItem.Attributes.Count)</MTab>
                         <MTab>res(@_activeTreeItem.Resource.Count)</MTab>
                         <MTab>dt(@detail.Count)</MTab>
-                        <MTab>logs</MTab>
+                        <MTab>logs(@_logs.Count)</MTab>
                     </MTabs>
                     <MTabsItems Value="_tabValue">
                         <MTabItem>
@@ -172,8 +172,22 @@
                         <MTabItem>
                             @((RenderFragment)(dictRender => RenderDictionary(dictRender, detail)))
                         </MTabItem>
-                        <MTabItem>
-                            TODO
+                        <MTabItem>                  
+                            <MCard Style="overflow-x-hidden" Height="600">
+                                <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="_logs" Class="m-sheet theme--light" Style="width:100% !important">
+                                    <ItemContent>
+                                        <div class="d-flex">
+                                            <div>
+                                                <LogView Small JsonObject="context.ExtensionData" />
+                                            </div>
+                                        </div>
+                                        @if (_logs != null && !_logs.Last().Equals(context))
+                                        {
+                                            <MDivider Class="mb-6" />
+                                        }
+                                    </ItemContent>
+                                </MVirtualScroll>
+                                </MCard>
                         </MTabItem>
                     </MTabsItems>
                 </div>
@@ -234,9 +248,9 @@
                     <EllipsisText TooltipStyle="white-space: pre-wrap;">
                         <ActivatorContent>
                             <MListItemActionText Class="text-truncate text-right"
-                                                 Style="width: 100%; cursor: auto;"
-                                                 RefBack="@context.Ref"
-                                                 @attributes="@context.Attrs">
+                                     Style="width: 100%; cursor: auto;"
+                                     RefBack="@context.Ref"
+                                         @attributes="@context.Attrs">
                                 @value
                             </MListItemActionText>
                         </ActivatorContent>
