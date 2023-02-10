@@ -22,9 +22,9 @@ public partial class TscEChartBase : TscComponentBase
         await Task.CompletedTask;
     }
 
-    protected string ToDateTimeStr(double value)
+    protected string ToDateTimeStr(double value,string fmt)
     {
         var millionSeconds = (long)Math.Floor(value * 1000);
-        return millionSeconds.ToDateTime().Format(CurrentTimeZone);
+        return millionSeconds.ToDateTime().Format(CurrentTimeZone, fmt);
     }
 }

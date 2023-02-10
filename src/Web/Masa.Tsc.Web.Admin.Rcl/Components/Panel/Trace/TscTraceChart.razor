@@ -8,8 +8,10 @@
         @if (PageMode)
         {
             <DateTimeRangeToolbar DefaultQuickRange="s_defaultQuickRange"
-                                  OnUpdate="OnDateTimeUpdate"
-                                  OnAutoUpdate="OnDateTimeAutoUpdate" />
+                              StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
+                              EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start"
+                              OnUpdate="OnDateTimeUpdate"
+                              OnAutoUpdate="OnDateTimeAutoUpdate" />
         }
     </MCardTitle>
     <MCardText Class="pa-0">

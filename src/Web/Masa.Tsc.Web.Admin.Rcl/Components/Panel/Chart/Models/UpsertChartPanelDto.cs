@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using System;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Models;
 
 public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPanelValue
@@ -391,12 +393,20 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
 
     string Key { get; set; }
 
+    string DateFormart { get; set; }
+
+    string ToFormatTimeSpan(long timestamp)
+    {
+        return DateTimeOffset.FromUnixTimeSeconds(timestamp).DateTime.Format(default!, DateFormart);
+    }
+
     List<QueryResultDataResponse> _chartData = new();
     List<List<Dessert>> _tableData = new();
     List<TopListOption> _topListData = new();
 
-    public void SetChartData(List<QueryResultDataResponse> chartData)
+    public void SetChartData(List<QueryResultDataResponse> chartData, DateTime start, DateTime end)
     {
+        DateFormart = start.Format(end);
         _chartData = chartData;
         IsLoadChartData = true;
         Key = "DataChanged" + Guid.NewGuid();
@@ -426,6 +436,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         if (IsLoadChartData is false) return;
 
         IsLoadChartData = false;
+
         if (ChartType is "line" or "bar")
         {
             var data = GetMatrixRangeData();
@@ -433,7 +444,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
             {
                 ["type"] = ChartType,
                 ["name"] = string.Join("-", item.Metric!.Values),
-                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), value[1].ToString()))
+                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0]), value[1].ToString()))
                                                     .ToArray())
             }).ToArray());
         }
@@ -450,7 +461,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                 {
                     ["focus"] = "series"
                 },
-                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(DateTimeOffset.FromUnixTimeSeconds((long)value[0]).DateTime.ToString("yyyy-MM-dd HH:mm:ss"), value[1].ToString()))
+                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0]), value[1].ToString()))
                                                     .ToArray())
             }).ToArray());
         }

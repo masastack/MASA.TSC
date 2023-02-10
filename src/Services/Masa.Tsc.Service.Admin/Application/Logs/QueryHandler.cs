@@ -55,6 +55,17 @@ public class QueryHandler
                 Value = queryData.JobTaskId
             });
         }
+
+        if (!string.IsNullOrEmpty(queryData.SpanId))
+        {
+            conditions.Add(new FieldConditionDto
+            {
+                Name = "SpanId.keyword",
+                Type = ConditionTypes.Equal,
+                Value = queryData.SpanId
+            });
+        }
+
         var data = await _logService.ListAsync(new BaseRequestDto
         {
             Start = queryData.Start,

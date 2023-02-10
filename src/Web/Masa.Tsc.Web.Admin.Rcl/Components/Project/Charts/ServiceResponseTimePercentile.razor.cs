@@ -69,7 +69,8 @@ public partial class ServiceResponseTimePercentile
             y = 25
         });
         _options.SetValue("legend.data", legend);
-        _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value)));
+        var format = start.Format(end);
+        _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value, format)));
         _options.SetValue("series", dddd.Select(item => new { name = item.Key, type = "line", data = item.Value }));
     }
 }

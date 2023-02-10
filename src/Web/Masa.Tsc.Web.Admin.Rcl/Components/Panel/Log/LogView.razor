@@ -7,7 +7,7 @@
         if (!string.IsNullOrEmpty(logTree.ToString()) && logTree.IsValueType)
         {
             <div class="d-flex mb-4">
-                <div class="px-2 ml-4 mr-6 my-auto fill-background" style="border-radius: 6px;height: 25px;text-align:center;">
+                <div class="px-2 @(MarginLeftClass) @(MarginRightClass) my-auto fill-background" style="border-radius: 6px;height: 25px;text-align:center;">
                     <span class="emphasis2--text btn">@name</span>
                 </div>
                 <span class="body2 regular2--text my-auto">
@@ -18,12 +18,15 @@
         else if (logTree.IsObject)
         {
             <div class="d-flex mb-4">
-                <SButton Icon Class="ml-n5" OnClick="() => logTree.Expanded =!logTree.Expanded">
-                    <SIcon Size="24" Color="regular2">
-                        @(logTree.Expanded ? IconConstants.MenuDown : IconConstants.MenuRight)
-                    </SIcon>
-                </SButton>
-                <div class="px-2 mr-6 my-auto fill-background" style="border-radius: 6px;height: 25px;text-align:center;">
+                @if (!Small)
+                {
+                    <SButton Icon Class="ml-n5" OnClick="() => logTree.Expanded =!logTree.Expanded">
+                        <SIcon Size="24" Color="regular2">
+                            @(logTree.Expanded ? IconConstants.MenuDown : IconConstants.MenuRight)
+                        </SIcon>
+                    </SButton>
+                }
+                <div class="px-2 @(MarginRightClass) my-auto fill-background" style="border-radius: 6px;height: 25px;text-align:center;">
                     <span class="emphasis2--text btn">@name</span>
                 </div>
                 <span class="body2 primary--text my-auto hover-pointer" @onclick="() => logTree.Expanded =!logTree.Expanded">@(logTree.Expanded ? "{" : "{ ... }")</span>
@@ -39,12 +42,15 @@
         else if (logTree.IsArray)
         {
             <div class="d-flex mb-4">
-                <SButton Icon Class="ml-n5" OnClick="() => logTree.Expanded =!logTree.Expanded">
-                    <SIcon Size="24" Color="regular2">
-                        @(logTree.Expanded ? IconConstants.MenuDown : IconConstants.MenuRight)
-                    </SIcon>
-                </SButton>
-                <div class="px-2 mr-6 my-auto fill-background" style="border-radius: 6px;height: 25px;text-align:center;">
+                @if (!Small)
+                {
+                    <SButton Icon Class="ml-n5" OnClick="() => logTree.Expanded =!logTree.Expanded">
+                        <SIcon Size="24" Color="regular2">
+                            @(logTree.Expanded ? IconConstants.MenuDown : IconConstants.MenuRight)
+                        </SIcon>
+                    </SButton>
+                }
+                <div class="px-2 @(MarginRightClass) my-auto fill-background" style="border-radius: 6px;height: 25px;text-align:center;">
                     <span class="emphasis2--text btn">@name</span>
                 </div>
                 <span class="body2 primary--text my-auto hover-pointer" @onclick="() => logTree.Expanded =!logTree.Expanded">@(logTree.Expanded ? "[" : "[ ... ]")</span>
