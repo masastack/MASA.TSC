@@ -55,7 +55,7 @@
                     <TextPanel Value=context IsEdit=IsEdit />
                     break;
                 case PanelTypes.Trace:
-                    <TscTrace Width="context.W" Height="context.H" />
+                    <TscTrace />
                     break;
                 case PanelTypes.Topology:
                     <TopologyPanel />
@@ -64,7 +64,7 @@
                     <ChartPanel Value="context as UpsertChartPanelDto" />
                     break;
                 case PanelTypes.Log:
-                    <LogPanel Width="context.W" Height="context.H" />
+                    <LogPanel />
                     break;
                 case PanelTypes.Select:
                     <PanelSelect PanelId="context.Id" OnSelect="ReplacePanel" />
