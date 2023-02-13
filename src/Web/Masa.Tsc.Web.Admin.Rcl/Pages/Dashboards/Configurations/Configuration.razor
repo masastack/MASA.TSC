@@ -6,7 +6,7 @@
 
 <PageTitle>@T("Configure Dashboard")</PageTitle>
 
-<AutoHeight Overflow AutoStyle="max-height: calc(100vh - 185px);height: 900px">
+<AutoHeight Id="@_scrollElementId" Overflow AutoStyle="max-height: calc(100vh - 185px);height: 900px">
     <HeaderContent>
         <div class="d-flex mb-6">
             @if (ConfigurationRecord.ShowServiceCompontent)
@@ -49,7 +49,7 @@
         </div>
     </HeaderContent>
     <AutoHeightContent>
-        <DefaultCard Style="min-height: calc(100vh - 185px);">
+        <DefaultCard Id="@_contentElementId" Style="min-height: calc(100vh - 185px);">
             <CascadingValue Value="ConfigurationRecord.IsEdit">
                 <CascadingValue Value="PanelGrids" IsFixed>
                     <CascadingValue Value="ConfigurationRecord">

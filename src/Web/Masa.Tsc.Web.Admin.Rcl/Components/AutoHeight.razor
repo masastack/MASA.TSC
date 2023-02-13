@@ -1,7 +1,13 @@
 ﻿<div class="full-height flex-column @Class">
     @HeaderContent
-    <div style="@AutoStyle" class="flex-height-auto @AutoClass @(Overflow?"overflow-y pr-4":"overflow-hidden")">
+    <div style="@AutoStyle" class="flex-height-auto @AutoClass @(Overflow?"overflow-y pr-4":"overflow-hidden")" id="@Id">
         @AutoHeightContent
     </div>
     @FooterContent
 </div>
+
+@code
+{
+    [Parameter]
+    public string Id { get; set; } = "";
+}

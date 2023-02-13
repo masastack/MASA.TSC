@@ -1,17 +1,22 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations;
 
-public partial class Configuration
+public partial class Configuration: IAsyncDisposable
 {
+    string _scrollElementId = Guid.NewGuid().ToString();
+    string _contentElementId = Guid.NewGuid().ToString();
+    IJSObjectReference? _helper;
+
     [Inject]
     public ConfigurationRecord ConfigurationRecord { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    public IJSRuntime JS { get; set; }
 
     [Parameter]
     public string DashboardId { get; set; }
@@ -98,6 +103,8 @@ public partial class Configuration
     {
         await PanelGrids.SaveUI();
         ConfigurationRecord.Panels.AdaptiveUI(new());
+        if(_helper is not null)
+            _helper.InvokeVoidAsync("scrollBottom", _scrollElementId,_contentElementId);
         //ConfigurationRecord.Panels.Insert(0, panel);
         //await PanelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();
     }
@@ -148,5 +155,19 @@ public partial class Configuration
         {
             ConfigurationRecord.IsEdit = true;
         }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _helper = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/scroll.js");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_helper is not null)
+            await _helper.DisposeAsync();
     }
 }
