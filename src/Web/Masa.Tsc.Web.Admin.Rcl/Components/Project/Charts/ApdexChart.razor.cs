@@ -39,8 +39,9 @@ public partial class ApdexChart
         {
             var seriesData = ((QueryResultMatrixRangeResponse)_data[0].Result!.First()).Values!.Select(items => (string)items[1]).ToArray();
             var timeSpans = ((QueryResultMatrixRangeResponse)_data[0].Result!.First()).Values!.Select(items => Convert.ToDouble(items[0])).ToArray();
-            Total = seriesData.Last();
-            _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value)));
+            Total = seriesData.Last();       
+            var format= query.Start.Value.Format(query.End.Value);
+            _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value,format)));
             _options.SetValue("series[0].data", seriesData);
         }
         else

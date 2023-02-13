@@ -28,6 +28,12 @@ public partial class DateTimeRangePicker
     [Parameter]
     public EventCallback<TimeZoneInfo> OnTimeZoneInfoChange { get; set; }
 
+    [Parameter]
+    public Func<DateOnly, DateOnly, bool> StartTimeLimit { get; set; }
+
+    [Parameter]
+    public Func<DateOnly, DateOnly, bool> EndTimeLimit { get; set; }
+
     private static ReadOnlyCollection<TimeZoneInfo> _systemTimeZones = TimeZoneInfo.GetSystemTimeZones();
 
     private TimeSpan _internalOffset;

@@ -142,10 +142,9 @@ export function registerEdge() {
 const createGraph = (domRef, data) => {
     const graph = new G6.Graph({
         container: domRef,
-        width: 1440,
-        height: 765,
         linkCenter: true,
         plugins: [tooltip],
+        fitView:'autoZoom',
         modes: {
             default: ['drag-node'],
         },

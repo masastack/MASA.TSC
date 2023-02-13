@@ -76,8 +76,12 @@ window.onelresize = (el, handler, delay) => {
 
     expand.addEventListener('scroll', onScroll, false)
     shrink.addEventListener('scroll', onScroll, false)
-    window.setTimeout(() => {
-        expand.scrollTop = shrink.scrollTop = maxHeight
-        expand.scrollLeft = shrink.scrollLeft = maxWidth
-    }, 1000);
+
+    var timer = window.setInterval(() => {
+        expand.scrollTop = shrink.scrollTop = maxHeight;
+        expand.scrollLeft = shrink.scrollLeft = maxWidth;
+        if (expand.scrollTop != 0 && expand.scrollLeft != 0) {
+            clearInterval(timer);
+        }         
+    }, 300);
 };

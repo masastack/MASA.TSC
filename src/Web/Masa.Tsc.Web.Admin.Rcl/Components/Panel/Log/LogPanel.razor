@@ -10,8 +10,8 @@
                 </MCardTitle>
                 <MCardText Class="pa-0">
                     <MDivider Class="mb-6" />
-                    <AutoResize OnResize="ResizeEChartAsync" Delay="300">
-                        <MECharts @key="@key" @ref=MECharts Option="_option" Width="@("100%")" Height="280" />
+                    <AutoResize OnResize="ResizeEChartAsync" Delay="10">
+                        <MECharts @ref=MECharts Option="_option" Width="@("100%")" Height="280" />
                     </AutoResize>
                 </MCardText>
             </MCard>
@@ -22,7 +22,8 @@
             <SearchTextField FullWidth @bind-Value="@Search" Small Clearable Class="my-auto mr-6" style="max-width:100%;" />
             @if (PageMode)
             {
-                <DateTimeRangeToolbar Class="mr-6 my-auto" OnUpdate="OnUpdate" OnAutoUpdate="OnAutoUpdate" />
+                <DateTimeRangeToolbar Class="mr-6 my-auto" OnUpdate="OnUpdate" OnAutoUpdate="OnAutoUpdate" StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
+                                  EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start" />
             }
         </div>
         <MCard Class="overflow-hidden" Style="@("border-radius:0 !important;"+ (PageMode ? "height: calc(100vh - 612px)" : "height: calc(100% - 120px)"))">

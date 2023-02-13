@@ -40,4 +40,25 @@ internal static class TimeExtentions
             _ => 0,
         };
     }
+
+    /// <summary>
+    /// echart line bar time format
+    /// </summary>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
+    public static string Format(this DateTime start, DateTime end)
+    {
+        if (start == DateTime.MaxValue || start == DateTime.MinValue || start == end)
+            return string.Empty;
+        var timeSpan = end - start;
+
+        if (timeSpan.TotalMinutes - 60 < 0)
+            return "mm:ss";
+
+        if (timeSpan.Hours - 24 <= 0)
+            return "HH:mm:ss";
+
+        return " dd HH:mm";
+    }
 }

@@ -83,7 +83,7 @@ public partial class ChartPanel
     {
         IsLoading = true;
         var data = await GetMetricsAsync();
-        Value.SetChartData(data);
+        Value.SetChartData(data, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
         IsLoading = false;
     }
 }
