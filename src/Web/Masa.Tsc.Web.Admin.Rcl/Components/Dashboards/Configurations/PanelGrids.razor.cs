@@ -55,6 +55,11 @@ public partial class PanelGrids
             Panels.Remove(panel);
         else
             panel.ParentPanel.ChildPanels.Remove(panel);
+
+        if (Panels.Any() is false)
+        {
+            PanelGridRange.Remove(this);
+        }
     }
 
     void RemovePanelGrid(UpsertPanelDto panel)
@@ -62,7 +67,6 @@ public partial class PanelGrids
         PanelGridRange.RemoveAll(item => item.ParentPanel == panel);
         if (panel.ChildPanels.Any())
         {
-            //PanelGridRange.RemoveAll(item => item.Panels.Any(item2 => item2.ParentPanel?.Id == panel.Id));
             foreach (var item in panel.ChildPanels)
             {
                 RemovePanelGrid(item);
@@ -75,12 +79,15 @@ public partial class PanelGrids
         var data = Panels.First(p => p.Id == panel.Id);
         panel.X = data.X;
         panel.Y = data.Y;
-        //panel.Width = data.Width;
-        //panel.Height = data.Height;
+        if(data.Width != GlobalPanelConfig.Width || data.Height != GlobalPanelConfig.Height)
+        {
+            panel.Width = data.Width;
+            panel.Height = data.Height;
+        }
         panel.Id = Guid.NewGuid();
         Panels.Remove(data);
+        await Task.Delay(10);
         Panels.Add(panel);
-        await PanelGridRange.First(item => item.ParentPanel is null).Gridstack!.Reload();
         if (panel.PanelType is PanelTypes.Chart)
         {
             await ConfigurationChartPanel(panel);
@@ -88,17 +95,9 @@ public partial class PanelGrids
     }
 
     async Task ConfigurationChartPanel(UpsertPanelDto panel)
-    {        
-        await Task.WhenAll(PanelGridRange.Select(item => item.SavePanelGridAsync()));
-        NavigationManager.NavigateToConfigurationChart(panel.Id.ToString());
-    }
-
-    void OnResize(GridstackResizeEventArgs args)
     {
-        var panel = Panels.FirstOrDefault(p => p.Id.ToString() == args.Id);
-        if (panel is null) return;
-        panel.W = args.Width - 32;
-        panel.H = args.Height - 135;
+        await PanelGridRange.SaveUI();
+        NavigationManager.NavigateToConfigurationChart(panel.Id.ToString());
     }
 
     public async Task SavePanelGridAsync()

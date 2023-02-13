@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Contracts.Admin.Enums;
-
 namespace Masa.Tsc.Contracts.Admin.Dashboards;
 
 public class UpsertPanelDto
@@ -73,12 +71,6 @@ public class UpsertPanelDto
     [JsonIgnore]
     public UpsertPanelDto? ParentPanel { get; set; }
 
-    [JsonIgnore]
-    public double H { get; set; }
-
-    [JsonIgnore]
-    public double W { get; set; }
-
     public virtual UpsertPanelDto Clone(UpsertPanelDto panel)
     {
         Id = panel.Id;
@@ -106,4 +98,9 @@ public class UpsertPanelDto
     }
 
     #endregion
+
+    public UpsertPanelDto()
+    {
+        Width = GlobalPanelConfig.Width; Height = GlobalPanelConfig.Height;
+    }
 }

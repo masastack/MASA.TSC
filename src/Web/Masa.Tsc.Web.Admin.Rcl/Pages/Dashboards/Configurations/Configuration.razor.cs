@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations;
 
 public partial class Configuration
@@ -94,11 +96,10 @@ public partial class Configuration
 
     async Task AddPanel()
     {
-        ConfigurationRecord.Panels.Insert(0, new() 
-        {
-            X = 5,Y=-1,Width = 10
-        });
-        await PanelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();
+        await PanelGrids.SaveUI();
+        ConfigurationRecord.Panels.AdaptiveUI(new());
+        //ConfigurationRecord.Panels.Insert(0, panel);
+        //await PanelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();
     }
 
     void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
@@ -114,15 +115,11 @@ public partial class Configuration
 
     async Task SaveAsync()
     {
-        if (ConfigurationRecord.Panels.Any() is false)
-        {
-            PanelGrids.Clear();
-        }
-        else
-        {
-            await PanelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();
-            await Task.WhenAll(PanelGrids.Select(item => item.SavePanelGridAsync()));
-        }
+        //if (ConfigurationRecord.Panels.Any() is false)
+        //{
+        //    PanelGrids.Clear();
+        //}
+        await PanelGrids.SaveUI();
         await ApiCaller.InstrumentService.UpsertPanelAsync(Guid.Parse(ConfigurationRecord.DashboardId), ConfigurationRecord.Panels.ToArray());
         OpenSuccessMessage(T("Save success"));
     }
