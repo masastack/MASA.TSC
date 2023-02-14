@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Newtonsoft.Json;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceChart
@@ -79,20 +81,12 @@ public partial class TscTraceChart
                 new
                 {
                     type = "value",
-                    name = "span",
-                    axisLabel = new
-                    {
-                        formatter = "{value} 条"
-                    }
+                    name = $"span({T("Total Count")})"
                 },
                 new
                 {
                     type = "value",
-                    name = "duration",
-                    axisLabel = new
-                    {
-                        formatter = "{value} ms"
-                    }
+                    name = $"duration(ms)"
                 },
             },
             series = new[]
@@ -136,7 +130,7 @@ public partial class TscTraceChart
             {
                 x = 70,
                 x2 = 70,
-                y = 10,
+                y = 50,
                 y2 = 50
             }
         };

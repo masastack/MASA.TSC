@@ -26,15 +26,21 @@
                         </MCol>
                         <MCol Md="8">
                             <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
-                                <MButton Class="text-capitalize" Value="@ListTypes.ServiceList.ToString()">
-                                    Service List
-                                </MButton>
-                                <MButton Class="text-capitalize" Value="@ListTypes.EndpointList.ToString()">
-                                    Endpoint List
-                                </MButton>
-                                <MButton Class="text-capitalize" Value="@ListTypes.InstanceList.ToString()">
-                                    Instance List
-                                </MButton>
+                                @if (Model == "All")
+                                {
+                                    <MButton Class="text-capitalize" Value="@ListTypes.ServiceList.ToString()">
+                                        Service List
+                                    </MButton>
+                                }
+                                else if (Model == "Service")
+                                {
+                                    <MButton Class="text-capitalize" Value="@ListTypes.EndpointList.ToString()">
+                                        Endpoint List
+                                    </MButton>                                
+                                    <MButton Class="text-capitalize" Value="@ListTypes.InstanceList.ToString()">
+                                        Instance List
+                                    </MButton>
+                                }
                                 <MButton Class="text-capitalize" Value="ListTypes.TopList.ToString()">
                                     Top List
                                 </MButton>
@@ -169,9 +175,9 @@
                                         <MCol Md="12">
                                             <SwitchItem Label="Show table header" @bind-Value="@Value.ShowTableHeader" />
                                         </MCol>
-@*                                        <MCol Md="12">
-                                            <SwitchItem Label="Show table footer" @bind-Value="@Value.ShowTableFooter" />
-                                        </MCol>*@
+                                        @*                                        <MCol Md="12">
+                                <SwitchItem Label="Show table footer" @bind-Value="@Value.ShowTableFooter" />
+                                </MCol>*@
                                         <MCol Md="12">
                                             <ButtonGroupItem @bind-Value="@Value.ColumnAlignment" Label="Column alignment" Items='new List<string>{"auto","left","center","right"}' />
                                         </MCol>

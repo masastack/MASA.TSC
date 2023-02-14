@@ -70,6 +70,7 @@ public partial class Configuration: IAsyncDisposable
         //ConfigurationRecord.Panels.Clear();
         if (detail is not null)
         {
+            ConfigurationRecord.Model = detail.Model;
             ConfigurationRecord.ShowServiceCompontent = detail.Model != ModelTypes.All.ToString();
             if (ConfigurationRecord.ShowServiceCompontent is false) ConfigurationRecord.AppName = "";
         }

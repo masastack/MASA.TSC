@@ -17,14 +17,15 @@ public partial class ProjectSelect
     [Parameter]
     public bool Readonly { get; set; }
 
-    protected List<ProjectDto> Projects { get; set; } = new();
+    protected List<string> Projects { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        var data = await ApiCaller.ProjectService.GetProjectsAsync(CurrentUserId);
+        var data = await ApiCaller.MetricService.GetValues(new RequestMetricListDto { Type = MetricValueTypes.Service });
         if (data != null)
+        {
             Projects = data;
-
+        }
         await base.OnInitializedAsync();
     }
 }

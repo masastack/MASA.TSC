@@ -169,5 +169,6 @@
   "Configure Dashboard": "配置仪表盘",
   "Configure Chart": "配置图表",
   "Loading data": "数据加载中.....",
-  "Title": "标题"
+  "Title": "标题",
+    "Total Count": "总条数"
 }

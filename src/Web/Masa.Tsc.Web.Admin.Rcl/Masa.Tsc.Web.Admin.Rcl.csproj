@@ -16,7 +16,7 @@
 		<PackageReference Include="Mapster" Version="7.3.0" />
 		<PackageReference Include="Masa.Blazor" Version="1.0.0-preview.2" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Tsc" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Stack.Components" Version="0.0.219" />
+		<PackageReference Include="Masa.Stack.Components" Version="0.0.220" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.3" />
 	</ItemGroup>
 
