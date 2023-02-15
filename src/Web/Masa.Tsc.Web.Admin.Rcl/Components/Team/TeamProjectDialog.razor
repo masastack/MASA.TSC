@@ -5,12 +5,12 @@
 {
     <SSheetDialog Value=Visible ValueChanged=VisibleChanged Title="@Team.CurrentProject.Name">
         <MCard Style="background-color:#F0F3FA;border-top-left-radius: 20px;border-top-right-radius: 20px;" Class="full-height">
-            <MRow NoGutters Class="full-height">
-                <MCol Style="background-color:white;border-top-left-radius: 20px;" Cols="2" Class="d-flex flex-column justify-space-between pa-6 pb-8">
+             <MRow NoGutters Class="full-height overflow-y">
+                <MCol Style="background-color:white;border-top-left-radius: 20px;" Cols="2" Class="d-flex flex-column justify-space-between pa-6 pb-9">
                     <ProjectDetail Value=@Team.CurrentProject></ProjectDetail>
                     <TeamDetail Value=@Team></TeamDetail>
                 </MCol>
-                <MCol Cols="10" Class="pa-12">
+                <MCol Cols="10" Class="pa-9">
                     <MRow Class="@Class">
                         <MCol Cols="6" Class="d-flex justify-start align-center">
                             <div style="width:210px;">

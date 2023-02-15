@@ -1,12 +1,12 @@
 ﻿@inherits TscComponentBase
 
-@if(Value.ListType == ListTypes.TopList)
+@if (Value.ListType == ListTypes.TopList)
 {
-    <TopList Value=Value />
+    <TopList Value=Value Class="@Class" />
 }
 else
 {
-    <Table Value="Value" IsEdit=IsEdit />
+    <Table Value="Value" IsEdit=IsEdit Class="@Class" />
 }
 @*<DynamicComponent Type="@CurrentComponentModule.ShowType" Parameters=CurrentComponentModule.Metadata />*@
 
@@ -24,50 +24,61 @@ else
     [Parameter]
     public string ServiceName { get; set; }
 
-    ListTypes? OldListType { get; set; }
+    ListTypes? LastListType { get; set; }
 
-    //Dictionary<ListTypes, DynamicComponentDescription> ComponentModuleMap { get; set; }
+    string? LastServiceName { get; set; }
 
-    //DynamicComponentDescription CurrentComponentModule => ComponentModuleMap[Value.ListType];
+    string jumpId { get; set; }
 
-    //protected override void OnInitialized()
-    //{
-    //    ComponentModuleMap = new()
-    //    {
-    //        [ListTypes.ServiceList] = new(typeof(Table), new() { ["Value"] = Value, ["IsEdit"] = IsEdit }),
-    //        [ListTypes.InstanceList] = new(typeof(Table), new() { ["Value"] = Value, ["IsEdit"] = IsEdit }),
-    //        [ListTypes.EndpointList] = new(typeof(Table), new() { ["Value"] = Value, ["IsEdit"] = IsEdit }),
-    //        [ListTypes.TopList] = new(typeof(TopList), new() { ["Value"] = Value, ["IsEdit"] = IsEdit })
-    //    };
-    //}
+    string jumpName { get; set; }
+
+    List<string> services { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (OldListType != Value.ListType && DataIsReady)
+        if (LastListType is null || LastListType != Value.ListType)
         {
-            OldListType = Value.ListType;
-            if (Value.ListType is ListTypes.TopList)
-            {
-                var jumpId = await GetJumpId();
-                Value.SetTopListOption(jumpId);
-            }
-            else
-            {
-                var serviceNamse = await GetServiceNames() ?? new();
-                var jumpId = await GetJumpId();
-                var jumpName = GetJumpName();
-                Value.SetTableOption(serviceNamse, jumpName, jumpId);
-            }
+            jumpId = await GetJumpId();
+            jumpName = GetJumpName();
         }
+
+        if ((LastListType is null || LastListType != Value.ListType) && Value.ListType is not ListTypes.TopList
+        || (string.IsNullOrEmpty(LastServiceName) || !string.Equals(LastServiceName, ServiceName)) && (Value.ListType is ListTypes.EndpointList || Value.ListType is ListTypes.InstanceList))
+            services = await GetServiceNames() ?? new();
+
+        LastServiceName = ServiceName;
+        LastListType = Value.ListType;
+
+        if (Value.ListType is ListTypes.TopList)
+            Value.SetTopListOption(jumpId);
+        else
+            Value.SetTableOption(services, jumpName, jumpId);
+
+        //if (LastListType != Value.ListType)
+        //{
+        //    LastListType = Value.ListType;
+        //    if (Value.ListType is ListTypes.TopList)
+        //    {
+        //        var jumpId = await GetJumpId();
+        //        Value.SetTopListOption(jumpId);
+        //    }
+        //    else
+        //    {
+        //        var serviceNamse = await GetServiceNames() ?? new();
+        //        var jumpId = await GetJumpId();
+        //        var jumpName = GetJumpName();
+        //        Value.SetTableOption(serviceNamse, jumpName, jumpId);
+        //    }
+        //}
     }
 
     async Task<List<string>> GetServiceNames()
     {
         return await base.ApiCaller.MetricService.GetValues(new RequestMetricListDto
-        {
-            Service = ServiceName,
-            Type = GetMetricValueType()
-        });
+            {
+                Service = ServiceName,
+                Type = GetMetricValueType()
+            });
     }
 
     async Task<string> GetJumpId()

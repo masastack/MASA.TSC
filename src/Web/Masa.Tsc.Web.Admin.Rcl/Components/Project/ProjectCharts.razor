@@ -19,10 +19,10 @@
             <ServiceResponseTimePercentile Title="@(T("Service Response Time Percentile")+"("+T("ms")+")")" @ref="_serviceResponseTimePercentile" />
         </MCol>
         <CascadingValue Value="ConfigurationRecord">
-            <MCol Cols="6" Style="@("height:calc(100vh - 532px -258px);max-height:600px;min-height:248px")">
+            <MCol Cols="6" Class="overflow-y">
                 <ChartPanel Value="_endpoint" Class="rounded-lg" />
             </MCol>
-            <MCol Cols="6" Style="@("height:calc(100vh - 532px - 258px);max-height:600px;min-height:248px")">
+            <MCol Cols="6" Class="overflow-y">
                 <ChartPanel Value="_slowEndpoint" Class="rounded-lg" />
             </MCol>
         </CascadingValue>

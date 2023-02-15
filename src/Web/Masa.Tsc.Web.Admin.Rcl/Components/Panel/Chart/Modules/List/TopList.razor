@@ -1,6 +1,6 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 
-<MCard Class="d-flex flex-column full-height">
+<MCard Class="@($"d-flex flex-column full-height {Class}")">
     <MCardTitle Class="d-flex justify-space-between">
         <MLabel Class="emphasis2--text h6">@Value.Title</MLabel>
         <MTooltip Top>
@@ -15,13 +15,13 @@
 
     @if (Value.GetTopListOption().Any() is false)
     {
-        <MCardText Class="full-height d-flex">
+        <MCardText Class="d-flex" Style="@("height:calc(100% - 62px)")">
             <div class="ma-auto">@I18n.T("No Data")</div>
         </MCardText>
     }
     else
     {
-        <MCardText Class="flex-grow-1 overflow-y" Style="@("height:calc(100vh - 62px)")">
+        <MCardText Class="flex-grow-1 overflow-y" Style="@("height:calc(100% - 62px)")">
             <MList>
                 @foreach (var item in Value.GetTopListOption())
                 {
@@ -54,6 +54,9 @@
 
     [CascadingParameter]
     public I18n I18n { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
 
     void ToDashboardConfiguration(string href)
     {
