@@ -3,7 +3,7 @@
 @inherits TscComponentBase
 
 <div class="d-flex align-center" style="overflow:auto;">
-    <div class="flex-grow-1">
+    <div class="flex-grow-1" style="min-width:220px;width:calc(100% - 750 px)">
         <MTabs Class="transparent-tab" Value="@_value.ProjectType" ValueChanged=@(async (value)=>await OnTabsChange(value.ToString()!))>
             @foreach (var item in _projectTypes)
             {

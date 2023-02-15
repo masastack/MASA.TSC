@@ -71,7 +71,7 @@ public partial class LogPanel
 
     protected async Task ResizeEChartAsync()
     {
-        if(MECharts is not null)
+        if (MECharts is not null)
             await MECharts.Resize();
     }
 
@@ -173,34 +173,24 @@ public partial class LogPanel
                     crossStyle = new { color = "#A18BFF66" }
                 }
             },
-            xAxis = new[]
+            xAxis = new
             {
-                new
+                type = "category",
+                data = xAxisData,
+                axisPointer = new
                 {
-                    type = "category",
-                    data = xAxisData,
-                    axisPointer = new
-                    {
-                        type = "shadow"
-                    }
-                },
-            },
-            yAxis = new[]
-            {
-                new
-                {
-                    type = "value",
-                    axisLabel = new
-                    {
-                        formatter = $"{{value}} {T("条")}"
-                    }
+                    type = "shadow"
                 }
+            },
+            yAxis = new
+            {
+                name = T("Total Count"),
+                type = "value"
             },
             series = new[]
             {
                 new
                 {
-                    name = "total count",
                     type = "bar",
                     yAxisIndex = 0,
                     data = (object)durations,
@@ -211,11 +201,12 @@ public partial class LogPanel
                     smooth = false
                 }
             },
-            grid=new{
-                top=10,
-                left=80,
-                right=20,
-                bottom=40
+            grid = new
+            {
+                top = 30,
+                left = 80,
+                right = 20,
+                bottom = 40
             }
         };
     }

@@ -13,6 +13,8 @@ public class ConfigurationRecord
 
     public string DashboardId { get; set; }
 
+    public string Model { get; set; }
+
     public DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow.AddMinutes(-15);
 
     public DateTimeOffset EndTime { get; set; } = DateTimeOffset.UtcNow;

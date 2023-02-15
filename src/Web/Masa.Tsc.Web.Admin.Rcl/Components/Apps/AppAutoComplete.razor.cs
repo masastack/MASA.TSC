@@ -18,6 +18,9 @@ public partial class AppAutoComplete
     public bool FillBackground { get; set; } = true;
 
     [Parameter]
+    public bool Metric { get; set; }
+
+    [Parameter]
     public List<AppDetailModel> Apps { get; set; }
 
     public AppDetailModel? CurrentApp => Apps.FirstOrDefault(app => app.Identity == Value);
@@ -26,7 +29,22 @@ public partial class AppAutoComplete
     {
         if (Apps is null)
         {
-            Apps = await PmClient.AppService.GetListAsync();
+            if (Metric)
+            {
+                var data = await ApiCaller.MetricService.GetValues(new RequestMetricListDto { Type = MetricValueTypes.Service });
+                if (data != null && data.Any())
+                {
+                    Apps = data.Select(item => new AppDetailModel
+                    {
+                        Identity = item,
+                        Name = item
+                    }).ToList();
+                }
+            }
+            else
+            {
+                Apps = await PmClient.AppService.GetListAsync();
+            }
         }
     }
 
