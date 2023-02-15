@@ -33,7 +33,7 @@ docker-dev:
   before_script:
     - docker login -u $CI_ALI_REGISTRY_USER -p $CI_ALI_REGISTRY_PASSWD $CI_ALI_REGISTRY_DOMAIN 
   only:
-    - develop  
+    - main  
   script:
     - docker build -f $TSCWebDockerFile -t $TSC_Web_Image .
     - docker push $TSC_Web_Image 
@@ -52,7 +52,7 @@ deploy-dev:
   tags:
     - ydy-runner
   only:
-    - develop  
+    - main  
   script:
     - ls
     - pwd 
@@ -73,7 +73,7 @@ deploy-staging:
   tags:
     - ydy-runner
   only:
-    - develop  
+    - main  
   script:
     - ls
     - pwd 
