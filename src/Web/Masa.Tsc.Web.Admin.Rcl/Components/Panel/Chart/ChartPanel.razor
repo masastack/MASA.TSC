@@ -9,7 +9,7 @@
 }
 @if (Value.ChartType == "table")
 {
-    <ListPanel Value="Value" IsEdit=ConfigurationRecord.IsEdit ServiceName="@ConfigurationRecord.AppName" Class="@Class" />
+    <ListPanel Value="Value" IsEdit=ConfigurationRecord.IsEdit IsChartDataReady=!IsLoading ConfigurationRecord="ConfigurationRecord" Class="@Class" />
 }
 else
 {

@@ -21,8 +21,6 @@ public interface IPanelValue
 
     public int Y { get; set; }
 
-    string? DataKey { get; set; }
-
     public List<UpsertPanelDto> ChildPanels { get; set; }
 
     public List<PanelMetricDto> Metrics { get; set; }

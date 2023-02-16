@@ -10,6 +10,17 @@ else
 }
 
 @code {
+    ListTypes? _lastListType { get; set; }
+
+    string? _lastServiceName;
+
+    string? _listKey;
+
+    string jumpId { get; set; }
+
+    string jumpName { get; set; }
+
+    List<string> services { get; set; }
 
     [Parameter]
     public ITablePanelValue Value { get; set; }
@@ -18,38 +29,29 @@ else
     public bool IsEdit { get; set; }
 
     [Parameter]
-    public string ServiceName { get; set; }
+    public ConfigurationRecord ConfigurationRecord { get; set; }
 
-    public string? LastKey { get; set; }
-
-    ListTypes? LastListType { get; set; }
-
-    string? LastServiceName { get; set; }
-
-    string jumpId { get; set; }
-
-    string jumpName { get; set; }
-
-    List<string> services { get; set; }
+    [Parameter]
+    public bool IsChartDataReady { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (LastListType != Value.ListType)
+        if (_lastListType != Value.ListType)
         {
-            LastListType = Value.ListType;
+            _lastListType = Value.ListType;
             jumpId = await GetJumpId();
             jumpName = GetJumpName();
         }
 
-        if (Value.ListType != ListTypes.TopList && LastServiceName != ServiceName)
+        if (Value.ListType != ListTypes.TopList && _lastServiceName != ConfigurationRecord.AppName)
         {
-            LastServiceName = ServiceName;
+            _lastServiceName = ConfigurationRecord.AppName;
             services = await GetServiceNames() ?? new();
         }
 
-        if (LastKey != Value.DataKey)
+        if (IsChartDataReady && _listKey!= ConfigurationRecord.Key)
         {
-            LastKey = Value.DataKey;
+            _listKey = ConfigurationRecord.Key;
             await SetOption();
         }
 
@@ -83,7 +85,7 @@ else
     {
         return await base.ApiCaller.MetricService.GetValues(new RequestMetricListDto
         {
-            Service = ServiceName,
+            Service = ConfigurationRecord.AppName!,
             Type = GetMetricValueType()
         });
     }

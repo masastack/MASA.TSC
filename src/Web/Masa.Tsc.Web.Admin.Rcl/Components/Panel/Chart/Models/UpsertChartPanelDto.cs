@@ -391,8 +391,6 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
 
     string Key { get; set; }
 
-    public string? DataKey { get; set; }
-
     string DateFormart { get; set; }
 
     string ToFormatTimeSpan(long timestamp)
@@ -410,7 +408,6 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         _chartData = chartData;
         IsLoadChartData = true;
         Key = "DataChanged" + Guid.NewGuid();
-        DataKey = Guid.NewGuid().ToString();
     }
 
     public string GetChartKey()
