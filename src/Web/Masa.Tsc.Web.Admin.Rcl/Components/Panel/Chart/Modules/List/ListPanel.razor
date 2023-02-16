@@ -1,63 +1,83 @@
 ﻿@inherits TscComponentBase
 
-@if(Value.ListType == ListTypes.TopList)
+@if (Value.ListType == ListTypes.TopList)
 {
-    <TopList Value=Value />
+    <TopList Value=Value Class="@Class" />
 }
 else
 {
-    <Table Value="Value" IsEdit=IsEdit />
+    <Table Value="Value" IsEdit=IsEdit Class="@Class" />
 }
-@*<DynamicComponent Type="@CurrentComponentModule.ShowType" Parameters=CurrentComponentModule.Metadata />*@
 
 @code {
+    ListTypes? _lastListType { get; set; }
+
+    string? _lastServiceName;
+
+    string? _listKey;
+
+    string jumpId { get; set; }
+
+    string jumpName { get; set; }
+
+    List<string> services { get; set; }
 
     [Parameter]
     public ITablePanelValue Value { get; set; }
 
     [Parameter]
-    public bool DataIsReady { get; set; }
-
-    [Parameter]
     public bool IsEdit { get; set; }
 
     [Parameter]
-    public string ServiceName { get; set; }
+    public ConfigurationRecord ConfigurationRecord { get; set; }
 
-    ListTypes? OldListType { get; set; }
-
-    //Dictionary<ListTypes, DynamicComponentDescription> ComponentModuleMap { get; set; }
-
-    //DynamicComponentDescription CurrentComponentModule => ComponentModuleMap[Value.ListType];
-
-    //protected override void OnInitialized()
-    //{
-    //    ComponentModuleMap = new()
-    //    {
-    //        [ListTypes.ServiceList] = new(typeof(Table), new() { ["Value"] = Value, ["IsEdit"] = IsEdit }),
-    //        [ListTypes.InstanceList] = new(typeof(Table), new() { ["Value"] = Value, ["IsEdit"] = IsEdit }),
-    //        [ListTypes.EndpointList] = new(typeof(Table), new() { ["Value"] = Value, ["IsEdit"] = IsEdit }),
-    //        [ListTypes.TopList] = new(typeof(TopList), new() { ["Value"] = Value, ["IsEdit"] = IsEdit })
-    //    };
-    //}
+    [Parameter]
+    public bool IsChartDataReady { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (OldListType != Value.ListType && DataIsReady)
+        if (_lastListType != Value.ListType)
         {
-            OldListType = Value.ListType;
-            if (Value.ListType is ListTypes.TopList)
-            {
-                var jumpId = await GetJumpId();
-                Value.SetTopListOption(jumpId);
-            }
-            else
-            {
-                var serviceNamse = await GetServiceNames() ?? new();
-                var jumpId = await GetJumpId();
-                var jumpName = GetJumpName();
-                Value.SetTableOption(serviceNamse, jumpName, jumpId);
-            }
+            _lastListType = Value.ListType;
+            jumpId = await GetJumpId();
+            jumpName = GetJumpName();
+        }
+
+        if (Value.ListType != ListTypes.TopList && _lastServiceName != ConfigurationRecord.AppName)
+        {
+            _lastServiceName = ConfigurationRecord.AppName;
+            services = await GetServiceNames() ?? new();
+        }
+
+        if (IsChartDataReady && _listKey!= ConfigurationRecord.Key)
+        {
+            _listKey = ConfigurationRecord.Key;
+            await SetOption();
+        }
+
+        //if ((LastListType is null || LastListType != Value.ListType) && Value.ListType is not ListTypes.TopList
+        //|| (string.IsNullOrEmpty(LastServiceName) || !string.Equals(LastServiceName, ServiceName)) && (Value.ListType is ListTypes.EndpointList || Value.ListType is ListTypes.InstanceList))
+        //    services = await GetServiceNames() ?? new();
+
+        //LastServiceName = ServiceName;
+        //LastListType = Value.ListType;
+
+        //if (Value.ListType is ListTypes.TopList)
+        //    Value.SetTopListOption(jumpId);
+        //else
+        //    Value.SetTableOption(services, jumpName, jumpId);
+    }
+
+    async Task SetOption()
+    {
+        if (Value.ListType is ListTypes.TopList)
+        {
+            Value.SetTopListOption(jumpId);
+        }
+        else
+        {
+            services = await GetServiceNames() ?? new();
+            Value.SetTableOption(services, jumpName, jumpId);
         }
     }
 
@@ -65,7 +85,7 @@ else
     {
         return await base.ApiCaller.MetricService.GetValues(new RequestMetricListDto
         {
-            Service = ServiceName,
+            Service = ConfigurationRecord.AppName!,
             Type = GetMetricValueType()
         });
     }

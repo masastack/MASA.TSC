@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using System;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Models;
 
 public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPanelValue
@@ -415,11 +413,6 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
     public string GetChartKey()
     {
         return Key;
-    }
-
-    public void SetChartKey(string key)
-    {
-        Key = key + Guid.NewGuid();
     }
 
     public object? GetChartOption()

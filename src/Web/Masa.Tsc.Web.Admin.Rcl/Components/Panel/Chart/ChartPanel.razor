@@ -3,13 +3,13 @@
 
 @if (IsLoading)
 {
-    <div class="d-flex full-height full-width white" style="border-radius: 8px;">
+    <div class="d-flex full-height full-width white @(Class)" style="border-radius: 8px;">
         <div class="ma-auto">@T("Loading data")</div>
     </div>
 }
 @if (Value.ChartType == "table")
 {
-    <ListPanel DataIsReady=!IsLoading Value="Value" IsEdit=ConfigurationRecord.IsEdit ServiceName="@ConfigurationRecord.AppName" />
+    <ListPanel Value="Value" IsEdit=ConfigurationRecord.IsEdit IsChartDataReady=!IsLoading ConfigurationRecord="ConfigurationRecord" Class="@Class" />
 }
 else
 {
