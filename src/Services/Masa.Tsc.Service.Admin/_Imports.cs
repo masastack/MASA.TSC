@@ -56,7 +56,6 @@ global using Masa.Tsc.Service.Admin.Infrastructure.Caching;
 global using Masa.Tsc.Service.Admin.Infrastructure.Const;
 global using Masa.Tsc.Service.Admin.Infrastructure.Repositories.Topologies;
 global using Masa.Tsc.Service.Infrastructure;
-global using Masa.Tsc.Service.Infrastructure.Middleware;
 global using Masa.Utils.Data.Elasticsearch;
 global using Masa.Utils.Data.Prometheus;
 global using Masa.Utils.Data.Prometheus.Enums;

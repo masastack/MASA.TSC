@@ -5,7 +5,7 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class MetricService : BaseService
 {
-    public MetricService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/metric", tokenProvider) { }
+    public MetricService(ICaller caller) : base(caller, "/api/metric") { }
 
     public async Task<List<string>> GetNamesAsync()
     {

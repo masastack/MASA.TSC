@@ -5,7 +5,7 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class InstrumentService : BaseService
 {
-    public InstrumentService(ICaller caller, TokenProvider tokenProvider) : base(caller, "/api/Instrument", tokenProvider) { }
+    public InstrumentService(ICaller caller) : base(caller, "/api/Instrument") { }
 
     public async Task AddAsync(AddDashboardDto param) => await Caller.PostAsync($"{RootPath}", param);
 

@@ -50,8 +50,7 @@ builder.Services.AddMasaIdentity(options =>
     options.Mapping(nameof(MasaUser.CurrentTeamId), IdentityClaimConsts.CURRENT_TEAM);
     options.Mapping(nameof(MasaUser.StaffId), IdentityClaimConsts.STAFF);
     options.Mapping(nameof(MasaUser.Account), IdentityClaimConsts.ACCOUNT);
-})
-    .AddScoped(service =>
+}).AddScoped(service =>
     {
         var content = service.GetRequiredService<IHttpContextAccessor>();
         if (content.HttpContext != null && AuthenticationHeaderValue.TryParse(content.HttpContext.Request.Headers.Authorization.ToString(), out var auth) && auth != null)
@@ -96,8 +95,7 @@ var app = builder.Services
                 Array.Empty<string>()
             }
         });
-    })
-    .AddTransient(typeof(IMiddleware<>), typeof(LogMiddleware<>))
+    })   
     .AddDomainEventBus(dispatcherOptions =>
         {
             dispatcherOptions

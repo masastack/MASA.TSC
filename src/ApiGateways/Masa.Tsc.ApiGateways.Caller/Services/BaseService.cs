@@ -9,21 +9,11 @@ public class BaseService
 
     internal string RootPath { get; private set; }
 
-    internal TokenProvider TokenProvider { get; private set; }
-
-    public BaseService(ICaller caller, string rootPath, TokenProvider tokenProvider)
+    public BaseService(ICaller caller, string rootPath)
     {
         ArgumentNullException.ThrowIfNull(caller);
         Caller = caller;
-        TokenProvider = tokenProvider;
         if (!string.IsNullOrEmpty(rootPath))
             RootPath = rootPath;
-        Caller.ConfigRequestMessage(async message =>
-        {
-            if (TokenProvider != null && !string.IsNullOrEmpty(TokenProvider.AccessToken))
-                message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", TokenProvider.AccessToken);
-
-            await Task.CompletedTask;
-        });
     }
 }

@@ -17,18 +17,26 @@ public static class ServiceExtensions
         }
         catch
         {
-            services.AddCaller(builder =>
+            IServiceProvider serviceProviderCopy = services.BuildServiceProvider();
+            services.AddCaller(DEFAULT_CLIENT_NAME, builder =>
             {
-                builder.UseHttpClient(DEFAULT_CLIENT_NAME, options =>
+                builder.UseHttpClient(options =>
                  {
                      options.BaseAddress = tscApiUrl;
-                 });
+                     options.Configure = (http) =>
+                     {
+                         var token = serviceProviderCopy.GetRequiredService<TokenProvider>();
+                         if (token != null && !string.IsNullOrEmpty(token.AccessToken))
+                             http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+                     };
+                 }).UseAuthentication();
             });
 
             services.AddScoped(serviceProvider =>
             {
+                serviceProviderCopy = serviceProvider;
                 var caller = serviceProvider.GetRequiredService<ICallerFactory>().Create(DEFAULT_CLIENT_NAME);
-                var client = new TscCaller(serviceProvider, caller, serviceProvider.GetRequiredService<TokenProvider>());
+                var client = new TscCaller(serviceProvider, caller);
                 return client;
             });
         }

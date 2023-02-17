@@ -15,6 +15,7 @@ global using Masa.Tsc.Contracts.Admin.Converters;
 global using Masa.Tsc.Contracts.Admin.Dashboards;
 global using Masa.Tsc.Contracts.Admin.Enums;
 global using Masa.Tsc.Contracts.Admin.Instruments;
+global using Masa.Tsc.Contracts.Admin.Logs;
 global using Masa.Tsc.Contracts.Admin.Metrics;
 global using Masa.Tsc.Contracts.Admin.Topologies;
 global using Masa.Utils.Data.Prometheus.Model;
