@@ -7,7 +7,7 @@ public class ProjectService : BaseService
 {
     private readonly IDccClient _dccClient;
 
-    public ProjectService(ICaller caller, TokenProvider tokenProvider, IDccClient dccClient) : base(caller, "/api/project", tokenProvider)
+    public ProjectService(ICaller caller, IDccClient dccClient) : base(caller, "/api/project")
     {
         _dccClient = dccClient;
     }

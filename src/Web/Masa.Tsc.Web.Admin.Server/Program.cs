@@ -44,10 +44,8 @@ string authUrl = config.GetValue<string>("$public.AppSettings:AuthClient:Url");
 string mcUrl = config.GetValue<string>("$public.AppSettings:McClient:Url");
 string pmUrl = config.GetValue<string>("$public.AppSettings:PmClient:Url");
 builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl, pmUrl);
-builder.Services.AddMasaOpenIdConnect(oidc);
-
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddTscApiCaller(tscUrl);
+builder.Services.AddMasaOpenIdConnect(oidc)
+                          .AddTscApiCaller(tscUrl);
 
 builder.Services.AddRcl();
 

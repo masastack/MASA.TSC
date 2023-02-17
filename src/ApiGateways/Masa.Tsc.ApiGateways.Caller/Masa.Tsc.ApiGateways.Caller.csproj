@@ -6,8 +6,7 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Masa.Contrib.Service.Caller" Version="$(MasaFrameworkPackageVersion)" />
+	<ItemGroup>		
 		<PackageReference Include="Masa.Contrib.Service.Caller.HttpClient" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.BuildingBlocks.Data.Contracts" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaFrameworkPackageVersion)" />
