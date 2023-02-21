@@ -10,19 +10,23 @@ public static class DateTimeExtensions
         return new DateTimeOffset(time).ToUnixTimeSeconds();
     }
 
-    public static DateTime ToDateTime(this long timestamp)
+    public static DateTime ToDateTime(this long timestamp, TimeZoneInfo? timeZone = default)
     {
         DateTimeOffset offset;
         if (timestamp - 0x7ffffffff > 0)
             offset = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
         else
             offset = DateTimeOffset.FromUnixTimeSeconds(timestamp);
-        return offset.DateTime;
+        if (timeZone != null && timeZone.BaseUtcOffset.TotalSeconds > 0)
+        {
+            return new DateTimeOffset(offset: timeZone.BaseUtcOffset, ticks: offset.Ticks+ timeZone.BaseUtcOffset.Ticks).LocalDateTime;
+        }
+        return offset.LocalDateTime;
     }
 
     public static string Format(this DateTime time, TimeZoneInfo timeZone, string fmt = "yyyy-MM-dd HH:mm:ss")
     {
-        //time = TimeZoneInfo.ConvertTime(time, timeZone);
+        time = TimeZoneInfo.ConvertTime(time, timeZone);
         if (time == DateTime.MinValue || time == DateTime.MaxValue)
             return "";
         return time.ToString(fmt);

@@ -2,6 +2,8 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 using Masa.Stack.Components.Extensions.OpenIdConnect;
+using Masa.Tsc.Web.Admin.Rcl.Components;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddObservable(builder.Logging, builder.Configuration, true);
@@ -46,7 +48,6 @@ string pmUrl = config.GetValue<string>("$public.AppSettings:PmClient:Url");
 builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl, pmUrl);
 builder.Services.AddMasaOpenIdConnect(oidc)
                           .AddTscApiCaller(tscUrl);
-
 builder.Services.AddRcl();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);

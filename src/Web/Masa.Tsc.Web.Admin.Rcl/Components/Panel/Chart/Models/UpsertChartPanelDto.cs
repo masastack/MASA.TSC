@@ -395,7 +395,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
 
     string ToFormatTimeSpan(long timestamp)
     {
-        return DateTimeOffset.FromUnixTimeSeconds(timestamp).DateTime.Format(default!, DateFormart);
+        return DateTimeOffset.FromUnixTimeSeconds(timestamp).DateTime.Format(TimeZoneInfo.Utc, DateFormart);
     }
 
     List<QueryResultDataResponse> _chartData = new();

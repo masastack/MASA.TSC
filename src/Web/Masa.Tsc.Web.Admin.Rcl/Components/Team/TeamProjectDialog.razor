@@ -3,7 +3,7 @@
 
 @if (Team != null)
 {
-    <SSheetDialog Value=Visible ValueChanged=VisibleChanged Title="@Team.CurrentProject.Name">
+    <SSheetDialog @bind-Value=Visible Title="@Team.CurrentProject.Name" EnableDomReload>
         <MCard Style="background-color:#F0F3FA;border-top-left-radius: 20px;border-top-right-radius: 20px;" Class="full-height">
              <MRow NoGutters Class="full-height">
                 <MCol Style="background-color:white;border-top-left-radius: 20px;" Cols="2" Class="d-flex flex-column justify-space-between pa-6 pb-9">

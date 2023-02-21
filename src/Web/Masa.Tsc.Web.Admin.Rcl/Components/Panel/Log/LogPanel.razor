@@ -2,20 +2,17 @@
 
 <AutoHeight AutoClass="full-height">
     <HeaderContent>
-        @if (_option is not null)
-        {
-            <MCard Rounded=true Style="border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important;">
-                <MCardTitle>
-                    <span>Log</span>
-                </MCardTitle>
-                <MCardText Class="pa-0">
-                    <MDivider Class="mb-6" />
-                    <AutoResize OnResize="ResizeEChartAsync" Delay="10">
-                        <MECharts @ref=MECharts Option="_option" Width="@("100%")" Height="280" />
-                    </AutoResize>
-                </MCardText>
-            </MCard>
-        }
+        <MCard Rounded=true Style="border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important;">
+            <MCardTitle>
+                <span>Log</span>
+            </MCardTitle>
+            <MCardText Class="pa-0">
+                <MDivider Class="mb-6" />
+                <AutoResize OnResize="ResizeEChartAsync" Delay="10">
+                    <MECharts @ref=MECharts Option="FormatChartData()" Width="@("100%")" Height="280" />
+                </AutoResize>
+            </MCardText>
+        </MCard>
     </HeaderContent>
     <AutoHeightContent>
         <div class="d-flex px-6 py-2 my-1" style="background: #FFFFFF;">
@@ -23,7 +20,7 @@
             @if (PageMode)
             {
                 <DateTimeRangeToolbar Class="mr-6 my-auto" OnUpdate="OnUpdate" OnAutoUpdate="OnAutoUpdate" StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
-                                  EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start" />
+                                  EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start" OnTimeZoneUpdate="OnTimeZoneUpdate" />
             }
         </div>
         <MCard Class="overflow-hidden" Style="@("border-radius:0 !important;"+ (PageMode ? "height: calc(100vh - 612px)" : "height: calc(100% - 120px)"))">
@@ -31,7 +28,7 @@
                 <ItemContent>
                     <div class="d-flex">
                         <div style="min-width:234px;">
-                            <div class="h5 regular--text">@context.Timestamp.ToString("MM-dd HH:mm:ss")</div>
+                            <div class="h5 regular--text">@context.Timestamp.Format( CurrentTimeZone,"MM-dd HH:mm:ss")</div>
                             <div class="mt-2 body regular3--text">@context.Timestamp.ToString("yyyy")</div>
                         </div>
                         <div class="full-widthh">

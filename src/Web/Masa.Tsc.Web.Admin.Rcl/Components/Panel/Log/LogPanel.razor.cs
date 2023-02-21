@@ -10,11 +10,10 @@ public partial class LogPanel
     string? _search;
     int _page = 1;
     int _pageSize = 10;
-    object _option = new object();
 
     string Search
     {
-        get => _search;
+        get => _search!;
         set
         {
             _search = value;
@@ -62,6 +61,8 @@ public partial class LogPanel
 
     List<LogModel> Logs { get; set; } = new();
 
+    List<KeyValuePair<long, long>> ChartData { get; set; }
+
     MECharts? MECharts { get; set; }
 
     protected override async Task OnParametersSetAsync()
@@ -77,8 +78,8 @@ public partial class LogPanel
 
     async Task OnUpdate((DateTimeOffset start, DateTimeOffset end) times)
     {
-        StartTime = times.start.ToUniversalTime().UtcDateTime;
-        EndTime = times.end.ToUniversalTime().UtcDateTime;
+        StartTime = times.start.UtcDateTime;
+        EndTime = times.end.UtcDateTime;
         await GetPageLogsAsync();
     }
 
@@ -118,21 +119,28 @@ public partial class LogPanel
             End = end,
             Page = Page,
             TaskId = TaskId,
-            Query = _search!,
+            Query = _search!
         };
         var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
         Logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
         Total = response.Total;
-        await GenOption();
+        await GetChartData();
         Loading = false;
+    }
+
+    private async Task OnTimeZoneUpdate(TimeZoneInfo timeZoneInfo)
+    {
+        CurrentTimeZone = timeZoneInfo;
+        StateHasChanged();
     }
 
     protected string ToDateTimeStr(long value, string format)
     {
-        return value.ToDateTime().Format(CurrentTimeZone, format);
+        var utcTime = value.ToDateTime(CurrentTimeZone);
+        return utcTime.Format(CurrentTimeZone, format);
     }
 
-    async Task GenOption()
+    async Task GetChartData()
     {
         DateTime end = EndTime ?? default, start = StartTime ?? default;
         var conditions = new List<FieldConditionDto>();
@@ -157,12 +165,18 @@ public partial class LogPanel
             Keyword = _search!,
             Conditions = conditions
         });
+        ChartData = result ?? new();
+        
+    }
 
+    private object FormatChartData()
+    {
+        DateTime end = EndTime ?? default, start = StartTime ?? default;
         var format = start.Format(end);
-        string[] xAxisData = result?.Select(item => ToDateTimeStr(item.Key, format))?.ToArray() ?? Array.Empty<string>();
-        long[] durations = result?.Select(item => item.Value)?.ToArray() ?? Array.Empty<long>();
+        string[] xAxisData = ChartData?.Select(item => ToDateTimeStr(item.Key, format))?.ToArray() ?? Array.Empty<string>();
+        long[] durations = ChartData?.Select(item => item.Value)?.ToArray() ?? Array.Empty<long>();
 
-        _option = new
+       return new
         {
             tooltip = new
             {
@@ -209,5 +223,5 @@ public partial class LogPanel
                 bottom = 40
             }
         };
-    }
+    }   
 }

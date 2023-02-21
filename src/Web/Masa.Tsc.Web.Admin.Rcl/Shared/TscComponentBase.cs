@@ -15,6 +15,9 @@ public partial class TscComponentBase : BDomComponentBase
     public ILogger<TscComponentBase> Logger { get; set; }
 
     [Inject]
+    public JsInitVariables JsInitVariables { get; set; }
+
+    [Inject]
     public IPopupService PopupService { get; set; }
 
     [Inject]
@@ -26,8 +29,8 @@ public partial class TscComponentBase : BDomComponentBase
     public string T(string key)
     {
         if (string.IsNullOrEmpty(key)) return key;
-        if (PageName is not null) return I18n.T(PageName, key, false) ?? I18n.T(key, false);
-        else return I18n.T(key, true);
+        if (PageName is not null) return (I18n.T(PageName, key, false) ?? I18n.T(key, false))!;
+        else return I18n.T(key, true)!;
     }
 
     public string T(string formatkey, params string[] args)
@@ -39,7 +42,7 @@ public partial class TscComponentBase : BDomComponentBase
 
     public Guid CurrentUserId { get; private set; }
 
-    public TimeZoneInfo CurrentTimeZone { get; set; } = TimeZoneInfo.Utc;
+    public TimeZoneInfo CurrentTimeZone { get; set; }
 
     protected virtual bool Loading { get; set; }
 
@@ -50,6 +53,18 @@ public partial class TscComponentBase : BDomComponentBase
             CurrentUserId = Guid.Parse(UserContext.UserId);
         Loading = false;
         await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await JsInitVariables.SetTimezoneOffset();
+            TimeSpan timeSpan = JsInitVariables.TimezoneOffset;
+            CurrentTimeZone = TimeZoneInfo.CreateCustomTimeZone("user custom timezone", timeSpan, default, default);
+            StateHasChanged();
+        }
     }
 
     public async Task<bool> OpenConfirmDialog(string content)
@@ -81,36 +96,4 @@ public partial class TscComponentBase : BDomComponentBase
     {
         PopupService.AlertAsync(message, AlertTypes.Error);
     }
-
-    //public static object GetDictionaryValue(object obj, string path)
-    //{
-    //    if (obj == null || string.IsNullOrEmpty(path))
-    //        return default!;
-
-    //    var keys = path.Split('.');
-    //    foreach (var key in keys)
-    //    {
-    //        if (string.IsNullOrEmpty(key))
-    //            continue;
-    //        if (obj == null || obj is not Dictionary<string, object> dic)
-    //        {
-    //            return default!;
-    //        }
-    //        if (dic.ContainsKey(key))
-    //        {
-    //            obj = dic[key];
-    //            continue;
-    //        }
-
-    //        var findKey = dic.Keys.FirstOrDefault(k => string.Equals(k, key, StringComparison.OrdinalIgnoreCase));
-    //        if (findKey != null)
-    //        {
-    //            obj = dic[findKey];
-    //            continue;
-    //        }
-    //        return default!;
-    //    }
-
-    //    return obj;
-    //}       
 }
