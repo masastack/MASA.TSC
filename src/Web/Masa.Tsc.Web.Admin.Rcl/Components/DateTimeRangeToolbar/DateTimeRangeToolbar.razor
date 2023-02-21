@@ -1,5 +1,6 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @using System.Timers;
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 @implements IDisposable
 @inject I18n I18n
 
@@ -9,7 +10,7 @@
                          StartTimeLimit="StartTimeLimit"
                          EndTimeLimit="EndTimeLimit"
                          @bind-EndDateTime="_endDateTime"
-                         OnConfirm="OnAbsoluteDateTimeUpdated" />
+                         OnConfirm="OnAbsoluteDateTimeUpdated" OnTimeZoneInfoChange="OnTimeZoneInfoChange" />
 
     <MDivider Vertical Class="mx-2"></MDivider>
 
@@ -73,6 +74,9 @@
     public EventCallback<(DateTimeOffset, DateTimeOffset)> OnAutoUpdate { get; set; }
 
     [Parameter]
+    public EventCallback<TimeZoneInfo> OnTimeZoneUpdate { get; set; }
+
+    [Parameter]
     public Func<DateOnly, DateOnly, bool> StartTimeLimit { get; set; }
 
     [Parameter]
@@ -94,6 +98,15 @@
         get => _endDateTime;
         set => _endDateTime = value;
     }
+
+    [Inject]
+    public ProtectedLocalStorage LocalStrorage { get; set; }
+
+    [Inject]
+    public IUserContext UserContext { get; set; }
+
+    [Inject]
+    public JsInitVariables JsInitVariables { get; set; }
 
     private static readonly QuickRange s_internalDefaultQuickRange = new(QuickRangeKey.Last12Hours, TimeSpan.FromHours(-12));
 
@@ -151,10 +164,54 @@
         new IntervalItem("1d", TimeSpan.FromDays(1)),
     };
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            await GetOffset();
+            if (DefaultQuickRange is not null)
+            {
+                _quickRange = _quickRangeItems.FirstOrDefault(item => item.Key == DefaultQuickRange) ?? s_internalDefaultQuickRange;
+            }
+
+            _selectedQuickRangeKey = _quickRange.Key;
+
+            if (_quickRange.TryGetRange(Offset, out var value))
+            {
+                _startDateTime = value.start;
+                _endDateTime = value.end;
+            }
+            await UpdateRangeDateTimeToLatest();
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnTimeZoneInfoChange(TimeZoneInfo timeZoneInfo)
+    {
+        JsInitVariables.TimezoneOffset = timeZoneInfo.BaseUtcOffset;       
+        Offset = JsInitVariables.TimezoneOffset;
+        if (DefaultQuickRange is not null)
+        {
+            _quickRange = _quickRangeItems.FirstOrDefault(item => item.Key == DefaultQuickRange) ?? s_internalDefaultQuickRange;
+        }
+
+        _selectedQuickRangeKey = _quickRange.Key;
+
+        if (_quickRange.TryGetRange(Offset, out var value))
+        {
+            _startDateTime = value.start;
+            _endDateTime = value.end;
+        }
+       
+        if (OnTimeZoneUpdate.HasDelegate)
+            await OnTimeZoneUpdate.InvokeAsync(timeZoneInfo);
+        StateHasChanged();
+    }
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
-
         if (DefaultQuickRange is not null)
         {
             _quickRange = _quickRangeItems.FirstOrDefault(item => item.Key == DefaultQuickRange) ?? s_internalDefaultQuickRange;
@@ -169,13 +226,9 @@
         }
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async Task GetOffset()
     {
-        if (firstRender)
-        {
-            await UpdateRangeDateTimeToLatest();
-            StateHasChanged();
-        }
+        Offset = JsInitVariables.TimezoneOffset;
     }
 
     private async Task UpdateRangeDateTimeToLatest(bool autoUpdate = false)
@@ -256,7 +309,5 @@
     }
 
     private record IntervalItem(string Text, TimeSpan TimeSpan);
-
-
 
 }

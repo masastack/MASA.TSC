@@ -12,7 +12,6 @@ public partial class Team
     private bool _isLoad = true;
     private StringNumber _projectStatus = "";
 
-
     private bool _visible;
     private string _selectedProjectId;
     private Guid _selectedTeamId;

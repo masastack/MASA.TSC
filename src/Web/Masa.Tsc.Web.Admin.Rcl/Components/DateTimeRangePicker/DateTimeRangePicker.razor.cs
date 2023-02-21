@@ -1,6 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using System;
 using System.Globalization;
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
@@ -21,9 +22,6 @@ public partial class DateTimeRangePicker
 
     [Parameter]
     public EventCallback OnConfirm { get; set; }
-
-    [Parameter]
-    public TimeZoneInfo TimeZoneInfo { get; set; }
 
     [Parameter]
     public EventCallback<TimeZoneInfo> OnTimeZoneInfoChange { get; set; }
@@ -52,10 +50,13 @@ public partial class DateTimeRangePicker
 
     private bool _disableEnsureValidDateTimes;
 
+    private TimeZoneInfo _timeZone;
+    private DateTimeOffset? _lastStartDateTime;
+    private DateTimeOffset? _lastEndDateTime;
+
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         await base.SetParametersAsync(parameters);
-
         EnsureValidDateTimes();
     }
 
@@ -90,22 +91,25 @@ public partial class DateTimeRangePicker
         }
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        base.OnInitialized();
-
-        if (StartDateTime != default)
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
         {
-            UpdateInternalStartDateTime(StartDateTime);
-        }
+            if (StartDateTime != default)
+            {
+                UpdateInternalStartDateTime(StartDateTime);
+            }
 
-        if (EndDateTime != default)
-        {
-            UpdateInternalEndDateTime(EndDateTime);
+            if (EndDateTime != default)
+            {
+                UpdateInternalEndDateTime(EndDateTime);
+            }
+            _offset = StartDateTime.Offset;
+            _internalOffset = _offset;
+            _timeZone = GetSelectTimeZone();
+            StateHasChanged();
         }
-
-        _offset = StartDateTime.Offset;
-        _internalOffset = _offset;
     }
 
     private void MenuValueChanged(bool val)
@@ -117,6 +121,12 @@ public partial class DateTimeRangePicker
         UpdateInternalStartDateTime(StartDateTime);
         UpdateInternalEndDateTime(EndDateTime);
         _internalOffset = _offset;
+    }
+
+    private void UpdateTimeZone(TimeZoneInfo timeZoneInfo)
+    {
+        _internalEndDateTime = new DateTimeOffset(ticks: _internalEndDateTime.Ticks, offset: timeZoneInfo.BaseUtcOffset);
+        _internalStartDateTime = new DateTimeOffset(ticks: _internalStartDateTime.Ticks, offset: timeZoneInfo.BaseUtcOffset);
     }
 
     private void UpdateInternalStartDateTime(DateTimeOffset val)
@@ -135,6 +145,7 @@ public partial class DateTimeRangePicker
 
     private void InternalStartDateChanged(DateOnly val)
     {
+        _lastStartDateTime = _internalStartDateTime;
         _internalStartDate = val;
         _internalStartDateTime = new DateTimeOffset(val.Year, val.Month, val.Day, _internalStartTime.Hour, _internalStartTime.Minute,
             _internalStartTime.Second, _internalOffset);
@@ -142,6 +153,7 @@ public partial class DateTimeRangePicker
 
     private void InternalEndDateChanged(DateOnly val)
     {
+        _lastEndDateTime = _internalEndDateTime;
         _internalEndDate = val;
         _internalEndDateTime = new DateTimeOffset(val.Year, val.Month, val.Day, _internalEndTime.Hour, _internalEndTime.Minute,
             _internalEndTime.Second,
@@ -150,6 +162,7 @@ public partial class DateTimeRangePicker
 
     private void InternalStartTimeChanged(TimeOnly val)
     {
+        _lastStartDateTime = _internalStartDateTime;
         _internalStartTime = val;
         _internalStartDateTime = new DateTimeOffset(
             _internalStartDateTime.Date.Year,
@@ -164,6 +177,7 @@ public partial class DateTimeRangePicker
 
     private void InternalEndTimeChanged(TimeOnly val)
     {
+        _lastEndDateTime = _internalEndDateTime;
         _internalEndTime = val;
         _internalEndDateTime = new DateTimeOffset(
             _internalEndDateTime.Date.Year,
@@ -198,12 +212,20 @@ public partial class DateTimeRangePicker
             EndDateTime = _internalEndDateTime;
         }
 
+        if (OnTimeZoneInfoChange.HasDelegate && _timeZone != GetSelectTimeZone())
+        {
+            _timeZone = GetSelectTimeZone();
+            await OnTimeZoneInfoChange.InvokeAsync(_timeZone);
+        }
+
         _disableEnsureValidDateTimes = false;
 
         _menuValue = false;
         _offset = _internalOffset;
 
-        if (OnConfirm.HasDelegate)
+        if ((_lastStartDateTime != null && _lastStartDateTime.Value.UtcDateTime != _internalStartDateTime.UtcDateTime
+            || _lastEndDateTime != null && _lastEndDateTime.Value.UtcDateTime != _internalEndDateTime.UtcDateTime
+            ) && OnConfirm.HasDelegate)
         {
             _ = OnConfirm.InvokeAsync();
         }
@@ -211,18 +233,39 @@ public partial class DateTimeRangePicker
 
     private void OnInternalOffsetUpdated(TimeZoneInfo timeZoneInfo)
     {
-        TimeZoneInfo = timeZoneInfo;
-        base.CurrentTimeZone = TimeZoneInfo;
-        if (OnTimeZoneInfoChange.HasDelegate)
-            _ = OnTimeZoneInfoChange.InvokeAsync(timeZoneInfo);
-        UpdateInternalStartDateTime(_internalStartDateTime.ToOffset(timeZoneInfo.BaseUtcOffset));
-        UpdateInternalEndDateTime(_internalEndDateTime.ToOffset(timeZoneInfo.BaseUtcOffset));
+        if (GetSelectTimeZone() != timeZoneInfo)
+        {
+            timeZoneInfo = GetSelectTimeZone();
+            if (OnTimeZoneInfoChange.HasDelegate)
+                _ = OnTimeZoneInfoChange.InvokeAsync(timeZoneInfo);
+            UpdateInternalStartDateTime(_internalStartDateTime.ToOffset(timeZoneInfo.BaseUtcOffset));
+            UpdateInternalEndDateTime(_internalEndDateTime.ToOffset(timeZoneInfo.BaseUtcOffset));
+            UpdateTimeZone(timeZoneInfo);
+        }
     }
 
-    private string FormatDateTime(DateTimeOffset dateTime)
+    private void CancelClick()
+    {
+        if (GetSelectTimeZone() != _timeZone)
+        {
+            if (OnTimeZoneInfoChange.HasDelegate)
+                _ = OnTimeZoneInfoChange.InvokeAsync(_timeZone);
+            UpdateInternalStartDateTime(_internalStartDateTime.ToOffset(_timeZone.BaseUtcOffset));
+            UpdateInternalEndDateTime(_internalEndDateTime.ToOffset(_timeZone.BaseUtcOffset));
+            UpdateTimeZone(_timeZone);
+        }
+        _menuValue = false;
+    }
+
+    private static string FormatDateTime(DateTimeOffset dateTime)
     {
         var str = dateTime.ToString(CultureInfo.CurrentUICulture);
         var lastIndex = str.LastIndexOf(" ", StringComparison.Ordinal);
-        return str.Substring(0, lastIndex);
+        return str[..lastIndex];
+    }
+
+    private TimeZoneInfo GetSelectTimeZone()
+    {
+        return _systemTimeZones.FirstOrDefault(timeZone => timeZone.BaseUtcOffset == _internalOffset)!;
     }
 }

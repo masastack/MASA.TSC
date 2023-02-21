@@ -11,7 +11,7 @@ public class LogPageQueryDto : Pagination<LogPageQueryDto>
 
     public DateTime End { get; set; }
 
-    public bool IsAsc { get; set; }
+    public bool IsDesc { get; set; } = true;
 
     public string Duration { get; set; }
 

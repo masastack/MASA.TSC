@@ -78,22 +78,22 @@ public static class JsonElementExtensions
         return list;
     }
 
-    public static DateTime GetTimestamp(this JsonElement value, string timeSpanKey = "@timestamp")
-    {
-        if (value.ValueKind == JsonValueKind.Object)
-        {
-            var tmp = value.EnumerateObject();
-            var find = tmp.FirstOrDefault(m => string.Equals(m.Name, timeSpanKey, StringComparison.OrdinalIgnoreCase));
-            if (!string.IsNullOrEmpty(find.Name))
-            {
-                if (find.Value.ValueKind == JsonValueKind.Number)
-                    return find.Value.GetInt64().ToDateTime();
-                else if (find.Value.ValueKind == JsonValueKind.String)
-                    if (DateTime.TryParse(find.Value.GetString(), out DateTime time))
-                        return time;
-            }
-        }
+    //public static DateTime GetTimestamp(this JsonElement value, string timeSpanKey = "@timestamp")
+    //{
+    //    if (value.ValueKind == JsonValueKind.Object)
+    //    {
+    //        var tmp = value.EnumerateObject();
+    //        var find = tmp.FirstOrDefault(m => string.Equals(m.Name, timeSpanKey, StringComparison.OrdinalIgnoreCase));
+    //        if (!string.IsNullOrEmpty(find.Name))
+    //        {
+    //            if (find.Value.ValueKind == JsonValueKind.Number)
+    //                return find.Value.GetInt64().ToDateTime();
+    //            else if (find.Value.ValueKind == JsonValueKind.String)
+    //                if (DateTime.TryParse(find.Value.GetString(), out DateTime time))
+    //                    return time;
+    //        }
+    //    }
 
-        return DateTime.MinValue;
-    }
+    //    return DateTime.MinValue;
+    //}
 }

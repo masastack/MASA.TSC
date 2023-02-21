@@ -6,16 +6,12 @@ var builder = WebApplication.CreateBuilder(args);
 var elasearchUrls = builder.Configuration.GetSection("Masa:Elastic:nodes").Get<string[]>();
 builder.Services.AddElasticClientLogAndTrace(elasearchUrls, builder.Configuration.GetSection("Masa:Elastic:logIndex").Get<string>(), builder.Configuration.GetSection("Masa:Elastic:traceIndex").Get<string>())
     .AddObservable(builder.Logging, builder.Configuration, false)
-    .AddPrometheusClient(builder.Configuration.GetSection("Masa:Prometheus").Value,10)
+    .AddPrometheusClient(builder.Configuration.GetSection("Masa:Prometheus").Value, 10)
     .AddTopology(elasearchUrls);
 builder.Services.AddDaprClient();
 var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
 
-RedisConfigurationOptions redis;
-if (builder.Environment.IsDevelopment())
-    redis = builder.Configuration.GetSection("redis:RedisOptions").Get<RedisConfigurationOptions>();
-else
-    redis = dccConfig.RedisOptions;
+RedisConfigurationOptions redis = dccConfig.RedisOptions;
 
 builder.Services.AddHttpContextAccessor()
     .AddMasaConfiguration(configurationBuilder => configurationBuilder.UseDcc(dccConfig, default, default));
@@ -95,7 +91,7 @@ var app = builder.Services
                 Array.Empty<string>()
             }
         });
-    })   
+    })
     .AddDomainEventBus(dispatcherOptions =>
         {
             dispatcherOptions

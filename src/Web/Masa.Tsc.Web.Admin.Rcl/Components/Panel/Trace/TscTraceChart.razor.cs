@@ -9,7 +9,7 @@ public partial class TscTraceChart
     public EventCallback<(DateTime, DateTime)> OnDateTimeRangeUpdate { get; set; }
 
     [Parameter]
-    public ValueTuple<string, string, string>[] Data { get; set; } = Array.Empty<(string, string, string)>();
+    public ValueTuple<long, string, string>[] Data { get; set; } = Array.Empty<(long, string, string)>();
 
     [Parameter]
     public bool PageMode { get; set; }
@@ -19,6 +19,9 @@ public partial class TscTraceChart
 
     [Parameter]
     public double Width { get; set; }
+
+    [Parameter]
+    public string Format { get; set; }
 
     private static readonly QuickRangeKey s_defaultQuickRange = QuickRangeKey.Last1Hour;
 
@@ -67,7 +70,7 @@ public partial class TscTraceChart
                 new
                 {
                     type = "category",
-                    data = Data.Select(item=>item.Item1),
+                    data = Data.Select(item=>item.Item1.ToDateTime(CurrentTimeZone).Format(CurrentTimeZone,Format)),
                     axisPointer = new
                     {
                         type = "shadow"
@@ -136,16 +139,16 @@ public partial class TscTraceChart
 
     private async Task OnDateTimeUpdate((DateTimeOffset start, DateTimeOffset end) range)
     {
-        var localStart = new DateTime(range.start.UtcTicks + range.start.Offset.Ticks, DateTimeKind.Local);
-        var localEnd = new DateTime(range.end.UtcTicks + range.end.Offset.Ticks, DateTimeKind.Local);
+        var localStart = range.start.UtcDateTime; //new DateTime(range.start.UtcTicks + range.start.Offset.Ticks, DateTimeKind.Local);
+        var localEnd = range.end.UtcDateTime; //new DateTime(range.end.UtcTicks + range.end.Offset.Ticks, DateTimeKind.Local);
 
         await OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd));
     }
 
     private async Task OnDateTimeAutoUpdate((DateTimeOffset start, DateTimeOffset end) range)
     {
-        var localStart = new DateTime(range.start.UtcTicks + range.start.Offset.Ticks, DateTimeKind.Local);
-        var localEnd = new DateTime(range.end.UtcTicks + range.end.Offset.Ticks, DateTimeKind.Local);
+        var localStart = range.start.UtcDateTime; //new DateTime(range.start.UtcTicks + range.start.Offset.Ticks, DateTimeKind.Local);
+        var localEnd = range.end.UtcDateTime; //new DateTime(range.end.UtcTicks + range.end.Offset.Ticks, DateTimeKind.Local);
         await base.InvokeAsync(async () => await OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd)));
     }
 }

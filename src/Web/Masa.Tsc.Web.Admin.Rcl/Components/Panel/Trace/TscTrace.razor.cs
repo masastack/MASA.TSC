@@ -6,7 +6,8 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TscTrace
 {
     private PaginatedListBase<TraceResponseDto> _queryResult;
-    private ValueTuple<string, string, string>[] _chartData;
+    private ValueTuple<long, string, string>[] _chartData;
+    private string? _chartFormat;
 
     private string? _service;
     private string? _instance;
@@ -121,7 +122,7 @@ public partial class TscTrace
 
         if (spanResult.Result!.Length == 0 && durationResult.Result!.Length == 0)
         {
-            _chartData = Array.Empty<ValueTuple<string, string, string>>();
+            _chartData = Array.Empty<ValueTuple<long, string, string>>();
             return;
         }
 
@@ -133,9 +134,9 @@ public partial class TscTrace
         bool hasFirst = spanArray != null, hasSecond = durationArray != null;
         var currentArray = hasFirst ? spanArray! : durationArray!;
 
-        ValueTuple<string, string, string>[] values = new (string, string, string)[currentArray.Length];
+        ValueTuple<long, string, string>[] values = new (long, string, string)[currentArray.Length];
         var index = 0;
-        var fmt = query.Start.Format(query.End);
+        _chartFormat = query.Start.Format(query.End);
         foreach (var item in currentArray!)
         {
             if (hasFirst)
@@ -150,12 +151,11 @@ public partial class TscTrace
             }
 
             var timeSpan = (long)Math.Floor(Convert.ToDouble(item[0]) * 1000);
-            var time = timeSpan.ToDateTime();
-            values[index].Item1 = time.Format(CurrentTimeZone, fmt);
+            values[index].Item1 = timeSpan;
             index++;
         }
         _chartData = values;
-    }    
+    }
 
     private Task<IEnumerable<string>> QueryServices(string key)
     {
