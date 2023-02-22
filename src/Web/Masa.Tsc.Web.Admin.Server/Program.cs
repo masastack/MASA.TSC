@@ -1,10 +1,6 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Stack.Components.Extensions.OpenIdConnect;
-using Masa.Tsc.Web.Admin.Rcl.Components;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddObservable(builder.Logging, builder.Configuration, true);
 string tscUrl = builder.Configuration["Masa:Tsc:ServiceBaseAddress"];

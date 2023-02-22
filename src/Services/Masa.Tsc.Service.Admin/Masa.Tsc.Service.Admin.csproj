@@ -10,28 +10,24 @@
 	<ItemGroup>
 		<Compile Remove="Application\Apps\**" />
 		<Compile Remove="Domain\Instruments\Services\**" />
-		<Compile Remove="Domain\Projects\Events\**" />
-		<Compile Remove="Domain\Projects\Service\**" />
-		<Compile Remove="Domain\Teams\Events\**" />
-		<Compile Remove="Domain\Teams\Service\**" />
+		<Compile Remove="Domain\Projects\**" />
+		<Compile Remove="Domain\Teams\**" />
+		<Compile Remove="Infrastructure\Middleware\**" />
 		<Content Remove="Application\Apps\**" />
 		<Content Remove="Domain\Instruments\Services\**" />
-		<Content Remove="Domain\Projects\Events\**" />
-		<Content Remove="Domain\Projects\Service\**" />
-		<Content Remove="Domain\Teams\Events\**" />
-		<Content Remove="Domain\Teams\Service\**" />
+		<Content Remove="Domain\Projects\**" />
+		<Content Remove="Domain\Teams\**" />
+		<Content Remove="Infrastructure\Middleware\**" />
 		<EmbeddedResource Remove="Application\Apps\**" />
 		<EmbeddedResource Remove="Domain\Instruments\Services\**" />
-		<EmbeddedResource Remove="Domain\Projects\Events\**" />
-		<EmbeddedResource Remove="Domain\Projects\Service\**" />
-		<EmbeddedResource Remove="Domain\Teams\Events\**" />
-		<EmbeddedResource Remove="Domain\Teams\Service\**" />
+		<EmbeddedResource Remove="Domain\Projects\**" />
+		<EmbeddedResource Remove="Domain\Teams\**" />
+		<EmbeddedResource Remove="Infrastructure\Middleware\**" />
 		<None Remove="Application\Apps\**" />
 		<None Remove="Domain\Instruments\Services\**" />
-		<None Remove="Domain\Projects\Events\**" />
-		<None Remove="Domain\Projects\Service\**" />
-		<None Remove="Domain\Teams\Events\**" />
-		<None Remove="Domain\Teams\Service\**" />
+		<None Remove="Domain\Projects\**" />
+		<None Remove="Domain\Teams\**" />
+		<None Remove="Infrastructure\Middleware\**" />
 	</ItemGroup>
 
 	<ItemGroup>		
@@ -73,12 +69,6 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Dapr.AspNetCore" Version="1.7.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Domain\Projects\Repositories\" />
-		<Folder Include="Domain\Teams\Repositories\" />
-		<Folder Include="Infrastructure\Middleware\" />
 	</ItemGroup>
 
 	<ItemGroup>

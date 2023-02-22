@@ -4,7 +4,14 @@
 <MCard Width="Width" Height="Height" Class="d-flex flex-column rounded-lg">
     <MCardTitle Class="d-flex justify-space-between">
         <MLabel Class="emphasis2--text h6">@Title</MLabel>
-        <MIcon>mdi-information-outline</MIcon>
+        <MTooltip Top>
+            <ActivatorContent>
+                <MIcon @attributes="@context.Attrs">mdi-information-outline</MIcon>
+            </ActivatorContent>
+            <ChildContent>
+                <span>@T("For HTTP 1/2, gRPC, RPC services, this means Calls Per Minute (calls / min)")</span>
+            </ChildContent>
+        </MTooltip>
     </MCardTitle>
     <MCardText Class="flex-grow-1">
         @if (_isLoading)

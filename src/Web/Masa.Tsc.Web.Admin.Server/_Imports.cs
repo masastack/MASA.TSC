@@ -5,6 +5,7 @@ global using Masa.Contrib.Configuration.ConfigurationApi.Dcc;
 global using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
 global using Masa.Contrib.Service.Caller.Authentication.OpenIdConnect;
 global using Masa.Stack.Components;
+global using Masa.Stack.Components.Extensions.OpenIdConnect;
 global using Masa.Tsc.ApiGateways.Caller;
 global using Masa.Tsc.Contracts.Admin.Converters;
 global using Masa.Tsc.Web.Admin.Rcl.Extentions;
