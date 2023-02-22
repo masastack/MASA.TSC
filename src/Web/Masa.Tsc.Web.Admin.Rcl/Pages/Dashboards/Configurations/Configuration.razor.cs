@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations;
 
-public partial class Configuration: IAsyncDisposable
+public partial class Configuration : IAsyncDisposable
 {
     string _scrollElementId = Guid.NewGuid().ToString();
     string _contentElementId = Guid.NewGuid().ToString();
@@ -104,8 +104,8 @@ public partial class Configuration: IAsyncDisposable
     {
         await PanelGrids.SaveUI();
         ConfigurationRecord.Panels.AdaptiveUI(new());
-        if(_helper is not null)
-            _helper.InvokeVoidAsync("scrollBottom", _scrollElementId,_contentElementId);
+        if (_helper is not null)
+            _helper.InvokeVoidAsync("scrollBottom", _scrollElementId, _contentElementId);
         //ConfigurationRecord.Panels.Insert(0, panel);
         //await PanelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();
     }

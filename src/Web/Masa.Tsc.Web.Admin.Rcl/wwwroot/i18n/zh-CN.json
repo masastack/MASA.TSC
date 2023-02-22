@@ -6,7 +6,6 @@
   "Cancel": "取消",
   "Save": "保存",
   "Ok": "确定",
-  "Submit": "提交",
   "Add Environment": "新增环境",
   "Edit Environment": "编辑环境",
   "Add Cluster": "新增集群",
@@ -170,5 +169,5 @@
   "Configure Chart": "配置图表",
   "Loading data": "数据加载中.....",
   "Title": "标题",
-    "Total Count": "总条数"
+  "Total Count": "总条数"
 }
