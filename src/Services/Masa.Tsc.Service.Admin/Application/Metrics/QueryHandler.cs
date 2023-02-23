@@ -111,7 +111,7 @@ public class QueryHandler
 
         if (data.Status == ResultStatuses.Success)
         {
-            if (data.Data == null || data.Data == null || !data.Data.Any())
+            if (data.Data == null || !data.Data.Any())
                 return;
 
             query.Result = data.Data;
@@ -340,9 +340,7 @@ public class QueryHandler
             {
                 positions.Add(index);
             }
-
-            //if ((index == 0 || index > 0 && !not.IsMatch(str[index - 1].ToString())) && (str.Length - index == 0 || str.Length - index > 0 && !not.IsMatch(str[index + 1].ToString())))
-            //    positions.Add(index);
+            
             start = index + itemLenth;
             if (str.Length - start - itemLenth < 0)
                 break;
