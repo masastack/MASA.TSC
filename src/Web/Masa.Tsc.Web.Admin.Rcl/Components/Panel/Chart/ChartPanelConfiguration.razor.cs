@@ -20,6 +20,9 @@ public partial class ChartPanelConfiguration : TscComponentBase
     [Parameter]
     public string? ServiceName { get; set; }
 
+    [Parameter]
+    public string? Model { get; set; }
+
     public ChartPanel ChartPanel { get; set; }
 
     bool IsLoading { get; set; }
