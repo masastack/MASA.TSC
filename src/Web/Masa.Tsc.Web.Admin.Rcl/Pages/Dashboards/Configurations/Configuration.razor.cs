@@ -8,6 +8,8 @@ public partial class Configuration : IAsyncDisposable
     string _scrollElementId = Guid.NewGuid().ToString();
     string _contentElementId = Guid.NewGuid().ToString();
     IJSObjectReference? _helper;
+    IJSObjectReference? _history;
+    DotNetObjectReference<Configuration> _dotNetHelper;
 
     [Inject]
     public ConfigurationRecord ConfigurationRecord { get; set; }
@@ -31,6 +33,7 @@ public partial class Configuration : IAsyncDisposable
         if (NavigationManager.Uri.Contains("record")) return;
         ConfigurationRecord.DashboardId = DashboardId;
         ConfigurationRecord.AppName = ServiceName;
+
         if (ServiceName is null)
         {
             ConfigurationRecord.Clear();
@@ -38,6 +41,12 @@ public partial class Configuration : IAsyncDisposable
         }
 
         await GetPanelsAsync();
+    }
+
+    [JSInvokable]
+    public void GoDashbordList()
+    {
+        NavigationManager.NavigateTo("/dashboard", false);
     }
 
     protected override async Task OnParametersSetAsync()
@@ -163,6 +172,9 @@ public partial class Configuration : IAsyncDisposable
         if (firstRender)
         {
             _helper = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/scroll.js");
+            _dotNetHelper = DotNetObjectReference.Create(this);
+            _history = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/history.js");
+            await _history.InvokeVoidAsync("historyToList", _dotNetHelper);
         }
     }
 
@@ -170,5 +182,9 @@ public partial class Configuration : IAsyncDisposable
     {
         if (_helper is not null)
             await _helper.DisposeAsync();
+        if (_history is not null)
+            await _history.DisposeAsync();
+        if (_dotNetHelper is not null)
+            _dotNetHelper.Dispose();
     }
 }

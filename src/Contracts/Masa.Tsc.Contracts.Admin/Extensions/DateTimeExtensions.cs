@@ -19,14 +19,15 @@ public static class DateTimeExtensions
             offset = DateTimeOffset.FromUnixTimeSeconds(timestamp);
         if (timeZone != null && timeZone.BaseUtcOffset.TotalSeconds > 0)
         {
-            return new DateTimeOffset(offset: timeZone.BaseUtcOffset, ticks: offset.Ticks+ timeZone.BaseUtcOffset.Ticks).LocalDateTime;
+            return new DateTimeOffset(offset: timeZone.BaseUtcOffset, ticks: offset.Ticks + timeZone.BaseUtcOffset.Ticks).LocalDateTime;
         }
         return offset.LocalDateTime;
     }
 
-    public static string Format(this DateTime time, TimeZoneInfo timeZone, string fmt = "yyyy-MM-dd HH:mm:ss")
+    public static string Format(this DateTime time, TimeZoneInfo? timeZone, string fmt = "yyyy-MM-dd HH:mm:ss")
     {
-        time = TimeZoneInfo.ConvertTime(time, timeZone);
+        if (timeZone is not null)
+            time = TimeZoneInfo.ConvertTime(time, timeZone);
         if (time == DateTime.MinValue || time == DateTime.MaxValue)
             return "";
         return time.ToString(fmt);

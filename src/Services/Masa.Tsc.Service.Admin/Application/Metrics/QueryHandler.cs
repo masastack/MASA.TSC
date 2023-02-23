@@ -111,7 +111,7 @@ public class QueryHandler
 
         if (data.Status == ResultStatuses.Success)
         {
-            if (data.Data == null || data.Data == null || !data.Data.Any())
+            if (data.Data == null || !data.Data.Any())
                 return;
 
             query.Result = data.Data;
@@ -325,15 +325,22 @@ public class QueryHandler
             return false;
         int start = 0, itemLenth = metric.Length;
         List<int> positions = new List<int>();
-        var not = new Regex("_[a-zA-Z0-9]");
+        var not = new Regex("[_a-zA-Z0-9]");
         do
         {
             var index = str.IndexOf(metric, start);
             if (index < 0)
                 break;
 
-            if ((index == 0 || index > 0 && !not.IsMatch(str[index - 1].ToString())) && (str.Length - index == 0 || str.Length - index > 0 && !not.IsMatch(str[index + 1].ToString())))
+            if (index == 0 && (str.Length - itemLenth == 0 || str.Length - metric.Length > 0 && !not.IsMatch(str[index + itemLenth + 1].ToString())))
+            {
                 positions.Add(index);
+            }
+            else if (index > 0 && !not.IsMatch(str[index - 1].ToString()) && (str.Length - index - itemLenth == 0 || str.Length - index > 0 && !not.IsMatch(str[index + itemLenth].ToString())))
+            {
+                positions.Add(index);
+            }
+            
             start = index + itemLenth;
             if (str.Length - start - itemLenth < 0)
                 break;

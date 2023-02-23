@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using BlazorComponent;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class ServiceResponseAvgTime : TscEChartBase
@@ -25,7 +23,7 @@ public partial class ServiceResponseAvgTime : TscEChartBase
         var step = (long)Math.Floor((query.End!.Value - query.Start!.Value).TotalSeconds);
         var metric = $"round(sum by(service_name) (increase(http_server_duration_sum{{service_name=\"{query.AppId}\"}}[{step}s]))/sum by(service_name) (increase(http_server_duration_count{{service_name=\"{query.AppId}\"}}[{step}s])),1)";
         total = 0;
-        var result = await ApiCaller.MetricService.GetQueryAsync(metric, query.End!.Value);
+        var result = await ApiCaller.MetricService.GetQueryAsync(metric, query.End!.Value.ToLocalTime());
         if (result != null && result.Result != null && result.Result.Any() && result.ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Vector)
         {
             var obj = ((QueryResultInstantVectorResponse)result.Result[0])!.Value![1];

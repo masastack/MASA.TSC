@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Nest;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Apps;
 
 public partial class AppAutoComplete
@@ -21,13 +23,16 @@ public partial class AppAutoComplete
     public bool Metric { get; set; }
 
     [Parameter]
-    public List<AppDetailModel> Apps { get; set; }
+    public List<AppDetailModel> Apps { get; set; } = new();
+
+    bool _hasLoadData;
 
     public AppDetailModel? CurrentApp => Apps.FirstOrDefault(app => app.Identity == Value);
 
+
     protected override async Task OnInitializedAsync()
     {
-        if (Apps is null)
+        if (!_hasLoadData)
         {
             if (Metric)
             {
@@ -43,8 +48,11 @@ public partial class AppAutoComplete
             }
             else
             {
-                Apps = await PmClient.AppService.GetListAsync();
+                var data = await PmClient.AppService.GetListAsync();
+                if (data != null && data.Any())
+                    Apps = data;
             }
+            _hasLoadData = true;
         }
     }
 
