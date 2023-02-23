@@ -7,7 +7,7 @@
         <MTabs Class="transparent-tab" Value="@_value.ProjectType" ValueChanged=@(async (value)=>await OnTabsChange(value.ToString()!))>
             @foreach (var item in _projectTypes)
             {
-                <MTab Value=@item.Key>@item.Value</MTab>
+                <MTab Value=@item.Key Class="text-capitalize">@item.Value</MTab>
             }
         </MTabs>
     </div>

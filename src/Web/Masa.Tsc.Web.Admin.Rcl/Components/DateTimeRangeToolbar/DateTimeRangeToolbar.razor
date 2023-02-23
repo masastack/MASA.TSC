@@ -23,9 +23,9 @@
               TValue="QuickRangeKey"
               OnItemClick="OnRelatedTimeSpanSelected"
               OffsetY
-              NudgeBottom="@((StringNumber)8)">
+              NudgeBottom="@((StringNumber)8)" Class="text-capitalize">
         <ActivatorContent>
-            <MButton Small @attributes="@context.Attrs" Text>
+            <MButton Small @attributes="@context.Attrs" Text Class="text-capitalize">
                 @I18n.T(_selectedQuickRangeKey.ToString())
                 <MIcon Right>mdi-menu-down</MIcon>
             </MButton>
