@@ -1,7 +1,6 @@
- window.addEventListener("popstate", function (e) {
-    let url = window.location.pathname;
-    const route = "/dashboard/configuration", target = "/dashboard";
-    if (url.includes(route)) {
-        history.pushState({}, '', target);
-    }
-});
+export function historyToList(dotNetHelper) {
+    const _dotNetHelper = dotNetHelper;
+    window.addEventListener("popstate", function () {
+        _dotNetHelper.invokeMethodAsync("GoDashbordList");
+    })
+}

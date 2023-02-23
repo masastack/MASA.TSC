@@ -5,7 +5,19 @@ namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class MetricService : BaseService
 {
-    public MetricService(ICaller caller) : base(caller, "/api/metric") { }
+    static JsonSerializerOptions options;
+
+    public MetricService(ICaller caller) : base(caller, "/api/metric")
+    {
+        if (options == null)
+        {
+            options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            options.Converters.Add(new QueryResultDataResponseConverter());
+        }
+    }
 
     public async Task<List<string>> GetNamesAsync()
     {
@@ -59,13 +71,8 @@ public class MetricService : BaseService
         return (await Caller.GetAsync<List<string>>($"{RootPath}/values", param))!;
     }
 
-    private QueryResultDataResponse ConvertResult(QueryResultDataResponse result)
+    private static QueryResultDataResponse ConvertResult(QueryResultDataResponse result)
     {
-        var options = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-        options.Converters.Add(new QueryResultDataResponseConverter());
         return JsonSerializer.Deserialize<QueryResultDataResponse>(JsonSerializer.Serialize(result), options)!;
     }
 }
