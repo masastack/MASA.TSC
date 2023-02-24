@@ -38,16 +38,13 @@ public partial class ChartPanelConfiguration : TscComponentBase
     async Task NavigateToPanelConfigurationPage()
     {
         var success = !Value.Metrics.Any(x => string.IsNullOrEmpty(x.Name));
-        if (success)
-        {
-            Value.Metrics.RemoveAll(item => string.IsNullOrEmpty(item.Name));
-            NavigationManager.NavigateToDashboardConfigurationRecord(DashboardId, ServiceName);
-        }
-        else
+        if (!success)
         {
             await PopupService.AlertAsync(T("Name is required"), AlertTypes.Error);
             return;
         }
+        Value.Metrics.RemoveAll(item => string.IsNullOrEmpty(item.Name));
+        NavigationManager.NavigateToDashboardConfigurationRecord(DashboardId, ServiceName);
     }
 
     async Task Cancel()
