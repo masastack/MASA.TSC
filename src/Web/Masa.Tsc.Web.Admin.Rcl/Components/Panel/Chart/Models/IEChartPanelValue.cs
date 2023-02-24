@@ -17,7 +17,7 @@ public interface IEChartPanelValue : IPanelValue
 
     public Axis YAxis { get; set; }
 
-    public object? GetChartOption();
+    public object? GetChartOption(TimeZoneInfo timeZoneInfo);
 
     public string GetChartKey();
 }

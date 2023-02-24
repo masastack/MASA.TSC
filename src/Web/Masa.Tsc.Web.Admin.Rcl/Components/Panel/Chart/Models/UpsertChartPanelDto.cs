@@ -362,7 +362,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         set => this[ExtensionFieldTypes.YAxis] = value;
     }
 
-    public EChartType _eChartType;
+    private EChartType _eChartType;
 
     public EChartType EChartType
     {
@@ -370,7 +370,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         set => _eChartType = value;
     }
 
-    static JsonSerializerOptions JsonOption = new JsonSerializerOptions
+    static JsonSerializerOptions JsonOption = new()
     {
         PropertyNameCaseInsensitive = true
     };
@@ -393,14 +393,16 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
 
     string DateFormart { get; set; }
 
-    string ToFormatTimeSpan(long timestamp)
-    {
-        return DateTimeOffset.FromUnixTimeSeconds(timestamp).DateTime.Format(TimeZoneInfo.Utc, DateFormart);
-    }
-
     List<QueryResultDataResponse> _chartData = new();
-    List<List<Dessert>> _tableData = new();
-    List<TopListOption> _topListData = new();
+
+    readonly List<List<Dessert>> _tableData = new();
+
+    readonly List<TopListOption> _topListData = new();
+
+    string ToFormatTimeSpan(long timestamp,TimeZoneInfo timeZoneInfo)
+    {
+        return timestamp.ToDateTime(timeZoneInfo).Format(timeZoneInfo, DateFormart);
+    }
 
     public void SetChartData(List<QueryResultDataResponse> chartData, DateTime start, DateTime end)
     {
@@ -410,21 +412,18 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         Key = "DataChanged" + Guid.NewGuid();
     }
 
-    public string GetChartKey()
-    {
-        return Key;
-    }
+    public string GetChartKey() => Key;
 
-    public object? GetChartOption()
+    public object? GetChartOption(TimeZoneInfo timeZoneInfo)
     {
         if (_chartData.Any(item => item?.Result?.Any() is true) is false) return null;
-        LoadChartData();
+        LoadChartData(timeZoneInfo);
         LoadChartOption();
 
         return EChartType.Json;
     }
 
-    void LoadChartData()
+    void LoadChartData(TimeZoneInfo timeZoneInfo)
     {
         if (IsLoadChartData is false) return;
 
@@ -437,8 +436,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
             {
                 ["type"] = ChartType,
                 ["name"] = string.Join("-", item.Metric!.Values),
-                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0]), value[1].ToString()))
-                                                    .ToArray())
+                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0], timeZoneInfo), value[1].ToString())).ToArray())
             }).ToArray());
         }
         else if (ChartType is "line-area")
@@ -454,8 +452,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                 {
                     ["focus"] = "series"
                 },
-                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0]), value[1].ToString()))
-                                                    .ToArray())
+                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0], timeZoneInfo), value[1].ToString())).ToArray())
             }).ToArray());
         }
         else if (ChartType is "pie")
@@ -637,10 +634,9 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         });
     }
 
-    public List<List<Dessert>> GetTableOption()
-    {
-        return _tableData;
-    }
+    public List<List<Dessert>> GetTableOption() => _tableData;
+
+    public List<TopListOption> GetTopListOption() => _topListData;
 
     public void SetTableOption(List<string> services, string jumpName, string jumpId)
     {
@@ -670,11 +666,6 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         }
     }
 
-    public List<TopListOption> GetTopListOption()
-    {
-        return _topListData;
-    }
-
     public void SetTopListOption(string href)
     {
         _topListData.Clear();
@@ -688,13 +679,6 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                                     Text = string.Join('-', item.Metric!.Select(metric => metric.Value)),
                                     Value = Convert.ToDouble(item.Value![1] ?? 0)
                                 }));
-    }
-
-    double ConvertToDouble(object value)
-    {
-        double.TryParse(value.ToString(), out double doubleValue);
-        if (double.IsNaN(doubleValue)) doubleValue = 0;
-        return doubleValue;
     }
 
     private void YAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)
