@@ -40,7 +40,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
         var success = !Value.Metrics.Any(x => string.IsNullOrEmpty(x.Name));
         if (!success)
         {
-            await PopupService.AlertAsync(T("Indicator name is required"), AlertTypes.Error);
+            await PopupService.AlertAsync(T("Metrics name is required"), AlertTypes.Error);
             return;
         }
         NavigationManager.NavigateToDashboardConfigurationRecord(DashboardId, ServiceName);
