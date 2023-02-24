@@ -43,7 +43,6 @@ public partial class ChartPanelConfiguration : TscComponentBase
             await PopupService.AlertAsync(T("Name is required"), AlertTypes.Error);
             return;
         }
-        Value.Metrics.RemoveAll(item => string.IsNullOrEmpty(item.Name));
         NavigationManager.NavigateToDashboardConfigurationRecord(DashboardId, ServiceName);
     }
 
