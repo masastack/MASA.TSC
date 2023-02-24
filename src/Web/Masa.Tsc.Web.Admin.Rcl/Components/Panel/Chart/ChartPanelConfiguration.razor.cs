@@ -35,7 +35,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
         if (Value.Metrics.Any() is false) Value.Metrics.Add(new());
     }
 
-    async Task NavigateToPanelConfigurationPage()
+    async Task NavigateToPanelConfigurationPageAsync()
     {
         var success = !Value.Metrics.Any(x => string.IsNullOrEmpty(x.Name));
         if (!success)
@@ -47,11 +47,11 @@ public partial class ChartPanelConfiguration : TscComponentBase
         NavigationManager.NavigateToDashboardConfigurationRecord(DashboardId, ServiceName);
     }
 
-    async Task Cancel()
+    async Task CancelAsync()
     {
         var backUp = JsonSerializer.Deserialize<UpsertPanelDto>(ValueBackup);
         Value.Clone(backUp!);
-        await NavigateToPanelConfigurationPage();
+        await NavigateToPanelConfigurationPageAsync();
     }
 
     void Add()
