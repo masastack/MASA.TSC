@@ -35,17 +35,22 @@ public partial class ChartPanelConfiguration : TscComponentBase
         if (Value.Metrics.Any() is false) Value.Metrics.Add(new());
     }
 
-    void NavigateToPanelConfigurationPage()
+    async Task NavigateToPanelConfigurationPageAsync()
     {
-        Value.Metrics.RemoveAll(item => string.IsNullOrEmpty(item.Name));
+        var success = !Value.Metrics.Any(x => string.IsNullOrEmpty(x.Name));
+        if (!success)
+        {
+            await PopupService.AlertAsync(T("Metrics name is required"), AlertTypes.Error);
+            return;
+        }
         NavigationManager.NavigateToDashboardConfigurationRecord(DashboardId, ServiceName);
     }
 
-    void Cancel()
+    async Task CancelAsync()
     {
         var backUp = JsonSerializer.Deserialize<UpsertPanelDto>(ValueBackup);
         Value.Clone(backUp!);
-        NavigateToPanelConfigurationPage();
+        await NavigateToPanelConfigurationPageAsync();
     }
 
     void Add()

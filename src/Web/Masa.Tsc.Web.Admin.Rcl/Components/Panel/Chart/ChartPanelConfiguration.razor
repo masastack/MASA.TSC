@@ -5,10 +5,10 @@
         <SButton Icon OnClick="GetGetMetricsAsync">
             <SIcon Tooltip="@T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon>
         </SButton>
-        <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg" OnClick="() => Cancel()">
+        <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg" OnClick="() => CancelAsync()">
             取消
         </SButton>
-        <SButton Small BorderRadiusClass="rounded-lg" OnClick="() => NavigateToPanelConfigurationPage()">
+        <SButton Small BorderRadiusClass="rounded-lg" OnClick="() => NavigateToPanelConfigurationPageAsync()">
             应用
         </SButton>
     </MCol>
@@ -36,7 +36,7 @@
                                 {
                                     <MButton Class="text-capitalize" Value="@ListTypes.EndpointList.ToString()">
                                         Endpoint List
-                                    </MButton>                                
+                                    </MButton>
                                     <MButton Class="text-capitalize" Value="@ListTypes.InstanceList.ToString()">
                                         Instance List
                                     </MButton>
@@ -62,7 +62,7 @@
                                         <MCardText>
                                             <MRow>
                                                 <MCol Md="12">
-                                                    <STextField BackgroundColor="white" DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].Name" ValueChanged="async value => await MetricNameChangedAsync(Value.Metrics[0],value) " Label="指标名称" />
+                                                    <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].Name" ValueChanged="async value => await MetricNameChangedAsync(Value.Metrics[0],value) " Label="指标名称" />
                                                 </MCol>
                                                 <MCol Md="12">
                                                     <STextField BackgroundColor="white" @bind-Value="Value.Metrics[0].Range" Label="取值范围" />
@@ -87,7 +87,7 @@
                                                         </MCol>
                                                     }
                                                     <MCol Md="12">
-                                                        <STextField BackgroundColor="white" DebounceInterval="1000" TValue="string" Value="item.Name" ValueChanged="async value => await MetricNameChangedAsync(item,value) " Label="指标名称" />
+                                                        <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="item.Name" ValueChanged="async value => await MetricNameChangedAsync(item,value) " Label="指标名称" />
                                                     </MCol>
                                                     <MCol Md="12">
                                                         <STextField BackgroundColor="white" @bind-Value="item.Range" Label="取值范围" />

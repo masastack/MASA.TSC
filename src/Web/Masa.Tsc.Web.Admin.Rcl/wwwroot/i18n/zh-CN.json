@@ -91,6 +91,7 @@
   "Remove Panel": "移除面板",
   "Name is required": "名称必须填写",
   "Folder is required": "目录必须填写",
+  "Metrics name is required": "指标名称必须填写",
   "Edit": "编辑",
   "Expend all": "全部展开",
   "Close all": "全部关闭",
