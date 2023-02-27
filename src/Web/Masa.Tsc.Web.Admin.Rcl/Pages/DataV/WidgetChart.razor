@@ -17,7 +17,7 @@
     protected override void OnInitialized()
     {
         if (PanelId is not null)
-            Panel = FindPanel(Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException("find panel error");
+            Panel = FindPanel(Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException(T("Find panel error"));
         else
             Panel = new UpsertChartPanelDto(default);
     }
