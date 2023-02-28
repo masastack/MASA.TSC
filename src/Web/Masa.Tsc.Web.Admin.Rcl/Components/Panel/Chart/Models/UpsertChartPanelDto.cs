@@ -399,7 +399,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
 
     readonly List<TopListOption> _topListData = new();
 
-    string ToFormatTimeSpan(long timestamp,TimeZoneInfo timeZoneInfo)
+    string ToFormatTimeSpan(long timestamp, TimeZoneInfo timeZoneInfo)
     {
         return timestamp.ToDateTime(timeZoneInfo).Format(timeZoneInfo, DateFormart);
     }
@@ -425,8 +425,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
 
     void LoadChartData(TimeZoneInfo timeZoneInfo)
     {
-        if (IsLoadChartData is false) return;
-
+        if (IsLoadChartData is false) return;        
         IsLoadChartData = false;
 
         if (ChartType is "line" or "bar")

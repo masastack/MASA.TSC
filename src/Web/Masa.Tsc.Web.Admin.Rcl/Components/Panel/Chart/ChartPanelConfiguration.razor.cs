@@ -33,7 +33,23 @@ public partial class ChartPanelConfiguration : TscComponentBase
     {
         ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
         if (Value.Metrics.Any() is false) Value.Metrics.Add(new());
+
+        CheckListType();
     }
+
+    private void CheckListType()
+    {
+        if (Value.ChartType != "table") return;
+
+        if (Model != "All")
+        {
+            if (Model != "Service")
+                Value.ListType = ListTypes.TopList;
+            else if (Value.ListType == ListTypes.ServiceList)
+                Value.ListType = ListTypes.EndpointList;
+        }
+    }
+
 
     async Task NavigateToPanelConfigurationPageAsync()
     {
