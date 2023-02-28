@@ -23,7 +23,7 @@ public class QueryHandler
 
         var apps = await _pmClient.AppService.GetListByProjectIdsAsync(new List<int> { project.Id });
         var team = await _authClient.TeamService.GetDetailAsync(project.TeamId)!;
-        var creator = (await _authClient.UserService.GetUsersAsync(project.Creator))?.First();
+        var creator = await _authClient.UserService.GetByIdAsync(project.Creator);
 
         query.Result = new ProjectDto
         {
@@ -32,7 +32,7 @@ public class QueryHandler
             Description = project.Description,
             Identity = project.Identity,
             //LabelName = project.LabelCode,
-            LabelCode=project.LabelCode,
+            LabelCode = project.LabelCode,
             Name = project.Name
         };
 
@@ -81,7 +81,7 @@ public class QueryHandler
                 Name = project.Name,
                 Description = project.Description,
                 LabelName = project.LabelName,
-                LabelCode= project.LabelCode,
+                LabelCode = project.LabelCode,
             });
         }
 
