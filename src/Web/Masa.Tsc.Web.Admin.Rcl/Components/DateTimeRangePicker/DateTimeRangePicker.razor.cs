@@ -209,7 +209,8 @@ public partial class DateTimeRangePicker
             EndDateTime = _internalEndDateTime;
         }
 
-        if (OnTimeZoneInfoChange.HasDelegate && _timeZone != GetSelectTimeZone())
+        bool hasChangeTimeZone = _offset == _internalOffset;
+        if (hasChangeTimeZone && OnTimeZoneInfoChange.HasDelegate)
         {
             _timeZone = GetSelectTimeZone();
             await OnTimeZoneInfoChange.InvokeAsync(_timeZone);
@@ -220,13 +221,16 @@ public partial class DateTimeRangePicker
         _menuValue = false;
         _offset = _internalOffset;
 
-        if ((_lastStartDateTime != null && _lastStartDateTime.Value.UtcDateTime != _internalStartDateTime.UtcDateTime
-            || _lastEndDateTime != null && _lastEndDateTime.Value.UtcDateTime != _internalEndDateTime.UtcDateTime
-            ) && OnConfirm.HasDelegate)
+        if (HasTimeChange && OnConfirm.HasDelegate)
         {
             _ = OnConfirm.InvokeAsync();
         }
     }
+
+    bool HasTimeChange =>
+            _lastStartDateTime != null && _lastStartDateTime.Value.ToUnixTimeSeconds() - _internalStartDateTime.ToUnixTimeSeconds() != 0
+            || _lastEndDateTime != null && _lastEndDateTime.Value.ToUnixTimeSeconds() - _internalEndDateTime.ToUnixTimeSeconds() != 0;
+
 
     private void OnInternalOffsetUpdated(TimeZoneInfo timeZoneInfo)
     {
