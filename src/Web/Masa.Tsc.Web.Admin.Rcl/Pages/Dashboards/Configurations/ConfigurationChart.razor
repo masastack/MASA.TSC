@@ -37,7 +37,7 @@
         if (DashboardId is null) return;
         if (string.IsNullOrEmpty(ConfigurationRecord.DashboardId) is false)
         {
-            Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException("find panel error");
+            Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException(T("Find panel error"));
         }
     }
 
@@ -45,7 +45,7 @@
     {
         if(ReLoad)
         {
-            Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException("find panel error");
+            Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException(T("Find panel error"));
         }
     }
 
