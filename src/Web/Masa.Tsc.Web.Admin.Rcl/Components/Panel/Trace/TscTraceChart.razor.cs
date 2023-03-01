@@ -12,6 +12,9 @@ public partial class TscTraceChart
     public ValueTuple<long, string, string>[] Data { get; set; } = Array.Empty<(long, string, string)>();
 
     [Parameter]
+    public EventCallback<TimeZoneInfo> OnTimeZoneUpdated { get; set; }
+
+    [Parameter]
     public bool PageMode { get; set; }
 
     [Parameter]
@@ -21,9 +24,7 @@ public partial class TscTraceChart
     public double Width { get; set; }
 
     [Parameter]
-    public string Format { get; set; }
-
-    private static readonly QuickRangeKey s_defaultQuickRange = QuickRangeKey.Last1Hour;
+    public string Format { get; set; }    
 
     private object _option;
 
@@ -150,5 +151,12 @@ public partial class TscTraceChart
         var localStart = range.start.UtcDateTime; //new DateTime(range.start.UtcTicks + range.start.Offset.Ticks, DateTimeKind.Local);
         var localEnd = range.end.UtcDateTime; //new DateTime(range.end.UtcTicks + range.end.Offset.Ticks, DateTimeKind.Local);
         await base.InvokeAsync(async () => await OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd)));
+    }
+
+    private async Task OnTimeZoneUpdate(TimeZoneInfo timeZoneInfo)
+    { 
+        CurrentTimeZone= timeZoneInfo;
+        if(OnTimeZoneUpdated.HasDelegate)
+            await OnTimeZoneUpdated.InvokeAsync(timeZoneInfo);
     }
 }

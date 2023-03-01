@@ -8,9 +8,9 @@
 
 <TscTraceChart PageMode=PageMode
                OnDateTimeRangeUpdate="Search"
-               Data="_chartData" Format="@_chartFormat" />
+               Data="_chartData" Format="@_chartFormat" OnTimeZoneUpdated="OnTimeZoneUpdated" />
 
 <TscTraceList PageMode=PageMode
               OnPaginationUpdate="Search"
               SearchResult="_queryResult"
-              SearchLoading="_loading" />
+              SearchLoading="_loading" @ref="_tscTraceList" />

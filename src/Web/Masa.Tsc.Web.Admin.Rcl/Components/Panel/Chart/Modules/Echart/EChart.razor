@@ -14,7 +14,7 @@
         </MCardTitle>
         <MCardText Class="flex-grow-1">
             @{
-                var options = Value.GetChartOption(CurrentTimeZone);
+                var options = Value.GetChartOption(TimeZoneInfo??CurrentTimeZone);
                 if (options is null)
                 {
                     <NoData />
@@ -32,6 +32,9 @@
 @code {
     [Parameter]
     public IEChartPanelValue Value { get; set; }
+
+    [CascadingParameter]
+    public TimeZoneInfo TimeZoneInfo { get; set; }
 
     public MECharts? Chart { get; set; }
 

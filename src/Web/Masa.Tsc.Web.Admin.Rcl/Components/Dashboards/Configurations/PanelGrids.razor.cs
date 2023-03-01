@@ -112,4 +112,10 @@ public partial class PanelGrids
             panel.Y = grid.Y ?? 0;
         }
     }
+
+    public void UpdateTimeZoneInfo(TimeZoneInfo timeZoneInfo)
+    { 
+        CurrentTimeZone= timeZoneInfo;
+        StateHasChanged();
+    }
 }

@@ -11,6 +11,8 @@ public partial class Configuration : IAsyncDisposable
     IJSObjectReference? _history;
     DotNetObjectReference<Configuration> _dotNetHelper;
 
+    private QuickRangeKey _defaultValue = QuickRangeKey.Last15Minutes;
+
     [Inject]
     public ConfigurationRecord ConfigurationRecord { get; set; }
 
@@ -117,6 +119,12 @@ public partial class Configuration : IAsyncDisposable
             _helper.InvokeVoidAsync("scrollBottom", _scrollElementId, _contentElementId);
         //ConfigurationRecord.Panels.Insert(0, panel);
         //await PanelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();
+    }
+
+    void OnTimeZoneUpdate(TimeZoneInfo timeZoneInfo)
+    {
+        CurrentTimeZone = timeZoneInfo;
+        StateHasChanged();
     }
 
     void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)

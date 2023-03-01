@@ -40,7 +40,7 @@ public partial class TscComponentBase : BDomComponentBase
 
     protected virtual string? PageName { get; set; }
 
-    public Guid CurrentUserId { get; private set; }
+    public Guid CurrentUserId { get; private set; }    
 
     public TimeZoneInfo CurrentTimeZone { get; set; }
 

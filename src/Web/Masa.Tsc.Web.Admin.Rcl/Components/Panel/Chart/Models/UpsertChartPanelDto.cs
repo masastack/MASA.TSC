@@ -425,8 +425,8 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
 
     void LoadChartData(TimeZoneInfo timeZoneInfo)
     {
-        if (IsLoadChartData is false) return;        
-        IsLoadChartData = false;
+        //if (IsLoadChartData is false) return;
+        //IsLoadChartData = false;
 
         if (ChartType is "line" or "bar")
         {

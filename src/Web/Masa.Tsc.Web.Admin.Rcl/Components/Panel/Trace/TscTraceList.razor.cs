@@ -67,4 +67,9 @@ public partial class TscTraceList : TscComponentBase
         _isDesc = options.SortDesc.FirstOrDefault();
         await OnPaginationUpdate.InvokeAsync((1, _pageSize, _isDesc));
     }
+
+    public void SetTimeZoneInfo(TimeZoneInfo timeZoneInfo)
+    {
+        CurrentTimeZone = timeZoneInfo;
+    }
 }

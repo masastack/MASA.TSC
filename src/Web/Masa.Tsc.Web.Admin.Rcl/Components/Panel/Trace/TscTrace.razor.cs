@@ -19,6 +19,8 @@ public partial class TscTrace
     private bool _isDesc = true;
     private bool _loading;
 
+    private TscTraceList _tscTraceList = default!;
+
     [CascadingParameter]
     ConfigurationRecord? ConfigurationRecord { get; set; }
 
@@ -94,7 +96,7 @@ public partial class TscTrace
             End = EndDateTime,
             Page = _page,
             PageSize = _pageSize,
-            IsDesc= _isDesc,
+            IsDesc = _isDesc,
         };
 
         _queryResult = await ApiCaller.TraceService.GetListAsync(query);
@@ -108,13 +110,14 @@ public partial class TscTrace
     {
         var interval = query.Start.Interval(query.End);
 
-        var queryResult = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto { 
-            Instance=query.Instance,
-            ServiceName=query.Service,
-            Start=query.Start,
-            End=query.End,
-            Step=interval,
-            MetricNames=new List<string> { $"round(sum (increase(http_server_duration_count[{interval}])),1)", $"round(sum (increase(http_server_duration_sum[{interval}]))/sum (increase(http_server_duration_count[{interval}])),1)" }
+        var queryResult = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
+        {
+            Instance = query.Instance,
+            ServiceName = query.Service,
+            Start = query.Start,
+            End = query.End,
+            Step = interval,
+            MetricNames = new List<string> { $"round(sum (increase(http_server_duration_count[{interval}])),1)", $"round(sum (increase(http_server_duration_sum[{interval}]))/sum (increase(http_server_duration_count[{interval}])),1)" }
         });
 
         var spanResult = queryResult[0];
@@ -201,5 +204,10 @@ public partial class TscTrace
         };
 
         return ApiCaller.TraceService.GetAttrValuesAsync(query);
+    }
+
+    private void OnTimeZoneUpdated(TimeZoneInfo timeZoneInfo)
+    {
+        _tscTraceList.SetTimeZoneInfo(timeZoneInfo);
     }
 }
