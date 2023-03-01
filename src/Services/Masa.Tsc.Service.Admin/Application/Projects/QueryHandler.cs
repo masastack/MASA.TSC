@@ -31,7 +31,6 @@ public class QueryHandler
             Id = project.Identity,
             Description = project.Description,
             Identity = project.Identity,
-            //LabelName = project.LabelCode,
             LabelCode = project.LabelCode,
             Name = project.Name
         };

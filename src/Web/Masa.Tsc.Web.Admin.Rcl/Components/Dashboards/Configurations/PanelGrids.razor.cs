@@ -116,6 +116,5 @@ public partial class PanelGrids
     public void UpdateTimeZoneInfo(TimeZoneInfo timeZoneInfo)
     { 
         CurrentTimeZone= timeZoneInfo;
-        StateHasChanged();
     }
 }
