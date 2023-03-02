@@ -107,7 +107,6 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
             {
                 JsInitVariables.TimezoneOffsetChanged -= OnTimeZoneInfoChanged;
             }
-            await JsInitVariables.DisposeAsync();
             _disposing = true;
         }
     }
