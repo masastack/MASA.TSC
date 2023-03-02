@@ -42,7 +42,17 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
 
     public Guid CurrentUserId { get; private set; }
 
-    public TimeZoneInfo CurrentTimeZone=> TimeZoneInfo.CreateCustomTimeZone("user custom timezone", JsInitVariables.TimezoneOffset, default, default);
+    private TimeZoneInfo _timeZoneInfo;
+
+    public TimeZoneInfo CurrentTimeZone
+    {
+        get
+        {
+            if (_timeZoneInfo == null || _timeZoneInfo.BaseUtcOffset != JsInitVariables.TimezoneOffset)
+                _timeZoneInfo = TimeZoneInfo.CreateCustomTimeZone("user custom timezone", JsInitVariables.TimezoneOffset, default, default);
+            return _timeZoneInfo;
+        }
+    }
 
     protected virtual bool Loading { get; set; }
 
