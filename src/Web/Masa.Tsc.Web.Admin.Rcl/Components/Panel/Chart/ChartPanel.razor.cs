@@ -19,6 +19,7 @@ public partial class ChartPanel
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         await ReloadAsync();
     }
 
@@ -59,20 +60,20 @@ public partial class ChartPanel
         if (Value.Metrics.Any(item => item.Name is not null) is false) return new();
         if (Value.ChartType is "pie" or "gauge" or "table")
         {
-            return await base.ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto()
+            return await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto()
             {
-                Time = ConfigurationRecord.EndTime.UtcDateTime,
-                ServiceName = ConfigurationRecord.AppName,
+                Time = ConfigurationRecord.EndTime.LocalDateTime,
+                ServiceName = ConfigurationRecord.AppName!,
                 Queries = Value.Metrics.Select(item => item.Name).ToList()
             });
         }
         else
         {
-            return await base.ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto()
+            return await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto()
             {
-                Start = ConfigurationRecord.StartTime.UtcDateTime,
-                End = ConfigurationRecord.EndTime.UtcDateTime,
-                ServiceName = ConfigurationRecord.AppName,
+                Start = ConfigurationRecord.StartTime.LocalDateTime,
+                End = ConfigurationRecord.EndTime.LocalDateTime,
+                ServiceName = ConfigurationRecord.AppName!,
                 Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
                 MetricNames = Value.Metrics.Select(item => item.Name).ToList()
             });
@@ -85,5 +86,17 @@ public partial class ChartPanel
         var data = await GetMetricsAsync();
         Value.SetChartData(data, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
         IsLoading = false;
+    }
+
+    protected override bool IsSubscribeTimeZoneChange => true;
+
+    protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
+    {
+        if (Value.ChartType is "line" or "bar" or "line-area")
+        {
+            Value.SetTimeZoneChange();
+            StateHasChanged();
+        }
+        await base.OnTimeZoneInfoChanged(timeZoneInfo);
     }
 }

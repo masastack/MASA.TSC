@@ -33,14 +33,30 @@ public partial class ChartPanelConfiguration : TscComponentBase
     {
         ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
         if (Value.Metrics.Any() is false) Value.Metrics.Add(new());
+
+        CheckListType();
     }
+
+    private void CheckListType()
+    {
+        if (Value.ChartType != "table") return;
+
+        if (Model != "All")
+        {
+            if (Model != "Service")
+                Value.ListType = ListTypes.TopList;
+            else if (Value.ListType == ListTypes.ServiceList)
+                Value.ListType = ListTypes.EndpointList;
+        }
+    }
+
 
     async Task NavigateToPanelConfigurationPageAsync()
     {
         var success = !Value.Metrics.Any(x => string.IsNullOrEmpty(x.Name));
         if (!success)
         {
-            await PopupService.AlertAsync(T("Metrics name is required"), AlertTypes.Error);
+            await PopupService.EnqueueSnackbarAsync(T("Metrics name is required"), AlertTypes.Error);
             return;
         }
         NavigationManager.NavigateToDashboardConfigurationRecord(DashboardId, ServiceName);

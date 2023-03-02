@@ -22,12 +22,6 @@ public partial class LogView
 
     protected override void OnParametersSet()
     {
-        //if(CloseAotoExpand is false && string.IsNullOrEmpty(Search) is false && Search != _oldSearch)
-        //{
-        //    _oldSearch = Search;
-        //    if(JsonObject is not null) ExpandTree(JsonObject.Select(item => item.Value));
-        //    else if(JsonArray is not null) ExpandTree(JsonArray);
-        //}
         if (CloseAotoExpand is false && string.IsNullOrEmpty(Search) is false)
         {
             if (JsonObject is not null) ExpandTree(JsonObject.Select(item => item.Value));

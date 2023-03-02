@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Shared;
 
-public partial class TscComponentBase : BDomComponentBase
+public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
 {
     [Inject]
     public IUserContext UserContext { get; set; }
@@ -42,29 +42,30 @@ public partial class TscComponentBase : BDomComponentBase
 
     public Guid CurrentUserId { get; private set; }
 
-    public TimeZoneInfo CurrentTimeZone { get; set; }
+    private TimeZoneInfo _timeZoneInfo;
+
+    public TimeZoneInfo CurrentTimeZone
+    {
+        get
+        {
+            if (_timeZoneInfo == null || _timeZoneInfo.BaseUtcOffset != JsInitVariables.TimezoneOffset)
+                _timeZoneInfo = TimeZoneInfo.CreateCustomTimeZone("user custom timezone", JsInitVariables.TimezoneOffset, default, default);
+            return _timeZoneInfo;
+        }
+    }
 
     protected virtual bool Loading { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         Loading = true;
+        if (IsSubscribeTimeZoneChange)
+            JsInitVariables.TimezoneOffsetChanged += OnTimeZoneInfoChanged;
         if (UserContext != null && !string.IsNullOrEmpty(UserContext.UserId))
             CurrentUserId = Guid.Parse(UserContext.UserId);
         Loading = false;
-        await base.OnInitializedAsync();
-    }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            await JsInitVariables.SetTimezoneOffset();
-            TimeSpan timeSpan = JsInitVariables.TimezoneOffset;
-            CurrentTimeZone = TimeZoneInfo.CreateCustomTimeZone("user custom timezone", timeSpan, default, default);
-            StateHasChanged();
-        }
+        await base.OnInitializedAsync();
     }
 
     public async Task<bool> OpenConfirmDialog(string content)
@@ -84,16 +85,41 @@ public partial class TscComponentBase : BDomComponentBase
 
     public void OpenSuccessMessage(string message)
     {
-        PopupService.AlertAsync(message, AlertTypes.Success);
+        PopupService.EnqueueSnackbarAsync(message, AlertTypes.Success);
     }
 
     public void OpenWarningMessage(string message)
     {
-        PopupService.AlertAsync(message, AlertTypes.Warning);
+        PopupService.EnqueueSnackbarAsync(message, AlertTypes.Warning);
     }
 
     public void OpenErrorMessage(string message)
     {
-        PopupService.AlertAsync(message, AlertTypes.Error);
+        PopupService.EnqueueSnackbarAsync(message, AlertTypes.Error);
     }
+
+    private bool _disposing = false;
+    public async ValueTask DisposeAsync()
+    {
+        if (!_disposing)
+        {
+            if (IsSubscribeTimeZoneChange)
+            {
+                JsInitVariables.TimezoneOffsetChanged -= OnTimeZoneInfoChanged;
+            }
+            _disposing = true;
+        }
+    }
+
+    protected virtual Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
+    {
+        return Task.CompletedTask;
+    }
+
+    private void OnTimeZoneInfoChanged()
+    {
+        _ = InvokeAsync(() => OnTimeZoneInfoChanged(CurrentTimeZone));
+    }
+
+    protected virtual bool IsSubscribeTimeZoneChange => false;
 }

@@ -71,7 +71,7 @@ public class QueryHandler
 
     private async Task<UserDto> GetUserAsync(Guid creatorId)
     {
-        var creator = (await _authClient.UserService.GetUsersAsync(creatorId))?.FirstOrDefault();
+        var creator = await _authClient.UserService.GetByIdAsync(creatorId);
         if (creator != null)
             return new UserDto
             {
@@ -314,7 +314,7 @@ public class QueryHandler
         var tasks = new Task<long>[] {
             GetErrorOrWarnCountAsync(true, appids, start, end),
             GetErrorOrWarnCountAsync(false, appids, start, end)
-        };        
+        };
         var queryResult = await Task.WhenAll(tasks);
         return (queryResult[0], queryResult[1]);
     }

@@ -63,6 +63,9 @@
     public QuickRangeKey? DefaultQuickRange { get; set; }
 
     [Parameter]
+    public EventCallback<QuickRangeKey> DefaultQuickRangeChanged { get; set; }
+
+    [Parameter]
     public TimeSpan Offset { get; set; }
 
     [Parameter]
@@ -187,7 +190,7 @@
 
     private async Task OnTimeZoneInfoChange(TimeZoneInfo timeZoneInfo)
     {
-        JsInitVariables.TimezoneOffset = timeZoneInfo.BaseUtcOffset;       
+        JsInitVariables.TimezoneOffset = timeZoneInfo.BaseUtcOffset;
         Offset = JsInitVariables.TimezoneOffset;
         if (DefaultQuickRange is not null)
         {
@@ -201,7 +204,7 @@
             _startDateTime = value.start;
             _endDateTime = value.end;
         }
-       
+
         if (OnTimeZoneUpdate.HasDelegate)
             await OnTimeZoneUpdate.InvokeAsync(timeZoneInfo);
         StateHasChanged();
@@ -253,7 +256,7 @@
 
     private async Task OnAbsoluteDateTimeUpdated()
     {
-        _selectedQuickRangeKey = QuickRangeKey.Off;
+        // _selectedQuickRangeKey = QuickRangeKey.Off;
 
         if (OnUpdate.HasDelegate)
         {
@@ -265,6 +268,8 @@
     {
         _quickRange = item;
         await UpdateRangeDateTimeToLatest();
+        if (DefaultQuickRangeChanged.HasDelegate)
+            await DefaultQuickRangeChanged.InvokeAsync(item.Key);
     }
 
     private void OnIntervalSelected(IntervalItem item)

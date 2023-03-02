@@ -67,4 +67,12 @@ public partial class TscTraceList : TscComponentBase
         _isDesc = options.SortDesc.FirstOrDefault();
         await OnPaginationUpdate.InvokeAsync((1, _pageSize, _isDesc));
     }
+
+    protected override bool IsSubscribeTimeZoneChange => true;
+
+    protected override Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
+    {
+        StateHasChanged();
+        return base.OnTimeZoneInfoChanged(timeZoneInfo);
+    }
 }

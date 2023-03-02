@@ -1,4 +1,5 @@
-﻿<AutoResize Delay="10" OnResize="ResizeAsync">
+﻿@inherits TscComponentBase
+<AutoResize Delay="10" OnResize="ResizeAsync">
     <MCard Class="d-flex flex-column rounded-lg full-height">
         <MCardTitle Class="d-flex justify-space-between">
             <MLabel Class="emphasis2--text h6">@Value.Title</MLabel>
@@ -12,14 +13,18 @@
             </MTooltip>
         </MCardTitle>
         <MCardText Class="flex-grow-1">
-            @if (Value.GetChartOption() is null)
-            {
-                <NoData />
+            @{
+                var options = Value.GetChartOption(CurrentTimeZone);
+                if (options is null)
+                {
+                    <NoData />
+                }
+                else
+                {
+                    <MECharts Option="options" @ref=Chart />
+                }
             }
-            else
-            {
-                <MECharts Option="Value.GetChartOption()" @ref=Chart />
-            }
+
         </MCardText>
     </MCard>
 </AutoResize>

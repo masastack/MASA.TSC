@@ -209,41 +209,39 @@ public partial class DateTimeRangePicker
             EndDateTime = _internalEndDateTime;
         }
 
-        if (OnTimeZoneInfoChange.HasDelegate && _timeZone != GetSelectTimeZone())
+        if (HasTimeInfoChange && OnTimeZoneInfoChange.HasDelegate)
         {
+            _offset = _internalOffset;
             _timeZone = GetSelectTimeZone();
             await OnTimeZoneInfoChange.InvokeAsync(_timeZone);
         }
 
-        _disableEnsureValidDateTimes = false;
-
-        _menuValue = false;
-        _offset = _internalOffset;
-
-        if ((_lastStartDateTime != null && _lastStartDateTime.Value.UtcDateTime != _internalStartDateTime.UtcDateTime
-            || _lastEndDateTime != null && _lastEndDateTime.Value.UtcDateTime != _internalEndDateTime.UtcDateTime
-            ) && OnConfirm.HasDelegate)
+        if (HasTimeChange && OnConfirm.HasDelegate)
         {
             _ = OnConfirm.InvokeAsync();
         }
+
+        _disableEnsureValidDateTimes = false;
+        _menuValue = false;
+
     }
+
+    bool HasTimeChange =>
+            _lastStartDateTime != null && _lastStartDateTime.Value.ToUnixTimeSeconds() - _internalStartDateTime.ToUnixTimeSeconds() != 0
+            || _lastEndDateTime != null && _lastEndDateTime.Value.ToUnixTimeSeconds() - _internalEndDateTime.ToUnixTimeSeconds() != 0;
+
+    bool HasTimeInfoChange => (long)Math.Floor(_offset.TotalSeconds) - (long)Math.Floor(_internalOffset.TotalSeconds) != 0;
 
     private void OnInternalOffsetUpdated(TimeZoneInfo timeZoneInfo)
     {
-        if (GetSelectTimeZone() != timeZoneInfo)
-        {
-            timeZoneInfo = GetSelectTimeZone();
-            if (OnTimeZoneInfoChange.HasDelegate)
-                _ = OnTimeZoneInfoChange.InvokeAsync(timeZoneInfo);
-            UpdateInternalStartDateTime(_internalStartDateTime.ToOffset(timeZoneInfo.BaseUtcOffset));
-            UpdateInternalEndDateTime(_internalEndDateTime.ToOffset(timeZoneInfo.BaseUtcOffset));
-            UpdateTimeZone(timeZoneInfo);
-        }
+        UpdateInternalStartDateTime(_internalStartDateTime.ToOffset(timeZoneInfo.BaseUtcOffset));
+        UpdateInternalEndDateTime(_internalEndDateTime.ToOffset(timeZoneInfo.BaseUtcOffset));
+        UpdateTimeZone(timeZoneInfo);
     }
 
     private void CancelClick()
     {
-        if (GetSelectTimeZone() != _timeZone)
+        if (HasTimeInfoChange)
         {
             if (OnTimeZoneInfoChange.HasDelegate)
                 _ = OnTimeZoneInfoChange.InvokeAsync(_timeZone);

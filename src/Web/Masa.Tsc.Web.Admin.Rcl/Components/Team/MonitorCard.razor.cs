@@ -75,9 +75,9 @@ public partial class MonitorCard
     {
         if (active)
         {
-            return $"border: 1px solid {appMonitor.Color};border-radius: 16px;";
+            return $"border: 1px solid {appMonitor.Color};border-radius: 16px;min-width:170px";
         }
-        return "border: 1px solid #E4E8F3;border-radius: 16px;";
+        return "border: 1px solid #E4E8F3;border-radius: 16px;min-width:170px";
     }
 }
 

@@ -23,8 +23,6 @@ public partial class TscTraceChart
     [Parameter]
     public string Format { get; set; }
 
-    private static readonly QuickRangeKey s_defaultQuickRange = QuickRangeKey.Last1Hour;
-
     private object _option;
 
     MECharts? MECharts { get; set; }
@@ -139,16 +137,25 @@ public partial class TscTraceChart
 
     private async Task OnDateTimeUpdate((DateTimeOffset start, DateTimeOffset end) range)
     {
-        var localStart = range.start.UtcDateTime; //new DateTime(range.start.UtcTicks + range.start.Offset.Ticks, DateTimeKind.Local);
-        var localEnd = range.end.UtcDateTime; //new DateTime(range.end.UtcTicks + range.end.Offset.Ticks, DateTimeKind.Local);
+        var localStart = range.start.UtcDateTime;
+        var localEnd = range.end.UtcDateTime;
 
         await OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd));
     }
 
     private async Task OnDateTimeAutoUpdate((DateTimeOffset start, DateTimeOffset end) range)
     {
-        var localStart = range.start.UtcDateTime; //new DateTime(range.start.UtcTicks + range.start.Offset.Ticks, DateTimeKind.Local);
-        var localEnd = range.end.UtcDateTime; //new DateTime(range.end.UtcTicks + range.end.Offset.Ticks, DateTimeKind.Local);
+        var localStart = range.start.UtcDateTime;
+        var localEnd = range.end.UtcDateTime;
         await base.InvokeAsync(async () => await OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd)));
+    }
+
+    protected override bool IsSubscribeTimeZoneChange => true;
+
+    protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
+    {
+        _option = GenOption();
+        StateHasChanged();
+        await base.OnTimeZoneInfoChanged(timeZoneInfo);
     }
 }

@@ -20,13 +20,18 @@ public partial class ApdexChart
 
     private List<QueryResultDataResponse>? _data;
 
+    private DateTime StartTime;
+
+    private DateTime EndTime;
+
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         var step = query.Start!.Value.Interval(query.End!.Value);
         string metric = $@"round((sum(rate(http_server_duration_bucket{{le=""250""}}[{step}])) by (service_name) + 
                                  sum(rate(http_server_duration_bucket{{le=""1000""}}[{step}])) by (service_name)
                                ) /2/sum(rate(http_server_duration_bucket{{le=""+Inf""}}[{step}])) by (service_name),0.0001)";
-
+        StartTime = query.Start.Value;
+        EndTime = query.End.Value;
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> { metric },
@@ -35,13 +40,18 @@ public partial class ApdexChart
             ServiceName = query.AppId,
             Step = step
         });
-        if (_data[0] != null && _data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && _data[0].Result != null && _data[0].Result!.Any())
+        SetData();
+    }
+
+    private void SetData()
+    {
+        if (_data != null && _data[0] != null && _data[0].ResultType == ResultTypes.Matrix && _data[0].Result != null && _data[0].Result!.Any())
         {
             var seriesData = ((QueryResultMatrixRangeResponse)_data[0].Result!.First()).Values!.Select(items => (string)items[1]).ToArray();
             var timeSpans = ((QueryResultMatrixRangeResponse)_data[0].Result!.First()).Values!.Select(items => Convert.ToDouble(items[0])).ToArray();
-            Total = seriesData.Last();       
-            var format= query.Start.Value.Format(query.End.Value);
-            _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value,format)));
+            Total = seriesData.Last();
+            var format = StartTime.Format(EndTime);
+            _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value, format)));
             _options.SetValue("series[0].data", seriesData);
         }
         else
@@ -50,6 +60,14 @@ public partial class ApdexChart
             _options.SetValue("series[0].data", Array.Empty<string>());
             Total = "0";
         }
+    }
 
+    protected override bool IsSubscribeTimeZoneChange => true;
+
+    protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
+    {
+        SetData();
+        StateHasChanged();
+        await base.OnTimeZoneInfoChanged(timeZoneInfo);
     }
 }
