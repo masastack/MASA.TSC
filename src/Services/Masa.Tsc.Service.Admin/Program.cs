@@ -3,11 +3,6 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
-var configration = new ConfigurationBuilder()
-            .SetBasePath(builder.Environment.ContentRootPath)
-            .AddJsonFile("appsettings.json")
-            .Build();
-
 await builder.Services.AddMasaStackConfigAsync();
 var masaStackConfig = builder.Services.GetMasaStackConfig();
 
@@ -16,10 +11,10 @@ builder.Services.AddMasaConfiguration(configurationBuilder =>
     configurationBuilder.UseDcc(masaStackConfig.GetDefaultDccOptions());
 });
 
-var elasearchUrls = configration.GetSection("Masa:Elastic:Nodes").Get<string[]>();
-var logIndexName = configration.GetSection("Masa:Elastic:logIndex").Get<string>();
-var traceIndexName = configration.GetSection("Masa:Elastic:TraceIndex").Get<string>();
-var prometheusUrl = configration.GetSection("Masa:Prometheus").Value;
+var elasearchUrls = AppSettings.GetModel<string[]>("Masa:Elastic:Nodes");
+var logIndexName = AppSettings.Get("Masa:Elastic:logIndex");
+var traceIndexName = AppSettings.Get("Masa:Elastic:TraceIndex");
+var prometheusUrl = AppSettings.Get("Masa:Prometheus");
 
 builder.Services.AddElasticClientLogAndTrace(elasearchUrls, logIndexName, traceIndexName)
     .AddObservable(builder.Logging, new MasaObservableOptions
@@ -48,7 +43,7 @@ var redisOption = new RedisConfigurationOptions
 
 RedisConfigurationOptions redis;
 if (builder.Environment.IsDevelopment())
-    redis = configration.GetSection("redis:RedisOptions").Get<RedisConfigurationOptions>();
+    redis = AppSettings.GetModel<RedisConfigurationOptions>("LocalRedisOptions");
 else
     redis = redisOption;
 

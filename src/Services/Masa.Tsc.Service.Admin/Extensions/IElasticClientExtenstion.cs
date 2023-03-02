@@ -5,15 +5,6 @@ namespace Nest;
 
 internal static class IElasticClientExtenstion
 {
-    /// <summary>
-    /// 批量数据插入
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="client"></param>
-    /// <param name="data"></param>
-    /// <param name="indexName"></param>
-    /// <param name="logger"></param>
-    /// <returns></returns>
     public static async Task BulkAllAsync<T>(this IElasticClient client, IEnumerable<T> data, string indexName, ILogger logger) where T : class
     {
         int numberOfSlices = Environment.ProcessorCount;
@@ -56,14 +47,6 @@ internal static class IElasticClientExtenstion
         await Task.CompletedTask;
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="client"></param>
-    /// <param name="indexName"></param>
-    /// <param name="scroll"></param>
-    /// <returns></returns>
     public static async Task<IEnumerable<T>> ScrollAllAsync<T>(this IElasticClient client, string indexName, string scroll) where T : class
     {
         ISearchResponse<T> searchResponse;

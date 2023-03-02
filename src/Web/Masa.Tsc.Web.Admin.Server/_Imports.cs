@@ -11,6 +11,7 @@ global using Masa.Stack.Components.Extensions.OpenIdConnect;
 global using Masa.Tsc.ApiGateways.Caller;
 global using Masa.Tsc.Contracts.Admin.Converters;
 global using Masa.Tsc.Web.Admin.Rcl.Extentions;
+global using Masa.Utils.Configuration.Json;
 global using Microsoft.AspNetCore.Authentication;
 global using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 global using Microsoft.AspNetCore.Mvc;

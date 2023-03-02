@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 await builder.Services.AddMasaStackConfigAsync();
 var masaStackConfig = builder.Services.GetMasaStackConfig();
-var tscUrl = masaStackConfig.GetTscServiceDomain();
+var tscUrl = builder.Environment.IsDevelopment() ? AppSettings.Get("ServiceAddress") : masaStackConfig.GetTscServiceDomain();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
