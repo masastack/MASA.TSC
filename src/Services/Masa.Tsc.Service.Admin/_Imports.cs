@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+global using Directory = Masa.Tsc.Service.Admin.Domain.Aggregates.Directory;
+global using ElasticsearchNest = Nest;
 global using FluentValidation;
 global using Masa.BuildingBlocks.Authentication.Identity;
 global using Masa.BuildingBlocks.Caching;

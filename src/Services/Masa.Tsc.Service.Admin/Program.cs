@@ -6,11 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 await builder.Services.AddMasaStackConfigAsync();
 var masaStackConfig = builder.Services.GetMasaStackConfig();
 
-builder.Services.AddMasaConfiguration(configurationBuilder =>
-{
-    configurationBuilder.UseDcc(masaStackConfig.GetDefaultDccOptions());
-});
-
 var elasearchUrls = AppSettings.GetModel<string[]>("Masa:Elastic:Nodes");
 var logIndexName = AppSettings.Get("Masa:Elastic:logIndex");
 var traceIndexName = AppSettings.Get("Masa:Elastic:TraceIndex");

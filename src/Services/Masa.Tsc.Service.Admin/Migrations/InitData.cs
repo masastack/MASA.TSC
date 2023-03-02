@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Directory = Masa.Tsc.Service.Admin.Domain.Aggregates.Directory;
-
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class InitData
