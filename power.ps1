@@ -1,14 +1,18 @@
-param($t,$u,$p,$s)
+param($t,$u,$p)
 
 #docker build 
 #Write-Host "Hello.$args"
 Write-Host "Hello $t"
 
-switch($s)
-{
-  service {$DockerfilePath="./src/Services/Masa.Tsc.Service.Admin/Dockerfile";$ServerName="masa-tsc-service-admin"}
-  web  {$DockerfilePath="./src/Web/Masa.Tsc.Web.Admin.Server/Dockerfile";$ServerName="masa-tsc-web-admin"}
-}
 docker login --username=$u registry.cn-hangzhou.aliyuncs.com --password=$p
-docker build -t registry.cn-hangzhou.aliyuncs.com/masa/${ServerName}:$t  -f $DockerfilePath .
-docker push registry.cn-hangzhou.aliyuncs.com/masa/${ServerName}:$t 
+
+$ServiceDockerfilePath="./src/Services/Masa.Tsc.Service.Admin/Dockerfile"
+$ServiceServerName="masa-tsc-service-admin"
+$WebDockerfilePath="./src/Web/Masa.Tsc.Web.Admin.Server/Dockerfile"
+$WebServerName="masa-tsc-web-admin"
+
+docker build -t registry.cn-hangzhou.aliyuncs.com/masastack/${ServiceServerName}:$t  -f $ServiceDockerfilePath .
+docker push registry.cn-hangzhou.aliyuncs.com/masastack/${ServiceServerName}:$t 
+
+docker build -t registry.cn-hangzhou.aliyuncs.com/masastack/${WebServerName}:$t  -f $WebDockerfilePath .
+docker push registry.cn-hangzhou.aliyuncs.com/masastack/${WebServerName}:$t 

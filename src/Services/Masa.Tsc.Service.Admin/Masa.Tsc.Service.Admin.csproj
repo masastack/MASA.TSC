@@ -12,22 +12,18 @@
 		<Compile Remove="Domain\Instruments\Services\**" />
 		<Compile Remove="Domain\Projects\**" />
 		<Compile Remove="Domain\Teams\**" />
-		<Compile Remove="Infrastructure\Middleware\**" />
 		<Content Remove="Application\Apps\**" />
 		<Content Remove="Domain\Instruments\Services\**" />
 		<Content Remove="Domain\Projects\**" />
 		<Content Remove="Domain\Teams\**" />
-		<Content Remove="Infrastructure\Middleware\**" />
 		<EmbeddedResource Remove="Application\Apps\**" />
 		<EmbeddedResource Remove="Domain\Instruments\Services\**" />
 		<EmbeddedResource Remove="Domain\Projects\**" />
 		<EmbeddedResource Remove="Domain\Teams\**" />
-		<EmbeddedResource Remove="Infrastructure\Middleware\**" />
 		<None Remove="Application\Apps\**" />
 		<None Remove="Domain\Instruments\Services\**" />
 		<None Remove="Domain\Projects\**" />
 		<None Remove="Domain\Teams\**" />
-		<None Remove="Infrastructure\Middleware\**" />
 	</ItemGroup>
 
 	<ItemGroup>		
