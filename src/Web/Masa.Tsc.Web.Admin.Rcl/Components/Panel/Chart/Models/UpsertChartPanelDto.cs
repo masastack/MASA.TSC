@@ -423,10 +423,16 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         return EChartType.Json;
     }
 
+    public void SetTimeZoneChange()
+    {
+        IsLoadChartData = true;
+        Key = "TimeZoneChange" + Guid.NewGuid();
+    }
+
     void LoadChartData(TimeZoneInfo timeZoneInfo)
     {
-        //if (IsLoadChartData is false) return;
-        //IsLoadChartData = false;
+        if (IsLoadChartData is false) return;
+        IsLoadChartData = false;
 
         if (ChartType is "line" or "bar")
         {

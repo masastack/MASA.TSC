@@ -17,40 +17,54 @@ public partial class ServiceCallChart
     private EChartType _options = EChartConst.Line;
 
     private List<QueryResultDataResponse>? _data;
+    private DateTime StartTime = DateTime.UtcNow.AddDays(-1);
+    private DateTime EndTime = DateTime.UtcNow;
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         if (query == null)
-            return;
-        DateTime start = DateTime.UtcNow.AddDays(-1);
-        DateTime end = DateTime.UtcNow;
+            return;       
         if (query.Start.HasValue)
-            start = query.Start.Value;
+            StartTime = query.Start.Value;
         if (query.End.HasValue)
-            end = query.End.Value;
+            EndTime = query.End.Value;
 
-        var step = start.Interval(end);
+        var step = StartTime.Interval(EndTime);
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
                 $"round(sum by(service_name)(increase(http_server_duration_count[1m])),0.01)"
             },
             ServiceName = query.AppId,
-            Start = start,
-            End = end,
+            Start = StartTime,
+            End = EndTime,
             Step = step
         });
 
+        SetData();
+    }
+
+    private void SetData()
+    {
         List<string> values = new();
         var timeSpans = new List<double>();
 
-        if (_data[0] != null && _data[0].ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && _data[0].Result != null && _data[0].Result.Any())
+        if (_data[0] != null && _data[0].ResultType == ResultTypes.Matrix && _data[0].Result != null && _data[0].Result.Any())
         {
             timeSpans.AddRange(((QueryResultMatrixRangeResponse)_data[0].Result![0]).Values!.Select(values => Convert.ToDouble(values[0])));
             values = ((QueryResultMatrixRangeResponse)_data[0].Result![0])!.Values!.Select(values => values[1].ToString()!).ToList();
         }
-        var format = start.Format(end);
-        _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value,format)));
+        var format = StartTime.Format(EndTime);
+        _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value, format)));
         _options.SetValue("series[0].data", values);
+    }
+
+    protected override bool IsSubscribeTimeZoneChange => true;
+
+    protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
+    {
+        SetData();
+        StateHasChanged();
+        await base.OnTimeZoneInfoChanged(timeZoneInfo);
     }
 }

@@ -22,7 +22,7 @@
             <DateTimeRangeToolbar Class="mr-6 my-auto" DefaultQuickRange="_defaultValue" DefaultQuickRangeChanged="@(value=>_defaultValue=value)"
                                   StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
                                   EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start"
-                                  OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" OnTimeZoneUpdate="OnTimeZoneUpdate" />
+                                  OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
             <MTooltip Top>
                 <ActivatorContent>
                     <div @attributes="@context.Attrs" @onclick="SwitchEdit" class="mr-6 my-auto d-flex">
@@ -53,12 +53,10 @@
             <CascadingValue Value="ConfigurationRecord.IsEdit">
                 <CascadingValue Value="PanelGrids" IsFixed>
                     <CascadingValue Value="ConfigurationRecord">
-                        <CascadingValue Value="CurrentTimeZone">
-                            @if (ConfigurationRecord.Panels.Any() && (ConfigurationRecord.ShowServiceCompontent is false || string.IsNullOrEmpty(ConfigurationRecord.AppName) is false))
-                            {
-                                <PanelGrids Panels="ConfigurationRecord.Panels" />
-                            }
-                        </CascadingValue>
+                        @if (ConfigurationRecord.Panels.Any() && (ConfigurationRecord.ShowServiceCompontent is false || string.IsNullOrEmpty(ConfigurationRecord.AppName) is false))
+                        {
+                            <PanelGrids Panels="ConfigurationRecord.Panels" />
+                        }
                     </CascadingValue>
                 </CascadingValue>
             </CascadingValue>

@@ -3,7 +3,7 @@
 
 <MCard Width="Width" Height="Height" Class="d-flex flex-column rounded-lg">
     <MCardTitle>
-        <MLabel Class="emphasis2--text h6">@(Title + "(" + T(unit) + ")")</MLabel>
+        <MLabel Class="emphasis2--text h6">@(Title + "(" + T(Unit) + ")")</MLabel>
     </MCardTitle>
     <MCardText Class="flex-grow-1 d-flex justify-center align-center emphasis--text">
         @if (_isLoading)
@@ -12,8 +12,8 @@
         }
         else
         {
-            <span style="font-weight: 700;font-size: 60px;line-height: 76px;text-align: center;letter-spacing: -0.5px;">@total</span>
-            <span class="ml-2 h4 ">@unit</span>
+            <span style="font-weight: 700;font-size: 60px;line-height: 76px;text-align: center;letter-spacing: -0.5px;">@Total</span>
+            <span class="ml-2 h4 ">@Unit</span>
         }
     </MCardText>
     <MCardActions Class="regular3--text body2 px-4">

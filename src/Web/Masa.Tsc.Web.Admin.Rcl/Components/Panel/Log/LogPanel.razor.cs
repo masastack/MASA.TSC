@@ -63,6 +63,14 @@ public partial class LogPanel
 
     MECharts? MECharts { get; set; }
 
+    protected override bool IsSubscribeTimeZoneChange => true;
+
+    protected override Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
+    {
+        StateHasChanged();
+        return base.OnTimeZoneInfoChanged(timeZoneInfo);
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         await GetCompontentLogsAsync();
@@ -126,12 +134,6 @@ public partial class LogPanel
         Loading = false;
     }
 
-    private async Task OnTimeZoneUpdate(TimeZoneInfo timeZoneInfo)
-    {
-        CurrentTimeZone = timeZoneInfo;
-        StateHasChanged();
-    }
-
     protected string ToDateTimeStr(long value, string format)
     {
         var utcTime = value.ToDateTime(CurrentTimeZone);
@@ -164,7 +166,6 @@ public partial class LogPanel
             Conditions = conditions
         });
         ChartData = result ?? new();
-        
     }
 
     private object FormatChartData()
@@ -174,7 +175,7 @@ public partial class LogPanel
         string[] xAxisData = ChartData?.Select(item => ToDateTimeStr(item.Key, format))?.ToArray() ?? Array.Empty<string>();
         long[] durations = ChartData?.Select(item => item.Value)?.ToArray() ?? Array.Empty<long>();
 
-       return new
+        return new
         {
             tooltip = new
             {
@@ -200,7 +201,7 @@ public partial class LogPanel
                 type = "value"
             },
             series = new[]
-            {
+             {
                 new
                 {
                     type = "bar",
@@ -221,5 +222,5 @@ public partial class LogPanel
                 bottom = 40
             }
         };
-    }   
+    }
 }

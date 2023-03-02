@@ -20,4 +20,6 @@ public interface IEChartPanelValue : IPanelValue
     public object? GetChartOption(TimeZoneInfo timeZoneInfo);
 
     public string GetChartKey();
+
+    public void SetTimeZoneChange();
 }

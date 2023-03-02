@@ -121,12 +121,6 @@ public partial class Configuration : IAsyncDisposable
         //await PanelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();
     }
 
-    void OnTimeZoneUpdate(TimeZoneInfo timeZoneInfo)
-    {
-        CurrentTimeZone = timeZoneInfo;
-        StateHasChanged();
-    }
-
     void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
         (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;

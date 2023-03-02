@@ -19,6 +19,7 @@ public partial class ChartPanel
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         await ReloadAsync();
     }
 
@@ -85,5 +86,17 @@ public partial class ChartPanel
         var data = await GetMetricsAsync();
         Value.SetChartData(data, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
         IsLoading = false;
+    }
+
+    protected override bool IsSubscribeTimeZoneChange => true;
+
+    protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
+    {
+        if (Value.ChartType is "line" or "bar" or "line-area")
+        {
+            Value.SetTimeZoneChange();
+            StateHasChanged();
+        }
+        await base.OnTimeZoneInfoChanged(timeZoneInfo);
     }
 }

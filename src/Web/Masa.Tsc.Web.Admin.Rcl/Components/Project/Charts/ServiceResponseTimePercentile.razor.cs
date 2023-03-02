@@ -17,10 +17,14 @@ public partial class ServiceResponseTimePercentile
     private EChartType _options = EChartConst.Line;
     private List<QueryResultDataResponse>? _data;
 
+    private DateTime StartTime;
+    private DateTime EndTime;
+
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        DateTime start = query.Start!.Value, end = query.End!.Value;
-        var step = start.Interval(end);
+        StartTime = query.Start!.Value;
+        EndTime = query.End!.Value;
+        var step = StartTime.Interval(EndTime);
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
@@ -30,12 +34,16 @@ public partial class ServiceResponseTimePercentile
                 $"round(histogram_quantile(0.95,sum(increase(http_server_duration_bucket[5m])) by (le)),0.01)",
                 $"round(histogram_quantile(0.99,sum(increase(http_server_duration_bucket[5m])) by (le)),0.01)"
             },
-            Start = start,
+            Start = StartTime,
             ServiceName = query.AppId,
-            End = end,
+            End = EndTime,
             Step = step
         });
+        SetData();
+    }
 
+    private void SetData()
+    {
         Dictionary<string, List<string>> dddd = new();
         var timeSpans = new List<double>();
 
@@ -43,7 +51,7 @@ public partial class ServiceResponseTimePercentile
         var index = 0;
         foreach (var item in _data)
         {
-            if (item != null && item.ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && item.Result != null && item.Result.Any())
+            if (item != null && item.ResultType == ResultTypes.Matrix && item.Result != null && item.Result.Any())
             {
                 timeSpans.AddRange(((QueryResultMatrixRangeResponse)item.Result[0]).Values!.Select(values => Convert.ToDouble(values[0])));
             }
@@ -54,7 +62,7 @@ public partial class ServiceResponseTimePercentile
         index = 0;
         foreach (var item in _data)
         {
-            if (item != null && item.ResultType == Utils.Data.Prometheus.Enums.ResultTypes.Matrix && item.Result != null && item.Result.Any())
+            if (item != null && item.ResultType == ResultTypes.Matrix && item.Result != null && item.Result.Any())
             {
                 var key = legend[index++];
                 dddd[key] = ((QueryResultMatrixRangeResponse)item.Result[0]).Values!.Select(values => values[1].ToString()).ToList()!;
@@ -69,8 +77,17 @@ public partial class ServiceResponseTimePercentile
             y = 25
         });
         _options.SetValue("legend.data", legend);
-        var format = start.Format(end);
+        var format = StartTime.Format(EndTime);
         _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value, format)));
         _options.SetValue("series", dddd.Select(item => new { name = item.Key, type = "line", data = item.Value }));
+    }
+
+    protected override bool IsSubscribeTimeZoneChange => true;
+
+    protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
+    {
+        SetData();
+        StateHasChanged();
+        await base.OnTimeZoneInfoChanged(timeZoneInfo);
     }
 }

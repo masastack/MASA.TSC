@@ -19,8 +19,6 @@ public partial class TscTrace
     private bool _isDesc = true;
     private bool _loading;
 
-    private TscTraceList _tscTraceList = default!;
-
     [CascadingParameter]
     ConfigurationRecord? ConfigurationRecord { get; set; }
 
@@ -204,10 +202,5 @@ public partial class TscTrace
         };
 
         return ApiCaller.TraceService.GetAttrValuesAsync(query);
-    }
-
-    private void OnTimeZoneUpdated(TimeZoneInfo timeZoneInfo)
-    {
-        _tscTraceList.SetTimeZoneInfo(timeZoneInfo);
     }
 }
