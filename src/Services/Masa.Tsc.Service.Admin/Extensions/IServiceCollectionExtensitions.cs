@@ -9,7 +9,7 @@ public static class IServiceCollectionExtensitions
     {
         services.AddElasticsearch(TopologyConstants.ES_CLINET_NAME, options =>
           {
-              options.UseNodes(elasearchUrls);
+              options.UseNodes(elasearchUrls).UseConnectionSettings(setting => setting.EnableApiVersioningHeader(false));
           });
 
         var fatory = services.BuildServiceProvider().GetRequiredService<IElasticClientFactory>();
