@@ -134,10 +134,6 @@ public partial class Configuration : IAsyncDisposable
 
     async Task SaveAsync()
     {
-        //if (ConfigurationRecord.Panels.Any() is false)
-        //{
-        //    PanelGrids.Clear();
-        //}
         await PanelGrids.SaveUI();
         await ApiCaller.InstrumentService.UpsertPanelAsync(Guid.Parse(ConfigurationRecord.DashboardId), ConfigurationRecord.Panels.ToArray());
         OpenSuccessMessage(T("Save success"));
