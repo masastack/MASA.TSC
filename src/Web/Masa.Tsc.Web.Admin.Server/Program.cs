@@ -2,8 +2,13 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddObservable(builder.Logging, builder.Configuration, true);
-string tscUrl = builder.Configuration["Masa:Tsc:ServiceBaseAddress"];
+
+await builder.Services.AddMasaStackConfigAsync();
+var masaStackConfig = builder.Services.GetMasaStackConfig();
+var tscUrl = builder.Environment.IsDevelopment() ? AppSettings.Get("ServiceAddress") : masaStackConfig.GetTscServiceDomain();
+
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -29,21 +34,37 @@ builder.WebHost.UseKestrel(option =>
     });
 });
 
-var dccConfig = builder.Configuration.GetSection("Masa:Dcc").Get<DccOptions>();
-builder.Services.AddDccClient(dccConfig.RedisOptions);
-builder.Services.AddMasaConfiguration(configurationBuilder =>
+builder.Services.AddObservable(builder.Logging, new MasaObservableOptions
 {
-    configurationBuilder.UseDcc(dccConfig, default, default);
-});
-IConfiguration config = builder.Services.GetMasaConfiguration().ConfigurationApi.GetPublic();
+    ServiceNameSpace = builder.Environment.EnvironmentName,
+    ServiceVersion = masaStackConfig.Version,
+    ServiceName = masaStackConfig.GetWebId(MasaStackConstant.TSC)
+}, masaStackConfig.OtlpUrl, true);
 
-var oidc = config.GetSection("$public.OIDC").Get<MasaOpenIdConnectOptions>();
-string authUrl = config.GetValue<string>("$public.AppSettings:AuthClient:Url");
-string mcUrl = config.GetValue<string>("$public.AppSettings:McClient:Url");
-string pmUrl = config.GetValue<string>("$public.AppSettings:PmClient:Url");
-builder.AddMasaStackComponentsForServer("wwwroot/i18n", authUrl, mcUrl, pmUrl);
-builder.Services.AddMasaOpenIdConnect(oidc)
-                          .AddTscApiCaller(tscUrl);
+MasaOpenIdConnectOptions masaOpenIdConnectOptions = new()
+{
+    Authority = masaStackConfig.GetSsoDomain(),
+    ClientId = masaStackConfig.GetWebId(MasaStackConstant.TSC),
+    Scopes = new List<string> { "offline_access" }
+};
+
+IdentityModelEventSource.ShowPII = true;
+builder.Services.AddMasaOpenIdConnect(masaOpenIdConnectOptions);
+
+var redisOption = new RedisConfigurationOptions
+{
+    Servers = new List<RedisServerOptions> {
+        new RedisServerOptions()
+        {
+            Host= masaStackConfig.RedisModel.RedisHost,
+            Port= masaStackConfig.RedisModel.RedisPort
+        }
+    },
+    DefaultDatabase = masaStackConfig.RedisModel.RedisDb,
+    Password = masaStackConfig.RedisModel.RedisPassword
+};
+builder.AddMasaStackComponentsForServer();
+builder.Services.AddTscApiCaller(tscUrl).AddDccClient(redisOption);
 builder.Services.AddRcl();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);

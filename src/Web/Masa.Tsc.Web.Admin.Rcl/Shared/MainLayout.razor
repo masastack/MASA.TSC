@@ -1,9 +1,10 @@
-﻿@using Microsoft.Extensions.Hosting;
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
+@inject GlobalConfig GlobalConfig
+@inject IMasaStackConfig MasaStackConfig
 
-<SLayout AppId="@MasaStackConsts.TSC_SYSTEM_WEB_APP_ID" OnErrorAsync="OnError" Exact=false
-         Logo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo-h-en.png"
-         MiniLogo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo.png"
+<SLayout AppId="@MasaStackConfig.GetWebId(MasaStackConstant.TSC)" OnErrorAsync="OnError" Exact=false
+        Logo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo-h-en.png"
+        MiniLogo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo.png"
          WhiteUris="_whiteUrlRoutes">
     @Body
 </SLayout>

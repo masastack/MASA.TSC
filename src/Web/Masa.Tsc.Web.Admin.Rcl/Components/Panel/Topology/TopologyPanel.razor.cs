@@ -103,11 +103,11 @@ public partial class TopologyPanel
 
     async Task GetYopologyPanelData()
     {
-        var result = await ApiCaller.TopologyService.GetAsync(ConfigurationRecord.AppName, _depth, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
+        var result = await ApiCaller.TopologyService.GetAsync(ConfigurationRecord.AppName!, _depth, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
         if (result?.Data is null) return;
         Antvg6Option.Data = new
         {
-            nodes = result.Services.Select(item => new 
+            nodes = result.Services.Select(item => new
             {
                 id = item.Id,
                 label = item.Name

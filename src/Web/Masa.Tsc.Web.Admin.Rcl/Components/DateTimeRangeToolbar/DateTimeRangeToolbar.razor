@@ -63,7 +63,7 @@
     public QuickRangeKey? DefaultQuickRange { get; set; }
 
     [Parameter]
-    public EventCallback<QuickRangeKey> DefaultQuickRangeChanged { get; set; }
+    public EventCallback<QuickRangeKey?> DefaultQuickRangeChanged { get; set; }
 
     [Parameter]
     public TimeSpan Offset { get; set; }
@@ -175,6 +175,10 @@
             {
                 _quickRange = _quickRangeItems.FirstOrDefault(item => item.Key == DefaultQuickRange) ?? s_internalDefaultQuickRange;
             }
+            else
+            {
+                DefaultQuickRange = _quickRange.Key;
+            }
 
             _selectedQuickRangeKey = _quickRange.Key;
 
@@ -266,7 +270,7 @@
 
     private async Task OnRelatedTimeSpanSelected(QuickRange item)
     {
-        _quickRange = item;
+        _quickRange = item;        
         await UpdateRangeDateTimeToLatest();
         if (DefaultQuickRangeChanged.HasDelegate)
             await DefaultQuickRangeChanged.InvokeAsync(item.Key);

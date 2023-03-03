@@ -4,11 +4,11 @@
 
 <PageTitle>@T("ProjectTeam")</PageTitle>
 <TeamSearch OnValueChanged="OnSearch" OnTabsChanged="OnTabsChange" OnSearchChanged="OnSearchChange"></TeamSearch>
-<MCard Class="mt-8" Style="min-width:464px">
-    <MRow Class="overflow-auto d-flex justify-space-between" Style="min-height: calc(100vh - 190px);">
+<MCard Class="d-flex mt-8" Style="min-width:464px">
+    <MRow Class="overflow-auto d-flex justify-space-between pt-8" Style="min-height: calc(100vh - 190px);">
         @if (_isLoad)
         {
-            <div class="full-height full-width d-flex">
+            <div class="full-height full-width d-flex col">
                 <div class="ma-auto">@T("Loading data")</div>
             </div>
         }

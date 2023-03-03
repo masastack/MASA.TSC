@@ -11,7 +11,7 @@ public partial class Configuration : IAsyncDisposable
     IJSObjectReference? _history;
     DotNetObjectReference<Configuration> _dotNetHelper;
 
-    private QuickRangeKey _defaultValue = QuickRangeKey.Last15Minutes;
+    private QuickRangeKey? _defaultValue = QuickRangeKey.Last15Minutes;
 
     [Inject]
     public ConfigurationRecord ConfigurationRecord { get; set; }

@@ -1,13 +1,11 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Nest;
-
 namespace Masa.Tsc.Service.Admin.Infrastructure.Repositories.Topologies;
 
 internal class TraceServiceStateRepository : ITraceServiceStateRepository
 {
-    private readonly IElasticClient _client;
+    private readonly ElasticsearchNest.IElasticClient _client;
     private readonly ILogger _logger;
 
     public TraceServiceStateRepository(ILogger<TraceServiceStateRepository> logger, IElasticClientFactory elasticClientFactory)
@@ -41,44 +39,44 @@ internal class TraceServiceStateRepository : ITraceServiceStateRepository
         if (!response.Aggregations.Any() || !response.Aggregations.ContainsKey(nameof(TraceServiceState.ServiceId)))
             return default!;
 
-        var serviceGroups = (BucketAggregate)response.Aggregations[nameof(TraceServiceState.ServiceId)];
+        var serviceGroups = (ElasticsearchNest.BucketAggregate)response.Aggregations[nameof(TraceServiceState.ServiceId)];
         return SetServiceId(serviceGroups);
     }
 
-    private List<TopologyServiceDataDto> SetServiceId(BucketAggregate aggResult)
+    private List<TopologyServiceDataDto> SetServiceId(ElasticsearchNest.BucketAggregate aggResult)
     {
         var result = new List<TopologyServiceDataDto>();
         foreach (var item in aggResult.Items)
         {
-            var bucket = (KeyedBucket<object>)item;
+            var bucket = (ElasticsearchNest.KeyedBucket<object>)item;
             if (!bucket.ContainsKey(nameof(TraceServiceState.DestServiceId)))
                 continue;
 
-            var items = SetDesctServiceId((string)bucket.Key, (BucketAggregate)bucket[nameof(TraceServiceState.DestServiceId)]);
+            var items = SetDesctServiceId((string)bucket.Key, (ElasticsearchNest.BucketAggregate)bucket[nameof(TraceServiceState.DestServiceId)]);
             if (items != null && items.Any())
                 result.AddRange(items);
         }
         return result;
     }
 
-    private IEnumerable<TopologyServiceDataDto> SetDesctServiceId(string serviceId, BucketAggregate aggResult)
+    private IEnumerable<TopologyServiceDataDto> SetDesctServiceId(string serviceId, ElasticsearchNest.BucketAggregate aggResult)
     {
         var result = new List<TopologyServiceDataDto>();
         foreach (var item in aggResult.Items)
         {
-            var ddd = (KeyedBucket<object>)item;
-            var model = new TopologyServiceDataDto { CurrentId = serviceId, DestId = (string)ddd.Key };
-            SetValues(ddd, model);
+            var value = (ElasticsearchNest.KeyedBucket<object>)item;
+            var model = new TopologyServiceDataDto { CurrentId = serviceId, DestId = (string)value.Key };
+            SetValues(value, model);
             result.Add(model);
         }
         return result;
     }
 
-    private void SetValues(KeyedBucket<object> result, TopologyServiceDataDto model)
+    private void SetValues(ElasticsearchNest.KeyedBucket<object> result, TopologyServiceDataDto model)
     {
         foreach (var key in result.Keys)
         {
-            var value = result[key] as ValueAggregate;
+            var value = result[key] as ElasticsearchNest.ValueAggregate;
             if (value == null)
                 continue;
             if (key == "CallCount")
