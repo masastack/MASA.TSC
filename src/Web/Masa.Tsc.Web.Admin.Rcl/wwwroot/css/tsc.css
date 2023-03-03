@@ -289,3 +289,7 @@
     padding: 10px 8px;
     box-shadow: rgb(174, 174, 174) 0px 0px 10px;
 }
+
+.m-tooltip.m-tooltip--top.m-tooltip--attached {
+    display:none !important;
+}
