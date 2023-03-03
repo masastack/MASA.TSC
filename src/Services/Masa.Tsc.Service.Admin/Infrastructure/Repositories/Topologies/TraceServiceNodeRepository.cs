@@ -1,13 +1,11 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Nest;
-
 namespace Masa.Tsc.Service.Admin.Infrastructure.Repositories.Topologies;
 
 public class TraceServiceNodeRepository : ITraceServiceNodeRepository
 {
-    private readonly IElasticClient _client;
+    private readonly ElasticsearchNest.IElasticClient _client;
     private readonly ILogger _logger;
 
     public TraceServiceNodeRepository(ILogger<TraceServiceNodeRepository> logger, IElasticClientFactory elasticClientFactory)
