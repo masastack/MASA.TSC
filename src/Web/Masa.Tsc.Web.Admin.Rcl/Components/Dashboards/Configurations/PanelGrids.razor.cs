@@ -26,7 +26,7 @@ public partial class PanelGrids
 
     protected override void OnParametersSet()
     {
-        if(PanelGridRange.Contains(this) is false)
+        if(Panels.Any() && PanelGridRange.Contains(this) is false)
         {
             PanelGridRange.Add(this);
         }
