@@ -10,10 +10,10 @@ public class QueryHandler
     private readonly ILogger _logger;
     private readonly object lockObj = new();
 
-    public QueryHandler(IMasaPrometheusClient masaPrometheusClient, IMultilevelCacheClientFactory multilevelCacheClientFactory, ILogger<QueryHandler> logger)
+    public QueryHandler(IMasaStackConfig masaStackConfig, IMasaPrometheusClient masaPrometheusClient, IMultilevelCacheClientFactory multilevelCacheClientFactory, ILogger<QueryHandler> logger)
     {
         _prometheusClient = masaPrometheusClient;
-        _multilevelCacheClient = multilevelCacheClientFactory.Create(MasaStackConsts.TSC_SYSTEM_SERVICE_APP_ID);
+        _multilevelCacheClient = multilevelCacheClientFactory.Create(masaStackConfig.GetServerId(MasaStackConstant.TSC));
         _logger = logger;
     }
 
@@ -340,7 +340,7 @@ public class QueryHandler
             {
                 positions.Add(index);
             }
-            
+
             start = index + itemLenth;
             if (str.Length - start - itemLenth < 0)
                 break;

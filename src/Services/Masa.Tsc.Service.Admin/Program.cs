@@ -22,7 +22,7 @@ builder.Services.AddElasticClientLogAndTrace(elasearchUrls, logIndexName, traceI
     .AddTopology(elasearchUrls);
 
 builder.Services.AddDaprClient();
-builder.Services.AddDccClient();
+await builder.Services.AddDccClient().AddSchedulerClient(masaStackConfig.GetSchedulerServiceDomain()).AddSchedulerJobAsync();
 var redisOption = new RedisConfigurationOptions
 {
     Servers = new List<RedisServerOptions> {
@@ -81,12 +81,12 @@ builder.Services.AddMasaIdentity(options =>
         return default!;
     })
     .AddAuthClient(masaStackConfig.GetAuthServiceDomain(), redisOption)
-    .AddPmClient(masaStackConfig.GetPmServiceDomain())
-    .AddMultilevelCache(MasaStackConsts.TSC_SYSTEM_SERVICE_APP_ID,
+.AddPmClient(masaStackConfig.GetPmServiceDomain())
+    .AddMultilevelCache(masaStackConfig.GetServerId(MasaStackConstant.TSC),
         distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
         multilevelCacheOptions =>
         {
-            multilevelCacheOptions.SubscribeKeyPrefix = MasaStackConsts.TSC_SYSTEM_ID;
+            multilevelCacheOptions.SubscribeKeyPrefix = MasaStackConstant.TSC;
             multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
         });
 

@@ -19,7 +19,9 @@ public class CommandHandler
     private static Task _currentTask;
     private static CancellationTokenSource _tokenSource = new();
 
-    public CommandHandler(ITraceService traceService,
+    public CommandHandler(
+        IMasaStackConfig masaStackConfig,
+        ITraceService traceService,
         IMultilevelCacheClientFactory multilevelCacheClientFactory,
         ITraceServiceNodeRepository traceServiceNodeRepository,
         ITraceServiceRelationRepository traceServiceRelationRepository,
@@ -27,7 +29,7 @@ public class CommandHandler
         ILogger<CommandHandler> logger)
     {
         _traceService = traceService;
-        _multilevelCacheClient = multilevelCacheClientFactory.Create(MasaStackConsts.TSC_SYSTEM_SERVICE_APP_ID);
+        _multilevelCacheClient = multilevelCacheClientFactory.Create(masaStackConfig.GetServerId(MasaStackConstant.TSC));
         _traceServiceNodeRepository = traceServiceNodeRepository;
         _traceServiceRelationRepository = traceServiceRelationRepository;
         _traceServiceStateRepository = traceServiceStateRepository;
