@@ -12,7 +12,7 @@
     </ChildContent>
     <FooterContent>
         <div class="d-flex">
-            <SCheckbox @bind-Value="Dashboard.IsRoot" Label="@T("Set as root")" Class="my-auto" />
+            <SCheckbox @bind-Value="Dashboard.IsRoot" Label="@T("Set as root")" Class="my-auto" Style="display:none" />
             <MSpacer />
             <SButton Large OnClick="AddFolderAsync" Width="140" Style="min-width:140px !important;" Class="my-auto">@T("Save")</SButton>
         </div>       

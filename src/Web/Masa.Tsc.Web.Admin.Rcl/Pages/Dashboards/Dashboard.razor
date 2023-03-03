@@ -53,7 +53,7 @@
                                 break;
                             case "Action":
                                 <div class="d-flex">
-                                    <SButton Text Style="max-width:150px !important;border-radius: 6px !important;" Small Class="white btn mr-2" OnClick="async () => await SwitchRootAsync(context.Item)"><span class="emphasis2--text">@T(context.Item.IsRoot ? "Not set as root" : "Set as root")</span></SButton>
+                                    @*<SButton Text Style="max-width:150px !important;border-radius: 6px !important;" Small Class="white btn mr-2" OnClick="async () => await SwitchRootAsync(context.Item)"><span class="emphasis2--text">@T(context.Item.IsRoot ? "Not set as root" : "Set as root")</span></SButton>*@
                                     <SButton Icon Class="mr-4"><SIcon Tooltip="@T("Edit")" OnClick="() => OpenUpdateDashboardDialog(context.Item)">@IconConstants.Update</SIcon></SButton>
                                     <SButton Icon Color="red" OnClick="async () => await OpenRemoveDashboardDialogAsync(context.Item)"><SIcon Tooltip="@T("Remove")" Style="color:#F44336 !important;">@IconConstants.Remove</SIcon></SButton>
                                 </div>
@@ -97,7 +97,7 @@
                                             {
                                                 <MChip Class="mr-8 my-auto" Color="primary"> @dashboard.Type</MChip>
                                             }
-                                            <SButton StopPropagation Text Style="max-width:150px !important;border-radius: 6px !important;" Small Class="white btn mr-2" OnClick="async () => await SwitchRootAsync(dashboard)"><span class="emphasis2--text">@T(dashboard.IsRoot ? "Not set as root" : "Set as root")</span></SButton>
+                                            @*<SButton StopPropagation Text Style="max-width:150px !important;border-radius: 6px !important;" Small Class="white btn mr-2" OnClick="async () => await SwitchRootAsync(dashboard)"><span class="emphasis2--text">@T(dashboard.IsRoot ? "Not set as root" : "Set as root")</span></SButton>*@
                                             <SButton StopPropagation Icon Class="mr-4" OnClick="() => OpenUpdateDashboardDialog(dashboard)"><SIcon Tooltip="@T("Edit")">@IconConstants.Update</SIcon></SButton>
                                             <SButton StopPropagation Icon Color="red" OnClick="async () => await OpenRemoveDashboardDialogAsync(dashboard)"><SIcon Tooltip="@T("Remove")" Color="red">@IconConstants.Remove</SIcon></SButton>
                                         </MListItemAction>

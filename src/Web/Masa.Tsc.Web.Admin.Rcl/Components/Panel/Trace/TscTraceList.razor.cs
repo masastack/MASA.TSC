@@ -31,11 +31,11 @@ public partial class TscTraceList : TscComponentBase
 
     private List<DataTableHeader<TraceResponseDto>> _headers => new()
     {
-        new() { Text = T("Service"), Value = "Service", Sortable = false },
+        new() { Text = T("Service"), Value = "Service", Sortable = false,Width=250},
         new() { Text = T("TraceId"), Value = "TraceId", Sortable = false },
         new() { Text = T("Endpoint"), Value = "Endpoint", Sortable = false },
-        new() { Text = T("Duration (ms)"), Value = "Duration", Sortable = false},
-        new() { Text = T("Timestamp"), Value = "Timestamp", Sortable = true}
+        new() { Text = T("Duration (ms)"), Value = "Duration", Sortable = false,Width=150},
+        new() { Text = T("Timestamp"), Value = "Timestamp", Sortable = true,Width=200}
     };
 
     protected override void OnParametersSet()
