@@ -36,7 +36,7 @@ public partial class TopologyPanel
             animate = true,
             modes = new
             {
-                Default = new[] { "drag-node" },
+                Default = new[] { "drag-node","zoom-canvas", "drag-canvas" },
             },
             defaultNode = new
             {

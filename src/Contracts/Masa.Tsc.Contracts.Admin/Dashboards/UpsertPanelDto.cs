@@ -39,7 +39,7 @@ public class UpsertPanelDto
                     break;
                 case PanelTypes.Topology:
                     Width = 12;
-                    Height = 9;
+                    Height = 6;
                     break;
                 default: break;
             }

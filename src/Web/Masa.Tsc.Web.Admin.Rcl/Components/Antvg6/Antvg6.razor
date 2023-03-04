@@ -19,9 +19,9 @@
         {
             if (HasRendered is false && Value.Data is not null && Value.Option is not null)
             {
+                HasRendered = true;
                 await _helper.InvokeVoidAsync("init", _elementRef, Value.Option, Value.Data, Value.PluginOption);
                 _oldData = Value.Data;
-                HasRendered = true;
             }
             if (Value.Data != _oldData)
             {

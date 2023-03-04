@@ -75,6 +75,10 @@ G6.registerEdge(
     'quadratic',
 ); // 该自定义边继承了内置三阶贝塞尔曲线边 cubic
 
+var minimap = new Minimap({
+    size: [800, 400]
+});
+
 export function init(elementRef, option, data, pluginOption) {
     if (pluginOption.useNodeTooltip) {
         option.modes.default.push({
@@ -95,6 +99,7 @@ export function init(elementRef, option, data, pluginOption) {
     option.container = elementRef;
     const graph = new G6.Graph(option);
     elementRef.graph = graph;
+    graph.plugins = [minimap];
     graph.on('edge:mouseenter', (ev) => {
         const edge = ev.item;
         graph.setItemState(edge, 'active', true);
@@ -110,6 +115,7 @@ export function init(elementRef, option, data, pluginOption) {
 
 export function render(elementRef, data) {
     const graph = elementRef.graph;
+    graph.clear();
     graph.data(data); // 加载数据
     graph.render(); // 渲染
 };
