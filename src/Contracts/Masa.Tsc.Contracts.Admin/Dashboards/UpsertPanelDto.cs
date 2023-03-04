@@ -71,6 +71,20 @@ public class UpsertPanelDto
     [JsonIgnore]
     public UpsertPanelDto? ParentPanel { get; set; }
 
+    bool _isRemove;
+    public bool IsRemove
+    {
+        get => _isRemove;
+        set
+        {
+            _isRemove = value;
+            foreach(var item in ChildPanels)
+            {
+                item.IsRemove = value;
+            }
+        }
+    }
+
     public virtual UpsertPanelDto Clone(UpsertPanelDto panel)
     {
         Id = panel.Id;
@@ -95,6 +109,12 @@ public class UpsertPanelDto
         }
 
         return this;
+    }
+
+    protected void RemoveChildPanel(UpsertPanelDto panel)
+    {
+        panel.IsRemove = true;
+        ChildPanels.Remove(panel);
     }
 
     #endregion

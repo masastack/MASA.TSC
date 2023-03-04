@@ -75,10 +75,8 @@ public partial class Configuration : IAsyncDisposable
 
     async Task GetPanelsAsync()
     {
-        ConfigurationRecord.Panels.Clear();
-        PanelGrids.Clear();
+        ConfigurationRecord.ClearPanels();
         var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(ConfigurationRecord.DashboardId));
-        //ConfigurationRecord.Panels.Clear();
         if (detail is not null)
         {
             ConfigurationRecord.Model = detail.Model;
@@ -117,8 +115,6 @@ public partial class Configuration : IAsyncDisposable
         ConfigurationRecord.Panels.AdaptiveUI(new());
         if (_helper is not null)
             _helper.InvokeVoidAsync("scrollBottom", _scrollElementId, _contentElementId);
-        //ConfigurationRecord.Panels.Insert(0, panel);
-        //await PanelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();
     }
 
     void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
@@ -154,7 +150,6 @@ public partial class Configuration : IAsyncDisposable
             {
                 ConfigurationRecord.UpdateKey();
                 await GetPanelsAsync();
-                Convert(ConfigurationRecord.Panels);
                 ConfigurationRecord.IsEdit = false;
             }
             else ConfigurationRecord.IsEdit = true;

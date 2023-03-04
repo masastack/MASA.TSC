@@ -21,7 +21,7 @@ public class UpsertTabItemPanelDto : UpsertPanelDto
 
     public void AddPanel(PanelTypes panelType = default)
     {
-        ChildPanels.Add(new UpsertPanelDto()
+        ChildPanels.AdaptiveUI(new UpsertPanelDto()
         {
             PanelType = panelType,
             ParentPanel = this

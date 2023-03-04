@@ -17,7 +17,7 @@ public class UpsertTabsPanelDto : UpsertPanelDto
     {
         Id = id;
         PanelType = PanelTypes.Tabs;
-        AddTabItem();       
+        AddTabItem();
     }
 
     public void AddTabItem()
@@ -33,18 +33,18 @@ public class UpsertTabsPanelDto : UpsertPanelDto
         var index = ChildPanels.IndexOf(panel);
         if (index == 0)
         {
-            ChildPanels.Remove(panel);
+            RemoveChildPanel(panel);
             CurrentTabItem = ChildPanels.FirstOrDefault() as UpsertTabItemPanelDto;
         }
         else if (index == panel.ParentPanel!.ChildPanels.Count - 1)
         {
-            ChildPanels.Remove(panel);
+            RemoveChildPanel(panel);
             CurrentTabItem = ChildPanels.Last() as UpsertTabItemPanelDto;
         }
         else
         {
             CurrentTabItem = ChildPanels[index + 1] as UpsertTabItemPanelDto;
-            ChildPanels.Remove(panel);
+            RemoveChildPanel(panel);
         }
     }
 
