@@ -18,7 +18,7 @@ builder.Services.AddElasticClientLogAndTrace(elasearchUrls, logIndexName, traceI
         ServiceVersion = masaStackConfig.Version,
         ServiceName = masaStackConfig.GetServerId(MasaStackConstant.TSC)
     }, masaStackConfig.OtlpUrl, false)
-    .AddPrometheusClient(prometheusUrl)
+    .AddPrometheusClient(prometheusUrl,15)
     .AddTopology(elasearchUrls);
 
 builder.Services.AddDaprClient();
@@ -81,7 +81,7 @@ builder.Services.AddMasaIdentity(options =>
         return default!;
     })
     .AddAuthClient(masaStackConfig.GetAuthServiceDomain(), redisOption)
-.AddPmClient(masaStackConfig.GetPmServiceDomain())
+    .AddPmClient(masaStackConfig.GetPmServiceDomain())
     .AddMultilevelCache(masaStackConfig.GetServerId(MasaStackConstant.TSC),
         distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
         multilevelCacheOptions =>
@@ -89,6 +89,8 @@ builder.Services.AddMasaIdentity(options =>
             multilevelCacheOptions.SubscribeKeyPrefix = MasaStackConstant.TSC;
             multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
         });
+
+builder.Services.AddI18n(Path.Combine("Assets", "I18n"));
 
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -136,6 +138,8 @@ var app = builder.Services
     })
     .AddTopologyRepository()
     .AddServices(builder);
+
+app.UseI18n();
 
 await builder.Services.MigrateAsync();
 app.UseMasaExceptionHandler(opt =>

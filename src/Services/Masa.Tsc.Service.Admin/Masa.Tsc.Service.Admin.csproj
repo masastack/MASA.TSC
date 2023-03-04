@@ -86,9 +86,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="Assets\Fonts\SourceHanSansCN-Normal.ttf">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 		<None Update="Dockerfile">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Nest;
+
 namespace Masa.Tsc.Service.Admin.Domain.Topologies.Aggregates;
 
 /// <summary>
@@ -8,25 +10,25 @@ namespace Masa.Tsc.Service.Admin.Domain.Topologies.Aggregates;
 /// </summary>
 public class TraceServiceState
 {
-    [ElasticsearchNest.Keyword]
+    [Keyword]
     public string ServiceId { get; set; }
 
-    [ElasticsearchNest.Keyword]
+    [Keyword]
     public string ServiceName { get; set; }
 
-    [ElasticsearchNest.Keyword]
+    [Keyword]
     public string Instance { get; set; }
 
-    [ElasticsearchNest.Keyword]
+    [Keyword]
     public string DestEndpint { get; set; }
 
-    [ElasticsearchNest.Keyword]
+    [Keyword]
     public string DestInstance { get; set; }
 
-    [ElasticsearchNest.Keyword]
+    [Keyword]
     public string DestServiceId { get; set; }
 
-    [ElasticsearchNest.Keyword]
+    [Keyword]
     public string DestServiceName { get; set; }
 
     public DateTime Timestamp { get; set; }

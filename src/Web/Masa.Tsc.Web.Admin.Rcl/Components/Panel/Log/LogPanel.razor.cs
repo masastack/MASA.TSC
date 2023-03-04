@@ -174,9 +174,16 @@ public partial class LogPanel
         var format = start.Format(end);
         string[] xAxisData = ChartData?.Select(item => ToDateTimeStr(item.Key, format))?.ToArray() ?? Array.Empty<string>();
         long[] durations = ChartData?.Select(item => item.Value)?.ToArray() ?? Array.Empty<long>();
+        var subText = $"{start.Format(CurrentTimeZone)}～{end.Format(CurrentTimeZone)}";
 
         return new
         {
+            title = new
+            {
+                right = 20,
+                top=-14,
+                subtext = subText,
+            },
             tooltip = new
             {
                 trigger = "axis",
@@ -186,41 +193,106 @@ public partial class LogPanel
                     crossStyle = new { color = "#A18BFF66" }
                 }
             },
-            xAxis = new
+            legend = new
             {
-                type = "category",
-                data = xAxisData,
-                axisPointer = new
-                {
-                    type = "shadow"
-                }
+                data = new[] { "Log Count" },
+                bottom = true
             },
-            yAxis = new
+            xAxis = new[]
             {
-                name = T("Total Count"),
-                type = "value"
-            },
-            series = new[]
-             {
                 new
                 {
+                    type = "category",
+                    data = xAxisData,
+                    axisPointer = new
+                    {
+                        type = "shadow"
+                    }
+                },
+            },
+            yAxis = new[]
+            {
+                new
+                {
+                    type = "value",
+                    //name = $"span({T("Total Count")})"
+                },
+            },
+            series = new[]
+            {
+                new
+                {
+                    name = "Log Count" ,
                     type = "bar",
                     yAxisIndex = 0,
-                    data = (object)durations,
+                    data =(object)durations,
                     itemStyle = new
                     {
                         color = "#4318FF"
+                    },
+                    lineStyle = new
+                    {
+                        color = "",
+                        type = ""
                     },
                     smooth = false
                 }
             },
             grid = new
             {
-                top = 30,
-                left = 80,
+                top = 20,
+                left = 70,
                 right = 20,
-                bottom = 40
+                bottom = 50
             }
         };
+
+        //return new
+        //{
+        //    tooltip = new
+        //    {
+        //        trigger = "axis",
+        //        axisPointer = new
+        //        {
+        //            type = "cross",
+        //            crossStyle = new { color = "#A18BFF66" }
+        //        }
+        //    },
+        //    xAxis = new
+        //    {
+        //        type = "category",
+        //        data = xAxisData,
+        //        axisPointer = new
+        //        {
+        //            type = "shadow"
+        //        }
+        //    },
+        //    yAxis = new
+        //    {
+        //        name = T("Total Count"),
+        //        type = "value"
+        //    },
+        //    series = new[]
+        //     {
+        //        new
+        //        {
+        //            type = "bar",
+        //            yAxisIndex = 0,
+        //            data = (object)durations,
+        //            itemStyle = new
+        //            {
+        //                color = "#4318FF"
+        //            },
+        //            smooth = false
+        //        }
+        //    },
+        //    grid = new
+        //    {
+        //        top = 30,
+        //        left = 80,
+        //        right = 20,
+        //        bottom = 40
+        //    }
+        //};
     }
 }
