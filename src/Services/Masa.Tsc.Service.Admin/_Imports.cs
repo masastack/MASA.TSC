@@ -2,6 +2,8 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 global using FluentValidation;
+global using Masa.Contrib.StackSdks.Middleware;
+global using Masa.BuildingBlocks.StackSdks.Middleware;
 global using Masa.BuildingBlocks.Authentication.Identity;
 global using Masa.BuildingBlocks.Caching;
 global using Masa.BuildingBlocks.Data.UoW;

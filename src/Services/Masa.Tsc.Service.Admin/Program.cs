@@ -18,7 +18,7 @@ builder.Services.AddElasticClientLogAndTrace(elasearchUrls, logIndexName, traceI
         ServiceVersion = masaStackConfig.Version,
         ServiceName = masaStackConfig.GetServerId(MasaStackConstant.TSC)
     }, masaStackConfig.OtlpUrl, false)
-    .AddPrometheusClient(prometheusUrl,15)
+    .AddPrometheusClient(prometheusUrl, 15)
     .AddTopology(elasearchUrls);
 
 builder.Services.AddDaprClient();
@@ -90,7 +90,8 @@ builder.Services.AddMasaIdentity(options =>
             multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
         });
 
-builder.Services.AddI18n(Path.Combine("Assets", "I18n"));
+builder.Services.AddScoped<IDisabledEventDeterminer, TscDisabledEventDeterminer>();
+builder.Services.AddStackMiddleware();
 
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -128,10 +129,7 @@ var app = builder.Services
             {
                 options.UseDapr()
                 .UseEventLog<TscDbContext>()
-                .UseEventBus(envenbusBuilder =>
-                {
-                    envenbusBuilder.UseMiddleware(typeof(DisabledCommandMiddleware<>));
-                });
+                .UseEventBus();
             })
             .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(AppSettings.Get("DBName"))).UseFilter())
             .UseRepository<TscDbContext>();
@@ -139,7 +137,7 @@ var app = builder.Services
     .AddTopologyRepository()
     .AddServices(builder);
 
-app.UseI18n();
+app.UseAddStackMiddleware();
 
 await builder.Services.MigrateAsync();
 app.UseMasaExceptionHandler(opt =>
