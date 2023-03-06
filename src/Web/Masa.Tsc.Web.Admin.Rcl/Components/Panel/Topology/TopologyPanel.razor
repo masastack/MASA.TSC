@@ -1,6 +1,24 @@
 ﻿@inherits TscComponentBase
 
-<div style="height: calc(100% - 18px);width: calc(100% - 18px);">
+@*@if (IsLoading)
+{
+    <div class="d-flex" style="height: calc(100% - 18px);width: calc(100% - 18px);">
+        <div class="ma-auto">@T("Loading data")</div>
+    </div>
+}
+else
+{
+    <div style="height: calc(100% - 18px);width: calc(100% - 18px);">
+        <Antvg6 Value="Antvg6Option" />
+    </div>
+}*@
+@if (IsLoading)
+{
+    <div style="position:absolute;top:20%;left:49%;">
+        <div>@T("Loading data")</div>
+    </div>
+}
+<div style="height: calc(100% - 18px);width: calc(100% - 18px);@(IsLoading?"visibility: hidden;":"")">
     <Antvg6 Value="Antvg6Option" />
 </div>
 <div style="min-width:242px;overflow:auto;position:absolute;top:24px;right:24px;">
