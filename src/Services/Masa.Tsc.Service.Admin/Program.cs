@@ -91,7 +91,7 @@ builder.Services.AddMasaIdentity(options =>
         });
 
 builder.Services.AddScoped<IDisabledEventDeterminer, TscDisabledEventDeterminer>();
-builder.Services.AddStackMiddleware();
+builder.Services.AddStackMiddleware().AddHealthChecks();
 
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -172,4 +172,5 @@ app.UseEndpoints(endpoints =>
     endpoints.MapSubscribeHandler();
 });
 app.UseHttpsRedirection();
+app.UseHealthChecks("/healthy");
 app.Run();
