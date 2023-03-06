@@ -138,7 +138,6 @@ var app = builder.Services
     .AddServices(builder);
 
 app.UseAddStackMiddleware();
-
 await builder.Services.MigrateAsync();
 app.UseMasaExceptionHandler(opt =>
 {

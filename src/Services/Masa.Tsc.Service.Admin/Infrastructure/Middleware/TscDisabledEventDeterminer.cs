@@ -15,7 +15,7 @@ public class TscDisabledEventDeterminer : IDisabledEventDeterminer
         _masaStackConfig = masaStackConfig;
     }
 
-    public bool DisabledCommand => throw new NotImplementedException();
+    public bool DisabledCommand => true;
 
     public bool Determiner()
     {

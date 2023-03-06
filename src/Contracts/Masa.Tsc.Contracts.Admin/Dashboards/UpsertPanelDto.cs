@@ -19,36 +19,39 @@ public class UpsertPanelDto
         set
         {
             _panelType = value;
-            switch (value)
+            if (Width == 0 && Height == 0)
             {
-                case PanelTypes.Tabs:
-                    Width = 12;
-                    Height = 6;
-                    break;
-                case PanelTypes.Chart:
-                    Width = 12;
-                    Height = 5;
-                    break;
-                case PanelTypes.Log:
-                    Width = 12;
-                    Height = 10;
-                    break;
-                case PanelTypes.Trace:
-                    Width = 12;
-                    Height = 9;
-                    break;
-                case PanelTypes.Topology:
-                    Width = 12;
-                    Height = 6;
-                    break;
-                default: break;
+                switch (value)
+                {
+                    case PanelTypes.Tabs:
+                        Width = 12;
+                        Height = 6;
+                        break;
+                    case PanelTypes.Chart:
+                        Width = 12;
+                        Height = 5;
+                        break;
+                    case PanelTypes.Log:
+                        Width = 12;
+                        Height = 10;
+                        break;
+                    case PanelTypes.Trace:
+                        Width = 12;
+                        Height = 9;
+                        break;
+                    case PanelTypes.Topology:
+                        Width = 12;
+                        Height = 6;
+                        break;
+                    default: break;
+                }
             }
         }
     }
 
-    public int Width { get; set; } = 5;
+    public int Width { get; set; }
 
-    public int Height { get; set; } = 3;
+    public int Height { get; set; }
 
     public int X { get; set; }
 
@@ -78,7 +81,7 @@ public class UpsertPanelDto
         set
         {
             _isRemove = value;
-            foreach(var item in ChildPanels)
+            foreach (var item in ChildPanels)
             {
                 item.IsRemove = value;
             }
