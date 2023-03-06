@@ -33,16 +33,7 @@ public partial class Configuration : IAsyncDisposable
     protected override async Task OnInitializedAsync()
     {
         if (NavigationManager.Uri.Contains("record")) return;
-        ConfigurationRecord.DashboardId = DashboardId;
-        ConfigurationRecord.AppName = ServiceName;
-
-        if (ServiceName is null)
-        {
-            ConfigurationRecord.Clear();
-            return;
-        }
-
-        await GetPanelsAsync();
+        ConfigurationRecord.Clear();
     }
 
     [JSInvokable]
