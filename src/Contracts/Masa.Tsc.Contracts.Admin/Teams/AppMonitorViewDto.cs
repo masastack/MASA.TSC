@@ -13,17 +13,9 @@ public class AppMonitorViewDto
 
     public string Text { get; set; }
 
-    public string Value { get; set; }
+    public MonitorStatuses Value { get; set; }
 
     public string Icon { get; set; }
 
-    public bool IsShowApp { get; set; } = true;
-
-    public string ToDispaly()
-    {
-        if (IsShowApp)
-            return $"{ServiceTotal} ({AppTotal})";
-        else
-            return ServiceTotal.ToString();
-    }
+    public bool IsShowApp { get; set; } = true;    
 }

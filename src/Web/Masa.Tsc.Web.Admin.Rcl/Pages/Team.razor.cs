@@ -115,7 +115,7 @@ public partial class Team
     List<ProjectOverviewDto> GetViewData()
     {
         IEnumerable<ProjectOverviewDto>? result = _projects;
-        if (_projectStatus != null && _projectStatus != "all" && Enum.TryParse<MonitorStatuses>((string)_projectStatus, true, out var type))
+        if (_projectStatus != null && _projectStatus.IsT0 && Enum.TryParse<MonitorStatuses>(_projectStatus.AsT0, out var type))
         {
             switch (type)
             {
@@ -125,16 +125,18 @@ public partial class Team
                 case MonitorStatuses.Warn:
                     result = result.Where(item => item.HasWarning);
                     break;
-                default:
+                case MonitorStatuses.Normal:
                     result = result.Where(item => !item.HasWarning && !item.HasError);
                     break;
             }
         }
-        if (_teamSearchModel?.ProjectType != "all" && string.IsNullOrEmpty(_teamSearchModel?.ProjectType) is false)
+
+        if (_teamSearchModel?.ProjectType != "all" && !string.IsNullOrEmpty(_teamSearchModel?.ProjectType))
         {
             result = result.Where(item => item.LabelCode.Equals(_teamSearchModel.ProjectType, StringComparison.OrdinalIgnoreCase));
         }
-        if (string.IsNullOrEmpty(_teamSearchModel?.Keyword) is false)
+
+        if (!string.IsNullOrEmpty(_teamSearchModel?.Keyword))
         {
             result = result.Where(item => item.Name.Contains(_teamSearchModel.Keyword, StringComparison.OrdinalIgnoreCase) || item.Apps.Any(app => app.Name.Contains(_teamSearchModel.Keyword, StringComparison.OrdinalIgnoreCase)));
         }

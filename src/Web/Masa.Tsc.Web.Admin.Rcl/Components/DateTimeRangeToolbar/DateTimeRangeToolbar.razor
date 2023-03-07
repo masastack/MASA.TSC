@@ -101,9 +101,6 @@
     }
 
     [Inject]
-    public ProtectedLocalStorage LocalStrorage { get; set; }
-
-    [Inject]
     public IUserContext UserContext { get; set; }
 
     [Inject]
@@ -270,7 +267,7 @@
 
     private async Task OnRelatedTimeSpanSelected(QuickRange item)
     {
-        _quickRange = item;        
+        _quickRange = item;
         await UpdateRangeDateTimeToLatest();
         if (DefaultQuickRangeChanged.HasDelegate)
             await DefaultQuickRangeChanged.InvokeAsync(item.Key);

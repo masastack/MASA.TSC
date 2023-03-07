@@ -11,15 +11,15 @@
                 {
                     <div class="d-flex align-center">
                         <div class="mr-6">
-                            <MChip Label Small Color="emphasis2 mr-3" Dark>起始点</MChip>
+                            <MChip Label Small Color="emphasis2 mr-3" Dark>@T("Start")</MChip>
                             <span class="regular--text">@_rootTreeItem.Timestamp</span>
                         </div>
                         <div class="mr-6">
-                            <MChip Label Small Color="emphasis2 mr-3" Dark>持续时间</MChip>
+                            <MChip Label Small Color="emphasis2 mr-3" Dark>@T("Duration")</MChip>
                             <span class="regular--text">@FormatDuration(_rootTreeItem.DoubleDuration)</span>
                         </div>
                         <div>
-                            <MChip Label Small Color="emphasis2 mr-3" Dark>跨度</MChip>
+                            <MChip Label Small Color="emphasis2 mr-3" Dark>@T("Span Count")</MChip>
                             <span class="regular--text">@_count</span>
                         </div>
                     </div>
