@@ -5,8 +5,9 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
 
 public static class PanelGridsExtensions
 {
-    public static async Task SaveUI(this IEnumerable<PanelGrids> panelGrids)
+    public static async Task SaveUI(this List<PanelGrids> panelGrids)
     {
+        panelGrids.RemoveAll(Panel => Panel.ParentPanel?.IsRemove is true);
         if (panelGrids.Any() is false) return;
         await panelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();
         await Task.WhenAll(panelGrids.Select(item => item.SavePanelGridAsync()));

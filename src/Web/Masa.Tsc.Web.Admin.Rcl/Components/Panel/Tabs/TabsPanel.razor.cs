@@ -11,9 +11,6 @@ public partial class TabsPanel
     [CascadingParameter]
     public bool IsEdit { get; set; }
 
-    [CascadingParameter]
-    public List<PanelGrids> PanelGridRange { get; set; }
-
     [Parameter]
     public bool IsEditTabItem { get; set; }
 
@@ -24,16 +21,6 @@ public partial class TabsPanel
         set
         {
             Panel.SetCurrentTabItem(Guid.Parse(value.ToString()!));
-            //if (Panel.CurrentTabItem is not null)
-            //{
-            //    foreach (var child in Panel.CurrentTabItem.ChildPanels)
-            //    {
-            //        if (child is UpsertChartPanelDto chartPanel)
-            //        {
-            //            chartPanel.SetChartKey("tabItem");
-            //        }
-            //    }
-            //}
         }
     }
 
@@ -49,21 +36,7 @@ public partial class TabsPanel
     }
 
     void CloseTabItem(UpsertPanelDto panel)
-    {
-        RemovePanelGrid(panel);
+    {       
         Panel.RemoveTabItem(panel);
-    }
-
-    void RemovePanelGrid(UpsertPanelDto panel)
-    {
-        PanelGridRange.RemoveAll(item => item.ParentPanel == panel);
-        if (panel.ChildPanels.Any())
-        {
-            //PanelGridRange.RemoveAll(item => item.Panels.Any(item2 => item2.ParentPanel?.Id == panel.Id));
-            foreach (var item in panel.ChildPanels)
-            {
-                RemovePanelGrid(item);
-            }
-        }
     }
 }

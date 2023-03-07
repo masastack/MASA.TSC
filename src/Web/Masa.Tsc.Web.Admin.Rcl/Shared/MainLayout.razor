@@ -18,7 +18,7 @@
 
     Task OnError(Exception exception)
     {
-        PopupService.EnqueueSnackbarAsync(exception, HostEnvironment.IsDevelopment());
+        PopupService.EnqueueSnackbarAsync(exception.Message, AlertTypes.Error);
         return Task.CompletedTask;
     }
 

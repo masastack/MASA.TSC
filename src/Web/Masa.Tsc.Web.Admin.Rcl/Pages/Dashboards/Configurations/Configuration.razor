@@ -52,6 +52,10 @@
                         {
                             <PanelGrids Panels="ConfigurationRecord.Panels" />
                         }
+                        else
+                        {
+                            PanelGrids.RemoveAll(item => item.ParentPanel is null);
+                        }
                     </CascadingValue>
                 </CascadingValue>
             </CascadingValue>

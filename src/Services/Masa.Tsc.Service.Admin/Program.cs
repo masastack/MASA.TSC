@@ -18,7 +18,7 @@ builder.Services.AddElasticClientLogAndTrace(elasearchUrls, logIndexName, traceI
         ServiceVersion = masaStackConfig.Version,
         ServiceName = masaStackConfig.GetServerId(MasaStackConstant.TSC)
     }, masaStackConfig.OtlpUrl, false)
-    .AddPrometheusClient(prometheusUrl)
+    .AddPrometheusClient(prometheusUrl, 15)
     .AddTopology(elasearchUrls);
 
 builder.Services.AddDaprClient();
@@ -81,7 +81,7 @@ builder.Services.AddMasaIdentity(options =>
         return default!;
     })
     .AddAuthClient(masaStackConfig.GetAuthServiceDomain(), redisOption)
-.AddPmClient(masaStackConfig.GetPmServiceDomain())
+    .AddPmClient(masaStackConfig.GetPmServiceDomain())
     .AddMultilevelCache(masaStackConfig.GetServerId(MasaStackConstant.TSC),
         distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
         multilevelCacheOptions =>
@@ -89,6 +89,8 @@ builder.Services.AddMasaIdentity(options =>
             multilevelCacheOptions.SubscribeKeyPrefix = MasaStackConstant.TSC;
             multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
         });
+
+builder.Services.AddStackMiddleware().AddHealthChecks();
 
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -126,10 +128,7 @@ var app = builder.Services
             {
                 options.UseDapr()
                 .UseEventLog<TscDbContext>()
-                .UseEventBus(envenbusBuilder =>
-                {
-                    envenbusBuilder.UseMiddleware(typeof(DisabledCommandMiddleware<>));
-                });
+                .UseEventBus();
             })
             .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(AppSettings.Get("DBName"))).UseFilter())
             .UseRepository<TscDbContext>();
@@ -137,6 +136,7 @@ var app = builder.Services
     .AddTopologyRepository()
     .AddServices(builder);
 
+app.UseAddStackMiddleware();
 await builder.Services.MigrateAsync();
 app.UseMasaExceptionHandler(opt =>
 {
@@ -170,4 +170,5 @@ app.UseEndpoints(endpoints =>
     endpoints.MapSubscribeHandler();
 });
 app.UseHttpsRedirection();
+app.UseHealthChecks("/healthy");
 app.Run();

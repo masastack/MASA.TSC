@@ -31,7 +31,7 @@ public class ConfigurationRecord
 
     public void Clear()
     {
-        Panels.Clear();
+        ClearPanels();
         //AppName = "";
         Search = "";
         DashboardId = "";
@@ -39,5 +39,11 @@ public class ConfigurationRecord
         ShowServiceCompontent = false;
         //StartTime = default;
         //EndTime = default;
+    }
+
+    public void ClearPanels()
+    {
+        Panels.ForEach(item => item.IsRemove = true);
+        Panels.Clear();
     }
 }

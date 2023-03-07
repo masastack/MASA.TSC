@@ -26,52 +26,22 @@ public partial class PanelGrids
 
     protected override void OnParametersSet()
     {
-        if(Panels.Any() && PanelGridRange.Contains(this) is false)
+        if(PanelGridRange.Contains(this) is false)
         {
             PanelGridRange.Add(this);
         }
     }
 
-    void AddChildPanel(UpsertTabsPanelDto? panel)
+    async Task AddChildPanel(UpsertTabsPanelDto? panel)
     {
+        await PanelGridRange.SaveUI();
         panel?.CurrentTabItem?.AddPanel();
-    }
-
-    void AddTabItem(UpsertTabsPanelDto? panel)
-    {
-        panel?.AddTabItem();
-    }
-
-    void EditEditTabItems()
-    {
-        IsEditTabItem = !IsEditTabItem;
     }
 
     void RemovePanel(UpsertPanelDto panel)
     {
-        RemovePanelGrid(panel);
-
-        if (panel.ParentPanel is null)
-            Panels.Remove(panel);
-        else
-            panel.ParentPanel.ChildPanels.Remove(panel);
-
-        if (Panels.Any() is false)
-        {
-            PanelGridRange.Remove(this);
-        }
-    }
-
-    void RemovePanelGrid(UpsertPanelDto panel)
-    {
-        PanelGridRange.RemoveAll(item => item.ParentPanel == panel);
-        if (panel.ChildPanels.Any())
-        {
-            foreach (var item in panel.ChildPanels)
-            {
-                RemovePanelGrid(item);
-            }
-        }
+        panel.IsRemove = true;
+        Panels.Remove(panel);
     }
 
     async Task ReplacePanel(UpsertPanelDto panel)

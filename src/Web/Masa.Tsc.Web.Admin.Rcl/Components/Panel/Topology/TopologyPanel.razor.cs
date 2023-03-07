@@ -19,6 +19,8 @@ public partial class TopologyPanel
         }
     }
 
+    bool IsLoading { get; set; }
+
     Antvg6Option Antvg6Option { get; set; } = new();
 
     [CascadingParameter]
@@ -36,7 +38,7 @@ public partial class TopologyPanel
             animate = true,
             modes = new
             {
-                Default = new[] { "drag-node" },
+                Default = new[] { "drag-node","zoom-canvas", "drag-canvas" },
             },
             defaultNode = new
             {
@@ -103,7 +105,9 @@ public partial class TopologyPanel
 
     async Task GetYopologyPanelData()
     {
+        IsLoading = true;
         var result = await ApiCaller.TopologyService.GetAsync(ConfigurationRecord.AppName!, _depth, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
+        IsLoading = false;
         if (result?.Data is null) return;
         Antvg6Option.Data = new
         {
@@ -118,7 +122,7 @@ public partial class TopologyPanel
                 target = item.DestId,
                 label = item.AvgLatency.ToString()
             }),
-        };
+        };     
     }
 
     async Task RefreshAsync()

@@ -23,6 +23,9 @@ public partial class TscTraceChart
     [Parameter]
     public string Format { get; set; }
 
+    [Parameter]
+    public string SubText { get; set; }
+
     private object _option;
 
     MECharts? MECharts { get; set; }
@@ -49,6 +52,12 @@ public partial class TscTraceChart
 
         return new
         {
+            title = new
+            {
+                right = 50,
+                top = -14,
+                subtext = SubText,
+            },
             tooltip = new
             {
                 trigger = "axis",
@@ -60,7 +69,7 @@ public partial class TscTraceChart
             },
             legend = new
             {
-                data = new[] { "span", "duration" },
+                data = new[] { "Span Count", "Duration(ms)" },
                 bottom = true
             },
             xAxis = new[]
@@ -80,19 +89,19 @@ public partial class TscTraceChart
                 new
                 {
                     type = "value",
-                    name = $"span({T("Total Count")})"
+                    //name = $"span({T("Total Count")})"
                 },
                 new
                 {
                     type = "value",
-                    name = $"duration(ms)"
+                    //name = $"duration(ms)"
                 },
             },
             series = new[]
             {
                 new
                 {
-                    name = "span",
+                    name = "Span Count" ,
                     type = "bar",
                     yAxisIndex = 0,
                     data = Data.Select(item=>item.Item2),
@@ -109,7 +118,7 @@ public partial class TscTraceChart
                 },
                 new
                 {
-                    name = "duration",
+                    name = "Duration(ms)",
                     type = "line",
                     yAxisIndex = 1,
                     data = Data.Select(item=>item.Item3),
@@ -129,7 +138,7 @@ public partial class TscTraceChart
             {
                 x = 70,
                 x2 = 70,
-                y = 50,
+                y = 20,
                 y2 = 50
             }
         };
