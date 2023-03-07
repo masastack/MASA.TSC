@@ -90,7 +90,6 @@ builder.Services.AddMasaIdentity(options =>
             multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
         });
 
-builder.Services.AddScoped<IDisabledEventDeterminer, TscDisabledEventDeterminer>();
 builder.Services.AddStackMiddleware().AddHealthChecks();
 
 var app = builder.Services
