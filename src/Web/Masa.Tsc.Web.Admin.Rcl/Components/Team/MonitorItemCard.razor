@@ -23,14 +23,14 @@
         </MCard>
     </ActivatorContent>
     <ChildContent>
-        <div>@T("Project count")：@Value.ServiceTotal</div>
-        @if (Value.Text is "WARNS" or "ERRORS")
+        <div>@T("Project Count")：@Value.ServiceTotal</div>
+        @if (Value.Value is MonitorStatuses.Error or MonitorStatuses.Warn)
         {
-            <div>@T("Log count")：@Value.AppTotal</div>
+            <div>@T("Log Count")：@Value.AppTotal</div>
         }
-        else if (Value.Text != "NORMAL")
+        else if (Value.Value != MonitorStatuses.Normal)
         {
-            <div>@T("Service count")：@Value.AppTotal</div>
+            <div>@T("Service Count")：@Value.AppTotal</div>
         }
     </ChildContent>
 </MTooltip>

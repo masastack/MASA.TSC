@@ -162,8 +162,9 @@ public partial class Configuration : IAsyncDisposable
         }
     }
 
-    public async ValueTask DisposeAsync()
+    public new async ValueTask DisposeAsync()
     {
+        await base.DisposeAsync();
         if (_helper is not null)
             await _helper.DisposeAsync();
         if (_history is not null)

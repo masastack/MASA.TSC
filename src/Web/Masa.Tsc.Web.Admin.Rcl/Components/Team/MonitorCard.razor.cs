@@ -23,42 +23,45 @@ public partial class MonitorCard
     [Parameter]
     public EventCallback<StringNumber> ValueChanged { get; set; }
 
-    private List<AppMonitorViewDto> _items { get; set; } = new List<AppMonitorViewDto>
-            {
-                new AppMonitorViewDto
-                {
-                    Text="MONITORING",
-                    Color="#7C4DFF",
-                    Icon="monitor",
-                    Value="all"
-                },
-                new AppMonitorViewDto
-                {
-                    Text="WARNS",
-                    Color="#FF7D00",
-                    Icon="warning",
-                    Value=MonitorStatuses.Warn.ToString("G"),
-                },
-                new AppMonitorViewDto
-                {
-                    Text="ERRORS",
-                    Color="#FF5252",
-                    Icon="error",
-                    Value=MonitorStatuses.Error.ToString("G"),
-                },
-                new AppMonitorViewDto
-                {
-                    Text="NORMAL",
-                    Color="#69F0AE",
-                    Icon="default",
-                    IsShowApp=false,
-                    Value=MonitorStatuses.Normal.ToString("G")
-                }
-            };
+    private List<AppMonitorViewDto> _items;
     private AppMonitorDto _appMonitorDto = new();
 
     private void UpdateItems()
     {
+        if (_items == null)
+            _items = new List<AppMonitorViewDto>
+            {
+                new AppMonitorViewDto
+                {
+                    Text=T("MONITORING"),
+                    Color="#7C4DFF",
+                    Icon="monitor",
+                    Value=default
+                },
+                new AppMonitorViewDto
+                {
+                    Text=T("WARNS"),
+                    Color="#FF7D00",
+                    Icon="warning",
+                    Value=MonitorStatuses.Warn
+                },
+                new AppMonitorViewDto
+                {
+                    Text=T("ERRORS"),
+                    Color="#FF5252",
+                    Icon="error",
+                    Value=MonitorStatuses.Error
+                },
+                new AppMonitorViewDto
+                {
+                    Text=T("NORMAL"),
+                    Color="#69F0AE",
+                    Icon="default",
+                    IsShowApp=false,
+                    Value=MonitorStatuses.Normal
+                }
+            };
+
         _items[0].ServiceTotal = _appMonitorDto.ServiceTotal;
         _items[0].AppTotal = _appMonitorDto.AppTotal;
 
@@ -69,6 +72,7 @@ public partial class MonitorCard
         _items[2].AppTotal = _appMonitorDto.ErrorCount;
 
         _items[3].ServiceTotal = _appMonitorDto.Normal;
+
     }
 
     private string ItemStyle(AppMonitorViewDto appMonitor, bool active)
