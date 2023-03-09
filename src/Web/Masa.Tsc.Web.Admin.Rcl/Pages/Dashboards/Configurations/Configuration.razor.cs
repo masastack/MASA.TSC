@@ -30,7 +30,7 @@ public partial class Configuration : IAsyncDisposable
 
     List<PanelGrids> PanelGrids { get; set; } = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         if (NavigationManager.Uri.Contains("record")) return;
         ConfigurationRecord.Clear();
@@ -128,7 +128,6 @@ public partial class Configuration : IAsyncDisposable
 
     void ServiceNameChange(string serviceName)
     {
-        ServiceName = serviceName;
         NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName);
     }
 
