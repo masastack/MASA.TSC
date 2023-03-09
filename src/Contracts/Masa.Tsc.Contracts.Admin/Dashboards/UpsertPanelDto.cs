@@ -19,33 +19,6 @@ public class UpsertPanelDto
         set
         {
             _panelType = value;
-            if (Width == 0 && Height == 0)
-            {
-                switch (value)
-                {
-                    case PanelTypes.Tabs:
-                        Width = 12;
-                        Height = 6;
-                        break;
-                    case PanelTypes.Chart:
-                        Width = 12;
-                        Height = 5;
-                        break;
-                    case PanelTypes.Log:
-                        Width = 12;
-                        Height = 10;
-                        break;
-                    case PanelTypes.Trace:
-                        Width = 12;
-                        Height = 9;
-                        break;
-                    case PanelTypes.Topology:
-                        Width = 12;
-                        Height = 6;
-                        break;
-                    default: break;
-                }
-            }
         }
     }
 

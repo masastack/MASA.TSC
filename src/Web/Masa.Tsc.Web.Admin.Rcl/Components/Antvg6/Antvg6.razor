@@ -36,6 +36,7 @@
         if (firstRender)
         {
             _helper = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/antv-g6.js");
+            await OnParametersSetAsync();
         }
     }
 

@@ -47,12 +47,40 @@ public partial class PanelGrids
     async Task ReplacePanel(UpsertPanelDto panel)
     {
         var data = Panels.First(p => p.Id == panel.Id);
+        await SavePanelGridAsync();
         panel.X = data.X;
         panel.Y = data.Y;
-        if(data.Width != GlobalPanelConfig.Width || data.Height != GlobalPanelConfig.Height)
+        if (data.Width != GlobalPanelConfig.Width || data.Height != GlobalPanelConfig.Height)
         {
             panel.Width = data.Width;
             panel.Height = data.Height;
+        }
+        else
+        {
+            switch (panel.PanelType)
+            {
+                case PanelTypes.Tabs:
+                    panel.Width = 12;
+                    panel.Height = 6;
+                    break;
+                case PanelTypes.Chart:
+                    panel.Width = 12;
+                    panel.Height = 5;
+                    break;
+                case PanelTypes.Log:
+                    panel.Width = 12;
+                    panel.Height = 10;
+                    break;
+                case PanelTypes.Trace:
+                    panel.Width = 12;
+                    panel.Height = 9;
+                    break;
+                case PanelTypes.Topology:
+                    panel.Width = 12;
+                    panel.Height = 6;
+                    break;
+                default: break;
+            }
         }
         panel.Id = Guid.NewGuid();
         Panels.Remove(data);
