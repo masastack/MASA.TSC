@@ -5,6 +5,8 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Apps;
 
 public partial class AppAutoComplete
 {
+    bool _firstValueChanged;
+
     [Inject]
     public IPmClient PmClient { get; set; }
 
@@ -21,15 +23,13 @@ public partial class AppAutoComplete
     public bool Metric { get; set; }
 
     [Parameter]
-    public List<AppDetailModel> Apps { get; set; } = new();
-
-    bool _hasLoadData;
+    public List<AppDetailModel> Apps { get; set; }
 
     public AppDetailModel? CurrentApp => Apps.FirstOrDefault(app => app.Identity == Value);
 
     protected override async Task OnInitializedAsync()
     {
-        if (!_hasLoadData)
+        if(Apps is null)
         {
             if (Metric)
             {
@@ -49,14 +49,14 @@ public partial class AppAutoComplete
                 if (data != null && data.Any())
                     Apps = data;
             }
-            _hasLoadData = true;
         }
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (string.IsNullOrEmpty(Value) && Apps?.Any() is true)
+        if (_firstValueChanged is false && string.IsNullOrEmpty(Value) && Apps?.Any() is true)
         {
+            _firstValueChanged = true;
             var value = Apps.First().Identity;
             await ValueChanged.InvokeAsync(value);
         }
