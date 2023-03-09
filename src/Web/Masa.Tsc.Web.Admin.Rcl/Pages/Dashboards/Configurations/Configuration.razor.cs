@@ -25,13 +25,8 @@ public partial class Configuration : IAsyncDisposable
     [Parameter]
     public string DashboardId { get; set; }
 
-    string? _a;
     [Parameter]
-    public string ServiceName
-    {
-        get => _a;
-        set => _a = value;
-    }
+    public string ServiceName { get; set; }
 
     List<PanelGrids> PanelGrids { get; set; } = new();
 
