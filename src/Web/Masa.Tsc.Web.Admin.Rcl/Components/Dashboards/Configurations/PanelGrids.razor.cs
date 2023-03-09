@@ -84,7 +84,7 @@ public partial class PanelGrids
         }
         panel.Id = Guid.NewGuid();
         Panels.Remove(data);
-        await Task.Delay(10);
+        StateHasChanged();
         Panels.Add(panel);
         if (panel.PanelType is PanelTypes.Chart)
         {
