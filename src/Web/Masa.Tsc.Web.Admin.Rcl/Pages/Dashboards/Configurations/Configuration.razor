@@ -1,9 +1,9 @@
 ﻿@page "/dashboard/configuration/{dashboardId}"
 @page "/dashboard/configuration/{dashboardId}/{serviceName}"
 @page "/dashboard/configuration/{dashboardId}/{serviceName}/{relationName}"
-
 @page "/dashboard/configuration/record/{dashboardId}"
 @page "/dashboard/configuration/record/{dashboardId}/{serviceName}"
+@page "/dashboard/configuration/record/{dashboardId}/{serviceName}/{relationName}"
 @inherits TscComponentBase
 
 <PageTitle>@T("Configure Dashboard")</PageTitle>
@@ -14,7 +14,8 @@
             <ServiceRelation Service="@ServiceName" 
                              ServiceChanged="ServiceNameChanged"
                              Relation="@RelationName"
-                             RelationChanged="RelationNameChanged" />
+                             RelationChanged="RelationNameChanged"
+                             ModelType="ConfigurationRecord.ModelType" />
 @*            @if (ConfigurationRecord.ShowServiceCompontent)
             {
                 <ServiceAutoComplete Value="@ServiceName" ValueChanged=ServiceNameChange FillBackground=false Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" Metric />
@@ -63,7 +64,7 @@
             <CascadingValue Value="ConfigurationRecord.IsEdit">
                 <CascadingValue Value="PanelGrids" IsFixed>
                     <CascadingValue Value="ConfigurationRecord">
-                        @if (ConfigurationRecord.Panels.Any() && (ConfigurationRecord.ShowServiceCompontent is false || string.IsNullOrEmpty(ConfigurationRecord.Service) is false))
+                        @if (ConfigurationRecord.RenderReady)
                         {
                             <PanelGrids Panels="ConfigurationRecord.Panels" />
                         }

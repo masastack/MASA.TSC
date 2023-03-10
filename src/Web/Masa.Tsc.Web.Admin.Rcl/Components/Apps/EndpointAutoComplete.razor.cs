@@ -41,7 +41,7 @@ public partial class EndpointAutoComplete
             }
             _isLoading = false;
         }
-        else
+        if(string.IsNullOrEmpty(Service))
         {
             Endpoints.Clear();
         }

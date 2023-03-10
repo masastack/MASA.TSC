@@ -35,13 +35,17 @@ public partial class InstanceAutoComplete
             };
             var data = await ApiCaller.MetricService.GetValues(query);
             Instances = data ?? new();
-            if (Instances.Any() && (string.IsNullOrEmpty(Value) || Instances.Contains(Value) is false))
+            if (Instances.Any())
             {
-                await ValueChanged.InvokeAsync(Instances.First());
+                if(string.IsNullOrEmpty(Value) || Instances.Contains(Value) is false)
+                {
+                    await ValueChanged.InvokeAsync(Instances.First());
+                }
             }
+            else await ValueChanged.InvokeAsync(null);
             _isLoading = false;
         }
-        else
+        if (string.IsNullOrEmpty(Service))
         {
             Instances.Clear();
         }

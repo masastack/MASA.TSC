@@ -7,15 +7,15 @@ public class ConfigurationRecord
 {
     public List<UpsertPanelDto> Panels { get; set; } = new();
 
+    public string DashboardId { get; set; }
+
     public string? Service { get; set; }
 
-    public string Relation { get; set; }
+    public string? Relation { get; set; }
 
     public string Search { get; set; }
 
-    public string DashboardId { get; set; }
-
-    public string Model { get; set; }
+    public ModelTypes ModelType { get; set; }
 
     public DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow.AddMinutes(-15);
 
@@ -25,7 +25,13 @@ public class ConfigurationRecord
 
     public bool IsEdit { get; set; }
 
-    public bool ShowServiceCompontent { get; set; }
+    public bool NotRelationData { get; set; }
+
+    public bool RenderReady => Panels.Any() && (
+        ModelType is ModelTypes.All || 
+        (ModelType is ModelTypes.Service && string.IsNullOrEmpty(Service) is false) || 
+        (string.IsNullOrEmpty(Service) is false && (string.IsNullOrEmpty(Relation) is false || NotRelationData))
+    );
 
     string RandomStr { get; set; } = "";
 
@@ -37,7 +43,6 @@ public class ConfigurationRecord
         Search = "";
         DashboardId = "";
         IsEdit = false;
-        ShowServiceCompontent = false;
     }
 
     public void ClearPanels()

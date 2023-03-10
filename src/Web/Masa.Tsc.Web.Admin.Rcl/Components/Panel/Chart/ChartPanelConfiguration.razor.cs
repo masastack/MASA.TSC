@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Contracts.Admin.Enums;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
 public partial class ChartPanelConfiguration : TscComponentBase
@@ -21,7 +23,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
     public string? ServiceName { get; set; }
 
     [Parameter]
-    public string? Model { get; set; }
+    public ModelTypes ModelType { get; set; }
 
     public ChartPanel ChartPanel { get; set; }
 
@@ -41,15 +43,14 @@ public partial class ChartPanelConfiguration : TscComponentBase
     {
         if (Value.ChartType != "table") return;
 
-        if (Model != "All")
+        if (ModelType is not ModelTypes.All)
         {
-            if (Model != "Service")
+            if (ModelType is not ModelTypes.Service)
                 Value.ListType = ListTypes.TopList;
             else if (Value.ListType == ListTypes.ServiceList)
                 Value.ListType = ListTypes.EndpointList;
         }
     }
-
 
     async Task NavigateToPanelConfigurationPageAsync()
     {

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations.Models;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations;
 
 public partial class Configuration : IAsyncDisposable
@@ -8,10 +10,7 @@ public partial class Configuration : IAsyncDisposable
     string _scrollElementId = Guid.NewGuid().ToString();
     string _contentElementId = Guid.NewGuid().ToString();
     IJSObjectReference? _helper;
-    IJSObjectReference? _history;
-    DotNetObjectReference<Configuration> _dotNetHelper;
-
-    private QuickRangeKey? _defaultValue = QuickRangeKey.Last15Minutes;
+    QuickRangeKey? _defaultValue = QuickRangeKey.Last15Minutes;
 
     [Inject]
     public ConfigurationRecord ConfigurationRecord { get; set; }
@@ -39,23 +38,14 @@ public partial class Configuration : IAsyncDisposable
         ConfigurationRecord.Clear();
     }
 
-    [JSInvokable]
-    public void GoDashbordList()
-    {
-        NavigationManager.NavigateTo("/dashboard", false);
-    }
-
     protected override async Task OnParametersSetAsync()
     {
-        if (ConfigurationRecord.DashboardId != DashboardId)
+        ConfigurationRecord.Service = ServiceName;
+        ConfigurationRecord.Relation = RelationName;
+        if (string.IsNullOrEmpty(DashboardId) is false && ConfigurationRecord.DashboardId != DashboardId)
         {
             ConfigurationRecord.DashboardId = DashboardId;
-            ConfigurationRecord.Service = ServiceName;
             await GetPanelsAsync();
-        }
-        else if (ServiceName is not null && ServiceName != ConfigurationRecord.Service)
-        {
-            ConfigurationRecord.Service = ServiceName;
         }
     }
 
@@ -63,7 +53,7 @@ public partial class Configuration : IAsyncDisposable
     {
         if (NavigationManager.Uri.Contains("record") && string.IsNullOrEmpty(ConfigurationRecord.DashboardId))
         {
-            NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName);
+            NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName, RelationName);
         }
     }
 
@@ -73,13 +63,11 @@ public partial class Configuration : IAsyncDisposable
         var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(ConfigurationRecord.DashboardId));
         if (detail is not null)
         {
-            ConfigurationRecord.Model = detail.Model;
-            ConfigurationRecord.ShowServiceCompontent = detail.Model != ModelTypes.All.ToString();
-            if (ConfigurationRecord.ShowServiceCompontent is false) ConfigurationRecord.Service = "";
-        }
-        if (detail?.Panels != null && detail.Panels.Any())
-        {
-            ConfigurationRecord.Panels.AddRange(detail.Panels);
+            ConfigurationRecord.ModelType = Enum.Parse<ModelTypes>(detail.Model);
+            if (detail.Panels?.Any() is true)
+            {
+                ConfigurationRecord.Panels.AddRange(detail.Panels);
+            }
         }
 
         if (ConfigurationRecord.Panels.Any() is false) ConfigurationRecord.IsEdit = true;
@@ -131,14 +119,17 @@ public partial class Configuration : IAsyncDisposable
 
     void ServiceNameChanged(string serviceName)
     {
-        ServiceName = serviceName;
-        NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName, RelationName);
+        if (ConfigurationRecord.ModelType is ModelTypes.Service)
+        {
+            NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName);
+        }
+        else ServiceName = serviceName;
     }
 
-    void RelationNameChanged(string relationName)
+    void RelationNameChanged(string? relationName)
     {
-        RelationName = relationName;
-        NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName, RelationName);
+        ConfigurationRecord.NotRelationData = string.IsNullOrEmpty(relationName);
+        Task.Delay(3000).ContinueWith(_ => NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName, relationName));
     }
 
     async Task SwitchEdit()
@@ -165,9 +156,6 @@ public partial class Configuration : IAsyncDisposable
         if (firstRender)
         {
             _helper = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/scroll.js");
-            _dotNetHelper = DotNetObjectReference.Create(this);
-            _history = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/history.js");
-            await _history.InvokeVoidAsync("historyToList", _dotNetHelper);
         }
     }
 
@@ -176,9 +164,5 @@ public partial class Configuration : IAsyncDisposable
         await base.DisposeAsync();
         if (_helper is not null)
             await _helper.DisposeAsync();
-        if (_history is not null)
-            await _history.DisposeAsync();
-        if (_dotNetHelper is not null)
-            _dotNetHelper.Dispose();
     }
 }

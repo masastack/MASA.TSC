@@ -125,7 +125,7 @@ public class InstrumentQueryHandler
             if (query.Type == MetricValueTypes.Service)
                 type = ModelTypes.Service;
             else if (query.Type == MetricValueTypes.Instance)
-                type = ModelTypes.Instance;
+                type = ModelTypes.ServiceInstance;
             else
                 type = ModelTypes.Endpoint;
             var instrument = await _instrumentRepository.ToQueryable().Where(item => item.Model == type.ToString("G")).OrderBy(item => item.CreationTime).FirstOrDefaultAsync();

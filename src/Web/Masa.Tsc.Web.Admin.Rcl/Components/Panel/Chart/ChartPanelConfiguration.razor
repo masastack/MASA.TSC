@@ -26,13 +26,13 @@
                         </MCol>
                         <MCol Md="8">
                             <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
-                                @if (Model == "All")
+                                @if (ModelType == ModelTypes.All)
                                 {
                                     <MButton Class="text-capitalize" Value="@ListTypes.ServiceList.ToString()">
                                         Service List
                                     </MButton>
                                 }
-                                else if (Model == "Service")
+                                else if (ModelType == ModelTypes.Service)
                                 {
                                     <MButton Class="text-capitalize" Value="@ListTypes.EndpointList.ToString()">
                                         Endpoint List
