@@ -51,14 +51,14 @@
                     </tr>
                 }
             </tbody>
-@*            @if (Value.ShowTableFooter)
+            @*            @if (Value.ShowTableFooter)
             {
-                <tfoot>
-                    <tr>
-                        <td>Sum</td>
-                        <td>$180</td>
-                    </tr>
-                </tfoot>
+            <tfoot>
+            <tr>
+            <td>Sum</td>
+            <td>$180</td>
+            </tr>
+            </tfoot>
             }*@
         </MSimpleTable>
         @if (Value.EnablePaginaton)
@@ -84,10 +84,13 @@
         get => _pageSize;
         set
         {
-            _page =1;
+            _page = 1;
             _pageSize = value;
         }
     }
+
+    [CascadingParameter]
+    ConfigurationRecord ConfigurationRecord { get; set; }
 
     [Parameter]
     public ITablePanelValue Value { get; set; }
@@ -130,6 +133,12 @@
     void ToDashboardConfiguration(Dessert dessert)
     {
         if (IsEdit) return;
-        NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, dessert.Text);
+        var text = dessert.Text;
+        if (Value.ListType == ListTypes.InstanceList)
+            NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, ConfigurationRecord.AppName, instance: text);
+        else if (Value.ListType == ListTypes.EndpointList)
+            NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, ConfigurationRecord.AppName, endpoint: text);
+        else
+            NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, text);
     }
 }

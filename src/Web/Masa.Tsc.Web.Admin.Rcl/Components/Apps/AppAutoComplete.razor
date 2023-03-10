@@ -1,13 +1,22 @@
 ﻿@inherits TscComponentBase
 
-<SAutoComplete Value=Value
-               ValueChanged=ValueChanged
-               Items=Apps
+<SAutoComplete Placeholder="@T("Service")"
+               Items="@Apps"
+               @*ValueChanged="OnSelectedItemUpdate" *@
+               @bind-Value="Value"
                ItemText="app => app.Name"
-               ItemValue="app => app.Identity"
-               BackgroundColor="@(FillBackground?"fill-background":"white")"
+               ItemValue="app=>app.Identity"
+               TItem=AppDetailModel
+               TValue=string
+               TItemValue=string
                Small
-               Placeholder="@T("Service")"
-               Class="@Class"
-               Style="@Style">
+               BackgroundColor="white"
+               Clearable
+               Flat
+               Solo
+               Outlined="false"
+               Loading="_isLoading"
+               Class="mr-6 rounded-2 m-input--h-40"
+               Style="@Style"
+               OnSelectedItemUpdate="OnSelectedItemUpdate">
 </SAutoComplete>

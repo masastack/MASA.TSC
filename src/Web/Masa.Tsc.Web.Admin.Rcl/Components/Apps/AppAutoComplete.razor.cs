@@ -25,6 +25,8 @@ public partial class AppAutoComplete
     [Parameter]
     public List<AppDetailModel> Apps { get; set; }
 
+    bool _isLoading;
+
     public AppDetailModel? CurrentApp => Apps.FirstOrDefault(app => app.Identity == Value);
 
     protected override async Task OnInitializedAsync()
@@ -33,6 +35,7 @@ public partial class AppAutoComplete
         {
             if (Metric)
             {
+                _isLoading = true;
                 var data = await ApiCaller.MetricService.GetValues(new RequestMetricListDto { Type = MetricValueTypes.Service });
                 if (data != null && data.Any())
                 {
@@ -42,6 +45,7 @@ public partial class AppAutoComplete
                         Name = item
                     }).ToList();
                 }
+                _isLoading = false;
             }
             else
             {
@@ -60,5 +64,11 @@ public partial class AppAutoComplete
             var value = Apps.First().Identity;
             await ValueChanged.InvokeAsync(value);
         }
+    }
+
+    async Task OnSelectedItemUpdate(AppDetailModel item)
+    {
+        if (ValueChanged.HasDelegate)
+            await ValueChanged.InvokeAsync(item.Identity);
     }
 }

@@ -180,6 +180,6 @@ public partial class Dashboard
 
     void NavigateToConfiguration(DashboardDto dashboard)
     {
-        NavigationManager.NavigateToDashboardConfiguration(dashboard.Id.ToString());
+        NavigationManager.NavigateToDashboardConfiguration(dashboard.Id.ToString(),default!);
     }
 }

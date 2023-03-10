@@ -6,10 +6,10 @@
             <SIcon Tooltip="@T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon>
         </SButton>
         <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg" OnClick="() => CancelAsync()">
-            取消
+            @T("Cancel")
         </SButton>
         <SButton Small BorderRadiusClass="rounded-lg" OnClick="() => NavigateToPanelConfigurationPageAsync()">
-            应用
+            @T("Apply")
         </SButton>
     </MCol>
     <MCol Cols="8">

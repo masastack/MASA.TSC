@@ -28,6 +28,12 @@ public partial class Configuration : IAsyncDisposable
     [Parameter]
     public string ServiceName { get; set; }
 
+    [Parameter]
+    public string InstanceName { get; set; }
+
+    [Parameter]
+    public string EndpointName { get; set; }
+
     List<PanelGrids> PanelGrids { get; set; } = new();
 
     protected override void OnInitialized()
@@ -128,8 +134,23 @@ public partial class Configuration : IAsyncDisposable
 
     void ServiceNameChange(string serviceName)
     {
-        NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName);
+        ServiceName = serviceName;
+        NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName,InstanceName,EndpointName);
     }
+
+    void InstanceChange(string instance)
+    {
+        InstanceName = instance;
+        NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName, instance, EndpointName);
+    }
+
+    void EndpointChange(string endpoint)
+    {
+        EndpointName = endpoint;
+        NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName, InstanceName, endpoint);
+    }
+
+
 
     async Task SwitchEdit()
     {

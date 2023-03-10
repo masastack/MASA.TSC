@@ -9,6 +9,10 @@ public class ConfigurationRecord
 
     public string? AppName { get; set; }
 
+    public string Instance { get; set; }
+
+    public string Endpoint { get; set; }
+
     public string Search { get; set; }
 
     public string DashboardId { get; set; }
@@ -19,7 +23,7 @@ public class ConfigurationRecord
 
     public DateTimeOffset EndTime { get; set; } = DateTimeOffset.UtcNow;
 
-    public string? Key => AppName + StartTime + EndTime + RandomStr;
+    public string? Key => $"{AppName}{StartTime}{EndTime}{RandomStr}";
 
     public bool IsEdit { get; set; }
 
@@ -32,13 +36,10 @@ public class ConfigurationRecord
     public void Clear()
     {
         ClearPanels();
-        //AppName = "";
         Search = "";
         DashboardId = "";
         IsEdit = false;
         ShowServiceCompontent = false;
-        //StartTime = default;
-        //EndTime = default;
     }
 
     public void ClearPanels()

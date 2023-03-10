@@ -50,19 +50,19 @@
                     </tr>
                 }
             </tbody>
-@*            @if (Value.ShowTableFooter)
+            @*            @if (Value.ShowTableFooter)
             {
-                <tfoot>
-                    <tr>
-                        <td>Sum</td>
-                        <td>$180</td>
-                    </tr>
-                </tfoot>
+            <tfoot>
+            <tr>
+            <td>Sum</td>
+            <td>$180</td>
+            </tr>
+            </tfoot>
             }*@
         </MSimpleTable>
-@*        @if (Value.EnablePaginaton)
+        @*        @if (Value.EnablePaginaton)
         {
-            <MPagination Length="10" TotalVisible="5"></MPagination>
+        <MPagination Length="10" TotalVisible="5"></MPagination>
         }*@
     </MCardText>
 </MCard>
@@ -71,11 +71,14 @@
     [Parameter]
     public ITablePanelValue Value { get; set; }
 
+    [CascadingParameter]
+    ConfigurationRecord ConfigurationRecord { get; set; }
+
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
     void ToDashboardConfiguration(string dashboardId, string instanceName)
     {
-        NavigationManager.NavigateToDashboardConfiguration(dashboardId, instanceName:instanceName);
+        NavigationManager.NavigateToDashboardConfiguration(dashboardId, ConfigurationRecord.AppName, instanceName);
     }
 }

@@ -54,18 +54,6 @@ else
             _listKey = ConfigurationRecord.Key;
             await SetOption();
         }
-
-        //if ((LastListType is null || LastListType != Value.ListType) && Value.ListType is not ListTypes.TopList
-        //|| (string.IsNullOrEmpty(LastServiceName) || !string.Equals(LastServiceName, ServiceName)) && (Value.ListType is ListTypes.EndpointList || Value.ListType is ListTypes.InstanceList))
-        //    services = await GetServiceNames() ?? new();
-
-        //LastServiceName = ServiceName;
-        //LastListType = Value.ListType;
-
-        //if (Value.ListType is ListTypes.TopList)
-        //    Value.SetTopListOption(jumpId);
-        //else
-        //    Value.SetTableOption(services, jumpName, jumpId);
     }
 
     async Task SetOption()
