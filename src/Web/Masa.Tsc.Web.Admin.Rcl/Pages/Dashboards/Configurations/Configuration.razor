@@ -1,10 +1,9 @@
-﻿@page "/dashboard/configuration/record/{dashboardId}"
-@page "/dashboard/configuration/record/{dashboardId}/{serviceName}"
-@page "/dashboard/configuration/{dashboardId}"
+﻿@page "/dashboard/configuration/{dashboardId}"
 @page "/dashboard/configuration/{dashboardId}/{serviceName}"
+@page "/dashboard/configuration/{dashboardId}/{serviceName}/{relationName}"
 
-@page "/dashboard/configuration/{dashboardId}/{serviceName}/endpoint/{endpointName}"
-@page "/dashboard/configuration/{dashboardId}/{serviceName}/{instanceName}"
+@page "/dashboard/configuration/record/{dashboardId}"
+@page "/dashboard/configuration/record/{dashboardId}/{serviceName}"
 @inherits TscComponentBase
 
 <PageTitle>@T("Configure Dashboard")</PageTitle>
@@ -12,9 +11,13 @@
 <AutoHeight Id="@_scrollElementId" Overflow AutoStyle="max-height: calc(100vh - 185px);height: 900px">
     <HeaderContent>
         <div class="d-flex mb-6">
-            @if (ConfigurationRecord.ShowServiceCompontent)
+            <ServiceRelation Service="@ServiceName" 
+                             ServiceChanged="ServiceNameChanged"
+                             Relation="@RelationName"
+                             RelationChanged="RelationNameChanged" />
+@*            @if (ConfigurationRecord.ShowServiceCompontent)
             {
-                <AppAutoComplete Value="@ServiceName" ValueChanged=ServiceNameChange FillBackground=false Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" Metric />
+                <ServiceAutoComplete Value="@ServiceName" ValueChanged=ServiceNameChange FillBackground=false Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" Metric />
                 @if (ConfigurationRecord.Model=="ServiceInstance")
                 {
                     <EndpintAutoComplete Value="@InstanceName" Service="@ServiceName" ValueChanged=InstanceChange Class="mr-6 my-auto" Instance Style="max-width:300px !important;width:300px;" />
@@ -23,7 +26,7 @@
                 {
                     <EndpintAutoComplete Value="@EndpointName" Service="@ServiceName" ValueChanged=EndpointChange Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" />
                 }
-            }
+            }*@
             <MSpacer />
             <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="_defaultValue"
                                   StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
@@ -60,7 +63,7 @@
             <CascadingValue Value="ConfigurationRecord.IsEdit">
                 <CascadingValue Value="PanelGrids" IsFixed>
                     <CascadingValue Value="ConfigurationRecord">
-                        @if (ConfigurationRecord.Panels.Any() && (ConfigurationRecord.ShowServiceCompontent is false || string.IsNullOrEmpty(ConfigurationRecord.AppName) is false))
+                        @if (ConfigurationRecord.Panels.Any() && (ConfigurationRecord.ShowServiceCompontent is false || string.IsNullOrEmpty(ConfigurationRecord.Service) is false))
                         {
                             <PanelGrids Panels="ConfigurationRecord.Panels" />
                         }

@@ -1,0 +1,14 @@
+﻿@inherits TscComponentBase
+
+<SAutoComplete Value=Value
+               ValueChanged=ValueChanged
+               Items="@Endpoints"
+               ItemText="item => item"
+               ItemValue="item => item"
+               Small
+               Placeholder="@T("Endpoint")"
+               BackgroundColor="@(FillBackground?"fill-background":"white")"
+               Clearable
+               Loading="_isLoading"
+               Class="@Class"
+               Style="@Style" />

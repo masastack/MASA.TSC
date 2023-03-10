@@ -29,10 +29,7 @@ public partial class Configuration : IAsyncDisposable
     public string ServiceName { get; set; }
 
     [Parameter]
-    public string InstanceName { get; set; }
-
-    [Parameter]
-    public string EndpointName { get; set; }
+    public string RelationName { get; set; }
 
     List<PanelGrids> PanelGrids { get; set; } = new();
 
@@ -53,12 +50,12 @@ public partial class Configuration : IAsyncDisposable
         if (ConfigurationRecord.DashboardId != DashboardId)
         {
             ConfigurationRecord.DashboardId = DashboardId;
-            ConfigurationRecord.AppName = ServiceName;
+            ConfigurationRecord.Service = ServiceName;
             await GetPanelsAsync();
         }
-        else if (ServiceName is not null && ServiceName != ConfigurationRecord.AppName)
+        else if (ServiceName is not null && ServiceName != ConfigurationRecord.Service)
         {
-            ConfigurationRecord.AppName = ServiceName;
+            ConfigurationRecord.Service = ServiceName;
         }
     }
 
@@ -78,7 +75,7 @@ public partial class Configuration : IAsyncDisposable
         {
             ConfigurationRecord.Model = detail.Model;
             ConfigurationRecord.ShowServiceCompontent = detail.Model != ModelTypes.All.ToString();
-            if (ConfigurationRecord.ShowServiceCompontent is false) ConfigurationRecord.AppName = "";
+            if (ConfigurationRecord.ShowServiceCompontent is false) ConfigurationRecord.Service = "";
         }
         if (detail?.Panels != null && detail.Panels.Any())
         {
@@ -132,25 +129,17 @@ public partial class Configuration : IAsyncDisposable
         OpenSuccessMessage(T("Save success"));
     }
 
-    void ServiceNameChange(string serviceName)
+    void ServiceNameChanged(string serviceName)
     {
         ServiceName = serviceName;
-        NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName,InstanceName,EndpointName);
+        NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName, RelationName);
     }
 
-    void InstanceChange(string instance)
+    void RelationNameChanged(string relationName)
     {
-        InstanceName = instance;
-        NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName, instance, EndpointName);
+        RelationName = relationName;
+        NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName, RelationName);
     }
-
-    void EndpointChange(string endpoint)
-    {
-        EndpointName = endpoint;
-        NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName, InstanceName, endpoint);
-    }
-
-
 
     async Task SwitchEdit()
     {

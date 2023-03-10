@@ -106,7 +106,7 @@ public partial class TopologyPanel
     async Task GetYopologyPanelData()
     {
         IsLoading = true;
-        var result = await ApiCaller.TopologyService.GetAsync(ConfigurationRecord.AppName!, _depth, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
+        var result = await ApiCaller.TopologyService.GetAsync(ConfigurationRecord.Service!, _depth, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
         IsLoading = false;
         if (result?.Data is null) return;
         Antvg6Option.Data = new

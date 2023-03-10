@@ -44,7 +44,7 @@ public partial class TopologyPanelOld
         Data = new();
 
         //var result =await ApiCaller.TopologyService.GetAsync("masa-tsc-service-admin", _depth, DateTime.Now.AddMonths(-3), DateTime.Now);
-        var result = await ApiCaller.TopologyService.GetAsync(ConfigurationRecord.AppName, _depth, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
+        var result = await ApiCaller.TopologyService.GetAsync(ConfigurationRecord.Service, _depth, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
         if (result?.Data is null) return;
         Data.Edges = result.Data.Select(item => new LinkTrackingTopologyEdgeViewModel
         {

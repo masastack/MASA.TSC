@@ -43,9 +43,9 @@ else
             jumpName = GetJumpName();
         }
 
-        if (Value.ListType != ListTypes.TopList && _lastServiceName != ConfigurationRecord.AppName)
+        if (Value.ListType != ListTypes.TopList && _lastServiceName != ConfigurationRecord.Service)
         {
-            _lastServiceName = ConfigurationRecord.AppName;
+            _lastServiceName = ConfigurationRecord.Service;
             services = await GetServiceNames() ?? new();
         }
 
@@ -73,7 +73,7 @@ else
     {
         return await base.ApiCaller.MetricService.GetValues(new RequestMetricListDto
         {
-            Service = ConfigurationRecord.AppName!,
+            Service = ConfigurationRecord.Service!,
             Type = GetMetricValueType()
         });
     }

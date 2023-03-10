@@ -5,46 +5,32 @@ namespace Masa.Tsc.Web.Admin.Rcl.Extentions;
 
 public static class NavigationManagerExtensions
 {
-    public static void NavigateToDashboardConfiguration(this NavigationManager navigationManager, string dashboardId, string? serviceName, string? instance = null, string? endpoint = null)
+    public static void NavigateToDashboardConfiguration(this NavigationManager navigationManager, string dashboardId, string? service = null, string? relation = null)
     {
-        string url;
-        if (!string.IsNullOrEmpty(instance))
-            url = $"/dashboard/configuration/{dashboardId}/{System.Web.HttpUtility.UrlEncode(serviceName)}/{System.Web.HttpUtility.UrlEncode(instance)}";
-        else if (!string.IsNullOrEmpty(endpoint))
-            url = $"/dashboard/configuration/{dashboardId}/{System.Web.HttpUtility.UrlEncode(serviceName)}/endpoint/{System.Web.HttpUtility.UrlEncode(endpoint)}";
-        else if (string.IsNullOrEmpty(serviceName))
-            url = $"/dashboard/configuration/{System.Web.HttpUtility.UrlEncode(dashboardId)}";
-        else
-            url = $"/dashboard/configuration/{dashboardId}/{System.Web.HttpUtility.UrlEncode(serviceName)}";
-        //if (serviceName is not null)
-        //{
-        //    bashUri += $"/{serviceName}";
-        //}
-        //if (instanceName is not null)
-        //{
-        //    bashUri += $"/{instanceName}";
-        //}
-        navigationManager.NavigateTo(url);
+        var uri = $"/dashboard/configuration/{dashboardId}";
+        if (string.IsNullOrEmpty(service) is false) uri += $"/{service}";
+        if (string.IsNullOrEmpty(relation) is false) uri += $"/{relation}";
+
+        navigationManager.NavigateTo(uri);
     }
 
-    public static void NavigateToDashboardConfigurationRecord(this NavigationManager navigationManager, string dashboardId, string? serviceName = null)
+    public static void NavigateToDashboardConfigurationRecord(this NavigationManager navigationManager, string dashboardId, string? service = null, string? relation = null)
     {
-        var bashUri = $"/dashboard/configuration/record/{dashboardId}";
-        if (serviceName is not null)
-        {
-            bashUri += $"/{serviceName}";
-        }
-        navigationManager.NavigateTo(bashUri);
+        var uri = $"/dashboard/configuration/record/{dashboardId}";
+        if (service is not null) uri += $"/{service}";
+        if (string.IsNullOrEmpty(relation) is false) uri += $"/{relation}";
+
+        navigationManager.NavigateTo(uri);
     }
 
     public static void NavigateToConfigurationChart(this NavigationManager navigationManager, string dashboardId, string panelId, string? serviceName = null)
     {
-        var bashUri = $"/dashboard/configuration/chart/{dashboardId}";
+        var uri = $"/dashboard/configuration/chart/{dashboardId}";
         if (serviceName is not null)
         {
-            bashUri += $"/{serviceName}";
+            uri += $"/{serviceName}";
         }
-        navigationManager.NavigateTo($"{bashUri}/{panelId}");
+        navigationManager.NavigateTo($"{uri}/{panelId}");
     }
 
     public static void NavigateToConfigurationChart(this NavigationManager navigationManager, string panelId)

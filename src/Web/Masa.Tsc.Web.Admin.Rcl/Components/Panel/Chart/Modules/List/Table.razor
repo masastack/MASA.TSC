@@ -133,12 +133,6 @@
     void ToDashboardConfiguration(Dessert dessert)
     {
         if (IsEdit) return;
-        var text = dessert.Text;
-        if (Value.ListType == ListTypes.InstanceList)
-            NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, ConfigurationRecord.AppName, instance: text);
-        else if (Value.ListType == ListTypes.EndpointList)
-            NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, ConfigurationRecord.AppName, endpoint: text);
-        else
-            NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, text);
+        NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, ConfigurationRecord.Service, dessert.Text);
     }
 }

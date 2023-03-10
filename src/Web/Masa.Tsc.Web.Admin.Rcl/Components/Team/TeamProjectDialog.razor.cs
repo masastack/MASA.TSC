@@ -32,7 +32,7 @@ public partial class TeamProjectDialog
 
     ConfigurationRecord ConfigurationRecord { get; set; } = new();
 
-    AppAutoComplete AppAutoComplete { get; set; }
+    ServiceAutoComplete AppAutoComplete { get; set; }
 
     List<AppDetailModel> Apps { get; set; } = new();
 
@@ -54,7 +54,7 @@ public partial class TeamProjectDialog
             }).ToList();
             Team.ProjectTotal = MonitorProjectCount;
             Team.AppTotal = MonitorServiceCount;
-            ConfigurationRecord.AppName = Apps.FirstOrDefault()?.Identity;
+            ConfigurationRecord.Service = Apps.FirstOrDefault()?.Identity;
         }
     }
 
@@ -74,7 +74,7 @@ public partial class TeamProjectDialog
         var data = await base.ApiCaller.InstrumentService.GetLinkAsync(MetricValueTypes.Service);
         if (data?.InstrumentId is not null)
         {
-            NavigationManager.NavigateToDashboardConfiguration(data.InstrumentId.ToString()!, ConfigurationRecord.AppName);
+            NavigationManager.NavigateToDashboardConfiguration(data.InstrumentId.ToString()!, ConfigurationRecord.Service);
         }
     }
 }

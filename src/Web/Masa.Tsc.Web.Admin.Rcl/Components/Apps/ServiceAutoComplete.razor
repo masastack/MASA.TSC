@@ -1,0 +1,14 @@
+﻿@inherits TscComponentBase
+
+<SAutoComplete Value=Value
+               ValueChanged=ValueChanged
+               Items="@Services"
+               ItemText="app => app.Name"
+               ItemValue="app=>app.Identity"
+               Small
+               Placeholder="@T("Service")"
+               BackgroundColor="@(FillBackground?"fill-background":"white")"
+               Clearable
+               Loading="_isLoading"
+               Class="@Class"
+               Style="@Style" />
