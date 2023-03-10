@@ -1,0 +1,21 @@
+﻿@inherits TscComponentBase
+
+<SAutoComplete Placeholder="@T(Instance?"Instance":"Endpoint")"
+               Items="@Items"             
+               @bind-Value="Value"
+               ItemText="item =>item"
+               ItemValue="item =>item"
+               TItem=string
+               TValue=string
+               TItemValue=string
+               Small
+               BackgroundColor="white"
+               Clearable
+               Flat
+               Solo
+               Outlined="false"
+               Loading="_isLoading"
+               Class="mr-6 rounded-2 m-input--h-40"
+               Style="@Style"
+               OnSelectedItemUpdate="OnSelectedItemUpdate">
+</SAutoComplete>
