@@ -59,14 +59,6 @@ public partial class Configuration : IAsyncDisposable
         }
     }
 
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (NavigationManager.Uri.Contains("record") && string.IsNullOrEmpty(ConfigurationRecord.DashboardId))
-        {
-            NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName, InstanceName, EndpointName);
-        }
-    }
-
     async Task GetPanelsAsync()
     {
         ConfigurationRecord.ClearPanels();
@@ -130,10 +122,10 @@ public partial class Configuration : IAsyncDisposable
 
     void ServiceRelationChanged((string?, string?, string?) serviceRelation)
     {
-        var (serviceName, instanceName, endpointName) = serviceRelation;
         _hasNavigateTo = true;
         _serviceRelationReady = true;
-        NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName, instanceName, endpointName);
+        (ConfigurationRecord.Service, ConfigurationRecord.Instance, ConfigurationRecord.Endpoint) = serviceRelation;
+        NavigationManager.NavigateToDashboardConfiguration(DashboardId, ConfigurationRecord.Service, ConfigurationRecord.Instance, ConfigurationRecord.Endpoint);
     }
 
 

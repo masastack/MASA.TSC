@@ -63,7 +63,9 @@ public partial class ChartPanel
             return await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto()
             {
                 Time = ConfigurationRecord.EndTime.LocalDateTime,
-                ServiceName = ConfigurationRecord.Service!,
+                Service = ConfigurationRecord.Service,
+                Instance = ConfigurationRecord.Instance,
+                EndPoint = ConfigurationRecord.Endpoint,
                 Queries = Value.Metrics.Select(item => item.Name).ToList()
             });
         }
@@ -73,7 +75,9 @@ public partial class ChartPanel
             {
                 Start = ConfigurationRecord.StartTime.LocalDateTime,
                 End = ConfigurationRecord.EndTime.LocalDateTime,
-                ServiceName = ConfigurationRecord.Service!,
+                Service = ConfigurationRecord.Service!,
+                Instance = ConfigurationRecord.Instance,
+                EndPoint = ConfigurationRecord.Endpoint,
                 Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
                 MetricNames = Value.Metrics.Select(item => item.Name).ToList()
             });

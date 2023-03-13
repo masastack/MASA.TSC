@@ -150,7 +150,7 @@ public class QueryHandler
         var index = 0;
         foreach (var name in query.Data.MetricNames)
         {
-            var metric = await AppendCondition(name, query.Data.ServiceName, query.Data.Instance, query.Data.EndPoint);
+            var metric = await AppendCondition(name, query.Data.Service, query.Data.Instance, query.Data.EndPoint);
             tasks[index] = _prometheusClient.QueryRangeAsync(new QueryRangeRequest
             {
                 End = query.Data.End.ToUnixTimestamp().ToString(),
@@ -171,7 +171,7 @@ public class QueryHandler
         var index = 0;
         foreach (var name in query.Data.Queries)
         {
-            var metric = await AppendCondition(name, query.Data.ServiceName, query.Data.Instance, query.Data.EndPoint);
+            var metric = await AppendCondition(name, query.Data.Service, query.Data.Instance, query.Data.EndPoint);
             tasks[index] = _prometheusClient.QueryAsync(new QueryRequest
             {
                 Time = query.Data.Time.ToUnixTimestamp().ToString(),

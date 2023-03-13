@@ -15,7 +15,7 @@ public class ConfigurationRecord
 
     public string? Endpoint { get; set; }
 
-    public string Search { get; set; }
+    public string PanelId { get; set; }
 
     public ModelTypes ModelType { get; set; }
 
@@ -23,7 +23,7 @@ public class ConfigurationRecord
 
     public DateTimeOffset EndTime { get; set; } = DateTimeOffset.UtcNow;
 
-    public string? Key => $"{Service}{StartTime}{EndTime}";
+    public string? Key => $"{Service}{Instance}{Endpoint}{StartTime}{EndTime}";
 
     public bool IsEdit { get; set; }
 
@@ -39,7 +39,6 @@ public class ConfigurationRecord
     public void Clear()
     {
         ClearPanels();
-        Search = "";
         DashboardId = "";
         IsEdit = false;
     }

@@ -35,7 +35,7 @@ public partial class ServiceResponseTimePercentile
                 $"round(histogram_quantile(0.99,sum(increase(http_server_duration_bucket[5m])) by (le)),0.01)"
             },
             Start = StartTime,
-            ServiceName = query.AppId,
+            Service = query.AppId,
             End = EndTime,
             Step = step
         });

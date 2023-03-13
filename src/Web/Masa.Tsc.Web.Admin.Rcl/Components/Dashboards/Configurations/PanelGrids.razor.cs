@@ -15,18 +15,18 @@ public partial class PanelGrids
     public UpsertPanelDto? ParentPanel { get; set; }
 
     [CascadingParameter]
-    public bool IsEdit { get; set; }
+    public ConfigurationRecord ConfigurationRecord { get; set; }
+
+    bool IsEdit => ConfigurationRecord.IsEdit;
 
     [CascadingParameter]
     public List<PanelGrids> PanelGridRange { get; set; }
-
-    public bool IsEditTabItem { get; set; }
 
     public MGridstack<UpsertPanelDto>? Gridstack;
 
     protected override void OnParametersSet()
     {
-        if(PanelGridRange.Contains(this) is false)
+        if (PanelGridRange.Contains(this) is false)
         {
             PanelGridRange.Add(this);
         }
@@ -95,7 +95,7 @@ public partial class PanelGrids
     async Task ConfigurationChartPanel(UpsertPanelDto panel)
     {
         await PanelGridRange.SaveUI();
-        NavigationManager.NavigateToConfigurationChart(panel.Id.ToString());
+        NavigationManager.NavigateToConfigurationChart(panel.Id.ToString(), ConfigurationRecord.DashboardId, ConfigurationRecord.Service, ConfigurationRecord.Instance, ConfigurationRecord.Endpoint);
     }
 
     public async Task SavePanelGridAsync()

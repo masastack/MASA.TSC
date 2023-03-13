@@ -1,14 +1,11 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Contracts.Admin.Enums;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
 public partial class ChartPanelConfiguration : TscComponentBase
 {
     List<StringNumber> _panelValues = new() { 1 };
-    string _listType = string.Empty;
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -17,13 +14,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
     public UpsertChartPanelDto Value { get; set; }
 
     [Parameter]
-    public string DashboardId { get; set; }
-
-    [Parameter]
-    public string? ServiceName { get; set; }
-
-    [Parameter]
-    public ModelTypes ModelType { get; set; }
+    public ConfigurationRecord ConfigurationRecord { get; set; }
 
     public ChartPanel ChartPanel { get; set; }
 
@@ -36,16 +27,14 @@ public partial class ChartPanelConfiguration : TscComponentBase
         ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
         if (Value.Metrics.Any() is false) Value.Metrics.Add(new());
 
-        CheckListType();
+        InitListType();
     }
 
-    private void CheckListType()
+    private void InitListType()
     {
-        if (Value.ChartType != "table") return;
-
-        if (ModelType is not ModelTypes.All)
+        if (Value.ChartType == "table" && ConfigurationRecord.ModelType is not ModelTypes.All)
         {
-            if (ModelType is not ModelTypes.Service)
+            if (ConfigurationRecord.ModelType is not ModelTypes.Service)
                 Value.ListType = ListTypes.TopList;
             else if (Value.ListType == ListTypes.ServiceList)
                 Value.ListType = ListTypes.EndpointList;
@@ -60,7 +49,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
             await PopupService.EnqueueSnackbarAsync(T("Metrics name is required"), AlertTypes.Error);
             return;
         }
-        NavigationManager.NavigateToDashboardConfigurationRecord(DashboardId, ServiceName);
+        NavigationManager.NavigateToDashboardConfigurationRecord(ConfigurationRecord.DashboardId, ConfigurationRecord.Service, ConfigurationRecord.Instance, ConfigurationRecord.Endpoint);
     }
 
     async Task CancelAsync()

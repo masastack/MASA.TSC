@@ -37,7 +37,7 @@ public partial class ApdexChart
             MetricNames = new List<string> { metric },
             Start = query.Start.Value,
             End = query.End.Value,
-            ServiceName = query.AppId,
+            Service = query.AppId,
             Step = step
         });
         SetData();

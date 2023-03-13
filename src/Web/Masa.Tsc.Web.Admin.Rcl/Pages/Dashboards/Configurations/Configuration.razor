@@ -45,9 +45,9 @@
     </HeaderContent>
     <AutoHeightContent>
         <DefaultCard Id="@_contentElementId" Style="min-height: calc(100vh - 185px);">
-            <CascadingValue Value="ConfigurationRecord.IsEdit">
-                <CascadingValue Value="PanelGrids" IsFixed>
-                    <CascadingValue Value="ConfigurationRecord">
+            <CascadingValue Value="ConfigurationRecord.IsEdit" IsFixed>
+                <CascadingValue Value="PanelGrids" IsFixed>                   
+                    <CascadingValue Value="ConfigurationRecord" IsFixed>
                         @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady && _timeRangeReady))
                         {
                             <PanelGrids Panels="ConfigurationRecord.Panels" />

@@ -35,7 +35,7 @@ public partial class ServiceCallChart
             MetricNames = new List<string> {
                 $"round(sum by(service_name)(increase(http_server_duration_count[1m])),0.01)"
             },
-            ServiceName = query.AppId,
+            Service = query.AppId,
             Start = StartTime,
             End = EndTime,
             Step = step
