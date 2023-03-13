@@ -2,13 +2,12 @@
 
 <SAutoComplete Value=Value
                ValueChanged=ValueChanged
-               Items="@Services"
+               Items="@(Services?? new())"
                ItemText="app => app.Name"
                ItemValue="app=>app.Identity"
                Small
                Placeholder="@T("Service")"
                BackgroundColor="@(FillBackground?"fill-background":"white")"
-               Clearable
                Loading="_isLoading"
                Class="@Class"
                Style="@Style" />

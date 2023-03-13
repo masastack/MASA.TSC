@@ -12,11 +12,38 @@ public partial class ServiceRelation
     public string Service { get; set; }
 
     [Parameter]
-    public EventCallback<string> ServiceChanged { get; set; }
+    public string Instance { get; set; }
 
     [Parameter]
-    public string Relation { get; set; }
+    public string Endpoint { get; set; }
 
     [Parameter]
-    public EventCallback<string> RelationChanged { get; set; }
+    public EventCallback<(string?, string?, string?)> ValueChanged { get; set; }
+
+    async Task ServiceChanged(string service)
+    {
+        Service = service;
+        if (ModelType is ModelTypes.Service)
+        {
+            await ValueChanged.InvokeAsync((Service, default, default));
+        }
+    }
+
+    async Task InstanceChanged(string instance)
+    {
+        Instance = instance;
+        if (ModelType is ModelTypes.ServiceInstance)
+        {
+            await ValueChanged.InvokeAsync((Service, Instance, default));
+        }
+    }
+
+    async Task EndpointChanged(string endpoint)
+    {
+        Endpoint = endpoint;
+        if (ModelType is ModelTypes.Endpoint)
+        {
+            await ValueChanged.InvokeAsync((Service, Instance, Endpoint));
+        }
+    }
 }

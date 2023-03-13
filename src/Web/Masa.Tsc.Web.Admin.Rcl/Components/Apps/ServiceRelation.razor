@@ -2,31 +2,28 @@
 
 @if (ModelType is not ModelTypes.All)
 {
-    <ServiceAutoComplete 
-        Value="@Service" 
-        ValueChanged=ServiceChanged 
-        FillBackground=false 
-        Class="mr-6 my-auto" 
-        Style="max-width:300px !important;width:300px;" 
-        Metric />
-    @if (ModelType is ModelTypes.ServiceInstance)
+    <ServiceAutoComplete Value="@Service"
+                         ValueChanged=ServiceChanged
+                         FillBackground=false
+                         Class="mr-6 my-auto"
+                         Style="max-width:300px !important;width:300px;"
+                         Metric />
+    @if (ModelType is ModelTypes.ServiceInstance or ModelTypes.Endpoint)
     {
-        <InstanceAutoComplete 
-            Value="@Relation" 
-            ValueChanged=RelationChanged 
-            Service="@Service" 
-            FillBackground=false 
-            Class="mr-6 my-auto" 
-            Style="max-width:300px !important;width:300px;" />
+        <InstanceAutoComplete Value="@Instance"
+                              ValueChanged=InstanceChanged
+                              Service="@Service"
+                              FillBackground=false
+                              Class="mr-6 my-auto"
+                              Style="max-width:300px !important;width:300px;" />
     }
-    else if (ModelType is ModelTypes.Endpoint)
+    @if (ModelType is ModelTypes.Endpoint)
     {
-        <EndpointAutoComplete 
-            Value="@Relation"
-            ValueChanged=RelationChanged
-            Service="@Service" 
-            FillBackground=false 
-            Class="mr-6 my-auto" 
-            Style="max-width:300px !important;width:300px;" />
+        <EndpointAutoComplete Value="@Endpoint"
+                              ValueChanged=EndpointChanged
+                              Service="@Service"
+                              FillBackground=false
+                              Class="mr-6 my-auto"
+                              Style="max-width:300px !important;width:300px;" />
     }
 }

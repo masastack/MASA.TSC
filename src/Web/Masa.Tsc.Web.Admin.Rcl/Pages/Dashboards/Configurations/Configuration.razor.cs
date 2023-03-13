@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations.Models;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations;
 
 public partial class Configuration : IAsyncDisposable
@@ -11,6 +9,9 @@ public partial class Configuration : IAsyncDisposable
     string _contentElementId = Guid.NewGuid().ToString();
     IJSObjectReference? _helper;
     QuickRangeKey? _defaultValue = QuickRangeKey.Last15Minutes;
+    bool _hasNavigateTo;
+    bool _serviceRelationReady;
+    bool _timeRangeReady;
 
     [Inject]
     public ConfigurationRecord ConfigurationRecord { get; set; }
@@ -25,10 +26,13 @@ public partial class Configuration : IAsyncDisposable
     public string DashboardId { get; set; }
 
     [Parameter]
-    public string ServiceName { get; set; }
+    public string? ServiceName { get; set; }
 
     [Parameter]
-    public string RelationName { get; set; }
+    public string? InstanceName { get; set; }
+
+    [Parameter]
+    public string? EndpointName { get; set; }
 
     List<PanelGrids> PanelGrids { get; set; } = new();
 
@@ -40,8 +44,14 @@ public partial class Configuration : IAsyncDisposable
 
     protected override async Task OnParametersSetAsync()
     {
+        if (_hasNavigateTo)
+        {
+            _hasNavigateTo = false;
+            return;
+        }
         ConfigurationRecord.Service = ServiceName;
-        ConfigurationRecord.Relation = RelationName;
+        ConfigurationRecord.Instance = InstanceName;
+        ConfigurationRecord.Endpoint = EndpointName;
         if (string.IsNullOrEmpty(DashboardId) is false && ConfigurationRecord.DashboardId != DashboardId)
         {
             ConfigurationRecord.DashboardId = DashboardId;
@@ -53,7 +63,7 @@ public partial class Configuration : IAsyncDisposable
     {
         if (NavigationManager.Uri.Contains("record") && string.IsNullOrEmpty(ConfigurationRecord.DashboardId))
         {
-            NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName, RelationName);
+            NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName, InstanceName, EndpointName);
         }
     }
 
@@ -101,6 +111,7 @@ public partial class Configuration : IAsyncDisposable
 
     void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
+        _timeRangeReady = true;
         (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
     }
 
@@ -117,20 +128,14 @@ public partial class Configuration : IAsyncDisposable
         OpenSuccessMessage(T("Save success"));
     }
 
-    void ServiceNameChanged(string serviceName)
+    void ServiceRelationChanged((string?, string?, string?) serviceRelation)
     {
-        if (ConfigurationRecord.ModelType is ModelTypes.Service)
-        {
-            NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName);
-        }
-        else ServiceName = serviceName;
+        var (serviceName, instanceName, endpointName) = serviceRelation;
+        _hasNavigateTo = true;
+        _serviceRelationReady = true;
+        NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName, instanceName, endpointName);
     }
 
-    void RelationNameChanged(string? relationName)
-    {
-        ConfigurationRecord.NotRelationData = string.IsNullOrEmpty(relationName);
-        Task.Delay(3000).ContinueWith(_ => NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName, relationName));
-    }
 
     async Task SwitchEdit()
     {
@@ -139,7 +144,6 @@ public partial class Configuration : IAsyncDisposable
             var confirm = await OpenConfirmDialog(T("Operation confirmation"), T("Are you sure switch view mode,unsaved data will be lost"), AlertTypes.Warning);
             if (confirm)
             {
-                ConfigurationRecord.UpdateKey();
                 await GetPanelsAsync();
                 ConfigurationRecord.IsEdit = false;
             }
