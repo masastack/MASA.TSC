@@ -10,7 +10,7 @@ public partial class Team
     private TeamSearchModel? _teamSearchModel = null;
     private AppMonitorDto _appMonitorDto;
     private bool _isLoad = true;
-    private StringNumber _projectStatus = "";
+    private StringNumber _projectStatus = "0";
 
     private bool _visible;
     private string _selectedProjectId;

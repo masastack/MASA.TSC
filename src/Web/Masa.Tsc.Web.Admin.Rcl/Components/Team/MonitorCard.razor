@@ -6,8 +6,8 @@
         @foreach (var item in _items)
         {
             <MItem Value="@item.Value.ToString()">
-                <MCol Class="mt-4" Cols="12" Style="@ItemStyle(item,context.Active)">
-                    <MonitorItemCard Value=@item OnClick="@context.Toggle" />
+                <MCol Class="ma-0 pa-0 mt-4" Cols="12" Style="@ItemStyle(item)">
+                    <MonitorItemCard Value=@item OnClick="@(item=>Value=item.Value.ToString())" />
                 </MCol>
             </MItem>
         }

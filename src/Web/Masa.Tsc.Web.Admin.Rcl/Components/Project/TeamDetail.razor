@@ -16,20 +16,26 @@
             </MCol>
             <MCol Cols=6 Class="regular--text"><MLabel Class="body2">@T("Monitoring Projects") ：</MLabel> <span class="subtitle2">@Value.ProjectTotal</span></MCol>
             <MCol Cols=6 Class="regular--text"><MLabel Class="body2">@T("Monitoring Applications") ：</MLabel><span class="subtitle2">@Value.AppTotal</span></MCol>
-            <MCol Cols=12 Class="regular2--text body2">@Value.Description</MCol>
         </MRow>
-        <MRow Class="">
+        <MRow>
             @foreach (var user in Value.Admins!)
             {
                 <MCol Cols="@("auto")">
-                    <MChip Color="white">
-                        <MAvatar Left>
+                    <MChip Color="#F0F3FA">
+                        <MAvatar Left Color="#E9EDF7" Size="24">
                             <MImage Src="@user.Avatar" />
                         </MAvatar>
                         @user.Name
                     </MChip>
                 </MCol>
             }
+        </MRow>
+        <MRow>
+            <MCol Cols=12 Class="regular2--text body2">
+                @(Value.Description)ABCDEFGHIJKLMNOPQRSTYVWXYZ
+                members to your team to start collaborating. Click here to edit this description.
+                Professional team
+            </MCol>
         </MRow>
     </MCardText>
 </MCard>

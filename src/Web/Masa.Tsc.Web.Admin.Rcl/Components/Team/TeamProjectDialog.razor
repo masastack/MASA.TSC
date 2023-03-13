@@ -16,11 +16,11 @@
                             <div style="width:210px;">
                                 <ServiceAutoComplete Services="Apps" @bind-Value="@ConfigurationRecord.Service" @ref="AppAutoComplete" FillBackground=false />
                             </div>
-                            <MChip Class="mx-6" Color="#05CD99" TextColor="white">@AppAutoComplete!.CurrentApp?.Type</MChip>
+                            <MChip Class="mx-6" Color="#4318FF" TextColor="white">@AppAutoComplete!.CurrentApp?.Type</MChip>
                             <MTooltip Top>
                                 <ActivatorContent>
                                     <MLabel @attributes="@context.Attrs" Class="regular2--text body2" Style="max-width: 200px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">
-                                        @AppAutoComplete!.CurrentApp?.Identity
+                                        @T("APPID"):@AppAutoComplete!.CurrentApp?.Identity
                                     </MLabel>
                                 </ActivatorContent>
                                 <ChildContent>

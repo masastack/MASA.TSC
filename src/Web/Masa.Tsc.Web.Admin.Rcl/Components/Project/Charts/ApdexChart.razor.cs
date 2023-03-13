@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using System.Drawing;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class ApdexChart
@@ -23,6 +25,59 @@ public partial class ApdexChart
     private DateTime StartTime;
 
     private DateTime EndTime;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _options.SetValue("yAxis", new { type = "value", show = false });
+        _options.SetValue("xAxis.show", false);
+        _options.SetValue("tooltip", new
+        {
+            trigger = "axis",
+            axisPointer = new
+            {
+                type = "cross"
+            }
+        });
+        _options.SetValue("grid", new[] { new {
+            top=10,
+            left=10,
+            right=10,
+            bottom=10
+        } });
+        _options.SetValue("series[0].smooth", true);
+        _options.SetValue("series[0].showSymbol", false);
+        _options.SetValue("series[0].itemStyle", new
+        {
+            normal = new
+            {
+                lineStyle = new
+                {
+                    type = "solid",
+                    width = 6,
+                    color = new
+                    {
+                        colorStops = new[] {
+                            new {
+                            offset=0,
+                            color="rgba(255, 82, 82, 1)",
+                            },
+                            new {
+                            offset=1,
+                            color="rgba(255, 82, 82, 0)",
+                            }
+                        },
+                        x = 0,
+                        y = 0,
+                        x2 = 0,
+                        y2 = 1,
+                        type = "linear",
+                        global = false
+                    }
+                }
+            }
+        });
+    }
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {

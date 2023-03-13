@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Nest;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class ServiceResponseTimePercentile
@@ -19,6 +21,18 @@ public partial class ServiceResponseTimePercentile
 
     private DateTime StartTime;
     private DateTime EndTime;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _options.SetValue("grid", new
+        {
+            x = 60,
+            x2 = 20,
+            y2 = 20,
+            y = 25
+        });
+    }
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
@@ -68,18 +82,10 @@ public partial class ServiceResponseTimePercentile
                 dddd[key] = ((QueryResultMatrixRangeResponse)item.Result[0]).Values!.Select(values => values[1].ToString()).ToList()!;
             }
         }
-
-        _options.SetValue("grid", new
-        {
-            x = 60,
-            x2 = 20,
-            y2 = 20,
-            y = 25
-        });
         _options.SetValue("legend.data", legend);
         var format = StartTime.Format(EndTime);
         _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value, format)));
-        _options.SetValue("series", dddd.Select(item => new { name = item.Key, type = "line", data = item.Value }));
+        _options.SetValue("series", dddd.Select(item => new { name = item.Key, type = "line", showSymbol=false, smooth=true, data = item.Value }));
     }
 
     protected override bool IsSubscribeTimeZoneChange => true;
