@@ -44,7 +44,7 @@
             ConfigurationRecord.DashboardId = DashboardId;
             await GetPanelsAsync();
         }
-        if (string.IsNullOrEmpty(PanelId) is false && ConfigurationRecord.PanelId != PanelId)
+        if (string.IsNullOrEmpty(PanelId) is false)
         {
             ConfigurationRecord.PanelId = PanelId;
             Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException(T("Find panel error"));

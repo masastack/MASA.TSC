@@ -26,24 +26,12 @@
                         </MCol>
                         <MCol Md="8">
                             <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
-                                @if (ConfigurationRecord.ModelType == ModelTypes.All)
+                                @foreach (var item in TableMap[ConfigurationRecord.ModelType])
                                 {
-                                    <MButton Class="text-capitalize" Value="@ListTypes.ServiceList.ToString()">
-                                        Service List
+                                    <MButton Class="text-capitalize" Value="@item.ToString()">
+                                        @item.ToString()
                                     </MButton>
                                 }
-                                else if (ConfigurationRecord.ModelType == ModelTypes.Service)
-                                {
-                                    <MButton Class="text-capitalize" Value="@ListTypes.InstanceList.ToString()">
-                                        Instance List
-                                    </MButton>
-                                    <MButton Class="text-capitalize" Value="@ListTypes.EndpointList.ToString()">
-                                        Endpoint List
-                                    </MButton>
-                                }
-                                <MButton Class="text-capitalize" Value="ListTypes.TopList.ToString()">
-                                    Top List
-                                </MButton>
                             </MButtonGroup>
                         </MCol>
                     }
@@ -138,7 +126,7 @@
     <MCol Cols="4">
         <MCard>
             <MCardText>
-                <MExpansionPanels @bind-Values=_panelValues Multiple Style="z-index:auto !important;max-height:855px;overflow:auto;">
+                <MExpansionPanels Values="new List<StringNumber>{1}" Multiple Style="z-index:auto !important;max-height:855px;overflow:auto;">
                     <MExpansionPanel Value="1">
                         <MExpansionPanelHeader Class="emphasis2--text h6">Visualization</MExpansionPanelHeader>
                         <MExpansionPanelContent>
@@ -270,5 +258,3 @@
         </MCard>
     </MCol>
 </MRow>
-
-<MLoading @bind-Value="IsLoading" />

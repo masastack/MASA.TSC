@@ -5,22 +5,42 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
 public partial class ChartPanelConfiguration : TscComponentBase
 {
-    List<StringNumber> _panelValues = new() { 1 };
-
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
     [Parameter]
     public UpsertChartPanelDto Value { get; set; }
 
-    [Parameter]
+    [CascadingParameter]
     public ConfigurationRecord ConfigurationRecord { get; set; }
 
     public ChartPanel ChartPanel { get; set; }
 
-    bool IsLoading { get; set; }
-
     string ValueBackup { get; set; }
+
+    Dictionary<ModelTypes, ListTypes[]> TableMap = new()
+    {
+        [ModelTypes.All] = new[]
+        {
+            ListTypes.ServiceList,
+            ListTypes.TopList,
+        },
+        [ModelTypes.Service] = new[]
+        {
+            ListTypes.InstanceList,
+            ListTypes.EndpointList,
+            ListTypes.TopList,
+        },
+        [ModelTypes.ServiceInstance] = new[]
+        {
+            ListTypes.EndpointList,
+            ListTypes.TopList,
+        },
+        [ModelTypes.Endpoint] = new[]
+        {
+            ListTypes.TopList,
+        },
+    };
 
     protected override void OnInitialized()
     {
@@ -32,12 +52,9 @@ public partial class ChartPanelConfiguration : TscComponentBase
 
     private void InitListType()
     {
-        if (Value.ChartType == "table" && ConfigurationRecord.ModelType is not ModelTypes.All)
+        if (TableMap[ConfigurationRecord.ModelType].Contains(Value.ListType) is false)
         {
-            if (ConfigurationRecord.ModelType is not ModelTypes.Service)
-                Value.ListType = ListTypes.TopList;
-            else if (Value.ListType == ListTypes.ServiceList)
-                Value.ListType = ListTypes.EndpointList;
+            Value.ListType = TableMap[ConfigurationRecord.ModelType].First();
         }
     }
 
@@ -71,9 +88,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
 
     async Task GetGetMetricsAsync()
     {
-        IsLoading = true;
         await ChartPanel.ReloadAsync();
-        IsLoading = false;
     }
 
     async Task MetricNameChangedAsync(PanelMetricDto metric, string metricName)
