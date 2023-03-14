@@ -14,17 +14,17 @@
                     <MRow Class="@Class">
                         <MCol Cols="6" Class="d-flex justify-start align-center">
                             <div style="width:210px;">
-                                <AppAutoComplete Apps="Apps" Value="@ConfigurationRecord.AppName" ValueChanged="OnAppChanged" @ref="AppAutoComplete" FillBackground=false />
+                                <ServiceAutoComplete Apps="Apps" Value="@ConfigurationRecord.Service" ValueChanged="OnAppChanged" @ref="ServiceAutoComplete" FillBackground=false />
                             </div>
-                            <MChip Class="mx-6" Color="#05CD99" TextColor="white">@AppAutoComplete!.CurrentApp?.Type</MChip>
+                            <MChip Class="mx-6" Color="#05CD99" TextColor="white">@ServiceAutoComplete!.CurrentApp?.Type</MChip>
                             <MTooltip Top>
                                 <ActivatorContent>
                                     <MLabel @attributes="@context.Attrs" Class="regular2--text body2" Style="max-width: 200px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">
-                                        @T("APPID"):@AppAutoComplete!.CurrentApp?.Identity
+                                        @T("APPID"):@ServiceAutoComplete!.CurrentApp?.Identity
                                     </MLabel>
                                 </ActivatorContent>
                                 <ChildContent>
-                                    <span>@AppAutoComplete!.CurrentApp?.Identity</span>
+                                    <span>@ServiceAutoComplete!.CurrentApp?.Identity</span>
                                 </ChildContent>
                             </MTooltip>
                         </MCol>

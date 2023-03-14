@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Contracts.Admin;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TeamProjectDialog
@@ -49,11 +47,17 @@ public partial class TeamProjectDialog
 
     ConfigurationRecord ConfigurationRecord { get; set; } = new();
 
-    ServiceAutoComplete AppAutoComplete { get; set; }
+    ServiceAutoComplete ServiceAutoComplete { get; set; }
 
     List<AppDetailModel> Apps { get; set; } = new();
 
     TeamDto Team { get; set; }
+
+    async Task OnAppChanged(string appid)
+    {
+        ConfigurationRecord.Service = appid;
+        ErrorCount = await GetErroCountAsync(appid);
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -71,8 +75,8 @@ public partial class TeamProjectDialog
             }).ToList();
             Team.ProjectTotal = ProjectCount;
             Team.AppTotal = ServiceCount;            
-            ConfigurationRecord.AppName = Apps.FirstOrDefault()?.Identity;
-            ErrorCount = await GetErroCountAsync(ConfigurationRecord.AppName!);
+            ConfigurationRecord.Service = Apps.FirstOrDefault()?.Identity;
+            ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
         }
     }
 
@@ -94,13 +98,6 @@ public partial class TeamProjectDialog
         {
             NavigationManager.NavigateToDashboardConfiguration(data.InstrumentId.ToString()!, ConfigurationRecord.Service);
         }
-    }
-
-    async Task OnAppChanged(string appid)
-    {
-        ConfigurationRecord.AppName = appid;
-        //var app = Project?.Apps?.FirstOrDefault(app => app.Identity == appid);
-        ErrorCount = await GetErroCountAsync(appid);
     }
 
     async Task<int> GetErroCountAsync(string appid)
