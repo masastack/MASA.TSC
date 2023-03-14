@@ -29,7 +29,7 @@ public class ConfigurationRecord
 
     public bool ServiceRelationReady(bool ready)
     {
-        var allModelPass = ModelType is ModelTypes.All;
+        var allModelPass = ModelType is ModelTypes.All or default(ModelTypes);
         var serviceModelPass = ModelType is ModelTypes.Service && string.IsNullOrEmpty(Service) is false;
         var instanceModelPass = ModelType is ModelTypes.ServiceInstance && string.IsNullOrEmpty(Service) is false && string.IsNullOrEmpty(Instance) is false;
         var endPointPass = ModelType is ModelTypes.Endpoint && string.IsNullOrEmpty(Service) is false && string.IsNullOrEmpty(Instance) is false && string.IsNullOrEmpty(Endpoint) is false;

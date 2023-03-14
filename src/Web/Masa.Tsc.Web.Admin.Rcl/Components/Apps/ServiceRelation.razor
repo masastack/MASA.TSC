@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-@if (ModelType is not ModelTypes.All)
+@if (ModelType is not ModelTypes.All && ModelType != default(ModelTypes))
 {
     <ServiceAutoComplete Value="@Service"
                          ValueChanged=ServiceChanged
@@ -22,6 +22,7 @@
         <EndpointAutoComplete Value="@Endpoint"
                               ValueChanged=EndpointChanged
                               Service="@Service"
+                              Instance="@Instance"
                               FillBackground=false
                               Class="mr-6 my-auto"
                               Style="max-width:300px !important;width:300px;" />
