@@ -30,7 +30,7 @@ public partial class EndpointAutoComplete
     {
         var serviceChanged = string.IsNullOrEmpty(Service) is false && _oldService != Service;
         var instanceChanged = string.IsNullOrEmpty(Instance) is false && _oldInstance != Instance;
-        if (serviceChanged || instanceChanged)
+        if ((serviceChanged && Instance == "All") || instanceChanged)
         {
             _oldService = Service;
             _oldInstance = Instance;
@@ -39,17 +39,22 @@ public partial class EndpointAutoComplete
             {
                 Type = MetricValueTypes.Endpoint,
                 Service = Service,
-                Instance = Instance,
+                Instance = Instance == "All" ? null : Instance,
             };
             var data = await ApiCaller.MetricService.GetValues(query);
             Endpoints = data ?? new();
-            if (Endpoints.Any() && (string.IsNullOrEmpty(Value) || Endpoints.Contains(Value) is false))
+            if (Endpoints.Any())
             {
-                await ValueChanged.InvokeAsync(Endpoints.First());
+                if(string.IsNullOrEmpty(Value) || Endpoints.Contains(Value) is false)
+                {
+                    await ValueChanged.InvokeAsync(Endpoints.First());
+                }
+                else await ValueChanged.InvokeAsync(Value);
             }
+            else await ValueChanged.InvokeAsync(default);
             _isLoading = false;
         }
-        if(string.IsNullOrEmpty(Service) || string.IsNullOrEmpty(Instance))
+        if (string.IsNullOrEmpty(Service) || string.IsNullOrEmpty(Instance))
         {
             Endpoints.Clear();
         }

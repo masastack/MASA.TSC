@@ -71,7 +71,7 @@ else
         {
             Service = ConfigurationRecord.Service,
             Instance = ConfigurationRecord.Instance,
-            Endpoint = ConfigurationRecord.Endpoint,
+            Endpoint = ConfigurationRecord.ConvertEndpoint,
             Type = GetMetricValueType()
         });
     }

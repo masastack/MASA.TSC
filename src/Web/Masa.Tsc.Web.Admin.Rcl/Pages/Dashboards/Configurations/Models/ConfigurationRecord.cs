@@ -15,7 +15,9 @@ public class ConfigurationRecord
 
     public string? Endpoint { get; set; }
 
-    public string PanelId { get; set; }
+    public string? ConvertEndpoint => Endpoint == "All" ? null : Endpoint;
+
+    public string? PanelId { get; set; }
 
     public ModelTypes ModelType { get; set; }
 
@@ -39,7 +41,12 @@ public class ConfigurationRecord
     public void Clear()
     {
         ClearPanels();
+        ModelType = default;
         DashboardId = "";
+        Service = default;
+        Instance = default;
+        Endpoint = default;
+        PanelId = default;
         IsEdit = false;
     }
 

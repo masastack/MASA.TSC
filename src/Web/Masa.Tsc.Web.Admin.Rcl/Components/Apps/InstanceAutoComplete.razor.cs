@@ -20,11 +20,14 @@ public partial class InstanceAutoComplete
     [Parameter]
     public bool FillBackground { get; set; } = true;
 
-    public List<string> Instances { get; set; } = new();
+    [Parameter]
+    public bool IncludeAll { get; set; }
+
+    public List<KeyValuePair<string, string>> Instances { get; set; } = new();
 
     protected override async Task OnParametersSetAsync()
     {
-        if(string.IsNullOrEmpty(Service) is false && _oldService != Service)
+        if (string.IsNullOrEmpty(Service) is false && _oldService != Service)
         {
             _oldService = Service;
             _isLoading = true;
@@ -34,15 +37,19 @@ public partial class InstanceAutoComplete
                 Service = Service
             };
             var data = await ApiCaller.MetricService.GetValues(query);
-            Instances = data ?? new();
+            Instances = new();
+            if (IncludeAll)
+            {
+                Instances.Add(new("All", T("All")));
+            }
+            Instances.TryAddRange(data?.ToDictionary(item => item, item => item) ?? new());
             if (Instances.Any())
             {
-                if(string.IsNullOrEmpty(Value) || Instances.Contains(Value) is false)
+                if (string.IsNullOrEmpty(Value) || Instances.Any(item => item.Key == Value) is false)
                 {
-                    await ValueChanged.InvokeAsync(Instances.First());
+                    await ValueChanged.InvokeAsync(Instances.First().Key);
                 }
             }
-            else await ValueChanged.InvokeAsync(null);
             _isLoading = false;
         }
         if (string.IsNullOrEmpty(Service))
