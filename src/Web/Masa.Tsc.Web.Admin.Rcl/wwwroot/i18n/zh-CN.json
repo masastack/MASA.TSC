@@ -191,6 +191,8 @@
   "Total Count": "总条数",
   "Loading": "加载中",
   "Save success": "保存成功",
+  "Apply": "应用",
+  "Current Selected TimeZone": "当前时区"
   "Service": "服务",
   "Instance": "实例",
   "Endpoint": "接口",
