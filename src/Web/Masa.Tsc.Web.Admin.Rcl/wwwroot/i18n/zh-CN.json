@@ -156,10 +156,13 @@
     "Service Slow Endpoint": "服务慢接口",
     "call/min": "调用次数/每分钟",
     "APPID": "应用ID",
+    "Project ID": "项目ID",
     "During this period of time, the service applies the Adpx application service standard and the application service rating": "该时间段内服务应用Adpx应用服务标准于应用服务评级",
     "The average response time of the service during the time period": "该时间段内服务平均响应时间",
     "The average success rate of the service in the current time period": "该服务目前时间段内平均成功率",
-    "The average failure rate of the service in the current time period": "该服务目前时间段内平均失败率"
+    "The average failure rate of the service in the current time period": "该服务目前时间段内平均失败率",
+    "For HTTP 1/2, gRPC, RPC services, this means Calls Per Minute (calls/min)": "例如 HTTP 1/2, gRPC, RPC的服务负载 (调用次数/分钟)",
+    "Currently the application has {0} error logs": "目前该应用程序有{0}条错误日志"
   },
   "Start": "开始点",
   "Duration": "持续时间",

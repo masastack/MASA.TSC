@@ -3,7 +3,10 @@
 @inherits TscComponentBase
 
 <PageTitle>@T("ProjectTeam")</PageTitle>
-<TeamSearch OnValueChanged="OnSearch" OnTabsChanged="OnTabsChange" OnSearchChanged="OnSearchChange"></TeamSearch>
+<TeamSearch OnValueChanged="OnSearch"
+            OnTabsChanged="OnSearchChangeAsync"
+            OnSearchChanged="OnSearchChangeAsync"
+            OnQuickRangeChanged="@(value=>_quickRangeKey=value)"></TeamSearch>
 <MCard Class="d-flex mt-8" Style="min-width:464px">
     <MRow Class="overflow-auto d-flex justify-space-between pt-8" Style="min-height: calc(100vh - 190px);">
         @if (_isLoad)
@@ -57,9 +60,28 @@
                 </HoneyCombGrid>
             </MCol>
             <MCol Style="max-width:266px">
-                <MonitorCard Class="ml-8" Data=_appMonitorDto Value="@_projectStatus" ValueChanged="ProjectStatusChanged" />
+                <MonitorCard Class="ml-8" Data=_appMonitorDto Value="@_projectStatus" ValueChanged="ProjectStatusChangedAsync" />
             </MCol>
         }
     </MRow>
 </MCard>
-<TeamProjectDialog @bind-Visible="_visible" ProjectId="@_selectedProjectId" TeamId="@_selectedTeamId" MonitorProjectCount="@_teamProjectCount" MonitorServiceCount="@_teamServiceCount" />
+
+<CascadingValue Value="_selectedProjectId" Name="ProjectId">
+    <CascadingValue Value="_selectedTeamId" Name="TeamId">
+        <CascadingValue Value="_teamProjectCount" Name="ProjectCount">
+            <CascadingValue Value="_teamServiceCount" Name="ServiceCount">
+                <CascadingValue Value="_errorCount" Name="ErrorCount">
+                    <CascadingValue Value="_projectOverviewDto">
+                        <CascadingValue Value="ToDateTimeOffset( _teamSearchModel?.Start)" Name="Start">
+                            <CascadingValue Value="ToDateTimeOffset(_teamSearchModel?.End)" Name="End">
+                                <CascadingValue Value="_quickRangeKey">
+                                    <TeamProjectDialog @bind-Visible="_visible" />
+                                </CascadingValue>
+                            </CascadingValue>
+                        </CascadingValue>
+                    </CascadingValue>
+                </CascadingValue>
+            </CascadingValue>
+        </CascadingValue>
+    </CascadingValue>
+</CascadingValue>

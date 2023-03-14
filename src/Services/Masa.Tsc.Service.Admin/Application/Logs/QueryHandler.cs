@@ -15,6 +15,25 @@ public class QueryHandler
     [EventHandler]
     public async Task AggregateAsync(LogAggQuery query)
     {
+
+        if (query.Data.Conditions != null)
+        {
+            foreach (var item in query.Data.Conditions)
+            {
+                if (item.Type == ConditionTypes.In)
+                {
+                    if (item.Value is JsonElement json)
+                    {
+                        item.Value = json.EnumerateArray().Select(value => value.ToString());
+                    }
+                }
+            }
+        }
+
+
+
+
+
         query.Result = await _logService.AggregateAsync(query.Data);
     }
 

@@ -41,7 +41,7 @@ public partial class HexagonalMesh : BDomComponentBase
         await _helper.InvokeVoidAsync("render", Ref);
     }
 
-    public async ValueTask DisposeAsync()
+    public new async ValueTask DisposeAsync()
     {
         try
         {
@@ -51,8 +51,9 @@ public partial class HexagonalMesh : BDomComponentBase
             {
                 await _helper.DisposeAsync();
             }
+            await base.DisposeAsync();
         }
-        catch (Exception)
+        catch
         {
         }
     }

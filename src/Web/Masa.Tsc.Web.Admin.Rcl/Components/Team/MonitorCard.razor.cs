@@ -28,7 +28,7 @@ public partial class MonitorCard
         await base.SetParametersAsync(parameters);
         if (parameters.TryGetValue<AppMonitorDto>(nameof(Data), out var data))
         {
-            UpdateItems();            
+            UpdateItems();
         }
     }
 
@@ -90,6 +90,13 @@ public partial class MonitorCard
             return $"border: 1px solid {appMonitor.Color};border-radius: 16px;min-width:170px";
         }
         return "border: 1px solid #E4E8F3;border-radius: 16px;min-width:170px";
+    }
+
+    private async Task ValueChangedAsync(AppMonitorViewDto value)
+    {
+        Value = value.Value.ToString();
+        if (ValueChanged.HasDelegate)
+            await ValueChanged.InvokeAsync(Value);
     }
 }
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Contracts.Admin;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TeamProjectDialog
@@ -18,17 +20,32 @@ public partial class TeamProjectDialog
     [Parameter]
     public EventCallback<bool> VisibleChanged { get; set; }
 
-    [Parameter]
+    [CascadingParameter(Name = "ProjectId")]
     public string ProjectId { get; set; }
 
-    [Parameter]
+    [CascadingParameter(Name = "TeamId")]
     public Guid TeamId { get; set; }
 
-    [Parameter]
-    public int MonitorProjectCount { get; set; }
+    [CascadingParameter(Name = "ProjectCount")]
+    public int ProjectCount { get; set; }
 
-    [Parameter]
-    public int MonitorServiceCount { get; set; }
+    [CascadingParameter(Name = "ServiceCount")]
+    public int ServiceCount { get; set; }
+
+    [CascadingParameter(Name = "ErrorCount")]
+    public int ErrorCount { get; set; }
+
+    [CascadingParameter]
+    public ProjectOverviewDto Project { get; set; }
+
+    [CascadingParameter(Name = "Start")]
+    public DateTimeOffset Start { get; set; }
+
+    [CascadingParameter(Name = "End")]
+    public DateTimeOffset End { get; set; }
+
+    [CascadingParameter]
+    public QuickRangeKey? QuickRangeKey { get; set; }
 
     ConfigurationRecord ConfigurationRecord { get; set; } = new();
 
@@ -52,9 +69,11 @@ public partial class TeamProjectDialog
                 Type = app.AppType,
                 ServiceType = app.ServiceType
             }).ToList();
-            Team.ProjectTotal = MonitorProjectCount;
-            Team.AppTotal = MonitorServiceCount;
-            ConfigurationRecord.Service = Apps.FirstOrDefault()?.Identity;
+            Team.ProjectTotal = ProjectCount;
+            Team.AppTotal = ServiceCount;
+            Team.Admins = new List<UserDto> { Team.CurrentProject.Creator, Team.CurrentProject.Creator, Team.CurrentProject.Creator };
+            ConfigurationRecord.AppName = Apps.FirstOrDefault()?.Identity;
+            ErrorCount = await GetErroCountAsync(ConfigurationRecord.AppName!);
         }
     }
 
@@ -76,5 +95,32 @@ public partial class TeamProjectDialog
         {
             NavigationManager.NavigateToDashboardConfiguration(data.InstrumentId.ToString()!, ConfigurationRecord.Service);
         }
+    }
+
+    async Task OnAppChanged(string appid)
+    {
+        ConfigurationRecord.AppName = appid;
+        //var app = Project?.Apps?.FirstOrDefault(app => app.Identity == appid);
+        ErrorCount = await GetErroCountAsync(appid);
+    }
+
+    async Task<int> GetErroCountAsync(string appid)
+    {
+        var query = new SimpleAggregateRequestDto
+        {
+            Type = AggregateTypes.Count,
+            Start = ConfigurationRecord.StartTime.UtcDateTime,
+            End = ConfigurationRecord.EndTime.UtcDateTime,
+            Service = appid,
+            Name = "Resource.service.name",
+            Conditions = new List<FieldConditionDto> {
+                new FieldConditionDto{
+                Name="SeverityText",
+                Type= ConditionTypes.Equal,
+                Value="Error"
+                }
+            }
+        };
+        return await ApiCaller.LogService.AggregateAsync<int>(query);
     }
 }

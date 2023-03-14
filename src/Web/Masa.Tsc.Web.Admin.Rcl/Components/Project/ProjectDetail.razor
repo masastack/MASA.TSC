@@ -1,13 +1,19 @@
-﻿  @namespace Masa.Tsc.Web.Admin.Rcl.Components
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
 <MCard>
     <MCardText>
         <div class="emphasis--text h6">
             <div>@Value.Name</div>
-            <div>@T("Application count")：@Value.Apps?.Count</div>
         </div>
-        <p class="regular3--text body2 mt-2">@Value.Identity</p>
+        <div class="d-flex justify-space-between">
+            <span class="regular3--text body2">@T("Application count")：</span>
+            <span class="regular3--text body2">@Value.Apps?.Count</span>
+        </div>   
+        <div class="d-flex justify-space-between">
+            <span class="regular3--text body2">@T("Project ID")：</span>
+            <span class="regular3--text body2">@Value.Identity</span>
+        </div>        
         <p class="regular--text body2 mt-4" style="min-height:105px">
             @Value.Description
         </p>
