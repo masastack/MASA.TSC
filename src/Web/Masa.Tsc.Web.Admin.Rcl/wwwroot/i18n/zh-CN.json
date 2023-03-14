@@ -189,6 +189,6 @@
   "Service": "服务",
   "Instance": "实例",
   "Endpoint": "接口",
-  "ServiceINstance": "实例",
+  "ServiceInstance": "实例",
   "All": "所有"
 }
