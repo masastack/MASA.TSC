@@ -70,8 +70,7 @@ public partial class TeamProjectDialog
                 ServiceType = app.ServiceType
             }).ToList();
             Team.ProjectTotal = ProjectCount;
-            Team.AppTotal = ServiceCount;
-            Team.Admins = new List<UserDto> { Team.CurrentProject.Creator, Team.CurrentProject.Creator, Team.CurrentProject.Creator };
+            Team.AppTotal = ServiceCount;            
             ConfigurationRecord.AppName = Apps.FirstOrDefault()?.Identity;
             ErrorCount = await GetErroCountAsync(ConfigurationRecord.AppName!);
         }
