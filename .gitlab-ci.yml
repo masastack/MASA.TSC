@@ -17,15 +17,19 @@ variables:
   WebDomain_dev: tsc-develop.masastack.com
   ServiceDomain_dev: tsc-service-develop.masastack.com
   
-
   TSC_Service_Image: $CI_ALI_REGISTRY_DOMAIN/masa/$TSC_Service_Name:dev-$CI_PIPELINE_ID
   TSC_Web_Image: $CI_ALI_REGISTRY_DOMAIN/masa/$TSC_Web_Name:dev-$CI_PIPELINE_ID
+  TSC_Service_Image_Prd: $CI_ALI_REGISTRY_DOMAIN/masa/$TSC_Service_Name:$CI_PIPELINE_ID
+  TSC_Web_Image_Prd: $CI_ALI_REGISTRY_DOMAIN/masa/$TSC_Web_Name:$CI_PIPELINE_ID
 
   NAMESPACE_STAGING: masa-tsc-staging
   WebDomain_staging: tsc-staging.masastack.com
   ServiceDomain_staging: tsc-service-staging.masastack.com
-  
-  # NAMESPACE_PRD: TSC
+
+  NAMESPACE_PRD: loncloud
+  WebDomain_Prd: tsc.masastack.com
+  ServiceDomain_Prd: tsc-service.masastack.com
+
 docker-dev:
   stage: docker-dev
   tags:
@@ -40,7 +44,7 @@ docker-dev:
     - docker build -f $TSCServiceDockerFile -t $TSC_Service_Image .
     - docker push $TSC_Service_Image
   after_script:
-    - docker rmi $TSC_Service_Image   
+    - docker rmi $TSC_Service_Image
     - docker rmi $TSC_Web_Image
 
 
@@ -86,6 +90,44 @@ deploy-staging:
     - helm upgrade --install $TSC_Web_Name ./charts/masa-service  --set domain.name=$WebDomain_staging  --set domain.secret=masastack  --set service.port=443  --set environment.path=$EnviromentPath --set image.tag=dev-$CI_PIPELINE_ID -n $NAMESPACE_STAGING  
 
 
+docker-prd:
+  stage: docker-prd
+  tags:
+    - linux-shell
+  before_script:
+    - docker login -u $CI_ALI_REGISTRY_USER -p $CI_ALI_REGISTRY_PASSWD $CI_ALI_REGISTRY_DOMAIN 
+  only:
+    - tags
+  script:
+    - docker build -f $TSCWebDockerFile -t $TSC_Web_Image_Prd .
+    - docker push $TSC_Web_Image_Prd 
+    - docker build -f $TSCServiceDockerFile -t $TSC_Service_Image_Prd .
+    - docker push $TSC_Service_Image_Prd
+  after_script:
+    - docker rmi $TSC_Service_Image_Prd
+    - docker rmi $TSC_Web_Image_Prd
+
+deploy-prd:
+  stage: deploy-prd
+  image: registry.cn-hangzhou.aliyuncs.com/masa/library:helm3_latest
+  variables:
+    EnviromentPath: Production
+  tags:
+    - linux-shell
+  only:
+    - tags
+  script:
+    - ls
+    - pwd 
+    - echo $EnviromentPath
+    - echo $KUBE_CONFIG_IOT | base64 -d > ./config
+    - cat ./config
+    - helm version 
+    - helm --kubeconfig ./config list   -n $NAMESPACE_PRD
+    - helm upgrade --install $TSC_Service_Name ./charts/masa-service --set domain.name=$ServiceDomain_PRD  --set domain.secret=masastack  --set service.port=80  --set environment.path=$EnviromentPath --set image.tag=$CI_PIPELINE_ID -n $NAMESPACE_PRD
+    - helm upgrade --install $TSC_Web_Name ./charts/masa-service  --set domain.name=$WebDomain_PRD  --set domain.secret=masastack  --set service.port=443  --set environment.path=$EnviromentPath --set image.tag=$CI_PIPELINE_ID -n $NAMESPACE_PRD
+
+
 # include: 'devops/**/*.yml'
 
 # stages:
@@ -111,4 +153,3 @@ deploy-staging:
 
 #   K8S_IMAGEPULLSECRETSPULL: aliregistry
 #   SECRET_TLS: lonsid-cn
-
