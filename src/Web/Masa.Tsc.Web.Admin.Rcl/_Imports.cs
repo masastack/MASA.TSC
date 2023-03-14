@@ -32,7 +32,6 @@ global using Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart.Models;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Log.Models;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Tabs.Models;
-global using Masa.Tsc.Web.Admin.Rcl.Components.Panel.Topology.Models;
 global using Masa.Tsc.Web.Admin.Rcl.Data;
 global using Masa.Tsc.Web.Admin.Rcl.Data.EChart;
 global using Masa.Tsc.Web.Admin.Rcl.Data.Team;

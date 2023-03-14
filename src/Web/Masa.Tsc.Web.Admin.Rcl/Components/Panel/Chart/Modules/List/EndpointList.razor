@@ -50,20 +50,7 @@
                     </tr>
                 }
             </tbody>
-            @*            @if (Value.ShowTableFooter)
-            {
-            <tfoot>
-            <tr>
-            <td>Sum</td>
-            <td>$180</td>
-            </tr>
-            </tfoot>
-            }*@
         </MSimpleTable>
-        @*        @if (Value.EnablePaginaton)
-        {
-        <MPagination Length="10" TotalVisible="5"></MPagination>
-        }*@
     </MCardText>
 </MCard>
 
@@ -79,6 +66,6 @@
 
     void ToDashboardConfiguration(string dashboardId, string endpoint)
     {
-        NavigationManager.NavigateToDashboardConfiguration(dashboardId, ConfigurationRecord.Service, endpoint);
+        NavigationManager.NavigateToDashboardConfiguration(dashboardId, ConfigurationRecord.Service, ConfigurationRecord.Instance, endpoint);
     }
 }
