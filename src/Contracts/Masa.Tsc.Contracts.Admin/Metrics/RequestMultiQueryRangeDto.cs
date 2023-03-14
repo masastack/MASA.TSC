@@ -5,11 +5,11 @@ namespace Masa.Tsc.Contracts.Admin.Metrics;
 
 public class RequestMultiQueryRangeDto
 {
-    public string ServiceName { get; set; }
+    public string? Service { get; set; }
 
-    public string Instance { get; set; }
+    public string? Instance { get; set; }
 
-    public string EndPoint { get; set; }
+    public string? EndPoint { get; set; }
 
     public DateTime Start { get; set; } = DateTime.Now;
 

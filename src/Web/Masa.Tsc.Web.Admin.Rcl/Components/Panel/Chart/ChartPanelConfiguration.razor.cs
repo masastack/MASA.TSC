@@ -5,51 +5,58 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
 public partial class ChartPanelConfiguration : TscComponentBase
 {
-    List<StringNumber> _panelValues = new() { 1 };
-    string _listType = string.Empty;
-
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
     [Parameter]
     public UpsertChartPanelDto Value { get; set; }
 
-    [Parameter]
-    public string DashboardId { get; set; }
-
-    [Parameter]
-    public string? ServiceName { get; set; }
-
-    [Parameter]
-    public string? Model { get; set; }
+    [CascadingParameter]
+    public ConfigurationRecord ConfigurationRecord { get; set; }
 
     public ChartPanel ChartPanel { get; set; }
 
-    bool IsLoading { get; set; }
-
     string ValueBackup { get; set; }
+
+    Dictionary<ModelTypes, ListTypes[]> TableMap = new()
+    {
+        [ModelTypes.All] = new[]
+        {
+            ListTypes.ServiceList,
+            ListTypes.TopList,
+        },
+        [ModelTypes.Service] = new[]
+        {
+            ListTypes.InstanceList,
+            ListTypes.EndpointList,
+            ListTypes.TopList,
+        },
+        [ModelTypes.ServiceInstance] = new[]
+        {
+            ListTypes.EndpointList,
+            ListTypes.TopList,
+        },
+        [ModelTypes.Endpoint] = new[]
+        {
+            ListTypes.TopList,
+        },
+    };
 
     protected override void OnInitialized()
     {
         ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
         if (Value.Metrics.Any() is false) Value.Metrics.Add(new());
 
-        CheckListType();
+        InitListType();
     }
 
-    private void CheckListType()
+    private void InitListType()
     {
-        if (Value.ChartType != "table") return;
-
-        if (Model != "All")
+        if (TableMap[ConfigurationRecord.ModelType].Contains(Value.ListType) is false)
         {
-            if (Model != "Service")
-                Value.ListType = ListTypes.TopList;
-            else if (Value.ListType == ListTypes.ServiceList)
-                Value.ListType = ListTypes.EndpointList;
+            Value.ListType = TableMap[ConfigurationRecord.ModelType].First();
         }
     }
-
 
     async Task NavigateToPanelConfigurationPageAsync()
     {
@@ -59,7 +66,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
             await PopupService.EnqueueSnackbarAsync(T("Metrics name is required"), AlertTypes.Error);
             return;
         }
-        NavigationManager.NavigateToDashboardConfigurationRecord(DashboardId, ServiceName);
+        NavigationManager.NavigateToDashboardConfigurationRecord(ConfigurationRecord.DashboardId, ConfigurationRecord.Service, ConfigurationRecord.Instance, ConfigurationRecord.Endpoint);
     }
 
     async Task CancelAsync()
@@ -81,9 +88,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
 
     async Task GetGetMetricsAsync()
     {
-        IsLoading = true;
         await ChartPanel.ReloadAsync();
-        IsLoading = false;
     }
 
     async Task MetricNameChangedAsync(PanelMetricDto metric, string metricName)

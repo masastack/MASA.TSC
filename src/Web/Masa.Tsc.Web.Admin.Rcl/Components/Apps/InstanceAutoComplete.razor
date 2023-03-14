@@ -1,0 +1,13 @@
+﻿@inherits TscComponentBase
+
+<SAutoComplete Value=Value
+               ValueChanged=ValueChanged
+               Items="@Instances"
+               ItemText="item => item.Value"
+               ItemValue='item => item.Key'
+               Small
+               Label="@T("Instance")"
+               BackgroundColor="@(FillBackground?"fill-background":"white")"
+               Loading="_isLoading"
+               Class="@("rounded-2 " + Class)"
+               Style="@Style" />

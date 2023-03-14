@@ -185,5 +185,10 @@
   "Title": "标题",
   "Total Count": "总条数",
   "Loading": "加载中",
-  "Save success": "保存成功"
+  "Save success": "保存成功",
+  "Service": "服务",
+  "Instance": "实例",
+  "Endpoint": "接口",
+  "ServiceInstance": "实例",
+  "All": "全部"
 }

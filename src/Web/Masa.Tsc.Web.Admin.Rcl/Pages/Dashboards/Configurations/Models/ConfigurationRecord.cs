@@ -7,38 +7,47 @@ public class ConfigurationRecord
 {
     public List<UpsertPanelDto> Panels { get; set; } = new();
 
-    public string? AppName { get; set; }
-
-    public string Search { get; set; }
-
     public string DashboardId { get; set; }
 
-    public string Model { get; set; }
+    public string? Service { get; set; }
+
+    public string? Instance { get; set; }
+
+    public string? Endpoint { get; set; }
+
+    public string? ConvertEndpoint => Endpoint == "All" ? null : Endpoint;
+
+    public string? PanelId { get; set; }
+
+    public ModelTypes ModelType { get; set; }
 
     public DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow.AddMinutes(-15);
 
     public DateTimeOffset EndTime { get; set; } = DateTimeOffset.UtcNow;
 
-    public string? Key => AppName + StartTime + EndTime + RandomStr;
+    public string? Key => $"{Service}{Instance}{Endpoint}{StartTime}{EndTime}";
 
     public bool IsEdit { get; set; }
 
-    public bool ShowServiceCompontent { get; set; }
-
-    string RandomStr { get; set; } = "";
-
-    public void UpdateKey() => RandomStr = Guid.NewGuid().ToString();
+    public bool ServiceRelationReady(bool ready)
+    {
+        var allModelPass = ModelType is ModelTypes.All or default(ModelTypes);
+        var serviceModelPass = ModelType is ModelTypes.Service && string.IsNullOrEmpty(Service) is false;
+        var instanceModelPass = ModelType is ModelTypes.ServiceInstance && string.IsNullOrEmpty(Service) is false && string.IsNullOrEmpty(Instance) is false;
+        var endPointPass = ModelType is ModelTypes.Endpoint && string.IsNullOrEmpty(Service) is false && string.IsNullOrEmpty(Instance) is false && string.IsNullOrEmpty(Endpoint) is false;
+        return Panels.Any() && (ready || (allModelPass || serviceModelPass || instanceModelPass || endPointPass));
+    }
 
     public void Clear()
     {
         ClearPanels();
-        //AppName = "";
-        Search = "";
+        ModelType = default;
         DashboardId = "";
+        Service = default;
+        Instance = default;
+        Endpoint = default;
+        PanelId = default;
         IsEdit = false;
-        ShowServiceCompontent = false;
-        //StartTime = default;
-        //EndTime = default;
     }
 
     public void ClearPanels()

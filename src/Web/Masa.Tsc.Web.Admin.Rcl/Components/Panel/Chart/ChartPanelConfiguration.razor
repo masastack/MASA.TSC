@@ -6,10 +6,10 @@
             <SIcon Tooltip="@T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon>
         </SButton>
         <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg" OnClick="() => CancelAsync()">
-            取消
+            @T("Cancel")
         </SButton>
         <SButton Small BorderRadiusClass="rounded-lg" OnClick="() => NavigateToPanelConfigurationPageAsync()">
-            应用
+            @T("Apply")
         </SButton>
     </MCol>
     <MCol Cols="8">
@@ -26,24 +26,12 @@
                         </MCol>
                         <MCol Md="8">
                             <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
-                                @if (Model == "All")
+                                @foreach (var item in TableMap[ConfigurationRecord.ModelType])
                                 {
-                                    <MButton Class="text-capitalize" Value="@ListTypes.ServiceList.ToString()">
-                                        Service List
+                                    <MButton Class="text-capitalize" Value="@item.ToString()">
+                                        @item.ToString()
                                     </MButton>
                                 }
-                                else if (Model == "Service")
-                                {
-                                    <MButton Class="text-capitalize" Value="@ListTypes.EndpointList.ToString()">
-                                        Endpoint List
-                                    </MButton>
-                                    <MButton Class="text-capitalize" Value="@ListTypes.InstanceList.ToString()">
-                                        Instance List
-                                    </MButton>
-                                }
-                                <MButton Class="text-capitalize" Value="ListTypes.TopList.ToString()">
-                                    Top List
-                                </MButton>
                             </MButtonGroup>
                         </MCol>
                     }
@@ -138,7 +126,7 @@
     <MCol Cols="4">
         <MCard>
             <MCardText>
-                <MExpansionPanels @bind-Values=_panelValues Multiple Style="z-index:auto !important;max-height:855px;overflow:auto;">
+                <MExpansionPanels Values="new List<StringNumber>{1}" Multiple Style="z-index:auto !important;max-height:855px;overflow:auto;">
                     <MExpansionPanel Value="1">
                         <MExpansionPanelHeader Class="emphasis2--text h6">Visualization</MExpansionPanelHeader>
                         <MExpansionPanelContent>
@@ -147,7 +135,7 @@
                     </MExpansionPanel>
                     @if (Value.ChartType == "table")
                     {
-                        @if (_listType == "top-list")
+                        @if (Value.ListType is ListTypes.TopList)
                         {
                             <MExpansionPanel Value="2">
                                 <MExpansionPanelHeader Class="emphasis2--text h6">Options</MExpansionPanelHeader>
@@ -175,15 +163,12 @@
                                         <MCol Md="12">
                                             <SwitchItem Label="Show table header" @bind-Value="@Value.ShowTableHeader" />
                                         </MCol>
-                                        @*                                        <MCol Md="12">
-                                <SwitchItem Label="Show table footer" @bind-Value="@Value.ShowTableFooter" />
-                                </MCol>*@
                                         <MCol Md="12">
                                             <ButtonGroupItem @bind-Value="@Value.ColumnAlignment" Label="Column alignment" Items='new List<string>{"auto","left","center","right"}' />
                                         </MCol>
-                                        <MCol Md="12">
+                                       @* <MCol Md="12">
                                             <SwitchItem Label="Enable pagination" @bind-Value="@Value.EnablePaginaton" />
-                                        </MCol>
+                                        </MCol>*@
                                     </MRow>
                                 </MExpansionPanelContent>
                             </MExpansionPanel>
@@ -273,5 +258,3 @@
         </MCard>
     </MCol>
 </MRow>
-
-<MLoading @bind-Value="IsLoading" />

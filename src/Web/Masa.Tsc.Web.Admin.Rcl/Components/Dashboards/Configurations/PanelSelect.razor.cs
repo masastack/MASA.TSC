@@ -15,24 +15,25 @@ public partial class PanelSelect
     public EventCallback<UpsertPanelDto> OnSelect { get; set; }
 
     [CascadingParameter]
-    public bool IsEdit { get; set; }
+    public ConfigurationRecord ConfigurationRecord { get; set; }
 
     List<PanelTypes> GetPanelTypes(PanelTypes type = default)
     {
-        if (type == default)
+        var types = new List<PanelTypes>
         {
-            return new List<PanelTypes>
-            {
-                PanelTypes.Tabs,
-                PanelTypes.Text,
-                PanelTypes.Chart,
-                PanelTypes.Topology,
-                PanelTypes.Log,
-                PanelTypes.Trace,
-                //PanelTypes.Table
-            };
+            PanelTypes.Tabs,
+            PanelTypes.Text,
+            PanelTypes.Chart,
+            PanelTypes.Topology,
+            PanelTypes.Log,
+            PanelTypes.Trace,
+            //PanelTypes.Table
+        };
+        if(ConfigurationRecord.ModelType is ModelTypes.All or default(ModelTypes))
+        {
+            types.Remove(PanelTypes.Topology);
         }
-        return new List<PanelTypes>();
+        return types;
     }
 
     async Task SelectPanelAsync(PanelTypes type)

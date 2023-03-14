@@ -5,42 +5,33 @@ namespace Masa.Tsc.Web.Admin.Rcl.Extentions;
 
 public static class NavigationManagerExtensions
 {
-    public static void NavigateToDashboardConfiguration(this NavigationManager navigationManager, string dashboardId, string? serviceName = null, string? instanceName = null)
+    public static void NavigateToDashboardConfiguration(this NavigationManager navigationManager, string dashboardId, string? service = null, string? instance = null,string? endpoint = null)
     {
-        var bashUri = $"/dashboard/configuration/{dashboardId}";
-        if (serviceName is not null)
-        {
-            bashUri += $"/{serviceName}";
-        }
-        if (instanceName is not null)
-        {
-            bashUri += $"/{instanceName}";
-        }
-        navigationManager.NavigateTo(bashUri);
+        var uri = $"/dashboard/configuration/{dashboardId}";
+        if (string.IsNullOrEmpty(service) is false) uri += $"/{service}";
+        if (string.IsNullOrEmpty(instance) is false) uri += $"/{instance}";
+        if (string.IsNullOrEmpty(endpoint) is false) uri += $"/{HttpUtility.UrlEncode(endpoint)}";
+
+        navigationManager.NavigateTo(uri);
     }
 
-    public static void NavigateToDashboardConfigurationRecord(this NavigationManager navigationManager, string dashboardId, string? serviceName = null)
+    public static void NavigateToDashboardConfigurationRecord(this NavigationManager navigationManager, string dashboardId, string? service = null, string? instance = null, string? endpoint = null)
     {
-        var bashUri = $"/dashboard/configuration/record/{dashboardId}";
-        if (serviceName is not null)
-        {
-            bashUri += $"/{serviceName}";
-        }
-        navigationManager.NavigateTo(bashUri);
+        var uri = $"/dashboard/configuration/record/{dashboardId}";
+        if (string.IsNullOrEmpty(service) is false) uri += $"/{service}";
+        if (string.IsNullOrEmpty(instance) is false) uri += $"/{instance}";
+        if (string.IsNullOrEmpty(endpoint) is false) uri += $"/{HttpUtility.UrlEncode(endpoint)}";
+
+        navigationManager.NavigateTo(uri);
     }
 
-    public static void NavigateToConfigurationChart(this NavigationManager navigationManager, string dashboardId, string panelId, string? serviceName = null)
+    public static void NavigateToConfigurationChart(this NavigationManager navigationManager, string panelId, string dashboardId, string? service = null, string? instance = null, string? endpoint = null)
     {
-        var bashUri = $"/dashboard/configuration/chart/{dashboardId}";
-        if (serviceName is not null)
-        {
-            bashUri += $"/{serviceName}";
-        }
-        navigationManager.NavigateTo($"{bashUri}/{panelId}");
-    }
+        var uri = $"/dashboard/configuration/chart/{panelId}/{dashboardId}";
+        if (string.IsNullOrEmpty(service) is false) uri += $"/{service}";
+        if (string.IsNullOrEmpty(instance) is false) uri += $"/{instance}";
+        if (string.IsNullOrEmpty(endpoint) is false) uri += $"/{HttpUtility.UrlEncode(endpoint)}";
 
-    public static void NavigateToConfigurationChart(this NavigationManager navigationManager, string panelId)
-    {
-        navigationManager.NavigateTo($"/dashboard/configuration/chart/{panelId}");
+        navigationManager.NavigateTo(uri);
     }
 }

@@ -8,10 +8,10 @@ public partial class Configuration : IAsyncDisposable
     string _scrollElementId = Guid.NewGuid().ToString();
     string _contentElementId = Guid.NewGuid().ToString();
     IJSObjectReference? _helper;
-    IJSObjectReference? _history;
-    DotNetObjectReference<Configuration> _dotNetHelper;
-
-    private QuickRangeKey? _defaultValue = QuickRangeKey.Last15Minutes;
+    QuickRangeKey? _defaultValue = QuickRangeKey.Last15Minutes;
+    bool _hasNavigateTo;
+    bool _serviceRelationReady;
+    bool _timeRangeReady;
 
     [Inject]
     public ConfigurationRecord ConfigurationRecord { get; set; }
@@ -26,7 +26,13 @@ public partial class Configuration : IAsyncDisposable
     public string DashboardId { get; set; }
 
     [Parameter]
-    public string ServiceName { get; set; }
+    public string? ServiceName { get; set; }
+
+    [Parameter]
+    public string? InstanceName { get; set; }
+
+    [Parameter]
+    public string? EndpointName { get; set; }
 
     List<PanelGrids> PanelGrids { get; set; } = new();
 
@@ -36,31 +42,20 @@ public partial class Configuration : IAsyncDisposable
         ConfigurationRecord.Clear();
     }
 
-    [JSInvokable]
-    public void GoDashbordList()
-    {
-        NavigationManager.NavigateTo("/dashboard", false);
-    }
-
     protected override async Task OnParametersSetAsync()
     {
-        if (ConfigurationRecord.DashboardId != DashboardId)
+        if (_hasNavigateTo)
+        {
+            _hasNavigateTo = false;
+            return;
+        }
+        ConfigurationRecord.Service = ServiceName;
+        ConfigurationRecord.Instance = InstanceName;
+        ConfigurationRecord.Endpoint = EndpointName;
+        if (string.IsNullOrEmpty(DashboardId) is false && ConfigurationRecord.DashboardId != DashboardId)
         {
             ConfigurationRecord.DashboardId = DashboardId;
-            ConfigurationRecord.AppName = ServiceName;
             await GetPanelsAsync();
-        }
-        else if (ServiceName is not null && ServiceName != ConfigurationRecord.AppName)
-        {
-            ConfigurationRecord.AppName = ServiceName;
-        }
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (NavigationManager.Uri.Contains("record") && string.IsNullOrEmpty(ConfigurationRecord.DashboardId))
-        {
-            NavigationManager.NavigateToDashboardConfiguration(DashboardId, ServiceName);
         }
     }
 
@@ -70,13 +65,11 @@ public partial class Configuration : IAsyncDisposable
         var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(ConfigurationRecord.DashboardId));
         if (detail is not null)
         {
-            ConfigurationRecord.Model = detail.Model;
-            ConfigurationRecord.ShowServiceCompontent = detail.Model != ModelTypes.All.ToString();
-            if (ConfigurationRecord.ShowServiceCompontent is false) ConfigurationRecord.AppName = "";
-        }
-        if (detail?.Panels != null && detail.Panels.Any())
-        {
-            ConfigurationRecord.Panels.AddRange(detail.Panels);
+            ConfigurationRecord.ModelType = Enum.Parse<ModelTypes>(detail.Model);
+            if (detail.Panels?.Any() is true)
+            {
+                ConfigurationRecord.Panels.AddRange(detail.Panels);
+            }
         }
 
         if (ConfigurationRecord.Panels.Any() is false) ConfigurationRecord.IsEdit = true;
@@ -110,6 +103,7 @@ public partial class Configuration : IAsyncDisposable
 
     void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
+        _timeRangeReady = true;
         (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
     }
 
@@ -126,10 +120,14 @@ public partial class Configuration : IAsyncDisposable
         OpenSuccessMessage(T("Save success"));
     }
 
-    void ServiceNameChange(string serviceName)
+    void ServiceRelationChanged((string?, string?, string?) serviceRelation)
     {
-        NavigationManager.NavigateToDashboardConfiguration(DashboardId, serviceName);
+        _hasNavigateTo = true;
+        _serviceRelationReady = true;
+        (ConfigurationRecord.Service, ConfigurationRecord.Instance, ConfigurationRecord.Endpoint) = serviceRelation;
+        NavigationManager.NavigateToDashboardConfiguration(DashboardId, ConfigurationRecord.Service, ConfigurationRecord.Instance, ConfigurationRecord.Endpoint);
     }
+
 
     async Task SwitchEdit()
     {
@@ -138,7 +136,6 @@ public partial class Configuration : IAsyncDisposable
             var confirm = await OpenConfirmDialog(T("Operation confirmation"), T("Are you sure switch view mode,unsaved data will be lost"), AlertTypes.Warning);
             if (confirm)
             {
-                ConfigurationRecord.UpdateKey();
                 await GetPanelsAsync();
                 ConfigurationRecord.IsEdit = false;
             }
@@ -155,9 +152,6 @@ public partial class Configuration : IAsyncDisposable
         if (firstRender)
         {
             _helper = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/scroll.js");
-            _dotNetHelper = DotNetObjectReference.Create(this);
-            _history = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/history.js");
-            await _history.InvokeVoidAsync("historyToList", _dotNetHelper);
         }
     }
 
@@ -166,9 +160,5 @@ public partial class Configuration : IAsyncDisposable
         await base.DisposeAsync();
         if (_helper is not null)
             await _helper.DisposeAsync();
-        if (_history is not null)
-            await _history.DisposeAsync();
-        if (_dotNetHelper is not null)
-            _dotNetHelper.Dispose();
     }
 }

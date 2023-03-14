@@ -6,15 +6,15 @@
 }
 else
 {
-    <Table Value="Value" IsEdit=IsEdit Class="@Class" />
+    <Table Value="Value" Class="@Class" />
 }
 
 @code {
     ListTypes? _lastListType { get; set; }
 
-    string? _lastServiceName;
+    string? _oldKey;
 
-    string? _listKey;
+    bool _shouldRender;
 
     string jumpId { get; set; }
 
@@ -25,10 +25,7 @@ else
     [Parameter]
     public ITablePanelValue Value { get; set; }
 
-    [Parameter]
-    public bool IsEdit { get; set; }
-
-    [Parameter]
+    [CascadingParameter]
     public ConfigurationRecord ConfigurationRecord { get; set; }
 
     [Parameter]
@@ -38,34 +35,21 @@ else
     {
         if (_lastListType != Value.ListType)
         {
+            if (Value.ListType != ListTypes.TopList && _oldKey != ConfigurationRecord.Key)
+            {
+                services = await GetServiceNames() ?? new();
+            }
             _lastListType = Value.ListType;
             jumpId = await GetJumpId();
             jumpName = GetJumpName();
+            _shouldRender = true;
         }
 
-        if (Value.ListType != ListTypes.TopList && _lastServiceName != ConfigurationRecord.AppName)
+        if (IsChartDataReady && _shouldRender)
         {
-            _lastServiceName = ConfigurationRecord.AppName;
-            services = await GetServiceNames() ?? new();
-        }
-
-        if (IsChartDataReady && _listKey!= ConfigurationRecord.Key)
-        {
-            _listKey = ConfigurationRecord.Key;
+            _shouldRender = false;
             await SetOption();
         }
-
-        //if ((LastListType is null || LastListType != Value.ListType) && Value.ListType is not ListTypes.TopList
-        //|| (string.IsNullOrEmpty(LastServiceName) || !string.Equals(LastServiceName, ServiceName)) && (Value.ListType is ListTypes.EndpointList || Value.ListType is ListTypes.InstanceList))
-        //    services = await GetServiceNames() ?? new();
-
-        //LastServiceName = ServiceName;
-        //LastListType = Value.ListType;
-
-        //if (Value.ListType is ListTypes.TopList)
-        //    Value.SetTopListOption(jumpId);
-        //else
-        //    Value.SetTableOption(services, jumpName, jumpId);
     }
 
     async Task SetOption()
@@ -85,7 +69,9 @@ else
     {
         return await base.ApiCaller.MetricService.GetValues(new RequestMetricListDto
         {
-            Service = ConfigurationRecord.AppName!,
+            Service = ConfigurationRecord.Service,
+            Instance = ConfigurationRecord.Instance,
+            Endpoint = ConfigurationRecord.ConvertEndpoint,
             Type = GetMetricValueType()
         });
     }

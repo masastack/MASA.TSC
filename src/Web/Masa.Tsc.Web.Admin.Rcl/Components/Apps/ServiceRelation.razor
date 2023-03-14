@@ -1,0 +1,30 @@
+﻿@inherits TscComponentBase
+
+@if (ModelType is not ModelTypes.All && ModelType != default(ModelTypes))
+{
+    <ServiceAutoComplete Value="@Service"
+                         ValueChanged=ServiceChanged
+                         FillBackground=false
+                         Class="mr-6 my-auto"
+                         Style="max-width:300px !important;width:300px;" />
+    @if (ModelType is ModelTypes.ServiceInstance or ModelTypes.Endpoint)
+    {
+        <InstanceAutoComplete Value="@Instance"
+                              ValueChanged=InstanceChanged
+                              Service="@Service"                         
+                              FillBackground=false
+                              IncludeAll="ModelType is ModelTypes.Endpoint"
+                              Class="mr-6 my-auto"
+                              Style="max-width:300px !important;width:300px;" />
+    }
+    @if (ModelType is ModelTypes.Endpoint)
+    {
+        <EndpointAutoComplete Value="@Endpoint"
+                              ValueChanged=EndpointChanged
+                              Service="@Service"
+                              Instance="@Instance"
+                              FillBackground=false
+                              Class="mr-6 my-auto"
+                              Style="max-width:300px !important;width:300px;" />
+    }
+}

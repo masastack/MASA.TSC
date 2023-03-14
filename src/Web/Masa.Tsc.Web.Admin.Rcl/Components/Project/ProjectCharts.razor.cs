@@ -39,7 +39,7 @@ public partial class ProjectCharts
     {
         query = new()
         {
-            AppId = ConfigurationRecord.AppName!,
+            AppId = ConfigurationRecord.Service!,
             Start = ConfigurationRecord.StartTime.UtcDateTime,
             End = ConfigurationRecord.EndTime.UtcDateTime,
         };

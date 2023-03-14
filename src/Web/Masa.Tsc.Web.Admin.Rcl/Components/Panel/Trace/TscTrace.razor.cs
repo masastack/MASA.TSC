@@ -112,7 +112,7 @@ public partial class TscTrace
         var queryResult = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             Instance = query.Instance,
-            ServiceName = query.Service,
+            Service = query.Service,
             Start = query.Start,
             End = query.End,
             Step = interval,

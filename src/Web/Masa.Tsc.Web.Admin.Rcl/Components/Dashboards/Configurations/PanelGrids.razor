@@ -16,11 +16,6 @@
                         <MList>
                             @if (context.PanelType == PanelTypes.Tabs)
                             {
-@*                                <MListItem OnClick="() => AddTabItem(context as UpsertTabsPanelDto)">
-                                    <MListItemTitle>
-                                        @T("Add Tab Item")
-                                    </MListItemTitle>
-                                </MListItem>*@
                                 <MListItem OnClick="async () =>await AddChildPanel(context as UpsertTabsPanelDto)">
                                     <MListItemTitle>
                                         @T("Add Panel")
@@ -49,10 +44,10 @@
             @switch (context.PanelType)
             {
                 case PanelTypes.Tabs:
-                    <TabsPanel Panel="context as UpsertTabsPanelDto" IsEditTabItem=IsEditTabItem />
+                    <TabsPanel Panel="context as UpsertTabsPanelDto" />
                     break;
                 case PanelTypes.Text:
-                    <TextPanel Value=context IsEdit=IsEdit />
+                    <TextPanel Value=context />
                     break;
                 case PanelTypes.Trace:
                     <TscTrace />

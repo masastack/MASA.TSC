@@ -15,7 +15,7 @@ public class AddDashboardDto
 
     public LayerTypes Layer { get; set; }
 
-    public ModelTypes Model { get; set; }
+    public ModelTypes Model { get; set; } = ModelTypes.All;
 
     public string Type { get; set; } = "";
 }

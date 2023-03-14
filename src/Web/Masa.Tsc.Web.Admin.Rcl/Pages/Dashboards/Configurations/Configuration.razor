@@ -1,7 +1,5 @@
-﻿@page "/dashboard/configuration/record/{dashboardId}"
-@page "/dashboard/configuration/record/{dashboardId}/{serviceName}"
-@page "/dashboard/configuration/{dashboardId}"
-@page "/dashboard/configuration/{dashboardId}/{serviceName}"
+﻿@page "/dashboard/configuration/{dashboardId}/{serviceName?}/{instanceName?}/{endpointName?}"
+@page "/dashboard/configuration/record/{dashboardId}/{serviceName?}/{instanceName?}/{endpointName?}"
 @inherits TscComponentBase
 
 <PageTitle>@T("Configure Dashboard")</PageTitle>
@@ -9,15 +7,17 @@
 <AutoHeight Id="@_scrollElementId" Overflow AutoStyle="max-height: calc(100vh - 185px);height: 900px">
     <HeaderContent>
         <div class="d-flex mb-6">
-            @if (ConfigurationRecord.ShowServiceCompontent)
-            {
-                <AppAutoComplete Value="@ServiceName" ValueChanged=ServiceNameChange FillBackground=false Class="mr-6 my-auto" Style="max-width:300px !important;width:300px;" Metric />
-            }
+            <ServiceRelation Service="@ConfigurationRecord.Service"
+                             Instance="@ConfigurationRecord.Instance"
+                             Endpoint="@ConfigurationRecord.Endpoint"
+                             ValueChanged="ServiceRelationChanged"
+                             ModelType="ConfigurationRecord.ModelType" />
             <MSpacer />
             <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="_defaultValue"
                                   StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
                                   EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start"
-                                  OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
+                                  OnUpdate="OnDateTimeUpdateAsync"
+                                  OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
             <MTooltip Top>
                 <ActivatorContent>
                     <div @attributes="@context.Attrs" @onclick="SwitchEdit" class="mr-6 my-auto d-flex">
@@ -45,10 +45,10 @@
     </HeaderContent>
     <AutoHeightContent>
         <DefaultCard Id="@_contentElementId" Style="min-height: calc(100vh - 185px);">
-            <CascadingValue Value="ConfigurationRecord.IsEdit">
-                <CascadingValue Value="PanelGrids" IsFixed>
-                    <CascadingValue Value="ConfigurationRecord">
-                        @if (ConfigurationRecord.Panels.Any() && (ConfigurationRecord.ShowServiceCompontent is false || string.IsNullOrEmpty(ConfigurationRecord.AppName) is false))
+            <CascadingValue Value="ConfigurationRecord.IsEdit" IsFixed>
+                <CascadingValue Value="PanelGrids" IsFixed>                   
+                    <CascadingValue Value="ConfigurationRecord" IsFixed>
+                        @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady && _timeRangeReady))
                         {
                             <PanelGrids Panels="ConfigurationRecord.Panels" />
                         }

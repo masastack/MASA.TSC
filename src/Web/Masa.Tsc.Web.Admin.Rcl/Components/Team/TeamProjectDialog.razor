@@ -14,7 +14,7 @@
                     <MRow Class="@Class">
                         <MCol Cols="6" Class="d-flex justify-start align-center">
                             <div style="width:210px;">
-                                <AppAutoComplete Apps="Apps" @bind-Value="@ConfigurationRecord.AppName" @ref="AppAutoComplete" FillBackground=false />
+                                <ServiceAutoComplete Services="Apps" @bind-Value="@ConfigurationRecord.Service" @ref="AppAutoComplete" FillBackground=false />
                             </div>
                             <MChip Class="mx-6" Color="#05CD99" TextColor="white">@AppAutoComplete!.CurrentApp?.Type</MChip>
                             <MTooltip Top>

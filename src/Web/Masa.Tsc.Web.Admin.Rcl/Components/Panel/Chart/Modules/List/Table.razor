@@ -39,7 +39,7 @@
                             var item = option[i];
                             @if (item.JumpId is not null)
                             {
-                                <td @onclick="() => ToDashboardConfiguration(item)" style="@GetTextColorStyle(i)" class="@($"text-{Value.ColumnAlignment}") primary--text @(IsEdit?"":"hover-pointer")">
+                                <td @onclick="() => ToDashboardConfiguration(item)" style="@GetTextColorStyle(i)" class="@($"text-{Value.ColumnAlignment}") primary--text @(ConfigurationRecord.IsEdit?"":"hover-pointer")">
                                     @item.Text
                                 </td>
                             }
@@ -51,15 +51,6 @@
                     </tr>
                 }
             </tbody>
-@*            @if (Value.ShowTableFooter)
-            {
-                <tfoot>
-                    <tr>
-                        <td>Sum</td>
-                        <td>$180</td>
-                    </tr>
-                </tfoot>
-            }*@
         </MSimpleTable>
         @if (Value.EnablePaginaton)
         {
@@ -84,16 +75,16 @@
         get => _pageSize;
         set
         {
-            _page =1;
+            _page = 1;
             _pageSize = value;
         }
     }
 
-    [Parameter]
-    public ITablePanelValue Value { get; set; }
+    [CascadingParameter]
+    ConfigurationRecord ConfigurationRecord { get; set; }
 
     [Parameter]
-    public bool IsEdit { get; set; }
+    public ITablePanelValue Value { get; set; }
 
     [Parameter]
     public string Class { get; set; }
@@ -129,7 +120,7 @@
 
     void ToDashboardConfiguration(Dessert dessert)
     {
-        if (IsEdit) return;
-        NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, dessert.Text);
+        if (ConfigurationRecord.IsEdit) return;
+        NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, ConfigurationRecord.Service, dessert.Text);
     }
 }

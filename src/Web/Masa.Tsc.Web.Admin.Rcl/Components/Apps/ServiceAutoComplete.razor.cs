@@ -3,9 +3,10 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Apps;
 
-public partial class AppAutoComplete
+public partial class ServiceAutoComplete
 {
     bool _firstValueChanged;
+    bool _isLoading;
 
     [Inject]
     public IPmClient PmClient { get; set; }
@@ -23,41 +24,43 @@ public partial class AppAutoComplete
     public bool Metric { get; set; }
 
     [Parameter]
-    public List<AppDetailModel> Apps { get; set; }
+    public List<AppDetailModel> Services { get; set; }
 
-    public AppDetailModel? CurrentApp => Apps.FirstOrDefault(app => app.Identity == Value);
+    public AppDetailModel? CurrentApp => Services.FirstOrDefault(app => app.Identity == Value);
 
     protected override async Task OnInitializedAsync()
     {
-        if(Apps is null)
+        if(Services is null)
         {
+            _isLoading = true;
             if (Metric)
             {
                 var data = await ApiCaller.MetricService.GetValues(new RequestMetricListDto { Type = MetricValueTypes.Service });
                 if (data != null && data.Any())
                 {
-                    Apps = data.Select(item => new AppDetailModel
+                    Services = data.Select(item => new AppDetailModel
                     {
                         Identity = item,
                         Name = item
                     }).ToList();
-                }
+                }            
             }
             else
             {
                 var data = await PmClient.AppService.GetListAsync();
                 if (data != null && data.Any())
-                    Apps = data;
+                    Services = data;
             }
+            _isLoading = false;
         }
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (_firstValueChanged is false && string.IsNullOrEmpty(Value) && Apps?.Any() is true)
+        if (_firstValueChanged is false && string.IsNullOrEmpty(Value) && Services?.Any() is true)
         {
             _firstValueChanged = true;
-            var value = Apps.First().Identity;
+            var value = Services.First().Identity;
             await ValueChanged.InvokeAsync(value);
         }
     }
