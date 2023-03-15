@@ -83,9 +83,10 @@ public partial class ChartPanelConfiguration : TscComponentBase
         Value.Metrics.Add(new());
     }
 
-    void Remove(PanelMetricDto metric)
+    async Task Remove(PanelMetricDto metric)
     {
         Value.Metrics.Remove(metric);
+        await GetGetMetricsAsync();
     }
 
     async Task GetGetMetricsAsync()
@@ -93,10 +94,16 @@ public partial class ChartPanelConfiguration : TscComponentBase
         await ChartPanel.ReloadAsync();
     }
 
-    async Task MetricNameChangedAsync(PanelMetricDto metric, string metricName)
+    async Task MetricExpressionChangedAsync(PanelMetricDto metric, string metricExpression)
     {
-        metric.Expression = metricName;
+        metric.Expression = metricExpression;
         await GetGetMetricsAsync();
+    }
+
+    void MetricNameChanged(PanelMetricDto metric, string metricName)
+    {
+        metric.DisplayName = metricName;
+        Value.ReloadChartData();
     }
 
     void ListTypeChanged(StringNumber listType)

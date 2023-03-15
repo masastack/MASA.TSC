@@ -414,6 +414,12 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         Key = "DataChanged" + Guid.NewGuid();
     }
 
+    public void ReloadChartData()
+    {
+        IsLoadChartData = true;
+        Key = "ReloadChartData" + Guid.NewGuid();
+    }
+
     public string GetChartKey() => Key;
 
     public object? GetChartOption(TimeZoneInfo timeZoneInfo)
@@ -442,8 +448,8 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
             EChartType.Json["series"] = new JsonArray(data.Select(item => new JsonObject
             {
                 ["type"] = ChartType.ToString().ToLower(),
-                ["name"] = string.Join("-", item.Metric!.Values),
-                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0], timeZoneInfo), value[1].ToString())).ToArray())
+                ["name"] = item.Key,
+                ["data"] = new JsonArray(item.Value.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0], timeZoneInfo), value[1].ToString())).ToArray())
             }).ToArray());
         }
         else if (ChartType is ChartTypes.LineArea)
@@ -451,7 +457,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
             var data = GetMatrixRangeData();
             EChartType.Json["series"] = new JsonArray(data.Select(item => new JsonObject
             {
-                ["name"] = string.Join("-", item.Metric!.Values),
+                ["name"] = item.Key,
                 ["type"] = "line",
                 ["stack"] = "Total",
                 ["areaStyle"] = new JsonObject(),
@@ -459,7 +465,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                 {
                     ["focus"] = "series"
                 },
-                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0], timeZoneInfo), value[1].ToString())).ToArray())
+                ["data"] = new JsonArray(item.Value.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0], timeZoneInfo), value[1].ToString())).ToArray())
             }).ToArray());
         }
         else if (ChartType is ChartTypes.Pie)
@@ -508,21 +514,34 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         }
     }
 
-    List<QueryResultMatrixRangeResponse> GetMatrixRangeData()
+    List<KeyValuePair<string, QueryResultMatrixRangeResponse>> GetMatrixRangeData()
     {
-        List<QueryResultMatrixRangeResponse> data = new();
+        List<KeyValuePair<string, QueryResultMatrixRangeResponse>> data = new();
 
         if (_chartData is not null)
         {
+            var index = 0;
             foreach (var item in _chartData)
             {
                 if (item is not null)
                 {
-                    foreach (var result in item.Result!)
+                    var matrixs = item.Result?.Select(item => item as QueryResultMatrixRangeResponse)?.Where(item => item is not null)?.ToList() ?? new();
+                    var multiple = matrixs.Count > 1;
+                    foreach (var matrix in matrixs)
                     {
-                        if (result is QueryResultMatrixRangeResponse matrix) data.Add(matrix);
+                        var metricName = "";
+                        if (multiple)
+                        {
+                            metricName = string.Join("-", matrix.Metric!.Values);
+                        }
+                        else
+                        {
+                            metricName = Metrics[index].DisplayName ?? string.Join("-", matrix.Metric!.Values);
+                        }
+                        data.Add(new(metricName, matrix));
                     }
                 }
+                index++;
             }
         }
 

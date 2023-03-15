@@ -56,10 +56,10 @@
                                         <MCardText>
                                             <MRow>
                                                 <MCol Md="12">
-                                                    <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].DisplayName" ValueChanged="async value => await MetricNameChangedAsync(Value.Metrics[0],value) " Label="@T("Metric name")" />
+                                                    <STextField BackgroundColor="white" Required DebounceInterval="500" TValue="string" Value="Value.Metrics[0].DisplayName" ValueChanged="value => MetricNameChanged(Value.Metrics[0],value) " Label="@T("Metric name")" />
                                                 </MCol>
                                                 <MCol Md="12">
-                                                    <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].Expression" ValueChanged="async value => await MetricNameChangedAsync(Value.Metrics[0],value) " Label="@T("Metric expression")" />
+                                                    <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value) " Label="@T("Metric expression")" />
                                                 </MCol>
                                             </MRow>
                                         </MCardText>
@@ -74,28 +74,16 @@
                                         <MCard Class="pa-2" Style="background-color:#F6F8FD">
                                             <MCardText>
                                                 <MRow>
-                                                    @if (Value.ChartType is ChartTypes.Table)
-                                                    {
-                                                        <MCol Md="12">
-                                                            <STextField BackgroundColor="white" @bind-Value="item.DisplayName" Label="列名" />
-                                                        </MCol>
-                                                    }
                                                     <MCol Md="12">
-                                                        <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="item.Expression" ValueChanged="async value => await MetricNameChangedAsync(item,value) " Label="指标名称" />
+                                                        <STextField BackgroundColor="white" Value="item.DisplayName" TValue="string" ValueChanged="value => MetricNameChanged(item,value)" DebounceInterval="500" Label="@(Value.ChartType is ChartTypes.Table ?T("Column name"):T("Metric name"))" />
                                                     </MCol>
                                                     <MCol Md="12">
-                                                        <STextField BackgroundColor="white" @bind-Value="item.Range" Label="取值范围" />
+                                                        <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="item.Expression" ValueChanged="async value => await MetricExpressionChangedAsync(item,value)" Label="@T("Metric expression")" />
                                                     </MCol>
                                                     @if (Value.ChartType is ChartTypes.Table)
                                                     {
                                                         <MCol Md="12">
                                                             <STextField BackgroundColor="white" @bind-Value="item.Icon" Label="图标" />
-                                                        </MCol>
-                                                    }
-                                                    else
-                                                    {
-                                                        <MCol Md="12">
-                                                            <STextField BackgroundColor="white" @bind-Value="item.Caculate" Label="计算规则" />
                                                         </MCol>
                                                     }
                                                     <MCol Md="12">
@@ -104,21 +92,14 @@
                                                 </MRow>
                                             </MCardText>
                                             <MCardActions Class="d-flex justify-space-between">
-                                                @if (Value.ChartType is ChartTypes.Table)
-                                                {
-                                                    <SColorGroup @bind-Value="item.Color" Colors='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
-                                                }
-                                                else
-                                                {
-                                                    <MSpacer />
-                                                }
+                                                <SColorGroup @bind-Value="item.Color" Colors='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
                                                 <MIcon OnClick="() => Remove(item)" Color="red">mdi-delete</MIcon>
                                             </MCardActions>
                                         </MCard>
                                     </MCol>
                                 }
                                 <MCol Md="4">
-                                    <MCard Height=350 OnClick="Add" Class="d-flex justify-center align-center" Style="background-color:#F6F8FD">
+                                    <MCard Height=@(Value.ChartType is ChartTypes.Table ? 350 : 280) OnClick="Add" Class="d-flex justify-center align-center" Style="background-color:#F6F8FD">
                                         <MIcon XLarge>mdi-plus</MIcon>
                                     </MCard>
                                 </MCol>

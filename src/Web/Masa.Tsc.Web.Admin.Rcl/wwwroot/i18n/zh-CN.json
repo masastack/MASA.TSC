@@ -201,5 +201,6 @@
   "Action": "操作",
   "Metric name": "指标名称",
   "Metric expression": "指标表达式",
-  "APPID": "应用ID"
+  "APPID": "应用ID",
+  "Column name": "列名"
 }

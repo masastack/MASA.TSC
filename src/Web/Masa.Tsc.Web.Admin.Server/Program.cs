@@ -64,7 +64,7 @@ var redisOption = new RedisConfigurationOptions
     Password = masaStackConfig.RedisModel.RedisPassword
 };
 builder.AddMasaStackComponentsForServer();
-builder.Services.AddTscApiCaller("https://tsc-service-develop.masastack.com").AddDccClient(redisOption);
+builder.Services.AddTscApiCaller(tscUrl).AddDccClient(redisOption);//"https://tsc-service-develop.masastack.com"
 builder.Services.AddRcl();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
