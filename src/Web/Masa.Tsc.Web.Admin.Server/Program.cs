@@ -38,7 +38,8 @@ builder.Services.AddObservable(builder.Logging, new MasaObservableOptions
 {
     ServiceNameSpace = builder.Environment.EnvironmentName,
     ServiceVersion = masaStackConfig.Version,
-    ServiceName = masaStackConfig.GetWebId(MasaStackConstant.TSC)
+    ServiceName = masaStackConfig.GetWebId(MasaStackConstant.TSC),
+    ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
 }, masaStackConfig.OtlpUrl, true);
 
 MasaOpenIdConnectOptions masaOpenIdConnectOptions = new()

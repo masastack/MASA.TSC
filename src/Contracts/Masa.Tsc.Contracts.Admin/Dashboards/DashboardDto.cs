@@ -13,7 +13,7 @@ public class DashboardDto
 
     public bool IsRoot { get; set; }
 
-    public LayerTypes Layer { get; set; }
+    public string Layer { get; set; } = MetricConstants.DEFAULT_LAYER;
 
     public ModelTypes Model { get; set; }
 

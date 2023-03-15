@@ -16,7 +16,8 @@ builder.Services.AddElasticClientLogAndTrace(elasearchUrls, logIndexName, traceI
     {
         ServiceNameSpace = builder.Environment.EnvironmentName,
         ServiceVersion = masaStackConfig.Version,
-        ServiceName = masaStackConfig.GetServerId(MasaStackConstant.TSC)
+        ServiceName = masaStackConfig.GetServerId(MasaStackConstant.TSC),
+        ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
     }, masaStackConfig.OtlpUrl, false)
     .AddPrometheusClient(prometheusUrl, 15)
     .AddTopology(elasearchUrls);

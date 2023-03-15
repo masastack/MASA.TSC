@@ -5,6 +5,8 @@ namespace Masa.Tsc.Contracts.Admin.Metrics;
 
 public class RequestMultiQueryDto
 {
+    public string? Layer { get; set; }
+
     public string? Service { get; set; }
 
     public string? Instance { get; set; }

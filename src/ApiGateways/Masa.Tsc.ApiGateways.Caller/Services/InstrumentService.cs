@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Contracts.Admin.Enums;
+
 namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public class InstrumentService : BaseService
@@ -23,5 +25,5 @@ public class InstrumentService : BaseService
 
     public async Task<PaginatedListBase<InstrumentListDto>> ListAsync(int page, int size, string keyword) => (await Caller.GetAsync<PaginatedListBase<InstrumentListDto>>($"{RootPath}/list/{page}/{size}/{keyword}"))!;
 
-    public async Task<LinkResultDto> GetLinkAsync(MetricValueTypes type) => (await Caller.GetAsync<LinkResultDto>($"{RootPath}/link", new { type }))!;
+    public async Task<LinkResultDto> GetLinkAsync(string layer, MetricValueTypes type) => (await Caller.GetAsync<LinkResultDto>($"{RootPath}/link", new { layer, type }))!;
 }
