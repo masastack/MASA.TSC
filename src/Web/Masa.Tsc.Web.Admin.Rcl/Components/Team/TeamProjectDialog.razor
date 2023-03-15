@@ -31,9 +31,9 @@
                         <MCol Cols="6" Class="d-flex justify-end align-center">
                             <DateTimeRangeToolbar StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
                                               EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start"
-                                              StartDateTime="@Start"
-                                              EndDateTime="@End"
-                                              @bind-DefaultQuickRange="@QuickRangeKey"
+                                              StartDateTime="@ParamData.Start"
+                                              EndDateTime="@ParamData.End"
+                                              @bind-DefaultQuickRange="@ParamData.QuickRangeKey"
                                               OnUpdate="OnDateTimeUpdateAsync"
                                               OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
                             <SButton OnClick=NavigateToDashboardConfiguration Class="ml-6" Small BorderRadiusClass="rounded-lg">

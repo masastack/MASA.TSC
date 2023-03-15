@@ -5,9 +5,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TeamProjectDialog
 {
-    string _projectId { get; set; }
-
-    Guid _teamId { get; set; }
+    string lastKey;
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -18,32 +16,10 @@ public partial class TeamProjectDialog
     [Parameter]
     public EventCallback<bool> VisibleChanged { get; set; }
 
-    [CascadingParameter(Name = "ProjectId")]
-    public string ProjectId { get; set; }
+    [Parameter]
+    public TeamDialogModel ParamData { get; set; } = new();
 
-    [CascadingParameter(Name = "TeamId")]
-    public Guid TeamId { get; set; }
-
-    [CascadingParameter(Name = "ProjectCount")]
-    public int ProjectCount { get; set; }
-
-    [CascadingParameter(Name = "ServiceCount")]
-    public int ServiceCount { get; set; }
-
-    [CascadingParameter(Name = "ErrorCount")]
-    public int ErrorCount { get; set; }
-
-    [CascadingParameter]
-    public ProjectOverviewDto Project { get; set; }
-
-    [CascadingParameter(Name = "Start")]
-    public DateTimeOffset Start { get; set; }
-
-    [CascadingParameter(Name = "End")]
-    public DateTimeOffset End { get; set; }
-
-    [CascadingParameter]
-    public QuickRangeKey? QuickRangeKey { get; set; }
+    int ErrorCount { get; set; }
 
     ConfigurationRecord ConfigurationRecord { get; set; } = new();
 
@@ -61,11 +37,15 @@ public partial class TeamProjectDialog
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Visible && !string.IsNullOrEmpty(ProjectId) && TeamId != Guid.Empty && (ProjectId != _projectId || TeamId != _teamId))
+        if (!Visible || string.IsNullOrEmpty(ParamData.ProjectId) || ParamData.TeamId == Guid.Empty)
+            return;
+
+        var key = $"{ParamData.TeamId}_{ParamData.ProjectId}_{ParamData.Start}_{ParamData.End}";
+
+        if (lastKey != key)
         {
-            _projectId = ProjectId;
-            _teamId = TeamId;
-            Team = await ApiCaller.TeamService.GetTeamAsync(TeamId, ProjectId);
+            lastKey = key;
+            Team = await ApiCaller.TeamService.GetTeamAsync(ParamData.TeamId, ParamData.ProjectId);
             Apps = Team.CurrentProject.Apps.Select(app => new AppDetailModel
             {
                 Name = app.Name,
@@ -73,8 +53,8 @@ public partial class TeamProjectDialog
                 Type = app.AppType,
                 ServiceType = app.ServiceType
             }).ToList();
-            Team.ProjectTotal = ProjectCount;
-            Team.AppTotal = ServiceCount;            
+            Team.ProjectTotal = ParamData.TeamProjectCount;
+            Team.AppTotal = ParamData.TeamServiceCount;
             ConfigurationRecord.Service = Apps.FirstOrDefault()?.Identity;
             ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
         }
@@ -108,12 +88,12 @@ public partial class TeamProjectDialog
             Start = ConfigurationRecord.StartTime.UtcDateTime,
             End = ConfigurationRecord.EndTime.UtcDateTime,
             Service = appid,
-            Name = "Resource.service.name",
+            Name = ElasticSearchConst.ServiceName,
             Conditions = new List<FieldConditionDto> {
                 new FieldConditionDto{
-                Name="SeverityText",
+                Name=ElasticSearchConst.LogLevelText,
                 Type= ConditionTypes.Equal,
-                Value="Error"
+                Value=ElasticSearchConst.LogErrorText
                 }
             }
         };

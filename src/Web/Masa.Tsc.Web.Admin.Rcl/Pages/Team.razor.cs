@@ -13,20 +13,18 @@ public partial class Team
     private StringNumber _projectStatus = "0";
 
     private bool _visible;
-    private string _selectedProjectId;
-    private Guid _selectedTeamId;
-    private int _teamProjectCount = 0;
-    private int _teamServiceCount = 0;
-    private int _errorCount = 0;
     private ProjectOverviewDto _projectOverviewDto = default!;
-    private QuickRangeKey? _quickRangeKey;
+    private TeamDialogModel teamDialog = new();
+
 
     private void HandleOnItemClick(ProjectOverviewDto item)
     {
-        _selectedProjectId = item.Identity;
-        _selectedTeamId = item.TeamId;
-        _teamProjectCount = _projects.Count(p => p.TeamId == _selectedTeamId);
-        _teamServiceCount = _projects.Where(p => p.TeamId == _selectedTeamId).Sum(p => p.Apps.Count);
+        teamDialog.ProjectId = item.Identity;
+        teamDialog.TeamId = item.TeamId;
+        teamDialog.TeamProjectCount = _projects.Count(p => p.TeamId == item.TeamId);
+        teamDialog.TeamServiceCount = _projects.Where(p => p.TeamId == item.TeamId).Sum(p => p.Apps.Count);
+        teamDialog.Start = ToDateTimeOffset(_teamSearchModel.Start);
+        teamDialog.End = ToDateTimeOffset(_teamSearchModel.End);
         _projectOverviewDto = item;
         _visible = true;
     }

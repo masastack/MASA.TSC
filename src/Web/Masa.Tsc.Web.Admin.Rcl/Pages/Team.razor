@@ -6,7 +6,7 @@
 <TeamSearch OnValueChanged="OnSearch"
             OnTabsChanged="OnSearchChangeAsync"
             OnSearchChanged="OnSearchChangeAsync"
-            OnQuickRangeChanged="@(value=>_quickRangeKey=value)"></TeamSearch>
+            OnQuickRangeChanged="@(value=>teamDialog.QuickRangeKey=value)"></TeamSearch>
 <MCard Class="d-flex mt-8" Style="min-width:464px">
     <MRow Class="overflow-auto d-flex justify-space-between pt-8" Style="min-height: calc(100vh - 190px);">
         @if (_isLoad)
@@ -66,22 +66,4 @@
     </MRow>
 </MCard>
 
-<CascadingValue Value="_selectedProjectId" Name="ProjectId">
-    <CascadingValue Value="_selectedTeamId" Name="TeamId">
-        <CascadingValue Value="_teamProjectCount" Name="ProjectCount">
-            <CascadingValue Value="_teamServiceCount" Name="ServiceCount">
-                <CascadingValue Value="_errorCount" Name="ErrorCount">
-                    <CascadingValue Value="_projectOverviewDto">
-                        <CascadingValue Value="ToDateTimeOffset( _teamSearchModel?.Start)" Name="Start">
-                            <CascadingValue Value="ToDateTimeOffset(_teamSearchModel?.End)" Name="End">
-                                <CascadingValue Value="_quickRangeKey">
-                                    <TeamProjectDialog @bind-Visible="_visible" />
-                                </CascadingValue>
-                            </CascadingValue>
-                        </CascadingValue>
-                    </CascadingValue>
-                </CascadingValue>
-            </CascadingValue>
-        </CascadingValue>
-    </CascadingValue>
-</CascadingValue>
+<TeamProjectDialog @bind-Visible=" _visible" ParamData="teamDialog" />
