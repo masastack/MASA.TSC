@@ -5,6 +5,8 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations.Models;
 
 public class ConfigurationRecord
 {
+    string? _randomStr;
+
     public List<UpsertPanelDto> Panels { get; set; } = new();
 
     public string DashboardId { get; set; }
@@ -27,7 +29,7 @@ public class ConfigurationRecord
 
     public DateTimeOffset EndTime { get; set; } = DateTimeOffset.UtcNow;
 
-    public string? Key => $"{Service}{Instance}{Endpoint}{StartTime}{EndTime}";
+    public string? Key => $"{Service}{Instance}{Endpoint}{StartTime}{EndTime}{_randomStr}";
 
     public bool IsEdit { get; set; }
 
@@ -38,6 +40,11 @@ public class ConfigurationRecord
         var instanceModelPass = ModelType is ModelTypes.ServiceInstance && string.IsNullOrEmpty(Service) is false && string.IsNullOrEmpty(Instance) is false;
         var endPointPass = ModelType is ModelTypes.Endpoint && string.IsNullOrEmpty(Service) is false && string.IsNullOrEmpty(Instance) is false && string.IsNullOrEmpty(Endpoint) is false;
         return Panels.Any() && (ready || (allModelPass || serviceModelPass || instanceModelPass || endPointPass));
+    }
+
+    public void ReloadUI()
+    {
+        _randomStr = Guid.NewGuid().ToString();
     }
 
     public void Clear()

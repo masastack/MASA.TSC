@@ -134,8 +134,9 @@ public partial class Configuration : IAsyncDisposable
         {
             var confirm = await OpenConfirmDialog(T("Operation confirmation"), T("Are you sure switch view mode,unsaved data will be lost"), AlertTypes.Warning);
             if (confirm)
-            {
+            {               
                 await GetPanelsAsync();
+                ConfigurationRecord.ReloadUI();
                 ConfigurationRecord.IsEdit = false;
             }
             else ConfigurationRecord.IsEdit = true;

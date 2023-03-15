@@ -191,5 +191,7 @@
   "Endpoint": "接口",
   "ServiceInstance": "实例",
   "All": "全部",
-  "Action": "操作"
+  "Action": "操作",
+  "Metric name": "指标名称",
+  "Metric expression": "指标表达式"
 }

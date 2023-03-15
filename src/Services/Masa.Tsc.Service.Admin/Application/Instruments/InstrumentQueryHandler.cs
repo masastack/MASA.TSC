@@ -103,7 +103,7 @@ public class InstrumentQueryHandler
                     Icon = item.Icon,
                     DisplayName = item.DisplayName,
                     Id = item.Id,
-                    Name = item.Name,
+                    Expression = item.Name,
                     Sort = item.Sort,
                     Unit = item.Unit,
                     Range = item.Name

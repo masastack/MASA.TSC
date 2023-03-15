@@ -62,7 +62,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
 
     async Task NavigateToPanelConfigurationPageAsync()
     {
-        var success = !Value.Metrics.Any(x => string.IsNullOrEmpty(x.Name));
+        var success = !Value.Metrics.Any(x => string.IsNullOrEmpty(x.Expression));
         if (!success)
         {
             await PopupService.EnqueueSnackbarAsync(T("Metrics name is required"), AlertTypes.Error);
@@ -95,7 +95,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
 
     async Task MetricNameChangedAsync(PanelMetricDto metric, string metricName)
     {
-        metric.Name = metricName;
+        metric.Expression = metricName;
         await GetGetMetricsAsync();
     }
 

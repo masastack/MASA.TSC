@@ -57,7 +57,7 @@ public partial class ChartPanel
 
     async Task<List<QueryResultDataResponse>> GetMetricsAsync()
     {
-        if (Value.Metrics.Any(item => item.Name is not null) is false) return new();
+        if (Value.Metrics.Any(item => item.Expression is not null) is false) return new();
         if (Value.ChartType is ChartTypes.Pie or ChartTypes.Gauge or ChartTypes.Table)
         {
             return await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto()
@@ -66,7 +66,7 @@ public partial class ChartPanel
                 Service = ConfigurationRecord.Service,
                 Instance = ConfigurationRecord.Instance,
                 EndPoint = ConfigurationRecord.ConvertEndpoint,
-                Queries = Value.Metrics.Select(item => item.Name).ToList()
+                Queries = Value.Metrics.Select(item => item.Expression).ToList()
             });
         }
         else
@@ -79,7 +79,7 @@ public partial class ChartPanel
                 Instance = ConfigurationRecord.Instance,
                 EndPoint = ConfigurationRecord.ConvertEndpoint,
                 Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
-                MetricNames = Value.Metrics.Select(item => item.Name).ToList()
+                MetricNames = Value.Metrics.Select(item => item.Expression).ToList()
             });
         }
     }

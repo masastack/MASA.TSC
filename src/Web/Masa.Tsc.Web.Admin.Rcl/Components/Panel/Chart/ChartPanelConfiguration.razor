@@ -56,10 +56,10 @@
                                         <MCardText>
                                             <MRow>
                                                 <MCol Md="12">
-                                                    <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].Name" ValueChanged="async value => await MetricNameChangedAsync(Value.Metrics[0],value) " Label="指标名称" />
+                                                    <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].DisplayName" ValueChanged="async value => await MetricNameChangedAsync(Value.Metrics[0],value) " Label="@T("Metric name")" />
                                                 </MCol>
                                                 <MCol Md="12">
-                                                    <STextField BackgroundColor="white" @bind-Value="Value.Metrics[0].Range" Label="取值范围" />
+                                                    <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].Expression" ValueChanged="async value => await MetricNameChangedAsync(Value.Metrics[0],value) " Label="@T("Metric expression")" />
                                                 </MCol>
                                             </MRow>
                                         </MCardText>
@@ -81,7 +81,7 @@
                                                         </MCol>
                                                     }
                                                     <MCol Md="12">
-                                                        <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="item.Name" ValueChanged="async value => await MetricNameChangedAsync(item,value) " Label="指标名称" />
+                                                        <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="item.Expression" ValueChanged="async value => await MetricNameChangedAsync(item,value) " Label="指标名称" />
                                                     </MCol>
                                                     <MCol Md="12">
                                                         <STextField BackgroundColor="white" @bind-Value="item.Range" Label="取值范围" />
