@@ -8,8 +8,11 @@ public partial class ServiceAutoComplete
     bool _firstValueChanged;
     bool _isLoading;
 
+    [Inject]
+    public IPmClient PmClient { get; set; }
+
     [Parameter]
-    public string Value { get; set; }
+    public string Value { get; set; }    
 
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
@@ -27,17 +30,26 @@ public partial class ServiceAutoComplete
 
     protected override async Task OnInitializedAsync()
     {
-        if (Metric)
+        if (Services is null)
         {
             _isLoading = true;
-            var data = await ApiCaller.MetricService.GetValues(new RequestMetricListDto { Type = MetricValueTypes.Service });
-            if (data != null && data.Any())
+            if (Metric)
             {
-                Services = data.Select(item => new AppDetailModel
+                var data = await ApiCaller.MetricService.GetValues(new RequestMetricListDto { Type = MetricValueTypes.Service });
+                if (data != null && data.Any())
                 {
-                    Identity = item,
-                    Name = item
-                }).ToList();
+                    Services = data.Select(item => new AppDetailModel
+                    {
+                        Identity = item,
+                        Name = item
+                    }).ToList();
+                }
+            }
+            else
+            {
+                var data = await PmClient.AppService.GetListAsync();
+                if (data != null && data.Any())
+                    Services = data;
             }
             _isLoading = false;
         }
