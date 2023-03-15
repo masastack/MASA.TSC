@@ -293,3 +293,15 @@
 .m-tooltip.m-tooltip--top.m-tooltip--attached {
     display:none !important;
 }
+
+/*
+    dashboard
+*/
+
+.folder .m-list-item.m-list-item--link:not(.m-list-group__header):hover {
+    background: #F4F1FF !important;
+}
+
+.folder .m-list-item.m-list-item--link:not(.m-list-group__header) {
+    background: rgba(246, 248, 253, 0.5) !important;
+}

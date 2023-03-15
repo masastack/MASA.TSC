@@ -190,5 +190,6 @@
   "Instance": "实例",
   "Endpoint": "接口",
   "ServiceInstance": "实例",
-  "All": "全部"
+  "All": "全部",
+  "Action": "操作"
 }

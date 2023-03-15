@@ -27,7 +27,7 @@
         </div>
     </HeaderContent>
     <AutoHeightContent>
-        <DefaultCard>
+        <DefaultCard Class="px-2">
             @if (Mode is Modes.Table)
             {
                 <SDataTable Items="Dashboards"
@@ -47,12 +47,9 @@
                             case nameof(DashboardDto.Folder):
                                 <div >@context.Item.Folder.Name</div>
                                 break;
-                            case nameof(DashboardDto.IsRoot):
-                                <span>@(context.Item.IsRoot ? T("Yes") : T("No"))</span>
-                                break;
                             case "Action":
                                 <div class="d-flex">
-                                    <SButton Icon Class="mr-4"><SIcon Tooltip="@T("Edit")" OnClick="() => OpenUpdateDashboardDialog(context.Item)">@IconConstants.Update</SIcon></SButton>
+                                    <SButton Icon Class="mr-4"><SIcon Tooltip="@T("Edit")" OnClick="() => OpenUpdateDashboardDialog(context.Item)" Style="color: #4318FF !important;">@IconConstants.Update</SIcon></SButton>
                                     <SButton Icon Color="red" OnClick="async () => await OpenRemoveDashboardDialogAsync(context.Item)"><SIcon Tooltip="@T("Remove")" Style="color:#F44336 !important;">@IconConstants.Remove</SIcon></SButton>
                                 </div>
                                 break;
@@ -65,12 +62,12 @@
             }
             else
             {
-                <MList Height="@("calc(100vh - 289px)")" Class="overflow-auto">
+                <MList Height="@("calc(100vh - 289px)")" Class="overflow-auto folder">
                     @foreach (var folder in Folders)
                     {
                         <MListGroup PrependIcon="@(IconConstants.Folder)"
                                     NoAction
-                                    @bind-Value=folder.ISActive>
+                                    @bind-Value=folder.IsActive>
                             <ActivatorContent>
                                 <MListItemContent>
                                     <MListItemTitle Class="h8">@folder.Name</MListItemTitle>
@@ -79,7 +76,7 @@
                             <AppendIconContent>
                                 <SButton Icon OnClick="() => OpenUpdateFolderDialog(folder)" Class="mr-4" StopPropagation><SIcon Tooltip="@T("Edit")" Style="transform: none !important">@IconConstants.Update</SIcon></SButton>
                                 <SButton Icon Color="red" Class="mr-10" OnClick="async () => await OpenRemoveFolderDialogAsync(folder)" StopPropagation><SIcon Tooltip="@T("Remove")" Color="red" Style="transform: none !important">@IconConstants.Remove</SIcon></SButton>
-                                <SIcon Size="28" Color="@(folder.ISActive ? "primary" : "")">@IconConstants.Down</SIcon>
+                                <SIcon Size="28" Color="@(folder.IsActive ? "primary" : "")">@IconConstants.Down</SIcon>
                             </AppendIconContent>
                             <ChildContent>
                                 @foreach (var dashboard in folder.Dashboards)
@@ -96,10 +93,22 @@
                                                 <SButton StopPropagation Icon Color="red" Style="@(context.Hover?"":"visibility: hidden")" OnClick="async () => await OpenRemoveDashboardDialogAsync(dashboard)"><SIcon Tooltip="@T("Remove")" Color="red">@IconConstants.Remove</SIcon></SButton>
                                             </MListItemAction>
                                         </MListItem>
+                                        @if (folder.Dashboards.Last() != dashboard)
+                                        {
+                                            <div class="px-4" style="background: rgba(246, 248, 253, 0.5);@(!context.Hover?"":"visibility: hidden")">
+                                                <div style="height: 1px;background:#E4E8F3;" />
+                                            </div>
+                                        }
                                     </MHover>
                                 }
                             </ChildContent>
                         </MListGroup>
+                        @if (Folders.Last() != folder)
+                        {
+                            <div class="px-4" style="background: rgba(246, 248, 253, 0.5);@(folder.IsActive?"visibility: hidden":"")">
+                                <div style="height: 1px;background:#E4E8F3;" />
+                            </div>
+                        }
                     }
                 </MList>
             }

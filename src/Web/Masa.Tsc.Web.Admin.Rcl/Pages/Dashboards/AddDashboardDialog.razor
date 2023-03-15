@@ -6,7 +6,7 @@
             <STextField Required @bind-Value="@Dashboard.Name" Class="mb-6" />
             <FolderSelect @bind-Value="Dashboard.Folder" Class="mb-6" />
             <EnumSelect TValue="ModelTypes" @bind-Value="Dashboard.Model" Clearable=false Class="mb-6" />
-            <ProjectTypeSelect @bind-Value="Dashboard.Type" Class="mb-6" />
+            @*<ProjectTypeSelect @bind-Value="Dashboard.Type" Class="mb-6" />*@
             <STextField Type="number" TValue="int" @bind-Value="Dashboard.Order" />
         </MForm>
     </ChildContent>
