@@ -1,7 +1,13 @@
 ﻿@inherits TscComponentBase
 
 <MRow>
-    <MCol Md="12" Class="d-flex justify-end">
+    <MCol Md="12" Class="d-flex">
+        <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
+                              StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
+                              EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start"
+                              OnUpdate="OnDateTimeUpdateAsync"
+                              OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
+        <MSpacer />
         <SButton Icon OnClick="GetGetMetricsAsync">
             <SIcon Tooltip="@T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon>
         </SButton>
@@ -19,7 +25,7 @@
         <MCard Class="mt-6">
             <MCardText>
                 <MRow>
-                    @if (Value.ChartType == "table")
+                    @if (Value.ChartType == ChartTypes.Table)
                     {
                         <MCol Md="4">
                             <ProjectSelect @bind-Value="@Value.SystemIdentity" />
@@ -43,7 +49,7 @@
                     </MCol>
                     <MCol Md="12">
                         <MRow>
-                            @if (Value.ChartType == "table" && Value.ListType == ListTypes.TopList)
+                            @if (Value.ChartType is ChartTypes.Table && Value.ListType is ListTypes.TopList)
                             {
                                 <MCol Md="4">
                                     <MCard Class="pa-2" Style="background-color:#F6F8FD">
@@ -68,7 +74,7 @@
                                         <MCard Class="pa-2" Style="background-color:#F6F8FD">
                                             <MCardText>
                                                 <MRow>
-                                                    @if (Value.ChartType == "table")
+                                                    @if (Value.ChartType is ChartTypes.Table)
                                                     {
                                                         <MCol Md="12">
                                                             <STextField BackgroundColor="white" @bind-Value="item.DisplayName" Label="列名" />
@@ -80,7 +86,7 @@
                                                     <MCol Md="12">
                                                         <STextField BackgroundColor="white" @bind-Value="item.Range" Label="取值范围" />
                                                     </MCol>
-                                                    @if (Value.ChartType == "table")
+                                                    @if (Value.ChartType is ChartTypes.Table)
                                                     {
                                                         <MCol Md="12">
                                                             <STextField BackgroundColor="white" @bind-Value="item.Icon" Label="图标" />
@@ -98,7 +104,7 @@
                                                 </MRow>
                                             </MCardText>
                                             <MCardActions Class="d-flex justify-space-between">
-                                                @if (Value.ChartType == "table")
+                                                @if (Value.ChartType is ChartTypes.Table)
                                                 {
                                                     <SColorGroup @bind-Value="item.Color" Colors='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
                                                 }
@@ -126,14 +132,14 @@
     <MCol Cols="4">
         <MCard>
             <MCardText>
-                <MExpansionPanels Values="new List<StringNumber>{1}" Multiple Style="z-index:auto !important;max-height:855px;overflow:auto;">
+                <MExpansionPanels @bind-Values=_trash Multiple Style="z-index:auto !important;max-height:855px;overflow:auto;">
                     <MExpansionPanel Value="1">
                         <MExpansionPanelHeader Class="emphasis2--text h6">Visualization</MExpansionPanelHeader>
                         <MExpansionPanelContent>
                             <WidgetType @bind-Value="@Value.ChartType" />
                         </MExpansionPanelContent>
                     </MExpansionPanel>
-                    @if (Value.ChartType == "table")
+                    @if (Value.ChartType is ChartTypes.Table)
                     {
                         @if (Value.ListType is ListTypes.TopList)
                         {
@@ -166,9 +172,6 @@
                                         <MCol Md="12">
                                             <ButtonGroupItem @bind-Value="@Value.ColumnAlignment" Label="Column alignment" Items='new List<string>{"auto","left","center","right"}' />
                                         </MCol>
-                                       @* <MCol Md="12">
-                                            <SwitchItem Label="Enable pagination" @bind-Value="@Value.EnablePaginaton" />
-                                        </MCol>*@
                                     </MRow>
                                 </MExpansionPanelContent>
                             </MExpansionPanel>

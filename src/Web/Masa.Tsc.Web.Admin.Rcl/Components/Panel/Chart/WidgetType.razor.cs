@@ -6,10 +6,10 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 public partial class WidgetType
 {
     [Parameter]
-    public EventCallback<string> ValueChanged { get; set; }
+    public EventCallback<ChartTypes> ValueChanged { get; set; }
 
     [Parameter]
-    public string Value { get; set; }
+    public ChartTypes Value { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -35,43 +35,43 @@ public partial class WidgetType
         new EChartPanelTypeModel
         {
             Name="表格",
-            Type="table",
+            Type= ChartTypes.Table,
             Src="_content/Masa.Tsc.Web.Admin.Rcl/img/other/table.png"
         },
         new EChartPanelTypeModel
         {
             Name="折线图",
-            Type="line",
+            Type=ChartTypes.Line,
             Src="_content/Masa.Tsc.Web.Admin.Rcl/img/echarts/line.png"
         },
         new EChartPanelTypeModel
         {
             Name="柱形图",
-            Type="bar",
+            Type=ChartTypes.Bar,
             Src="_content/Masa.Tsc.Web.Admin.Rcl/img/echarts/bar.png"
         },
         new EChartPanelTypeModel
         {
             Name="堆叠面积",
-            Type="line-area",
+            Type=ChartTypes.LineArea,
             Src="_content/Masa.Tsc.Web.Admin.Rcl/img/echarts/line-area.png"
         },
         new EChartPanelTypeModel
         {
             Name="饼图",
-            Type="pie",
+            Type=ChartTypes.Pie,
             Src="_content/Masa.Tsc.Web.Admin.Rcl/img/echarts/pie.png"
         },
         new EChartPanelTypeModel
         {
             Name="仪表盘",
-            Type="gauge",
+            Type=ChartTypes.Gauge,
             Src="_content/Masa.Tsc.Web.Admin.Rcl/img/echarts/gauge.png"
         },
         //new EChartPanelTypeModel
         //{
         //    Name="热力图",
-        //    Type="heatmap",
+        //    Type=ChartTypes.Heatmap,
         //    Src="_content/Masa.Tsc.Web.Admin.Rcl/img/echarts/heatmap.png"
         //}
     };

@@ -5,6 +5,8 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
 public partial class ChartPanelConfiguration : TscComponentBase
 {
+    List<StringNumber> _trash = new List<StringNumber> { 1 };
+
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
@@ -100,5 +102,16 @@ public partial class ChartPanelConfiguration : TscComponentBase
     void ListTypeChanged(StringNumber listType)
     {
         Value.ListType = Enum.Parse<ListTypes>(listType.ToString()!);
+    }
+
+    void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    {
+        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
+    }
+
+    async Task OnAutoDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    {
+        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
+        await base.InvokeAsync(base.StateHasChanged);
     }
 }

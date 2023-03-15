@@ -6,7 +6,7 @@
         <div class="ma-auto">@T("Loading data")</div>
     </div>
 }
-@if (Value.ChartType == "table")
+@if (Value.ChartType is ChartTypes.Table)
 {
     <ListPanel Value="Value" IsChartDataReady=!IsLoading Class="@Class" />
 }

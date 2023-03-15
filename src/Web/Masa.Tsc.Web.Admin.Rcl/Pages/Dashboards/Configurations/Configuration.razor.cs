@@ -7,8 +7,7 @@ public partial class Configuration : IAsyncDisposable
 {
     string _scrollElementId = Guid.NewGuid().ToString();
     string _contentElementId = Guid.NewGuid().ToString();
-    IJSObjectReference? _helper;
-    QuickRangeKey? _defaultValue = QuickRangeKey.Last15Minutes;
+    IJSObjectReference? _helper;   
     bool _hasNavigateTo;
     bool _serviceRelationReady;
     bool _timeRangeReady;

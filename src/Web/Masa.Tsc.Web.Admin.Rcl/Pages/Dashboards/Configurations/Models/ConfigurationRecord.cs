@@ -21,6 +21,8 @@ public class ConfigurationRecord
 
     public ModelTypes ModelType { get; set; }
 
+    public QuickRangeKey? DefaultQuickRangeKey = QuickRangeKey.Last15Minutes;
+
     public DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow.AddMinutes(-15);
 
     public DateTimeOffset EndTime { get; set; } = DateTimeOffset.UtcNow;
@@ -48,6 +50,9 @@ public class ConfigurationRecord
         Endpoint = default;
         PanelId = default;
         IsEdit = false;
+        DefaultQuickRangeKey = QuickRangeKey.Last15Minutes;
+        StartTime = DateTimeOffset.UtcNow.AddMinutes(-15);
+        EndTime = DateTimeOffset.UtcNow;
     }
 
     public void ClearPanels()

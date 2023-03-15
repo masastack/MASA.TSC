@@ -67,7 +67,7 @@ public partial class ProjectCharts
         if (_endpoint == null)
             _endpoint = new UpsertChartPanelDto(Guid.Empty)
             {
-                ChartType = "table",
+                ChartType = ChartTypes.Table,
                 ListType = ListTypes.TopList,
                 Title = T("Service Endpoint Load") + "(" + T("calls/min") + ")",
                 Description = T("For HTTP 1/2, gRPC, RPC services, this means Calls Per Minute (calls / min)"),
@@ -85,7 +85,7 @@ public partial class ProjectCharts
         if (_slowEndpoint == null)
             _slowEndpoint = new UpsertChartPanelDto(Guid.Empty)
             {
-                ChartType = "table",
+                ChartType = ChartTypes.Table,
                 ListType = ListTypes.TopList,
                 Title = T("Service Slow Endpoint") + "(" + T("ms") + ")",
                 //Description = "Service Slow Endpont(ms)",
