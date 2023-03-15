@@ -14,5 +14,5 @@
     <div class="mx-6">
         <SearchTextField Style="width:220px;border-radius: 10px !important;" @bind-Value="@Search" FillBackground=false Clearable />
     </div>
-    <DateTimeRangeToolbar OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
+    <DateTimeRangeToolbar OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" DefaultQuickRangeChanged="OnQuickRangeChanged" />
 </div>

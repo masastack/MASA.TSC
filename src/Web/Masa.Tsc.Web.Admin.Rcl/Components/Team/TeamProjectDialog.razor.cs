@@ -5,9 +5,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TeamProjectDialog
 {
-    string _projectId { get; set; }
-
-    Guid _teamId { get; set; }
+    string lastKey;
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -19,32 +17,35 @@ public partial class TeamProjectDialog
     public EventCallback<bool> VisibleChanged { get; set; }
 
     [Parameter]
-    public string ProjectId { get; set; }
+    public TeamDialogModel ParamData { get; set; } = new();
 
-    [Parameter]
-    public Guid TeamId { get; set; }
-
-    [Parameter]
-    public int MonitorProjectCount { get; set; }
-
-    [Parameter]
-    public int MonitorServiceCount { get; set; }
+    int ErrorCount { get; set; }
 
     ConfigurationRecord ConfigurationRecord { get; set; } = new();
 
-    ServiceAutoComplete AppAutoComplete { get; set; }
+    ServiceAutoComplete ServiceAutoComplete { get; set; }
 
     List<AppDetailModel> Apps { get; set; } = new();
 
     TeamDto Team { get; set; }
 
+    async Task OnAppChanged(string appid)
+    {
+        ConfigurationRecord.Service = appid;
+        ErrorCount = await GetErroCountAsync(appid);
+    }
+
     protected override async Task OnParametersSetAsync()
     {
-        if (Visible && !string.IsNullOrEmpty(ProjectId) && TeamId != Guid.Empty && (ProjectId != _projectId || TeamId != _teamId))
+        if (!Visible || string.IsNullOrEmpty(ParamData.ProjectId) || ParamData.TeamId == Guid.Empty)
+            return;
+
+        var key = $"{ParamData.TeamId}_{ParamData.ProjectId}_{ParamData.Start}_{ParamData.End}";
+
+        if (lastKey != key)
         {
-            _projectId = ProjectId;
-            _teamId = TeamId;
-            Team = await ApiCaller.TeamService.GetTeamAsync(TeamId, ProjectId);
+            lastKey = key;
+            Team = await ApiCaller.TeamService.GetTeamAsync(ParamData.TeamId, ParamData.ProjectId);
             Apps = Team.CurrentProject.Apps.Select(app => new AppDetailModel
             {
                 Name = app.Name,
@@ -52,9 +53,10 @@ public partial class TeamProjectDialog
                 Type = app.AppType,
                 ServiceType = app.ServiceType
             }).ToList();
-            Team.ProjectTotal = MonitorProjectCount;
-            Team.AppTotal = MonitorServiceCount;
+            Team.ProjectTotal = ParamData.TeamProjectCount;
+            Team.AppTotal = ParamData.TeamServiceCount;
             ConfigurationRecord.Service = Apps.FirstOrDefault()?.Identity;
+            ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
         }
     }
 
@@ -76,5 +78,25 @@ public partial class TeamProjectDialog
         {
             NavigationManager.NavigateToDashboardConfiguration(data.InstrumentId.ToString()!, ConfigurationRecord.Service);
         }
+    }
+
+    async Task<int> GetErroCountAsync(string appid)
+    {
+        var query = new SimpleAggregateRequestDto
+        {
+            Type = AggregateTypes.Count,
+            Start = ConfigurationRecord.StartTime.UtcDateTime,
+            End = ConfigurationRecord.EndTime.UtcDateTime,
+            Service = appid,
+            Name = ElasticSearchConst.ServiceName,
+            Conditions = new List<FieldConditionDto> {
+                new FieldConditionDto{
+                Name=ElasticSearchConst.LogLevelText,
+                Type= ConditionTypes.Equal,
+                Value=ElasticSearchConst.LogErrorText
+                }
+            }
+        };
+        return await ApiCaller.LogService.AggregateAsync<int>(query);
     }
 }

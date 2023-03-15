@@ -17,5 +17,5 @@ public class AppMonitorViewDto
 
     public string Icon { get; set; }
 
-    public bool IsShowApp { get; set; } = true;    
+    public bool IsShowApp { get; set; } = true;
 }

@@ -13,7 +13,7 @@ public partial class TeamSearch
         set
         {
             _search = value;
-            OnSearchChange(value);
+            _ = OnSearchChange(value);
         }
     }
 
@@ -25,6 +25,9 @@ public partial class TeamSearch
 
     [Parameter]
     public EventCallback<TeamSearchModel> OnSearchChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<QuickRangeKey?> OnQuickRangeChanged { get; set; }
 
     private TeamSearchModel _value = new() { ProjectType = "all" };
     private List<KeyValuePair<string, string>> _projectTypes = new() { KeyValuePair.Create("all", "All") };

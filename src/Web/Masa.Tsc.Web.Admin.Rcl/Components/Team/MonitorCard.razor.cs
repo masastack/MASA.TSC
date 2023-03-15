@@ -23,6 +23,15 @@ public partial class MonitorCard
     [Parameter]
     public EventCallback<StringNumber> ValueChanged { get; set; }
 
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        if (parameters.TryGetValue<AppMonitorDto>(nameof(Data), out var data))
+        {
+            UpdateItems();
+        }
+    }
+
     private List<AppMonitorViewDto> _items;
     private AppMonitorDto _appMonitorDto = new();
 
@@ -72,16 +81,22 @@ public partial class MonitorCard
         _items[2].AppTotal = _appMonitorDto.ErrorCount;
 
         _items[3].ServiceTotal = _appMonitorDto.Normal;
-
     }
 
-    private string ItemStyle(AppMonitorViewDto appMonitor, bool active)
+    private string ItemStyle(AppMonitorViewDto appMonitor)
     {
-        if (active)
+        if (Value != null && Value.IsT0 && Value.AsT0 == appMonitor.Value.ToString())
         {
             return $"border: 1px solid {appMonitor.Color};border-radius: 16px;min-width:170px";
         }
         return "border: 1px solid #E4E8F3;border-radius: 16px;min-width:170px";
+    }
+
+    private async Task ValueChangedAsync(AppMonitorViewDto value)
+    {
+        Value = value.Value.ToString();
+        if (ValueChanged.HasDelegate)
+            await ValueChanged.InvokeAsync(Value);
     }
 }
 

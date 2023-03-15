@@ -10,20 +10,22 @@ public partial class Team
     private TeamSearchModel? _teamSearchModel = null;
     private AppMonitorDto _appMonitorDto;
     private bool _isLoad = true;
-    private StringNumber _projectStatus = "";
+    private StringNumber _projectStatus = "0";
 
     private bool _visible;
-    private string _selectedProjectId;
-    private Guid _selectedTeamId;
-    private int _teamProjectCount = 0;
-    private int _teamServiceCount = 0;
+    private ProjectOverviewDto _projectOverviewDto = default!;
+    private TeamDialogModel teamDialog = new();
+
 
     private void HandleOnItemClick(ProjectOverviewDto item)
     {
-        _selectedProjectId = item.Identity;
-        _selectedTeamId = item.TeamId;
-        _teamProjectCount = _projects.Count(p => p.TeamId == _selectedTeamId);
-        _teamServiceCount = _projects.Where(p => p.TeamId == _selectedTeamId).Sum(p => p.Apps.Count);
+        teamDialog.ProjectId = item.Identity;
+        teamDialog.TeamId = item.TeamId;
+        teamDialog.TeamProjectCount = _projects.Count(p => p.TeamId == item.TeamId);
+        teamDialog.TeamServiceCount = _projects.Where(p => p.TeamId == item.TeamId).Sum(p => p.Apps.Count);
+        teamDialog.Start = ToDateTimeOffset(_teamSearchModel.Start);
+        teamDialog.End = ToDateTimeOffset(_teamSearchModel.End);
+        _projectOverviewDto = item;
         _visible = true;
     }
 
@@ -94,22 +96,18 @@ public partial class Team
         await LoadData();
     }
 
-    private void OnTabsChange(TeamSearchModel query)
+    private async Task OnSearchChangeAsync(TeamSearchModel query)
     {
         _teamSearchModel = query;
         _viewProjects = GetViewData();
+        await UpdateCardDataAsync(_viewProjects);
     }
 
-    private void OnSearchChange(TeamSearchModel query)
-    {
-        _teamSearchModel = query;
-        _viewProjects = GetViewData();
-    }
-
-    void ProjectStatusChanged(StringNumber projectStatus)
+    async Task ProjectStatusChangedAsync(StringNumber projectStatus)
     {
         _projectStatus = projectStatus;
         _viewProjects = GetViewData();
+        await Task.CompletedTask;
     }
 
     List<ProjectOverviewDto> GetViewData()
@@ -140,6 +138,63 @@ public partial class Team
         {
             result = result.Where(item => item.Name.Contains(_teamSearchModel.Keyword, StringComparison.OrdinalIgnoreCase) || item.Apps.Any(app => app.Name.Contains(_teamSearchModel.Keyword, StringComparison.OrdinalIgnoreCase)));
         }
+
         return result.ToList();
+    }
+
+    async Task UpdateCardDataAsync(IEnumerable<ProjectOverviewDto> data)
+    {
+        _appMonitorDto.ServiceTotal = data.Count();
+        _appMonitorDto.AppTotal = data.Sum(project => project.Apps.Count);
+
+        _appMonitorDto.ServiceWarn = data.Count(project => project.Apps.Any(app => app.HasWarning));
+
+        _appMonitorDto.ServiceError = data.Count(project => project.Apps.Any(app => app.HasError));
+
+        _appMonitorDto.Normal = data.Count(project => project.Apps.All(app => !app.HasError && !app.HasWarning));
+
+        var appids = string.Join(',', data.Select(project => string.Join(',', project.Apps?.Select(app => app.Identity)))).Split(',').Where(s => !string.IsNullOrEmpty(s)).ToArray();
+        var tasks = new Task<int>[] {
+            GetErroOrWarningCountAsync(true,appids),
+            GetErroOrWarningCountAsync(false,appids),
+        };
+
+        var counts = await Task.WhenAll(tasks);
+        _appMonitorDto.ErrorCount = counts[0];
+        _appMonitorDto.WarnCount = counts[1];
+    }
+
+    async Task<int> GetErroOrWarningCountAsync(bool isError, params string[] appids)
+    {
+        if (appids.Length == 0)
+            return default;
+        var query = new SimpleAggregateRequestDto
+        {
+            Type = AggregateTypes.Count,
+            Start = _teamSearchModel.Start.Value,
+            End = _teamSearchModel.End.Value,
+            Name = ElasticSearchConst.ServiceName,
+            Conditions = new List<FieldConditionDto> {
+                new FieldConditionDto{
+                Name=ElasticSearchConst.LogLevelText,
+                Type= ConditionTypes.Equal,
+                Value=isError?ElasticSearchConst.LogErrorText:ElasticSearchConst.LogWarningText
+                },
+                new FieldConditionDto
+                {
+                    Name=ElasticSearchConst.ServiceName,
+                    Type= ConditionTypes.In,
+                    Value=appids
+                }
+            }
+        };
+        return await ApiCaller.LogService.AggregateAsync<int>(query);
+    }
+
+    DateTimeOffset ToDateTimeOffset(DateTime? time)
+    {
+        if (time == null)
+            return DateTimeOffset.MinValue;
+        return new DateTimeOffset(ticks: time.Value.Ticks + CurrentTimeZone.BaseUtcOffset.Ticks, offset: CurrentTimeZone.BaseUtcOffset);
     }
 }
