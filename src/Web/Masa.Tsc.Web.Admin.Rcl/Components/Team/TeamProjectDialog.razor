@@ -4,8 +4,8 @@
 @if (Team != null)
 {
     <SSheetDialog Value=Visible ValueChanged="VisibleChanged" Title="@Team.CurrentProject.Name" EnableDomReload>
-        <MCard Style="background-color:#F0F3FA;border-top-left-radius: 20px;border-top-right-radius: 20px;" Class="full-height">
-             <MRow NoGutters Class="full-height">
+        <MCard Style="background-color:#F0F3FA;border-top-left-radius: 20px;border-top-right-radius: 20px;" Class="@(ErrorCount>0?"full-height overflow-y":"full-height")">
+            <MRow NoGutters Class="full-height">
                 <MCol Style="background-color:white;border-top-left-radius: 20px;" Cols="2" Class="d-flex flex-column justify-space-between pa-6 pb-9">
                     <ProjectDetail Value=@Team.CurrentProject></ProjectDetail>
                     <TeamDetail Value=@Team></TeamDetail>
@@ -14,24 +14,26 @@
                     <MRow Class="@Class">
                         <MCol Cols="6" Class="d-flex justify-start align-center">
                             <div style="width:210px;">
-                                <ServiceAutoComplete Services="Apps" @bind-Value="@ConfigurationRecord.Service" @ref="AppAutoComplete" FillBackground=false />
+                                <ServiceAutoComplete Services="Apps" Value="@ConfigurationRecord.Service" ValueChanged="OnAppChanged" @ref="ServiceAutoComplete" FillBackground=false />
                             </div>
-                            <MChip Class="mx-6" Color="#05CD99" TextColor="white">@AppAutoComplete!.CurrentApp?.Type</MChip>
+                            <MChip Class="mx-6" Color="#05CD99" TextColor="white">@ServiceAutoComplete!.CurrentApp?.Type</MChip>
                             <MTooltip Top>
                                 <ActivatorContent>
                                     <MLabel @attributes="@context.Attrs" Class="regular2--text body2" Style="max-width: 200px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">
-                                        @AppAutoComplete!.CurrentApp?.Identity
+                                        @T("APPID"):@ServiceAutoComplete!.CurrentApp?.Identity
                                     </MLabel>
                                 </ActivatorContent>
                                 <ChildContent>
-                                    <span>@AppAutoComplete!.CurrentApp?.Identity</span>
+                                    <span>@ServiceAutoComplete!.CurrentApp?.Identity</span>
                                 </ChildContent>
                             </MTooltip>
                         </MCol>
                         <MCol Cols="6" Class="d-flex justify-end align-center">
                             <DateTimeRangeToolbar StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
                                               EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start"
-                                              DefaultQuickRange="QuickRangeKey.Last15Minutes"
+                                              StartDateTime="@ParamData.Start"
+                                              EndDateTime="@ParamData.End"
+                                              @bind-DefaultQuickRange="@ParamData.QuickRangeKey"
                                               OnUpdate="OnDateTimeUpdateAsync"
                                               OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
                             <SButton OnClick=NavigateToDashboardConfiguration Class="ml-6" Small BorderRadiusClass="rounded-lg">
@@ -39,6 +41,15 @@
                             </SButton>
                         </MCol>
                     </MRow>
+                    @if (ErrorCount > 0)
+                    {
+                        <MRow Class="pa-3">
+                            <MCol Class="rounded-lg d-flex justify-space-between" Style="background-color:#FF5252">
+                                <div class="d-flex align-center white--text"><MIcon Class="px-4" Color="white text-#FF5252">info</MIcon> @T("Currently the application has {0} error logs",ErrorCount.ToString())</div>
+                                <MButton Depressed Color="white--text" Style="background-color:#FF5252;text-decoration:underline">查看详情</MButton>
+                            </MCol>
+                        </MRow>
+                    }
                     <ProjectCharts Class="mt-2" ConfigurationRecord="ConfigurationRecord" />
                 </MCol>
             </MRow>

@@ -14,47 +14,46 @@
                 <MDivider Vertical Class="mx-2" Style="align-self: auto; height: 14px;" />
                 <div>@FormatDateTime(EndDateTime)</div>
             </MButton>
-            <MChip Label Small Color="secondary">@(_offset.Hours > 0 ? $"+{_offset.Hours}" : _offset.Hours.ToString())</MChip>
-            </div>
-        </ActivatorContent>
-        <ChildContent>
-            <div class="date-time-offset-picker__content mb-4 d-flex" style="width: 580px">
-                <MDatePicker Value="@_internalStartDate" ValueChanged="InternalStartDateChanged" TValue="DateOnly"
+            <TimeZoneDisplay Offset="@_offset" />
+        </div>
+    </ActivatorContent>
+    <ChildContent>
+        <div class="date-time-offset-picker__content mb-4 d-flex" style="width: 580px">
+            <MDatePicker Value="@_internalStartDate" ValueChanged="InternalStartDateChanged" TValue="DateOnly"
                          NoTitle FullWidth Class="mr-1 ml-n2"
                          AllowedDates="val =>StartTimeLimit is null ? val <= _internalEndDate :StartTimeLimit(val,_internalEndDate)">
-                    <TimeSelector Value="@_internalStartTime" ValueChanged="InternalStartTimeChanged"></TimeSelector>
-                </MDatePicker>
-                <MDatePicker Value="@_internalEndDate" ValueChanged="InternalEndDateChanged" TValue="DateOnly"
+                <TimeSelector Value="@_internalStartTime" ValueChanged="InternalStartTimeChanged"></TimeSelector>
+            </MDatePicker>
+            <MDatePicker Value="@_internalEndDate" ValueChanged="InternalEndDateChanged" TValue="DateOnly"
                          NoTitle FullWidth Class="ml-1 mr-n2"
                          AllowedDates="val =>EndTimeLimit is null? val >= _internalStartDate : EndTimeLimit(val,_internalStartDate)">
-                    <TimeSelector Value="@_internalEndTime" ValueChanged="InternalEndTimeChanged"></TimeSelector>
-                </MDatePicker>
+                <TimeSelector Value="@_internalEndTime" ValueChanged="InternalEndTimeChanged"></TimeSelector>
+            </MDatePicker>
+        </div>
+        <div class="text-right mb-4">
+            <MAutocomplete @bind-Value="@_internalOffset"
+                           Items="_systemTimeZones"
+                           ItemText='item => item.DisplayName'
+                           ItemValue="item => item.BaseUtcOffset"
+                           TValue="TimeSpan"
+                           TItem="TimeZoneInfo"
+                           TItemValue="TimeSpan"
+                           Dense
+                           Outlined
+                           HideDetails="true"
+                           Class="d-inline-block"
+                           Style="width:316px"
+                           OnSelectedItemUpdate="OnInternalOffsetUpdated" />
+        </div>
+        <MDivider />
+        <div class="d-flex justify-space-between align-center pt-4">
+            <div>
+                @FormatDateTime(_internalStartDateTime) to @FormatDateTime(_internalEndDateTime)
             </div>
-            <div class="text-right mb-4">
-                <MSelect @bind-Value="@_internalOffset"
-                     Items="_systemTimeZones"
-                     ItemText='item => item.DisplayName'
-                     ItemValue="item => item.BaseUtcOffset"
-                     TValue="TimeSpan"
-                     TItem="TimeZoneInfo"
-                     TItemValue="TimeSpan"
-                     Dense
-                     Outlined
-                     HideDetails="true"
-                     Class="d-inline-block"
-                     Style="width:316px"                     
-                     OnSelectedItemUpdate="OnInternalOffsetUpdated">
-                </MSelect>
+            <div>
+                <MButton Color="primary" Outlined OnClick="CancelClick">Cancel</MButton>
+                <MButton Color="primary" OnClick="HandleOnConfirm">Confirm</MButton>
             </div>
-            <MDivider />
-            <div class="d-flex justify-space-between align-center pt-4">
-                <div>
-                    @FormatDateTime(_internalStartDateTime) to @FormatDateTime(_internalEndDateTime)
-                </div>
-                <div>
-                    <MButton Color="primary" Outlined OnClick="CancelClick">Cancel</MButton>
-                    <MButton Color="primary" OnClick="HandleOnConfirm">Confirm</MButton>
-                </div>
-            </div>
-        </ChildContent>
-    </MMenu>
+        </div>
+    </ChildContent>
+</MMenu>

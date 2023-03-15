@@ -12,7 +12,7 @@ public partial class ServiceAutoComplete
     public IPmClient PmClient { get; set; }
 
     [Parameter]
-    public string Value { get; set; }
+    public string Value { get; set; }    
 
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
@@ -26,11 +26,11 @@ public partial class ServiceAutoComplete
     [Parameter]
     public List<AppDetailModel> Services { get; set; }
 
-    public AppDetailModel? CurrentApp => Services.FirstOrDefault(app => app.Identity == Value);
+    public AppDetailModel? CurrentApp => Services?.FirstOrDefault(app => app.Identity == Value);
 
     protected override async Task OnInitializedAsync()
     {
-        if(Services is null)
+        if (Services is null)
         {
             _isLoading = true;
             if (Metric)
@@ -43,7 +43,7 @@ public partial class ServiceAutoComplete
                         Identity = item,
                         Name = item
                     }).ToList();
-                }            
+                }
             }
             else
             {

@@ -22,20 +22,19 @@ public partial class ErrorWarnChart
     protected override void OnInitialized()
     {
         _options.SetValue("legend", new { bottom = 0, left = "center" });
+        _options.SetValue("color", new string[] { "#4318FF", "#FF5252" });
         _options.SetValue("series[0]", new
         {
             type = "pie",
-            radius = "60%",
-            emphasis = new
-            {
-                itemStyle = new
-                {
-                    shadowBlur = 10,
-                    shadowOffsetX = 0,
-                    shadowColor = "rgba(0, 0, 0, 0.5)"
+            radius = "76%",            
+            itemStyle=new { 
+                normal=new {
+                    borderColor="#FFFFFF",
+                    borderWidth=2
                 }
             },
-            label = new { show = false }
+            label = new { show = false },
+            center=new string[] { "50%","43%"}
         });
         base.OnInitialized();
     }

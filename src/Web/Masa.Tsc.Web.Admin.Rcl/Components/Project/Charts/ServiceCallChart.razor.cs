@@ -20,6 +20,13 @@ public partial class ServiceCallChart
     private DateTime StartTime = DateTime.UtcNow.AddDays(-1);
     private DateTime EndTime = DateTime.UtcNow;
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _options.SetValue("series[0].smooth", true);
+        _options.SetValue("series[0].showSymbol", false);
+    }
+
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         if (query == null)
