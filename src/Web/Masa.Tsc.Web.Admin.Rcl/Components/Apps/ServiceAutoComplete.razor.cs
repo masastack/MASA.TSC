@@ -8,9 +8,6 @@ public partial class ServiceAutoComplete
     bool _firstValueChanged;
     bool _isLoading;
 
-    [Inject]
-    public IPmClient PmClient { get; set; }
-
     [Parameter]
     public string Value { get; set; }
 
@@ -30,26 +27,17 @@ public partial class ServiceAutoComplete
 
     protected override async Task OnInitializedAsync()
     {
-        if (Services is null)
+        if (Metric)
         {
             _isLoading = true;
-            if (Metric)
+            var data = await ApiCaller.MetricService.GetValues(new RequestMetricListDto { Type = MetricValueTypes.Service });
+            if (data != null && data.Any())
             {
-                var data = await ApiCaller.MetricService.GetValues(new RequestMetricListDto { Type = MetricValueTypes.Service });
-                if (data != null && data.Any())
+                Services = data.Select(item => new AppDetailModel
                 {
-                    Services = data.Select(item => new AppDetailModel
-                    {
-                        Identity = item,
-                        Name = item
-                    }).ToList();
-                }
-            }
-            else
-            {
-                var data = await PmClient.AppService.GetListAsync();
-                if (data != null && data.Any())
-                    Services = data;
+                    Identity = item,
+                    Name = item
+                }).ToList();
             }
             _isLoading = false;
         }
