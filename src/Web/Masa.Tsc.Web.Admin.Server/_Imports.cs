@@ -3,13 +3,14 @@
 
 global using Masa.BuildingBlocks.StackSdks.Config;
 global using Masa.Contrib.Caching.Distributed.StackExchangeRedis;
-global using Masa.Contrib.Service.Caller.Authentication.OpenIdConnect;
+global using Masa.Contrib.StackSdks.Caller;
 global using Masa.Contrib.StackSdks.Config;
 global using Masa.Contrib.StackSdks.Tsc;
 global using Masa.Stack.Components;
 global using Masa.Stack.Components.Extensions.OpenIdConnect;
 global using Masa.Tsc.ApiGateways.Caller;
 global using Masa.Tsc.Contracts.Admin.Converters;
+global using Masa.Tsc.Contracts.Admin.Infrastructure.Const;
 global using Masa.Tsc.Web.Admin.Rcl.Extentions;
 global using Masa.Utils.Configuration.Json;
 global using Microsoft.AspNetCore.Authentication;

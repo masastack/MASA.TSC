@@ -71,7 +71,7 @@ public class InstrumentQueryHandler
             Folder = instument.DirectoryId,
             Name = instument.Name,
             IsRoot = instument.IsRoot,
-            Layer = Enum.Parse<LayerTypes>(instument.Layer),
+            Layer = instument.Layer,
             Model = Enum.Parse<ModelTypes>(instument.Model),
             Type = instument.Lable,
             Order = instument.Sort
@@ -128,7 +128,9 @@ public class InstrumentQueryHandler
                 type = ModelTypes.ServiceInstance;
             else
                 type = ModelTypes.Endpoint;
-            var instrument = await _instrumentRepository.ToQueryable().Where(item => item.Model == type.ToString("G")).OrderBy(item => item.CreationTime).FirstOrDefaultAsync();
+            var instrument = await _instrumentRepository.ToQueryable().Where(item => item.Model == type.ToString("G") && item.Layer == query.Layer).OrderBy(item => item.CreationTime).FirstOrDefaultAsync();
+            if (instrument == null)
+                instrument = await _instrumentRepository.ToQueryable().Where(item => item.Model == type.ToString("G") && item.Layer == MetricConstants.DEFAULT_LAYER).OrderBy(item => item.CreationTime).FirstOrDefaultAsync();
             query.Result = new LinkResultDto { InstrumentId = instrument?.Id };
         }
         else

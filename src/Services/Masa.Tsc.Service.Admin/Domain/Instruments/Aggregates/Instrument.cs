@@ -33,9 +33,9 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
     {
         if (dashbord.Name != Name)
             Name = dashbord.Name;
-        Layer = dashbord.Layer.ToString();
+        Layer = dashbord.Layer;
         Model = dashbord.Model.ToString();
-        Lable = dashbord.Type.ToString();
+        Lable = dashbord.Type;
         Sort = dashbord.Order;
         DirectoryId = dashbord.Folder;
         IsRoot = dashbord.IsRoot;
@@ -49,8 +49,7 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
             return;
         }
 
-        if (Panels == null)
-            Panels = new();
+        Panels ??= new();
         var list = new List<Panel>();
         foreach (var item in data!)
         {

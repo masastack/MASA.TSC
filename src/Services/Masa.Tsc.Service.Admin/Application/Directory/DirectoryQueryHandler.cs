@@ -32,7 +32,7 @@ public class DirectoryQueryHandler
                         Id = instrument.Id,
                         Name = instrument.Name,
                         IsRoot = instrument.IsRoot,
-                        Layer = Enum.Parse<LayerTypes>(instrument.Layer),
+                        Layer = instrument.Layer,
                         Model = Enum.Parse<ModelTypes>(instrument.Model),
                         Type = instrument.Lable
                     })?.ToList()!

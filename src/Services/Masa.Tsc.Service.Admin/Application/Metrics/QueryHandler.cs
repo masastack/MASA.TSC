@@ -133,7 +133,7 @@ public class QueryHandler
 
         if (data.Status == ResultStatuses.Success)
         {
-            if (data.Data == null || data.Data == null || !data.Data.Any())
+            if (data.Data == null || !data.Data.Any())
                 return;
 
             query.Result = ConverToKeyValues(data.Data);
@@ -150,7 +150,7 @@ public class QueryHandler
         var index = 0;
         foreach (var name in query.Data.MetricNames)
         {
-            var metric = await AppendCondition(name, query.Data.Service, query.Data.Instance, query.Data.EndPoint);
+            var metric = await AppendCondition(name, query.Data.Layer!, query.Data.Service!, query.Data.Instance!, query.Data.EndPoint!);
             tasks[index] = _prometheusClient.QueryRangeAsync(new QueryRangeRequest
             {
                 End = query.Data.End.ToUnixTimestamp().ToString(),
@@ -171,7 +171,7 @@ public class QueryHandler
         var index = 0;
         foreach (var name in query.Data.Queries)
         {
-            var metric = await AppendCondition(name, query.Data.Service, query.Data.Instance, query.Data.EndPoint);
+            var metric = await AppendCondition(name, query.Data.Layer!, query.Data.Service!, query.Data.Instance!, query.Data.EndPoint!);
             tasks[index] = _prometheusClient.QueryAsync(new QueryRequest
             {
                 Time = query.Data.Time.ToUnixTimestamp().ToString(),
@@ -193,8 +193,10 @@ public class QueryHandler
             metric = $"group by (service_instance_id) (http_client_duration_bucket)";
         else if (query.Type == MetricValueTypes.Endpoint)
             metric = $"group by (http_target) (http_response_bucket)";
+        else if (query.Type == MetricValueTypes.Layer)
+            metric = $"group by (service_layer) (http_client_duration_bucket)";
 
-        metric = await AppendCondition(metric, query.Service, default!, default!);
+        metric = await AppendCondition(metric, query.Layer, query.Service, query.Instance, query.Endpint);
 
         var result = await _prometheusClient.QueryAsync(new QueryRequest
         {
@@ -205,8 +207,19 @@ public class QueryHandler
         {
             if (result.Data == null || result.Data.Result == null || !result.Data.Result.Any())
                 return;
-            query.Result = result.Data.Result.Select(item => ((QueryResultInstantVectorResponse)item)!.Metric!.Values.FirstOrDefault()?.ToString()).ToList()!;
+            query.Result = result.Data.Result.Select(item => ((QueryResultInstantVectorResponse)item)!.Metric!.Values.FirstOrDefault()?.ToString()).Where(s => !string.IsNullOrEmpty(s)).ToList()!;
             query.Result.Sort();
+        }
+
+        if (query.Type == MetricValueTypes.Layer)
+        {
+            if (query.Result == null || !query.Result.Any())
+                query.Result = new List<string> { MetricConstants.DEFAULT_LAYER };
+            else if (!query.Result.Contains(MetricConstants.DEFAULT_LAYER))
+            {
+                query.Result.Add(MetricConstants.DEFAULT_LAYER);
+                query.Result.Sort();
+            }
         }
     }
 
@@ -292,7 +305,7 @@ public class QueryHandler
         return data!;
     }
 
-    private async Task<string> AppendCondition(string str, string service, string instance, string endpoint)
+    private async Task<string> AppendCondition(string str, string layer, string service, string instance, string endpoint)
     {
         var metrics = await GetAllMetricsAsync();
         if (metrics == null || !metrics.Any())
@@ -305,7 +318,8 @@ public class QueryHandler
             text.Append($"service_instance_id=\"{instance}\",");
         if (!string.IsNullOrEmpty(endpoint))
             text.Append($"endpoint=\"{endpoint}\",");
-
+        if (!string.IsNullOrEmpty(layer))
+            text.Append($"service_layer=\"{layer}\",");
         if (text.Length == 0)
             return str;
 
