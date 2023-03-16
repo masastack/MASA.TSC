@@ -31,6 +31,10 @@ public static class ObjectExtensions
 
         return dictionary;
     }
+    public static T Random<T>(this IEnumerable<T> source)
+    {
+        return source.ToArray()[System.Random.Shared.Next(source.Count())];
+    }
 
     private static bool IsOfType<T>(object value)
     {

@@ -448,7 +448,8 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
             EChartType.Json["series"] = new JsonArray(data.Select(item => new JsonObject
             {
                 ["type"] = ChartType.ToString().ToLower(),
-                ["name"] = item.Key,
+                ["name"] = item.Key.Name,
+                ["color"] = item.Key.Color,
                 ["data"] = new JsonArray(item.Value.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0], timeZoneInfo), value[1].ToString())).ToArray())
             }).ToArray());
         }
@@ -457,8 +458,9 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
             var data = GetMatrixRangeData();
             EChartType.Json["series"] = new JsonArray(data.Select(item => new JsonObject
             {
-                ["name"] = item.Key,
                 ["type"] = "line",
+                ["name"] = item.Key.Name,
+                ["color"] = item.Key.Color,
                 ["stack"] = "Total",
                 ["areaStyle"] = new JsonObject(),
                 ["emphasis"] = new JsonObject()
@@ -471,10 +473,12 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         else if (ChartType is ChartTypes.Pie)
         {
             var data = GetInstantVectorData();
-            EChartType.Json["series"]!.AsArray().First()!["data"] = new JsonArray(data.Select(item => new JsonObject
+            var serie = EChartType.Json["series"]!.AsArray().First()!;
+            serie["color"] = new JsonArray(data.Select(item => (JsonNode)item.Key.Color).ToArray());
+            serie["data"] = new JsonArray(data.Select(item => new JsonObject
             {
-                ["name"] = string.Join("-", item.Metric!.Values),
-                ["value"] = item.Value![1].ToString()
+                ["name"] = item.Key.Name,
+                ["value"] = item.Value.Value![1].ToString()
             }).ToArray());
         }
         else if (ChartType is ChartTypes.Gauge)
@@ -482,8 +486,9 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
             var data = GetInstantVectorData();
             EChartType.Json["series"]!.AsArray().First()!["data"] = new JsonArray(data.Take(1).Select(item => new JsonObject
             {
-                ["name"] = string.Join("-", item.Metric!.Values),
-                ["value"] = item.Value![1].ToString(),
+                ["name"] = item.Key.Name,
+                ["color"] = item.Key.Color,
+                ["value"] = item.Value.Value![1].ToString(),
                 ["title"] = new JsonObject()
                 {
                     ["offsetCenter"] = new JsonArray($"{GetPosition(data.IndexOf(item) + 1)}%", "80%")
@@ -514,9 +519,9 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         }
     }
 
-    List<KeyValuePair<string, QueryResultMatrixRangeResponse>> GetMatrixRangeData()
+    List<KeyValuePair<ChartSeriesOPtion, QueryResultMatrixRangeResponse>> GetMatrixRangeData()
     {
-        List<KeyValuePair<string, QueryResultMatrixRangeResponse>> data = new();
+        List<KeyValuePair<ChartSeriesOPtion, QueryResultMatrixRangeResponse>> data = new();
 
         if (_chartData is not null)
         {
@@ -538,7 +543,11 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                         {
                             metricName = Metrics[index].DisplayName ?? string.Join("-", matrix.Metric!.Values);
                         }
-                        data.Add(new(metricName, matrix));
+                        data.Add(new(new()
+                        {
+                            Name = metricName,
+                            Color = Metrics[index].Color,
+                        }, matrix));
                     }
                 }
                 index++;
@@ -548,21 +557,49 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         return data;
     }
 
-    List<QueryResultInstantVectorResponse> GetInstantVectorData()
+    List<KeyValuePair<ChartSeriesOPtion, QueryResultInstantVectorResponse>> GetInstantVectorData()
     {
-        List<QueryResultInstantVectorResponse> data = new();
+        List<KeyValuePair<ChartSeriesOPtion, QueryResultInstantVectorResponse>> data = new();
 
         if (_chartData is not null)
         {
+            var index = 0;
+            var defaultColorIndex = 0;
             foreach (var item in _chartData)
             {
                 if (item is not null)
                 {
-                    foreach (var result in item.Result!)
+                    var matrixs = item.Result?.Select(item => item as QueryResultInstantVectorResponse)?.Where(item => item is not null)?.ToList() ?? new();
+                    var multiple = matrixs.Count > 1;
+                    foreach (var matrix in matrixs)
                     {
-                        if (result is QueryResultInstantVectorResponse matrix) data.Add(matrix);
+                        var metricName = "";
+                        if (multiple)
+                        {
+                            metricName = string.Join("-", matrix.Metric!.Values);
+                        }
+                        else
+                        {
+                            metricName = Metrics[index].DisplayName ?? string.Join("-", matrix.Metric!.Values);
+                        }
+                        var color = Metrics[index].Color;
+                        if (string.IsNullOrEmpty(color))
+                        {
+                            color = _defaultColors[defaultColorIndex];
+                            defaultColorIndex++;
+                            if (defaultColorIndex == _defaultColors.Count())
+                            {
+                                defaultColorIndex = 0;
+                            }
+                        }
+                        data.Add(new(new()
+                        {
+                            Name = metricName,
+                            Color = color,
+                        }, matrix));
                     }
                 }
+                index++;
             }
         }
 
@@ -579,7 +616,12 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
             {
                 if (item is not null)
                 {
-                    data.Add(item.Result!.Select(item => (QueryResultInstantVectorResponse)item).ToList());
+                    var matrixs = new List<QueryResultInstantVectorResponse>();
+                    foreach (var result in item.Result!)
+                    {
+                        if (result is QueryResultInstantVectorResponse matrix) matrixs.Add(matrix);
+                    }
+                    data.Add(matrixs);
                 }
             }
         }
@@ -587,6 +629,8 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         return data;
     }
 
+
+    string[] _defaultColors = new string[] { "#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc" };
     void LoadChartOption()
     {
         if (IsLoadOption is false) return;
@@ -651,6 +695,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         EChartType.SetValue("tooltip.trigger", Tooltip.Trigger);
         EChartType.SetValue("tooltip.confine", true);
 
+        EChartType.SetValue("color", _defaultColors);
         EChartType.SetValue("grid", new
         {
             x = 60,

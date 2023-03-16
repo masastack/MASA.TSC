@@ -103,7 +103,13 @@ public partial class ChartPanelConfiguration : TscComponentBase
     void MetricNameChanged(PanelMetricDto metric, string metricName)
     {
         metric.DisplayName = metricName;
-        Value.ReloadChartData();
+        if (string.IsNullOrEmpty(metric.Expression) is false) Value.ReloadChartData();
+    }
+
+    void MetricColorChanged(PanelMetricDto metric, string metricColor)
+    {
+        metric.Color = metricColor;
+        if(string.IsNullOrEmpty(metric.Expression) is false) Value.ReloadChartData();
     }
 
     void ListTypeChanged(StringNumber listType)
