@@ -64,7 +64,7 @@
                                             </MRow>
                                         </MCardText>
                                         <MCardActions Class="d-flex justify-space-between">
-                                            <SColorGroup Value="@Value.Metrics[0].Color" ValueChanged="value => MetricColorChanged(Value.Metrics[0],value)" Colors='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
+                                            <ColorGroup Value="@Value.Metrics[0].Color" ValueChanged="value => MetricColorChanged(Value.Metrics[0],value)" />
                                         </MCardActions>
                                     </MCard>
                                 </MCol>
@@ -95,7 +95,7 @@
                                                 </MRow>
                                             </MCardText>
                                             <MCardActions Class="d-flex justify-space-between">
-                                                <SColorGroup Value="@item.Color" ValueChanged="value => MetricColorChanged(item,value)" Colors='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
+                                                <ColorGroup Value="@item.Color" ValueChanged="value => MetricColorChanged(item,value)"/>
                                                 <MIcon OnClick="() => Remove(item)" Color="red">mdi-delete</MIcon>
                                             </MCardActions>
                                         </MCard>

@@ -1,0 +1,12 @@
+﻿<div class="d-flex full-width">
+    <MLabel Class="emphasis2--text h6" Style="@(string.IsNullOrEmpty(Title)?"display:none":"")">@Title</MLabel>
+    <MSpacer />
+    <MTooltip Top>
+        <ActivatorContent>
+            <MIcon @attributes="@context.Attrs" Style="@(string.IsNullOrEmpty(Description)?"display:none":"")">mdi-information-outline</MIcon>
+        </ActivatorContent>
+        <ChildContent>
+            <span>@Description</span>
+        </ChildContent>
+    </MTooltip>
+</div>

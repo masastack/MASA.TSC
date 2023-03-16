@@ -1,0 +1,16 @@
+﻿@namespace Masa.Stack.Components
+
+<div class="m-color-group d-flex mx-n1 @Class">
+    @foreach (var color in Colors)
+    {
+        <div>
+            <MCard Elevation="@Elevation"
+                   Class="mx-1 rounded-pill"
+                   Style="@(Value == color ? $"background-color: {color} !important;" : $"border: 2px solid {color}; background-color: transparent !important;")"
+                   OnClick="()=>OnClickHandler(color)"
+                   Width=Size
+                   Height=Size>
+            </MCard>
+        </div>
+    }
+</div>

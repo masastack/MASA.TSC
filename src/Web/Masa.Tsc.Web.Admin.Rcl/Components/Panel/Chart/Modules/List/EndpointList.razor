@@ -1,16 +1,8 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 
 <MCard Height="410" Class="d-flex flex-column">
-    <MCardTitle Class="d-flex justify-space-between">
-        <MLabel Class="emphasis2--text h6" Style="@(string.IsNullOrEmpty(Value.Title)?"display:none":"")">@Value.Title</MLabel>
-        <MTooltip Top>
-            <ActivatorContent>
-                <MIcon @attributes="@context.Attrs" Style="@(string.IsNullOrEmpty(Value.Description)?"display:none":"")">mdi-information-outline</MIcon>
-            </ActivatorContent>
-            <ChildContent>
-                <span>@Value.Description</span>
-            </ChildContent>
-        </MTooltip>
+    <MCardTitle>
+        <PanelTooltip Title="@Value.Title" Description="@Value.Description" />
     </MCardTitle>
     <MCardText Class="flex-grow-1" Style="overflow-y: auto;">
         <MSimpleTable>
