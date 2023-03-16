@@ -9,11 +9,11 @@
         <MMenu OpenOnHover Top OffsetY ContentClass="m-honeycomb-cell__tip">
             <ActivatorContent>
                 <div class="m-honeycomb-cell__border-parent">
-                <li @attributes="@context.Attrs" class="@SplicingCellClass()" @onclick="()=>OnClickHandler(item)" style="@(OnItemClick.HasDelegate?"cursor:pointer;":"")">
+                <li @attributes="@context.Attrs" class="@SplicingCellClass()" @onclick="()=>OnClickHandler(item)" style="@(OnItemClick.HasDelegate?"cursor:pointer;":"")z-index:1 !important;">
                         @if (CellBack != null)
                         {
                             //style="@CellBackStyle.Invoke(item)" has border
-                        <div class="m-honeycomb-cell__back" style="background-color:@CellBorderColor(item)">
+                        <div class="m-honeycomb-cell__back" style="background-color:@CellBorderColor(item);z-index:1 !important;">
                                 @CellBack.Invoke(item)
                         </div>
                         }
