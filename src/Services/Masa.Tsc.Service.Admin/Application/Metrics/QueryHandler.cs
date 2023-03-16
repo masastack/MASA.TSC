@@ -207,7 +207,7 @@ public class QueryHandler
         {
             if (result.Data == null || result.Data.Result == null || !result.Data.Result.Any())
                 return;
-            query.Result = result.Data.Result.Select(item => ((QueryResultInstantVectorResponse)item)!.Metric!.Values.FirstOrDefault()?.ToString()).ToList()!;
+            query.Result = result.Data.Result.Select(item => ((QueryResultInstantVectorResponse)item)!.Metric!.Values.FirstOrDefault()?.ToString()).Where(s => !string.IsNullOrEmpty(s)).ToList()!;
             query.Result.Sort();
         }
 

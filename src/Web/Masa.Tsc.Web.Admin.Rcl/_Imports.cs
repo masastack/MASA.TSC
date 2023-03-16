@@ -13,7 +13,7 @@ global using Masa.BuildingBlocks.StackSdks.Pm.Model;
 global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Model;
 global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Model.Aggregate;
 global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Trace;
-global using Masa.Contrib.Service.Caller.Authentication.OpenIdConnect;
+global using Masa.Contrib.StackSdks.Caller;
 global using Masa.Contrib.StackSdks.Config;
 global using Masa.Stack.Components;
 global using Masa.Stack.Components.Configs;

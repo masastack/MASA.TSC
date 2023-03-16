@@ -39,6 +39,7 @@ builder.Services.AddObservable(builder.Logging, new MasaObservableOptions
     ServiceNameSpace = builder.Environment.EnvironmentName,
     ServiceVersion = masaStackConfig.Version,
     ServiceName = masaStackConfig.GetWebId(MasaStackConstant.TSC),
+    Layer = MetricConstants.MASASTACK_LAYER,
     ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
 }, masaStackConfig.OtlpUrl, true);
 
@@ -66,7 +67,7 @@ var redisOption = new RedisConfigurationOptions
 };
 builder.AddMasaStackComponentsForServer();
 builder.Services.AddTscApiCaller(tscUrl).AddDccClient(redisOption);
-builder.Services.AddRcl();
+builder.Services.AddRcl().AddScoped<TokenProvider>();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 var app = builder.Build();
@@ -74,6 +75,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
 }
 else
 {

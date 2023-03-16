@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Contrib.StackSdks.Caller;
+
 namespace Masa.Tsc.ApiGateways.Caller;
 
 public static class ServiceExtensions
@@ -29,7 +31,7 @@ public static class ServiceExtensions
                          if (token != null && !string.IsNullOrEmpty(token.AccessToken))
                              http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
                      };
-                 }).UseAuthentication();
+                 });
             });
 
             services.AddScoped(serviceProvider =>

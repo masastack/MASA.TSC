@@ -8,7 +8,6 @@ global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Model;
 global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Model.Aggregate;
 global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Trace;
 global using Masa.Contrib.Service.Caller;
-global using Masa.Contrib.Service.Caller.Authentication.OpenIdConnect;
 global using Masa.Tsc.ApiGateways.Caller.Services;
 global using Masa.Tsc.Contracts.Admin;
 global using Masa.Tsc.Contracts.Admin.Converters;
