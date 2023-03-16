@@ -416,8 +416,11 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
 
     public void ReloadChartData()
     {
-        IsLoadChartData = true;
-        Key = "ReloadChartData" + Guid.NewGuid();
+        if(ChartType is not ChartTypes.Table)
+        {
+            IsLoadChartData = true;
+            Key = "ReloadChartData" + Guid.NewGuid();
+        }
     }
 
     public string GetChartKey() => Key;
@@ -484,10 +487,11 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         else if (ChartType is ChartTypes.Gauge)
         {
             var data = GetInstantVectorData();
-            EChartType.Json["series"]!.AsArray().First()!["data"] = new JsonArray(data.Take(1).Select(item => new JsonObject
+            var serie = EChartType.Json["series"]!.AsArray().First()!;
+            serie["color"] = new JsonArray(data.Select(item => (JsonNode)item.Key.Color).ToArray());
+            serie["data"] = new JsonArray(data.Select(item => new JsonObject
             {
                 ["name"] = item.Key.Name,
-                ["color"] = item.Key.Color,
                 ["value"] = item.Value.Value![1].ToString(),
                 ["title"] = new JsonObject()
                 {
@@ -629,8 +633,8 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         return data;
     }
 
-
     string[] _defaultColors = new string[] { "#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc" };
+
     void LoadChartOption()
     {
         if (IsLoadOption is false) return;

@@ -24,14 +24,18 @@
                         @foreach (var field in Value.Metrics)
                         {
                             <th class="text-left" style="@(string.IsNullOrEmpty(field.Color)?"":$"color:{field.Color} !important;")">
-                                @(string.IsNullOrWhiteSpace(field.Unit) ? @field.DisplayName : $"{@field.DisplayName}({field.Unit})")
+                                @(string.IsNullOrWhiteSpace(field.Unit) ? field.DisplayName : $"{field.DisplayName}({field.Unit})")
                             </th>
                         }
                     </tr>
                 </thead>
             }
             <tbody>
-                @foreach (var option in Value.GetTableOption().Skip((_page - 1) * _pageSize).Take(_pageSize))
+                @{
+                    var options = Value.GetTableOption();
+                    if (Value.EnablePaginaton) options = options.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
+                }
+                @foreach (var option in options)
                 {
                     <tr>
                         @for (int i = 0; i < option.Count; i++)
