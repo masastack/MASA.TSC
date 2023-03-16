@@ -16,7 +16,6 @@ public partial class Team
     private ProjectOverviewDto _projectOverviewDto = default!;
     private TeamDialogModel teamDialog = new();
 
-
     private void HandleOnItemClick(ProjectOverviewDto item)
     {
         teamDialog.ProjectId = item.Identity;
@@ -29,6 +28,19 @@ public partial class Team
         _visible = true;
     }
 
+    private void OnProjectServiceClick(ProjectOverviewDto item, string serviceId)
+    {
+        teamDialog.ProjectId = item.Identity;
+        teamDialog.TeamId = item.TeamId;
+        teamDialog.TeamProjectCount = _projects.Count(p => p.TeamId == item.TeamId);
+        teamDialog.TeamServiceCount = _projects.Where(p => p.TeamId == item.TeamId).Sum(p => p.Apps.Count);
+        teamDialog.Start = ToDateTimeOffset(_teamSearchModel.Start);
+        teamDialog.End = ToDateTimeOffset(_teamSearchModel.End);
+        teamDialog.ServiceId = serviceId;
+        _projectOverviewDto = item;
+        _visible = true;
+    }
+
     private string CellBackBackgroundStyle(ProjectOverviewDto overviewDto)
     {
         return overviewDto.Status switch
@@ -36,6 +48,17 @@ public partial class Team
             MonitorStatuses.Normal => "background: #E6FAF5;",
             MonitorStatuses.Warn => "background: #FFF7E8;",
             MonitorStatuses.Error => "background: #FFECE8;",
+            _ => ""
+        };
+    }
+
+    private string GetHexTitleClass(MonitorStatuses status)
+    {
+        return status switch
+        {
+            MonitorStatuses.Normal => "green--text",
+            MonitorStatuses.Warn => "warning--text",
+            MonitorStatuses.Error => "error--text",
             _ => ""
         };
     }

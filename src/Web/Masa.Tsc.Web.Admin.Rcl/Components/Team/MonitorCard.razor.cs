@@ -42,28 +42,28 @@ public partial class MonitorCard
             {
                 new AppMonitorViewDto
                 {
-                    Text=T("MONITORING"),
+                    Text="MONITORING",
                     Color="#7C4DFF",
                     Icon="monitor",
                     Value=default
                 },
                 new AppMonitorViewDto
                 {
-                    Text=T("WARNS"),
+                    Text="WARNS",
                     Color="#FF7D00",
                     Icon="warning",
                     Value=MonitorStatuses.Warn
                 },
                 new AppMonitorViewDto
                 {
-                    Text=T("ERRORS"),
+                    Text="ERRORS",
                     Color="#FF5252",
                     Icon="error",
                     Value=MonitorStatuses.Error
                 },
                 new AppMonitorViewDto
                 {
-                    Text=T("NORMAL"),
+                    Text="NORMAL",
                     Color="#69F0AE",
                     Icon="default",
                     IsShowApp=false,

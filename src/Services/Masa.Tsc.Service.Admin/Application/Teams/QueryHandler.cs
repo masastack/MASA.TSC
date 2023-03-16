@@ -227,7 +227,8 @@ public class QueryHandler
                 LabelName = project.LabelName,
                 LabelCode = project.LabelCode,
                 Name = project.Name,
-                TeamId = project.TeamId
+                TeamId = project.TeamId,
+                Status = MonitorStatuses.Normal
             };
 
             var projectAppIds = apps.Where(a => a.ProjectId == project.Id).Select(app => app.Identity).ToList();
@@ -240,7 +241,8 @@ public class QueryHandler
                     Identity = a.Identity,
                     Name = a.Name,
                     ServiceType = a.ServiceType,
-                    AppType = a.Type
+                    AppType = a.Type,
+                    Status = MonitorStatuses.Normal
                 }).ToList();
 
             result.Add(model);

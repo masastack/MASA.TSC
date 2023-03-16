@@ -4,6 +4,16 @@
     box-sizing: border-box;
 }
 
+.m-honeycomb-cell__border-parent {
+    filter: url('#goo');
+    /*overflow: hidden;
+    position: fixed;
+    right: -50px;*/
+    margin-top: 2vw;
+    z-index: -2
+}
+
+
 .m-honeycomb {
     display: flex;
     flex-wrap: wrap;

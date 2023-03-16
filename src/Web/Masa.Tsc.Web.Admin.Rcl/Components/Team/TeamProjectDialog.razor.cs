@@ -31,6 +31,7 @@ public partial class TeamProjectDialog
 
     async Task OnAppChanged(string appid)
     {
+        ParamData.ServiceId = appid;
         ConfigurationRecord.Service = appid;
         ErrorCount = await GetErroCountAsync(appid);
     }
@@ -40,7 +41,7 @@ public partial class TeamProjectDialog
         if (!Visible || string.IsNullOrEmpty(ParamData.ProjectId) || ParamData.TeamId == Guid.Empty)
             return;
 
-        var key = $"{ParamData.TeamId}_{ParamData.ProjectId}_{ParamData.Start}_{ParamData.End}";
+        var key = $"{ParamData.TeamId}_{ParamData.ProjectId}_{ParamData.Start}_{ParamData.End}_{ParamData.ServiceId}";
 
         if (lastKey != key)
         {
@@ -55,7 +56,7 @@ public partial class TeamProjectDialog
             }).ToList();
             Team.ProjectTotal = ParamData.TeamProjectCount;
             Team.AppTotal = ParamData.TeamServiceCount;
-            ConfigurationRecord.Service = Apps.FirstOrDefault()?.Identity;
+            ConfigurationRecord.Service = ParamData.ServiceId;
             ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
         }
     }
