@@ -29,7 +29,7 @@ public static class ServiceExtensions
                          if (token != null && !string.IsNullOrEmpty(token.AccessToken))
                              http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
                      };
-                 }).UseAuthentication();
+                 });
             });
 
             services.AddScoped(serviceProvider =>

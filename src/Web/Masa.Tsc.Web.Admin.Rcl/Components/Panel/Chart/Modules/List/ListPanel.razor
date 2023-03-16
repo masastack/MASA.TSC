@@ -78,7 +78,8 @@ else
 
     async Task<string> GetJumpId()
     {
-        var data = await base.ApiCaller.InstrumentService.GetLinkAsync(GetMetricValueType());
+        //add layer
+        var data = await base.ApiCaller.InstrumentService.GetLinkAsync(MetricConstants.DEFAULT_LAYER,GetMetricValueType());
         return data.InstrumentId?.ToString() ?? "";
     }
 

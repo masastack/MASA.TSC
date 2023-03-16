@@ -73,7 +73,8 @@ public partial class TeamProjectDialog
 
     async Task NavigateToDashboardConfiguration()
     {
-        var data = await base.ApiCaller.InstrumentService.GetLinkAsync(MetricValueTypes.Service);
+        //add layer
+        var data = await base.ApiCaller.InstrumentService.GetLinkAsync(MetricConstants.DEFAULT_LAYER, MetricValueTypes.Service);
         if (data?.InstrumentId is not null)
         {
             NavigationManager.NavigateToDashboardConfiguration(data.InstrumentId.ToString()!, ConfigurationRecord.Service);

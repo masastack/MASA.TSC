@@ -20,7 +20,7 @@ public class InstrumentCommandHandler
         var model = new Instrument
         {
             Name = command.Data.Name,
-            Layer = command.Data.Layer.ToString(),
+            Layer = command.Data.Layer,
             IsRoot = command.Data.IsRoot,
             DirectoryId = command.Data.Folder,
             Model = command.Data.Model.ToString(),

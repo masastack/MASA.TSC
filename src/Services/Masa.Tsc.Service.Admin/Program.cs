@@ -16,7 +16,9 @@ builder.Services.AddElasticClientLogAndTrace(elasearchUrls, logIndexName, traceI
     {
         ServiceNameSpace = builder.Environment.EnvironmentName,
         ServiceVersion = masaStackConfig.Version,
-        ServiceName = masaStackConfig.GetServerId(MasaStackConstant.TSC)
+        ServiceName = masaStackConfig.GetServerId(MasaStackConstant.TSC),
+        Layer = MetricConstants.MASASTACK_LAYER,
+        ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
     }, masaStackConfig.OtlpUrl, false)
     .AddPrometheusClient(prometheusUrl, 15)
     .AddTopology(elasearchUrls);
@@ -72,14 +74,7 @@ builder.Services.AddMasaIdentity(options =>
     options.Mapping(nameof(MasaUser.CurrentTeamId), IdentityClaimConsts.CURRENT_TEAM);
     options.Mapping(nameof(MasaUser.StaffId), IdentityClaimConsts.STAFF);
     options.Mapping(nameof(MasaUser.Account), IdentityClaimConsts.ACCOUNT);
-})
-    .AddScoped(service =>
-    {
-        var content = service.GetRequiredService<IHttpContextAccessor>();
-        if (content.HttpContext != null && AuthenticationHeaderValue.TryParse(content.HttpContext.Request.Headers.Authorization.ToString(), out var auth) && auth != null)
-            return new TokenProvider { AccessToken = auth?.Parameter };
-        return default!;
-    })
+}).AddAuthenticationCore()
     .AddAuthClient(masaStackConfig.GetAuthServiceDomain(), redisOption)
     .AddPmClient(masaStackConfig.GetPmServiceDomain())
     .AddMultilevelCache(masaStackConfig.GetServerId(MasaStackConstant.TSC),
@@ -136,7 +131,7 @@ var app = builder.Services
     .AddTopologyRepository()
     .AddServices(builder);
 
-app.UseAddStackMiddleware();
+//app.UseAddStackMiddleware();
 await builder.Services.MigrateAsync();
 app.UseMasaExceptionHandler(opt =>
 {

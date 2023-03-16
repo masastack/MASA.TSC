@@ -8,5 +8,6 @@ public enum MetricValueTypes
     Service = 1,
     Instance,
     Endpoint,
-    TopList
+    TopList,
+    Layer
 }

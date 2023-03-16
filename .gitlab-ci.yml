@@ -27,8 +27,8 @@ variables:
   ServiceDomain_staging: tsc-service-staging.masastack.com
 
   NAMESPACE_PRD: loncloud
-  WebDomain_Prd: tsc.masastack.com
-  ServiceDomain_Prd: tsc-service.masastack.com
+  WebDomain_PRD: tsc.masastack.com
+  ServiceDomain_PRD: tsc-service.masastack.com
 
 docker-dev:
   stage: docker-dev
