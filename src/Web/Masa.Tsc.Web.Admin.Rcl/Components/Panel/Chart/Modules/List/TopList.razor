@@ -14,6 +14,7 @@
     </MCardTitle>
     @{
         var options = Value.GetTopListOption();
+        var multiple = options.Count > 1;
     }
     @if (options.Any() is false)
     {
@@ -33,10 +34,10 @@
                         </MListItemAvatar>
                         <MListItemContent>
                             <MListItemTitle Class="d-flex justify-space-between">
-                                <MLabel Class="body2 regular2--text d-inline-block text-truncate">@(item.Text)</MLabel>
+                                <MLabel Class="body2 regular2--text d-inline-block text-truncate">@(multiple ? item.Text : (Value.Metrics[0].DisplayName ?? item.Text))</MLabel>
                             </MListItemTitle>
                             <MListItemSubtitle>
-                                <MProgressLinear Height="8" Color="@GetTextColorStyle(options.IndexOf(item))" Rounded Value="@item.Value"></MProgressLinear>
+                                    <MProgressLinear Height="8" Color="@(multiple?GetTextColorStyle(options.IndexOf(item)):(Value.Metrics[0].Color ?? GetTextColorStyle(options.IndexOf(item))))" Rounded Value="@item.Value"></MProgressLinear>
                             </MListItemSubtitle>
                         </MListItemContent>
                     </MListItem>

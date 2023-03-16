@@ -56,10 +56,16 @@
                                         <MCardText>
                                             <MRow>
                                                 <MCol Md="12">
+                                                    <STextField BackgroundColor="white" DebounceInterval="500" TValue="string" Value="Value.Metrics[0].DisplayName" ValueChanged="value => MetricNameChanged(Value.Metrics[0],value) " Label="@T("Metric name")" />
+                                                </MCol>
+                                                <MCol Md="12">
                                                     <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value) " Label="@T("Metric expression")" />
                                                 </MCol>
                                             </MRow>
                                         </MCardText>
+                                        <MCardActions Class="d-flex justify-space-between">
+                                            <SColorGroup Value="@Value.Metrics[0].Color" ValueChanged="value => MetricColorChanged(Value.Metrics[0],value)" Colors='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
+                                        </MCardActions>
                                     </MCard>
                                 </MCol>
                             }
