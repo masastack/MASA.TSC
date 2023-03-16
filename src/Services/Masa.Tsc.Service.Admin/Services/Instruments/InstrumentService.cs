@@ -60,9 +60,9 @@ public class InstrumentService : ServiceBase
         await eventBus.PublishAsync(command);
     }
 
-    public async Task<LinkResultDto> GetLinkAsync([FromServices] IEventBus eventBus,string layer, MetricValueTypes type)
+    public async Task<LinkResultDto> GetLinkAsync([FromServices] IEventBus eventBus,string? layer, MetricValueTypes type)
     {
-        var query = new LinkTypeQuery(layer,type);
+        var query = new LinkTypeQuery(layer!,type);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
