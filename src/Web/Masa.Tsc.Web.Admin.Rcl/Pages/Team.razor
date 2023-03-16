@@ -19,7 +19,7 @@
         {
             <span @onclick="@(()=>OnProjectServiceClick(default,default))">asdasdasdasdasdsadsd</span>
             <MCol Style="min-width:220px">
-                <HoneyCombGrid Data="_viewProjects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor" TItem="ProjectOverviewDto">
+                <HoneyCombGridItem Data="_viewProjects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor" TItem="ProjectOverviewDto">
                     <CellBack>
                         <div class="d-flex flex-column align-center mx-2 pt-7">
                             <span class="d-inline-block text-truncate masa btn body @GetHexTitleClass(context.Status)" style="width:120px;" @onclick="@(()=>OnProjectServiceClick(default,default))">@context.Name</span>
@@ -64,7 +64,7 @@
                             </div>
                         </div>
                     </CellHoverTip>
-                </HoneyCombGrid>
+                </HoneyCombGridItem>
             </MCol>
             <MCol Style="max-width:266px">
                 <MonitorCard Class="ml-8" Data=_appMonitorDto Value="@_projectStatus" ValueChanged="ProjectStatusChangedAsync" />
