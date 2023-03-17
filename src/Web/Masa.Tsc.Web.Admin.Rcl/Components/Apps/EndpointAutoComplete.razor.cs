@@ -45,7 +45,7 @@ public partial class EndpointAutoComplete
             Endpoints = data ?? new();
             if (Endpoints.Any())
             {
-                if(string.IsNullOrEmpty(Value) || Endpoints.Contains(Value) is false)
+                if (string.IsNullOrEmpty(Value) || Endpoints.Contains(Value) is false)
                 {
                     await ValueChanged.InvokeAsync(Endpoints.First());
                 }

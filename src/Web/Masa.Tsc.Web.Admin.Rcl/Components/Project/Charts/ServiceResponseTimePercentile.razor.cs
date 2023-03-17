@@ -83,7 +83,7 @@ public partial class ServiceResponseTimePercentile
         _options.SetValue("legend.data", legend);
         var format = StartTime.Format(EndTime);
         _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value, format)));
-        _options.SetValue("series", dddd.Select(item => new { name = item.Key, type = "line", showSymbol=false, smooth=true, data = item.Value }));
+        _options.SetValue("series", dddd.Select(item => new { name = item.Key, type = "line", showSymbol = false, smooth = true, data = item.Value }));
     }
 
     protected override bool IsSubscribeTimeZoneChange => true;

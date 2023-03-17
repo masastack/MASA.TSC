@@ -30,7 +30,7 @@ public partial class ServiceCallChart
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         if (query == null)
-            return;       
+            return;
         if (query.Start.HasValue)
             StartTime = query.Start.Value;
         if (query.End.HasValue)

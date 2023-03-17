@@ -12,7 +12,7 @@ public partial class ServiceAutoComplete
     public IPmClient PmClient { get; set; }
 
     [Parameter]
-    public string Value { get; set; }    
+    public string Value { get; set; }
 
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }

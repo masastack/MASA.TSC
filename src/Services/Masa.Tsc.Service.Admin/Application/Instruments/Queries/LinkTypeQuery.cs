@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments.Queries;
 
-public record LinkTypeQuery(string Layer,MetricValueTypes Type) : Query<LinkResultDto>
+public record LinkTypeQuery(string Layer, MetricValueTypes Type) : Query<LinkResultDto>
 {
     public override LinkResultDto Result { get; set; }
 }

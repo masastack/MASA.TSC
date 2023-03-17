@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Metrics.Queries;
 
-public record ValuesQuery(string Layer,string Service,string Instance,string Endpint,MetricValueTypes Type) : Query<List<string>>
+public record ValuesQuery(string Layer, string Service, string Instance, string Endpint, MetricValueTypes Type) : Query<List<string>>
 {
     public override List<string> Result { get; set; }
 }

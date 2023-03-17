@@ -4,7 +4,6 @@
 global using FluentValidation;
 global using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Enum;
 global using Masa.BuildingBlocks.StackSdks.Pm.Enum;
-global using Masa.Contrib.Configuration.ConfigurationApi.Dcc.Options;
 global using Masa.Tsc.Contracts.Admin.Dashboards;
 global using Masa.Tsc.Contracts.Admin.Enums;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Const;

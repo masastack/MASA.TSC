@@ -26,15 +26,17 @@ public partial class ErrorWarnChart
         _options.SetValue("series[0]", new
         {
             type = "pie",
-            radius = "76%",            
-            itemStyle=new { 
-                normal=new {
-                    borderColor="#FFFFFF",
-                    borderWidth=2
+            radius = "76%",
+            itemStyle = new
+            {
+                normal = new
+                {
+                    borderColor = "#FFFFFF",
+                    borderWidth = 2
                 }
             },
             label = new { show = false },
-            center=new string[] { "50%","43%"}
+            center = new string[] { "50%", "43%" }
         });
         base.OnInitialized();
     }
