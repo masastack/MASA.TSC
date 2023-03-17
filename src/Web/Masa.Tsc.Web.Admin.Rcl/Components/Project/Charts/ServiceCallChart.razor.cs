@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using System.Drawing;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class ServiceCallChart
@@ -25,12 +27,52 @@ public partial class ServiceCallChart
         base.OnInitialized();
         _options.SetValue("series[0].smooth", true);
         _options.SetValue("series[0].showSymbol", false);
+        _options.SetValue("yAxis.splitLine", new
+        {
+            lineStyle = new
+            {
+                color = "#E4E8F3",
+                type = "dashed",
+                width = 1
+            }
+        });
+        _options.SetValue("xAxis.axisLine", new
+        {
+            lineStyle = new
+            {
+                color = "#FF5252",
+                type = "solid",
+                width = 1
+            }
+        });
+        _options.SetValue("xAxis.axisLabel", new
+        {
+            textStyle = new
+            {
+                color = "#A3AED0"
+            }
+        });
+        _options.SetValue("tooltip", new
+        {
+            trigger = "axis",
+            axisPointer = new
+            {
+                type = "cross"
+            }
+        });
+        _options.SetValue("series[0].lineStyle", new
+        {
+            type = "solid",
+            width = 3,
+            color = "#FF5252"
+        });
+        _options.SetValue("series[0].areaStyle", new { color = new { colorStops = new[] { new { offset = 0, color = "rgba(255, 82, 82, 1)" }, new { offset = 1, color = "rgba(255, 82, 82, 0)" } }, x = 0, y = 0, x2 = 0, y2 = 1, type = "linear", global = false } });
     }
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         if (query == null)
-            return;       
+            return;
         if (query.Start.HasValue)
             StartTime = query.Start.Value;
         if (query.End.HasValue)

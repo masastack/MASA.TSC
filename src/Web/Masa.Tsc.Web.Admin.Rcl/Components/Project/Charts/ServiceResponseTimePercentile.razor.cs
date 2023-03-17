@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using System.Drawing;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class ServiceResponseTimePercentile
@@ -25,10 +27,33 @@ public partial class ServiceResponseTimePercentile
         base.OnInitialized();
         _options.SetValue("grid", new
         {
-            x = 60,
-            x2 = 20,
-            y2 = 20,
-            y = 25
+            x = 45,
+            x2 = 8,
+            y2 =40,
+            y = 8
+        });
+        _options.SetValue("legend.top", "bottom");
+        _options.SetValue("legend.textStyle", new { color = "#7681AB" });
+        _options.SetValue("tooltip", new
+        {
+            trigger = "axis",
+            axisPointer = new
+            {
+                type = "cross"
+            }
+        });
+        _options.SetValue("xAxis.axisLabel.textStyle", new { color = "#A3AED0" });
+        _options.SetValue("xAxis.axisLine.lineStyle", new
+        {
+            color = "#FF7D00",
+            type = "sloid",
+            width = 1
+        });
+        _options.SetValue("yAxis.splitLine.lineStyle", new
+        {
+            color = "#E4E8F3",
+            type = "dashed",
+            width = 1
         });
     }
 
@@ -80,10 +105,10 @@ public partial class ServiceResponseTimePercentile
                 dddd[key] = ((QueryResultMatrixRangeResponse)item.Result[0]).Values!.Select(values => values[1].ToString()).ToList()!;
             }
         }
-        _options.SetValue("legend.data", legend);
+        _options.SetValue("legend.data", legend.Select(name => new { name, icon = "square" }));
         var format = StartTime.Format(EndTime);
         _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value, format)));
-        _options.SetValue("series", dddd.Select(item => new { name = item.Key, type = "line", showSymbol=false, smooth=true, data = item.Value }));
+        _options.SetValue("series", dddd.Select(item => new { name = item.Key, type = "line", showSymbol = false, smooth = true,lineStyle=new {type="solid",width=4 }, data = item.Value }));
     }
 
     protected override bool IsSubscribeTimeZoneChange => true;

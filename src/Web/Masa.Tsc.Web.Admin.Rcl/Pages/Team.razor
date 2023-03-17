@@ -17,12 +17,11 @@
         }
         else
         {
-            <span @onclick="@(()=>OnProjectServiceClick(default,default))">asdasdasdasdasdsadsd</span>
             <MCol Style="min-width:220px">
                 <HoneyCombGridItem Data="_viewProjects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor" TItem="ProjectOverviewDto">
                     <CellBack>
                         <div class="d-flex flex-column align-center mx-2 pt-7">
-                            <span class="d-inline-block text-truncate masa btn body @GetHexTitleClass(context.Status)" style="width:120px;" @onclick="@(()=>OnProjectServiceClick(default,default))">@context.Name</span>
+                            <span class="d-inline-block text-truncate masa btn body @GetHexTitleClass(context.Status)" style="width:120px;">@context.Name</span>
                             @foreach (var app in context.Apps.Take(3))
                             {
                                 if (app.Status == MonitorStatuses.Normal)
@@ -33,11 +32,11 @@
                                 {
                                     <div @onclick="()=>OnProjectServiceClick(context,app.Identity)" @onclick:stopPropagation="true">
                                         <MChip Class="masa body2 ma-1 d-inline-block text-truncate text-center"
-                                               Style="width:100%;cursor:pointer"
-                                               Color="@ChipLabelColor(app)"
-                                               TextColor="white"
-                                               Label
-                                               Small>
+                                   Style="width:100%;cursor:pointer"
+                                   Color="@ChipLabelColor(app)"
+                                   TextColor="white"
+                                   Label
+                                   Small>
                                             @app.Name
                                         </MChip>
                                     </div>
