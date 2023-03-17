@@ -77,44 +77,46 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         set => this[ExtensionFieldTypes.MaxCount] = value;
     }
 
-    public string ChartType
+    public ChartTypes ChartType
     {
         get
         {
             var value = this[ExtensionFieldTypes.ChartType];
-            if (value is string stringValue)
+            if (value is string strValue)
             {
-                return stringValue;
+                Enum.TryParse<ChartTypes>(strValue, out var convertValue);
+                return convertValue;
             }
             else if (value is JsonElement jsonElement)
             {
-                return jsonElement.GetString() ?? "table";
+                Enum.TryParse<ChartTypes>(jsonElement.ToString(), out var convertValue);
+                return convertValue;
             }
-            return "table";
+            return ChartTypes.Table;
         }
         set
         {
-            this[ExtensionFieldTypes.ChartType] = value;
+            this[ExtensionFieldTypes.ChartType] = value.ToString();
             IsLoadChartData = true;
             IsLoadOption = true;
             switch (value)
             {
-                case "line":
+                case ChartTypes.Line:
                     EChartType = EChartConst.Line;
                     break;
-                case "bar":
+                case ChartTypes.Bar:
                     EChartType = EChartConst.Bar;
                     break;
-                case "pie":
+                case ChartTypes.Pie:
                     EChartType = EChartConst.Pie;
                     break;
-                case "gauge":
+                case ChartTypes.Gauge:
                     EChartType = EChartConst.Gauge;
                     break;
-                case "heatmap":
+                case ChartTypes.Heatmap:
                     EChartType = EChartConst.Heatmap;
                     break;
-                case "line-area":
+                case ChartTypes.LineArea:
                     EChartType = EChartConst.LineArea;
                     break;
                 default:
@@ -412,6 +414,15 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         Key = "DataChanged" + Guid.NewGuid();
     }
 
+    public void ReloadChartData()
+    {
+        if(ChartType is not ChartTypes.Table)
+        {
+            IsLoadChartData = true;
+            Key = "ReloadChartData" + Guid.NewGuid();
+        }
+    }
+
     public string GetChartKey() => Key;
 
     public object? GetChartOption(TimeZoneInfo timeZoneInfo)
@@ -434,48 +445,54 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         if (IsLoadChartData is false) return;
         IsLoadChartData = false;
 
-        if (ChartType is "line" or "bar")
+        if (ChartType is ChartTypes.Line or ChartTypes.Bar)
         {
             var data = GetMatrixRangeData();
             EChartType.Json["series"] = new JsonArray(data.Select(item => new JsonObject
             {
-                ["type"] = ChartType,
-                ["name"] = string.Join("-", item.Metric!.Values),
-                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0], timeZoneInfo), value[1].ToString())).ToArray())
+                ["type"] = ChartType.ToString().ToLower(),
+                ["name"] = item.Key.Name,
+                ["color"] = item.Key.Color,
+                ["data"] = new JsonArray(item.Value.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0], timeZoneInfo), value[1].ToString())).ToArray())
             }).ToArray());
         }
-        else if (ChartType is "line-area")
+        else if (ChartType is ChartTypes.LineArea)
         {
             var data = GetMatrixRangeData();
             EChartType.Json["series"] = new JsonArray(data.Select(item => new JsonObject
             {
-                ["name"] = string.Join("-", item.Metric!.Values),
                 ["type"] = "line",
+                ["name"] = item.Key.Name,
+                ["color"] = item.Key.Color,
                 ["stack"] = "Total",
                 ["areaStyle"] = new JsonObject(),
                 ["emphasis"] = new JsonObject()
                 {
                     ["focus"] = "series"
                 },
-                ["data"] = new JsonArray(item.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0], timeZoneInfo), value[1].ToString())).ToArray())
+                ["data"] = new JsonArray(item.Value.Values!.Select(value => new JsonArray(ToFormatTimeSpan((long)value[0], timeZoneInfo), value[1].ToString())).ToArray())
             }).ToArray());
         }
-        else if (ChartType is "pie")
+        else if (ChartType is ChartTypes.Pie)
         {
             var data = GetInstantVectorData();
-            EChartType.Json["series"]!.AsArray().First()!["data"] = new JsonArray(data.Select(item => new JsonObject
+            var serie = EChartType.Json["series"]!.AsArray().First()!;
+            serie["color"] = new JsonArray(data.Select(item => (JsonNode)item.Key.Color).ToArray());
+            serie["data"] = new JsonArray(data.Select(item => new JsonObject
             {
-                ["name"] = string.Join("-", item.Metric!.Values),
-                ["value"] = item.Value![1].ToString()
+                ["name"] = item.Key.Name,
+                ["value"] = item.Value.Value![1].ToString()
             }).ToArray());
         }
-        else if (ChartType is "gauge")
+        else if (ChartType is ChartTypes.Gauge)
         {
             var data = GetInstantVectorData();
-            EChartType.Json["series"]!.AsArray().First()!["data"] = new JsonArray(data.Take(1).Select(item => new JsonObject
+            var serie = EChartType.Json["series"]!.AsArray().First()!;
+            serie["color"] = new JsonArray(data.Select(item => (JsonNode)item.Key.Color).ToArray());
+            serie["data"] = new JsonArray(data.Select(item => new JsonObject
             {
-                ["name"] = string.Join("-", item.Metric!.Values),
-                ["value"] = item.Value![1].ToString(),
+                ["name"] = item.Key.Name,
+                ["value"] = item.Value.Value![1].ToString(),
                 ["title"] = new JsonObject()
                 {
                     ["offsetCenter"] = new JsonArray($"{GetPosition(data.IndexOf(item) + 1)}%", "80%")
@@ -486,12 +503,12 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                 },
             }).ToArray());
         }
-        else if (ChartType is "heatmap")
+        else if (ChartType is ChartTypes.Heatmap)
         {
             EChartType.Json["series"] = new JsonArray(Metrics.Select(item => new JsonObject
             {
                 ["name"] = item.DisplayName,
-                ["type"] = ChartType,
+                ["type"] = ChartType.ToString().ToLower(),
                 ["data"] = new JsonArray(new JsonArray(8, 0, 0), new JsonArray(11, 0, 2), new JsonArray(15, 0, 3), new JsonArray(11, 11, 11), new JsonArray(10, 3, 5))
             }).ToArray());
         }
@@ -506,42 +523,87 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         }
     }
 
-    List<QueryResultMatrixRangeResponse> GetMatrixRangeData()
+    List<KeyValuePair<ChartSeriesOPtion, QueryResultMatrixRangeResponse>> GetMatrixRangeData()
     {
-        List<QueryResultMatrixRangeResponse> data = new();
+        List<KeyValuePair<ChartSeriesOPtion, QueryResultMatrixRangeResponse>> data = new();
 
         if (_chartData is not null)
         {
+            var index = 0;
             foreach (var item in _chartData)
             {
                 if (item is not null)
                 {
-                    foreach (var result in item.Result!)
+                    var matrixs = item.Result?.Select(item => item as QueryResultMatrixRangeResponse)?.Where(item => item is not null)?.ToList() ?? new();
+                    var multiple = matrixs.Count > 1;
+                    foreach (var matrix in matrixs)
                     {
-                        if (result is QueryResultMatrixRangeResponse matrix) data.Add(matrix);
+                        var metricName = "";
+                        if (multiple)
+                        {
+                            metricName = string.Join("-", matrix.Metric!.Values);
+                        }
+                        else
+                        {
+                            metricName = Metrics[index].DisplayName ?? string.Join("-", matrix.Metric!.Values);
+                        }
+                        data.Add(new(new()
+                        {
+                            Name = metricName,
+                            Color = Metrics[index].Color,
+                        }, matrix));
                     }
                 }
+                index++;
             }
         }
 
         return data;
     }
 
-    List<QueryResultInstantVectorResponse> GetInstantVectorData()
+    List<KeyValuePair<ChartSeriesOPtion, QueryResultInstantVectorResponse>> GetInstantVectorData()
     {
-        List<QueryResultInstantVectorResponse> data = new();
+        List<KeyValuePair<ChartSeriesOPtion, QueryResultInstantVectorResponse>> data = new();
 
         if (_chartData is not null)
         {
+            var index = 0;
+            var defaultColorIndex = 0;
             foreach (var item in _chartData)
             {
                 if (item is not null)
                 {
-                    foreach (var result in item.Result!)
+                    var matrixs = item.Result?.Select(item => item as QueryResultInstantVectorResponse)?.Where(item => item is not null)?.ToList() ?? new();
+                    var multiple = matrixs.Count > 1;
+                    foreach (var matrix in matrixs)
                     {
-                        if (result is QueryResultInstantVectorResponse matrix) data.Add(matrix);
+                        var metricName = "";
+                        if (multiple)
+                        {
+                            metricName = string.Join("-", matrix.Metric!.Values);
+                        }
+                        else
+                        {
+                            metricName = Metrics[index].DisplayName ?? string.Join("-", matrix.Metric!.Values);
+                        }
+                        var color = Metrics[index].Color;
+                        if (string.IsNullOrEmpty(color))
+                        {
+                            color = _defaultColors[defaultColorIndex];
+                            defaultColorIndex++;
+                            if (defaultColorIndex == _defaultColors.Count())
+                            {
+                                defaultColorIndex = 0;
+                            }
+                        }
+                        data.Add(new(new()
+                        {
+                            Name = metricName,
+                            Color = color,
+                        }, matrix));
                     }
                 }
+                index++;
             }
         }
 
@@ -558,7 +620,12 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
             {
                 if (item is not null)
                 {
-                    data.Add(item.Result!.Select(item => (QueryResultInstantVectorResponse)item).ToList());
+                    var matrixs = new List<QueryResultInstantVectorResponse>();
+                    foreach (var result in item.Result!)
+                    {
+                        if (result is QueryResultInstantVectorResponse matrix) matrixs.Add(matrix);
+                    }
+                    data.Add(matrixs);
                 }
             }
         }
@@ -566,13 +633,15 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         return data;
     }
 
+    string[] _defaultColors = new string[] { "#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc" };
+
     void LoadChartOption()
     {
         if (IsLoadOption is false) return;
 
         IsLoadOption = false;
 
-        if (ChartType is "line-area")
+        if (ChartType is ChartTypes.LineArea)
         {
             var yAxis = EChartType.Json["yAxis"]!.AsArray().First()!;
             yAxis["show"] = YAxis.Show;
@@ -630,6 +699,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         EChartType.SetValue("tooltip.trigger", Tooltip.Trigger);
         EChartType.SetValue("tooltip.confine", true);
 
+        EChartType.SetValue("color", _defaultColors);
         EChartType.SetValue("grid", new
         {
             x = 60,
@@ -720,13 +790,15 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
     {
         base.Clone(panel);
         var value = this[ExtensionFieldTypes.ChartType];
-        if (value is string stringValue)
+        if (value is string strValue)
         {
-            ChartType = stringValue;
+            Enum.TryParse<ChartTypes>(strValue, out var chartType);
+            ChartType = chartType;
         }
         else if (value is JsonElement jsonElement)
         {
-            ChartType = jsonElement.GetString() ?? "table";
+            Enum.TryParse<ChartTypes>(jsonElement.ToString(), out var chartType);
+            ChartType = chartType;
         }
 
         Tooltip.PropertyChanged += Tooltip_PropertyChanged;

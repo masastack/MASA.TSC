@@ -5,7 +5,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Data;
 
 public class EChartPanelTypeModel
 {
-    public string Type { get; set; }
+    public ChartTypes Type { get; set; }
 
     public string Name { get; set; }
 

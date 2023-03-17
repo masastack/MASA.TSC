@@ -13,7 +13,7 @@ public class FolderDto
 
     #region UI field
 
-    public bool ISActive { get; set; } = true;
+    public bool IsActive { get; set; } = true;
 
     #endregion
 }

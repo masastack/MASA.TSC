@@ -1,7 +1,13 @@
 ﻿@inherits TscComponentBase
 
 <MRow>
-    <MCol Md="12" Class="d-flex justify-end">
+    <MCol Md="12" Class="d-flex">
+        <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
+                              StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
+                              EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start"
+                              OnUpdate="OnDateTimeUpdateAsync"
+                              OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
+        <MSpacer />
         <SButton Icon OnClick="GetGetMetricsAsync">
             <SIcon Tooltip="@T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon>
         </SButton>
@@ -19,7 +25,7 @@
         <MCard Class="mt-6">
             <MCardText>
                 <MRow>
-                    @if (Value.ChartType == "table")
+                    @if (Value.ChartType == ChartTypes.Table)
                     {
                         <MCol Md="4">
                             <ProjectSelect @bind-Value="@Value.SystemIdentity" />
@@ -43,20 +49,23 @@
                     </MCol>
                     <MCol Md="12">
                         <MRow>
-                            @if (Value.ChartType == "table" && Value.ListType == ListTypes.TopList)
+                            @if (Value.ChartType is ChartTypes.Table && Value.ListType is ListTypes.TopList)
                             {
                                 <MCol Md="4">
                                     <MCard Class="pa-2" Style="background-color:#F6F8FD">
                                         <MCardText>
                                             <MRow>
                                                 <MCol Md="12">
-                                                    <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].Name" ValueChanged="async value => await MetricNameChangedAsync(Value.Metrics[0],value) " Label="指标名称" />
+                                                    <STextField BackgroundColor="white" DebounceInterval="500" TValue="string" Value="Value.Metrics[0].DisplayName" ValueChanged="value => MetricNameChanged(Value.Metrics[0],value) " Label="@T("Metric name")" />
                                                 </MCol>
                                                 <MCol Md="12">
-                                                    <STextField BackgroundColor="white" @bind-Value="Value.Metrics[0].Range" Label="取值范围" />
+                                                    <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value) " Label="@T("Metric expression")" />
                                                 </MCol>
                                             </MRow>
                                         </MCardText>
+                                        <MCardActions Class="d-flex justify-space-between">
+                                            <ColorGroup Value="@Value.Metrics[0].Color" ValueChanged="value => MetricColorChanged(Value.Metrics[0],value)" />
+                                        </MCardActions>
                                     </MCard>
                                 </MCol>
                             }
@@ -68,51 +77,32 @@
                                         <MCard Class="pa-2" Style="background-color:#F6F8FD">
                                             <MCardText>
                                                 <MRow>
-                                                    @if (Value.ChartType == "table")
-                                                    {
-                                                        <MCol Md="12">
-                                                            <STextField BackgroundColor="white" @bind-Value="item.DisplayName" Label="列名" />
-                                                        </MCol>
-                                                    }
                                                     <MCol Md="12">
-                                                        <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="item.Name" ValueChanged="async value => await MetricNameChangedAsync(item,value) " Label="指标名称" />
+                                                        <STextField BackgroundColor="white" Value="@item.DisplayName" TValue="string" ValueChanged="value => MetricNameChanged(item,value)" DebounceInterval="500" Label="@(Value.ChartType is ChartTypes.Table ?T("Column name"):T("Metrics name"))" />
                                                     </MCol>
                                                     <MCol Md="12">
-                                                        <STextField BackgroundColor="white" @bind-Value="item.Range" Label="取值范围" />
+                                                        <MetricsExpression Value="@item.Expression" ValueChanged="async value => await MetricExpressionChangedAsync(item,value)" />
                                                     </MCol>
-                                                    @if (Value.ChartType == "table")
+                                                    @if (Value.ChartType is ChartTypes.Table)
                                                     {
                                                         <MCol Md="12">
-                                                            <STextField BackgroundColor="white" @bind-Value="item.Icon" Label="图标" />
+                                                            <STextField BackgroundColor="white" @bind-Value="item.Icon" Label="@T("Icon")" />
                                                         </MCol>
-                                                    }
-                                                    else
-                                                    {
                                                         <MCol Md="12">
-                                                            <STextField BackgroundColor="white" @bind-Value="item.Caculate" Label="计算规则" />
+                                                            <STextField BackgroundColor="white" @bind-Value="item.Unit" Label="@T("Unit")" />
                                                         </MCol>
                                                     }
-                                                    <MCol Md="12">
-                                                        <STextField BackgroundColor="white" @bind-Value="item.Unit" Label="单位" />
-                                                    </MCol>
                                                 </MRow>
                                             </MCardText>
                                             <MCardActions Class="d-flex justify-space-between">
-                                                @if (Value.ChartType == "table")
-                                                {
-                                                    <SColorGroup @bind-Value="item.Color" Colors='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
-                                                }
-                                                else
-                                                {
-                                                    <MSpacer />
-                                                }
+                                                <ColorGroup Value="@item.Color" ValueChanged="value => MetricColorChanged(item,value)"/>
                                                 <MIcon OnClick="() => Remove(item)" Color="red">mdi-delete</MIcon>
                                             </MCardActions>
                                         </MCard>
                                     </MCol>
                                 }
                                 <MCol Md="4">
-                                    <MCard Height=350 OnClick="Add" Class="d-flex justify-center align-center" Style="background-color:#F6F8FD">
+                                    <MCard Height=@(Value.ChartType is ChartTypes.Table ? 350 : 208) OnClick="Add" Class="d-flex justify-center align-center" Style="background-color:#F6F8FD">
                                         <MIcon XLarge>mdi-plus</MIcon>
                                     </MCard>
                                 </MCol>
@@ -126,14 +116,14 @@
     <MCol Cols="4">
         <MCard>
             <MCardText>
-                <MExpansionPanels Values="new List<StringNumber>{1}" Multiple Style="z-index:auto !important;max-height:855px;overflow:auto;">
+                <MExpansionPanels @bind-Values=_trash Multiple Style="z-index:auto !important;max-height:855px;overflow:auto;">
                     <MExpansionPanel Value="1">
                         <MExpansionPanelHeader Class="emphasis2--text h6">Visualization</MExpansionPanelHeader>
                         <MExpansionPanelContent>
                             <WidgetType @bind-Value="@Value.ChartType" />
                         </MExpansionPanelContent>
                     </MExpansionPanel>
-                    @if (Value.ChartType == "table")
+                    @if (Value.ChartType is ChartTypes.Table)
                     {
                         @if (Value.ListType is ListTypes.TopList)
                         {
@@ -166,9 +156,6 @@
                                         <MCol Md="12">
                                             <ButtonGroupItem @bind-Value="@Value.ColumnAlignment" Label="Column alignment" Items='new List<string>{"auto","left","center","right"}' />
                                         </MCol>
-                                       @* <MCol Md="12">
-                                            <SwitchItem Label="Enable pagination" @bind-Value="@Value.EnablePaginaton" />
-                                        </MCol>*@
                                     </MRow>
                                 </MExpansionPanelContent>
                             </MExpansionPanel>

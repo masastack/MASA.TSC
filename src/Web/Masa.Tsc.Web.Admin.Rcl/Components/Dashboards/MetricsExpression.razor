@@ -1,0 +1,87 @@
+﻿@inherits TscComponentBase
+
+<div class="d-flex textfield-autocomplete @Class" style="@Style">
+    <div style="@(_autocomplete?"width:100%;":"width:0;")transition-property: width;transition-duration: 0.2s;transition-timing-function:ease;">
+        <SAutoComplete Value="Value"
+                       ValueChanged="ValueChanged"
+                       ValueExpression="ValueExpression"
+                       Label="@T("Metrics expression")"
+                       Placeholder="@T("Please select metrics expression")"
+                       AutoLabel=false
+                       Required
+                       BackgroundColor="white"
+                       Items=Metrics.ToList()
+                       ItemText="e => e.Key"
+                       ItemValue="e => e.Value" />
+    </div>
+    <div style="@(_autocomplete?"width:0;":"width:100%;")transition-property: width;transition-duration: 0.2s;transition-timing-function:ease;">
+        <STextField Value="Value"
+                    ValueChanged="ValueChanged"
+                    ValueExpression="ValueExpression"
+                    Label="@T("Metrics expression")"
+                    AutoLabel=false
+                    Placeholder="@T("Please enter metrics expression")"
+                    BackgroundColor="white"
+                    Class="full-width"
+                    Required
+                    DebounceInterval="1000"
+                    Style="margin-right: 1px;">
+            <AppendContent>
+                <a href="https://prometheus.io/docs/prometheus/latest/querying/basics" target="_blank">
+                    <SIcon Tooltip="@T("Clike me view metrics expression docs")">
+                        mdi-help-circle-outline
+                    </SIcon>
+                </a>
+            </AppendContent>
+        </STextField>
+    </div>
+    <MSpacer />
+    <FadeTransition LeaveAbsolute>
+        <div @onclick="SwitchMode" class="d-flex hover-pointer" style="background-color:white;height:46.5px;min-width:46.5px;z-index:1;margin-left:0;margin-top:1px;">
+            <KeyTransitionElement Value="_autocomplete" Class="ma-auto">
+                <SIcon>@(_autocomplete ? IconConstants.Update : IconConstants.Close)IconConstants.Update</SIcon>
+            </KeyTransitionElement>
+        </div>
+    </FadeTransition>
+</div>
+
+@code {
+    bool _autocomplete = true;
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public Expression<Func<string?>>? ValueExpression { get; set; }
+
+    [Parameter]
+    public Dictionary<string, string> Metrics { get; set; } = new()
+    {
+        ["p99"] = "histogram_quantile(0.99,sum(increase(http_server_duration_bucket[5m])) by (le))",
+        ["p95"] = "histogram_quantile(0.95,sum(increase(http_server_duration_bucket[5m])) by (le))",
+        ["p90"] = "histogram_quantile(0.90,sum(increase(http_server_duration_bucket[5m])) by (le))",
+        ["p75"] = "histogram_quantile(0.75,sum(increase(http_server_duration_bucket[5m])) by (le))",
+        ["p50"] = "histogram_quantile(0.50,sum(increase(http_server_duration_bucket[5m])) by (le))",
+    };
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrEmpty(Value) is false && Metrics.ContainsValue(Value) is false)
+        {
+            _autocomplete = false;
+        }
+        base.OnInitialized();
+    }
+
+    async Task SwitchMode()
+    {
+        _autocomplete = !_autocomplete;
+        if (_autocomplete && string.IsNullOrEmpty(Value) is false && Metrics.ContainsValue(Value) is false)
+        {
+            await ValueChanged.InvokeAsync(null);
+        }
+    }
+}

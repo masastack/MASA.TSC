@@ -5,6 +5,8 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
 
 public partial class ChartPanelConfiguration : TscComponentBase
 {
+    List<StringNumber> _trash = new List<StringNumber> { 1 };
+
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
@@ -60,7 +62,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
 
     async Task NavigateToPanelConfigurationPageAsync()
     {
-        var success = !Value.Metrics.Any(x => string.IsNullOrEmpty(x.Name));
+        var success = !Value.Metrics.Any(x => string.IsNullOrEmpty(x.Expression));
         if (!success)
         {
             await PopupService.EnqueueSnackbarAsync(T("Metrics name is required"), AlertTypes.Error);
@@ -81,9 +83,10 @@ public partial class ChartPanelConfiguration : TscComponentBase
         Value.Metrics.Add(new());
     }
 
-    void Remove(PanelMetricDto metric)
+    async Task Remove(PanelMetricDto metric)
     {
         Value.Metrics.Remove(metric);
+        await GetGetMetricsAsync();
     }
 
     async Task GetGetMetricsAsync()
@@ -91,14 +94,37 @@ public partial class ChartPanelConfiguration : TscComponentBase
         await ChartPanel.ReloadAsync();
     }
 
-    async Task MetricNameChangedAsync(PanelMetricDto metric, string metricName)
+    async Task MetricExpressionChangedAsync(PanelMetricDto metric, string metricExpression)
     {
-        metric.Name = metricName;
+        metric.Expression = metricExpression;
         await GetGetMetricsAsync();
+    }
+
+    void MetricNameChanged(PanelMetricDto metric, string metricName)
+    {
+        metric.DisplayName = metricName;
+        if (string.IsNullOrEmpty(metric.Expression) is false) Value.ReloadChartData();
+    }
+
+    void MetricColorChanged(PanelMetricDto metric, string metricColor)
+    {
+        metric.Color = metricColor;
+        if(string.IsNullOrEmpty(metric.Expression) is false) Value.ReloadChartData();
     }
 
     void ListTypeChanged(StringNumber listType)
     {
         Value.ListType = Enum.Parse<ListTypes>(listType.ToString()!);
+    }
+
+    void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    {
+        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
+    }
+
+    async Task OnAutoDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    {
+        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
+        await base.InvokeAsync(base.StateHasChanged);
     }
 }

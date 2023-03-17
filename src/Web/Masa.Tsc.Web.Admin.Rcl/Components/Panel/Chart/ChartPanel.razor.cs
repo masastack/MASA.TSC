@@ -13,7 +13,7 @@ public partial class ChartPanel
 
     bool IsLoading { get; set; }
 
-    string? OldChartType { get; set; }
+    ChartTypes? OldChartType { get; set; }
 
     string? OldConfigRecordKey { get; set; }
 
@@ -27,16 +27,16 @@ public partial class ChartPanel
     {
         if (OldChartType != Value.ChartType)
         {
-            if (OldChartType is "line" or "bar" or "line-area")
+            if (OldChartType is ChartTypes.Line or ChartTypes.Bar or ChartTypes.LineArea)
             {
-                if (Value.ChartType is "gauge" or "heatmap" or "pie" or "table")
+                if (Value.ChartType is ChartTypes.Gauge or ChartTypes.Heatmap or ChartTypes.Pie or ChartTypes.Table)
                 {
                     await ReloadAsync();
                 }
             }
-            else if (OldChartType is "gauge" or "heatmap" or "pie" or "table")
+            else if (OldChartType is ChartTypes.Gauge or ChartTypes.Heatmap or ChartTypes.Pie or ChartTypes.Table)
             {
-                if (Value.ChartType is "line" or "bar" or "line-area")
+                if (Value.ChartType is ChartTypes.Line or ChartTypes.Bar or ChartTypes.LineArea)
                 {
                     await ReloadAsync();
                 }
@@ -57,8 +57,8 @@ public partial class ChartPanel
 
     async Task<List<QueryResultDataResponse>> GetMetricsAsync()
     {
-        if (Value.Metrics.Any(item => item.Name is not null) is false) return new();
-        if (Value.ChartType is "pie" or "gauge" or "table")
+        if (Value.Metrics.Any(item => item.Expression is not null) is false) return new();
+        if (Value.ChartType is ChartTypes.Pie or ChartTypes.Gauge or ChartTypes.Table)
         {
             return await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto()
             {
@@ -66,7 +66,7 @@ public partial class ChartPanel
                 Service = ConfigurationRecord.Service,
                 Instance = ConfigurationRecord.Instance,
                 EndPoint = ConfigurationRecord.ConvertEndpoint,
-                Queries = Value.Metrics.Select(item => item.Name).ToList()
+                Queries = Value.Metrics.Select(item => item.Expression).ToList()
             });
         }
         else
@@ -79,7 +79,7 @@ public partial class ChartPanel
                 Instance = ConfigurationRecord.Instance,
                 EndPoint = ConfigurationRecord.ConvertEndpoint,
                 Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
-                MetricNames = Value.Metrics.Select(item => item.Name).ToList()
+                MetricNames = Value.Metrics.Select(item => item.Expression).ToList()
             });
         }
     }
@@ -96,7 +96,7 @@ public partial class ChartPanel
 
     protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
     {
-        if (Value.ChartType is "line" or "bar" or "line-area")
+        if (Value.ChartType is ChartTypes.Line or ChartTypes.Bar or ChartTypes.LineArea)
         {
             Value.SetTimeZoneChange();
             StateHasChanged();

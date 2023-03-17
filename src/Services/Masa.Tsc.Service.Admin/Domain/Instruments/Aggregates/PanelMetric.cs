@@ -35,7 +35,7 @@ public class PanelMetric : AggregateRoot<Guid>
 
     public void Update(PanelMetricDto data)
     {
-        Name = data.Name;
+        Name = data.Expression;
         Caculate = data.Caculate ?? string.Empty;
         Color = data.Color ?? string.Empty;
         Unit = data.Unit ?? string.Empty;

@@ -67,7 +67,7 @@ public partial class ProjectCharts
         if (_endpoint == null)
             _endpoint = new UpsertChartPanelDto(Guid.Empty)
             {
-                ChartType = "table",
+                ChartType = ChartTypes.Table,
                 ListType = ListTypes.TopList,
                 Title = T("Service Endpoint Load") + "(" + T("calls/min") + ")",
                 Description = T("For HTTP 1/2, gRPC, RPC services, this means Calls Per Minute (calls/min)"),
@@ -75,17 +75,17 @@ public partial class ProjectCharts
                 {
                     new PanelMetricDto()
                     {
-                        Name = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{step}])),0.01)>0.01))"
+                        Expression = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{step}])),0.01)>0.01))"
                     }
                 }
             };
         else
-            _endpoint.Metrics[0].Name = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{step}])),0.01)>0.01))";
+            _endpoint.Metrics[0].Expression = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{step}])),0.01)>0.01))";
 
         if (_slowEndpoint == null)
             _slowEndpoint = new UpsertChartPanelDto(Guid.Empty)
             {
-                ChartType = "table",
+                ChartType = ChartTypes.Table,
                 ListType = ListTypes.TopList,
                 Title = T("Service Slow Endpoint") + "(" + T("ms") + ")",
                 //Description = "Service Slow Endpont(ms)",
@@ -93,7 +93,7 @@ public partial class ProjectCharts
                 {
                     new PanelMetricDto()
                     {
-                        Name = "topk(10, sort_desc(max by(http_target) (http_response_bucket)))"
+                        Expression = "topk(10, sort_desc(max by(http_target) (http_response_bucket)))"
                     }
                 }
             };

@@ -198,5 +198,14 @@
   "Endpoint": "接口",
   "ServiceInstance": "实例",
   "All": "全部",
-  "APPID": "应用ID"
+  "Action": "操作",
+  "Metrics name": "指标名称",
+  "Metrics expression": "指标表达式",
+  "APPID": "应用ID",
+  "Column name": "列名",
+  "Icon": "图标",
+  "Unit": "单位",
+  "Please select metrics expression": "请选择指标表达式",
+  "Please enter metrics expression": "请输入指标表达式",
+  "Clike me view metrics expression docs": "点击查看指标表达式使用文档"
 }

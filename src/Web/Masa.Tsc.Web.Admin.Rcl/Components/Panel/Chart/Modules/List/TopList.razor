@@ -1,19 +1,14 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 
 <MCard Class="@($"d-flex flex-column full-height {Class}")">
-    <MCardTitle Class="d-flex justify-space-between">
-        <MLabel Class="emphasis2--text h6">@Value.Title</MLabel>
-        <MTooltip Top>
-            <ActivatorContent>
-                <MIcon @attributes="@context.Attrs">mdi-information-outline</MIcon>
-            </ActivatorContent>
-            <ChildContent>
-                <span>@Value.Description</span>
-            </ChildContent>
-        </MTooltip>
+    <MCardTitle>
+        <PanelTooltip Title="@Value.Title" Description="@Value.Description" />
     </MCardTitle>
-
-    @if (Value.GetTopListOption().Any() is false)
+    @{
+        var options = Value.GetTopListOption();
+        var multiple = options.Count > 1;
+    }
+    @if (options.Any() is false)
     {
         <MCardText Class="d-flex" Style="@("height:calc(100% - 62px)")">
             <div class="ma-auto">@I18n.T("No Data")</div>
@@ -23,7 +18,7 @@
     {
         <MCardText Class="flex-grow-1 overflow-y" Style="@("height:calc(100% - 62px)")">
             <MList>
-                @foreach (var item in Value.GetTopListOption())
+                @foreach (var item in options)
                 {
                     <MListItem Class="px-0" Dense OnClick="() => ToDashboardConfiguration(item.Href)">
                         <MListItemAvatar Style="background: #F4F1FF;border-radius: 10px;">
@@ -31,10 +26,10 @@
                         </MListItemAvatar>
                         <MListItemContent>
                             <MListItemTitle Class="d-flex justify-space-between">
-                                <MLabel Class="body2 regular2--text d-inline-block text-truncate">@item.Text</MLabel>
+                                <MLabel Class="body2 regular2--text d-inline-block text-truncate">@(multiple ? item.Text : (Value.Metrics[0].DisplayName ?? item.Text))</MLabel>
                             </MListItemTitle>
                             <MListItemSubtitle>
-                                <MProgressLinear Height="8" Color="@(Value.Color as string)" Rounded Value="@item.Value"></MProgressLinear>
+                                    <MProgressLinear Height="8" Color="@(multiple?GetTextColorStyle(options.IndexOf(item)):(Value.Metrics[0].Color ?? GetTextColorStyle(options.IndexOf(item))))" Rounded Value="@item.Value"></MProgressLinear>
                             </MListItemSubtitle>
                         </MListItemContent>
                     </MListItem>
@@ -46,6 +41,8 @@
 </MCard>
 
 @code {
+    string[] _defaultColors = new string[] { "#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc" };
+
     [Parameter]
     public ITopListPanelValue Value { get; set; }
 
@@ -57,6 +54,15 @@
 
     [Parameter]
     public string Class { get; set; }
+
+    string GetTextColorStyle(int index)
+    {
+        if (index > _defaultColors.Count())
+        {
+            index = index % _defaultColors.Count();
+        }
+        return _defaultColors[index];
+    }
 
     void ToDashboardConfiguration(string href)
     {

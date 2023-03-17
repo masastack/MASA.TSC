@@ -1,16 +1,8 @@
 ﻿@inherits TscComponentBase
 <AutoResize Delay="10" OnResize="ResizeAsync">
     <MCard Class="d-flex flex-column rounded-lg full-height">
-        <MCardTitle Class="d-flex justify-space-between">
-            <MLabel Class="emphasis2--text h6">@Value.Title</MLabel>
-            <MTooltip Top>
-                <ActivatorContent>
-                    <MIcon @attributes="@context.Attrs">mdi-information-outline</MIcon>
-                </ActivatorContent>
-                <ChildContent>
-                    <span>@Value.Description</span>
-                </ChildContent>
-            </MTooltip>
+        <MCardTitle>
+            <PanelTooltip Title="@Value.Title" Description="@Value.Description" />
         </MCardTitle>
         <MCardText Class="flex-grow-1">
             @{

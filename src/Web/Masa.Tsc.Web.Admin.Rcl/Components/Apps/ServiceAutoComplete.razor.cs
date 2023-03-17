@@ -21,7 +21,7 @@ public partial class ServiceAutoComplete
     public bool FillBackground { get; set; } = true;
 
     [Parameter]
-    public bool Metric { get; set; }
+    public bool Metric { get; set; } = true;
 
     [Parameter]
     public List<AppDetailModel> Services { get; set; }

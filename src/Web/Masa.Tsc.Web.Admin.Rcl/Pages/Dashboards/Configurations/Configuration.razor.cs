@@ -7,8 +7,7 @@ public partial class Configuration : IAsyncDisposable
 {
     string _scrollElementId = Guid.NewGuid().ToString();
     string _contentElementId = Guid.NewGuid().ToString();
-    IJSObjectReference? _helper;
-    QuickRangeKey? _defaultValue = QuickRangeKey.Last15Minutes;
+    IJSObjectReference? _helper;   
     bool _hasNavigateTo;
     bool _serviceRelationReady;
     bool _timeRangeReady;
@@ -55,6 +54,7 @@ public partial class Configuration : IAsyncDisposable
         if (string.IsNullOrEmpty(DashboardId) is false && ConfigurationRecord.DashboardId != DashboardId)
         {
             ConfigurationRecord.DashboardId = DashboardId;
+            ConfigurationRecord.ModelType = default;
             await GetPanelsAsync();
         }
     }
@@ -66,6 +66,7 @@ public partial class Configuration : IAsyncDisposable
         if (detail is not null)
         {
             ConfigurationRecord.ModelType = Enum.Parse<ModelTypes>(detail.Model);
+            ConfigurationRecord.Layer = detail.Layer;
             if (detail.Panels?.Any() is true)
             {
                 ConfigurationRecord.Panels.AddRange(detail.Panels);
@@ -135,8 +136,9 @@ public partial class Configuration : IAsyncDisposable
         {
             var confirm = await OpenConfirmDialog(T("Operation confirmation"), T("Are you sure switch view mode,unsaved data will be lost"), AlertTypes.Warning);
             if (confirm)
-            {
+            {               
                 await GetPanelsAsync();
+                ConfigurationRecord.ReloadUI();
                 ConfigurationRecord.IsEdit = false;
             }
             else ConfigurationRecord.IsEdit = true;

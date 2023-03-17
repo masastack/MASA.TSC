@@ -29,10 +29,6 @@ public partial class PanelSelect
             PanelTypes.Trace,
             //PanelTypes.Table
         };
-        if(ConfigurationRecord.ModelType is ModelTypes.All or default(ModelTypes))
-        {
-            types.Remove(PanelTypes.Topology);
-        }
         return types;
     }
 
