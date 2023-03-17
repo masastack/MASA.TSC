@@ -11,9 +11,7 @@
     <MRow Class="overflow-auto d-flex justify-space-between pt-8" Style="min-height: calc(100vh - 190px);">
         @if (_isLoad)
         {
-            <div class="full-height full-width d-flex col">
-                <div class="ma-auto">@T("Loading data")</div>
-            </div>
+            <LoadingData Class="col" />
         }
         else
         {

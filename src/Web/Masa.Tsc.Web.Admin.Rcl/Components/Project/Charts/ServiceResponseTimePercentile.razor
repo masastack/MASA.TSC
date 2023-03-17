@@ -4,20 +4,15 @@
 <MCard Width="Width" Height="Height" Class="d-flex flex-column rounded-lg">
     <MCardTitle Class="d-flex justify-space-between">
         <MLabel Class="emphasis2--text h6">@Title</MLabel>
-        @*<MIcon>mdi-information-outline</MIcon>*@
     </MCardTitle>
     <MCardText Class="flex-grow-1">
         @if (_isLoading)
         {
-            <div class="d-flex full-height full-width">
-                <div class="ma-auto">@T("Loading data")</div>
-            </div>
+            <LoadingData />
         }
         else if (_data?.Any(item => item?.Result?.Any() is true) is false)
         {
-            <div class="full-height d-flex">
-                <div class="ma-auto">@T("No Data")</div>
-            </div>
+            <NoData />
         }
         else
         {
