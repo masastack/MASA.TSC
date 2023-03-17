@@ -1,4 +1,4 @@
-﻿namespace Masa.Stack.Components;
+﻿namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class ColorGroup
 {

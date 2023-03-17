@@ -6,6 +6,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations.Models;
 public class ConfigurationRecord
 {
     string? _randomStr;
+    ModelTypes _modelType;
 
     public List<UpsertPanelDto> Panels { get; set; } = new();
 
@@ -21,7 +22,23 @@ public class ConfigurationRecord
 
     public string? PanelId { get; set; }
 
-    public ModelTypes ModelType { get; set; }
+    public ModelTypes ModelType
+    {
+        get => _modelType;
+        set
+        {
+            if(value is ModelTypes.All)
+            {
+                Service = null;
+                Instance = null;
+                Endpoint = null;
+            }
+            _modelType = value;
+        }
+    }
+
+    public string? Layer { get; set; }
+
 
     public QuickRangeKey? DefaultQuickRangeKey = QuickRangeKey.Last15Minutes;
 
@@ -51,6 +68,7 @@ public class ConfigurationRecord
     {
         ClearPanels();
         ModelType = default;
+        Layer = default;
         DashboardId = "";
         Service = default;
         Instance = default;

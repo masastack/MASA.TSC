@@ -33,12 +33,13 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
+        if (Value.ListType != ListTypes.TopList && _oldKey != ConfigurationRecord.Key)
+        {
+            services = await GetServiceNames() ?? new();
+            _shouldRender = true;
+        }
         if (_lastListType != Value.ListType)
         {
-            if (Value.ListType != ListTypes.TopList && _oldKey != ConfigurationRecord.Key)
-            {
-                services = await GetServiceNames() ?? new();
-            }
             _lastListType = Value.ListType;
             jumpId = await GetJumpId();
             jumpName = GetJumpName();
@@ -72,14 +73,14 @@ else
             Service = ConfigurationRecord.Service,
             Instance = ConfigurationRecord.Instance,
             Endpoint = ConfigurationRecord.ConvertEndpoint,
+            Layer = ConfigurationRecord.Layer,
             Type = GetMetricValueType()
         });
     }
 
     async Task<string> GetJumpId()
     {
-        //add layer
-        var data = await base.ApiCaller.InstrumentService.GetLinkAsync(MetricConstants.DEFAULT_LAYER,GetMetricValueType());
+        var data = await base.ApiCaller.InstrumentService.GetLinkAsync(ConfigurationRecord.Layer, GetMetricValueType());
         return data.InstrumentId?.ToString() ?? "";
     }
 

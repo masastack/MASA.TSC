@@ -78,18 +78,18 @@
                                             <MCardText>
                                                 <MRow>
                                                     <MCol Md="12">
-                                                        <STextField BackgroundColor="white" Value="item.DisplayName" TValue="string" ValueChanged="value => MetricNameChanged(item,value)" DebounceInterval="500" Label="@(Value.ChartType is ChartTypes.Table ?T("Column name"):T("Metric name"))" />
+                                                        <STextField BackgroundColor="white" Value="@item.DisplayName" TValue="string" ValueChanged="value => MetricNameChanged(item,value)" DebounceInterval="500" Label="@(Value.ChartType is ChartTypes.Table ?T("Column name"):T("Metrics name"))" />
                                                     </MCol>
                                                     <MCol Md="12">
-                                                        <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="item.Expression" ValueChanged="async value => await MetricExpressionChangedAsync(item,value)" Label="@T("Metric expression")" />
+                                                        <MetricsExpression Value="@item.Expression" ValueChanged="async value => await MetricExpressionChangedAsync(item,value)" />
                                                     </MCol>
                                                     @if (Value.ChartType is ChartTypes.Table)
                                                     {
                                                         <MCol Md="12">
-                                                            <STextField BackgroundColor="white" @bind-Value="item.Icon" Label="图标" />
+                                                            <STextField BackgroundColor="white" @bind-Value="item.Icon" Label="@T("Icon")" />
                                                         </MCol>
                                                         <MCol Md="12">
-                                                            <STextField BackgroundColor="white" @bind-Value="item.Unit" Label="单位" />
+                                                            <STextField BackgroundColor="white" @bind-Value="item.Unit" Label="@T("Unit")" />
                                                         </MCol>
                                                     }
                                                 </MRow>

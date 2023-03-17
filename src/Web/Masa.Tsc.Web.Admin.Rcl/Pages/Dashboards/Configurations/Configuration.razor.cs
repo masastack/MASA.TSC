@@ -54,6 +54,7 @@ public partial class Configuration : IAsyncDisposable
         if (string.IsNullOrEmpty(DashboardId) is false && ConfigurationRecord.DashboardId != DashboardId)
         {
             ConfigurationRecord.DashboardId = DashboardId;
+            ConfigurationRecord.ModelType = default;
             await GetPanelsAsync();
         }
     }
@@ -65,6 +66,7 @@ public partial class Configuration : IAsyncDisposable
         if (detail is not null)
         {
             ConfigurationRecord.ModelType = Enum.Parse<ModelTypes>(detail.Model);
+            ConfigurationRecord.Layer = detail.Layer;
             if (detail.Panels?.Any() is true)
             {
                 ConfigurationRecord.Panels.AddRange(detail.Panels);
