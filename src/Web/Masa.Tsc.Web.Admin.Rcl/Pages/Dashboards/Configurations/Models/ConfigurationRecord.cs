@@ -4,7 +4,7 @@
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations.Models;
 
 public class ConfigurationRecord
-{
+{   
     string? _randomStr;
     ModelTypes _modelType;
 
@@ -27,7 +27,7 @@ public class ConfigurationRecord
         get => _modelType;
         set
         {
-            if(value is ModelTypes.All)
+            if (value is ModelTypes.All)
             {
                 Service = null;
                 Instance = null;
@@ -39,7 +39,6 @@ public class ConfigurationRecord
 
     public string? Layer { get; set; }
 
-
     public QuickRangeKey? DefaultQuickRangeKey = QuickRangeKey.Last15Minutes;
 
     public DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow.AddMinutes(-15);
@@ -49,6 +48,29 @@ public class ConfigurationRecord
     public string? Key => $"{Service}{Instance}{Endpoint}{StartTime}{EndTime}{_randomStr}";
 
     public bool IsEdit { get; set; }
+
+    public NavigationManager NavigationManager;
+
+    public ConfigurationRecord(NavigationManager navigationManager)
+    {
+        NavigationManager = navigationManager;
+    }
+
+    public void NavigateToDashboardConfiguration()
+    {
+        NavigationManager.NavigateToDashboardConfiguration(DashboardId, Service, Instance, Endpoint);
+    }
+
+    public void NavigateToDashboardConfigurationRecord()
+    {
+        NavigationManager.NavigateToDashboardConfigurationRecord(DashboardId, Service, Instance, Endpoint);
+    }
+
+    public void NavigateToConfigurationChart()
+    {
+        ArgumentNullException.ThrowIfNull(PanelId);
+        NavigationManager.NavigateToConfigurationChart(PanelId, DashboardId, Service, Instance, Endpoint);
+    }
 
     public bool ServiceRelationReady(bool ready)
     {

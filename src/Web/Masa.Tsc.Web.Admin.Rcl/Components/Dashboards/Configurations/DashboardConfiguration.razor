@@ -1,8 +1,4 @@
-﻿@page "/dashboard/configuration/{dashboardId}/{serviceName?}/{instanceName?}/{endpointName?}"
-@page "/dashboard/configuration/record/{dashboardId}/{serviceName?}/{instanceName?}/{endpointName?}"
-@inherits TscComponentBase
-
-<PageTitle>@T("Configure Dashboard")</PageTitle>
+﻿@inherits TscComponentBase
 
 <AutoHeight Id="@_scrollElementId" Overflow AutoStyle="max-height: calc(100vh - 185px);height: 900px">
     <HeaderContent>
@@ -46,7 +42,7 @@
     <AutoHeightContent>
         <DefaultCard Id="@_contentElementId" Style="min-height: calc(100vh - 185px);">
             <CascadingValue Value="ConfigurationRecord.IsEdit" IsFixed>
-                <CascadingValue Value="PanelGrids" IsFixed>                   
+                <CascadingValue Value="PanelGrids" IsFixed>
                     <CascadingValue Value="ConfigurationRecord" IsFixed>
                         @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady && _timeRangeReady))
                         {

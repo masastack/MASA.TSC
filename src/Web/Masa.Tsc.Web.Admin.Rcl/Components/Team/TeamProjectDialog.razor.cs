@@ -21,7 +21,8 @@ public partial class TeamProjectDialog
 
     int ErrorCount { get; set; }
 
-    ConfigurationRecord ConfigurationRecord { get; set; } = new();
+    [Inject]
+    ConfigurationRecord ConfigurationRecord { get; set; }
 
     ServiceAutoComplete ServiceAutoComplete { get; set; }
 

@@ -1,11 +1,13 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.Web.Admin.Rcl.Components.Panel.Chart;
+namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
 
 public partial class ChartPanelConfiguration : TscComponentBase
 {
     List<StringNumber> _trash = new List<StringNumber> { 1 };
+    ChartPanel _chartPanel;
+    string _valueBackup;
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -13,12 +15,8 @@ public partial class ChartPanelConfiguration : TscComponentBase
     [Parameter]
     public UpsertChartPanelDto Value { get; set; }
 
-    [CascadingParameter]
+    [Parameter]
     public ConfigurationRecord ConfigurationRecord { get; set; }
-
-    public ChartPanel ChartPanel { get; set; }
-
-    string ValueBackup { get; set; }
 
     Dictionary<ModelTypes, ListTypes[]> TableMap = new()
     {
@@ -46,7 +44,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
 
     protected override void OnInitialized()
     {
-        ValueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
+        _valueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
         if (Value.Metrics.Any() is false) Value.Metrics.Add(new());
 
         InitListType();
@@ -73,7 +71,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
 
     async Task CancelAsync()
     {
-        var backUp = JsonSerializer.Deserialize<UpsertPanelDto>(ValueBackup);
+        var backUp = JsonSerializer.Deserialize<UpsertPanelDto>(_valueBackup);
         Value.Clone(backUp!);
         await NavigateToPanelConfigurationPageAsync();
     }
@@ -91,7 +89,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
 
     async Task GetGetMetricsAsync()
     {
-        await ChartPanel.ReloadAsync();
+        await _chartPanel.ReloadAsync();
     }
 
     async Task MetricExpressionChangedAsync(PanelMetricDto metric, string metricExpression)

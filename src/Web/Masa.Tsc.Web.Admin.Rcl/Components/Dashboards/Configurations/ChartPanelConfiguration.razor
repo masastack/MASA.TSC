@@ -20,7 +20,9 @@
     </MCol>
     <MCol Cols="8">
         <div style="height:410px;max-height:700px;;overflow:auto;">
-            <ChartPanel @ref="ChartPanel" Value="Value" />
+            <CascadingValue Value="ConfigurationRecord" IsFixed>
+                <ChartPanel @ref="_chartPanel" Value="Value" />
+            </CascadingValue>
         </div>
         <MCard Class="mt-6">
             <MCardText>

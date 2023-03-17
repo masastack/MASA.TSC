@@ -1,0 +1,7 @@
+﻿@page "/dashboard/configuration/{dashboardId}/{serviceName?}/{instanceName?}/{endpointName?}"
+@page "/dashboard/configuration/record/{dashboardId}/{serviceName?}/{instanceName?}/{endpointName?}"
+@inherits TscComponentBase
+
+<PageTitle>@T("Configure Dashboard")</PageTitle>
+
+<DashboardConfiguration ConfigurationRecord="ConfigurationRecord" />
