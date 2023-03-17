@@ -1,12 +1,12 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Models;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Configurations;
 
 public partial class ConfigurationDashboard
 {
-    bool _hasNavigateTo;
-
     [Inject]
     public ConfigurationRecord ConfigurationRecord { get; set; }
 
@@ -33,9 +33,9 @@ public partial class ConfigurationDashboard
 
     protected override async Task OnParametersSetAsync()
     {
-        if (_hasNavigateTo)
+        if (ConfigurationRecord.HasNavigateTo)//想想办法解决这个问题，去掉这段代码
         {
-            _hasNavigateTo = false;
+            ConfigurationRecord.HasNavigateTo = false;
             return;
         }
         ConfigurationRecord.Service = ServiceName;

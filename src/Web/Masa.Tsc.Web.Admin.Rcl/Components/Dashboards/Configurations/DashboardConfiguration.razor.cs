@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Models;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
 
 public partial class DashboardConfiguration : IAsyncDisposable
@@ -8,7 +10,6 @@ public partial class DashboardConfiguration : IAsyncDisposable
     string _scrollElementId = Guid.NewGuid().ToString();
     string _contentElementId = Guid.NewGuid().ToString();
     IJSObjectReference? _helper;
-    bool _hasNavigateTo;
     bool _serviceRelationReady;
     bool _timeRangeReady;
 
@@ -49,7 +50,6 @@ public partial class DashboardConfiguration : IAsyncDisposable
 
     void ServiceRelationChanged((string?, string?, string?) serviceRelation)
     {
-        _hasNavigateTo = true;
         _serviceRelationReady = true;
         (ConfigurationRecord.Service, ConfigurationRecord.Instance, ConfigurationRecord.Endpoint) = serviceRelation;
         ConfigurationRecord.NavigateToDashboardConfiguration();

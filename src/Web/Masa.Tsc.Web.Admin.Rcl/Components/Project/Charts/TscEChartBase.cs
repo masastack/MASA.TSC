@@ -1,7 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.Web.Admin.Rcl.Components;
+namespace Masa.Tsc.Web.Admin.Rcl.Components.Project.Charts;
 
 public partial class TscEChartBase : TscComponentBase
 {
@@ -22,7 +22,7 @@ public partial class TscEChartBase : TscComponentBase
         await Task.CompletedTask;
     }
 
-    protected string ToDateTimeStr(double value,string fmt)
+    protected string ToDateTimeStr(double value, string fmt)
     {
         var millionSeconds = (long)Math.Floor(value * 1000);
         return millionSeconds.ToDateTime(CurrentTimeZone).Format(CurrentTimeZone, fmt);
