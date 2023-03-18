@@ -5,18 +5,19 @@
     <MCardTitle>
         <MLabel Class="emphasis2--text h6">@(Title)</MLabel>
     </MCardTitle>
-    <MCardText Class="flex-grow-1 d-flex justify-center align-center emphasis--text">
-        @if (_isLoading)
+        <MCardText Class="flex-grow-1 pb-0 overflow-hidden" Style="height:129px">
+            @if (_isLoading)
         {
-            @("Loading ...")
+            <div class="d-flex full-height full-width">
+                <div class="ma-auto">@T("Loading data")</div>
+            </div>
         }
         else
         {
-            <span style="font-weight: 700;font-size: 60px;line-height: 76px;text-align: center;letter-spacing: -0.5px;">@Total</span>
-            <span class="ml-2 h4 ">@Unit</span>
+            <MECharts Option="_options.Option" Width="@("200%")" Height="@("180%")"></MECharts>
         }
     </MCardText>
     <MCardActions Class="regular3--text body2 px-4">
-        @T("The average response time of the service during the time period")
+        @T("The sum of the total duration/executions during the period, the lower the relative value, the better")
     </MCardActions>
 </MCard>

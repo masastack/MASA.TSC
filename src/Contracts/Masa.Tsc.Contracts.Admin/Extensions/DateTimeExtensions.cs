@@ -26,8 +26,8 @@ public static class DateTimeExtensions
 
     public static string Format(this DateTime time, TimeZoneInfo? timeZone, string fmt = "yyyy-MM-dd HH:mm:ss")
     {
-        if (timeZone is not null)
-            time = TimeZoneInfo.ConvertTime(time, timeZone);
+        //if (timeZone is not null)
+        //    time = TimeZoneInfo.ConvertTime(time, timeZone);
         if (time == DateTime.MinValue || time == DateTime.MaxValue)
             return "";
         return time.ToString(fmt);

@@ -21,6 +21,9 @@ public partial class TeamProjectDialog
 
     int ErrorCount { get; set; }
 
+    [Inject]
+    IJSRuntime JSRuntime { get; set; }
+
     ConfigurationRecord ConfigurationRecord { get; set; } = new();
 
     ServiceAutoComplete ServiceAutoComplete { get; set; }
@@ -57,8 +60,16 @@ public partial class TeamProjectDialog
             Team.ProjectTotal = ParamData.TeamProjectCount;
             Team.AppTotal = ParamData.TeamServiceCount;
             ConfigurationRecord.Service = ParamData.ServiceId;
+            ConfigurationRecord.StartTime = ParamData.Start;
+            ConfigurationRecord.EndTime= ParamData.End;
             ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
         }
+    }
+
+    async Task OpenLogAsync()
+    {
+        var url = $"/dashbord/log/{ConfigurationRecord.Service}/{ConfigurationRecord.StartTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/{ConfigurationRecord.EndTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/Error";        
+        await JSRuntime.InvokeAsync<object>("open", url, "_blank");
     }
 
     void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)

@@ -761,10 +761,10 @@ public class EChartType
         Src = src;
         //try
         //{
-        Json = JsonNode.Parse(Regex.Replace(json, @"\s", ""))!;
+           Json = JsonNode.Parse(Regex.Replace(json, @"\s", ""))!;
         //}
         //catch (Exception ex)
-        //{ 
+        //{
 
         //}
     }

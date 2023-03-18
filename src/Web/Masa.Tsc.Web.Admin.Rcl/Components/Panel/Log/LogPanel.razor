@@ -19,7 +19,12 @@
             <SearchTextField FullWidth @bind-Value="@Search" Small Clearable Class="my-auto mr-6" style="max-width:100%;" />
             @if (PageMode)
             {
-                <DateTimeRangeToolbar Class="mr-6 my-auto" OnUpdate="OnUpdate" OnAutoUpdate="OnAutoUpdate" StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
+                <DateTimeRangeToolbar Class="mr-6 my-auto"
+                                  StartDateTime="@StartTime.ToDateTimeOffset(CurrentTimeZone)"
+                                  EndDateTime="@EndTime.ToDateTimeOffset(CurrentTimeZone)"
+                                  OnUpdate="OnUpdate"
+                                  OnAutoUpdate="OnAutoUpdate"
+                                  StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
                                   EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start" />
             }
         </div>

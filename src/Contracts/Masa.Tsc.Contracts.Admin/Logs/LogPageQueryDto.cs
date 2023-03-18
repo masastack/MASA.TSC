@@ -21,4 +21,8 @@ public class LogPageQueryDto : Pagination<LogPageQueryDto>
     ///  scheduler job taskid
     /// </summary>
     public string TaskId { get; set; }
+
+    public string Service { get; set; }
+
+    public string LogLevel { get; set; }
 }
