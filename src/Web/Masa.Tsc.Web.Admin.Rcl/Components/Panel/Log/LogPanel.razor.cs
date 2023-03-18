@@ -145,7 +145,7 @@ public partial class LogPanel
             LogLevel = LogLevel
         };
         var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
-        Logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
+        Logs = response.Result.Select(item => new LogModel(item.Timestamp+CurrentTimeZone.BaseUtcOffset, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
         Total = response.Total;
         await GetChartData();
         Loading = false;
