@@ -21,6 +21,17 @@ public class QueryHandler
     }
 
     [EventHandler]
+    public async Task GetDetailByMetricAsync(TraceMetricToDetailQuery query)
+    {
+        //_traceService.AggregateAsync(new SimpleAggregateRequestDto { 
+        //    Start= query.Start,
+        //    End= query.End,
+        //    Name=ElasticConstant.TraceId,
+        //    Type= AggregateTypes.
+        //});
+    }
+
+    [EventHandler]
     public async Task GetListAsync(TraceListQuery query)
     {
         var queryDto = new BaseRequestDto

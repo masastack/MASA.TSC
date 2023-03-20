@@ -34,7 +34,7 @@ public partial class TscTraceList : TscComponentBase
         new() { Text = T("Service"), Value = "Service", Sortable = false,Width=250},
         new() { Text = T("TraceId"), Value = "TraceId", Sortable = false },
         new() { Text = T("Endpoint"), Value = "Endpoint", Sortable = false },
-        new() { Text = T("Duration (ms)"), Value = "Duration", Sortable = false,Width=150},
+        new() { Text = $"{T("Duration")}({T("ms")})", Value = "Duration", Sortable = false,Width=150},
         new() { Text = T("Timestamp"), Value = "Timestamp", Sortable = true,Width=200}
     };
 
@@ -56,6 +56,26 @@ public partial class TscTraceList : TscComponentBase
             CurrentTrace = item;
         }
         await _tscTraceDetail!.OpenAsync(item.TraceId);
+    }
+
+    private static string FormatDuration(double duration)
+    {
+        if (duration < 1)
+            return "< 1ms";
+
+        var ms = (long)Math.Round(duration, 0);
+
+        if (ms < 1000)
+        {
+            return $"{ms}ms";
+        }
+
+        if (ms < 60000)
+        {
+            return $"{(ms / 1000d):F}s";
+        }
+
+        return $"{(ms / 60000d):F}m";
     }
 
     private async Task HandleOnPaginationUpdate((int page, int pageSize) pagination)

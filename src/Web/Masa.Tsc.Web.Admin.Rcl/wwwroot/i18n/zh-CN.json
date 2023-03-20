@@ -164,6 +164,12 @@
     "For HTTP 1/2, gRPC, RPC services, this means Calls Per Minute (calls/min)": "例如 HTTP 1/2, gRPC, RPC的服务负载 (调用次数/分钟)",
     "Currently the application has {0} error logs": "目前该应用程序有{0}条错误日志"
   },
+  "Trace": {
+    "TraceId": "追踪Id",
+    "Duration": "耗时",
+    "Timestamp": "时间",
+    "Copy value": "复制"
+  },
   "Start": "开始点",
   "Duration": "持续时间",
   "Span Count": "跨度",

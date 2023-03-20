@@ -27,6 +27,10 @@
             {
                 @context.Item.GetDispalyName()
             }
+            else if (context.Header.Value == nameof(TraceResponseDto.Duration))
+            {
+                @FormatDuration((context.Item.Timestamp-context.Item.EndTimestamp).TotalMilliseconds)
+            }
             else
             {
                 @context.Value

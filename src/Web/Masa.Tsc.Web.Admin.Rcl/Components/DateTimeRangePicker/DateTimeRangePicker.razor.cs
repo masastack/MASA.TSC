@@ -252,11 +252,11 @@ public partial class DateTimeRangePicker
         _menuValue = false;
     }
 
-    private static string FormatDateTime(DateTimeOffset dateTime)
+    private string FormatDateTime(DateTimeOffset dateTime)
     {
-        var str = dateTime.ToString(CultureInfo.CurrentUICulture);
-        var lastIndex = str.LastIndexOf(" ", StringComparison.Ordinal);
-        return str[..lastIndex];
+        return dateTime.ToString(T("$DateTimeFormat"));
+        //var lastIndex = str.LastIndexOf(" ", StringComparison.Ordinal);
+        //return str[..lastIndex];
     }
 
     private TimeZoneInfo GetSelectTimeZone()
