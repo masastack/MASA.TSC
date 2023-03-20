@@ -52,9 +52,10 @@ public partial class DateTimeRangePicker
     private DateTimeOffset? _lastEndDateTime;
 
     public override async Task SetParametersAsync(ParameterView parameters)
-    {
+    {        
         await base.SetParametersAsync(parameters);
-        EnsureValidDateTimes();
+        //has bugs
+        //EnsureValidDateTimes();
     }
 
     private void EnsureValidDateTimes()

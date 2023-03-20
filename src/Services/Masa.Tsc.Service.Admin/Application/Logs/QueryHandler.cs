@@ -87,12 +87,15 @@ public class QueryHandler
             });
         }
 
+        bool isRawQuery = queryData.Query?.IndexOfAny(new char[] { '{', '}' }) >= 0 ? true : false;
+
         var data = await _logService.ListAsync(new BaseRequestDto
         {
             Service = queryData.Service!,
             Start = queryData.Start,
             End = queryData.End,
-            Keyword = queryData.Query,
+            Keyword = isRawQuery ? default! : queryData.Query,
+            RawQuery = isRawQuery ? queryData.Query : default!,
             Page = queryData.Page,
             PageSize = queryData.Size,
             Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = queryData.IsDesc },

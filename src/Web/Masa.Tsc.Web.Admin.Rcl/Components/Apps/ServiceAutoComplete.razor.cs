@@ -35,14 +35,10 @@ public partial class ServiceAutoComplete
             _isLoading = true;
             if (Metric)
             {
-                var data = await ApiCaller.MetricService.GetValues(new RequestMetricListDto { Type = MetricValueTypes.Service });
+                var data = CombineServices(await ApiCaller.MetricService.GetValues(new RequestMetricListDto { Type = MetricValueTypes.Service }), await PmClient.AppService.GetListAsync());
                 if (data != null && data.Any())
                 {
-                    Services = data.Select(item => new AppDetailModel
-                    {
-                        Identity = item,
-                        Name = item
-                    }).ToList();
+                    Services = data;
                 }
             }
             else
@@ -53,6 +49,26 @@ public partial class ServiceAutoComplete
             }
             _isLoading = false;
         }
+    }
+
+    private List<AppDetailModel> CombineServices(List<string> metricServices, List<AppDetailModel> pmServices)
+    {
+        var result = new List<AppDetailModel>();
+        if (metricServices == null || !metricServices.Any())
+            return result;
+        foreach (var name in metricServices)
+        {
+            var pmService = pmServices?.FirstOrDefault(p => p.Identity == name);
+            if (pmService != null)
+                result.Add(pmService);
+            else
+                result.Add(new AppDetailModel
+                {
+                    Identity = name,
+                    Name = name
+                });
+        }
+        return result;
     }
 
     protected override async Task OnParametersSetAsync()

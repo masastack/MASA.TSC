@@ -14,4 +14,6 @@ public sealed class ElasticSearchConst
     public const string LogWarningText = "Warning";
 
     public const string ServiceName = "Resource.service.name";
+
+    public const string URL = "Attributes.http.target";
 }

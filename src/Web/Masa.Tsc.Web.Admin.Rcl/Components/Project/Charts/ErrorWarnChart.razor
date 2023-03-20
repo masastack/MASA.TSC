@@ -22,6 +22,6 @@
     </MCardText>
     <MCardActions Class="regular3--text body2 text-left px-4 pt-0">
         @T("The average success rate of the service in the current time period")@(_success)%<br />
-        @T("The average failure rate of the service in the current time period")@(100 - _success)%
+        @T("The average failure rate of the service in the current time period")@(Math.Round(100 - _success,2))%
     </MCardActions>
 </MCard>

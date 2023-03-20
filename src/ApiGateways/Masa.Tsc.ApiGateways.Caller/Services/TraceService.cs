@@ -29,4 +29,9 @@ public class TraceService : BaseService
             return default!;
         return JsonSerializer.Deserialize<TResult>(str)!;
     }
+
+    public async Task<IEnumerable<TraceResponseDto>> GetByMetricAsync(string service, string url, DateTime start, DateTime end)
+    {
+        return (await Caller.GetAsync<IEnumerable<TraceResponseDto>>($"{RootPath}/getByMetric", new { service, url, start, end }))!;
+    }
 }
