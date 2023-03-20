@@ -1,7 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Models;
+namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Models;
 
 public static class NavigationManagerExtensions
 {
@@ -25,7 +25,7 @@ public static class NavigationManagerExtensions
         navigationManager.NavigateTo(uri);
     }
 
-    public static void NavigateToConfigurationChart(this NavigationManager navigationManager, string panelId, string dashboardId, string? service = null, string? instance = null, string? endpoint = null)
+    public static void NavigateToChartConfiguration(this NavigationManager navigationManager, string panelId, string dashboardId, string? service = null, string? instance = null, string? endpoint = null)
     {
         var uri = $"/dashboard/configuration/chart/{panelId}/{dashboardId}";
         if (string.IsNullOrEmpty(service) is false) uri += $"/{service}";

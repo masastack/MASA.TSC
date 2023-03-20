@@ -3,6 +3,7 @@
 <AutoHeight Id="@_scrollElementId" Overflow AutoStyle="max-height: calc(100vh - 185px);height: 900px">
     <HeaderContent>
         <div class="d-flex mb-6">
+            @Header
             <ServiceRelation Service="@ConfigurationRecord.Service"
                              Instance="@ConfigurationRecord.Instance"
                              Endpoint="@ConfigurationRecord.Endpoint"
@@ -44,7 +45,7 @@
             <CascadingValue Value="ConfigurationRecord.IsEdit" IsFixed>
                 <CascadingValue Value="PanelGrids" IsFixed>
                     <CascadingValue Value="ConfigurationRecord" IsFixed>
-                        @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady && _timeRangeReady))
+                        @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady) && _timeRangeReady)
                         {
                             <PanelGrids Panels="ConfigurationRecord.Panels" />
                         }

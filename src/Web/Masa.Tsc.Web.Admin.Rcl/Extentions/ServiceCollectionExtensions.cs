@@ -7,7 +7,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddRcl(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddScoped<ConfigurationRecord>();
+        serviceCollection.AddScoped<DashboardConfigurationRecord>();
 
         return serviceCollection;
     }

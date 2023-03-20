@@ -67,7 +67,7 @@ public partial class Dashboard
         return folder.Dashboards;
     });
 
-    Modes Mode { get; set; } = Modes.Folder;
+    ModeTypes Mode { get; set; } = ModeTypes.Folder;
 
     bool AddFolderDialogVisible { get; set; }
 

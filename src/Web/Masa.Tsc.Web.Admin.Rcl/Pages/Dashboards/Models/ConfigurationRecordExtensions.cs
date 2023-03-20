@@ -1,11 +1,11 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Models;
+namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Models;
 
 public static class ConfigurationRecordExtensions
 {
-    public static async Task BindPanelsAsync(this ConfigurationRecord configurationRecord, TscCaller apiCaller)
+    public static async Task BindPanelsAsync(this DashboardConfigurationRecord configurationRecord, TscCaller apiCaller)
     {
         configurationRecord.ClearPanels();
         var detail = await apiCaller.InstrumentService.GetDetailAsync(Guid.Parse(configurationRecord.DashboardId));

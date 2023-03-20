@@ -10,7 +10,7 @@
 
 @code {
     [Inject]
-    ConfigurationRecord ConfigurationRecord { get; set; }
+    DashboardConfigurationRecord ConfigurationRecord { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -32,11 +32,15 @@
 
     UpsertChartPanelDto? Panel { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnInitialized()
     {
         ConfigurationRecord.Service = ServiceName;
         ConfigurationRecord.Instance = InstanceName;
-        ConfigurationRecord.Endpoint = EndpointName;       
+        ConfigurationRecord.Endpoint = EndpointName;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {     
         if (string.IsNullOrEmpty(DashboardId) is false && ConfigurationRecord.DashboardId != DashboardId)
         {
             ConfigurationRecord.DashboardId = DashboardId;

@@ -3,14 +3,12 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Models;
 
-public class ConfigurationRecord
+public abstract class ConfigurationRecord
 {
     string? _randomStr;
     ModelTypes _modelType;
 
     public List<UpsertPanelDto> Panels { get; set; } = new();
-
-    public string DashboardId { get; set; }
 
     public string? Service { get; set; }
 
@@ -49,8 +47,6 @@ public class ConfigurationRecord
 
     public bool IsEdit { get; set; }
 
-    public bool HasNavigateTo { get; set; }
-
     public NavigationManager NavigationManager { get; }
 
     public ConfigurationRecord(NavigationManager navigationManager)
@@ -58,26 +54,15 @@ public class ConfigurationRecord
         NavigationManager = navigationManager;
     }
 
-    public void NavigateToDashboardConfiguration()
-    {
-        if (NavigationManager.Uri.Contains(DashboardId)) HasNavigateTo = true;
-        NavigationManager.NavigateToDashboardConfiguration(DashboardId, Service, Instance, Endpoint);
-    }
+    public abstract void NavigateToDashboardConfiguration();
 
-    public void NavigateToDashboardConfigurationRecord()
-    {
-        NavigationManager.NavigateToDashboardConfigurationRecord(DashboardId, Service, Instance, Endpoint);
-    }
+    public abstract void NavigateToDashboardConfigurationRecord();
 
-    public void NavigateToConfigurationChart()
-    {
-        ArgumentNullException.ThrowIfNull(PanelId);
-        NavigationManager.NavigateToConfigurationChart(PanelId, DashboardId, Service, Instance, Endpoint);
-    }
+    public abstract void NavigateToChartConfiguration();
 
     public bool ServiceRelationReady(bool ready)
     {
-        var allModelPass = ModelType is ModelTypes.All or default(ModelTypes);
+        var allModelPass = ModelType is ModelTypes.All;
         var serviceModelPass = ModelType is ModelTypes.Service && string.IsNullOrEmpty(Service) is false;
         var instanceModelPass = ModelType is ModelTypes.ServiceInstance && string.IsNullOrEmpty(Service) is false && string.IsNullOrEmpty(Instance) is false;
         var endPointPass = ModelType is ModelTypes.Endpoint && string.IsNullOrEmpty(Service) is false && string.IsNullOrEmpty(Instance) is false && string.IsNullOrEmpty(Endpoint) is false;
@@ -89,12 +74,11 @@ public class ConfigurationRecord
         _randomStr = Guid.NewGuid().ToString();
     }
 
-    public void Clear()
+    public virtual void Clear()
     {
         ClearPanels();
         ModelType = default;
         Layer = default;
-        DashboardId = "";
         Service = default;
         Instance = default;
         Endpoint = default;

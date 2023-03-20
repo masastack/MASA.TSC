@@ -6,15 +6,15 @@
 <AutoHeight>
     <HeaderContent>
         <div class="d-flex mb-6">
-            <SLabeledRadioGroup TValue="Modes" @bind-Value=Mode Dense ActiveClass="fill-background" Class="mr-6 my-auto white">
-                <SLabeledRadio Value="Modes.Folder">
-                    <SIcon Color="@(Mode == Modes.Folder ? "primary" : "emphasis2")">@IconConstants.Folder</SIcon>
+            <SLabeledRadioGroup TValue="ModeTypes" @bind-Value=Mode Dense ActiveClass="fill-background" Class="mr-6 my-auto white">
+                <SLabeledRadio Value="ModeTypes.Folder">
+                    <SIcon Color="@(Mode == ModeTypes.Folder ? "primary" : "emphasis2")">@IconConstants.Folder</SIcon>
                 </SLabeledRadio>
-                <SLabeledRadio Value="Modes.Table">
-                    <SIcon Color="@(Mode == Modes.Table ? "primary" : "emphasis2")">@IconConstants.List</SIcon>
+                <SLabeledRadio Value="ModeTypes.Table">
+                    <SIcon Color="@(Mode == ModeTypes.Table ? "primary" : "emphasis2")">@IconConstants.List</SIcon>
                 </SLabeledRadio>
             </SLabeledRadioGroup>
-            @if (Mode is Modes.Folder)
+            @if (Mode is ModeTypes.Folder)
             {
                 <MButton Depressed Text Outlined Class="mr-6 my-auto regular--text body2 white" OnClick="() => ExpandAll = !ExpandAll">
                     @(ExpandAll ? T("Close all") : T("Expend all"))
@@ -28,7 +28,7 @@
     </HeaderContent>
     <AutoHeightContent>
         <DefaultCard Class="px-2">
-            @if (Mode is Modes.Table)
+            @if (Mode is ModeTypes.Table)
             {
                 <SDataTable Items="Dashboards"
                             TItem="DashboardDto"

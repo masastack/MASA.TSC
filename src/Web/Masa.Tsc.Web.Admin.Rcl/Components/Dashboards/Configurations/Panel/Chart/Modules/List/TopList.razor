@@ -58,7 +58,7 @@
 
     string GetTextColorStyle(int index)
     {
-        if (index > _defaultColors.Count())
+        if (index > _defaultColors.Count() - 1)
         {
             index = index % _defaultColors.Count();
         }
