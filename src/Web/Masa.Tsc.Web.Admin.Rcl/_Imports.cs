@@ -33,7 +33,9 @@ global using Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Panel.L
 global using Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Panel.Tabs.Models;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Panel.Trace;
 global using Masa.Tsc.Web.Admin.Rcl.Components.DateTimeRangeToolbars;
+global using Masa.Tsc.Web.Admin.Rcl.Components.Project.Charts;
 global using Masa.Tsc.Web.Admin.Rcl.Data.Team;
+global using Masa.Tsc.Web.Admin.Rcl.Extentions;
 global using Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Models;
 global using Masa.Tsc.Web.Admin.Rcl.Shared;
 global using Masa.Utils.Data.Prometheus.Enums;
