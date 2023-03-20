@@ -17,12 +17,12 @@ public class DashboardConfigurationRecord : ConfigurationRecord
         base.Clear();
     }
 
-    public override void NavigateToDashboardConfiguration()
+    public override void NavigateToConfiguration()
     {
         NavigationManager.NavigateToDashboardConfiguration(DashboardId, Service, Instance, Endpoint);
     }
 
-    public override void NavigateToDashboardConfigurationRecord()
+    public override void NavigateToConfigurationRecord()
     {
         NavigationManager.NavigateToDashboardConfigurationRecord(DashboardId, Service, Instance, Endpoint);
     }

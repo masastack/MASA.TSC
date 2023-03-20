@@ -108,7 +108,7 @@ public partial class DashboardConfiguration : IAsyncDisposable
     {
         _serviceRelationReady = true;
         (ConfigurationRecord.Service, ConfigurationRecord.Instance, ConfigurationRecord.Endpoint) = serviceRelation;
-        ConfigurationRecord.NavigateToDashboardConfiguration();
+        ConfigurationRecord.NavigateToConfiguration();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

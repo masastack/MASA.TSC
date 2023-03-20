@@ -54,9 +54,9 @@ public abstract class ConfigurationRecord
         NavigationManager = navigationManager;
     }
 
-    public abstract void NavigateToDashboardConfiguration();
+    public abstract void NavigateToConfiguration();
 
-    public abstract void NavigateToDashboardConfigurationRecord();
+    public abstract void NavigateToConfigurationRecord();
 
     public abstract void NavigateToChartConfiguration();
 

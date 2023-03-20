@@ -66,7 +66,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
             await PopupService.EnqueueSnackbarAsync(T("Metrics name is required"), AlertTypes.Error);
             return;
         }
-        ConfigurationRecord.NavigateToDashboardConfigurationRecord();
+        ConfigurationRecord.NavigateToConfigurationRecord();
     }
 
     async Task CancelAsync()
