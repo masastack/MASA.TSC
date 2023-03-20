@@ -98,7 +98,7 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
         PopupService.EnqueueSnackbarAsync(message, AlertTypes.Error);
     }
 
-    private bool _disposing = false;
+    protected bool _disposing = false;
     public async ValueTask DisposeAsync()
     {
         if (!_disposing)

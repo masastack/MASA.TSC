@@ -75,4 +75,30 @@ internal static class IElasticClientExtenstion
 
         return result;
     }
+
+    public static async Task<string> GetByMetricAsync(this IElasticClient client, string service, string url, DateTime start, DateTime end)
+    {
+        ISearchResponse<object> searchResponse = await client.SearchAsync<object>(searchDescriptor => searchDescriptor.Index(AppSettings.Get("Masa:Elastic:TraceIndex"))
+                .Query(q => q.Bool(
+                    b => b.Must(
+                            q1 => q1.Term(f => f.Field($"{ElasticConstant.ServiceName}.keyword").Value(service)),
+                            q2 => q2.DateRange(f => f.Name(ElasticConstant.Trace.Timestamp).LessThanOrEquals(end).GreaterThanOrEquals(start)),
+                            q3 => url.Contains('*') ? q3.QueryString(f => f.Name($"{ElasticSearchConst.URL}").Query(url)) : q3.Term(f => f.Field($"{ElasticSearchConst.URL}.keyword").Value(url))
+                            )
+                ))
+                .Sort(sort => sort.Script(script => script.Order(SortOrder.Descending).Script(s => s.Source("doc['EndTimestamp'].value.toEpochSecond()-doc['@timestamp'].value.toEpochSecond()")).Type("number")))
+                .Size(1));
+
+        if (!searchResponse.IsValid || !searchResponse.Documents.Any())
+            return default!;
+        var obj = (Dictionary<string, object>)searchResponse.Documents.First();
+
+        foreach (var item in obj)
+        {
+            if (item.Key == ElasticConstant.TraceId)
+                return item.Value.ToString();
+        }
+
+        return default!;
+    }
 }

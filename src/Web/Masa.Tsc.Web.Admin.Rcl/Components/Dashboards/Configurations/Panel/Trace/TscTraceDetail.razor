@@ -58,10 +58,13 @@
                     <div class="trace-timelines-view">
                         <div class="trace-timelines-view__line">
                             <div class="trace-timelines-view__line-item body2" style="left: 0;">0</div>
-                            <div class="trace-timelines-view__line-item body2" style="left: 20%;">@(FormatDuration(scale * 1))</div>
-                            <div class="trace-timelines-view__line-item body2" style="left: 40%;">@(FormatDuration(scale * 2))</div>
-                            <div class="trace-timelines-view__line-item body2" style="left: 60%;">@(FormatDuration(scale * 3))</div>
-                            <div class="trace-timelines-view__line-item body2" style="left: 80%;">@(FormatDuration(scale * 4))</div>
+                            @if (_rootTreeItem.Duration >= 5)
+                            {
+                                <div class="trace-timelines-view__line-item body2" style="left: 20%;">@(FormatDuration(scale * 1))</div>
+                                <div class="trace-timelines-view__line-item body2" style="left: 40%;">@(FormatDuration(scale * 2))</div>
+                                <div class="trace-timelines-view__line-item body2" style="left: 60%;">@(FormatDuration(scale * 3))</div>
+                                <div class="trace-timelines-view__line-item body2" style="left: 80%;">@(FormatDuration(scale * 4))</div>
+                            }
                             <div class="trace-timelines-view__line-item body2" style="right: 0;">@(FormatDuration(_rootTreeItem.Duration))</div>
                         </div>
                     </div>
@@ -81,47 +84,53 @@
                        Class="flex-fill overflow-y-auto"
                        Style='@($"height: calc(100vh - {_timelinesView.Count * 20 + 254}px)")'
                        @key="@_treeData">
-                <LabelContent>
-                    <MListItem Dense>
-                        <MListItemContent>
-                            <div class="d-flex align-center">
-                                @{
-                                    int level = context.Item.Level - 1;
+                <ChildContent>
+                    <MCard Width="500" Style="margin: 0 auto">
+                        <MVirtualScroll Height="250" Items="_treeData" @ref="_vs" TItem="TraceResponseTree">
+                            <ItemContent>
+                                <MListItem Dense>
+                                    <MListItemContent>
+                                        <div class="d-flex align-center">
+                                            @{
+                                                int level = context.Level - 1;
 
-                                    <div style="min-width:calc(542px - @(level * 24)px)">
-                                        @context.Item.Name
-                                        @{
-                                            if (context.Item.Resource.ContainsKey("service.name"))
-                                            {
-                                                <div>
-                                                    @context.Item.Resource["service.name"]
-                                                    @((RenderFragment)(labelBuilder => RenderItemLabel(labelBuilder, context.Item)))
+                                                <div style="min-width:calc(542px - @(level * 24)px)">
+                                                    @context.Name
+                                                    @{
+                                                        if (context.Resource.ContainsKey("service.name"))
+                                                        {
+                                                            <div>
+                                                                @context.Resource["service.name"]
+                                                                @((RenderFragment)(labelBuilder => RenderItemLabel(labelBuilder, context)))
+                                                            </div>
+                                                        }
+                                                    }
                                                 </div>
                                             }
-                                        }
-                                    </div>
-                                }
-                                <div class="trace-timelines">
-                                    @foreach (var timeline in context.Item.Timelines)
-                                    {
-                                        if (timeline.marginLeft > 0)
-                                        {
-                                            <div style="width: @(timeline.marginLeft * 100)%"></div>
-                                        }
-                                        <div class="trace-timeline__section" style="width: @(timeline.Percent * 100)%;">
-                                            <div class="trace-timeline__background">
-                                                <div class="trace-timeline__leaner @(timeline.Render ? "" : "d-none")"></div>
+                                            <div class="trace-timelines">
+                                                @foreach (var timeline in context.Timelines)
+                                                {
+                                                    if (timeline.marginLeft > 0)
+                                                    {
+                                                        <div style="width: @(timeline.marginLeft * 100)%"></div>
+                                                    }
+                                                    <div class="trace-timeline__section" style="width: @(timeline.Percent * 100)%;">
+                                                        <div class="trace-timeline__background">
+                                                            <div class="trace-timeline__leaner @(timeline.Render ? "" : "d-none")"></div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div class="d-inline-block ml-2" style="min-width: 52px;">
+                                                @FormatDuration(context.DoubleDuration)
                                             </div>
                                         </div>
-                                    }
-                                </div>
-                                <div class="d-inline-block ml-2" style="min-width: 52px;">
-                                    @FormatDuration(context.Item.DoubleDuration)
-                                </div>
-                            </div>
-                        </MListItemContent>
-                    </MListItem>
-                </LabelContent>
+                                    </MListItemContent>
+                                </MListItem>
+                            </ItemContent>
+                        </MVirtualScroll>
+                    </MCard>
+                </ChildContent>
             </MTreeview>
         </div>
 
@@ -130,6 +139,10 @@
         @if (_activeTreeItem is not null)
         {
             var detail = _activeTreeItem.ToDictionary(nameof(TraceResponseTree.Children), nameof(TraceResponseTree.Attributes), nameof(TraceResponseTree.Resource), nameof(TraceResponseTree.Timelines), nameof(TraceResponseTree.Level), nameof(TraceResponseTree.DoubleDuration));
+
+            var key = nameof(TraceResponseTree.Duration);
+            if (detail.ContainsKey(key))
+                detail[key] = FormatDuration(_activeTreeItem.DoubleDuration);
 
             <div class="pa-12" style="width:430px">
                 <MList Dense Class="emphasis2 mb-4 rounded" Dark>
@@ -244,19 +257,21 @@
                     <MListItemTitle>@item.Key</MListItemTitle>
                 </MListItemContent>
                 <MListItemAction Style="max-width: 38%">
-                    <EllipsisText TooltipStyle="white-space: pre-wrap;">
-                        <ActivatorContent>
-                            <MListItemActionText Class="text-truncate text-right"
-                                     Style="width: 100%; cursor: auto;"
-                                     RefBack="@context.Ref"
-                                         @attributes="@context.Attrs">
-                                @value
-                            </MListItemActionText>
-                        </ActivatorContent>
-                        <ChildContent>
-                            @value
-                        </ChildContent>
-                    </EllipsisText>
+                    <MListItemActionText Class="text-truncate text-right masa body-2"
+                             Style="width: 100%; cursor: auto;">
+                        <MHover Context="hContext">
+                            <div @attributes="hContext.Attrs" class="hover-pointer d-flex align-center">                                
+                                <div @onclick="() => Copy(value)" @onclick:stopPropagation>
+                                    <SIcon Tooltip="@T("Copy value")"
+                               Color="@(_copyClicked ? "success" : "gray")"
+                               Style="@(hContext.Hover ? "width: 18px; height: 18px; margin-right: 12px; transition: 0.5s;" : "opacity:0; width: 18px; height: 0px; margin-left: -24px; transition: 0.4s;")">
+                                        @(_copyClicked ? _checkSvg : _copySvg)
+                                    </SIcon>
+                                </div>
+                                <span class="mr-2">@value</span>
+                            </div>
+                        </MHover>
+                    </MListItemActionText>
                 </MListItemAction>
             </MListItem>
         }

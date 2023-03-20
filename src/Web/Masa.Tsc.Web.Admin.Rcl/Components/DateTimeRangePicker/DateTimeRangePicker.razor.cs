@@ -52,9 +52,10 @@ public partial class DateTimeRangePicker
     private DateTimeOffset? _lastEndDateTime;
 
     public override async Task SetParametersAsync(ParameterView parameters)
-    {
+    {        
         await base.SetParametersAsync(parameters);
-        EnsureValidDateTimes();
+        //has bugs
+        //EnsureValidDateTimes();
     }
 
     private void EnsureValidDateTimes()
@@ -252,11 +253,11 @@ public partial class DateTimeRangePicker
         _menuValue = false;
     }
 
-    private static string FormatDateTime(DateTimeOffset dateTime)
+    private string FormatDateTime(DateTimeOffset dateTime)
     {
-        var str = dateTime.ToString(CultureInfo.CurrentUICulture);
-        var lastIndex = str.LastIndexOf(" ", StringComparison.Ordinal);
-        return str[..lastIndex];
+        return dateTime.ToString(T("$DateTimeFormat"));
+        //var lastIndex = str.LastIndexOf(" ", StringComparison.Ordinal);
+        //return str[..lastIndex];
     }
 
     private TimeZoneInfo GetSelectTimeZone()

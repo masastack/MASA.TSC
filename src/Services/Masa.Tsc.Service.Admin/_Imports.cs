@@ -53,6 +53,7 @@ global using Masa.Tsc.Service.Admin.Application.Teams;
 global using Masa.Tsc.Service.Admin.Application.Topologies.Commands;
 global using Masa.Tsc.Service.Admin.Application.Topologies.Query;
 global using Masa.Tsc.Service.Admin.Application.Traces;
+global using Masa.Tsc.Service.Admin.Application.Traces.Queries;
 global using Masa.Tsc.Service.Admin.Domain.Aggregates;
 global using Masa.Tsc.Service.Admin.Domain.Repositories;
 global using Masa.Tsc.Service.Admin.Domain.Topologies.Aggregates;
