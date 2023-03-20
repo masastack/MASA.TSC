@@ -8,9 +8,6 @@ public partial class ConfigurationDashboard
     [Inject]
     public DashboardConfigurationRecord ConfigurationRecord { get; set; }
 
-    [Inject]
-    public IJSRuntime JS { get; set; }
-
     [Parameter]
     public string DashboardId { get; set; }
 
