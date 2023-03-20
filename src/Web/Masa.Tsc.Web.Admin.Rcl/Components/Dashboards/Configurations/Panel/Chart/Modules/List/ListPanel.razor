@@ -33,16 +33,21 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Value.ListType != ListTypes.TopList && _oldKey != ConfigurationRecord.Key)
-        {
-            services = await GetServiceNames() ?? new();
-            _shouldRender = true;
-        }
-        if (_lastListType != Value.ListType)
+        var keyChanged = _oldKey != ConfigurationRecord.Key;
+        var listTypeChanged = _lastListType != Value.ListType && Value.ListType != ListTypes.TopList;
+        if (keyChanged || listTypeChanged)
         {
             _lastListType = Value.ListType;
-            jumpId = await GetJumpId();
-            jumpName = GetJumpName();
+            _oldKey = ConfigurationRecord.Key;
+            if (listTypeChanged)
+            {
+                jumpId = await GetJumpId();
+                jumpName = GetJumpName();
+            }
+            if (keyChanged || listTypeChanged)
+            {
+                services = await GetServiceNames() ?? new();               
+            }
             _shouldRender = true;
         }
 
@@ -61,7 +66,6 @@ else
         }
         else
         {
-            services = await GetServiceNames() ?? new();
             Value.SetTableOption(services, jumpName, jumpId);
         }
     }

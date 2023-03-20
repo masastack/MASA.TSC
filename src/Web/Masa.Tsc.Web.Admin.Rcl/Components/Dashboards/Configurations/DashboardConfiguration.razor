@@ -1,9 +1,9 @@
 ﻿@inherits TscComponentBase
 
-<AutoHeight Id="@_scrollElementId" Overflow AutoStyle="max-height: calc(100vh - 185px);height: 900px">
+<AutoHeight Id="@_scrollElementId" AutoStyle="@($"max-height: calc(100vh - 185px);{Style}")">
     <HeaderContent>
-        <div class="d-flex mb-6">
-            @Header
+        <div class="d-flex mb-6 @HeaderClass" style="@HeaderStyle">
+            @HeaderContent
             <ServiceRelation Service="@ConfigurationRecord.Service"
                              Instance="@ConfigurationRecord.Instance"
                              Endpoint="@ConfigurationRecord.Endpoint"
@@ -41,18 +41,20 @@
         </div>
     </HeaderContent>
     <AutoHeightContent>
-        <DefaultCard Id="@_contentElementId" Style="min-height: calc(100vh - 185px);">
+        <DefaultCard Id="@_contentElementId">
             <CascadingValue Value="ConfigurationRecord.IsEdit" IsFixed>
                 <CascadingValue Value="PanelGrids" IsFixed>
                     <CascadingValue Value="ConfigurationRecord" IsFixed>
-                        @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady) && _timeRangeReady)
-                        {
-                            <PanelGrids Panels="ConfigurationRecord.Panels" />
-                        }
-                        else
-                        {
-                            PanelGrids.RemoveAll(item => item.ParentPanel is null);
-                        }
+                        <div style="overflow-y:auto;overflow-x:hidden;max-height: calc(100vh - 233px);min-height: calc(100vh - 233px);@ContentStyle">
+                            @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady) && _timeRangeReady)
+                            {
+                                <PanelGrids Panels="ConfigurationRecord.Panels" />
+                            }
+                            else
+                            {
+                                PanelGrids.RemoveAll(item => item.ParentPanel is null);
+                            }
+                        </div>                     
                     </CascadingValue>
                 </CascadingValue>
             </CascadingValue>

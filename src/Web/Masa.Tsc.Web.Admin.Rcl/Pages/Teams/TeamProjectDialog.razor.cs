@@ -7,9 +7,6 @@ public partial class TeamProjectDialog
 {
     string lastKey;
 
-    [Inject]
-    public NavigationManager NavigationManager { get; set; }
-
     [Parameter]
     public bool Visible { get; set; }
 
@@ -22,7 +19,7 @@ public partial class TeamProjectDialog
     int ErrorCount { get; set; }
 
     [Inject]
-    DashboardConfigurationRecord ConfigurationRecord { get; set; }
+    TeamDetailConfigurationRecord ConfigurationRecord { get; set; }
 
     [Inject]
     IJSRuntime JSRuntime { get; set; }
@@ -84,14 +81,9 @@ public partial class TeamProjectDialog
         await base.InvokeAsync(base.StateHasChanged);
     }
 
-    async Task NavigateToDashboardConfiguration()
+    void NavigateToDashboardConfiguration()
     {
-        //add layer
-        var data = await base.ApiCaller.InstrumentService.GetLinkAsync(MetricConstants.DEFAULT_LAYER, MetricValueTypes.Service);
-        if (data?.InstrumentId is not null)
-        {
-            NavigationManager.NavigateToDashboardConfiguration(data.InstrumentId.ToString()!, ConfigurationRecord.Service);
-        }
+        ConfigurationRecord.NavigateToConfiguration();
     }
 
     async Task<int> GetErroCountAsync(string appid)

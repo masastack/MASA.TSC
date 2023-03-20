@@ -1,7 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.Web.Admin.Rcl.Pages.Teams;
+namespace Masa.Tsc.Web.Admin.Rcl.Pages.Teams.Configurations;
 
 public partial class ConfigurationTeamDetail
 {
@@ -13,20 +13,21 @@ public partial class ConfigurationTeamDetail
 
     protected override void OnInitialized()
     {
-        if (ConfigurationRecord.NavigationManager.Uri.Contains("record")) return;
+        if (ConfigurationRecord.NavigationManager.Uri.Contains("record") is false)
+        {
+            ConfigurationRecord.Clear();
+        }
 
-        ConfigurationRecord.Clear();
         ConfigurationRecord.Service = ServiceName;
-
     }
 
     async Task SavePanelsAsync(List<UpsertPanelDto> panels)
     {
-        throw new NotImplementedException();
+        await ApiCaller.InstrumentService.UpdateTeamInstraumentAsync(panels.ToArray());
     }
 
     async Task<List<UpsertPanelDto>> GetPanelsAsync()
     {
-        throw new NotImplementedException();
+        return await ApiCaller.InstrumentService.GetTeamInstraumentDetailAsync();
     }
 }

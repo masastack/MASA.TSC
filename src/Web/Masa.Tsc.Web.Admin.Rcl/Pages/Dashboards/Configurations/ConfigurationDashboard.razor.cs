@@ -22,9 +22,12 @@ public partial class ConfigurationDashboard
 
     protected override void OnInitialized()
     {
-        if (ConfigurationRecord.NavigationManager.Uri.Contains("record")) return;
+        if (ConfigurationRecord.NavigationManager.Uri.Contains("record") is false)
+        {
+            ConfigurationRecord.Clear();
+        }
 
-        ConfigurationRecord.Clear();
+        ConfigurationRecord.DashboardId = DashboardId;
         ConfigurationRecord.Service = ServiceName;
         ConfigurationRecord.Instance = InstanceName;
         ConfigurationRecord.Endpoint = EndpointName;
@@ -35,7 +38,6 @@ public partial class ConfigurationDashboard
         if (string.IsNullOrEmpty(DashboardId) is false && ConfigurationRecord.DashboardId != DashboardId)
         {
             ConfigurationRecord.DashboardId = DashboardId;
-            ConfigurationRecord.ModelType = default;
             await ConfigurationRecord.BindPanelsAsync(ApiCaller);
         }
     }
@@ -47,6 +49,7 @@ public partial class ConfigurationDashboard
 
     async Task<List<UpsertPanelDto>> GetPanelsAsync()
     {
+        ConfigurationRecord.ModelType = default;
         var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(ConfigurationRecord.DashboardId));
         if (detail is not null)
         {

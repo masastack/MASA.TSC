@@ -18,7 +18,7 @@ public partial class DashboardConfiguration : IAsyncDisposable
     public ConfigurationRecord ConfigurationRecord { get; set; }
 
     [Parameter]
-    public RenderFragment Header { get; set; }
+    public RenderFragment HeaderContent { get; set; }
 
     [Parameter]
     public Func<List<UpsertPanelDto>, Task> SavePanelsAction { get; set; }
@@ -26,14 +26,20 @@ public partial class DashboardConfiguration : IAsyncDisposable
     [Parameter]
     public Func<Task<List<UpsertPanelDto>>> GetPanelsAction { get; set; }
 
+    [Parameter]
+    public string? HeaderStyle { get; set; }
+
+    [Parameter]
+    public string? HeaderClass { get; set; }
+
+    [Parameter]
+    public string? ContentStyle { get; set; }
+
     List<PanelGrids> PanelGrids { get; set; } = new();
 
-    async Task AddPanel()
+    protected override async Task OnInitializedAsync()
     {
-        await PanelGrids.SaveUI();
-        ConfigurationRecord.Panels.AdaptiveUI(new());
-        if (_helper is not null)
-            _ = _helper.InvokeVoidAsync("scrollBottom", _scrollElementId, _contentElementId);
+        if(ConfigurationRecord.Panels.Any() is false) await GetPanelsAsync();
     }
 
     async Task GetPanelsAsync()
@@ -47,6 +53,14 @@ public partial class DashboardConfiguration : IAsyncDisposable
         }
 
         if (ConfigurationRecord.Panels.Any() is false) ConfigurationRecord.IsEdit = true;
+    }
+
+    async Task AddPanel()
+    {
+        await PanelGrids.SaveUI();
+        ConfigurationRecord.Panels.AdaptiveUI(new());
+        if (_helper is not null)
+            _ = _helper.InvokeVoidAsync("scrollBottom", _scrollElementId, _contentElementId);
     }
 
     async Task SaveAsync()

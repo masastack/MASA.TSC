@@ -7,7 +7,7 @@ public static class ConfigurationRecordExtensions
 {
     public static async Task BindPanelsAsync(this DashboardConfigurationRecord configurationRecord, TscCaller apiCaller)
     {
-        configurationRecord.ClearPanels();
+        configurationRecord.ModelType = default;
         var detail = await apiCaller.InstrumentService.GetDetailAsync(Guid.Parse(configurationRecord.DashboardId));
         if (detail is not null)
         {

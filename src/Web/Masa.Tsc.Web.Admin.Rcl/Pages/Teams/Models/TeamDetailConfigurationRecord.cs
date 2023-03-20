@@ -7,6 +7,7 @@ public class TeamDetailConfigurationRecord : ConfigurationRecord
 {
     public TeamDetailConfigurationRecord(NavigationManager navigationManager) : base(navigationManager)
     {
+        ModelType = ModelTypes.All;
     }
 
     public override void NavigateToConfiguration()
@@ -26,5 +27,11 @@ public class TeamDetailConfigurationRecord : ConfigurationRecord
         ArgumentNullException.ThrowIfNull(PanelId);
         var uri = $"/teamDetail/configuration/chart/{PanelId}/{Service}";
         NavigationManager.NavigateTo(uri);
+    }
+
+    public override void Clear()
+    {
+        base.Clear();
+        ModelType = ModelTypes.All;
     }
 }
