@@ -4,7 +4,7 @@
                ValueChanged=ValueChanged
                Items="@(Services?? new())"
                ItemText="app => app.Name"
-               ItemValue="app=>app.Identity"
+               ItemValue="app => app.Identity"
                Small
                Label="@T("Service")"
                BackgroundColor="@(FillBackground?"fill-background":"white")"

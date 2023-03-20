@@ -38,8 +38,8 @@
     <MSpacer />
     <FadeTransition LeaveAbsolute>
         <div @onclick="SwitchMode" class="d-flex hover-pointer" style="background-color:white;height:46.5px;min-width:46.5px;z-index:1;margin-left:0;margin-top:1px;">
-            <KeyTransitionElement Value="_autocomplete" Class="ma-auto">
-                <SIcon>@(_autocomplete ? IconConstants.Update : IconConstants.Close)IconConstants.Update</SIcon>
+            <KeyTransitionElement Value="_autocomplete.ToString()" Class="ma-auto">
+                <SIcon>@(_autocomplete ? IconConstants.Update : IconConstants.Close)</SIcon>
             </KeyTransitionElement>
         </div>
     </FadeTransition>

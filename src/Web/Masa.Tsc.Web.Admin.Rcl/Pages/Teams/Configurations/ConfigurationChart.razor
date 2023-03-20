@@ -1,0 +1,57 @@
+﻿@page "/teamDetail/configuration/chart/{panelId}/{serviceName}"
+@inherits TscComponentBase
+
+<PageTitle>@T("Configure Chart")</PageTitle>
+
+@if (Panel is not null)
+{
+    <ChartPanelConfiguration Value="Panel" ConfigurationRecord="ConfigurationRecord" />
+}
+
+@code {
+    [Inject]
+    TeamDetailConfigurationRecord ConfigurationRecord { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    [Parameter]
+    public string? ServiceName { get; set; }
+
+    [Parameter]
+    public string PanelId { get; set; }
+
+    UpsertChartPanelDto? Panel { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ConfigurationRecord.Service = ServiceName;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {     
+        if (string.IsNullOrEmpty(PanelId) is false)
+        {
+            ConfigurationRecord.PanelId = PanelId;
+            Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException(T("Find panel error"));
+        }
+    }
+
+    UpsertPanelDto? FindPanel(List<UpsertPanelDto> panels)
+    {
+        foreach (var panel in panels)
+        {
+            if (panel.Id == Guid.Parse(PanelId!))
+            {
+                return panel;
+            }
+            if (panel.ChildPanels.Any())
+            {
+                var data = FindPanel(panel.ChildPanels);
+                if (data is not null) return data;
+            }
+        }
+
+        return default;
+    }
+}

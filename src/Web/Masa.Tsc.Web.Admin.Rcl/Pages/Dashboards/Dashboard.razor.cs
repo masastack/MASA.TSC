@@ -67,7 +67,7 @@ public partial class Dashboard
         return folder.Dashboards;
     });
 
-    Modes Mode { get; set; } = Modes.Folder;
+    ModeTypes Mode { get; set; } = ModeTypes.Folder;
 
     bool AddFolderDialogVisible { get; set; }
 
@@ -179,6 +179,6 @@ public partial class Dashboard
 
     void NavigateToConfiguration(DashboardDto dashboard)
     {
-        NavigationManager.NavigateToDashboardConfiguration(dashboard.Id.ToString(),default!);
+        NavigationManager.NavigateToDashboardConfiguration(dashboard.Id.ToString(), default!);
     }
 }

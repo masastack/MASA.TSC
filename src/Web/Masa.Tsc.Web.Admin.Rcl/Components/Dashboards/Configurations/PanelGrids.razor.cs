@@ -95,7 +95,8 @@ public partial class PanelGrids
     async Task ConfigurationChartPanel(UpsertPanelDto panel)
     {
         await PanelGridRange.SaveUI();
-        NavigationManager.NavigateToConfigurationChart(panel.Id.ToString(), ConfigurationRecord.DashboardId, ConfigurationRecord.Service, ConfigurationRecord.Instance, ConfigurationRecord.Endpoint);
+        ConfigurationRecord.PanelId = panel.Id.ToString();
+        ConfigurationRecord.NavigateToChartConfiguration();
     }
 
     public async Task SavePanelGridAsync()

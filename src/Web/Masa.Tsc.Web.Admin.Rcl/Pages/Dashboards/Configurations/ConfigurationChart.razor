@@ -5,14 +5,12 @@
 
 @if (Panel is not null)
 {
-    <CascadingValue Value="ConfigurationRecord" IsFixed>
-        <ChartPanelConfiguration Value="Panel" />
-    </CascadingValue>
+    <ChartPanelConfiguration Value="Panel" ConfigurationRecord="ConfigurationRecord" />
 }
 
 @code {
     [Inject]
-    ConfigurationRecord ConfigurationRecord { get; set; }
+    DashboardConfigurationRecord ConfigurationRecord { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -34,54 +32,24 @@
 
     UpsertChartPanelDto? Panel { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnInitialized()
     {
         ConfigurationRecord.Service = ServiceName;
         ConfigurationRecord.Instance = InstanceName;
-        ConfigurationRecord.Endpoint = EndpointName;       
+        ConfigurationRecord.Endpoint = EndpointName;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {     
         if (string.IsNullOrEmpty(DashboardId) is false && ConfigurationRecord.DashboardId != DashboardId)
         {
             ConfigurationRecord.DashboardId = DashboardId;
-            await GetPanelsAsync();
+            await ConfigurationRecord.BindPanelsAsync(ApiCaller);
         }
         if (string.IsNullOrEmpty(PanelId) is false)
         {
             ConfigurationRecord.PanelId = PanelId;
             Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException(T("Find panel error"));
-        }
-    }
-
-    async Task GetPanelsAsync()
-    {
-        ConfigurationRecord.ClearPanels();
-        var detail = await ApiCaller.InstrumentService.GetDetailAsync(Guid.Parse(ConfigurationRecord.DashboardId));
-        if (detail is not null)
-        {
-            ConfigurationRecord.ModelType = Enum.Parse<ModelTypes>(detail.Model);
-            if (detail.Panels?.Any() is true)
-            {
-                ConfigurationRecord.Panels.AddRange(detail.Panels);
-            }
-        }
-
-        if (ConfigurationRecord.Panels.Any() is false) ConfigurationRecord.IsEdit = true;
-        Convert(ConfigurationRecord.Panels);
-    }
-
-    void Convert(List<UpsertPanelDto> panels, UpsertPanelDto? parentPanel = null)
-    {
-        panels.ForEach(panel => panel.ParentPanel = parentPanel);
-        var chartPanels = panels.Where(panel => panel.PanelType == PanelTypes.Chart).ToList();
-        var tabsPanels = panels.Where(panel => panel.PanelType == PanelTypes.Tabs).ToList();
-        var tabItemPanels = panels.Where(panel => panel.PanelType == PanelTypes.TabItem).ToList();
-        panels.RemoveAll(panel => panel.PanelType == PanelTypes.Chart || panel.PanelType == PanelTypes.Tabs || panel.PanelType == PanelTypes.TabItem);
-        panels.AddRange(chartPanels.Select(panel => new UpsertChartPanelDto(Guid.Empty).Clone(panel)));
-        panels.AddRange(tabsPanels.Select(panel => new UpsertTabsPanelDto(Guid.Empty).Clone(panel)));
-        panels.AddRange(tabItemPanels.Select(panel => new UpsertTabItemPanelDto(parentPanel as UpsertTabsPanelDto).Clone(panel)));
-        foreach (var panel in panels)
-        {
-            if (panel.ChildPanels.Any() is false) continue;
-            else Convert(panel.ChildPanels, panel);
         }
     }
 

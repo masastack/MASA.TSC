@@ -1,0 +1,24 @@
+﻿@page "/teamDetail/configuration/{serviceName}"
+@page "/teamDetail/configuration/record/{serviceName}"
+@inherits TscComponentBase
+
+<PageTitle>@T("Configure Team Detail")</PageTitle>
+
+<DashboardConfiguration ConfigurationRecord="ConfigurationRecord"
+                        SavePanelsAction="SavePanelsAsync"
+                        GetPanelsAction="GetPanelsAsync"
+                        Style="max-height: calc(100vh - 216px)"
+                        HeaderClass="px-6"
+                        HeaderStyle="height: 72px;background: #FFFFFF;border-radius: 16px;"
+                        ContentStyle="max-height: calc(100vh - 264px);min-height: calc(100vh - 264px);">
+    <HeaderContent>
+        <div class="mr-4 d-flex my-auto" style="width: 40px;height: 40px;border: 1px solid #E4E8F3;border-radius: 40px;">
+            <div class="ma-auto">
+                <SIcon Color="emphasis2" Size=24 Tooltip="@T("Return to team details page")">mdi-arrow-left</SIcon>
+            </div>
+        </div>
+        <div class="h6 emphasis2--text my-auto">
+            @ServiceName
+        </div>
+    </HeaderContent>
+</DashboardConfiguration>
