@@ -15,15 +15,15 @@
             {
                 <MIcon OnClick="@(() => OpenAsync(context.Item))">mdi-view-headline</MIcon>
             }
-            else if (context.Header.Text == "Timestamp")
+            else if (context.Header.Value == "Timestamp")
             {
-                @(context.Item.Timestamp.Format(CurrentTimeZone))
+                @((context.Item.Timestamp + CurrentTimeZone.BaseUtcOffset).Format(CurrentTimeZone))
             }
-            else if (context.Header.Text == "Service")
+            else if (context.Header.Value == "Service")
             {
                 @context.Item.Resource["service.name"]
             }
-            else if (context.Header.Text == "Endpoint")
+            else if (context.Header.Value == "Endpoint")
             {
                 @context.Item.GetDispalyName()
             }

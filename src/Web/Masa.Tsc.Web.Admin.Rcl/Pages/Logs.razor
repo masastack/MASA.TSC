@@ -1,10 +1,11 @@
 ﻿@page "/dashbord/log"
 @page "/dashbord/log/{TaskId}"
+@page "/dashbord/log/{Service}/{StartTime}/{EndTime}/{LogLevel}"
 @inject I18n I18n
 
 <PageTitle>@I18n.T("Log")</PageTitle>
 
-<LogPanel PageMode=true TaskId="@TaskId" />
+<LogPanel PageMode=true TaskId="@TaskId" StartTime="ToDateTime(StartTime)" EndTime="ToDateTime(EndTime)" Service="@Service" LogLevel="@LogLevel" />
 
 @code {
 
@@ -13,4 +14,23 @@
     /// </summary>
     [Parameter]
     public string TaskId { get; set; }
+
+    [Parameter]
+    public string StartTime { get; set; }
+
+    [Parameter]
+    public string EndTime { get; set; }
+
+    [Parameter]
+    public string Service { get; set; }
+
+    [Parameter] 
+    public string LogLevel { get; set; }
+
+    DateTime ToDateTime(string str)
+    {
+        if (DateTime.TryParse(str, out var time))
+            return time;
+        return DateTime.MinValue;
+    }
 }

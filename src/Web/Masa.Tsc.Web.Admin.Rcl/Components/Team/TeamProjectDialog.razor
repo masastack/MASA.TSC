@@ -46,7 +46,7 @@
                         <MRow Class="pa-3">
                             <MCol Class="rounded-lg d-flex justify-space-between" Style="background-color:#FF5252">
                                 <div class="d-flex align-center white--text"><MIcon Class="px-4" Color="white text-#FF5252">info</MIcon> @T("Currently the application has {0} error logs",ErrorCount.ToString())</div>
-                                <MButton Depressed Color="white--text" Style="background-color:#FF5252;text-decoration:underline">查看详情</MButton>
+                                <MButton Depressed Color="white--text" Style="background-color:#FF5252;text-decoration:underline" OnClick="OpenLogAsync">@T("Show Detail")</MButton>
                             </MCol>
                         </MRow>
                     }

@@ -14,6 +14,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="FluentValidation" Version="11.4.0" />
+		<PackageReference Include="Masa.BuildingBlocks.StackSdks.Tsc.Contracts" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Authentication.Identity" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Configuration.ConfigurationApi.Dcc" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Auth" Version="$(MasaFrameworkPackageVersion)" />

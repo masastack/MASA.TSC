@@ -3,17 +3,17 @@
 
 <MTooltip Top>
     <ActivatorContent>
-        <MCard @attributes="context.Attrs" Class="pa-6" OnClick="OnClickHandler">
-            <MCardText Class="d-flex justify-space-between pa-0 pb-6">
+        <MCard @attributes="context.Attrs" Class="pa-6" OnClick="OnClickHandler" Style="@Style">
+            <MCardText Class="d-flex justify-space-between pa-0 pb-4">
                 <div class="d-flex flex-column justify-space-around">
                     <div>
-                        <span class="h5">@Value.ServiceTotal</span>
+                        <span class="masa h5">@Value.ServiceTotal</span>
                         @if (Value.IsShowApp)
                         {
-                            <span class="regular3--text h8 ml-1">/@Value.AppTotal</span>
+                            <span class="masa h8 ml-1">/ @Value.AppTotal</span>
                         }
                     </div>
-                    <span class="regular3--text h8">@T(Value.Text)</span>
+                    <span class="masa h8 regular3--text">@T(Value.Text)</span>
                 </div>
                 <img src="_content/Masa.Tsc.Web.Admin.Rcl/img/team/@(Value.Icon+".svg")" />
             </MCardText>
