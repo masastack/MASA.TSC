@@ -58,11 +58,22 @@ public class InstrumentService : ServiceBase
         await eventBus.PublishAsync(command);
     }
 
-    public async Task<LinkResultDto> GetLinkAsync([FromServices] IEventBus eventBus,string? layer, MetricValueTypes type)
+    public async Task<LinkResultDto> GetLinkAsync([FromServices] IEventBus eventBus, string? layer, MetricValueTypes type)
     {
-        var query = new LinkTypeQuery(layer!,type);
+        var query = new LinkTypeQuery(layer!, type);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
+    public async Task UpdateTeamAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromBody] UpsertPanelDto[] model)
+    {
+        await eventBus.PublishAsync(new UpInsertCommand(model, InstrumentConstants.TEAM_INSTRUMENT_ID, userContext.GetUserId<Guid>()));
+    }
+
+    public async Task<InstrumentDetailDto> GetTeamAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext)
+    {
+        var query = new InstrumentDetailQuery(userContext.GetUserId<Guid>(), InstrumentConstants.TEAM_INSTRUMENT_ID);
+        await eventBus.PublishAsync(query);
+        return query.Result;
+    }
 }
