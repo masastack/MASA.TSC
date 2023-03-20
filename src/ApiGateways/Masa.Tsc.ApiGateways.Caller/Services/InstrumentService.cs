@@ -24,4 +24,8 @@ public class InstrumentService : BaseService
     public async Task<PaginatedListBase<InstrumentListDto>> ListAsync(int page, int size, string keyword) => (await Caller.GetAsync<PaginatedListBase<InstrumentListDto>>($"{RootPath}/list/{page}/{size}/{keyword}"))!;
 
     public async Task<LinkResultDto> GetLinkAsync(string layer, MetricValueTypes type) => (await Caller.GetAsync<LinkResultDto>($"{RootPath}/link", new { layer, type }))!;
+
+    public async Task<InstrumentDetailDto> GetTeamInstraumentDetailAsync() => (await Caller.GetAsync<InstrumentDetailDto>($"{RootPath}/team"))!;
+
+    public async Task UpdateTeamInstraumentAsync(params UpsertPanelDto[] panels) => await Caller.PostAsync($"{RootPath}/team", panels);
 }

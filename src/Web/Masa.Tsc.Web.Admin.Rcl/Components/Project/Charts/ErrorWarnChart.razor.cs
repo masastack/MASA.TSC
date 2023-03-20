@@ -22,7 +22,7 @@ public partial class ErrorWarnChart
     protected override void OnInitialized()
     {
         _options.SetValue("legend", new { bottom = 0, left = "center" });
-        _options.SetValue("color", new string[] { "#4318FF", "#FF5252" });
+        _options.SetValue("color", new string[] { "#05CD99", "#FF5252" });
         _options.SetValue("series[0]", new
         {
             type = "pie",

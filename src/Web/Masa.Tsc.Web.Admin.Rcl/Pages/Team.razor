@@ -16,34 +16,40 @@
         else
         {
             <MCol Style="min-width:220px">
-                <HoneyCombGrid Data="_viewProjects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor"
-                           OnItemClick="HandleOnItemClick" TItem="ProjectOverviewDto">
+                <HoneyCombGridItem Data="_viewProjects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor" TItem="ProjectOverviewDto">
                     <CellBack>
                         <div class="d-flex flex-column align-center mx-2 pt-7">
-                            <span class="d-inline-block text-truncate" style="width:120px;">@context.Name</span>
+                            <span class="d-inline-block text-truncate masa btn body @GetHexTitleClass(context.Status)" style="width:120px;">@context.Name</span>
                             @foreach (var app in context.Apps.Take(3))
                             {
                                 if (app.Status == MonitorStatuses.Normal)
                                 {
-                                    <span class="regular2--text ma-1 d-inline-block text-truncate text-center" style="width:98%;">@app.Name</span>
+                                    <span class="masa regular2--text body2 ma-1 d-inline-block text-truncate text-center bordershadow" style="width:98%;cursor:pointer" @onclick="@(()=>OnProjectServiceClick(context,app.Identity))">@app.Name</span>
                                 }
                                 else
                                 {
-                                    <MChip Class="ma-1 d-inline-block text-truncate text-center" Style="width:100%;" Color="@ChipLabelColor(app)" TextColor="white" Label Small>
-                                        @app.Name
-                                    </MChip>
+                                    <div @onclick="()=>OnProjectServiceClick(context,app.Identity)" @onclick:stopPropagation="true" class="bordershadow">
+                                        <MChip Class="masa body2 ma-1 d-inline-block text-truncate text-center"
+                                               Style="width:100%;cursor:pointer"
+                                               Color="@ChipLabelColor(app)"
+                                               TextColor="white"
+                                               Label
+                                               Small>
+                                            @app.Name
+                                        </MChip>
+                                    </div>
                                 }
                             }
                             @if (context.Apps.Count > 3)
                             {
-                                <span class="regular3--text">...</span>
+                                <span class="masa regular2--text body2">...</span>
                             }
                         </div>
                     </CellBack>
                     <CellHoverTip>
                         <div style="min-height:150px;background-color:transparent;">
                             <MCard Class="emphasis2" Style="border-bottom-left-radius:20px;border-bottom-right-radius:20px;min-width:240px;max-width:300px;">
-                                <MCardText Class="d-flex flex-column white--text body">
+                                <MCardText Class="d-flex flex-column white--text masa body">
                                     <span>@T("Project Name")：@context.Name</span>
                                     <span>ID：@context.Id</span>
                                     <span>@T("Application Count")：@context.Apps.Count</span>
@@ -55,7 +61,7 @@
                             </div>
                         </div>
                     </CellHoverTip>
-                </HoneyCombGrid>
+                </HoneyCombGridItem>
             </MCol>
             <MCol Style="max-width:266px">
                 <MonitorCard Class="ml-8" Data=_appMonitorDto Value="@_projectStatus" ValueChanged="ProjectStatusChangedAsync" />

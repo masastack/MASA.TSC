@@ -316,3 +316,11 @@
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
 }
+.bordershadow {
+    border-radius: 4px;
+    transition: all 200ms ease-out;   
+}
+
+    .bordershadow:hover {
+        box-shadow: 0 0 6px lightsalmon;
+    }

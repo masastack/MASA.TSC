@@ -2,41 +2,53 @@
 @typeparam TItem
 @inherits TscComponentBase
 
+
 <ul class="m-honeycomb">
     @foreach (var item in Data)
     {
         <MMenu OpenOnHover Top OffsetY ContentClass="m-honeycomb-cell__tip">
             <ActivatorContent>
-                <li @attributes="@context.Attrs" class="@SplicingCellClass()" @onclick="()=>OnClickHandler(item)" style="@(OnItemClick.HasDelegate?"cursor:pointer;":"")">
-                    @if (CellBack != null)
-                    {
-                        <div class="m-honeycomb-cell__back" style="@CellBackStyle.Invoke(item)">
-                            @CellBack(item)
+                <div class="m-honeycomb-cell__border-parent">
+                <li @attributes="@context.Attrs" class="@SplicingCellClass()" @onclick="()=>OnClickHandler(item)" style="@(OnItemClick.HasDelegate?"cursor:pointer;":"")z-index:1 !important;">
+                        @if (CellBack != null)
+                        {
+                            //style="@CellBackStyle.Invoke(item)" has border
+                        <div class="m-honeycomb-cell__back" style="background-color:@CellBorderColor(item);z-index:1 !important;">
+                                @CellBack.Invoke(item)
                         </div>
-                    }
-                    @if (CellFront != null)
-                    {
+                        }
+                        @if (CellFront != null)
+                        {
                         <div class="m-honeycomb-cell__front">
-                            @CellFront(item)
+                                @CellFront.Invoke(item)
                         </div>
-                    }
-                    @if (HasBorder)
-                    {
+                        }
+                        @if (HasBorder)
+                        {
                         <div class="m-honeycomb-cell__border" style="background-color:@CellBorderColor(item)"></div>
-                    }
+                        }
                 </li>
+                </div>
             </ActivatorContent>
             <ChildContent>
                 @if (CellHoverTip != null)
                 {
-                    @CellHoverTip(item)
+                    @CellHoverTip.Invoke(item)
                 }
             </ChildContent>
         </MMenu>
     }
     <li class="m-honeycomb-cell m-honeycomb__placeholder"></li>
 </ul>
-
+<svg style="visibility: hidden; position: absolute;" width="0" height="0" xmlns="http://www.w3.org/2000/svg" version="1.1">
+    <defs>
+        <filter id="goo">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10" result="goo" />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+        </filter>
+    </defs>
+</svg>
 @code {
     [Parameter]
     public RenderFragment<TItem>? CellBack { get; set; }
@@ -60,7 +72,7 @@
     public Func<TItem, string> CellBorderColor { get; set; } = _ => "tomato";
 
     [Parameter]
-    public EventCallback<TItem> OnItemClick { get; set; }   
+    public EventCallback<TItem> OnItemClick { get; set; }
 
     private string SplicingCellClass()
     {

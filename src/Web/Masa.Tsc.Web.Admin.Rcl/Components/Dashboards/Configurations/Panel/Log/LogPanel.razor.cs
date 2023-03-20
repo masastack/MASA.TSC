@@ -20,6 +20,12 @@ public partial class LogPanel
         }
     }
 
+    [Parameter]
+    public string Service { get; set; }
+
+    [Parameter]
+    public string LogLevel { get; set; }
+
     [CascadingParameter]
     ConfigurationRecord? ConfigurationRecord { get; set; }
 
@@ -97,15 +103,24 @@ public partial class LogPanel
 
     async Task GetCompontentLogsAsync()
     {
+        bool isLoadData = false;
         if (PageMode is false && ConfigurationRecord is not null)
         {
             if ((StartTime, EndTime) != (ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime))
             {
                 StartTime = ConfigurationRecord.StartTime.UtcDateTime;
                 EndTime = ConfigurationRecord.EndTime.UtcDateTime;
-                await GetPageLogsAsync();
+                isLoadData = true;
             }
+
+            if (ConfigurationRecord.Service != Service)
+                isLoadData = true;
         }
+        else if (StartTime.HasValue && StartTime.Value > DateTime.MinValue)
+            isLoadData = true;
+
+        if (isLoadData)
+            await GetPageLogsAsync();
     }
 
     async Task GetPageLogsAsync()
@@ -125,10 +140,12 @@ public partial class LogPanel
             End = end,
             Page = Page,
             TaskId = TaskId,
-            Query = _search!
+            Query = _search!,
+            Service = Service,
+            LogLevel = LogLevel
         };
         var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
-        Logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
+        Logs = response.Result.Select(item => new LogModel(item.Timestamp+CurrentTimeZone.BaseUtcOffset, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
         Total = response.Total;
         await GetChartData();
         Loading = false;

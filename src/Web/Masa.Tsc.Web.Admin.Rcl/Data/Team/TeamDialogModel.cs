@@ -9,6 +9,8 @@ public class TeamDialogModel
 
     public Guid TeamId { get; set; }
 
+    public string ServiceId { get; set; }
+
     public int TeamProjectCount { get; set; }
 
     public int TeamServiceCount { get; set; }

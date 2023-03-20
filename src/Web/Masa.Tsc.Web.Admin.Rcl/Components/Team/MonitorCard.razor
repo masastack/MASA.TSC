@@ -5,9 +5,9 @@
     <MRow Class="mx-6">
         @foreach (var item in _items)
         {
-            <MCol Class="ma-0 pa-0 mt-4" Cols="12" Style="@ItemStyle(item)">
+            <MCol Class="ma-0 pa-0 mt-4" Cols="12" >
                 <MItem Value="@item.Value.ToString()">
-                    <MonitorItemCard Value=@item OnClick="ValueChangedAsync" />
+                    <MonitorItemCard Value=@item OnClick="ValueChangedAsync" Style="@ItemStyle(item)" />
                 </MItem>
             </MCol>
         }

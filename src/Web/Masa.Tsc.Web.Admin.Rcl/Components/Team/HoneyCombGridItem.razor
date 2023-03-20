@@ -1,0 +1,105 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@typeparam TItem
+@inherits TscComponentBase
+
+<div class="m-honeycomb">
+    @foreach (var item in Data)
+    {
+        <MMenu OpenOnHover Top OffsetY ContentClass="m-honeycomb-cell__tip">
+            <ActivatorContent>
+                <div class="m-honeycomb-cell__border-parent">
+                    <div class="m-honeycomb-cell__border" style="background-color:@CellBorderColor(item)">
+                        <div class="m-honeycomb-cell-parent">
+                            <div @attributes="@context.Attrs" class="@SplicingCellClass(item)" @onclick="()=>OnClickHandler(item)" style="@(OnItemClick.HasDelegate?"cursor:pointer;":"")z-index:1 !important;">
+                                @if (CellBack != null)
+                                {
+                                    <div class="m-honeycomb-cell__back" style="@CellBackStyle.Invoke(item);z-index:1 !important;">
+                                        @CellBack.Invoke(item)
+                                    </div>
+                                }
+                                @if (CellFront != null)
+                                {
+                                    <div class="m-honeycomb-cell__front">
+                                        @CellFront.Invoke(item)
+                                    </div>
+                                }                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ActivatorContent>
+            <ChildContent>
+                @if (CellHoverTip != null)
+                {
+                    @CellHoverTip.Invoke(item)
+                }
+            </ChildContent>
+        </MMenu>
+    }
+   @* <li class="m-honeycomb-cell m-honeycomb__placeholder"></li>*@
+</div>
+<svg style="visibility: hidden; position: absolute;" width="0" height="0" xmlns="http://www.w3.org/2000/svg" version="1.1">
+    <defs>
+        <filter id="goo">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10" result="goo" />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+        </filter>
+    </defs>
+</svg>
+@code {
+    [Parameter]
+    public RenderFragment<TItem>? CellBack { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem>? CellFront { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem>? CellHoverTip { get; set; }
+
+    [Parameter]
+    public List<TItem> Data { get; set; } = new();
+
+    [Parameter]
+    public bool HasBorder { get; set; } = true;
+
+    [Parameter]
+    public Func<TItem, string> CellBackStyle { get; set; }
+
+    [Parameter]
+    public Func<TItem, string> CellBorderColor { get; set; } = _ => "tomato";
+
+    [Parameter]
+    public EventCallback<TItem> OnItemClick { get; set; }
+
+    private string SplicingCellClass(TItem item)
+    {
+        StringBuilder text = new StringBuilder("m-honeycomb-cell");
+        if (item is AppDto app)
+        {
+            switch (app.Status)
+            {
+                case MonitorStatuses.Normal:
+                    text.Append(" m-honeycomb-cell-normal");
+                    break;
+                case MonitorStatuses.Warn:
+                    text.Append(" m-honeycomb-cell-warning");
+                    break;
+                case MonitorStatuses.Error:
+                    text.Append(" m-honeycomb-cell-error");
+                    break;
+            }
+        }
+        if (CellFront != null)
+            text.Append(" m-honeycomb-hover-cell");
+        return text.ToString();
+    }
+
+    private async Task OnClickHandler(TItem item)
+    {
+        if (OnItemClick.HasDelegate)
+        {
+            await OnItemClick.InvokeAsync(item);
+        }
+    }
+}

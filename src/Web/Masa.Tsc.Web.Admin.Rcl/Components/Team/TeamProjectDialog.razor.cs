@@ -24,6 +24,9 @@ public partial class TeamProjectDialog
     [Inject]
     DashboardConfigurationRecord ConfigurationRecord { get; set; }
 
+    [Inject]
+    IJSRuntime JSRuntime { get; set; }
+
     ServiceAutoComplete ServiceAutoComplete { get; set; }
 
     List<AppDetailModel> Apps { get; set; } = new();
@@ -32,6 +35,7 @@ public partial class TeamProjectDialog
 
     async Task OnAppChanged(string appid)
     {
+        ParamData.ServiceId = appid;
         ConfigurationRecord.Service = appid;
         ErrorCount = await GetErroCountAsync(appid);
     }
@@ -41,7 +45,7 @@ public partial class TeamProjectDialog
         if (!Visible || string.IsNullOrEmpty(ParamData.ProjectId) || ParamData.TeamId == Guid.Empty)
             return;
 
-        var key = $"{ParamData.TeamId}_{ParamData.ProjectId}_{ParamData.Start}_{ParamData.End}";
+        var key = $"{ParamData.TeamId}_{ParamData.ProjectId}_{ParamData.Start}_{ParamData.End}_{ParamData.ServiceId}";
 
         if (lastKey != key)
         {
@@ -56,9 +60,17 @@ public partial class TeamProjectDialog
             }).ToList();
             Team.ProjectTotal = ParamData.TeamProjectCount;
             Team.AppTotal = ParamData.TeamServiceCount;
-            ConfigurationRecord.Service = Apps.FirstOrDefault()?.Identity;
+            ConfigurationRecord.Service = ParamData.ServiceId;
+            ConfigurationRecord.StartTime = ParamData.Start;
+            ConfigurationRecord.EndTime= ParamData.End;
             ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
         }
+    }
+
+    async Task OpenLogAsync()
+    {
+        var url = $"/dashbord/log/{ConfigurationRecord.Service}/{ConfigurationRecord.StartTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/{ConfigurationRecord.EndTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/Error";        
+        await JSRuntime.InvokeAsync<object>("open", url, "_blank");
     }
 
     void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)

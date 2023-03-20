@@ -61,4 +61,13 @@ internal static class TimeExtentions
 
         return " dd HH:mm";
     }
+
+    public static DateTimeOffset ToDateTimeOffset(this DateTime? time, TimeZoneInfo? timeZoneInfo)
+    {
+        if (time == null)
+            return DateTimeOffset.MinValue;
+        if (timeZoneInfo == null)
+            timeZoneInfo = TimeZoneInfo.Utc;
+        return new DateTimeOffset(ticks: time.Value.Ticks + timeZoneInfo.BaseUtcOffset.Ticks, offset: timeZoneInfo.BaseUtcOffset);
+    }
 }

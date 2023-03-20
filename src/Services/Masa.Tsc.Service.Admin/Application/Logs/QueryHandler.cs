@@ -15,24 +15,16 @@ public class QueryHandler
     [EventHandler]
     public async Task AggregateAsync(LogAggQuery query)
     {
-
         if (query.Data.Conditions != null)
         {
             foreach (var item in query.Data.Conditions)
             {
-                if (item.Type == ConditionTypes.In)
+                if (item.Type == ConditionTypes.In && item.Value is JsonElement json)
                 {
-                    if (item.Value is JsonElement json)
-                    {
-                        item.Value = json.EnumerateArray().Select(value => value.ToString());
-                    }
+                    item.Value = json.EnumerateArray().Select(value => value.ToString());
                 }
             }
         }
-
-
-
-
 
         query.Result = await _logService.AggregateAsync(query.Data);
     }
@@ -85,8 +77,19 @@ public class QueryHandler
             });
         }
 
+        if (!string.IsNullOrEmpty(queryData.LogLevel))
+        {
+            conditions.Add(new FieldConditionDto
+            {
+                Name = "SeverityText",
+                Type = ConditionTypes.Equal,
+                Value = queryData.LogLevel
+            });
+        }
+
         var data = await _logService.ListAsync(new BaseRequestDto
         {
+            Service = queryData.Service!,
             Start = queryData.Start,
             End = queryData.End,
             Keyword = queryData.Query,
@@ -95,8 +98,8 @@ public class QueryHandler
             Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = queryData.IsDesc },
             Conditions = conditions
         });
-        if (data == null)
-            data = new PaginatedListBase<LogResponseDto>();
+
+        data ??= new PaginatedListBase<LogResponseDto>();
 
         queryData.Result = data;
     }
