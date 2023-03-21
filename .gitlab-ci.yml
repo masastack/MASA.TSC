@@ -26,7 +26,7 @@ variables:
   WebDomain_staging: tsc-staging.masastack.com
   ServiceDomain_staging: tsc-service-staging.masastack.com
 
-  NAMESPACE_PRD: loncloud
+  NAMESPACE_PRD: masastack
   WebDomain_PRD: tsc.masastack.com
   ServiceDomain_PRD: tsc-service.masastack.com
 
