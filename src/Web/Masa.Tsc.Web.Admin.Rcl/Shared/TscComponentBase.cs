@@ -21,7 +21,7 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
     public IPopupService PopupService { get; set; }
 
     [Inject]
-    public TscCaller ApiCaller { get; set; }
+    public TscCaller ApiCaller { get; set; }   
 
     [CascadingParameter]
     public I18n I18n { get; set; }
@@ -99,7 +99,7 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
     }
 
     protected bool _disposing = false;
-    public async ValueTask DisposeAsync()
+    public virtual async ValueTask DisposeAsync()
     {
         if (!_disposing)
         {

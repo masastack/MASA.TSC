@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.StackSdks.Auth.Contracts;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Teams;
 
 public partial class Team
@@ -16,17 +18,20 @@ public partial class Team
     private ProjectOverviewDto _projectOverviewDto = default!;
     private TeamDialogModel teamDialog = new();
 
-    private void HandleOnItemClick(ProjectOverviewDto item)
-    {
-        teamDialog.ProjectId = item.Identity;
-        teamDialog.TeamId = item.TeamId;
-        teamDialog.TeamProjectCount = _projects.Count(p => p.TeamId == item.TeamId);
-        teamDialog.TeamServiceCount = _projects.Where(p => p.TeamId == item.TeamId).Sum(p => p.Apps.Count);
-        teamDialog.Start = _teamSearchModel.Start.ToDateTimeOffset(CurrentTimeZone);
-        teamDialog.End = _teamSearchModel.End.ToDateTimeOffset(CurrentTimeZone);
-        _projectOverviewDto = item;
-        _visible = true;
-    }
+    [Inject]
+    public GlobalConfig GlobalConfig { get; set; }
+
+    //private void HandleOnItemClick(ProjectOverviewDto item)
+    //{
+    //    teamDialog.ProjectId = item.Identity;
+    //    teamDialog.TeamId = item.TeamId;
+    //    teamDialog.TeamProjectCount = _projects.Count(p => p.TeamId == item.TeamId);
+    //    teamDialog.TeamServiceCount = _projects.Where(p => p.TeamId == item.TeamId).Sum(p => p.Apps.Count);
+    //    teamDialog.Start = _teamSearchModel.Start.ToDateTimeOffset(CurrentTimeZone);
+    //    teamDialog.End = _teamSearchModel.End.ToDateTimeOffset(CurrentTimeZone);
+    //    _projectOverviewDto = item;
+    //    _visible = true;
+    //}
 
     private void OnProjectServiceClick(ProjectOverviewDto item, string serviceId)
     {
@@ -101,7 +106,8 @@ public partial class Team
             StartTime = start,
             Keyword = _teamSearchModel?.Keyword ?? default!,
             ProjectId = _teamSearchModel?.AppId ?? default!,
-            UserId = CurrentUserId
+            UserId = CurrentUserId,
+            TeamId = MasaUser.CurrentTeamId
         });
 
         _appMonitorDto = data?.Monitor ?? new();
@@ -218,10 +224,24 @@ public partial class Team
         return await ApiCaller.LogService.AggregateAsync<int>(query);
     }
 
-    DateTimeOffset ToDateTimeOffset(DateTime? time)
+    [Inject]
+    public MasaUser MasaUser { get; set; } = default!;
+
+    protected override void OnInitialized()
     {
-        if (time == null)
-            return DateTimeOffset.MinValue;
-        return new DateTimeOffset(ticks: time.Value.Ticks + CurrentTimeZone.BaseUtcOffset.Ticks, offset: CurrentTimeZone.BaseUtcOffset);
+        base.OnInitialized();
+        GlobalConfig.OnCurrentTeamChanged += TeamChange;
+    }
+
+    void TeamChange(Guid teamId)
+    {
+        MasaUser.CurrentTeamId = teamId;
+        _ = InvokeAsync(async () => { await LoadData(); StateHasChanged(); });
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        await base.DisposeAsync();
+        GlobalConfig.OnCurrentTeamChanged -= TeamChange;
     }
 }

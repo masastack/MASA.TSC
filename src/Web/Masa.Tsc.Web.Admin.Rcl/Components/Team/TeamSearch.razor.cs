@@ -7,6 +7,8 @@ public partial class TeamSearch
 {
     string _search;
 
+    QuickRangeKey? _quickRangeKey= QuickRangeKey.Last1Hour;
+
     public string Search
     {
         get => _search;
@@ -66,5 +68,12 @@ public partial class TeamSearch
         _value.Start = startTime.UtcDateTime;
         _value.End = endTime.UtcDateTime;
         await base.InvokeAsync(async () => await OnValueChanged.InvokeAsync(_value));
+    }
+
+    async Task QuickRangeChanged(QuickRangeKey? value)
+    { 
+        _quickRangeKey= value;
+        if(OnQuickRangeChanged.HasDelegate)
+            await OnQuickRangeChanged.InvokeAsync(value);
     }
 }

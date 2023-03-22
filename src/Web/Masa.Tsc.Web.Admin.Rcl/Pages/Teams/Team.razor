@@ -12,36 +12,40 @@
         {
             <LoadingData Class="col" />
         }
+        else if (_viewProjects == null || !_viewProjects.Any())
+        {
+            <NoData />
+        }
         else
         {
             <MCol Style="min-width:220px">
                 <HoneyCombGridItem Data="_viewProjects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor" TItem="ProjectOverviewDto">
                     <CellBack>
-                        <div class="d-flex flex-column align-center mx-2 pt-7">
+                        <div class="d-flex flex-column align-center pt-7">
                             <span class="d-inline-block text-truncate masa btn body @GetHexTitleClass(context.Status)" style="width:120px;">@context.Name</span>
                             @foreach (var app in context.Apps.Take(3))
                             {
                                 if (app.Status == MonitorStatuses.Normal)
                                 {
-                                    <span class="masa regular2--text body2 ma-1 d-inline-block text-truncate text-center bordershadow" style="width:98%;cursor:pointer" @onclick="@(()=>OnProjectServiceClick(context,app.Identity))">@app.Name</span>
+                                    <span class="masa regular2--text body2 pa-1 d-inline-block text-truncate text-center bordershadow" style="cursor:pointer;width:96%" @onclick="@(()=>OnProjectServiceClick(context,app.Identity))">@app.Name</span>
                                 }
                                 else
                                 {
-                                    <div @onclick="()=>OnProjectServiceClick(context,app.Identity)" @onclick:stopPropagation="true" class="bordershadow">
-                                        <MChip Class="masa body2 ma-1 d-inline-block text-truncate text-center"
-                                               Style="width:100%;cursor:pointer"
-                                               Color="@ChipLabelColor(app)"
-                                               TextColor="white"
-                                               Label
-                                               Small>
+                                    <div @onclick="()=>OnProjectServiceClick(context,app.Identity)" @onclick:stopPropagation="true" class="bordershadow pa-1" style="cursor:pointer;width:96%">
+                                        <TscTeamChip Class="masa body2 ma-0 p-1"
+                                         Color="@ChipLabelColor(app)"
+                                         TextColor="white"
+                                         Label
+                                         Small
+                                         ContentClass="d-inline-block text-truncate">
                                             @app.Name
-                                        </MChip>
+                                        </TscTeamChip>
                                     </div>
                                 }
                             }
                             @if (context.Apps.Count > 3)
                             {
-                                <span class="masa regular2--text body2">...</span>
+                                <span class="masa regular2--text body2 bordershadow pa-1" style="cursor:pointer;width:60%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First().Identity))">...</span>
                             }
                         </div>
                     </CellBack>

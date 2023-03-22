@@ -23,6 +23,8 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
 
     public bool IsGlobal { get; set; }
 
+    public bool EnableEdit { get; set; } = true;
+
     public List<Panel> Panels { get; set; }
 
     public Instrument() { }
