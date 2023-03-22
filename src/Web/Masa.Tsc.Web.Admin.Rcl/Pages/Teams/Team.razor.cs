@@ -11,7 +11,6 @@ public partial class Team
     private bool _isLoading;
     private string? _projectType = "";
     private string? _search;
-    private bool _teamProjectDialogVisible;
 
     [Inject]
     public TeamDetailConfigurationRecord ConfigurationRecord { get; set; }
@@ -68,7 +67,7 @@ public partial class Team
         ConfigurationRecord.TeamProjectCount = _projects.Count(p => p.TeamId == item.TeamId);
         ConfigurationRecord.TeamServiceCount = _projects.Where(p => p.TeamId == item.TeamId).Sum(p => p.Apps.Count);
         ConfigurationRecord.Service = serviceId;
-        _teamProjectDialogVisible = true;
+        ConfigurationRecord.TeamProjectDialogVisible = true;
     }
 
     async Task UpdateCardDataAsync()
