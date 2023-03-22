@@ -9,7 +9,7 @@ public static class PanelGridsExtensions
     {
         panelGrids.RemoveAll(Panel => Panel.ParentPanel?.IsRemove is true);
         if (panelGrids.Any() is false) return;
-        await panelGrids.First(item => item.ParentPanel is null).Gridstack!.Reload();
+        await Task.WhenAll(panelGrids.Select(item => item.Gridstack!.Reload()));
         await Task.WhenAll(panelGrids.Select(item => item.SavePanelGridAsync()));
     }
 
