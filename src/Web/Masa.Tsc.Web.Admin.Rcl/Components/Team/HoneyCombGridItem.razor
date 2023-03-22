@@ -58,7 +58,7 @@
     public RenderFragment<TItem>? CellHoverTip { get; set; }
 
     [Parameter]
-    public List<TItem> Data { get; set; } = new();
+    public IEnumerable<TItem> Data { get; set; } = new List<TItem>();
 
     [Parameter]
     public bool HasBorder { get; set; } = true;

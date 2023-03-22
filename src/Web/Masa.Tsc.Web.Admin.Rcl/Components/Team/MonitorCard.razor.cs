@@ -18,10 +18,10 @@ public partial class MonitorCard
     }
 
     [Parameter]
-    public StringNumber Value { get; set; }
+    public MonitorStatuses Value { get; set; }
 
     [Parameter]
-    public EventCallback<StringNumber> ValueChanged { get; set; }
+    public EventCallback<MonitorStatuses> ValueChanged { get; set; }
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -85,7 +85,7 @@ public partial class MonitorCard
 
     private string ItemStyle(AppMonitorViewDto appMonitor)
     {
-        if (Value != null && Value.IsT0 && Value.AsT0 == appMonitor.Value.ToString())
+        if (Value == appMonitor.Value)
         {
             return $"border: 1px solid {appMonitor.Color};border-radius: 16px;min-width:170px";
         }
@@ -94,9 +94,7 @@ public partial class MonitorCard
 
     private async Task ValueChangedAsync(AppMonitorViewDto value)
     {
-        Value = value.Value.ToString();
-        if (ValueChanged.HasDelegate)
-            await ValueChanged.InvokeAsync(Value);
+        await ValueChanged.InvokeAsync(value.Value);
     }
 }
 

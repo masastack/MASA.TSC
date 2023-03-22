@@ -5,6 +5,14 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards.Models;
 
 public class TeamDetailConfigurationRecord : ConfigurationRecord
 {
+    public string ProjectId { get; set; }
+
+    public Guid TeamId { get; set; }
+
+    public int TeamProjectCount { get; set; }
+
+    public int TeamServiceCount { get; set; }
+
     public TeamDetailConfigurationRecord(NavigationManager navigationManager) : base(navigationManager)
     {
         ModelType = ModelTypes.All;
