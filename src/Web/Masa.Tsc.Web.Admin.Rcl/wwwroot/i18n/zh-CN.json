@@ -94,7 +94,7 @@
   "Find panel error": "查找面板错误",
   "Name is required": "名称必须填写",
   "Folder is required": "目录必须填写",
-  "Metrics name is required": "指标名称必须填写",
+  "Metrics expression is required": "指标表达式必须填写",
   "Edit": "编辑",
   "Expend all": "全部展开",
   "Close all": "全部收起",
@@ -139,10 +139,9 @@
   "ProjectTeam": "项目团队",
   "Dashboard": "仪表盘",
   "Log": "日志",
-  "Trace": "链路",
+  "Link": "链路",
   "Application count": "应用数量",
   "Description": "描述",
-
   "Team": {
     "Monitoring Projects": "监测项目",
     "Monitoring Applications": "监测应用",
