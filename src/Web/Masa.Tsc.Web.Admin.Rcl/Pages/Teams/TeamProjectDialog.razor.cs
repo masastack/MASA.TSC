@@ -5,7 +5,12 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TeamProjectDialog
 {
-    string lastKey;
+    string? _oldKey;
+
+    int ErrorCount { get; set; }
+
+    [Inject]
+    IJSRuntime JSRuntime { get; set; }
 
     [Parameter]
     public bool Visible { get; set; }
@@ -14,59 +19,50 @@ public partial class TeamProjectDialog
     public EventCallback<bool> VisibleChanged { get; set; }
 
     [Parameter]
-    public TeamDialogModel ParamData { get; set; } = new();
-
-    int ErrorCount { get; set; }
-
-    [Inject]
-    TeamDetailConfigurationRecord ConfigurationRecord { get; set; }
-
-    [Inject]
-    IJSRuntime JSRuntime { get; set; }
+    public TeamDetailConfigurationRecord ConfigurationRecord { get; set; }
 
     ServiceAutoComplete ServiceAutoComplete { get; set; }
 
     List<AppDetailModel> Apps { get; set; } = new();
 
-    TeamDto Team { get; set; }
-
-    async Task OnAppChanged(string appid)
-    {
-        ParamData.ServiceId = appid;
-        ConfigurationRecord.Service = appid;
-        ErrorCount = await GetErroCountAsync(appid);
-    }
+    TeamDto? Team { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (!Visible || string.IsNullOrEmpty(ParamData.ProjectId) || ParamData.TeamId == Guid.Empty)
+        if (!Visible || string.IsNullOrEmpty(ConfigurationRecord.ProjectId) || ConfigurationRecord.TeamId == Guid.Empty)
             return;
 
-        var key = $"{ParamData.TeamId}_{ParamData.ProjectId}_{ParamData.Start}_{ParamData.End}_{ParamData.ServiceId}";
-
-        if (lastKey != key)
+        var key = $"{ConfigurationRecord.ProjectId}{ConfigurationRecord.TeamId}";
+        if (_oldKey != key)
         {
-            lastKey = key;
-            Team = await ApiCaller.TeamService.GetTeamAsync(ParamData.TeamId, ParamData.ProjectId);
-            Apps = Team.CurrentProject.Apps.Select(app => new AppDetailModel
-            {
-                Name = app.Name,
-                Identity = app.Identity,
-                Type = app.AppType,
-                ServiceType = app.ServiceType
-            }).ToList();
-            Team.ProjectTotal = ParamData.TeamProjectCount;
-            Team.AppTotal = ParamData.TeamServiceCount;
-            ConfigurationRecord.Service = ParamData.ServiceId;
-            ConfigurationRecord.StartTime = ParamData.Start;
-            ConfigurationRecord.EndTime= ParamData.End;
-            ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
+            _oldKey = key;
+            await InitDataAsync();
         }
+    }
+
+    async Task OnServiceChanged(string service)
+    {
+        ConfigurationRecord.Service = service;
+        ErrorCount = await GetErroCountAsync(service);
+    }
+
+    async Task InitDataAsync()
+    {
+        Team = await ApiCaller.TeamService.GetTeamAsync(ConfigurationRecord.TeamId, ConfigurationRecord.ProjectId);
+        Apps = Team.CurrentProject.Apps.Select(app => new AppDetailModel
+        {
+            Name = app.Name,
+            Identity = app.Identity,
+            Type = app.AppType,
+            ServiceType = app.ServiceType
+        }).ToList();
+        Team.ProjectTotal = ConfigurationRecord.TeamProjectCount;
+        Team.AppTotal = ConfigurationRecord.TeamServiceCount;
     }
 
     async Task OpenLogAsync()
     {
-        var url = $"/dashbord/log/{ConfigurationRecord.Service}/{ConfigurationRecord.StartTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/{ConfigurationRecord.EndTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/Error";        
+        var url = $"/dashbord/log/{ConfigurationRecord.Service}/{ConfigurationRecord.StartTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/{ConfigurationRecord.EndTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/Error";
         await JSRuntime.InvokeAsync<object>("open", url, "_blank");
     }
 
@@ -77,23 +73,18 @@ public partial class TeamProjectDialog
 
     async Task OnAutoDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
-        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
-        await base.InvokeAsync(base.StateHasChanged);
+        OnDateTimeUpdateAsync(times);
+        await InvokeAsync(StateHasChanged);
     }
 
-    void NavigateToDashboardConfiguration()
-    {
-        ConfigurationRecord.NavigateToConfiguration();
-    }
-
-    async Task<int> GetErroCountAsync(string appid)
+    async Task<int> GetErroCountAsync(string service)
     {
         var query = new SimpleAggregateRequestDto
         {
             Type = AggregateTypes.Count,
             Start = ConfigurationRecord.StartTime.UtcDateTime,
             End = ConfigurationRecord.EndTime.UtcDateTime,
-            Service = appid,
+            Service = service,
             Name = ElasticSearchConst.ServiceName,
             Conditions = new List<FieldConditionDto> {
                 new FieldConditionDto{
@@ -104,5 +95,16 @@ public partial class TeamProjectDialog
             }
         };
         return await ApiCaller.LogService.AggregateAsync<int>(query);
+    }
+
+    async Task DialogVisibleChanged()
+    {
+        Team = null;
+        await VisibleChanged.InvokeAsync(false);
+    }
+
+    void NavigateToDashboardConfiguration()
+    {
+        ConfigurationRecord.NavigateToConfiguration();
     }
 }

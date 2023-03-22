@@ -9,7 +9,7 @@ public class RequestTeamMonitorDto : FromUri<RequestTeamMonitorDto>
 
     public DateTime EndTime { get; set; }
 
-    public string Keyword { get; set; }
+    public string? Keyword { get; set; }
 
     public string ProjectId { get; set; }
 
