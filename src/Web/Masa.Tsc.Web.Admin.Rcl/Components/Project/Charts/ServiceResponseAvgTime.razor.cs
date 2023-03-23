@@ -25,7 +25,7 @@ public partial class ServiceResponseAvgTime : TscEChartBase
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        var initJosn = @"{""series"":[{""type"":""gauge"",""radius"":""100%"",""center"":[""25%"",""50%""],""startAngle"":180,""endAngle"":0,""min"":0,""max"":500,""splitNumber"":1,""itemStyle"":{""color"":""#6946FF"",""borderColor"":""#fff"",""borderWidth"":2},""progress"":{""show"":true,""roundCap"":false,""width"":28},""pointer"":{""show"":false},""axisLine"":{""roundCap"":false,""lineStyle"":{""width"":28,""color"":[[""1"",""#05CD99""]]}},""axisTick"":{""splitNumber"":30,""distance"":24,""length"":1,""lineStyle"":{""width"":2,""color"":""#6946FF""}},""splitLine"":{""show"":false},""axisLabel"":{""show"":true,""distance"":10},""title"":{""show"":false},""detail"":{""backgroundColor"":""#fff"",""width"":""100%"",""lineHeight"":24,""height"":24,""borderRadius"":4,""offsetCenter"":[0,""0""],""valueAnimation"":true,""rich"":{""value"":{""fontSize"":""14px"",""fontWeight"":""bolder"",""color"":""#323D6F""},""unit"":{""fontSize"":""14px"",""color"":""#323D6F"",""padding"":[0,0,0,20]}}},""data"":[{""value"":100}]}]}";
+        var initJosn = @"{""series"":[{""type"":""gauge"",""radius"":""100%"",""center"":[""25%"",""50%""],""avoidLabelOverlap"":true,""startAngle"":180,""endAngle"":0,""min"":0,""max"":500,""splitNumber"":1,""itemStyle"":{""color"":""#6946FF"",""borderColor"":""#fff"",""borderWidth"":2},""progress"":{""show"":true,""roundCap"":false,""width"":28},""pointer"":{""show"":false},""axisLine"":{""roundCap"":false,""lineStyle"":{""width"":28,""color"":[[""1"",""#05CD99""]]}},""axisTick"":{""splitNumber"":30,""distance"":24,""length"":1,""lineStyle"":{""width"":2,""color"":""#6946FF""}},""splitLine"":{""show"":false},""axisLabel"":{""show"":true,""distance"":10},""title"":{""show"":false},""detail"":{""backgroundColor"":""#fff"",""width"":""80%"",""lineHeight"":24,""height"":24,""borderRadius"":4,""offsetCenter"":[0,""0""],""valueAnimation"":true,""formatter"":null,""rich"":{""value"":{""fontSize"":""14px"",""fontWeight"":""bolder"",""color"":""#323D6F""},""unit"":{""fontSize"":""12px"",""color"":""#323D6F"",""padding"":[0,0,0,20]}}},""data"":[{""value"":100}]}]}";
         _options = new EChartType("guage", "", initJosn);
     }
 
@@ -39,6 +39,16 @@ public partial class ServiceResponseAvgTime : TscEChartBase
         {
             var obj = ((QueryResultInstantVectorResponse)result.Result[0])!.Value![1];
             Total = obj is double.NaN || string.Equals(obj, "NaN") ? 0 : Convert.ToDouble(obj);
+
+            if (Total - 1000 > 0)
+            {
+                Unit = "s";
+                Total = Total / 1000.0;
+            }
+            else
+            {
+                Unit = "ms";
+            }
 
             int currentTotal = 0;
             foreach (var item in _totals)
@@ -55,6 +65,7 @@ public partial class ServiceResponseAvgTime : TscEChartBase
 
             _options.SetValue("series[0].max", currentTotal);
             _options.SetValue("series[0].data[0].value", Total);
+            _options.SetValue("series[0].detail.formatter", $"{Total}{Unit}");
         }
     }
 }
