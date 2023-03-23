@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Masa.Tsc.Service.Admin.Migrations
 {
     [DbContext(typeof(TscDbContext))]
-    [Migration("20230321035130_tsc-20230321")]
-    partial class tsc20230321
+    [Migration("20230323055638_tsc-20230323")]
+    partial class tsc20230323
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
