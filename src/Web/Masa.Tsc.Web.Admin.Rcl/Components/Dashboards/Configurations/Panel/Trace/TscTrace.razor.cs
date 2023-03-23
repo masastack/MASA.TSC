@@ -7,8 +7,6 @@ public partial class TscTrace
 {
     private PaginatedListBase<TraceResponseDto> _queryResult;
     private ValueTuple<long, string, string>[] _chartData;
-    private string? _chartFormat;
-    private string? _chartSubText;
 
     private string? _service;
     private string? _instance;
@@ -138,8 +136,6 @@ public partial class TscTrace
 
         ValueTuple<long, string, string>[] values = new (long, string, string)[currentArray.Length];
         var index = 0;
-        _chartFormat = query.Start.Format(query.End);
-        _chartSubText = $"{query.Start.Format(CurrentTimeZone)}～{query.End.Format(CurrentTimeZone)}";
         foreach (var item in currentArray!)
         {
             if (hasFirst)

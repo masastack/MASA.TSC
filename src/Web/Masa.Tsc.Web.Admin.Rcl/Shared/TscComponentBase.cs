@@ -99,7 +99,7 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
     }
 
     protected bool _disposing = false;
-    public async ValueTask DisposeAsync()
+    public virtual async ValueTask DisposeAsync()
     {
         if (!_disposing)
         {
@@ -113,6 +113,7 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
 
     protected virtual Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
     {
+        _timeZoneInfo = timeZoneInfo;
         return Task.CompletedTask;
     }
 

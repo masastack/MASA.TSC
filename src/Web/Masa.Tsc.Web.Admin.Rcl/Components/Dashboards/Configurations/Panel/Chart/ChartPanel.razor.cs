@@ -96,11 +96,11 @@ public partial class ChartPanel
 
     protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
     {
+        await base.OnTimeZoneInfoChanged(timeZoneInfo);
         if (Value.ChartType is ChartTypes.Line or ChartTypes.Bar or ChartTypes.LineArea)
         {
             Value.SetTimeZoneChange();
             StateHasChanged();
         }
-        await base.OnTimeZoneInfoChanged(timeZoneInfo);
     }
 }

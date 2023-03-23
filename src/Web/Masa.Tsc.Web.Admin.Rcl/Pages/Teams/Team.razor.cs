@@ -15,20 +15,47 @@ public partial class Team
     [Inject]
     public TeamDetailConfigurationRecord ConfigurationRecord { get; set; }
 
+    [Inject]
+    public MasaUser MasaUser { get; set; } = default!;
+
+    [Inject]
+    public GlobalConfig GlobalConfig { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        GlobalConfig.OnCurrentTeamChanged += TeamChange;
+    }
+
+    void TeamChange(Guid teamId)
+    {
+        MasaUser.CurrentTeamId = teamId;
+        _ = InvokeAsync(async () => { await GetProjectsAsync(); });
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        await base.DisposeAsync();
+        GlobalConfig.OnCurrentTeamChanged -= TeamChange;
+    }
+
     private async Task GetProjectsAsync()
     {
         _isLoading = true;
+        StateHasChanged();
         DateTime start = DateTime.MinValue, end = DateTime.MinValue;
         var data = await ApiCaller.ProjectService.OverviewAsync(new RequestTeamMonitorDto
         {
             EndTime = end,
             StartTime = start,
             Keyword = _search,
-            UserId = CurrentUserId
+            UserId = CurrentUserId,
+            TeamId = MasaUser.CurrentTeamId
         });
         _appMonitorDto = data?.Monitor ?? new();
         _projects = data?.Projects ?? new();
         _isLoading = false;
+        StateHasChanged();
     }
 
     IEnumerable<ProjectOverviewDto> GetProjectViewData()

@@ -39,6 +39,8 @@ public class InstrumentCommandHandler
         var entry = await _instrumentRepository.GetAsync(command.Data.Id, command.UserId);
         if (entry == null)
             throw new UserFriendlyException($"instrument {command.Data.Id} is not exists");
+        if (!entry.EnableEdit)
+            throw new UserFriendlyException(errorCode: ErrorCodes.NOT_ALLOW_EDIT);
         entry.Update(command.Data);
         await _instrumentRepository.UpdateAsync(entry);
     }
@@ -62,6 +64,10 @@ public class InstrumentCommandHandler
         var entry = await _instrumentRepository.GetDetailAsync(command.InstumentId, command.UserId);
         if (entry == null)
             throw new UserFriendlyException($"instrument {command.InstumentId} is not exists");
+
+        if (!entry.EnableEdit)
+            throw new UserFriendlyException(errorCode: ErrorCodes.NOT_ALLOW_EDIT);
+
         entry.UpdatePanels(command.Data);
         await _instrumentRepository.UpdateDetailAsync(entry);
     }
@@ -75,6 +81,10 @@ public class InstrumentCommandHandler
         var list = await _instrumentRepository.GetListAsync(command.InstrumentIds, command.UserId);
         if (list == null || !list.Any())
             throw new UserFriendlyException("数据不存在");
+
+        if (list.Any(item => !item.EnableEdit))
+            throw new UserFriendlyException(errorCode: ErrorCodes.CONTAINS_NOT_ALLOW_EDIT);
+
         await _instrumentRepository.RemoveRangeAsync(list);
     }
     #endregion    

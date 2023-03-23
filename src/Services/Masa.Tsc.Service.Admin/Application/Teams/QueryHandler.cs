@@ -107,8 +107,10 @@ public class QueryHandler
     {
         var teams = await _authClient.TeamService.GetUserTeamsAsync();
 
-        if (teams == null || !teams.Any())
+        if (teams == null || !teams.Any(team => team.Id == query.TeamId))
             return;
+
+        teams = teams.Where(team => team.Id == query.TeamId).ToList();
 
         var monitors = await GetAllMonitServicesAsync(query.StartTime, query.EndTime);
 

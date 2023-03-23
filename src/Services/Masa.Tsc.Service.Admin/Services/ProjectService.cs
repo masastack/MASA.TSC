@@ -20,7 +20,7 @@ public class ProjectService : ServiceBase
 
     private async Task<TeamMonitorDto> OverviewAsync([FromServices] IEventBus eventBus, RequestTeamMonitorDto model)
     {
-        var teamQuery = new TeamMonitorQuery(model.UserId, model.ProjectId, model.StartTime, model.EndTime, model.Keyword);
+        var teamQuery = new TeamMonitorQuery(model.UserId, model.ProjectId,model.TeamId, model.StartTime, model.EndTime, model.Keyword);
         await eventBus.PublishAsync(teamQuery);
         return teamQuery.Result;
     }
