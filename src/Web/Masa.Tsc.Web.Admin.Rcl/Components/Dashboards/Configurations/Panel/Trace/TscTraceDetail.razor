@@ -1,7 +1,7 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<SSheetDialog Value="_dialogValue" ValueChanged="DialogValueChanged" Title="@Title">
+<SSheetDialog Value="_dialogValue" ValueChanged="DialogValueChanged" Title="@_rootTreeItem?.Resource["service.name"]?.ToString()">
     <div class="d-flex">
         <div class="pa-12" style="width:100%">
             <div class="d-flex mb-6">
@@ -65,7 +65,7 @@
                                 <div class="trace-timelines-view__line-item body2" style="left: 60%;">@(FormatDuration(scale * 3))</div>
                                 <div class="trace-timelines-view__line-item body2" style="left: 80%;">@(FormatDuration(scale * 4))</div>
                             }
-                            <div class="trace-timelines-view__line-item body2" style="right: 0;">@(FormatDuration(_rootTreeItem.Duration))</div>
+                            <div class="trace-timelines-view__line-item body2" style="right: 0;">@(FormatDuration(_rootTreeItem.DoubleDuration)) - @_rootTreeItem.DoubleDuration</div>
                         </div>
                     </div>
                 }
@@ -168,13 +168,13 @@
                     </MListItem>
                 </MList>
                 <div>
-                    <MTabs ValueChanged="OnTabValueChange" FixedTabs ShowArrows="false">
+                    <MTabs Value="_tabValue" ValueChanged="OnTabValueChange" FixedTabs ShowArrows="false">
                         <MTab>attr(@_activeTreeItem.Attributes.Count)</MTab>
                         <MTab>res(@_activeTreeItem.Resource.Count)</MTab>
                         <MTab>dt(@detail.Count)</MTab>
                         <MTab>logs(@_logs.Count)</MTab>
                     </MTabs>
-                    <MTabsItems Value="_tabValue">
+                    <MTabsItems @bind-Value="_tabValue">
                         <MTabItem>
                             @((RenderFragment)(dictRender => RenderDictionary(dictRender, _activeTreeItem.Attributes)))
                         </MTabItem>
@@ -210,10 +210,6 @@
 </SSheetDialog>
 
 @code {
-
-    [Parameter]
-    public string Title { get; set; }
-
     private void RenderItemLabel(RenderTreeBuilder __builder, TraceResponseTree item)
     {
         const string dbKey = "db.system";
@@ -268,9 +264,16 @@
                                         @(_copyClicked ? _checkSvg : _copySvg)
                                     </SIcon>
                                 </div>
-                                <span class="mr-2">@value</span>
+                                <MTooltip Top>
+                                    <ActivatorContent>
+                                        <span class="mr-2" @attributes="@context.Attrs">@value</span>
+                                    </ActivatorContent>
+                                    <ChildContent>
+                                        <span>@value</span>
+                                    </ChildContent>
+                                </MTooltip>
                             </div>
-                        </MHover>
+                        </MHover>                        
                     </MListItemActionText>
                 </MListItemAction>
             </MListItem>
