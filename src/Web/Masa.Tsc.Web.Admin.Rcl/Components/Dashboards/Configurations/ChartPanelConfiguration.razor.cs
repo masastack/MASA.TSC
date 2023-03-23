@@ -69,11 +69,11 @@ public partial class ChartPanelConfiguration : TscComponentBase
         ConfigurationRecord.NavigateToConfigurationRecord();
     }
 
-    async Task CancelAsync()
+    void Cancel()
     {
         var backUp = JsonSerializer.Deserialize<UpsertPanelDto>(_valueBackup);
         Value.Clone(backUp!);
-        await NavigateToPanelConfigurationPageAsync();
+        ConfigurationRecord.NavigateToConfigurationRecord();
     }
 
     void Add()

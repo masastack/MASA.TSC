@@ -7,6 +7,7 @@ public abstract class ConfigurationRecord
 {
     string? _randomStr;
     ModelTypes _modelType;
+    bool _isEdit;
 
     public List<UpsertPanelDto> Panels { get; set; } = new();
 
@@ -45,13 +46,24 @@ public abstract class ConfigurationRecord
 
     public string? Key => $"{Service}{Instance}{Endpoint}{StartTime}{EndTime}{_randomStr}";
 
-    public bool IsEdit { get; set; }
+    public bool IsEdit
+    {
+        get => _isEdit;
+        set
+        {
+            _isEdit = value;
+            JSRuntime.InvokeVoidAsync("eval",$"window.isEdit = {value}");
+        }
+    }
 
     public NavigationManager NavigationManager { get; }
 
-    public ConfigurationRecord(NavigationManager navigationManager)
+    public IJSRuntime JSRuntime { get; }
+
+    public ConfigurationRecord(NavigationManager navigationManager,IJSRuntime jsRuntime)
     {
         NavigationManager = navigationManager;
+        JSRuntime = jsRuntime;
     }
 
     public abstract void NavigateToConfiguration();

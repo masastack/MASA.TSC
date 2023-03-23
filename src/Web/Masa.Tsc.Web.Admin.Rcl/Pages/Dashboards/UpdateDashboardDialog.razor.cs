@@ -12,7 +12,7 @@ public partial class UpdateDashboardDialog
     public EventCallback<bool> VisibleChanged { get; set; }
 
     [Parameter]
-    public EventCallback OnSubmitSuccess { get; set; }
+    public EventCallback<UpdateDashboardDto> OnSubmitSuccess { get; set; }
 
     [Parameter]
     public Guid DashboardId { get; set; }
@@ -56,7 +56,7 @@ public partial class UpdateDashboardDialog
             await ApiCaller.InstrumentService.UpdateAsync(Dashboard);
             OpenSuccessMessage(T("Update dashboard data success"));
             await UpdateVisible(false);
-            await OnSubmitSuccess.InvokeAsync();
+            await OnSubmitSuccess.InvokeAsync(Dashboard);
         }
     }
 }

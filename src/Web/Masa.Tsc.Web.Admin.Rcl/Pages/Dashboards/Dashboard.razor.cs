@@ -92,9 +92,26 @@ public partial class Dashboard
     {
         Loading = true;
         var result = await ApiCaller.DirectoryService.GetListAsync(Page, PageSize, Search);
-        Folders = result.Result ?? new();
+        var folders = result.Result ?? new();
+        folders.ForEach(folder => 
+        {
+            folder.IsActive = Folders.FirstOrDefault(item => item.Id == folder.Id)?.IsActive ?? false;
+        });
+        Folders = folders;
         Total = result.Total;
         Loading = false;
+    }
+
+    async Task OnAddDashboardSuccessAsync(AddDashboardDto dashboard)
+    {
+        await GetFoldersAsync();
+        Folders.First(folder => folder.Id == dashboard.Folder).IsActive = true;
+    }
+
+    async Task OnUpdateDashboardSuccessAsync(UpdateDashboardDto dashboard)
+    {
+        await GetFoldersAsync();
+        Folders.First(folder => folder.Id == dashboard.Folder).IsActive = true;
     }
 
     List<DataTableHeader<DashboardDto>> GetHeaders() => new()
@@ -105,15 +122,6 @@ public partial class Dashboard
         new() { Text = T(nameof(DashboardDto.Model)), Value = nameof(DashboardDto.Model), Sortable = false },
         new() { Text = T("Action"), Value = "Action", Sortable = false, Align = DataTableHeaderAlign.Center, Width = "105px" },
     };
-
-    async Task RefreshAsync()
-    {
-        Loading = true;
-        await GetFoldersAsync();
-        OpenSuccessMessage(T("Refresh data success"));
-        Loading = false;
-    }
-
 
     void OpenAddFolderDialog()
     {
@@ -135,16 +143,6 @@ public partial class Dashboard
     {
         UpdateDashboardDialogVisible = true;
         CurrentDashboardId = dashboard.Id;
-    }
-
-    async Task SwitchRootAsync(DashboardDto dashboard)
-    {
-        Loading = true;
-        dashboard.IsRoot = !dashboard.IsRoot;
-        await ApiCaller.InstrumentService.SetRootAsync(dashboard.Id, dashboard.IsRoot);
-        OpenSuccessMessage(T("Action success"));
-        await GetFoldersAsync();
-        Loading = false;
     }
 
     async Task OpenRemoveDashboardDialogAsync(DashboardDto dashboard)
