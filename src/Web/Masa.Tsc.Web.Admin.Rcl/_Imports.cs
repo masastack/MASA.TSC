@@ -6,6 +6,7 @@ global using BlazorComponent.I18n;
 global using Force.DeepCloner;
 global using Masa.Blazor;
 global using Masa.BuildingBlocks.Authentication.Identity;
+global using Masa.BuildingBlocks.StackSdks.Auth.Contracts;
 global using Masa.BuildingBlocks.StackSdks.Config;
 global using Masa.BuildingBlocks.StackSdks.Pm;
 global using Masa.BuildingBlocks.StackSdks.Pm.Model;

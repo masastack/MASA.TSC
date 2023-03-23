@@ -19,63 +19,67 @@
         {
             <LoadingData Class="col" />
         }
-        else if (_viewProjects == null || !_viewProjects.Any())
-        {
-            <NoData />
-        }
         else
         {
-            <MCol Style="min-width:220px">
-                <HoneyCombGridItem Data="GetProjectViewData()" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor" TItem="ProjectOverviewDto">
-                    <CellBack>
-                        <div class="d-flex flex-column align-center pt-7">
-                            <span class="d-inline-block text-truncate masa btn body @GetHexTitleClass(context.Status)" style="width:120px;">@context.Name</span>
-                            @foreach (var app in context.Apps.Take(3))
-                            {
-                                if (app.Status == MonitorStatuses.Normal)
+            var _viewProjects = GetProjectViewData();
+            if (_viewProjects == null || !_viewProjects.Any())
+            {
+                <NoData />
+            }
+            else
+            {
+                <MCol Style="min-width:220px">
+                    <HoneyCombGridItem Data="GetProjectViewData()" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor" TItem="ProjectOverviewDto">
+                        <CellBack>
+                            <div class="d-flex flex-column align-center pt-7">
+                                <span class="d-inline-block text-truncate masa btn body @GetHexTitleClass(context.Status)" style="width:120px;">@context.Name</span>
+                                @foreach (var app in context.Apps.Take(3))
                                 {
-                                    <span class="masa regular2--text body2 pa-1 d-inline-block text-truncate text-center bordershadow" style="cursor:pointer;width:96%" @onclick="@(()=>OnProjectServiceClick(context,app.Identity))">@app.Name</span>
-                                }
-                                else
-                                {
-                                    <div @onclick="()=>OnProjectServiceClick(context,app.Identity)" @onclick:stopPropagation="true" class="bordershadow pa-1" style="cursor:pointer;width:96%">
-                                        <TscTeamChip Class="masa body2 ma-0 p-1"
+                                    if (app.Status == MonitorStatuses.Normal)
+                                    {
+                                        <span class="masa regular2--text body2 pa-1 d-inline-block text-truncate text-center bordershadow" style="cursor:pointer;width:96%" @onclick="@(()=>OnProjectServiceClick(context,app.Identity))">@app.Name</span>
+                                    }
+                                    else
+                                    {
+                                        <div @onclick="()=>OnProjectServiceClick(context,app.Identity)" @onclick:stopPropagation="true" class="bordershadow pa-1" style="cursor:pointer;width:96%">
+                                            <TscTeamChip Class="masa body2 ma-0 p-1"
                                          Color="@ChipLabelColor(app)"
                                          TextColor="white"
                                          Label
                                          Small
                                          ContentClass="d-inline-block text-truncate">
-                                            @app.Name
-                                        </TscTeamChip>
-                                    </div>
+                                                @app.Name
+                                            </TscTeamChip>
+                                        </div>
+                                    }
                                 }
-                            }
-                            @if (context.Apps.Count > 3)
-                            {
-                                <span class="masa regular2--text body2 bordershadow pa-1" style="cursor:pointer;width:60%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First().Identity))">...</span>
-                            }
-                        </div>
-                    </CellBack>
-                    <CellHoverTip>
-                        <div style="min-height:150px;background-color:transparent;">
-                            <MCard Class="emphasis2" Style="border-bottom-left-radius:20px;border-bottom-right-radius:20px;min-width:240px;max-width:300px;">
-                                <MCardText Class="d-flex flex-column white--text masa body">
-                                    <span>@T("Project name")：@context.Name</span>
-                                    <span>ID：@context.Id</span>
-                                    <span>@T("Application count")：@context.Apps.Count</span>
-                                    <p>@T("Description")：@context.Description</p>
-                                </MCardText>
-                            </MCard>
-                            <div class="d-flex justify-center" style="margin-top: -10px;margin-bottom:10px;">
-                                <div style="width: 0;height: 0;border-style: solid;border-width: 0 20px 20px 0;border-color: transparent transparent #323D6F transparent;transform: rotate(315deg);"></div>
+                                @if (context.Apps.Count > 3)
+                                {
+                                    <span class="masa regular2--text body2 bordershadow pa-1" style="cursor:pointer;width:60%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First().Identity))">...</span>
+                                }
                             </div>
-                        </div>
-                    </CellHoverTip>
-                </HoneyCombGridItem>
-            </MCol>
-            <MCol Style="max-width:266px">
-                <MonitorCard Class="ml-8" Data=_appMonitorDto @bind-Value="@_projectStatus" />
-            </MCol>
+                        </CellBack>
+                        <CellHoverTip>
+                            <div style="min-height:150px;background-color:transparent;">
+                                <MCard Class="emphasis2" Style="border-bottom-left-radius:20px;border-bottom-right-radius:20px;min-width:240px;max-width:300px;">
+                                    <MCardText Class="d-flex flex-column white--text masa body">
+                                        <span>@T("Project name")：@context.Name</span>
+                                        <span>ID：@context.Id</span>
+                                        <span>@T("Application count")：@context.Apps.Count</span>
+                                        <p>@T("Description")：@context.Description</p>
+                                    </MCardText>
+                                </MCard>
+                                <div class="d-flex justify-center" style="margin-top: -10px;margin-bottom:10px;">
+                                    <div style="width: 0;height: 0;border-style: solid;border-width: 0 20px 20px 0;border-color: transparent transparent #323D6F transparent;transform: rotate(315deg);"></div>
+                                </div>
+                            </div>
+                        </CellHoverTip>
+                    </HoneyCombGridItem>
+                </MCol>
+                <MCol Style="max-width:266px">
+                    <MonitorCard Class="ml-8" Data=_appMonitorDto @bind-Value="@_projectStatus" />
+                </MCol>
+            }
         }
     </MRow>
 </MCard>

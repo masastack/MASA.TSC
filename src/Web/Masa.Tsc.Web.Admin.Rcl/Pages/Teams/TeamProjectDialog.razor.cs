@@ -68,8 +68,7 @@ public partial class TeamProjectDialog
 
     async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
-        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
-        (ParamData.Start, ParamData.End) = times;
+        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;        
         ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
     }
 
