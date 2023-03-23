@@ -10,7 +10,7 @@
                     <ProjectDetail Value=@Team.CurrentProject></ProjectDetail>
                     <TeamDetail Value=@Team></TeamDetail>
                 </MCol>
-                <MCol Cols="10" Class="pa-9 full-height overflow-y">
+                <MCol Cols="10" Class="pa-9 full-height overflow-hidden">
                     <MRow Class="@Class">
                         <MCol Cols="6" Class="d-flex justify-start align-center">
                             <div style="width:210px;">
@@ -41,6 +41,7 @@
                             </SButton>
                         </MCol>
                     </MRow>
+                    <MRow Class="full-height overflow-y">
                     @if (ErrorCount > 0)
                     {
                         <MRow Class="pa-3">
@@ -51,6 +52,7 @@
                         </MRow>
                     }
                     <ProjectCharts Class="mt-2" ConfigurationRecord="ConfigurationRecord" />
+                    </MRow>
                 </MCol>
             </MRow>
         </MCard>

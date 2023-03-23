@@ -66,9 +66,10 @@ public partial class TeamProjectDialog
         await JSRuntime.InvokeAsync<object>("open", url, "_blank");
     }
 
-    void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
-        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
+        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;        
+        ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
     }
 
     async Task OnAutoDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)

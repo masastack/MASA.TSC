@@ -71,10 +71,10 @@ public partial class LogPanel
 
     protected override bool IsSubscribeTimeZoneChange => true;
 
-    protected override Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
+    protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
     {
+        await base.OnTimeZoneInfoChanged(timeZoneInfo);
         StateHasChanged();
-        return base.OnTimeZoneInfoChanged(timeZoneInfo);
     }
 
     protected override async Task OnParametersSetAsync()
@@ -145,7 +145,7 @@ public partial class LogPanel
             LogLevel = LogLevel
         };
         var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
-        Logs = response.Result.Select(item => new LogModel(item.Timestamp+CurrentTimeZone.BaseUtcOffset, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
+        Logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
         Total = response.Total;
         await GetChartData();
         Loading = false;
@@ -154,7 +154,7 @@ public partial class LogPanel
     protected string ToDateTimeStr(long value, string format)
     {
         var utcTime = value.ToDateTime(CurrentTimeZone);
-        return utcTime.Format(CurrentTimeZone, format);
+        return utcTime.Format(format);
     }
 
     async Task GetChartData()
@@ -191,7 +191,7 @@ public partial class LogPanel
         var format = start.Format(end);
         string[] xAxisData = ChartData?.Select(item => ToDateTimeStr(item.Key, format))?.ToArray() ?? Array.Empty<string>();
         long[] durations = ChartData?.Select(item => item.Value)?.ToArray() ?? Array.Empty<long>();
-        var subText = $"{start.Format(CurrentTimeZone)}～{end.Format(CurrentTimeZone)}";
+        var subText = $"{start.UtcFormatLocal(CurrentTimeZone)}～{end.UtcFormatLocal(CurrentTimeZone)}";
 
         return new
         {

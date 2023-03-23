@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Teams;
 
-public record TeamMonitorQuery(Guid UserId, string ProjectId, DateTime StartTime, DateTime EndTime, string Keyword) : Query<TeamMonitorDto>
+public record TeamMonitorQuery(Guid UserId, string ProjectId,Guid TeamId ,DateTime StartTime, DateTime EndTime, string Keyword) : Query<TeamMonitorDto>
 {
     public override TeamMonitorDto Result { get; set; }
 }

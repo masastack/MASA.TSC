@@ -21,18 +21,15 @@ public partial class TscTraceChart
     public double Width { get; set; }
 
     [Parameter]
-    public string Format { get; set; }
+    public DateTime Start { get; set; }
 
     [Parameter]
-    public string SubText { get; set; }
-
-    private object _option;
+    public DateTime End { get; set; }
 
     MECharts? MECharts { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        _option = GenOption();
         if (MECharts is not null && (Width, Height) != (0, 0))
         {
             await MECharts.Resize(Width, 300);
@@ -50,13 +47,16 @@ public partial class TscTraceChart
         if (Data == null)
             return new object();
 
+        var _chartFormat = Start.Format(End);
+        var subText = $"{Start.UtcFormatLocal(CurrentTimeZone)}～{End.UtcFormatLocal(CurrentTimeZone)}";
+
         return new
         {
             title = new
             {
                 right = 50,
                 top = -14,
-                subtext = SubText,
+                subtext = subText,
             },
             tooltip = new
             {
@@ -77,7 +77,7 @@ public partial class TscTraceChart
                 new
                 {
                     type = "category",
-                    data = Data.Select(item=>item.Item1.ToDateTime(CurrentTimeZone).Format(CurrentTimeZone,Format)),
+                    data = Data.Select(item=>item.Item1.ToDateTime(CurrentTimeZone).Format(_chartFormat)),
                     axisPointer = new
                     {
                         type = "shadow"
@@ -163,8 +163,7 @@ public partial class TscTraceChart
 
     protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
     {
-        _option = GenOption();
-        StateHasChanged();
         await base.OnTimeZoneInfoChanged(timeZoneInfo);
+        StateHasChanged();
     }
 }

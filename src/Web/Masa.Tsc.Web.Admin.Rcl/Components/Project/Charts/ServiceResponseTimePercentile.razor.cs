@@ -27,7 +27,7 @@ public partial class ServiceResponseTimePercentile
         {
             x = 45,
             x2 = 8,
-            y2 =40,
+            y2 = 40,
             y = 8
         });
         _options.SetValue("legend.top", "bottom");
@@ -106,15 +106,15 @@ public partial class ServiceResponseTimePercentile
         _options.SetValue("legend.data", legend.Select(name => new { name, icon = "square" }));
         var format = StartTime.Format(EndTime);
         _options.SetValue("xAxis.data", timeSpans.Select(value => ToDateTimeStr(value, format)));
-        _options.SetValue("series", dddd.Select(item => new { name = item.Key, type = "line", showSymbol = false, smooth = true,lineStyle=new {type="solid",width=4 }, data = item.Value }));
+        _options.SetValue("series", dddd.Select(item => new { name = item.Key, type = "line", showSymbol = false, smooth = true, lineStyle = new { type = "solid", width = 4 }, data = item.Value }));
     }
 
     protected override bool IsSubscribeTimeZoneChange => true;
 
     protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
     {
+        await base.OnTimeZoneInfoChanged(timeZoneInfo);
         SetData();
         StateHasChanged();
-        await base.OnTimeZoneInfoChanged(timeZoneInfo);
     }
 }

@@ -90,9 +90,9 @@ public partial class TscTraceList : TscComponentBase
 
     protected override bool IsSubscribeTimeZoneChange => true;
 
-    protected override Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
+    protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
     {
+        await base.OnTimeZoneInfoChanged(timeZoneInfo);
         StateHasChanged();
-        return base.OnTimeZoneInfoChanged(timeZoneInfo);
     }
 }

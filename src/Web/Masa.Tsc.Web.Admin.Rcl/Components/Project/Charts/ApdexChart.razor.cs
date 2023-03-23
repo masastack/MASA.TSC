@@ -152,8 +152,8 @@ public partial class ApdexChart
 
     protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
     {
+        await base.OnTimeZoneInfoChanged(timeZoneInfo);
         SetData();
         StateHasChanged();
-        await base.OnTimeZoneInfoChanged(timeZoneInfo);
     }
 }

@@ -85,6 +85,7 @@ builder.Services.AddMasaIdentity(options =>
             multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
         });
 
+builder.Services.AddI18n(Path.Combine("Resources", "I18n"));
 builder.Services.AddStackMiddleware().AddHealthChecks();
 
 var app = builder.Services
@@ -130,6 +131,8 @@ var app = builder.Services
     })
     .AddTopologyRepository()
     .AddServices(builder);
+
+app.UseI18n();
 
 //app.UseAddStackMiddleware();
 await builder.Services.MigrateAsync();

@@ -13,5 +13,7 @@ public class RequestTeamMonitorDto : FromUri<RequestTeamMonitorDto>
 
     public string ProjectId { get; set; }
 
+    public Guid TeamId { get; set; }
+
     public Guid UserId { get; set; }
 }
