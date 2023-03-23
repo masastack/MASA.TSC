@@ -21,7 +21,7 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
     public IPopupService PopupService { get; set; }
 
     [Inject]
-    public TscCaller ApiCaller { get; set; }   
+    public TscCaller ApiCaller { get; set; }
 
     [CascadingParameter]
     public I18n I18n { get; set; }
@@ -113,6 +113,7 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
 
     protected virtual Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
     {
+        _timeZoneInfo = timeZoneInfo;
         return Task.CompletedTask;
     }
 

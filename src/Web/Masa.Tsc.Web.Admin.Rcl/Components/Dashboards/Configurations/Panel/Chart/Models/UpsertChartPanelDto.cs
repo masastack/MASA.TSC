@@ -403,7 +403,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
 
     string ToFormatTimeSpan(long timestamp, TimeZoneInfo timeZoneInfo)
     {
-        return timestamp.ToDateTime(timeZoneInfo).Format(timeZoneInfo, DateFormart);
+        return timestamp.ToDateTime(timeZoneInfo).Format(DateFormart);
     }
 
     public void SetChartData(List<QueryResultDataResponse> chartData, DateTime start, DateTime end)

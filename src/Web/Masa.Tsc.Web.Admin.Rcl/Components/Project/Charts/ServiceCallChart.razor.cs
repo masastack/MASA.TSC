@@ -110,8 +110,8 @@ public partial class ServiceCallChart
 
     protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
     {
-        SetData();
-        StateHasChanged();
         await base.OnTimeZoneInfoChanged(timeZoneInfo);
+        SetData();
+        StateHasChanged();        
     }
 }

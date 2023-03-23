@@ -17,7 +17,7 @@
             }
             else if (context.Header.Value == "Timestamp")
             {
-                @((context.Item.Timestamp + CurrentTimeZone.BaseUtcOffset).Format(CurrentTimeZone))
+                @(context.Item.Timestamp.UtcFormatLocal(CurrentTimeZone))
             }
             else if (context.Header.Value == "Service")
             {
@@ -29,7 +29,7 @@
             }
             else if (context.Header.Value == nameof(TraceResponseDto.Duration))
             {
-                @FormatDuration((context.Item.Timestamp-context.Item.EndTimestamp).TotalMilliseconds)
+                @FormatDuration((context.Item.EndTimestamp-context.Item.Timestamp).TotalMilliseconds)
             }
             else
             {

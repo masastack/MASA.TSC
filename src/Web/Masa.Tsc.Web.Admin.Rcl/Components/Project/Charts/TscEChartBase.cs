@@ -25,6 +25,6 @@ public partial class TscEChartBase : TscComponentBase
     protected string ToDateTimeStr(double value, string fmt)
     {
         var millionSeconds = (long)Math.Floor(value * 1000);
-        return millionSeconds.ToDateTime(CurrentTimeZone).Format(CurrentTimeZone, fmt);
+        return millionSeconds.ToDateTime(CurrentTimeZone).Format(fmt);
     }
 }

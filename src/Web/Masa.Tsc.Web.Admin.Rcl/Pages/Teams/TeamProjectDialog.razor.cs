@@ -59,26 +59,28 @@ public partial class TeamProjectDialog
             Team.AppTotal = ParamData.TeamServiceCount;
             ConfigurationRecord.Service = ParamData.ServiceId;
             ConfigurationRecord.StartTime = ParamData.Start;
-            ConfigurationRecord.EndTime= ParamData.End;
+            ConfigurationRecord.EndTime = ParamData.End;
             ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
         }
     }
 
     async Task OpenLogAsync()
     {
-        var url = $"/dashbord/log/{ConfigurationRecord.Service}/{ConfigurationRecord.StartTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/{ConfigurationRecord.EndTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/Error";        
+        var url = $"/dashbord/log/{ConfigurationRecord.Service}/{ConfigurationRecord.StartTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/{ConfigurationRecord.EndTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/Error";
         await JSRuntime.InvokeAsync<object>("open", url, "_blank");
     }
 
     async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
         (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
+        (ParamData.Start, ParamData.End) = times;
         ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
     }
 
     async Task OnAutoDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
         (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
+        (ParamData.Start, ParamData.End) = times;
         ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
         await base.InvokeAsync(base.StateHasChanged);
     }
