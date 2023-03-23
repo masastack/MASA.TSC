@@ -1,9 +1,9 @@
 ﻿@inherits TscComponentBase
 @namespace Masa.Tsc.Web.Admin.Rcl.Components
 
-@if (Team != null)
-{
-    <SSheetDialog Value=Visible ValueChanged="VisibleChanged" Title="@Team.CurrentProject.Name" EnableDomReload>
+<SSheetDialog Value=Visible OnClosed=DialogVisibleChanged Title="@Team?.CurrentProject?.Name" EnableDomReload>
+    @if(Team is not null)
+    {
         <MCard Style="background-color:#F0F3FA;border-top-left-radius: 20px;border-top-right-radius: 20px;" Class="full-height">
             <MRow NoGutters Class="full-height">
                 <MCol Style="background-color:white;border-top-left-radius: 20px;" Cols="2" Class="d-flex flex-column justify-space-between pa-6 pb-9">
@@ -14,9 +14,9 @@
                     <MRow Class="@Class">
                         <MCol Cols="6" Class="d-flex justify-start align-center">
                             <div style="width:210px;">
-                                <ServiceAutoComplete Services="Apps" Value="@ConfigurationRecord.Service" ValueChanged="OnAppChanged" @ref="ServiceAutoComplete" FillBackground=false />
+                                <ServiceAutoComplete Services="Apps" Value="@ConfigurationRecord.Service" ValueChanged="OnServiceChanged" @ref="ServiceAutoComplete" FillBackground=false />
                             </div>
-                            <MChip Class="mx-6" Color="#05CD99" TextColor="white">@ServiceAutoComplete!.CurrentApp?.Type</MChip>
+                            <MChip Class="mx-6" Color="#05CD99" TextColor="white">@ServiceAutoComplete?.CurrentApp?.Type</MChip>
                             <MTooltip Top>
                                 <ActivatorContent>
                                     <MLabel @attributes="@context.Attrs" Class="regular2--text body2" Style="max-width: 200px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">
@@ -30,12 +30,12 @@
                         </MCol>
                         <MCol Cols="6" Class="d-flex justify-end align-center">
                             <DateTimeRangeToolbar StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
-                                              EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start"
-                                              StartDateTime="@ParamData.Start"
-                                              EndDateTime="@ParamData.End"
-                                              @bind-DefaultQuickRange="@ParamData.QuickRangeKey"
-                                              OnUpdate="OnDateTimeUpdateAsync"
-                                              OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
+                                                  EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start"
+                                                  StartDateTime="@ConfigurationRecord.StartTime"
+                                                  EndDateTime="@ConfigurationRecord.EndTime"
+                            @bind-DefaultQuickRange="@ConfigurationRecord.DefaultQuickRangeKey"
+                                                  OnUpdate="OnDateTimeUpdateAsync"
+                                                  OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
                             <SButton OnClick=NavigateToDashboardConfiguration Class="ml-6" Small BorderRadiusClass="rounded-lg">
                                 @T("Show Detail")
                             </SButton>
@@ -56,5 +56,5 @@
                 </MCol>
             </MRow>
         </MCard>
-    </SSheetDialog>
-}
+    }
+</SSheetDialog>

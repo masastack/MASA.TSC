@@ -18,7 +18,7 @@
         <MCol Cols="6">
             <ServiceResponseTimePercentile Title="@(T("Service Response Time Percentile")+"("+T("ms")+")")" @ref="_serviceResponseTimePercentile" />
         </MCol>
-        <CascadingValue Value="ConfigurationRecord">
+        <CascadingValue Value="ConfigurationRecord" IsFixed>
             <MCol Cols="6" Class="overflow-y">
                 <ChartPanel Value="_endpoint" Class="rounded-lg" />
             </MCol>

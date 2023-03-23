@@ -11,6 +11,12 @@ public partial class ConfigurationTeamDetail
     [Parameter]
     public string ServiceName { get; set; }
 
+    [Parameter]
+    public string ProjectId { get; set; }
+
+    [Parameter]
+    public string TeamId { get; set; }
+
     protected override void OnInitialized()
     {
         if (ConfigurationRecord.NavigationManager.Uri.Contains("record") is false)
@@ -19,6 +25,8 @@ public partial class ConfigurationTeamDetail
         }
 
         ConfigurationRecord.Service = ServiceName;
+        ConfigurationRecord.ProjectId = ProjectId;
+        ConfigurationRecord.TeamId = Guid.Parse(TeamId);
     }
 
     async Task SavePanelsAsync(List<UpsertPanelDto> panels)
@@ -29,5 +37,10 @@ public partial class ConfigurationTeamDetail
     async Task<List<UpsertPanelDto>> GetPanelsAsync()
     {
         return await ApiCaller.InstrumentService.GetTeamInstraumentDetailAsync();
+    }
+
+    void NavigateToTeamProjectDialog()
+    {
+        ConfigurationRecord.NavigateToTeamProjectDialog();
     }
 }

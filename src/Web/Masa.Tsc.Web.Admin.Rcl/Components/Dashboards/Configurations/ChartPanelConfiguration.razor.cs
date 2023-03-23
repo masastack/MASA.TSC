@@ -63,7 +63,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
         var success = !Value.Metrics.Any(x => string.IsNullOrEmpty(x.Expression));
         if (!success)
         {
-            await PopupService.EnqueueSnackbarAsync(T("Metrics name is required"), AlertTypes.Error);
+            await PopupService.EnqueueSnackbarAsync(T("Metrics expression is required"), AlertTypes.Error);
             return;
         }
         ConfigurationRecord.NavigateToConfigurationRecord();

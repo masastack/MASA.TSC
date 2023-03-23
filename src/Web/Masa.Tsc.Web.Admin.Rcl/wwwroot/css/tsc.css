@@ -324,3 +324,6 @@
     .bordershadow:hover {
         box-shadow: 0 0 6px lightsalmon;
     }
+.grid-stack > .grid-stack-item > .grid-stack-item-content {
+    overflow: auto !important;
+}

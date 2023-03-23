@@ -1,4 +1,4 @@
-﻿@page "/teamDetail/configuration/chart/{panelId}/{serviceName}"
+﻿@page "/teamDetail/configuration/chart/{projectId}/{teamId}/{panelId}/{serviceName}"
 @inherits TscComponentBase
 
 <PageTitle>@T("Configure Chart")</PageTitle>
@@ -19,13 +19,26 @@
     public string? ServiceName { get; set; }
 
     [Parameter]
+    public string ProjectId { get; set; }
+
+    [Parameter]
+    public string TeamId { get; set; }
+
+    [Parameter]
     public string PanelId { get; set; }
 
     UpsertChartPanelDto? Panel { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         ConfigurationRecord.Service = ServiceName;
+        ConfigurationRecord.ProjectId = ProjectId;
+        ConfigurationRecord.TeamId = Guid.Parse(TeamId);
+        if(ConfigurationRecord.Panels.Any() is false)
+        {
+            ConfigurationRecord.Panels = await ApiCaller.InstrumentService.GetTeamInstraumentDetailAsync();
+            ConfigurationRecord.Panels.ConvertToConfigurationFormat();
+        }
     }
 
     protected override async Task OnParametersSetAsync()
