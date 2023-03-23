@@ -17,6 +17,7 @@ public class InstrumentCommandHandler
     [EventHandler]
     public async Task AddInstrumentAsync(AddInstrumentCommand command)
     {
+        await ValidateAsync(command.Data.Layer, command.Data.Model.ToString());
         var model = new Instrument
         {
             Name = command.Data.Name,
@@ -41,6 +42,7 @@ public class InstrumentCommandHandler
             throw new UserFriendlyException($"instrument {command.Data.Id} is not exists");
         if (!entry.EnableEdit)
             throw new UserFriendlyException(errorCode: ErrorCodes.NOT_ALLOW_EDIT);
+        await ValidateAsync(command.Data.Layer, command.Data.Model.ToString(), entry.Id);
         entry.Update(command.Data);
         await _instrumentRepository.UpdateAsync(entry);
     }
@@ -88,4 +90,13 @@ public class InstrumentCommandHandler
         await _instrumentRepository.RemoveRangeAsync(list);
     }
     #endregion    
+
+    private async Task ValidateAsync(string layer, string model, Guid? id = null)
+    {
+        var instrument = await _instrumentRepository.FindAsync(e => e.Model == model && e.Layer == layer && e.Id != id);
+        if (instrument != null)
+        {
+            throw new UserFriendlyException($@"Model '{model}' must not be repeated in the same layer '{layer}'");
+        }
+    }
 }
