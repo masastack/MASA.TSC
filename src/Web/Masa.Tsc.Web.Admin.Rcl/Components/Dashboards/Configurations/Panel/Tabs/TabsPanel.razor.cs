@@ -12,7 +12,9 @@ public partial class TabsPanel
     public UpsertTabsPanelDto Panel { get; set; }
 
     [CascadingParameter]
-    public bool IsEdit { get; set; }
+    public ConfigurationRecord ConfigurationRecord { get; set; }
+
+    public bool IsEdit => ConfigurationRecord.IsEdit;
 
     [DisallowNull]
     StringNumber? CurrentTab
@@ -25,10 +27,7 @@ public partial class TabsPanel
     }
 
     protected override void OnParametersSet()
-    {
-        if (Panel.PanelType != PanelTypes.Tabs || Panel.ChildPanels.Any(child => child.PanelType != PanelTypes.TabItem))
-            OpenErrorMessage("Invalid tabs panel");
-
+    {      
         if(_oldIsEdit != IsEdit)
         {
             _oldIsEdit = IsEdit;

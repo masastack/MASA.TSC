@@ -5,22 +5,13 @@ namespace Masa.Tsc.Contracts.Admin.Dashboards;
 
 public class UpsertPanelDto
 {
-    PanelTypes _panelType;
-
     public Guid Id { get; set; } = Guid.NewGuid();
 
     public string Title { get; set; }
 
     public string Description { get; set; }
 
-    public PanelTypes PanelType
-    {
-        get => _panelType;
-        set
-        {
-            _panelType = value;
-        }
-    }
+    public PanelTypes PanelType { get; set; }
 
     public int Width { get; set; }
 

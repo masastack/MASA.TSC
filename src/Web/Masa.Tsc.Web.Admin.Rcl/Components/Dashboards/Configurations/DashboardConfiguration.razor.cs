@@ -6,7 +6,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
 public partial class DashboardConfiguration : IAsyncDisposable
 {
     string _scrollElementId = Guid.NewGuid().ToString();
-    string _contentElementId = Guid.NewGuid().ToString();
     IJSObjectReference? _helper;
     bool _serviceRelationReady;
     bool _timeRangeReady;
@@ -41,6 +40,7 @@ public partial class DashboardConfiguration : IAsyncDisposable
     protected override async Task OnInitializedAsync()
     {
         if(ConfigurationRecord.Panels.Any() is false) await GetPanelsAsync();
+        if(ConfigurationRecord.Panels.Any() is false) ConfigurationRecord.Panels.Add(new());
     }
 
     async Task GetPanelsAsync()
@@ -55,15 +55,27 @@ public partial class DashboardConfiguration : IAsyncDisposable
         }
         _isLoading = false;
 
-        if (ConfigurationRecord.Panels.Any() is false) ConfigurationRecord.IsEdit = true;
+        if (ConfigurationRecord.Panels.Any() is false)
+        {
+            ConfigurationRecord.IsEdit = true;
+        }
     }
 
+    bool _isAdd;
     async Task AddPanel()
     {
-        await PanelGrids.SaveUI();
-        ConfigurationRecord.Panels.AdaptiveUI(new());
+        _isAdd = true;
+        StateHasChanged();
         if (_helper is not null)
-            _ = _helper.InvokeVoidAsync("scrollBottom", _scrollElementId, _contentElementId);
+            _ = _helper.InvokeVoidAsync("scrollBottom", _scrollElementId);
+        if (ConfigurationRecord.Panels.Any() is false) PanelGrids.Clear();
+        else await PanelGrids.SaveUI();
+        ConfigurationRecord.Panels.AdaptiveUI(new());
+        _ = Task.Delay(100).ContinueWith(t => 
+        {
+            _isAdd = false;
+            InvokeAsync(StateHasChanged);
+        });
     }
 
     async Task SaveAsync()

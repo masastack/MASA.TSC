@@ -30,8 +30,6 @@
 <MTabsItems Value="CurrentTab">
     @foreach (var tabItem in Panel.ChildPanels)
     {
-        <MTabItem @key="tabItem.Id" Value="tabItem.Id.ToString()">
-            <PanelGrids ParentPanel="tabItem" Panels="tabItem.ChildPanels" />
-        </MTabItem>
+        <TabItemPanel Panel=tabItem IsCurrentTabItem="@(CurrentTab == tabItem.Id.ToString())" />
     }
 </MTabsItems>
