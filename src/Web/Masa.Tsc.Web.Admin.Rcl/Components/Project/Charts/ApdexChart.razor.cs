@@ -14,7 +14,7 @@ public partial class ApdexChart
     [Parameter]
     public string Title { get; set; }
 
-    public float Total { get; set; }
+    public string Total { get; set; }
 
     private EChartType _options = EChartConst.Line;
 
@@ -103,7 +103,7 @@ public partial class ApdexChart
             var seriesData = ((QueryResultMatrixRangeResponse)_data[0].Result!.First()).Values!.Select(items => (string)items[1]).ToArray();
             var timeSpans = ((QueryResultMatrixRangeResponse)_data[0].Result!.First()).Values!.Select(items => Convert.ToDouble(items[0])).ToArray();
             seriesData = Caculate(seriesData);
-            Total = toFloat(seriesData.Last());
+            Total = seriesData.Last();
             var format = StartTime.Format(EndTime);
             _options.SetValue("xAxis.data", timeSpans.Skip(1).Select(value => ToDateTimeStr(value, format)));
             _options.SetValue("series[0].data", seriesData);
@@ -112,17 +112,8 @@ public partial class ApdexChart
         {
             _options.SetValue("xAxis.data", Array.Empty<string>());
             _options.SetValue("series[0].data", Array.Empty<string>());
-            Total = 0;
+            Total = "0";
         }
-    }
-
-    private float toFloat(string strValue)
-    {
-	    if (!float.TryParse(strValue, out float value))
-	    {
-	       value = 0;
-	    }
-        return value;
     }
 
     private string[] Caculate(string[] data)
@@ -137,8 +128,8 @@ public partial class ApdexChart
         do
         {
             double pre = values[index - 1], current = values[index];
-            if (pre is double.NaN || current is double.NaN)
-                result[index - 1] = double.NaN.ToString();
+            if (pre is double.NaN || current is double.NaN || pre == 0)
+                result[index - 1] = "0";
             else
                 result[index - 1] = DoubleToString(Math.Round((current - pre) * 100.0 / pre, 2));
             index++;
