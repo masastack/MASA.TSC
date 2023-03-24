@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<MTabs Color="primary" Style="border-bottom:1px solid #E4E8F3;" @bind-Value="CurrentTab">
+<MTabs @ref=_tabs Color="primary" Style="border-bottom:1px solid #E4E8F3;" @bind-Value="CurrentTab">
     @foreach (var tabItem in Panel.ChildPanels)
     {
         <MTab @key="tabItem.Id" Value="tabItem.Id.ToString()">

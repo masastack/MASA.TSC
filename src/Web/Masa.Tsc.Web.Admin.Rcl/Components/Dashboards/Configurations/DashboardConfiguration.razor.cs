@@ -10,6 +10,7 @@ public partial class DashboardConfiguration : IAsyncDisposable
     IJSObjectReference? _helper;
     bool _serviceRelationReady;
     bool _timeRangeReady;
+    bool _isLoading;
 
     [Inject]
     public IJSRuntime JS { get; set; }
@@ -44,6 +45,7 @@ public partial class DashboardConfiguration : IAsyncDisposable
 
     async Task GetPanelsAsync()
     {
+        _isLoading = true;
         var panels = await GetPanelsAction.Invoke();
         if (panels.Any() is true)
         {
@@ -51,6 +53,7 @@ public partial class DashboardConfiguration : IAsyncDisposable
             ConfigurationRecord.ClearPanels();
             ConfigurationRecord.Panels.AddRange(panels);
         }
+        _isLoading = false;
 
         if (ConfigurationRecord.Panels.Any() is false) ConfigurationRecord.IsEdit = true;
     }

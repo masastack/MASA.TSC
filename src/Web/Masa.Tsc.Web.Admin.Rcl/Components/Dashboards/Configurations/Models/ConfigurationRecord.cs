@@ -13,6 +13,8 @@ public abstract class ConfigurationRecord
 
     public string? Service { get; set; }
 
+    public string? ServiceName { get; set; }
+
     public string? Instance { get; set; }
 
     public string? Endpoint { get; set; }

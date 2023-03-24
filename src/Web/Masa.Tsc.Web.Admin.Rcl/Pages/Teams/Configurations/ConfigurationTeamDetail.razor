@@ -20,7 +20,8 @@
             </div>
         </div>
         <div class="h6 emphasis2--text my-auto">
-            @ServiceName
+            @(ConfigurationRecord.ServiceName ?? _serviceAutoComplete?.CurrentApp?.Name)           
         </div>
+        <ServiceAutoComplete @ref=_serviceAutoComplete DataReady=" () => {}" Value="@ConfigurationRecord.Service" Style="visibility:hidden;" />
     </HeaderContent>
 </DashboardConfiguration>

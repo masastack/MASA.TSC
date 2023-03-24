@@ -86,6 +86,7 @@ public partial class Dashboard
     protected override async Task OnInitializedAsync()
     {
         await GetFoldersAsync();
+        Folders.ForEach(folder => folder.IsActive = true);
     }
 
     async Task GetFoldersAsync()

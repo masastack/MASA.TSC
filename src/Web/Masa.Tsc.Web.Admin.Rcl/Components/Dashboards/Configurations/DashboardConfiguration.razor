@@ -41,6 +41,10 @@
         </div>
     </HeaderContent>
     <AutoHeightContent>
+        @if (_isLoading)
+        {
+            <LoadingData />
+        }
         <DefaultCard Id="@_contentElementId">
             <CascadingValue Value="ConfigurationRecord.IsEdit" IsFixed>
                 <CascadingValue Value="PanelGrids" IsFixed>
