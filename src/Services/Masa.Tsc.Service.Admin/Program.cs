@@ -49,7 +49,7 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddDaprStarter(opt =>
     {
         opt.DaprHttpPort = 3606;
-        opt.DaprGrpcPort = 3607;
+        opt.DaprGrpcPort = 3601;
     });
 }
 
