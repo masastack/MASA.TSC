@@ -54,15 +54,17 @@ public abstract class ConfigurationRecord
         set
         {
             _isEdit = value;
-            JSRuntime.InvokeVoidAsync("eval",$"window.isEdit = {value}");
+            JSRuntime.InvokeVoidAsync("eval", $"window.isEdit = {value}");
         }
     }
+
+    public Func<TopListOption, Task>? TopListOnclick { get; set; }
 
     public NavigationManager NavigationManager { get; }
 
     public IJSRuntime JSRuntime { get; }
 
-    public ConfigurationRecord(NavigationManager navigationManager,IJSRuntime jsRuntime)
+    public ConfigurationRecord(NavigationManager navigationManager, IJSRuntime jsRuntime)
     {
         NavigationManager = navigationManager;
         JSRuntime = jsRuntime;
