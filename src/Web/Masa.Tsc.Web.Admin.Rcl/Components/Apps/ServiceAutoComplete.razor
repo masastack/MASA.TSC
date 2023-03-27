@@ -6,7 +6,8 @@
                ItemText="app => app.Name"
                ItemValue="app => app.Identity"
                Small
-               Label="@T("Service")"
+               Disabled=Readonly
+               Label="@(Label??T("Service"))"
                BackgroundColor="@(FillBackground?"fill-background":"white")"
                Loading="_isLoading"
                Class="@("rounded-2 " + Class)"

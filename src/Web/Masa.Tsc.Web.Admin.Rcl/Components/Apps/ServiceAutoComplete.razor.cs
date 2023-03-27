@@ -29,6 +29,12 @@ public partial class ServiceAutoComplete
     [Parameter]
     public List<AppDetailModel> Services { get; set; }
 
+    [Parameter]
+    public bool Readonly { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
     public AppDetailModel? CurrentApp => Services?.FirstOrDefault(app => app.Identity == Value);
 
     protected override async Task OnInitializedAsync()

@@ -125,6 +125,21 @@
     void ToDashboardConfiguration(Dessert dessert)
     {
         if (ConfigurationRecord.IsEdit) return;
-        NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, ConfigurationRecord.Service, dessert.Text);
+        var dashboard = dessert.JumpId;
+        if (Value.ListType is ListTypes.ServiceList)
+        {
+            var service = dessert.Text;
+            NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, ConfigurationRecord.Service, service);
+        }
+        else if (Value.ListType is ListTypes.InstanceList)
+        {
+            var instance = dessert.Text;
+            NavigationManager.NavigateToDashboardConfiguration(dashboard, ConfigurationRecord.Service, instance);
+        }
+        else if (Value.ListType is ListTypes.EndpointList)
+        {
+            var endpoint = dessert.Text;
+            NavigationManager.NavigateToDashboardConfiguration(dashboard, ConfigurationRecord.Service, ConfigurationRecord.Instance, endpoint);
+        }
     }
 }
