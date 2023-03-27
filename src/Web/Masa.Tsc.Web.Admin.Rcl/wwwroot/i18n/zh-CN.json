@@ -214,5 +214,6 @@
   "Please enter metrics expression": "请输入指标表达式",
   "Clike me view metrics expression docs": "点击查看指标表达式使用文档",
   "Configure Team Detail": "配置团队详情",
-  "Return to team details page": "返回团队详情页面"
+  "Return to team details page": "返回团队详情页面",
+  "Calls/Minute": "调用次数/每分钟"
 }
