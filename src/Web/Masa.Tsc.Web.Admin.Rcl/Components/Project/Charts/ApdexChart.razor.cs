@@ -128,8 +128,8 @@ public partial class ApdexChart
         do
         {
             double pre = values[index - 1], current = values[index];
-            if (pre is double.NaN || current is double.NaN)
-                result[index - 1] = double.NaN.ToString();
+            if (pre is double.NaN || current is double.NaN || pre == 0)
+                result[index - 1] = "0";
             else
                 result[index - 1] = DoubleToString(Math.Round((current - pre) * 100.0 / pre, 2));
             index++;

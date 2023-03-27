@@ -9,6 +9,8 @@
 }
 
 @code {
+    bool _findPanelFailed;
+
     [Inject]
     DashboardConfigurationRecord ConfigurationRecord { get; set; }
 
@@ -16,7 +18,7 @@
     public NavigationManager NavigationManager { get; set; }
 
     [Parameter]
-    public string? DashboardId { get; set; }
+    public string DashboardId { get; set; }
 
     [Parameter]
     public string? ServiceName { get; set; }
@@ -32,24 +34,45 @@
 
     UpsertChartPanelDto? Panel { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        ConfigurationRecord.DashboardId = DashboardId;
         ConfigurationRecord.Service = ServiceName;
         ConfigurationRecord.Instance = InstanceName;
         ConfigurationRecord.Endpoint = EndpointName;
+        ConfigurationRecord.PanelId = PanelId;
+        if (ConfigurationRecord.Panels.Any() is false)
+        {
+            await ConfigurationRecord.BindPanelsAsync(ApiCaller);            
+        }
+        Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto;
+        _findPanelFailed = Panel is null;
     }
 
     protected override async Task OnParametersSetAsync()
-    {     
+    {
         if (string.IsNullOrEmpty(DashboardId) is false && ConfigurationRecord.DashboardId != DashboardId)
         {
             ConfigurationRecord.DashboardId = DashboardId;
             await ConfigurationRecord.BindPanelsAsync(ApiCaller);
+            _findPanelFailed = ConfigurationRecord.Panels.Any() is false;
         }
-        if (string.IsNullOrEmpty(PanelId) is false)
+        if (string.IsNullOrEmpty(PanelId) is false && ConfigurationRecord.PanelId != PanelId)
         {
             ConfigurationRecord.PanelId = PanelId;
-            Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException(T("Find panel error"));
+            Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto;
+            _findPanelFailed = Panel is null;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_findPanelFailed)
+        {
+            _findPanelFailed = false;
+            await OpenConfirmDialog(T("This chart does not exist, it will jump back to the dashboard configuration page"));
+            ConfigurationRecord.IsEdit = true;
+            ConfigurationRecord.NavigateToConfiguration();
         }
     }
 

@@ -42,4 +42,4 @@
 <MCard Rounded=true Class="px-6 py-2" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
     <SPagination Class="mt-2" @bind-Page="_page" @bind-PageSize=_pageSize Total=_total OnChange="HandleOnPaginationUpdate" />
 </MCard>
-<TscTraceDetail Title="@CurrentTrace?.Resource["service.name"]?.ToString()" @ref="_tscTraceDetail"></TscTraceDetail>
+<TscTraceDetail @ref="_tscTraceDetail"></TscTraceDetail>

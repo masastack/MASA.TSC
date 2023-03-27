@@ -43,6 +43,7 @@ public partial class TeamProjectDialog
     async Task OnServiceChanged(string service)
     {
         ConfigurationRecord.Service = service;
+        ConfigurationRecord.ServiceName = ServiceAutoComplete?.CurrentApp?.Name;
         ErrorCount = await GetErroCountAsync(service);
     }
 
@@ -99,8 +100,7 @@ public partial class TeamProjectDialog
     }
 
     async Task DialogVisibleChanged()
-    {
-        Team = null;
+    {      
         await VisibleChanged.InvokeAsync(false);
     }
 

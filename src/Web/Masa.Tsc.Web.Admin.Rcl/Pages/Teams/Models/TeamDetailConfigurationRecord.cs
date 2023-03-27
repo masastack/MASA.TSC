@@ -15,7 +15,7 @@ public class TeamDetailConfigurationRecord : ConfigurationRecord
 
     public bool TeamProjectDialogVisible { get; set; }
 
-    public TeamDetailConfigurationRecord(NavigationManager navigationManager) : base(navigationManager)
+    public TeamDetailConfigurationRecord(NavigationManager navigationManager, IJSRuntime jsRuntime) : base(navigationManager, jsRuntime)
     {
         ModelType = ModelTypes.All;
     }

@@ -44,12 +44,12 @@
                                 {
                                     if (app.Status == MonitorStatuses.Normal)
                                     {
-                                        <span class="masa regular2--text body2 pa-1 d-inline-block text-truncate text-center bordershadow" style="cursor:pointer;width:96%" @onclick="@(()=>OnProjectServiceClick(context,app.Identity))">@app.Name</span>
+                                        <span class="masa regular2--text body2 pa-1 d-inline-block text-truncate text-center bordershadow" style="cursor:pointer;width:96%" @onclick="@(()=>OnProjectServiceClick(context,app))">@app.Name</span>
                                     }
                                     else
                                     {
-                                        <div @onclick="()=>OnProjectServiceClick(context,app.Identity)" @onclick:stopPropagation="true" class="bordershadow pa-1" style="cursor:pointer;width:96%">
-                                            <TscTeamChip Class="masa body2 ma-0 p-1"
+                                        <div @onclick="()=>OnProjectServiceClick(context,app)" @onclick:stopPropagation="true" class="bordershadow pa-1" style="cursor:pointer;width:96%">
+                                            <TscTeamChip Class="masa body2 ma-0 p-1 bordershadow" Style="cursor:pointer"
                                          Color="@ChipLabelColor(app)"
                                          TextColor="white"
                                          Label
@@ -62,7 +62,7 @@
                                 }
                                 @if (context.Apps.Count > 3)
                                 {
-                                    <span class="masa regular2--text body2 bordershadow pa-1" style="cursor:pointer;width:60%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First().Identity))">...</span>
+                                    <span class="masa regular2--text body2 bordershadow pa-1" style="cursor:pointer;width:60%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))">...</span>
                                 }
                             </div>
                         </CellBack>

@@ -1,0 +1,33 @@
+﻿@inherits TscComponentBase
+
+<MTabItem @key="Panel.Id" Value="Panel.Id.ToString()">
+    <PanelGrids ParentPanel="Panel" Panels="Panel.ChildPanels" />
+</MTabItem>
+
+@code {
+    string _panelIdJoin;
+    string _key;
+
+    [Parameter]
+    public UpsertPanelDto Panel { get; set; }
+
+    [Parameter]
+    public bool IsCurrentTabItem { get; set; }
+
+    [CascadingParameter]
+    public List<PanelGrids> PanelGridRange { get; set; }
+
+    [CascadingParameter]
+    public ConfigurationRecord ConfigurationRecord { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        //var panelIdJoin = string.Join(',', ConfigurationRecord.Panels.Select(panel => panel.Id));
+        //if (IsCurrentTabItem && _panelIdJoin != panelIdJoin)
+        //{
+        //    _panelIdJoin = panelIdJoin;
+        //    await PanelGridRange.SaveUI(Panel);
+        //    _key = panelIdJoin;
+        //}
+    }
+}

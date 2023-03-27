@@ -11,7 +11,7 @@
         <SButton Icon OnClick="GetGetMetricsAsync">
             <SIcon Tooltip="@T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon>
         </SButton>
-        <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg" OnClick="() => CancelAsync()">
+        <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg" OnClick="Cancel">
             @T("Cancel")
         </SButton>
         <SButton Small BorderRadiusClass="rounded-lg" OnClick="() => NavigateToPanelConfigurationPageAsync()">
@@ -29,19 +29,35 @@
                 <MRow>
                     @if (Value.ChartType == ChartTypes.Table)
                     {
-                        <MCol Md="4">
-                            <ProjectSelect @bind-Value="@Value.SystemIdentity" />
-                        </MCol>
-                        <MCol Md="8">
-                            <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
-                                @foreach (var item in TableMap[ConfigurationRecord.ModelType])
-                                {
-                                    <MButton Class="text-capitalize" Value="@item.ToString()">
-                                        @item.ToString()
-                                    </MButton>
-                                }
-                            </MButtonGroup>
-                        </MCol>
+                        @if (ConfigurationRecord.ModelType is not ModelTypes.All)
+                        {
+                            <MCol Md="4">
+                                <ServiceAutoComplete Label="@T("Project")" Readonly Value="@ConfigurationRecord.Service" />
+                            </MCol>
+                            <MCol Md="8">
+                                <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
+                                    @foreach (var item in TableMap[ConfigurationRecord.ModelType])
+                                    {
+                                        <MButton Class="text-capitalize" Value="@item.ToString()">
+                                            @item.ToString()
+                                        </MButton>
+                                    }
+                                </MButtonGroup>
+                            </MCol>
+                        }
+                        else
+                        {
+                            <MCol Md="12">
+                                <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
+                                    @foreach (var item in TableMap[ConfigurationRecord.ModelType])
+                                    {
+                                        <MButton Class="text-capitalize" Value="@item.ToString()">
+                                            @item.ToString()
+                                        </MButton>
+                                    }
+                                </MButtonGroup>
+                            </MCol>
+                        }
                     }
                     <MCol Md="4">
                         <STextField @bind-Value="@Value.Title" />
@@ -61,7 +77,7 @@
                                                     <STextField BackgroundColor="white" DebounceInterval="500" TValue="string" Value="Value.Metrics[0].DisplayName" ValueChanged="value => MetricNameChanged(Value.Metrics[0],value) " Label="@T("Metric name")" />
                                                 </MCol>
                                                 <MCol Md="12">
-                                                    <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value) " Label="@T("Metric expression")" />
+                                                    <MetricsExpression Value="Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value)" />
                                                 </MCol>
                                             </MRow>
                                         </MCardText>
@@ -97,7 +113,7 @@
                                                 </MRow>
                                             </MCardText>
                                             <MCardActions Class="d-flex justify-space-between">
-                                                <ColorGroup Value="@item.Color" ValueChanged="value => MetricColorChanged(item,value)"/>
+                                                <ColorGroup Value="@item.Color" ValueChanged="value => MetricColorChanged(item,value)" />
                                                 <MIcon OnClick="() => Remove(item)" Color="red">mdi-delete</MIcon>
                                             </MCardActions>
                                         </MCard>

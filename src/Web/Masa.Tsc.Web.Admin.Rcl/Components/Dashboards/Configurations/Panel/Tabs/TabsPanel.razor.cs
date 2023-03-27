@@ -5,11 +5,16 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Panel.Tabs
 
 public partial class TabsPanel
 {
+    MTabs? _tabs;
+    bool _oldIsEdit;
+
     [Parameter]
     public UpsertTabsPanelDto Panel { get; set; }
 
     [CascadingParameter]
-    public bool IsEdit { get; set; }
+    public ConfigurationRecord ConfigurationRecord { get; set; }
+
+    public bool IsEdit => ConfigurationRecord.IsEdit;
 
     [DisallowNull]
     StringNumber? CurrentTab
@@ -22,9 +27,18 @@ public partial class TabsPanel
     }
 
     protected override void OnParametersSet()
-    {
-        if (Panel.PanelType != PanelTypes.Tabs || Panel.ChildPanels.Any(child => child.PanelType != PanelTypes.TabItem))
-            OpenErrorMessage("Invalid tabs panel");
+    {      
+        if(_oldIsEdit != IsEdit)
+        {
+            _oldIsEdit = IsEdit;
+            if (_oldIsEdit)
+            {
+                NextTick(() =>
+                {
+                    _tabs?.CallSlider();
+                });
+            }
+        }
     }
 
     void AddTabItem()
@@ -35,5 +49,9 @@ public partial class TabsPanel
     void CloseTabItem(UpsertPanelDto panel)
     {
         Panel.RemoveTabItem(panel);
+        NextTick(() =>
+        {
+            _tabs?.CallSlider();
+        });
     }
 }

@@ -86,3 +86,4 @@ global using System.Text.RegularExpressions;
 global using HttpMethods = Masa.BuildingBlocks.StackSdks.Scheduler.Enum.HttpMethods;
 global using Directory = Masa.Tsc.Service.Admin.Domain.Aggregates.Directory;
 global using ElasticsearchNest = Nest;
+global using Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EFCore;
