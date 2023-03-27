@@ -9,7 +9,7 @@ public class DefaultCard : MCard
     {
         base.OnParametersSet();
         Class ??= "";
-        if (Class.Contains("pa-6") is false)
+        if (Class.Contains("pa-") is false)
             Class += " pa-6";
     }
 }
