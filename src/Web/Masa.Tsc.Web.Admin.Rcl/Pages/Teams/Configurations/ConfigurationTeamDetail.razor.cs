@@ -5,6 +5,8 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Teams.Configurations;
 
 public partial class ConfigurationTeamDetail
 {
+    ServiceAutoComplete _serviceAutoComplete;
+
     [Inject]
     public TeamDetailConfigurationRecord ConfigurationRecord { get; set; }
 

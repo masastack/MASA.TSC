@@ -12,10 +12,13 @@ public partial class ServiceAutoComplete
     public IPmClient PmClient { get; set; }
 
     [Parameter]
-    public string Value { get; set; }
+    public string? Value { get; set; }
 
     [Parameter]
-    public EventCallback<string> ValueChanged { get; set; }
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback DataReady { get; set; }
 
     [Parameter]
     public bool FillBackground { get; set; } = true;
@@ -48,6 +51,7 @@ public partial class ServiceAutoComplete
                     Services = data;
             }
             _isLoading = false;
+            if (DataReady.HasDelegate) await DataReady.InvokeAsync();
         }
     }
 

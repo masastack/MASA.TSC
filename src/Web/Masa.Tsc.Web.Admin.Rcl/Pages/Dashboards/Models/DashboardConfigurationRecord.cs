@@ -7,7 +7,7 @@ public class DashboardConfigurationRecord : ConfigurationRecord
 {
     public string DashboardId { get; set; }
 
-    public DashboardConfigurationRecord(NavigationManager navigationManager) : base(navigationManager)
+    public DashboardConfigurationRecord(NavigationManager navigationManager, IJSRuntime jsRuntime) : base(navigationManager, jsRuntime)
     {
     }
 

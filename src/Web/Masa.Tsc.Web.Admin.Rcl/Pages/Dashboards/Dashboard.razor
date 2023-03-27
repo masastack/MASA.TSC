@@ -120,6 +120,6 @@
 </AutoHeight>
 
 <AddFloderDialog @bind-Visible="AddFolderDialogVisible" OnSubmitSuccess=GetFoldersAsync />
-<AddDashboardDialog @bind-Visible="AddDashboardDialogVisible" OnSubmitSuccess=GetFoldersAsync />
-<UpdateDashboardDialog @bind-Visible="UpdateDashboardDialogVisible" DashboardId=CurrentDashboardId OnSubmitSuccess=GetFoldersAsync />
 <UpdateFolderDialog @bind-Visible="UpdateFolderDialogVisible" FolderId=CurrentFolderId OnSubmitSuccess=GetFoldersAsync />
+<AddDashboardDialog @bind-Visible="AddDashboardDialogVisible" OnSubmitSuccess=OnAddDashboardSuccessAsync />
+<UpdateDashboardDialog @bind-Visible="UpdateDashboardDialogVisible" DashboardId=CurrentDashboardId OnSubmitSuccess=OnUpdateDashboardSuccessAsync />

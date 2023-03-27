@@ -34,7 +34,7 @@ public partial class PanelGrids
 
     async Task AddChildPanel(UpsertTabsPanelDto? panel)
     {
-        await PanelGridRange.SaveUI();
+        await PanelGridRange.SaveUI(panel.CurrentTabItem);
         panel?.CurrentTabItem?.AddPanel();
     }
 
@@ -44,10 +44,9 @@ public partial class PanelGrids
         Panels.Remove(panel);
     }
 
-    async Task ReplacePanel(UpsertPanelDto panel)
+    void ReplacePanel(UpsertPanelDto panel)
     {
         var data = Panels.First(p => p.Id == panel.Id);
-        await SavePanelGridAsync();
         panel.X = data.X;
         panel.Y = data.Y;
         if (data.Width != GlobalPanelConfig.Width || data.Height != GlobalPanelConfig.Height)
@@ -61,11 +60,11 @@ public partial class PanelGrids
             {
                 case PanelTypes.Tabs:
                     panel.Width = 12;
-                    panel.Height = 6;
+                    panel.Height = 5;
                     break;
                 case PanelTypes.Chart:
                     panel.Width = 12;
-                    panel.Height = 5;
+                    panel.Height = 4;
                     break;
                 case PanelTypes.Log:
                     panel.Width = 12;
@@ -88,13 +87,12 @@ public partial class PanelGrids
         Panels.Add(panel);
         if (panel.PanelType is PanelTypes.Chart)
         {
-            await ConfigurationChartPanel(panel);
+            ConfigurationChartPanel(panel);
         }
     }
 
-    async Task ConfigurationChartPanel(UpsertPanelDto panel)
+    void ConfigurationChartPanel(UpsertPanelDto panel)
     {
-        await PanelGridRange.SaveUI();
         ConfigurationRecord.PanelId = panel.Id.ToString();
         ConfigurationRecord.NavigateToChartConfiguration();
     }

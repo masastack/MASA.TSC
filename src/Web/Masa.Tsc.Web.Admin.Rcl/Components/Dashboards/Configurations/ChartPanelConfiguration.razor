@@ -11,7 +11,7 @@
         <SButton Icon OnClick="GetGetMetricsAsync">
             <SIcon Tooltip="@T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon>
         </SButton>
-        <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg" OnClick="() => CancelAsync()">
+        <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg" OnClick="Cancel">
             @T("Cancel")
         </SButton>
         <SButton Small BorderRadiusClass="rounded-lg" OnClick="() => NavigateToPanelConfigurationPageAsync()">
@@ -61,7 +61,7 @@
                                                     <STextField BackgroundColor="white" DebounceInterval="500" TValue="string" Value="Value.Metrics[0].DisplayName" ValueChanged="value => MetricNameChanged(Value.Metrics[0],value) " Label="@T("Metric name")" />
                                                 </MCol>
                                                 <MCol Md="12">
-                                                    <STextField BackgroundColor="white" Required DebounceInterval="1000" TValue="string" Value="Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value) " Label="@T("Metric expression")" />
+                                                    <MetricsExpression Value="Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value)" />
                                                 </MCol>
                                             </MRow>
                                         </MCardText>
