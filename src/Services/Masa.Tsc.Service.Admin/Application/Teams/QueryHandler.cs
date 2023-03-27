@@ -255,14 +255,16 @@ public class QueryHandler
 
     private async Task<List<string>> GetAllMonitServicesAsync(DateTime? start = default, DateTime? end = default)
     {
-        start = null;
-        end = null;
+        if (start == null)
+            start = DateTime.MinValue;
+        if (end == null)
+            end = DateTime.MaxValue;
         var tasks = new Task<object>[] {
             _logService.AggregateAsync(new SimpleAggregateRequestDto
             {
                 Name = ElasticConstant.ServiceName,
-                Start = start ?? DateTime.MinValue,
-                End = end ?? DateTime.MinValue,
+                Start = start.Value,
+                End = end.Value,
                 Type = AggregateTypes.GroupBy,
                 MaxCount = 999
             }),
@@ -286,7 +288,8 @@ public class QueryHandler
         var metricServices = await _prometheusClient.QueryRangeAsync(new QueryRangeRequest
         {
             Query = "group by(service_name) (http_server_duration_sum)",
-            End = DateTime.Now.ToUnixTimestamp().ToString()
+            Start = start!.Value.ToUnixTimestamp().ToString(),
+            End = end!.Value.ToUnixTimestamp().ToString()
         });
         if (metricServices.Status == ResultStatuses.Success && metricServices.Data!.Result != null && metricServices.Data.Result.Any() && metricServices.Data.ResultType == ResultTypes.Vector)
         {
