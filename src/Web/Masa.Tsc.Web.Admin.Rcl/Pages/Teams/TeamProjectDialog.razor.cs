@@ -100,8 +100,7 @@ public partial class TeamProjectDialog
     }
 
     async Task DialogVisibleChanged()
-    {
-        Team = null;
+    {      
         await VisibleChanged.InvokeAsync(false);
     }
 

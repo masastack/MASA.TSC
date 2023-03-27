@@ -45,8 +45,8 @@ public partial class Team
         DateTime start = DateTime.MinValue, end = DateTime.MinValue;
         var data = await ApiCaller.ProjectService.OverviewAsync(new RequestTeamMonitorDto
         {
-            EndTime = end,
-            StartTime = start,
+            EndTime = ConfigurationRecord.EndTime.UtcDateTime,
+            StartTime = ConfigurationRecord.StartTime.UtcDateTime,
             Keyword = _search,
             UserId = CurrentUserId,
             TeamId = MasaUser.CurrentTeamId
