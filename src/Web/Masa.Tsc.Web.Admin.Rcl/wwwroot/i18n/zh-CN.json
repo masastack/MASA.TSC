@@ -169,8 +169,7 @@
     "Timestamp": "时间",
     "Copy value": "复制"
   },
-  "Start": "开始点",
-  "Duration": "持续时间",
+  "Start": "开始点",  
   "Span Count": "跨度",
   "No Data": "没有数据",
   "Topology": "拓扑图",

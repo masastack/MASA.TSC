@@ -255,6 +255,8 @@ public class QueryHandler
 
     private async Task<List<string>> GetAllMonitServicesAsync(DateTime? start = default, DateTime? end = default)
     {
+        start = null;
+        end = null;
         var tasks = new Task<object>[] {
             _logService.AggregateAsync(new SimpleAggregateRequestDto
             {
@@ -281,9 +283,10 @@ public class QueryHandler
         if (queryResult[0] is IEnumerable<string> traceServices && traceServices.Any())
             result.AddRange(traceServices);
 
-        var metricServices = await _prometheusClient.QueryAsync(new QueryRequest
+        var metricServices = await _prometheusClient.QueryRangeAsync(new QueryRangeRequest
         {
-            Query = "group by(service_name) (http_server_duration_sum)"
+            Query = "group by(service_name) (http_server_duration_sum)",
+            End = DateTime.Now.ToUnixTimestamp().ToString()
         });
         if (metricServices.Status == ResultStatuses.Success && metricServices.Data!.Result != null && metricServices.Data.Result.Any() && metricServices.Data.ResultType == ResultTypes.Vector)
         {

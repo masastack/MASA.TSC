@@ -42,7 +42,6 @@ public partial class Team
     private async Task GetProjectsAsync()
     {
         _isLoading = true;
-        DateTime start = DateTime.MinValue, end = DateTime.MinValue;
         var data = await ApiCaller.ProjectService.OverviewAsync(new RequestTeamMonitorDto
         {
             EndTime = ConfigurationRecord.EndTime.UtcDateTime,
@@ -108,7 +107,7 @@ public partial class Team
 
         _appMonitorDto.Normal = projects.Count(project => project.Apps.All(app => !app.HasError && !app.HasWarning));
 
-        var appids = string.Join(',', projects.Select(project => string.Join(',', project.Apps?.Select(app => app.Identity)))).Split(',').Where(s => !string.IsNullOrEmpty(s)).ToArray();
+        var appids = string.Join(',', projects.Select(project => string.Join(',', project.Apps.Select(app => app.Identity)))).Split(',').Where(s => !string.IsNullOrEmpty(s)).ToArray();
         var tasks = new Task<int>[] {
             GetErroOrWarningCountAsync(true,appids),
             GetErroOrWarningCountAsync(false,appids),
