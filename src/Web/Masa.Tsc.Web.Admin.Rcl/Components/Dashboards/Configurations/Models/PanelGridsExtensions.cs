@@ -1,7 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
+namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Models;
 
 public static class PanelGridsExtensions
 {
@@ -11,7 +11,7 @@ public static class PanelGridsExtensions
         if (panelGrids.Any() is false) return;
         var panelGrid = panelGrids.FirstOrDefault(item => item.ParentPanel == null);
         if (panelGrid == null) return;
-        //await panelGrid.Gridstack!.Reload();
+        await panelGrid.Gridstack!.Reload();
         //await Task.WhenAll(panelGrids.Select(item => item.SavePanelGridAsync()));
         //await Task.WhenAll(panelGrids.Where(item => item.ParentPanel == parentPanel).Select(item => item.Gridstack!.Reload()));
         //await Task.WhenAll(panelGrids.Select(item => item.SavePanelGridAsync()));
