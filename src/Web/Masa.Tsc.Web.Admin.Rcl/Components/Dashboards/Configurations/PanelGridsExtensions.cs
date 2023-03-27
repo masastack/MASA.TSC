@@ -9,10 +9,10 @@ public static class PanelGridsExtensions
     {
         panelGrids.RemoveAll(Panel => Panel.ParentPanel?.IsRemove is true);
         if (panelGrids.Any() is false) return;
-        var panelGrid = panelGrids.FirstOrDefault(item => item.ParentPanel == parentPanel);
+        var panelGrid = panelGrids.FirstOrDefault(item => item.ParentPanel == null);
         if (panelGrid == null) return;
-        await panelGrid.Gridstack!.Reload();
-        await panelGrid.SavePanelGridAsync();
+        //await panelGrid.Gridstack!.Reload();
+        //await Task.WhenAll(panelGrids.Select(item => item.SavePanelGridAsync()));
         //await Task.WhenAll(panelGrids.Where(item => item.ParentPanel == parentPanel).Select(item => item.Gridstack!.Reload()));
         //await Task.WhenAll(panelGrids.Select(item => item.SavePanelGridAsync()));
     }
