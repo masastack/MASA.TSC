@@ -65,6 +65,7 @@ public partial class ServiceCallChart
             color = "#FF5252"
         });
         _options.SetValue("series[0].areaStyle", new { color = new { colorStops = new[] { new { offset = 0, color = "rgba(255, 82, 82, 1)" }, new { offset = 1, color = "rgba(255, 82, 82, 0)" } }, x = 0, y = 0, x2 = 0, y2 = 1, type = "linear", global = false } });
+        _options.SetValue("tooltip.formatter", "{b}<br /><div style=\"display:flex;align-items: center;\"><div style=\"width:8px;height:8px;background-color:#cb18f8;border-radius:50px;\"></div>&nbsp;&nbsp;<div>(" + T("Calls/Minute") +"){c}</div></div>");
     }
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
@@ -112,6 +113,6 @@ public partial class ServiceCallChart
     {
         await base.OnTimeZoneInfoChanged(timeZoneInfo);
         SetData();
-        StateHasChanged();        
+        StateHasChanged();
     }
 }

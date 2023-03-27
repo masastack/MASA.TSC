@@ -1,48 +1,51 @@
 ﻿@inherits TscComponentBase
 
-<div class="d-flex textfield-autocomplete @Class" style="@Style">
-    <div style="@(_autocomplete?"width:100%;":"width:0;")transition-property: width;transition-duration: 0.2s;transition-timing-function:ease;">
-        <SAutoComplete Value="Value"
-                       ValueChanged="ValueChanged"
-                       ValueExpression="ValueExpression"
-                       Label="@T("Metrics expression")"
-                       Placeholder="@T("Please select metrics expression")"
-                       AutoLabel=false
-                       Required
-                       BackgroundColor="white"
-                       Items=Metrics.ToList()
-                       ItemText="e => e.Key"
-                       ItemValue="e => e.Value" />
-    </div>
-    <div style="@(_autocomplete?"width:0;":"width:100%;")transition-property: width;transition-duration: 0.2s;transition-timing-function:ease;">
-        <STextField Value="Value"
-                    ValueChanged="ValueChanged"
-                    ValueExpression="ValueExpression"
-                    Label="@T("Metrics expression")"
-                    AutoLabel=false
-                    Placeholder="@T("Please enter metrics expression")"
-                    BackgroundColor="white"
-                    Class="full-width"
-                    Required
-                    DebounceInterval="1000"
-                    Style="margin-right: 1px;">
-            <AppendContent>
-                <a href="https://docs.masastack.com/stack/tsc/introduce" target="_blank">
-                    <SIcon Tooltip="@T("Clike me view metrics expression docs")">
-                        mdi-help-circle-outline
-                    </SIcon>
-                </a>
-            </AppendContent>
-        </STextField>
-    </div>
-    <MSpacer />
-    <FadeTransition LeaveAbsolute>
-        <div @onclick="SwitchMode" class="d-flex hover-pointer" style="background-color:white;height:46.5px;min-width:46.5px;z-index:1;margin-left:0;margin-top:1px;">
-            <KeyTransitionElement Value="_autocomplete.ToString()" Class="ma-auto">
-                <SIcon>@(_autocomplete ? IconConstants.Update : IconConstants.Close)</SIcon>
-            </KeyTransitionElement>
+<div class="d-flex textfield-autocomplete @Class" style="align-items:center;@(Style)">
+    <div class="d-flex" style="@(_autocomplete ? "width: 100%":"width:calc(100% - 35px);")">
+        <div style="@(_autocomplete ? "width:100%;":"width:0;")transition-property: width;transition-duration: 0.2s;transition-timing-function:ease;">
+            <SAutoComplete Value="Value"
+                           ValueChanged="ValueChanged"
+                           ValueExpression="ValueExpression"
+                           Label="@T("Metrics expression")"
+                           Placeholder="@T("Please select metrics expression")"
+                           AutoLabel=false
+                           Required
+                           BackgroundColor="white"
+                           Items=Metrics.ToList()
+                           ItemText="e => e.Key"
+                           ItemValue="e => e.Value" />
         </div>
-    </FadeTransition>
+        <div style="@(_autocomplete ? "width:0;":"width: 100%;")transition-property: width;transition-duration: 0.2s;transition-timing-function:ease;">
+            <STextField Value="Value"
+                        ValueChanged="ValueChanged"
+                        ValueExpression="ValueExpression"
+                        Label="@T("Metrics expression")"
+                        AutoLabel=false
+                        Placeholder="@T("Please enter metrics expression")"
+                        BackgroundColor="white"
+                        Class="full-width"
+                        Required
+                        DebounceInterval="1000"
+                        Style="margin-right: 1px;">
+            </STextField>
+        </div>
+        <MSpacer />
+        <FadeTransition LeaveAbsolute>
+            <div @onclick="SwitchMode" class="d-flex hover-pointer" style="background-color:white;height:46.5px;min-width:46.5px;z-index:1;margin-left:0;margin-top:1px;">
+                <KeyTransitionElement Value="_autocomplete.ToString()" Class="ma-auto">
+                    <SIcon>@(_autocomplete ? IconConstants.Update : IconConstants.Close)</SIcon>
+                </KeyTransitionElement>
+            </div>
+        </FadeTransition>
+        
+    </div>
+    <div style="@(_autocomplete ? "display:none;":"width:20px; padding-left:10px;")">
+        <a href="https://docs.masastack.com/stack/tsc/introduce" target="_blank">
+            <SIcon Tooltip="@T("Clike me view metrics expression docs")">
+                mdi-help-circle-outline
+            </SIcon>
+        </a>
+    </div>
 </div>
 
 @code {
