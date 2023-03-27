@@ -53,6 +53,9 @@
                                     <SButton Icon Color="red" OnClick="async () => await OpenRemoveDashboardDialogAsync(context.Item)"><SIcon Tooltip="@T("Remove")" Style="color:#F44336 !important;">@IconConstants.Remove</SIcon></SButton>
                                 </div>
                                 break;
+                            case nameof(DashboardDto.Model):
+                                <span class="subtitle">@T(context.Value?.ToString() ?? "")</span>
+                                break;
                             default:
                                 <span class="subtitle">@context.Value</span>
                                 break;
