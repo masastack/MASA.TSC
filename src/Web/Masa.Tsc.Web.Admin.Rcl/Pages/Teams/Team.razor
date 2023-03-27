@@ -10,7 +10,14 @@
     <div class="mx-6">
         <SearchTextField Value="@_search" ValueChanged="OnSearchChangedAsync" Style="width:220px;border-radius: 10px !important;" FillBackground=false Clearable />
     </div>
-    <DateTimeRangeToolbar OnUpdate="OnDateTimeUpdateAsync" OnAutoUpdate="OnAutoDateTimeUpdateAsync" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey" />
+    <DateTimeRangeToolbar 
+        StartTimeLimit="(val,end)=>val<=end&& val.AddMonths(1)>=end"
+        EndTimeLimit="(val,start)=>val>=start&&val.AddMonths(-1)<=start"
+        OnUpdate="OnDateTimeUpdateAsync" 
+        OnAutoUpdate="OnAutoDateTimeUpdateAsync" 
+        @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
+        @bind-Interval="ConfigurationRecord.Interval"
+        @bind-UseAbsoluteTime="ConfigurationRecord.UseAbsoluteTime" />
 </div>
 
 <MCard Class="d-flex mt-8" Style="min-width:464px">

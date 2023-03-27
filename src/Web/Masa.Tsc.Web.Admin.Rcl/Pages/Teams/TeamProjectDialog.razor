@@ -29,13 +29,16 @@
                             </MTooltip>
                         </MCol>
                         <MCol Cols="6" Class="d-flex justify-end align-center">
-                            <DateTimeRangeToolbar StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
-                                                  EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start"
-                                                  StartDateTime="@ConfigurationRecord.StartTime"
-                                                  EndDateTime="@ConfigurationRecord.EndTime"
-                            @bind-DefaultQuickRange="@ConfigurationRecord.DefaultQuickRangeKey"
-                                                  OnUpdate="OnDateTimeUpdateAsync"
-                                                  OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
+                            <DateTimeRangeToolbar 
+                                StartTimeLimit="(val,end)=>val<=end&& val.AddMonths(1)>=end"
+                                EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start"
+                                StartDateTime="@ConfigurationRecord.StartTime"
+                                EndDateTime="@ConfigurationRecord.EndTime"
+                                DefaultQuickRange="@ConfigurationRecord.DefaultQuickRangeKey"
+                                Interval="@ConfigurationRecord.Interval"
+                                UseAbsoluteTime="@ConfigurationRecord.UseAbsoluteTime"
+                                OnUpdate="OnDateTimeUpdateAsync"
+                                OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
                             <SButton OnClick=NavigateToDashboardConfiguration Class="ml-6" Small BorderRadiusClass="rounded-lg">
                                 @T("Show Detail")
                             </SButton>

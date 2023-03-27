@@ -32,12 +32,12 @@
 
     <MDivider Vertical Class="mx-2" />
 
-    <Dropdown Items="_intervalList"
-              ItemValue="item => item.Text"
+    <Dropdown Items="IntervalItem.Items"
+              ItemValue="item => item"
               ItemText="item => I18n.T(item.Text)"
-              @bind-Value="_interval"
+              @bind-Value="Interval"
               TItem="IntervalItem"
-              TValue="string"
+              TValue="IntervalItem"
               OnItemClick="OnIntervalSelected">
         <PrependContent>
             <MButton Icon Small OnClick="Refresh">
@@ -46,10 +46,10 @@
         </PrependContent>
         <ActivatorContent>
             @{
-                var exists = _interval is not null;
+                var exists = Interval is not null;
                 <MButton Text Small Icon="!exists"
                          @attributes="@context.Attrs">
-                    <span class="mr-1">@I18n.T(_interval)</span>
+                    <span class="mr-1">@I18n.T(Interval.Text)</span>
                     <MIcon Small Right="@exists">mdi-menu-down</MIcon>
                 </MButton>
             }
@@ -57,8 +57,8 @@
     </Dropdown>
 </div>
 
-@code {
-
+@code
+{
     [Parameter]
     public QuickRangeKey? DefaultQuickRange { get; set; }
 
@@ -100,6 +100,18 @@
         set => _endDateTime = value;
     }
 
+    [Parameter]
+    public bool UseAbsoluteTime { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<bool> UseAbsoluteTimeChanged { get; set; }
+
+    [Parameter]
+    public IntervalItem Interval { get; set; } = IntervalItem.Off;
+
+    [Parameter]
+    public EventCallback<IntervalItem?> IntervalChanged { get; set; }
+
     [Inject]
     public IUserContext UserContext { get; set; }
 
@@ -113,7 +125,6 @@
     private DateTimeOffset _endDateTime;
     private QuickRangeKey _selectedQuickRangeKey = QuickRangeKey.Off;
     private QuickRange _quickRange = s_internalDefaultQuickRange;
-    private string? _interval = "Off";
 
     private List<QuickRange> _quickRangeItems = new()
     {
@@ -148,19 +159,19 @@
         //new QuickRange(QuickRangeKey.Off, TimeSpan.Zero, true),
     };
 
-    private List<IntervalItem> _intervalList = new()
-    {
-        new IntervalItem("Off", TimeSpan.Zero),
-        new IntervalItem("10s", TimeSpan.FromSeconds(10)),
-        new IntervalItem("30s", TimeSpan.FromSeconds(30)),
-        new IntervalItem("1m", TimeSpan.FromMinutes(1)),
-        new IntervalItem("5m", TimeSpan.FromMinutes(5)),
-        new IntervalItem("15m", TimeSpan.FromMinutes(15)),
-        new IntervalItem("30m", TimeSpan.FromMinutes(30)),
-        new IntervalItem("1h", TimeSpan.FromHours(1)),
-        new IntervalItem("2h", TimeSpan.FromHours(2)),
-        new IntervalItem("1d", TimeSpan.FromDays(1)),
-    };
+    // @* private List<IntervalItem> _intervalList = new()
+    // {
+    //     new IntervalItem("Off", TimeSpan.Zero),
+    //     new IntervalItem("10s", TimeSpan.FromSeconds(10)),
+    //     new IntervalItem("30s", TimeSpan.FromSeconds(30)),
+    //     new IntervalItem("1m", TimeSpan.FromMinutes(1)),
+    //     new IntervalItem("5m", TimeSpan.FromMinutes(5)),
+    //     new IntervalItem("15m", TimeSpan.FromMinutes(15)),
+    //     new IntervalItem("30m", TimeSpan.FromMinutes(30)),
+    //     new IntervalItem("1h", TimeSpan.FromHours(1)),
+    //     new IntervalItem("2h", TimeSpan.FromHours(2)),
+    //     new IntervalItem("1d", TimeSpan.FromDays(1)),
+    // }; *@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -179,12 +190,23 @@
 
             _selectedQuickRangeKey = _quickRange.Key;
 
-            if (_quickRange.TryGetRange(Offset, out var value))
+            Console.WriteLine(UseAbsoluteTime);
+            Console.WriteLine(StartDateTime.ToString("yyyy/MM/dd HH:mm:ss"));
+            if (UseAbsoluteTime)
             {
-                _startDateTime = value.start;
-                _endDateTime = value.end;
+                await OnAbsoluteDateTimeUpdated();
             }
-            await UpdateRangeDateTimeToLatest();
+            else
+            { 
+                if (_quickRange.TryGetRange(Offset, out var value))
+                {
+                    _startDateTime = value.start;
+                    _endDateTime = value.end;
+                }
+            
+                await UpdateRangeDateTimeToLatest();
+            }
+            handleIntervalUpdate(Interval);
             StateHasChanged();
         }
     }
@@ -258,6 +280,7 @@
     private async Task OnAbsoluteDateTimeUpdated()
     {
         // _selectedQuickRangeKey = QuickRangeKey.Off;
+        await updateUseAbsoluteTimeState(true);
 
         if (OnUpdate.HasDelegate)
         {
@@ -268,12 +291,24 @@
     private async Task OnRelatedTimeSpanSelected(QuickRange item)
     {
         _quickRange = item;
+        await updateUseAbsoluteTimeState(false);
         await UpdateRangeDateTimeToLatest();
         if (DefaultQuickRangeChanged.HasDelegate)
             await DefaultQuickRangeChanged.InvokeAsync(item.Key);
     }
 
-    private void OnIntervalSelected(IntervalItem item)
+    private async Task OnIntervalSelected(IntervalItem item)
+    {
+        Interval = item;
+        if (IntervalChanged.HasDelegate)
+        {
+            await IntervalChanged.InvokeAsync(Interval);
+        }
+
+        handleIntervalUpdate(Interval);
+    }
+
+    private void handleIntervalUpdate(IntervalItem item)
     {
         if (item.TimeSpan == TimeSpan.Zero)
         {
@@ -305,13 +340,20 @@
         InvokeAsync(StateHasChanged);
     }
 
+    private async Task updateUseAbsoluteTimeState(bool useAbsoluteTime)
+    {
+        UseAbsoluteTime = true;
+
+        if (UseAbsoluteTimeChanged.HasDelegate)
+        {
+            await UseAbsoluteTimeChanged.InvokeAsync(useAbsoluteTime);
+        }
+    }
+
     private Task Refresh() => UpdateRangeDateTimeToLatest();
 
     public void Dispose()
     {
         _timer?.Dispose();
-    }
-
-    private record IntervalItem(string Text, TimeSpan TimeSpan);
-
+    }    
 }
