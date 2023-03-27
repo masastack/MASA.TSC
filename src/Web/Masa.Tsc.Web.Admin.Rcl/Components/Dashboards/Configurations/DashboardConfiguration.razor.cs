@@ -21,6 +21,9 @@ public partial class DashboardConfiguration : IAsyncDisposable
     public RenderFragment HeaderContent { get; set; }
 
     [Parameter]
+    public bool View { get; set; }
+
+    [Parameter]
     public Func<List<UpsertPanelDto>, Task> SavePanelsAction { get; set; }
 
     [Parameter]
