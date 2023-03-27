@@ -81,6 +81,12 @@ public partial class ErrorWarnChart
         {
             _success = Math.Round(values[0] * 100 / values[1], 2);
         }
+
+        if (_data?.Any(item => item?.Result?.Any() is true) is true || values[0] <= 0 || values[1] <= 0)
+        {
+            _options.SetValue("series[0].itemStyle.normal.borderWidth", 0);
+        }
+
         _options.SetValue("tooltip.formatter", "{d}%");
         _options.SetValue("legend.bottom", "1%");
         _options.SetValue("series[0].data", new object[] {GetModel(true,values[0]),
