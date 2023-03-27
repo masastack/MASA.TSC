@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Stack.Components.Extensions;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Shared;
 
 public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
@@ -70,17 +72,22 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
 
     public async Task<bool> OpenConfirmDialog(string content)
     {
-        return await PopupService.ConfirmAsync(T("Operation confirmation"), content, AlertTypes.Error);
+        return await PopupService.SimpleConfirmAsync(T("Operation confirmation"), content, AlertTypes.Error);
     }
 
     public async Task<bool> OpenConfirmDialog(string title, string content)
     {
-        return await PopupService.ConfirmAsync(title, content, AlertTypes.Error);
+        return await PopupService.SimpleConfirmAsync(title, content, AlertTypes.Error);
     }
 
     public async Task<bool> OpenConfirmDialog(string title, string content, AlertTypes type)
     {
-        return await PopupService.ConfirmAsync(title, content, type);
+        return await PopupService.SimpleConfirmAsync(title, content, type);
+    }
+
+    public async Task OpenConfirmDialog(string messgae, Func<Task> callback, AlertTypes type = AlertTypes.Warning)
+    {
+        if (await PopupService.SimpleConfirmAsync(I18n.T("OperationConfirmation"), messgae, type)) await callback.Invoke();
     }
 
     public void OpenSuccessMessage(string message)

@@ -216,5 +216,6 @@
   "Configure Team Detail": "配置团队详情",
   "Return to team details page": "返回团队详情页面",
   "This chart does not exist, it will jump back to the dashboard configuration page": "此图表不存在,将跳转回仪表盘配置页面",
-  "Calls/Minute": "调用次数/每分钟"
+  "Calls/Minute": "调用次数/每分钟",
+  "OperationConfirmation": "操作确认"
 }
