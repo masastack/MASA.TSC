@@ -30,19 +30,18 @@ public partial class Team
     void TeamChange(Guid teamId)
     {
         MasaUser.CurrentTeamId = teamId;
-        _ = InvokeAsync(async () => { await GetProjectsAsync(); });
-    }
-
-    public override async ValueTask DisposeAsync()
-    {
-        await base.DisposeAsync();
-        GlobalConfig.OnCurrentTeamChanged -= TeamChange;
+        _ = InvokeAsync(async () => 
+        { 
+            _isLoading = true;
+            StateHasChanged();
+            await GetProjectsAsync();
+            StateHasChanged();
+        });
     }
 
     private async Task GetProjectsAsync()
     {
         _isLoading = true;
-        StateHasChanged();
         DateTime start = DateTime.MinValue, end = DateTime.MinValue;
         var data = await ApiCaller.ProjectService.OverviewAsync(new RequestTeamMonitorDto
         {
@@ -55,7 +54,6 @@ public partial class Team
         _appMonitorDto = data?.Monitor ?? new();
         _projects = data?.Projects ?? new();
         _isLoading = false;
-        StateHasChanged();
     }
 
     IEnumerable<ProjectOverviewDto> GetProjectViewData()
@@ -87,13 +85,14 @@ public partial class Team
         return result;
     }
 
-    private void OnProjectServiceClick(ProjectOverviewDto item, string serviceId)
+    private void OnProjectServiceClick(ProjectOverviewDto item, AppDto app)
     {
         ConfigurationRecord.ProjectId = item.Identity;
         ConfigurationRecord.TeamId = item.TeamId;
         ConfigurationRecord.TeamProjectCount = _projects.Count(p => p.TeamId == item.TeamId);
         ConfigurationRecord.TeamServiceCount = _projects.Where(p => p.TeamId == item.TeamId).Sum(p => p.Apps.Count);
-        ConfigurationRecord.Service = serviceId;
+        ConfigurationRecord.Service = app.Identity;
+        ConfigurationRecord.ServiceName = app.Name;
         ConfigurationRecord.TeamProjectDialogVisible = true;
     }
 
@@ -212,5 +211,11 @@ public partial class Team
             MonitorStatuses.Error => "#FF5252",
             _ => "#66BB6A"
         };
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        await base.DisposeAsync();
+        GlobalConfig.OnCurrentTeamChanged -= TeamChange;
     }
 }

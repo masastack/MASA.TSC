@@ -12,7 +12,7 @@ public partial class AddDashboardDialog
     public EventCallback<bool> VisibleChanged { get; set; }
 
     [Parameter]
-    public EventCallback OnSubmitSuccess { get; set; }
+    public EventCallback<AddDashboardDto> OnSubmitSuccess { get; set; }
 
     public MForm? Form { get; set; }
 
@@ -48,7 +48,7 @@ public partial class AddDashboardDialog
             await ApiCaller.InstrumentService.AddAsync(Dashboard);
             OpenSuccessMessage(T("Add dashboard data success"));
             await UpdateVisible(false);
-            await OnSubmitSuccess.InvokeAsync();
+            await OnSubmitSuccess.InvokeAsync(Dashboard);
         }
     }
 }

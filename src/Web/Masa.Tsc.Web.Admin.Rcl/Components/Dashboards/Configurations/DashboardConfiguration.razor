@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<AutoHeight Id="@_scrollElementId" AutoStyle="@($"max-height: calc(100vh - 185px);{Style}")">
+<AutoHeight AutoStyle="@($"max-height: calc(100vh - 185px);{Style}")">
     <HeaderContent>
         <div class="d-flex mb-6 @HeaderClass" style="@HeaderStyle">
             @HeaderContent
@@ -41,11 +41,15 @@
         </div>
     </HeaderContent>
     <AutoHeightContent>
-        <DefaultCard Id="@_contentElementId">
+        @if (_isLoading)
+        {
+            <LoadingData />
+        }
+        <DefaultCard Class="full-height pa-3">
             <CascadingValue Value="ConfigurationRecord.IsEdit" IsFixed>
                 <CascadingValue Value="PanelGrids" IsFixed>
                     <CascadingValue Value="ConfigurationRecord" IsFixed>
-                        <div style="overflow-y:auto;overflow-x:hidden;max-height: calc(100vh - 233px);min-height: calc(100vh - 233px);@ContentStyle">
+                        <div id="@_scrollElementId" style="overflow-y:auto;overflow-x:hidden;" class="full-height">
                             @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady) && _timeRangeReady)
                             {
                                 <PanelGrids Panels="ConfigurationRecord.Panels" />
@@ -53,6 +57,10 @@
                             else
                             {
                                 PanelGrids.RemoveAll(item => item.ParentPanel is null);
+                            }
+                            @if (_isAdd)
+                            {
+                                <div style="height:100000px;" />
                             }
                         </div>                     
                     </CascadingValue>

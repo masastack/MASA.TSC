@@ -1,8 +1,8 @@
-export function scrollBottom(scrollElementId, contentElementId) {
+export function scrollBottom(scrollElementId) {
     var scrollElementRef = document.getElementById(scrollElementId);
-    var contentElementRef = document.getElementById(contentElementId);
+    scrollElementRef.scrollTop = scrollElementRef.scrollTopMax;
     window.setTimeout(() =>
     {
-        scrollElementRef.scrollTop = contentElementRef.offsetHeight;
+        scrollElementRef.scrollTop = scrollElementRef.scrollTopMax;
     },100);
 }

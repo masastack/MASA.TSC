@@ -9,6 +9,8 @@
 }
 
 @code {
+    bool _findPanelFailed;
+
     [Inject]
     TeamDetailConfigurationRecord ConfigurationRecord { get; set; }
 
@@ -34,19 +36,34 @@
         ConfigurationRecord.Service = ServiceName;
         ConfigurationRecord.ProjectId = ProjectId;
         ConfigurationRecord.TeamId = Guid.Parse(TeamId);
+        ConfigurationRecord.PanelId = PanelId;
         if(ConfigurationRecord.Panels.Any() is false)
         {
             ConfigurationRecord.Panels = await ApiCaller.InstrumentService.GetTeamInstraumentDetailAsync();
-            ConfigurationRecord.Panels.ConvertToConfigurationFormat();
+            ConfigurationRecord.Panels.ConvertToConfigurationFormat();            
+        }
+        Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto;
+        _findPanelFailed = Panel is null;
+    }
+
+    protected override void OnParametersSet()
+    {     
+        if (string.IsNullOrEmpty(PanelId) is false && ConfigurationRecord.PanelId != PanelId)
+        {
+            ConfigurationRecord.PanelId = PanelId;
+            Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto;
+            _findPanelFailed = Panel is null;
         }
     }
 
-    protected override async Task OnParametersSetAsync()
-    {     
-        if (string.IsNullOrEmpty(PanelId) is false)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_findPanelFailed)
         {
-            ConfigurationRecord.PanelId = PanelId;
-            Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto ?? throw new UserFriendlyException(T("Find panel error"));
+            _findPanelFailed = false;
+            await OpenConfirmDialog(T("This chart does not exist, it will jump back to the dashboard configuration page"));
+            ConfigurationRecord.IsEdit = true;
+            ConfigurationRecord.NavigateToConfiguration();
         }
     }
 

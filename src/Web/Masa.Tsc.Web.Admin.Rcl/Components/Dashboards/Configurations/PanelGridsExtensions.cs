@@ -5,12 +5,16 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
 
 public static class PanelGridsExtensions
 {
-    public static async Task SaveUI(this List<PanelGrids> panelGrids)
+    public static async Task SaveUI(this List<PanelGrids> panelGrids, UpsertPanelDto? parentPanel = null)
     {
         panelGrids.RemoveAll(Panel => Panel.ParentPanel?.IsRemove is true);
         if (panelGrids.Any() is false) return;
-        await Task.WhenAll(panelGrids.Select(item => item.Gridstack!.Reload()));
-        await Task.WhenAll(panelGrids.Select(item => item.SavePanelGridAsync()));
+        var panelGrid = panelGrids.FirstOrDefault(item => item.ParentPanel == parentPanel);
+        if (panelGrid == null) return;
+        await panelGrid.Gridstack!.Reload();
+        await panelGrid.SavePanelGridAsync();
+        //await Task.WhenAll(panelGrids.Where(item => item.ParentPanel == parentPanel).Select(item => item.Gridstack!.Reload()));
+        //await Task.WhenAll(panelGrids.Select(item => item.SavePanelGridAsync()));
     }
 
     public static void AdaptiveUI(this List<UpsertPanelDto> panels, UpsertPanelDto panel)
