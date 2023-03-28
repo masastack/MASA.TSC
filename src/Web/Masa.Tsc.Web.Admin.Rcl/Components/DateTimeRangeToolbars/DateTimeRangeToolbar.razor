@@ -49,7 +49,7 @@
                 var exists = Interval is not null;
                 <MButton Text Small Icon="!exists"
                          @attributes="@context.Attrs">
-                    <span class="mr-1">@I18n.T(Interval.Text)</span>
+                    <span class="mr-1">@I18n.T(Interval?.Text)</span>
                     <MIcon Small Right="@exists">mdi-menu-down</MIcon>
                 </MButton>
             }
@@ -159,20 +159,6 @@
         //new QuickRange(QuickRangeKey.Off, TimeSpan.Zero, true),
     };
 
-    // @* private List<IntervalItem> _intervalList = new()
-    // {
-    //     new IntervalItem("Off", TimeSpan.Zero),
-    //     new IntervalItem("10s", TimeSpan.FromSeconds(10)),
-    //     new IntervalItem("30s", TimeSpan.FromSeconds(30)),
-    //     new IntervalItem("1m", TimeSpan.FromMinutes(1)),
-    //     new IntervalItem("5m", TimeSpan.FromMinutes(5)),
-    //     new IntervalItem("15m", TimeSpan.FromMinutes(15)),
-    //     new IntervalItem("30m", TimeSpan.FromMinutes(30)),
-    //     new IntervalItem("1h", TimeSpan.FromHours(1)),
-    //     new IntervalItem("2h", TimeSpan.FromHours(2)),
-    //     new IntervalItem("1d", TimeSpan.FromDays(1)),
-    // }; *@
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -190,14 +176,12 @@
 
             _selectedQuickRangeKey = _quickRange.Key;
 
-            Console.WriteLine(UseAbsoluteTime);
-            Console.WriteLine(StartDateTime.ToString("yyyy/MM/dd HH:mm:ss"));
             if (UseAbsoluteTime)
             {
                 await OnAbsoluteDateTimeUpdated();
             }
             else
-            { 
+            {  
                 if (_quickRange.TryGetRange(Offset, out var value))
                 {
                     _startDateTime = value.start;
@@ -242,7 +226,6 @@
         }
 
         _selectedQuickRangeKey = _quickRange.Key;
-
         if (_quickRange.TryGetRange(Offset, out var value))
         {
             _startDateTime = value.start;

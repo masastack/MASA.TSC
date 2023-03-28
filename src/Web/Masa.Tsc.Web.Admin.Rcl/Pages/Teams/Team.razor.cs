@@ -160,7 +160,6 @@ public partial class Team
     async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
         (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
-        Console.WriteLine(times.Item1.ToString("yyyy-MM-dd HH:mm:ss"));
         await GetProjectsAsync();
     }
 
