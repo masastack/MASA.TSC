@@ -11,9 +11,6 @@
     @if (options.Any() is false)
     {
         <NoData />
-        @*<MCardText Class="d-flex" Style="@("height:calc(100% - 62px)")">
-            <div class="ma-auto">@I18n.T("No Data")</div>
-        </MCardText>*@
     }
     else
     {
@@ -21,7 +18,7 @@
             <MList>
                 @foreach (var item in options)
                 {
-                    <MListItem Class="px-0" Dense OnClick="() => ToDashboardConfiguration(item.Href)">
+                    <MListItem Class="px-0" Dense OnClick="() => ToDashboardConfiguration(item)">
                         <MListItemAvatar Style="background: #F4F1FF;border-radius: 10px;">
                             <span>@item.Value</span>
                         </MListItemAvatar>
@@ -47,11 +44,8 @@
     [Parameter]
     public ITopListPanelValue Value { get; set; }
 
-    [Inject]
-    public NavigationManager NavigationManager { get; set; }
-
     [CascadingParameter]
-    public I18n I18n { get; set; }
+    ConfigurationRecord ConfigurationRecord { get; set; }
 
     [Parameter]
     public string Class { get; set; }
@@ -65,8 +59,11 @@
         return _defaultColors[index];
     }
 
-    void ToDashboardConfiguration(string href)
+    async Task ToDashboardConfiguration(TopListOption option)
     {
-        //NavigationManager.NavigateTo(href); //todo: remove annotate
+        if (ConfigurationRecord.TopListOnclick is not null)
+        {
+            await ConfigurationRecord.TopListOnclick(option);
+        }
     }
 }

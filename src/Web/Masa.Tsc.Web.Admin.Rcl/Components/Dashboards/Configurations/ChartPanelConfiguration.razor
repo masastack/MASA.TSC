@@ -29,19 +29,35 @@
                 <MRow>
                     @if (Value.ChartType == ChartTypes.Table)
                     {
-                        <MCol Md="4">
-                            <ProjectSelect @bind-Value="@Value.SystemIdentity" />
-                        </MCol>
-                        <MCol Md="8">
-                            <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
-                                @foreach (var item in TableMap[ConfigurationRecord.ModelType])
-                                {
-                                    <MButton Class="text-capitalize" Value="@item.ToString()">
-                                        @item.ToString()
-                                    </MButton>
-                                }
-                            </MButtonGroup>
-                        </MCol>
+                        @if (ConfigurationRecord.ModelType is not ModelTypes.All)
+                        {
+                            <MCol Md="4">
+                                <ServiceAutoComplete Label="@T("Project")" Readonly Value="@ConfigurationRecord.Service" />
+                            </MCol>
+                            <MCol Md="8">
+                                <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
+                                    @foreach (var item in TableMap[ConfigurationRecord.ModelType])
+                                    {
+                                        <MButton Class="text-capitalize" Value="@item.ToString()">
+                                            @item.ToString()
+                                        </MButton>
+                                    }
+                                </MButtonGroup>
+                            </MCol>
+                        }
+                        else
+                        {
+                            <MCol Md="12">
+                                <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
+                                    @foreach (var item in TableMap[ConfigurationRecord.ModelType])
+                                    {
+                                        <MButton Class="text-capitalize" Value="@item.ToString()">
+                                            @item.ToString()
+                                        </MButton>
+                                    }
+                                </MButtonGroup>
+                            </MCol>
+                        }
                     }
                     <MCol Md="4">
                         <STextField @bind-Value="@Value.Title" />
@@ -97,7 +113,7 @@
                                                 </MRow>
                                             </MCardText>
                                             <MCardActions Class="d-flex justify-space-between">
-                                                <ColorGroup Value="@item.Color" ValueChanged="value => MetricColorChanged(item,value)"/>
+                                                <ColorGroup Value="@item.Color" ValueChanged="value => MetricColorChanged(item,value)" />
                                                 <MIcon OnClick="() => Remove(item)" Color="red">mdi-delete</MIcon>
                                             </MCardActions>
                                         </MCard>

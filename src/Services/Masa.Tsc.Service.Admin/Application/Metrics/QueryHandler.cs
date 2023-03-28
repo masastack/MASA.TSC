@@ -205,10 +205,11 @@ public class QueryHandler
 
         if (result.Status == ResultStatuses.Success)
         {
-            if (result.Data == null || result.Data.Result == null || !result.Data.Result.Any())
-                return;
-            query.Result = result.Data.Result.Select(item => ((QueryResultInstantVectorResponse)item)!.Metric!.Values.FirstOrDefault()?.ToString()).Where(s => !string.IsNullOrEmpty(s)).ToList()!;
-            query.Result.Sort();
+            if (!(result.Data == null || result.Data.Result == null || !result.Data.Result.Any()))
+            {
+                query.Result = result.Data.Result.Select(item => ((QueryResultInstantVectorResponse)item)!.Metric!.Values.FirstOrDefault()?.ToString()).Where(s => !string.IsNullOrEmpty(s)).ToList()!;
+                query.Result.Sort();
+            }
         }
 
         if (query.Type == MetricValueTypes.Layer)
