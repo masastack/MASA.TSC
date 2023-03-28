@@ -1,32 +1,39 @@
 ﻿@inherits TscComponentBase
 
-<MTabs @ref=_tabs Color="primary" Style="border-bottom:1px solid #E4E8F3;" @bind-Value="CurrentTab">
-    @foreach (var tabItem in Panel.ChildPanels)
-    {
-        <MTab @key="tabItem.Id" Value="tabItem.Id.ToString()">
-            @if (IsEdit && Panel.CurrentTabItem == tabItem)
-            {
-                <MTextField Dense HideDetails="@("auto")" Autofocus Style="width:60px;" @bind-Value="@tabItem.Title" />
-            }
-            else
-            {
-                <span class="regular2--text btn"></span> @tabItem.Title
-            }
-            @if(IsEdit)
-            {
-                <SButton Icon Color="regular3" Class="ml-3">
-                    <SIcon Tooltip="@I18n.Dashboard("Close Tab Item")" Size="24" OnClickStopPropagation OnClick="() => CloseTabItem(tabItem)">mdi-close-circle</SIcon>
-                </SButton>               
-            }
-        </MTab>
-    }
+<div style="height:48px;" class="d-flex">
+    <MTabs @ref=_tabs Color="primary" Style="border-bottom:1px solid #E4E8F3;" @bind-Value="CurrentTab">
+        @foreach (var tabItem in Panel.ChildPanels)
+        {
+            <MTab @key="tabItem.Id" Value="tabItem.Id.ToString()">
+                @if (IsEdit && Panel.CurrentTabItem == tabItem)
+                {
+                    <MTextField Dense HideDetails="@("auto")" Autofocus Style="width:60px;" @bind-Value="@tabItem.Title" />
+                }
+                else
+                {
+                    <span class="regular2--text btn"></span> @tabItem.Title
+                }
+                @if (IsEdit)
+                {
+                    <SButton Icon Color="regular3" Class="ml-3">
+                        <SIcon Tooltip="@I18n.Dashboard("Close Tab Item")" Size="24" OnClickStopPropagation OnClick="() => CloseTabItem(tabItem)">mdi-close-circle</SIcon>
+                    </SButton>
+                }
+            </MTab>
+        }
+        @if (IsEdit)
+        {
+            <SButton Icon Color="regular3" Class="ml-3 my-auto" OnClick="AddTabItem">
+                <SIcon Tooltip="@I18n.Dashboard("Add Tab Item")" Size="24" OnClickStopPropagation>mdi-plus-circle-outline</SIcon>
+            </SButton>
+        }
+    </MTabs>
+    <MSpacer />
     @if (IsEdit)
     {
-        <SButton Icon Color="regular3" Class="ml-3 my-auto" OnClick="AddTabItem">
-            <SIcon Tooltip="@I18n.Dashboard("Add Tab Item")" Size="24" OnClickStopPropagation>mdi-plus-circle-outline</SIcon>
-        </SButton>
+        @HeaderRightContent
     }
-</MTabs>
+</div>
 <MTabsItems Value="CurrentTab">
     @foreach (var tabItem in Panel.ChildPanels)
     {

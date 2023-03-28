@@ -32,7 +32,8 @@ public partial class PanelGrids
         Panels.Remove(data);
         panel.X = data.X;
         panel.Y = data.Y;
-        if (data.Width != GlobalPanelConfig.Width || data.Height != GlobalPanelConfig.Height)
+        panel.ParentPanel = data.ParentPanel;
+        if ((data.Width != GlobalPanelConfig.Width || data.Height != GlobalPanelConfig.Height))
         {
             panel.Width = data.Width;
             panel.Height = data.Height;
@@ -46,8 +47,8 @@ public partial class PanelGrids
                     panel.Height = 6;
                     break;
                 case PanelTypes.Chart:
-                    panel.Width = 12;
-                    panel.Height = 4;
+                    //panel.Width = 12;
+                    //panel.Height = 4;
                     break;
                 case PanelTypes.Log:
                     panel.Width = 12;
@@ -55,7 +56,7 @@ public partial class PanelGrids
                     break;
                 case PanelTypes.Trace:
                     panel.Width = 12;
-                    panel.Height = 9;
+                    panel.Height = 6;
                     break;
                 case PanelTypes.Topology:
                     panel.Width = 12;
@@ -64,6 +65,7 @@ public partial class PanelGrids
                 default: break;
             }
         }
+
         panel.Id = Guid.NewGuid();
         Panels.Add(panel);
         if (panel.PanelType is PanelTypes.Chart)

@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Contracts.Admin.Dashboards;
 
-public class UpsertPanelDto: GridstackChangeEventArgs
+public class UpsertPanelDto : GridstackChangeEventArgs
 {
     public string Title { get; set; }
 
@@ -56,7 +56,7 @@ public class UpsertPanelDto: GridstackChangeEventArgs
 
     #endregion
 
-    public UpsertPanelDto(int x = 0,int y = 0)
+    public UpsertPanelDto(int x = 0, int y = 0)
     {
         Width = GlobalPanelConfig.Width; Height = GlobalPanelConfig.Height;
         X = x;
