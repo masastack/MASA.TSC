@@ -176,7 +176,7 @@
 
             _selectedQuickRangeKey = _quickRange.Key;
 
-            if (UseAbsoluteTime)
+            if (UseAbsoluteTime is true && _startDateTime != DateTimeOffset.MinValue && _endDateTime != DateTimeOffset.MinValue)
             {
                 await OnAbsoluteDateTimeUpdated();
             }
@@ -226,11 +226,6 @@
         }
 
         _selectedQuickRangeKey = _quickRange.Key;
-        if (_quickRange.TryGetRange(Offset, out var value))
-        {
-            _startDateTime = value.start;
-            _endDateTime = value.end;
-        }
     }
 
     private async Task GetOffset()
