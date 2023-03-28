@@ -1,0 +1,5 @@
+.instance-autoComplete ::deep input {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
