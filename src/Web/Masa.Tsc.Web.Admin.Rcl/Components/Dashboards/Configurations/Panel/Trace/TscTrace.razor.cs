@@ -44,7 +44,7 @@ public partial class TscTrace
     {
         StartDateTime = dateTimes.start;
         EndDateTime = dateTimes.end;
-
+        _page = 1;                                                                                                                                                                                                                   
         await PageSearchAsync();
     }
 
@@ -54,7 +54,7 @@ public partial class TscTrace
         _instance = query.instance;
         _endpoint = query.endpoint;
         _traceId = query.traceId;
-
+        _page = 1;
         await PageSearchAsync();
     }
 
@@ -74,6 +74,7 @@ public partial class TscTrace
             {
                 StartDateTime = ConfigurationRecord.StartTime.UtcDateTime;
                 EndDateTime = ConfigurationRecord.EndTime.UtcDateTime;
+                _page = 1;
                 await PageSearchAsync();
             }
         }
@@ -160,7 +161,7 @@ public partial class TscTrace
     {
         var query = new SimpleAggregateRequestDto
         {
-            MaxCount = 2,
+            MaxCount = 1000,
             Type = AggregateTypes.GroupBy,
             Service = string.Empty,
             Keyword = key,
@@ -175,7 +176,7 @@ public partial class TscTrace
     {
         var query = new SimpleAggregateRequestDto
         {
-            MaxCount = 2,
+            MaxCount = 1000,
             Type = AggregateTypes.GroupBy,
             Service = service,
             Keyword = key,
@@ -190,7 +191,7 @@ public partial class TscTrace
     {
         var query = new SimpleAggregateRequestDto
         {
-            MaxCount = 2,
+            MaxCount = 1000,
             Type = AggregateTypes.GroupBy,
             Service = service,
             Instance = instance,

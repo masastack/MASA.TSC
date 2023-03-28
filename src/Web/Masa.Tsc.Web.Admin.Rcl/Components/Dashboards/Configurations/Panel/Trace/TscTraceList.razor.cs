@@ -17,6 +17,20 @@ public partial class TscTraceList : TscComponentBase
     [Parameter]
     public bool PageMode { get; set; }
 
+    [Parameter]
+    public int Page
+    {
+        get { return _page; }
+        set { _page = value; }
+    }
+
+    [Parameter]
+    public int PageSize
+    {
+        get { return _pageSize; }
+        set { _pageSize = value; }
+    }
+
     private TscTraceDetail? _tscTraceDetail;
     private IEnumerable<TraceResponseDto> _data = new List<TraceResponseDto>();
     private int _total = 0;

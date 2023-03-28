@@ -143,7 +143,7 @@ public partial class ApdexChart
         if (value > 0)
             return value.ToString("+0.##");
         else if (value < 0)
-            return value.ToString("-0.##");
+            return value.ToString("0.##");
         else
             return value.ToString();
     }
