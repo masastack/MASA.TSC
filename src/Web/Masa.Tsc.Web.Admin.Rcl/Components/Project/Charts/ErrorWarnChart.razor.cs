@@ -14,7 +14,7 @@ public partial class ErrorWarnChart
     [Parameter]
     public string Title { get; set; }
 
-    private double _success;
+    private double? _success;
     private EChartType _options = EChartConst.Pie;
     private List<QueryResultDataResponse>? _data;
     private double[] values = new double[2];
@@ -43,7 +43,7 @@ public partial class ErrorWarnChart
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        _success = 0;
+        _success = null;
         if (query == null)
             return;
         if (query.End == null)
@@ -79,10 +79,14 @@ public partial class ErrorWarnChart
         }
         else
         {
-            _success = Math.Round(values[0] * 100 / values[1], 2);
+            _success = Math.Round(values[0] * 100 / values[1], 2, MidpointRounding.ToNegativeInfinity);
         }
 
-        _success = Math.Round(_success, 2);
+        if (_success.HasValue)
+        {
+            _success = Math.Round(_success.Value, 2, MidpointRounding.ToNegativeInfinity);
+        }
+
         if (_data?.Any(item => item?.Result?.Any() is true) is true || Math.Round(values[0], 2) <= 0 || Math.Round(values[1]) <= 0)
         {
             _options.SetValue("series[0].itemStyle.normal.borderWidth", 0);
