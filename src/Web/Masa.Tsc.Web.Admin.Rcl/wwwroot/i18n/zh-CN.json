@@ -169,7 +169,7 @@
     "Timestamp": "时间",
     "Copy value": "复制"
   },
-  "Start": "开始点",  
+  "Start": "开始点",
   "Span Count": "跨度",
   "No Data": "没有数据",
   "Topology": "拓扑图",
@@ -215,5 +215,6 @@
   "Configure Team Detail": "配置团队详情",
   "Return to team details page": "返回团队详情页面",
   "Calls/Minute": "调用次数/每分钟",
-  "This chart does not exist, it will jump back to the dashboard configuration page": "此图表不存在,将跳转回仪表盘配置页面"
+  "This chart does not exist, it will jump back to the dashboard configuration page": "此图表不存在,将跳转回仪表盘配置页面",
+  "OperationConfirmation": "操作确认"
 }
