@@ -81,6 +81,13 @@ public partial class ErrorWarnChart
         {
             _success = Math.Round(values[0] * 100 / values[1], 2);
         }
+
+        _success = Math.Round(_success, 2);
+        if (_data?.Any(item => item?.Result?.Any() is true) is true || Math.Round(values[0], 2) <= 0 || Math.Round(values[1]) <= 0)
+        {
+            _options.SetValue("series[0].itemStyle.normal.borderWidth", 0);
+        }
+
         _options.SetValue("tooltip.formatter", "{d}%");
         _options.SetValue("legend.bottom", "1%");
         _options.SetValue("series[0].data", new object[] {GetModel(true,values[0]),
@@ -89,6 +96,6 @@ public partial class ErrorWarnChart
 
     private static object GetModel(bool isSuccess, double value)
     {
-        return new { name = isSuccess ? "Success" : "Fail", value };
+        return new { name = isSuccess ? "Success" : "Fail", value = Math.Round(value, 2) };
     }
 }
