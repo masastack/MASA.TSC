@@ -12,7 +12,7 @@
                     <div class="d-flex align-center">
                         <div class="mr-6">
                             <MChip Label Small Color="emphasis2 mr-3" Dark>@T("Start")</MChip>
-                            <span class="regular--text">@_rootTreeItem.Timestamp</span>
+                            <span class="regular--text">@(_rootTreeItem.Timestamp+CurrentTimeZone.BaseUtcOffset)</span>
                         </div>
                         <div class="mr-6">
                             <MChip Label Small Color="emphasis2 mr-3" Dark>@T("Duration")</MChip>

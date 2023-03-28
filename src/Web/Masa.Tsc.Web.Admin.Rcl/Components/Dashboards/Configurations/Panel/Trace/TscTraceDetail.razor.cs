@@ -118,6 +118,21 @@ public partial class TscTraceDetail
         int parentLevel = parent?.Level ?? 0;
         string? parentSpanId = parent?.SpanId;
 
+        if (parent == null && items != null && items.Any())
+        {
+            if (!items.Any(item => string.IsNullOrEmpty(item.ParentSpanId)))
+            {
+                var first = items.First();
+                parentSpanId = first.ParentSpanId;
+                root = new TraceResponseTree(new TraceResponseDto {
+                    SpanId = parentSpanId,
+                    TraceId= first.TraceId,
+                    Timestamp=first.Timestamp,
+                    EndTimestamp= items.Last().EndTimestamp
+                }, 0);                
+            }
+        }
+
         var currentLevel = parentLevel + 1;
         var found = items.Where(item => item.ParentSpanId == parentSpanId);
         var nodes = found.Select(item => new TraceResponseTree(item, currentLevel)).ToList();

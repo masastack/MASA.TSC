@@ -2,7 +2,7 @@
 @inherits TscComponentBase
 
 <div class="d-flex mb-6">
-    <SAutoComplete Placeholder="Service"
+    <SAutoComplete Placeholder="Service" Label="@T("Service")"
                    Items="_services"
                    @bind-Value="_service"
                    ItemText="item => item"
@@ -15,16 +15,20 @@
                    Clearable
                    Flat
                    Solo
+                   PrependInnerIcon="mdi-magnify"
+                   ClearIcon="mdi-close"
                    Outlined="false"
                    Loading="_serviceSearching"
                    Class="mr-6 rounded-2 m-input--h-40"
-                   Style="max-width: 160px"
-                   OnSearchInputUpdate="@SearchServices"
-                   OnSelectedItemUpdate="Query"
-                   OnClearClick="Query">
+                   Style="max-width: 280px"                   
+                   OnSelectedItemUpdate="()=>Query(isService:true)"
+                   OnClearClick="()=>Query(isService:true)">
+        <SelectionContent>
+            <AutoCompleteSelection Value="@context.Item" />
+        </SelectionContent>
     </SAutoComplete>
 
-    <SAutoComplete Placeholder="Instance"
+    <SAutoComplete Placeholder="Instance" Label="@T("Instance")"
                    Items="_instances"
                    @bind-Value="_instance"
                    TItem=string
@@ -37,17 +41,21 @@
                    Clearable
                    Flat
                    Solo
+                   PrependInnerIcon="mdi-magnify"
+                   ClearIcon="mdi-close"
                    Outlined="false"
                    Loading="_instanceSearching"
                    Class="mr-6 rounded-2 m-input--h-40"
-                   Style="max-width: 160px"
+                   Style="max-width: 280px"
                    Disabled="@(string.IsNullOrWhiteSpace(_service))"
-                   OnSearchInputUpdate="@SearchInstances"
-                   OnSelectedItemUpdate="Query"
-                   OnClearClick="Query">
+                   OnSelectedItemUpdate="()=>Query(isInstance:true)"
+                   OnClearClick="()=>Query(isInstance:true)">
+        <SelectionContent>
+            <AutoCompleteSelection Value="@context.Item" />
+        </SelectionContent>
     </SAutoComplete>
 
-    <SAutoComplete Placeholder="Endpoint"
+    <SAutoComplete Placeholder="Endpoint" Label="@T("Endpoint")"
                    Items="_endpoints"
                    @bind-Value="_endpoint"
                    TItem=string
@@ -61,16 +69,21 @@
                    Clearable
                    Flat
                    Solo
+                   PrependInnerIcon="mdi-magnify"
+                   ClearIcon="mdi-close"
                    Outlined="false"
                    Loading="_endpointSearching"
                    Disabled="@(string.IsNullOrWhiteSpace(_service))"
                    Class="rounded-2 m-input--h-40"
-                   Style="max-width: 160px;"
-                   OnSelectedItemUpdate="Query"
-                   OnClearClick="Query">
+                   Style="max-width: 280px;"
+                   OnSelectedItemUpdate="()=>Query()"
+                   OnClearClick="()=>Query()">
+        <SelectionContent>
+            <AutoCompleteSelection Value="@context.Item" />
+        </SelectionContent>
     </SAutoComplete>
 
     <MSpacer></MSpacer>
 
-    <SearchTextField Class="rounded-lg d-flex-grow-2" Style="min-width:120px" Placeholder="TraceId" Value="@_keyword" ValueChanged="KeywordChanged" FillBackground=false Clearable />
+    <SearchTextField Class="rounded-lg" Style="width:368px" Placeholder="TraceId" Value="@_keyword" ValueChanged="KeywordChanged" FillBackground=false Clearable />
 </div>

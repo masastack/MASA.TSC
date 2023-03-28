@@ -51,24 +51,26 @@ public partial class ErrorWarnChart
         if (query.Start == null)
             query.Start = query.End.Value.AddDays(-1);
 
-        var step = (long)Math.Floor((query.End.Value - query.Start.Value).TotalSeconds);
-        _data = await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto
+        var step = 60;// (long)Math.Floor((query.End.Value - query.Start.Value).TotalSeconds);
+        _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
-            Queries = new List<string> {
+            MetricNames = new List<string> {
             $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"}}[{step}s])),1)",
             $"round(sum by(service_name) (increase(http_server_duration_count[{step}s])),1)"
            },
             Service = query.AppId,
-            Time = query.End.Value,
+            Start = query.Start.Value,
+            End = query.End.Value,
+            Step = $"{(long)Math.Floor((query.End.Value - query.Start.Value).TotalSeconds)}s"
         });
 
         var index = 0;
         foreach (var item in _data)
         {
-            if (item != null && item.ResultType == ResultTypes.Vector && item.Result != null && item.Result.Any())
+            if (item != null && item.ResultType == ResultTypes.Matrix && item.Result != null && item.Result.Any())
             {
-                var first = (QueryResultInstantVectorResponse)item.Result.First();
-                values[index++] = Convert.ToDouble(first.Value![1]);
+                var first = (QueryResultMatrixRangeResponse)item.Result.First()!;
+                values[index++] = first.Values.Sum(values => Convert.ToDouble(values[1]));
             }
         }
 
