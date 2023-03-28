@@ -23,6 +23,7 @@ public partial class PanelGrids
     public List<PanelGrids> PanelGridRange { get; set; }
 
     public MGridstack<UpsertPanelDto>? Gridstack;
+    MTabs? _tabs;
 
     protected override void OnParametersSet()
     {
@@ -49,7 +50,7 @@ public partial class PanelGrids
         var data = Panels.First(p => p.Id == panel.Id);
         panel.X = data.X;
         panel.Y = data.Y;
-        if (data.Width != GlobalPanelConfig.Width || data.Height != GlobalPanelConfig.Height)
+        if ((data.Width != GlobalPanelConfig.Width || data.Height != GlobalPanelConfig.Height))
         {
             panel.Width = data.Width;
             panel.Height = data.Height;
@@ -59,12 +60,12 @@ public partial class PanelGrids
             switch (panel.PanelType)
             {
                 case PanelTypes.Tabs:
-                    panel.Width = 12;
-                    panel.Height = 5;
+                    //panel.Width = 12;
+                    //panel.Height = 5;
                     break;
                 case PanelTypes.Chart:
-                    panel.Width = 12;
-                    panel.Height = 4;
+                    //panel.Width = 12;
+                    //panel.Height = 4;
                     break;
                 case PanelTypes.Log:
                     panel.Width = 12;
@@ -72,7 +73,7 @@ public partial class PanelGrids
                     break;
                 case PanelTypes.Trace:
                     panel.Width = 12;
-                    panel.Height = 9;
+                    panel.Height = 6;
                     break;
                 case PanelTypes.Topology:
                     panel.Width = 12;
@@ -81,6 +82,7 @@ public partial class PanelGrids
                 default: break;
             }
         }
+
         panel.Id = Guid.NewGuid();
         Panels.Remove(data);
         StateHasChanged();
@@ -108,5 +110,19 @@ public partial class PanelGrids
             panel.X = grid.X ?? 0;
             panel.Y = grid.Y ?? 0;
         }
+    }
+
+    void CloseTabItem(UpsertTabsPanelDto tabPanel, UpsertPanelDto panel)
+    {
+        tabPanel.RemoveTabItem(panel);
+        NextTick(() =>
+        {
+            _tabs?.CallSlider();
+        });
+    }
+
+    void AddTabItem(UpsertTabsPanelDto tabPanel)
+    {
+        tabPanel.AddTabItem();
     }
 }

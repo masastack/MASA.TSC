@@ -24,6 +24,7 @@ public class UpsertTabsPanelDto : UpsertPanelDto
     {
         var title = $"item {ChildPanels.Count + 1}";
         var tabItem = new UpsertTabItemPanelDto(this, title);
+        tabItem.Width = 12;
         ChildPanels.Add(tabItem);
         CurrentTabItem = tabItem;
     }

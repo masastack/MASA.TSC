@@ -18,9 +18,9 @@
             @if (!View)
             {
                 <MTooltip Top>
-                    <ActivatorContent>
-                        <div @attributes="@context.Attrs" @onclick="SwitchEdit" class="mr-6 my-auto d-flex">
-                            <MSwitch Value="ConfigurationRecord.IsEdit" Readonly TValue="bool" LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="my-auto" />
+                <ActivatorContent>
+                    <div @attributes="@context.Attrs" @onclick="SwitchEdit" class="mr-6 my-auto d-flex">
+                        <MSwitch Value="ConfigurationRecord.IsEdit" Readonly TValue="bool" LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="my-auto" />
                         </div>
                     </ActivatorContent>
                     <ChildContent>
@@ -35,10 +35,10 @@
                     </ChildContent>
                 </MTooltip>
                 <SButton Icon Class="mr-3 my-auto" Style="@(ConfigurationRecord.IsEdit ?"":"visibility:hidden;")" OnClick="AddPanel">
-                    <SIcon Tooltip="@T("Add Panel")" Size=28>@IconConstants.Chart</SIcon>
+                <SIcon Tooltip="@T("Add Panel")" Size=28>@IconConstants.Chart</SIcon>
                 </SButton>
                 <SButton Icon Class="my-auto" Style="@(ConfigurationRecord.IsEdit ?"":"visibility:hidden;")" OnClick="SaveAsync">
-                    <SIcon Tooltip="@T("Save")" Size=28>@IconConstants.Save</SIcon>
+                <SIcon Tooltip="@T("Save")" Size=28>@IconConstants.Save</SIcon>
                 </SButton>
             }
         </div>
@@ -48,7 +48,7 @@
         {
             <LoadingData />
         }
-        <DefaultCard Class="full-height pa-3">
+        <DefaultCard Class="full-height pa-3" Style="background-color:transparent;">
             <CascadingValue Value="ConfigurationRecord.IsEdit" IsFixed>
                 <CascadingValue Value="PanelGrids" IsFixed>
                     <CascadingValue Value="ConfigurationRecord" IsFixed>
@@ -65,7 +65,7 @@
                             {
                                 <div style="height:100000px;" />
                             }
-                        </div>                     
+                        </div>
                     </CascadingValue>
                 </CascadingValue>
             </CascadingValue>

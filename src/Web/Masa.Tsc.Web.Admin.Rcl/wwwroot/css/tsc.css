@@ -327,3 +327,7 @@
 .grid-stack > .grid-stack-item > .grid-stack-item-content {
     overflow: auto !important;
 }
+
+.fa-diagram-project::before {
+    content: "\f542";
+}

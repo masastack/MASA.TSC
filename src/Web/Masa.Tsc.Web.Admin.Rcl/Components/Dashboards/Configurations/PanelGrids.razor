@@ -1,50 +1,90 @@
 ﻿@inherits TscComponentBase
 
-<MGridstack Items="Panels" Readonly="!IsEdit" @ref="@Gridstack" ItemKey="panel => panel.Id.ToString()" ItemStyle="@("border:solid #E4E8F3 1px;position:absolute;overflow:hidden;"+(IsEdit?"cursor: move;":""))" ItemPosition="panel => new(panel.Width,panel.Height,panel.X,panel.Y)" TItem="UpsertPanelDto">
+<MGridstack Items="Panels" Readonly="!IsEdit" @ref="@Gridstack" ItemKey="panel => panel.Id.ToString()" ItemStyle="@("background-color:white;border-radius: 12px;position:absolute;overflow:hidden;"+(IsEdit?"cursor: move;":""))" ItemPosition="panel => new(panel.Width,panel.Height,panel.X,panel.Y)" TItem="UpsertPanelDto">
     <ItemContent>
-        @if (IsEdit)
-        {
-            <div style="height:35px;" class="d-flex">
-                <MSpacer />
-                <MMenu OpenOnHover OffsetY>
-                    <ActivatorContent Context="menuContext">
-                        <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
-                            <SIcon Size="24">@IconConstants.More</SIcon>
-                        </SButton>
-                    </ActivatorContent>
-                    <ChildContent>
-                        <MList>
+        @{
+            var parentPannel = Panels.FirstOrDefault(e => e.Id == context.Id)?.ParentPanel;
+            @if (IsEdit && parentPannel == null)
+            {
+                <div style="height:48px;" class="d-flex">
+                    @if (context.PanelType == PanelTypes.Tabs)
+                    {
+                        <MTabs @ref=_tabs Color="primary" Style="border-bottom:1px solid #E4E8F3;" Value="@((context as UpsertTabsPanelDto)!.CurrentTabItem?.Id.ToString())" ValueChanged="(newval)=>(context as UpsertTabsPanelDto)!.SetCurrentTabItem(Guid.Parse(newval.ToString()!))">
+                            @foreach (var tabItem in (context as UpsertTabsPanelDto)!.ChildPanels)
+                            {
+                                <MTab @key="tabItem.Id" Value="tabItem.Id.ToString()">
+                                    @if (IsEdit && (context as UpsertTabsPanelDto)!.CurrentTabItem == tabItem)
+                                    {
+                                        <MTextField Dense HideDetails="@("auto")" Autofocus Style="width:60px;" @bind-Value="@tabItem.Title" />
+                                    }
+                                    else
+                                    {
+                                        <span class="regular2--text btn"></span> @tabItem.Title
+                                    }
+                                    <SButton Icon Color="regular3" Class="ml-3">
+                                    <SIcon Tooltip="@T("Close tab item")" Size="24" OnClickStopPropagation OnClick="() => CloseTabItem((context as UpsertTabsPanelDto)!,tabItem)">mdi-close-circle</SIcon>
+                                        </SButton>
+                                        </MTab>
+                            }
+                            @if (IsEdit)
+                            {
+                                <SButton Icon Color="regular3" Class="ml-3 my-auto" OnClick="()=>AddTabItem((context as UpsertTabsPanelDto)!)">
+                                <SIcon Tooltip="@T("Add Tab Item")" Size="24" OnClickStopPropagation>mdi-plus-circle-outline</SIcon>
+                            </SButton>
+                            }
+                        </MTabs>
+                    }
+                    else
+                    {
+                        <MSpacer />
+                    }
+                    <MMenu OpenOnHover OffsetY>
+                        <ActivatorContent Context="menuContext">
+                            <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
+                                <SIcon Size="24">@IconConstants.More</SIcon>
+                            </SButton>
+                        </ActivatorContent>
+                        <ChildContent>
+                            <MList>
                             @if (context.PanelType == PanelTypes.Tabs)
-                            {
-                                <MListItem OnClick="async () =>await AddChildPanel(context as UpsertTabsPanelDto)">
+                                {
+                                    <MListItem OnClick="async () =>await AddChildPanel(context as UpsertTabsPanelDto)">
+                                        <MListItemTitle>
+                                            @T("Add Panel")
+                                        </MListItemTitle>
+                                    </MListItem>
+                                }
+                                else if (context.PanelType == PanelTypes.Chart)
+                                {
+                                    <MListItem OnClick="() => ConfigurationChartPanel(context)">
+                                        <MListItemTitle>
+                                            @T("Edit Panel")
+                                        </MListItemTitle>
+                                    </MListItem>
+                                }
+                                <MListItem OnClick="() => RemovePanel(context)">
                                     <MListItemTitle>
-                                        @T("Add Panel")
+                                        @T("Remove Panel")
                                     </MListItemTitle>
                                 </MListItem>
-                            }
-                            else if (context.PanelType == PanelTypes.Chart)
-                            {
-                                <MListItem OnClick="() => ConfigurationChartPanel(context)">
-                                    <MListItemTitle>
-                                        @T("Edit Panel")
-                                    </MListItemTitle>
-                                </MListItem>
-                            }
-                            <MListItem OnClick="() => RemovePanel(context)">
-                                <MListItemTitle>
-                                    @T("Remove Panel")
-                                </MListItemTitle>
-                            </MListItem>
-                        </MList>
-                    </ChildContent>
-                </MMenu>
-            </div>
+                            </MList>
+                        </ChildContent>
+                    </MMenu>
+                </div>
+            }
         }
-        <div style="@(context.PanelType==PanelTypes.Chart?"":"overflow:auto;") @(IsEdit?"height:calc(100% - 35px);":"height:calc(100%);")">
+        <div style="@(context.PanelType==PanelTypes.Chart?"":"overflow:auto;") @(IsEdit?"height:calc(100% - 50px);":"height:calc(100%);")">
             @switch (context.PanelType)
             {
                 case PanelTypes.Tabs:
-                    <TabsPanel Panel="context as UpsertTabsPanelDto" />
+                    @*<TabsPanel Panel="context as UpsertTabsPanelDto" />*@
+
+                    <MTabsItems Value="@((context as UpsertTabsPanelDto)!.CurrentTabItem?.Id.ToString())">
+                        @foreach (var tabItem in (context as UpsertTabsPanelDto)!.ChildPanels)
+                        {
+                            <TabItemPanel Panel=tabItem IsCurrentTabItem="@((context as UpsertTabsPanelDto)!.CurrentTabItem?.Id.ToString() == tabItem.Id.ToString())" />
+                        }
+                    </MTabsItems>
                     break;
                 case PanelTypes.Text:
                     <TextPanel Value=context />

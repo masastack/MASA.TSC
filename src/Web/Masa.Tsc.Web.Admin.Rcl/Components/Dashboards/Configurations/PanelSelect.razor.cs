@@ -17,16 +17,16 @@ public partial class PanelSelect
     [CascadingParameter]
     public ConfigurationRecord ConfigurationRecord { get; set; }
 
-    List<PanelTypes> GetPanelTypes(PanelTypes type = default)
+    List<KeyValuePair<PanelTypes, string>> GetPanelTypes(PanelTypes type = default)
     {
-        var types = new List<PanelTypes>
+        var types = new List<KeyValuePair<PanelTypes, string>>
         {
-            PanelTypes.Tabs,
-            PanelTypes.Text,
-            PanelTypes.Chart,
-            PanelTypes.Topology,
-            PanelTypes.Log,
-            PanelTypes.Trace,
+            new KeyValuePair<PanelTypes, string>(PanelTypes.Tabs,"mdi-tab"),
+            new KeyValuePair<PanelTypes, string>(PanelTypes.Text,"mdi-format-size"),
+            new KeyValuePair<PanelTypes, string>(PanelTypes.Chart,"mdi-chart-box"),
+            new KeyValuePair<PanelTypes, string>(PanelTypes.Topology,"mdi-sitemap"),
+            new KeyValuePair<PanelTypes, string>(PanelTypes.Log,"fas fa-list"),
+            new KeyValuePair<PanelTypes, string>(PanelTypes.Trace,"fas fa-eye"),
             //PanelTypes.Table
         };
         return types;

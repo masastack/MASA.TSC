@@ -13,7 +13,8 @@ public class UpsertTabItemPanelDto : UpsertPanelDto
         {
             new()
             {
-                ParentPanel = this
+                ParentPanel = this,
+                Width = 12,
             }
         };
         ParentPanel = parentPanel;
