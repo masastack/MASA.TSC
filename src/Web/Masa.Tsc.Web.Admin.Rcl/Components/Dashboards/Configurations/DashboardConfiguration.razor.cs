@@ -38,12 +38,10 @@ public partial class DashboardConfiguration : IAsyncDisposable
     [Parameter]
     public string? ContentStyle { get; set; }
 
-    List<PanelGrids> PanelGrids { get; set; } = new();
-
     protected override async Task OnInitializedAsync()
     {
-        if(ConfigurationRecord.Panels.Any() is false) await GetPanelsAsync();
-        if(ConfigurationRecord.Panels.Any() is false) ConfigurationRecord.Panels.Add(new());
+        if (ConfigurationRecord.Panels.Any() is false) await GetPanelsAsync();
+        if (ConfigurationRecord.Panels.Any() is false) ConfigurationRecord.Panels.Add(new());
     }
 
     async Task GetPanelsAsync()
@@ -64,26 +62,15 @@ public partial class DashboardConfiguration : IAsyncDisposable
         }
     }
 
-    bool _isAdd;
-    async Task AddPanel()
+    void AddPanel()
     {
-        _isAdd = true;
-        StateHasChanged();
-        if (_helper is not null)
-            _ = _helper.InvokeVoidAsync("scrollBottom", _scrollElementId);
-        if (ConfigurationRecord.Panels.Any() is false) PanelGrids.Clear();
-        else await PanelGrids.SaveUI();
-        ConfigurationRecord.Panels.AdaptiveUI(new());
-        _ = Task.Delay(100).ContinueWith(t => 
-        {
-            _isAdd = false;
-            InvokeAsync(StateHasChanged);
-        });
+        ConfigurationRecord.Panels.AdaptiveUI(new(1000,1000));
+        //if (_helper is not null)
+        //    _ = _helper.InvokeVoidAsync("scrollBottom", _scrollElementId);
     }
 
     async Task SaveAsync()
     {
-        await PanelGrids.SaveUI();
         await SavePanelsAction.Invoke(ConfigurationRecord.Panels);
         OpenSuccessMessage(T("Save success"));
     }
@@ -128,6 +115,7 @@ public partial class DashboardConfiguration : IAsyncDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
             _helper = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/scroll.js");

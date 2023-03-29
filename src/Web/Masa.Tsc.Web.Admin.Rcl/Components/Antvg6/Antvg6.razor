@@ -13,8 +13,13 @@
 
     bool HasRendered { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            _helper = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/antv-g6-helper.js");
+            await OnParametersSetAsync();
+        }
         if (_helper is not null)
         {
             if (HasRendered is false && Value.Data is not null && Value.Option is not null)
@@ -28,15 +33,6 @@
                 await _helper.InvokeVoidAsync("render", _elementRef, Value.Data);
                 _oldData = Value.Data;
             }
-        }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            _helper = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/antv-g6.js");
-            await OnParametersSetAsync();
         }
     }
 

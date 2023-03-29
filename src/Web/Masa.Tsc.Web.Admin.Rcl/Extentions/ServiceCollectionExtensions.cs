@@ -9,6 +9,7 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddScoped<DashboardConfigurationRecord>();
         serviceCollection.AddScoped<TeamDetailConfigurationRecord>();
+        serviceCollection.AddTransient<TscGridstackJSModule>();
 
         return serviceCollection;
     }

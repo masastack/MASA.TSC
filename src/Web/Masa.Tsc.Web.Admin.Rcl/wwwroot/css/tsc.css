@@ -327,3 +327,17 @@
 .grid-stack > .grid-stack-item > .grid-stack-item-content {
     overflow: auto !important;
 }
+
+.ui-resizable-se {
+    background-image: url(../img/dashboard/vector.svg) !important;
+    transform: rotate(0deg) !important;
+    -webkit-transform: rotate(0deg) !important;
+}
+
+div[name="True"] .ui-resizable-se {
+    display: none !important;
+}
+
+.hide {
+    visibility:hidden !important;
+}

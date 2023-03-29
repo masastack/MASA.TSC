@@ -1,5 +1,6 @@
 ﻿@inherits TscComponentBase
-<AutoResize Delay="10" OnResize="ResizeAsync">
+
+<AutoResize Class="@Class" Delay="10" OnResize="ResizeAsync">
     <MCard Class="d-flex flex-column rounded-lg full-height">
         <MCardTitle>
             <PanelTooltip Title="@Value.Title" Description="@Value.Description" />

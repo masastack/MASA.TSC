@@ -1,4 +1,4 @@
-﻿@if(IsEdit)
+﻿@if (ConfigurationRecord.IsEdit)
 {
     <MEditor @ref="_editor" Class="full-height" Value="@Content" ValueChanged="ContentChanged" Placeholder="请输入内容" ContentStyle="height:calc(100% - 43px);" />
 }
@@ -11,7 +11,7 @@ else
     private MEditor _editor;
 
     [CascadingParameter]
-    public bool IsEdit { get; set; }
+    public ConfigurationRecord ConfigurationRecord { get; set; }
 
     [Parameter]
     public UpsertPanelDto Value { get; set; }

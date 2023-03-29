@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<MGridstack Items="Panels" Readonly="!IsEdit" @ref="@Gridstack" ItemKey="panel => panel.Id.ToString()" ItemStyle="@("border:solid #E4E8F3 1px;position:absolute;overflow:hidden;"+(IsEdit?"cursor: move;":""))" ItemPosition="panel => new(panel.Width,panel.Height,panel.X,panel.Y)" TItem="UpsertPanelDto">
+<Gridstack Items="Panels" Id="@(ParentPanel is null ? null : ParentPanel.Id.ToString())" Readonly="!IsEdit" ItemStyle="@("border:solid #E4E8F3 1px;position:absolute;overflow:hidden;"+(IsEdit?"cursor: move;":""))">
     <ItemContent>
         @if (IsEdit)
         {
@@ -16,7 +16,7 @@
                         <MList>
                             @if (context.PanelType == PanelTypes.Tabs)
                             {
-                                <MListItem OnClick="async () =>await AddChildPanel(context as UpsertTabsPanelDto)">
+                                <MListItem OnClick="() => AddChildPanel(context as UpsertTabsPanelDto)">
                                     <MListItemTitle>
                                         @T("Add Panel")
                                     </MListItemTitle>
@@ -69,4 +69,4 @@
             }
         </div>
     </ItemContent>
-</MGridstack>
+</Gridstack>
