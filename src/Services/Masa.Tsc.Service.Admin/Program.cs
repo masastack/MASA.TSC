@@ -134,7 +134,7 @@ var app = builder.Services
 
 app.UseI18n();
 
-//app.UseAddStackMiddleware();
+app.UseStackMiddleware();
 await builder.Services.MigrateAsync();
 app.UseMasaExceptionHandler(opt =>
 {

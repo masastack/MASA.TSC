@@ -87,15 +87,15 @@ public class QueryHandler
             });
         }
 
-        bool isRawQuery = queryData.Query?.IndexOfAny(new char[] { '{', '}' }) >= 0 ? true : false;
+        bool isRawQuery = (queryData.Query?.IndexOfAny(new char[] { '{', '}' }) ?? -1) >= 0;
 
         var data = await _logService.ListAsync(new BaseRequestDto
         {
             Service = queryData.Service!,
             Start = queryData.Start,
             End = queryData.End,
-            Keyword = isRawQuery ? default! : queryData.Query,
-            RawQuery = isRawQuery ? queryData.Query : default!,
+            Keyword = isRawQuery ? string.Empty : queryData.Query!,
+            RawQuery = isRawQuery ? queryData.Query! : string.Empty,
             Page = queryData.Page,
             PageSize = queryData.Size,
             Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = queryData.IsDesc },

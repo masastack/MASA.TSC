@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Traces.Queries;
 
-public record TraceMetricToDetailQuery(string Service, string Url, DateTime Start, DateTime End) : Query<IEnumerable<TraceResponseDto>>
+public record TraceIdByMetricQuery(string Service, string Url, DateTime Start, DateTime End) : Query<string>
 {
-    public override IEnumerable<TraceResponseDto> Result { get; set; }
+    public override string Result { get; set; }
 }

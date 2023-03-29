@@ -10,9 +10,7 @@
     <div class="mx-6">
         <SearchTextField Value="@_search" ValueChanged="OnSearchChangedAsync" Style="width:220px;border-radius: 10px !important;" FillBackground=false Clearable />
     </div>
-    <DateTimeRangeToolbar 
-        StartTimeLimit="(val,end)=>val<=end&& val.AddMonths(1)>=end"
-        EndTimeLimit="(val,start)=>val>=start&&val.AddMonths(-1)<=start"
+    <DateTimeRangeToolbar       
         OnUpdate="OnDateTimeUpdateAsync" 
         OnAutoUpdate="OnAutoDateTimeUpdateAsync" 
         @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
