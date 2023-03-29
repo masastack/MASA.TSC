@@ -164,7 +164,7 @@
         if (firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
-            await GetOffset();
+            GetOffset();
             if (DefaultQuickRange is not null)
             {
                 _quickRange = _quickRangeItems.FirstOrDefault(item => item.Key == DefaultQuickRange) ?? s_internalDefaultQuickRange;
@@ -220,6 +220,9 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
+
+        GetOffset();
+
         if (DefaultQuickRange is not null)
         {
             _quickRange = _quickRangeItems.FirstOrDefault(item => item.Key == DefaultQuickRange) ?? s_internalDefaultQuickRange;
@@ -228,7 +231,7 @@
         _selectedQuickRangeKey = _quickRange.Key;
     }
 
-    private async Task GetOffset()
+    private void GetOffset()
     {
         Offset = JsInitVariables.TimezoneOffset;
     }
