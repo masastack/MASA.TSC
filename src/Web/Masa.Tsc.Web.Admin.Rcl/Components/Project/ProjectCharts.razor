@@ -3,7 +3,7 @@
 
 <div class="h-269 full-height">
     <MRow Style="background-color:#F0F3FA;" Class="@Class">
-        @*<MCol Cols="3">
+        <MCol Cols="3">
             <ErrorWarnChart Title=@T("Service Success Rate") @ref="_errorWarnChart" />
         </MCol>
         <MCol Cols="9">
@@ -17,7 +17,7 @@
         </MCol>
         <MCol Cols="6">
             <ServiceResponseTimePercentile Title="@(T("Service Response Time Percentile")+"("+T("ms")+")")" @ref="_serviceResponseTimePercentile" />
-        </MCol>*@
+        </MCol>
         <CascadingValue Value="ConfigurationRecord" IsFixed>
             <MCol Cols="6" Class="overflow-y">
                 <ChartPanel Value="_endpoint" Class="rounded-lg" />
