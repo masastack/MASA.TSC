@@ -3,23 +3,13 @@
 
 namespace Masa.Tsc.Contracts.Admin.Dashboards;
 
-public class UpsertPanelDto
+public class UpsertPanelDto: GridstackChangeEventArgs
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-
     public string Title { get; set; }
 
     public string Description { get; set; }
 
     public PanelTypes PanelType { get; set; }
-
-    public int Width { get; set; }
-
-    public int Height { get; set; }
-
-    public int X { get; set; }
-
-    public int Y { get; set; }
 
     public List<UpsertPanelDto> ChildPanels { get; set; } = new();
 
@@ -37,20 +27,6 @@ public class UpsertPanelDto
 
     [JsonIgnore]
     public UpsertPanelDto? ParentPanel { get; set; }
-
-    bool _isRemove;
-    public bool IsRemove
-    {
-        get => _isRemove;
-        set
-        {
-            _isRemove = value;
-            foreach (var item in ChildPanels)
-            {
-                item.IsRemove = value;
-            }
-        }
-    }
 
     public virtual UpsertPanelDto Clone(UpsertPanelDto panel)
     {
@@ -78,16 +54,12 @@ public class UpsertPanelDto
         return this;
     }
 
-    protected void RemoveChildPanel(UpsertPanelDto panel)
-    {
-        panel.IsRemove = true;
-        ChildPanels.Remove(panel);
-    }
-
     #endregion
 
-    public UpsertPanelDto()
+    public UpsertPanelDto(int x = 0,int y = 0)
     {
         Width = GlobalPanelConfig.Width; Height = GlobalPanelConfig.Height;
+        X = x;
+        Y = y;
     }
 }

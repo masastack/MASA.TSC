@@ -1,0 +1,113 @@
+﻿@typeparam TItem where TItem : GridstackChangeEventArgs
+@implements IDisposable
+
+<div class="@Class grid-stack" name="@Readonly.ToString()" id="@Options.Id" style="@(_lodaing?"display:none;":"") @Style">
+    @foreach (var item in Items.OrderBy(item => item.Y).ThenBy(item => item.X))
+    {
+        <div class="grid-stack-item"
+             id="@item.Id"
+             @key="@item.Id"
+             gs-w="@item.Width"
+             gs-h="@item.Height"
+             gs-x="@item.X"
+             gs-y="@item.Y">
+            <div class="grid-stack-item-content @ItemClass" style="@ItemStyle">
+                @ItemContent(item)
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    string? _prevItemKeys;
+    bool _prevReadonly;
+    bool _lodaing;
+
+    [Inject]
+    public TscGridstackJSModule GridstackJSModule { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? ItemStyle { get; set; }
+
+    [Parameter]
+    public string? ItemClass { get; set; }
+
+    [Parameter]
+    public bool Readonly { get; set; }
+
+    [Parameter]
+    public string? Id { get; set; }
+
+    [Parameter]
+    public Models.GridstackOptions Options { get; set; }
+
+    [Parameter, EditorRequired]
+    public IEnumerable<TItem> Items { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment<TItem> ItemContent { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Options ??= new();
+        if (Id is not null) Options.Id = Id;
+        GridstackJSModule.OnChangeEvent += OnItemChangeAsync;
+    }
+
+    async Task OnItemChangeAsync(GridstackChangeEventArgs args)
+    {
+        var item = Items.FirstOrDefault(e => e.Id == args.Id);
+        if (item is not null)
+        {
+            item.Width = args.Width;
+            item.Height = args.Height;
+            item.X = args.X;
+            item.Y = args.Y;
+        }
+        if (Options.OnChange is not null)
+        {
+            await Options.OnChange(args);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _prevItemKeys = string.Join(',', Items.Select(item => item.Id));
+            await GridstackJSModule.InitAsync(Options);
+        }
+        else
+        {
+            //var excepts = Items.ExceptBy(_prevItemKeys, item => item.Id.ToString()).Select(item => item.Id.ToString());
+            //_prevItemKeys = Items.Select(item => item.Id.ToString()).ToList();
+            //if (excepts.Any())
+            //{
+            //    await GridstackJSModule.MakeWidgetsAsync(excepts);
+            //}
+            var itemKeys = string.Join(',', Items.Select(item => item.Id));
+            if (_prevItemKeys != itemKeys)
+            {
+                _prevItemKeys = itemKeys;
+                await GridstackJSModule.ReloadAsync();
+                await GridstackJSModule.CompactAsync();
+            }
+            if (_prevReadonly != Readonly)
+            {
+                _prevReadonly = Readonly;
+                await GridstackJSModule.SwitchStateAsync(!Readonly);
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        GridstackJSModule.OnChangeEvent -= OnItemChangeAsync;
+    }
+}

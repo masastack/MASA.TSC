@@ -107,7 +107,6 @@ public abstract class ConfigurationRecord
 
     public void ClearPanels()
     {
-        Panels.ForEach(item => item.IsRemove = true);
         Panels.Clear();
     }
 }

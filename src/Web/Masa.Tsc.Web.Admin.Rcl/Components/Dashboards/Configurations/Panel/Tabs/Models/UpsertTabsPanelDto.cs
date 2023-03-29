@@ -33,18 +33,18 @@ public class UpsertTabsPanelDto : UpsertPanelDto
         var index = ChildPanels.IndexOf(panel);
         if (index == 0)
         {
-            RemoveChildPanel(panel);
+            ChildPanels.Remove(panel);
             CurrentTabItem = ChildPanels.FirstOrDefault() as UpsertTabItemPanelDto;
         }
         else if (index == panel.ParentPanel!.ChildPanels.Count - 1)
         {
-            RemoveChildPanel(panel);
+            ChildPanels.Remove(panel);
             CurrentTabItem = ChildPanels.Last() as UpsertTabItemPanelDto;
         }
         else
         {
             CurrentTabItem = ChildPanels[index + 1] as UpsertTabItemPanelDto;
-            RemoveChildPanel(panel);
+            ChildPanels.Remove(panel);
         }
     }
 

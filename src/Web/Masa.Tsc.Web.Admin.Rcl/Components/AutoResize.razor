@@ -1,12 +1,15 @@
 ﻿@inject IJSRuntime JS
 
-<div style="height:100%;width:100%;" @ref="_elementRef">
+<div style="height:100%;width:100%;" class="@Class" @ref="_elementRef">
     @ChildContent
 </div>
 
 @code {
     private ElementReference _elementRef;
     private DotNetObjectReference<AutoResize>? _objRef;
+
+    [Parameter]
+    public string? Class { get; set; }
 
     [Parameter]
     public int Delay { get; set; } = 100;

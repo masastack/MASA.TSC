@@ -8,9 +8,9 @@
 }
 @if (Value.ChartType is ChartTypes.Table)
 {
-    <ListPanel Value="Value" IsChartDataReady=!IsLoading Class="@Class" />
+    <ListPanel Value="Value" IsChartDataReady=!IsLoading Class="@(Class + (IsLoading?"hide":""))" />
 }
 else
 {
-    <EChart Value="Value" />
+    <EChart Value="Value" Class="@(Class + (IsLoading?"hide":""))" />
 }

@@ -15,7 +15,7 @@
             @if(IsEdit)
             {
                 <SButton Icon Color="regular3" Class="ml-3">
-                    <SIcon Tooltip="@T("Close tab item")" Size="24" OnClickStopPropagation OnClick="() => CloseTabItem(tabItem)">mdi-close-circle</SIcon>
+                    <SIcon Tooltip="@T("Close Tab Item")" Size="24" OnClickStopPropagation OnClick="() => CloseTabItem(tabItem)">mdi-close-circle</SIcon>
                 </SButton>               
             }
         </MTab>
@@ -30,6 +30,8 @@
 <MTabsItems Value="CurrentTab">
     @foreach (var tabItem in Panel.ChildPanels)
     {
-        <TabItemPanel Panel=tabItem IsCurrentTabItem="@(CurrentTab == tabItem.Id.ToString())" />
+        <MTabItem Value="tabItem.Id.ToString()">
+            <PanelGrids ParentPanel=tabItem Panels="tabItem.ChildPanels" />
+        </MTabItem>
     }
 </MTabsItems>

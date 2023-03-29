@@ -14,6 +14,9 @@ public partial class PanelSelect
     [Parameter]
     public EventCallback<UpsertPanelDto> OnSelect { get; set; }
 
+    //[Parameter]
+    //public Func<UpsertPanelDto,Task> OnSelect { get; set; }
+
     [CascadingParameter]
     public ConfigurationRecord ConfigurationRecord { get; set; }
 
