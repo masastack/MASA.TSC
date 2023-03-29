@@ -31,13 +31,10 @@ public partial class TabsPanel
         if(_oldIsEdit != IsEdit)
         {
             _oldIsEdit = IsEdit;
-            if (_oldIsEdit)
+            NextTick(() =>
             {
-                NextTick(() =>
-                {
-                    _tabs?.CallSlider();
-                });
-            }
+                _tabs?.CallSlider();
+            });
         }
     }
 

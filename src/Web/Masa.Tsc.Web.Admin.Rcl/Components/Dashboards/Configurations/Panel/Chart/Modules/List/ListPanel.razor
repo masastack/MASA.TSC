@@ -51,14 +51,18 @@ else
             _shouldRender = true;
         }
 
-        if (IsChartDataReady && _shouldRender)
+        //if (IsChartDataReady && _shouldRender)
+        //{
+        //    _shouldRender = false;
+        //    SetOption();
+        //}
+        if (IsChartDataReady)
         {
-            _shouldRender = false;
-            await SetOption();
+            SetOption();
         }
     }
 
-    async Task SetOption()
+    void SetOption()
     {
         if (Value.ListType is ListTypes.TopList)
         {
