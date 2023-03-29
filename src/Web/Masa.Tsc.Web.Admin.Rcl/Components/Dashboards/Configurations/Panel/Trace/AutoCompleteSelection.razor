@@ -1,21 +1,23 @@
 ﻿@inherits TscComponentBase
-
-<MListItem>  
-    <MListItemAction>
+<MListItem Style="min-height: 40px !important">
+    <MListItemAction Class="my-0">
         <MListItemActionText>
             <MHover Context="hContext">
-                <div @attributes="hContext.Attrs" class="hover-pointer d-flex align-center">
-                    <div @onclick="() => Copy(Value)" @onclick:stopPropagation>
+                <div @attributes="hContext.Attrs" class="hover-pointer d-flex align-left">
+                    <div @onclick="() => Copy(ValueFunc(Value))" @onclick:stopPropagation>
                         <SIcon Tooltip="@T("Copy value")"
                                Color="@(_copyClicked ? "success" : "gray")"
-                               Style="@(hContext.Hover ? "width: 18px; height: 18px; margin-right: 12px; transition: 0.5s;" : "opacity:0; width: 18px; height: 0px; margin-left: -24px; transition: 0.4s;")">
+                               Style="@(hContext.Hover ? "width: 18px; transition: 0.5s;" : "opacity:0; height: 0px; margin-left: -24px; transition: 0.4s;")">
                             @(_copyClicked ? _checkSvg : _copySvg)
                         </SIcon>
                     </div>
                     <MTooltip Top>
                         <ActivatorContent>
-                            <span @attributes="@context.Attrs" class="text-truncate text-right masa body-2">@Value</span>
-                        </ActivatorContent>                       
+                            <div @attributes="@context.Attrs" class="text-truncate text-left masa subtitle2 black--text" style="width:164px">@TextFunc(Value)</div>
+                        </ActivatorContent>
+                         <ChildContent>
+                            <span>@TextFunc(Value)</span>
+                        </ChildContent>
                     </MTooltip>
                 </div>
             </MHover>
@@ -25,7 +27,13 @@
 
 @code {
     [Parameter]
-    public string Value { get; set; }
+    public object Value { get; set; }
+
+    [Parameter]
+    public Func<object, string> TextFunc { get; set; } = obj => obj?.ToString()!;
+
+    [Parameter]
+    public Func<object, string> ValueFunc { get; set; } = obj => obj?.ToString()!;
 
     [Inject]
     public IJSRuntime Js { get; set; }

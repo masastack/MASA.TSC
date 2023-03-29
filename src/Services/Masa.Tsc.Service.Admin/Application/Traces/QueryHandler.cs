@@ -35,7 +35,7 @@ public class QueryHandler
             {
                 TraceId = traceId,
                 Page = 1,
-                PageSize = 9999
+                PageSize = 1000
             });
 
             if (data.Result != null && data.Result.Any())
@@ -44,7 +44,6 @@ public class QueryHandler
         if (query.Result == null)
             query.Result = Array.Empty<TraceResponseDto>();
     }
-
 
     [EventHandler]
     public async Task GetListAsync(TraceListQuery query)

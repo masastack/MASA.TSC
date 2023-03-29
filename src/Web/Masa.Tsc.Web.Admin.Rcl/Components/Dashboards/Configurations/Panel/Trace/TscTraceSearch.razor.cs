@@ -78,6 +78,8 @@ public partial class TscTraceSearch
         {
             if (isService)
             {
+                _instance = default!;
+                _endpoint = default!;
                 await SearchInstances(default!);
                 await SearchEndpoints(default!);
             }
