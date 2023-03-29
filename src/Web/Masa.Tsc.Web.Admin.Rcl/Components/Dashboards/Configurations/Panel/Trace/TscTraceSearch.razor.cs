@@ -9,20 +9,20 @@ public partial class TscTraceSearch
     public EventCallback<(string?, string?, string?, string?)> OnQueryUpdate { get; set; }
 
     [Parameter, EditorRequired]
-    public Func<string, Task<IEnumerable<string>>> QueryServices { get; set; }
+    public Func<string?, Task<IEnumerable<string>>> QueryServices { get; set; }
 
     [Parameter, EditorRequired]
-    public Func<string, string, Task<IEnumerable<string>>> QueryInstances { get; set; }
+    public Func<string, string?, Task<IEnumerable<string>>> QueryInstances { get; set; }
 
     [Parameter, EditorRequired]
-    public Func<string, string, string, Task<IEnumerable<string>>> QueryEndpoints { get; set; }
+    public Func<string, string?, string?, Task<IEnumerable<string>>> QueryEndpoints { get; set; }
 
     private List<string> _services = new();
     private List<string> _instances = new();
     private List<string> _endpoints = new();
 
     private string _service = string.Empty;
-    private string _instance = string.Empty;
+    private string? _instance;
     private string? _endpoint;
     private string? _keyword;
 
@@ -36,24 +36,24 @@ public partial class TscTraceSearch
         await base.OnInitializedAsync();
     }
 
-    private async Task SearchServices(string key)
+    private async Task SearchServices(string? key)
     {
         _serviceSearching = true;
         _services = (await QueryServices.Invoke(key)).ToList();
         _serviceSearching = false;
     }
 
-    private async Task SearchInstances(string key)
+    private async Task SearchInstances(string? key)
     {
         _instanceSearching = true;
         _instances = (await QueryInstances(_service, key)).ToList();
         _instanceSearching = false;
     }
 
-    private async Task SearchEndpoints(string key)
+    private async Task SearchEndpoints(string? key)
     {
         _endpointSearching = true;
-        _endpoints = (await QueryEndpoints(_service, _instance ?? string.Empty, key)).ToList();
+        _endpoints = (await QueryEndpoints(_service, _instance, key)).ToList();
         _endpointSearching = false;
     }
 
@@ -63,7 +63,7 @@ public partial class TscTraceSearch
         Query();
     }
 
-    private List<string> Filter(List<string> sources, string key)
+    private static List<string> Filter(List<string> sources, string key)
     {
         if (sources == null || !sources.Any())
             return new();
@@ -78,10 +78,10 @@ public partial class TscTraceSearch
         {
             if (isService)
             {
-                _instance = default!;
-                _endpoint = default!;
-                await SearchInstances(default!);
-                await SearchEndpoints(default!);
+                _instance = default;
+                _endpoint = default;
+                await SearchInstances(default);
+                await SearchEndpoints(default);
             }
             else if (isInstance)
             {
