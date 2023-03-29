@@ -56,7 +56,7 @@ internal static class TimeExtentions
         if (timeSpan.TotalMinutes - 60 < 0)
             return "mm:ss";
 
-        if (timeSpan.Hours - 24 <= 0)
+        if (timeSpan.TotalHours - 24 <= 0)
             return "HH:mm:ss";
 
         return " dd HH:mm";

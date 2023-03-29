@@ -13,12 +13,19 @@ public partial class ProjectCharts
     private UpsertChartPanelDto _endpoint;
     private UpsertChartPanelDto _slowEndpoint;
     string? _oldConfigRecordKey;
+    TscTraceDetail _tscTraceDetail = default!;
 
     [Parameter]
     public ConfigurationRecord ConfigurationRecord { get; set; }
 
     protected override void OnInitialized()
     {
+        ConfigurationRecord.TopListOnclick += async (TopListOption options) =>
+        {
+            var url = options.Text;
+            var traceId = await ApiCaller.TraceService.GetTraceIdByMetricAsync(ConfigurationRecord.Service!, url, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
+            await _tscTraceDetail.OpenAsync(traceId);
+        };
         UpSetMetrics();
     }
 
@@ -80,7 +87,7 @@ public partial class ProjectCharts
                 }
             };
         else
-            _endpoint.Metrics[0].Expression = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{step}])),0.01)>0.01))";
+            _endpoint.Metrics[0].Expression = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{step}])),1)>0))";
 
         if (_slowEndpoint == null)
             _slowEndpoint = new UpsertChartPanelDto(Guid.Empty)
@@ -93,7 +100,7 @@ public partial class ProjectCharts
                 {
                     new PanelMetricDto()
                     {
-                        Expression = "topk(10, sort_desc(max by(http_target) (http_response_bucket)))"
+                        Expression = "topk(10, sort_desc( round(sum by(http_target) (increase(http_response_sum[1m]))/sum by(http_target) (increase(http_response_count[1m])))),1)"
                     }
                 }
             };

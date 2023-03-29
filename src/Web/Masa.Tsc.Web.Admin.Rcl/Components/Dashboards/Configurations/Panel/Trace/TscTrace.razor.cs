@@ -44,7 +44,7 @@ public partial class TscTrace
     {
         StartDateTime = dateTimes.start;
         EndDateTime = dateTimes.end;
-        _page = 1;                                                                                                                                                                                                                   
+        _page = 1;
         await PageSearchAsync();
     }
 
@@ -157,14 +157,13 @@ public partial class TscTrace
         _chartData = values;
     }
 
-    private Task<IEnumerable<string>> QueryServices(string key)
+    private Task<IEnumerable<string>> QueryServices()
     {
         var query = new SimpleAggregateRequestDto
         {
             MaxCount = 1000,
             Type = AggregateTypes.GroupBy,
             Service = string.Empty,
-            Keyword = key,
             Start = StartDateTime,
             End = EndDateTime
         };
@@ -172,14 +171,13 @@ public partial class TscTrace
         return ApiCaller.TraceService.GetAttrValuesAsync(query);
     }
 
-    private Task<IEnumerable<string>> QueryInstances(string service, string key)
+    private Task<IEnumerable<string>> QueryInstances(string service)
     {
         var query = new SimpleAggregateRequestDto
         {
             MaxCount = 1000,
             Type = AggregateTypes.GroupBy,
             Service = service,
-            Keyword = key,
             Start = StartDateTime,
             End = EndDateTime
         };
@@ -187,15 +185,14 @@ public partial class TscTrace
         return ApiCaller.TraceService.GetAttrValuesAsync(query);
     }
 
-    private Task<IEnumerable<string>> QueryEndpoints(string service, string instance, string key)
+    private Task<IEnumerable<string>> QueryEndpoints(string service, string? instance)
     {
         var query = new SimpleAggregateRequestDto
         {
             MaxCount = 1000,
             Type = AggregateTypes.GroupBy,
             Service = service,
-            Instance = instance,
-            Keyword = key,
+            Instance = instance ?? string.Empty,
             Start = StartDateTime,
             End = EndDateTime
         };

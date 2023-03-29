@@ -11,7 +11,7 @@ public class TraceService : ServiceBase
         App.MapGet($"{BaseUri}/list", GetListAsync);
         App.MapGet($"{BaseUri}/attr-values", GetAttrValuesAsync);
         App.MapGet($"{BaseUri}/aggregate", AggregateAsync);
-        App.MapGet($"{BaseUri}/getByMetric", GetByMetricAsync);
+        App.MapGet($"{BaseUri}/getTraceIdByMetric", GetTraceIdByMetricAsync);
     }
 
     private async Task<IEnumerable<TraceResponseDto>> GetAsync([FromServices] IEventBus eventBus, [FromRoute] string traceId)
@@ -21,9 +21,9 @@ public class TraceService : ServiceBase
         return query.Result;
     }
 
-    private async Task<IEnumerable<TraceResponseDto>> GetByMetricAsync([FromServices] IEventBus eventBus, string service, string url, DateTime start, DateTime end)
+    private async Task<string> GetTraceIdByMetricAsync([FromServices] IEventBus eventBus, string service, string url, DateTime start, DateTime end)
     {
-        var query = new TraceMetricToDetailQuery(service, url, start, end);
+        var query = new TraceIdByMetricQuery(service, url, start, end);
         await eventBus.PublishAsync(query);
         return query.Result;
     }

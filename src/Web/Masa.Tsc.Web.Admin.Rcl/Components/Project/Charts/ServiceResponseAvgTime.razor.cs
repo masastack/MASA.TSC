@@ -32,12 +32,18 @@ public partial class ServiceResponseAvgTime : TscEChartBase
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         var step = (long)Math.Floor((query.End!.Value - query.Start!.Value).TotalSeconds);
-        var metric = $"round(sum by(service_name) (increase(http_server_duration_sum{{service_name=\"{query.AppId}\"}}[{step}s]))/sum by(service_name) (increase(http_server_duration_count{{service_name=\"{query.AppId}\"}}[{step}s])),1)";
+        var metric = $"round(sum by(service_name) (increase(http_server_duration_sum{{service_name=\"{query.AppId}\"}}[60s]))/sum by(service_name) (increase(http_server_duration_count{{service_name=\"{query.AppId}\"}}[60s])),1)";
         Total = 0;
-        var result = await ApiCaller.MetricService.GetQueryAsync(metric, query.End!.Value);
-        if (result != null && result.Result != null && result.Result.Any() && result.ResultType == ResultTypes.Vector)
+        var result = await ApiCaller.MetricService.GetQueryRangeAsync(new RequestMetricAggDto
         {
-            var obj = ((QueryResultInstantVectorResponse)result.Result[0])!.Value![1];
+            End = query.End!.Value,
+            Start = query.Start!.Value,
+            Step = $"{step}s",
+            Match = metric
+        });
+        if (result != null && result.Result != null && result.Result.Any() && result.ResultType == ResultTypes.Matrix)
+        {
+            var obj = ((QueryResultMatrixRangeResponse)result.Result[0]).Values!.FirstOrDefault()?[1];
             Total = obj is double.NaN || string.Equals(obj, "NaN") ? 0 : Convert.ToDouble(obj);
 
             if (Total - 1000 > 0)

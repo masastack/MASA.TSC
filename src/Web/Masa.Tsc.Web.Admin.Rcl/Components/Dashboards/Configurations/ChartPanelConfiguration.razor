@@ -2,9 +2,7 @@
 
 <MRow>
     <MCol Md="12" Class="d-flex">
-        <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
-                              StartTimeLimit="(val,end)=>val<=end&& val.AddDays(1)>=end"
-                              EndTimeLimit="(val,start)=>val>=start&&val.AddDays(-1)<=start"
+        <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"                             
                               OnUpdate="OnDateTimeUpdateAsync"
                               OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
         <MSpacer />

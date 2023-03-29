@@ -78,10 +78,10 @@
     public EventCallback<TimeZoneInfo> OnTimeZoneUpdate { get; set; }
 
     [Parameter]
-    public Func<DateOnly, DateOnly, bool> StartTimeLimit { get; set; }
+    public Func<DateOnly, DateOnly, bool> StartTimeLimit { get; set; } = (val, end) => val <= end && val.AddDays(30) >= end;
 
     [Parameter]
-    public Func<DateOnly, DateOnly, bool> EndTimeLimit { get; set; }
+    public Func<DateOnly, DateOnly, bool> EndTimeLimit { get; set; } = (val, start) => val >= start && val.AddDays(-30) <= start;
 
     [Parameter]
     public string Class { get; set; }
@@ -136,9 +136,9 @@
         new QuickRange(QuickRangeKey.Last6Hours, TimeSpan.FromHours(-6)),
         s_internalDefaultQuickRange,
         new QuickRange(QuickRangeKey.Last24Hours, TimeSpan.FromHours(-24)),
-        //new QuickRange(QuickRangeKey.Last2Days, TimeSpan.FromDays(-2)),
-        //new QuickRange(QuickRangeKey.Last7Days, TimeSpan.FromDays(-7)),
-        //new QuickRange(QuickRangeKey.Last30Days, TimeSpan.FromDays(-30)),
+        new QuickRange(QuickRangeKey.Last2Days, TimeSpan.FromDays(-2)),
+        new QuickRange(QuickRangeKey.Last7Days, TimeSpan.FromDays(-7)),
+        new QuickRange(QuickRangeKey.Last30Days, TimeSpan.FromDays(-30)),
         //new QuickRange(QuickRangeKey.Last6Months, TimeSpan.FromDays(-180)),
         //new QuickRange(QuickRangeKey.Last1Year, TimeSpan.FromDays(-365)),
         //new QuickRange(QuickRangeKey.Yesterday),
@@ -181,13 +181,13 @@
                 await OnAbsoluteDateTimeUpdated();
             }
             else
-            {  
+            {
                 if (_quickRange.TryGetRange(Offset, out var value))
                 {
                     _startDateTime = value.start;
                     _endDateTime = value.end;
                 }
-            
+
                 await UpdateRangeDateTimeToLatest();
             }
             handleIntervalUpdate(Interval);
@@ -336,5 +336,5 @@
     public void Dispose()
     {
         _timer?.Dispose();
-    }    
+    }
 }

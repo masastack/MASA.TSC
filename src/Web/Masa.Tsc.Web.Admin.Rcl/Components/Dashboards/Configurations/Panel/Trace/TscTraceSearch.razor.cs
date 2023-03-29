@@ -9,20 +9,20 @@ public partial class TscTraceSearch
     public EventCallback<(string?, string?, string?, string?)> OnQueryUpdate { get; set; }
 
     [Parameter, EditorRequired]
-    public Func<string, Task<IEnumerable<string>>> QueryServices { get; set; }
+    public Func<Task<IEnumerable<string>>> QueryServices { get; set; }
 
     [Parameter, EditorRequired]
-    public Func<string, string, Task<IEnumerable<string>>> QueryInstances { get; set; }
+    public Func<string, Task<IEnumerable<string>>> QueryInstances { get; set; }
 
     [Parameter, EditorRequired]
-    public Func<string, string, string, Task<IEnumerable<string>>> QueryEndpoints { get; set; }
+    public Func<string, string?, Task<IEnumerable<string>>> QueryEndpoints { get; set; }
 
     private List<string> _services = new();
     private List<string> _instances = new();
     private List<string> _endpoints = new();
 
     private string _service = string.Empty;
-    private string _instance = string.Empty;
+    private string? _instance;
     private string? _endpoint;
     private string? _keyword;
 
@@ -32,28 +32,28 @@ public partial class TscTraceSearch
 
     protected override async Task OnInitializedAsync()
     {
-        await SearchServices(default!);
+        await SearchServices();
         await base.OnInitializedAsync();
     }
 
-    private async Task SearchServices(string key)
+    private async Task SearchServices()
     {
         _serviceSearching = true;
-        _services = (await QueryServices.Invoke(key)).ToList();
+        _services = (await QueryServices.Invoke()).ToList();
         _serviceSearching = false;
     }
 
-    private async Task SearchInstances(string key)
+    private async Task SearchInstances()
     {
         _instanceSearching = true;
-        _instances = (await QueryInstances(_service, key)).ToList();
+        _instances = (await QueryInstances(_service)).ToList();
         _instanceSearching = false;
     }
 
-    private async Task SearchEndpoints(string key)
+    private async Task SearchEndpoints()
     {
         _endpointSearching = true;
-        _endpoints = (await QueryEndpoints(_service, _instance ?? string.Empty, key)).ToList();
+        _endpoints = (await QueryEndpoints(_service, _instance)).ToList();
         _endpointSearching = false;
     }
 
@@ -63,27 +63,20 @@ public partial class TscTraceSearch
         Query();
     }
 
-    private List<string> Filter(List<string> sources, string key)
-    {
-        if (sources == null || !sources.Any())
-            return new();
-        if (string.IsNullOrEmpty(key))
-            return sources;
-        return sources.Where(str => str.IndexOf(key) >= 0).ToList();
-    }
-
     private void Query(bool isService = false, bool isInstance = false)
     {
         NextTick(async () =>
         {
             if (isService)
             {
-                await SearchInstances(default!);
-                await SearchEndpoints(default!);
+                _instance = default;
+                _endpoint = default;
+                await SearchInstances();
+                await SearchEndpoints();
             }
             else if (isInstance)
             {
-                await SearchEndpoints(default!);
+                await SearchEndpoints();
             }
 
             await OnQueryUpdate.InvokeAsync((_service, _instance, _endpoint, _keyword));

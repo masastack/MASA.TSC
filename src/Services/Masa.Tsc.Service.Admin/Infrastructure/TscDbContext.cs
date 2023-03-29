@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Infrastructure;
 
-public class TscDbContext : MasaDbContext
+public class TscDbContext : MasaDbContext<TscDbContext>
 {
     public TscDbContext(MasaDbContextOptions<TscDbContext> options) : base(options)
     {
