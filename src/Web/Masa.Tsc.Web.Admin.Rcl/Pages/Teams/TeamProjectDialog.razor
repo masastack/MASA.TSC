@@ -29,9 +29,7 @@
                             </MTooltip>
                         </MCol>
                         <MCol Cols="6" Class="d-flex justify-end align-center">
-                            <DateTimeRangeToolbar 
-                                StartTimeLimit="(val,end)=>val<=end&& val.AddMonths(1)>=end"
-                                EndTimeLimit="(val,start)=>val>=start&&val.AddMonths(-1)<=start"
+                            <DateTimeRangeToolbar                               
                                 StartDateTime="@ConfigurationRecord.StartTime"
                                 EndDateTime="@ConfigurationRecord.EndTime"
                                 DefaultQuickRange="@ConfigurationRecord.DefaultQuickRangeKey"
