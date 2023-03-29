@@ -27,7 +27,6 @@ public partial class PanelSelect
             PanelTypes.Topology,
             PanelTypes.Log,
             PanelTypes.Trace,
-            //PanelTypes.Table
         };
         return types;
     }
