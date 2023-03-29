@@ -46,6 +46,10 @@ public abstract class ConfigurationRecord
 
     public DateTimeOffset EndTime { get; set; } = DateTimeOffset.UtcNow;
 
+    public IntervalItem Interval { get; set; } = IntervalItem.Off;
+
+    public bool UseAbsoluteTime { get; set; } = false;
+
     public string? Key => $"{Service}{Instance}{Endpoint}{StartTime}{EndTime}{_randomStr}";
 
     public bool IsEdit

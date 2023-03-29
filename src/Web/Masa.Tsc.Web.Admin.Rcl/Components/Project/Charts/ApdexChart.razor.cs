@@ -112,7 +112,7 @@ public partial class ApdexChart
         {
             _options.SetValue("xAxis.data", Array.Empty<string>());
             _options.SetValue("series[0].data", Array.Empty<string>());
-            Total = "0";
+            Total = "-";
         }
     }
 
@@ -143,7 +143,7 @@ public partial class ApdexChart
         if (value > 0)
             return value.ToString("+0.##");
         else if (value < 0)
-            return value.ToString("-0.##");
+            return value.ToString("0.##");
         else
             return value.ToString();
     }

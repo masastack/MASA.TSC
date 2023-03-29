@@ -17,6 +17,20 @@ public partial class TscTraceList : TscComponentBase
     [Parameter]
     public bool PageMode { get; set; }
 
+    [Parameter]
+    public int Page
+    {
+        get { return _page; }
+        set { _page = value; }
+    }
+
+    [Parameter]
+    public int PageSize
+    {
+        get { return _pageSize; }
+        set { _pageSize = value; }
+    }
+
     private TscTraceDetail? _tscTraceDetail;
     private IEnumerable<TraceResponseDto> _data = new List<TraceResponseDto>();
     private int _total = 0;
@@ -34,7 +48,7 @@ public partial class TscTraceList : TscComponentBase
         new() { Text = T("Service"), Value = "Service", Sortable = false,Width=250},
         new() { Text = T("TraceId"), Value = "TraceId", Sortable = false },
         new() { Text = T("Endpoint"), Value = "Endpoint", Sortable = false },
-        new() { Text = $"{T("Duration")}({T("ms")})", Value = "Duration", Sortable = false,Width=150},
+        new() { Text = $"{T("Duration")}", Value = "Duration", Sortable = false,Width=150},
         new() { Text = T("Timestamp"), Value = "Timestamp", Sortable = true,Width=200}
     };
 

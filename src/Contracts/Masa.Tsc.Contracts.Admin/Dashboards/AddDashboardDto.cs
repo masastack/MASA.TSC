@@ -13,7 +13,7 @@ public class AddDashboardDto
 
     public int Order { get; set; }
 
-    public string Layer { get; set; }
+    public string Layer { get; set; } = string.Empty;
 
     public ModelTypes Model { get; set; } = ModelTypes.All;
 

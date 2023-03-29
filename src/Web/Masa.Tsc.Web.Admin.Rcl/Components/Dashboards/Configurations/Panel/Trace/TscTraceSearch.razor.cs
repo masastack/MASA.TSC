@@ -63,10 +63,29 @@ public partial class TscTraceSearch
         Query();
     }
 
-    private void Query()
+    private List<string> Filter(List<string> sources, string key)
+    {
+        if (sources == null || !sources.Any())
+            return new();
+        if (string.IsNullOrEmpty(key))
+            return sources;
+        return sources.Where(str => str.IndexOf(key) >= 0).ToList();
+    }
+
+    private void Query(bool isService = false, bool isInstance = false)
     {
         NextTick(async () =>
         {
+            if (isService)
+            {
+                await SearchInstances(default!);
+                await SearchEndpoints(default!);
+            }
+            else if (isInstance)
+            {
+                await SearchEndpoints(default!);
+            }
+
             await OnQueryUpdate.InvokeAsync((_service, _instance, _endpoint, _keyword));
             StateHasChanged();
         });

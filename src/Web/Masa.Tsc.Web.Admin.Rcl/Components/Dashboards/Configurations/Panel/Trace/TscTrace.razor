@@ -11,6 +11,8 @@
                Data="_chartData" Start="@StartDateTime" End="@EndDateTime" />
 
 <TscTraceList PageMode=PageMode
+              Page="_page"
+              PageSize="_pageSize"
               OnPaginationUpdate="Search"
               SearchResult="_queryResult"
               SearchLoading="_loading" />

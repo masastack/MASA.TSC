@@ -79,6 +79,11 @@ public partial class LogPanel
 
     protected override async Task OnParametersSetAsync()
     {
+        if (string.IsNullOrEmpty(Search) && !string.IsNullOrEmpty(Service))
+        {
+            Search = Service;
+        }
+
         await GetCompontentLogsAsync();
     }
 

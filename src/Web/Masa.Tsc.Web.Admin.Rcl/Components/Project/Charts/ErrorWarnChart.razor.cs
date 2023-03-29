@@ -14,7 +14,7 @@ public partial class ErrorWarnChart
     [Parameter]
     public string Title { get; set; }
 
-    private double _success;
+    private double? _success;
     private EChartType _options = EChartConst.Pie;
     private List<QueryResultDataResponse>? _data;
     private double[] values = new double[2];
@@ -43,7 +43,7 @@ public partial class ErrorWarnChart
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        _success = 0;
+        _success = null;
         if (query == null)
             return;
         if (query.End == null)
@@ -51,24 +51,26 @@ public partial class ErrorWarnChart
         if (query.Start == null)
             query.Start = query.End.Value.AddDays(-1);
 
-        var step = (long)Math.Floor((query.End.Value - query.Start.Value).TotalSeconds);
-        _data = await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto
+        var step = 60;// (long)Math.Floor((query.End.Value - query.Start.Value).TotalSeconds);
+        _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
-            Queries = new List<string> {
+            MetricNames = new List<string> {
             $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"}}[{step}s])),1)",
             $"round(sum by(service_name) (increase(http_server_duration_count[{step}s])),1)"
            },
             Service = query.AppId,
-            Time = query.End.Value,
+            Start = query.Start.Value,
+            End = query.End.Value,
+            Step = $"{(long)Math.Floor((query.End.Value - query.Start.Value).TotalSeconds)}s"
         });
 
         var index = 0;
         foreach (var item in _data)
         {
-            if (item != null && item.ResultType == ResultTypes.Vector && item.Result != null && item.Result.Any())
+            if (item != null && item.ResultType == ResultTypes.Matrix && item.Result != null && item.Result.Any())
             {
-                var first = (QueryResultInstantVectorResponse)item.Result.First();
-                values[index++] = Convert.ToDouble(first.Value![1]);
+                var first = (QueryResultMatrixRangeResponse)item.Result.First()!;
+                values[index++] = first.Values.Sum(values => Convert.ToDouble(values[1]));
             }
         }
 
@@ -79,8 +81,19 @@ public partial class ErrorWarnChart
         }
         else
         {
-            _success = Math.Round(values[0] * 100 / values[1], 2);
+            _success = Math.Round(values[0] * 100 / values[1], 2, MidpointRounding.ToNegativeInfinity);
         }
+
+        if (_success.HasValue)
+        {
+            _success = Math.Round(_success.Value, 2, MidpointRounding.ToNegativeInfinity);
+        }
+
+        if (_data?.Any(item => item?.Result?.Any() is true) is true || Math.Round(values[0], 2) <= 0 || Math.Round(values[1]) <= 0)
+        {
+            _options.SetValue("series[0].itemStyle.normal.borderWidth", 0);
+        }
+
         _options.SetValue("tooltip.formatter", "{d}%");
         _options.SetValue("legend.bottom", "1%");
         _options.SetValue("series[0].data", new object[] {GetModel(true,values[0]),
@@ -89,6 +102,6 @@ public partial class ErrorWarnChart
 
     private static object GetModel(bool isSuccess, double value)
     {
-        return new { name = isSuccess ? "Success" : "Fail", value };
+        return new { name = isSuccess ? "Success" : "Fail", value = Math.Round(value, 2) < 0 ? 0 : Math.Round(value, 2) };
     }
 }
