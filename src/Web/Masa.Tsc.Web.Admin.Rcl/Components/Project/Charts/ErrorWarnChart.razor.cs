@@ -102,6 +102,6 @@ public partial class ErrorWarnChart
 
     private static object GetModel(bool isSuccess, double value)
     {
-        return new { name = isSuccess ? "Success" : "Fail", value = Math.Round(value, 2) };
+        return new { name = isSuccess ? "Success" : "Fail", value = Math.Round(value, 2) < 0 ? 0 : Math.Round(value, 2) };
     }
 }
