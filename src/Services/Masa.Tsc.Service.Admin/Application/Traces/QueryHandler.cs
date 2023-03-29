@@ -21,7 +21,7 @@ public class QueryHandler
     }
 
     [EventHandler]
-    public async Task GetDetailByMetricAsync(TraceMetricToDetailQuery query)
+    public async Task GetTraceIdByMetricAsync(TraceIdByMetricQuery query)
     {
         ArgumentNullException.ThrowIfNull(query.Service);
         ArgumentNullException.ThrowIfNull(query.Url);
@@ -29,20 +29,7 @@ public class QueryHandler
         Regex.Replace(query.Url, partten, "*");
 
         var traceId = await _traceService.GetElasticClient().GetByMetricAsync(query.Service, query.Url, query.Start, query.End);
-        if (!string.IsNullOrEmpty(traceId))
-        {
-            var data = await _traceService.ListAsync(new SimpleAggregateRequestDto
-            {
-                TraceId = traceId,
-                Page = 1,
-                PageSize = 1000
-            });
-
-            if (data.Result != null && data.Result.Any())
-                query.Result = data.Result;
-        }
-        if (query.Result == null)
-            query.Result = Array.Empty<TraceResponseDto>();
+        query.Result = traceId ?? string.Empty;
     }
 
     [EventHandler]
