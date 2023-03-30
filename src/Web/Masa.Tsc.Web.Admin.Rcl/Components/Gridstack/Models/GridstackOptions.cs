@@ -9,7 +9,7 @@ public class GridstackOptions
 
     public int Column { get; set; } = 12;
 
-    public bool AcceptWidgets { get; set; } = true;
+    public bool AcceptWidgets { get; set; }
 
     public bool AlwaysShowResizeHandle { get; set; } = true;
 
@@ -18,6 +18,8 @@ public class GridstackOptions
     public string CellHeight { get; set; } = "auto";
 
     public int CellHeightThrottle { get; set; } = 100;
+
+    public int MinRow { get; set; } = 1;
 
     public string? Nonce { get; set; }
 
@@ -32,7 +34,4 @@ public class GridstackOptions
     public bool OneColumnModeDomSort { get; set; }
 
     public bool DisableOneColumnMode { get; set; } = true;
-
-    [JsonIgnore]
-    public Func<IEnumerable<GridstackChangeEventArgs>, Task>? OnChange { get; set; }
 }

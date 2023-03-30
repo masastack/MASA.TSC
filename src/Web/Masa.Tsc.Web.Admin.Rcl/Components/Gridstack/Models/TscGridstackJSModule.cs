@@ -10,6 +10,8 @@ public class TscGridstackJSModule : IAsyncDisposable
     IJSObjectReference? _helper;
     GridstackOptions? _options;
     public event Func<IEnumerable<GridstackChangeEventArgs>, Task>? OnChangeEvent;
+    public event Func<IEnumerable<GridstackAddEventArgs>, Task>? OnAddEvent;
+    public event Func<IEnumerable<GridstackRemoveEventArgs>, Task>? OnRemoveEvent;
 
     public TscGridstackJSModule(IJSRuntime js)
     {
@@ -85,6 +87,20 @@ public class TscGridstackJSModule : IAsyncDisposable
     {
         if (OnChangeEvent is not null)
             await OnChangeEvent.Invoke(args);
+    }
+
+    [JSInvokable]
+    public async Task OnAdd(IEnumerable<GridstackAddEventArgs> args)
+    {
+        if (OnAddEvent is not null)
+            await OnAddEvent.Invoke(args);
+    }
+
+    [JSInvokable]
+    public async Task OnRemove(IEnumerable<GridstackRemoveEventArgs> args)
+    {
+        if (OnRemoveEvent is not null)
+            await OnRemoveEvent.Invoke(args);
     }
 
     public async ValueTask DisposeAsync()

@@ -42,9 +42,11 @@ export function reload(options) {
     var el = getElement(options);
     el.gridstack.removeAll(false);
     var childs = el.querySelectorAll(':scope > .grid-stack-item');
+    el.gridstack.batchUpdate(true);
     childs.forEach(child => {
         el.gridstack.makeWidget(child);
     });
+    el.gridstack.batchUpdate(false);
 }
 
 export function removeAll(options, destroyDom) {
@@ -103,6 +105,18 @@ function initByElement(options, el, dotNetHelper) {
             }
         }))
     });
+    //grid.on('added', function (e, items) {
+    //    dotNetHelper.invokeMethodAsync('OnAdd', items.map(item => {
+    //        return {
+    //            id: item.el.id,
+    //        }
+    //    }))
+    //});
+    //grid.on('removed', function (e, items) {
+    //    window.setTimeout(() => {
+    //        dotNetHelper.invokeMethodAsync('OnRemove',[]);
+    //    }, 500);
+    //});
 }
 
 function getElement(options) {

@@ -17,7 +17,6 @@
              gs-y="@item.Y"
              gs-auto-position="@((item.X!=0 || item.Y!=0) || item==firstItem ?"false":"true")">
             <div class="grid-stack-item-content @ItemClass" style="@ItemStyle">
-                @item.Id
                 @ItemContent(item)
             </div>
         </div>
@@ -54,16 +53,23 @@
     public Models.GridstackOptions Options { get; set; }
 
     [Parameter, EditorRequired]
-    public IEnumerable<TItem> Items { get; set; }
+    public ICollection<TItem> Items { get; set; }
 
     [Parameter, EditorRequired]
     public RenderFragment<TItem> ItemContent { get; set; }
+
+    [Parameter]
+    public Func<IEnumerable<GridstackChangeEventArgs>, Task>? OnChange { get; set; }
+
+    [Parameter]
+    public Func<IEnumerable<GridstackAddEventArgs>, Task>? OnAdd { get; set; }
 
     protected override void OnInitialized()
     {
         Options ??= new();
         if (Id is not null) Options.Id = Id;
         GridstackJSModule.OnChangeEvent += OnItemChangeAsync;
+        GridstackJSModule.OnAddEvent += OnItemAddAsync;
     }
 
     async Task OnItemChangeAsync(IEnumerable<GridstackChangeEventArgs> args)
@@ -79,9 +85,17 @@
                 item.Y = arg.Y;
             }
         });
-        if (Options.OnChange is not null)
+        if (OnChange is not null)
         {
-            await Options.OnChange(args);
+            await OnChange(args);
+        }
+    }
+
+    async Task OnItemAddAsync(IEnumerable<GridstackAddEventArgs> args)
+    {
+        if (OnAdd is not null)
+        {
+            await OnAdd(args);
         }
     }
 
@@ -100,7 +114,6 @@
                 _prevItemKeys = itemKeys;               
                 await GridstackJSModule.ReloadAsync();
                 await GridstackJSModule.SaveAsync();
-                //await GridstackJSModule.CompactAsync();
             }
             if (_prevReadonly != Readonly)
             {
@@ -113,5 +126,6 @@
     public void Dispose()
     {
         GridstackJSModule.OnChangeEvent -= OnItemChangeAsync;
+        GridstackJSModule.OnAddEvent -= OnItemAddAsync;
     }
 }

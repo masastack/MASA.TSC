@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<Gridstack Items="Panels" Id="@(ParentPanel is null ? null : ParentPanel.Id.ToString())" Readonly="!IsEdit" ItemStyle="@("border:solid #E4E8F3 1px;position:absolute;overflow:hidden;"+(IsEdit?"cursor: move;":""))">
+<Gridstack Items="Panels" Id="@(ParentPanel is null ? null : ParentPanel.Id.ToString())" Readonly="!IsEdit" Class="@Class" ItemStyle="@("border:solid #E4E8F3 1px;position:absolute;overflow:hidden;"+(IsEdit?"cursor: move;":""))">
     <ItemContent>
         @if (IsEdit)
         {
