@@ -65,14 +65,14 @@ public partial class DashboardConfiguration : IAsyncDisposable
     async Task SaveAsync()
     {
         await SavePanelsAction.Invoke(ConfigurationRecord.Panels);
-        OpenSuccessMessage(T("Save success"));
+        OpenSuccessMessage(I18n.T("Save success"));
     }
 
     async Task SwitchEdit()
     {
         if (ConfigurationRecord.IsEdit is true)
         {
-            var confirm = await OpenConfirmDialog(T("Operation confirmation"), T("Are you sure switch view mode,unsaved data will be lost"), AlertTypes.Warning);
+            var confirm = await OpenConfirmDialog(I18n.T("Operation confirmation"), I18n.Dashboard("Are you sure switch view mode,unsaved data will be lost"), AlertTypes.Warning);
             if (confirm)
             {
                 await GetPanelsAsync();

@@ -18,7 +18,7 @@
                             {
                                 <MListItem OnClick="() => AddChildPanel(context as UpsertTabsPanelDto)">
                                     <MListItemTitle>
-                                        @T("Add Panel")
+                                        @I18n.Dashboard("Add Panel")
                                     </MListItemTitle>
                                 </MListItem>
                             }
@@ -26,13 +26,13 @@
                             {
                                 <MListItem OnClick="() => ConfigurationChartPanel(context)">
                                     <MListItemTitle>
-                                        @T("Edit Panel")
+                                        @I18n.Dashboard("Edit Panel")
                                     </MListItemTitle>
                                 </MListItem>
                             }
                             <MListItem OnClick="() => RemovePanel(context)">
                                 <MListItemTitle>
-                                    @T("Remove Panel")
+                                    @I18n.Dashboard("Remove Panel")
                                 </MListItemTitle>
                             </MListItem>
                         </MList>

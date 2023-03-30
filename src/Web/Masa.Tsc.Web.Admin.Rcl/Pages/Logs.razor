@@ -3,7 +3,7 @@
 @page "/dashbord/log/{Service}/{StartTime}/{EndTime}/{LogLevel}"
 @inject I18n I18n
 
-<PageTitle>@I18n.T("Log")</PageTitle>
+<PageTitle>@I18n.Log("Log")</PageTitle>
 
 <LogPanel PageMode=true TaskId="@TaskId" StartTime="ToDateTime(StartTime)" EndTime="ToDateTime(EndTime)" Service="@Service" LogLevel="@LogLevel" />
 

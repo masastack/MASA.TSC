@@ -12,9 +12,6 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
     public TokenProvider TokenProvider { get; set; }
 
     [Inject]
-    public ILogger<TscComponentBase> Logger { get; set; }
-
-    [Inject]
     public JsInitVariables JsInitVariables { get; set; }
 
     [Inject]
@@ -23,22 +20,8 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
     [Inject]
     public TscCaller ApiCaller { get; set; }
 
-    [CascadingParameter]
+    [Inject]
     public I18n I18n { get; set; }
-
-    public string T(string key)
-    {
-        if (string.IsNullOrEmpty(key)) return key;
-        if (PageName is not null) return (I18n?.T(PageName, key, false) ?? I18n?.T(key, false))!;
-        else return I18n?.T(key, true)!;
-    }
-
-    public string T(string formatkey, params string[] args)
-    {
-        return string.Format(T(formatkey), args);
-    }
-
-    protected virtual string? PageName { get; set; }
 
     public Guid CurrentUserId { get; private set; }
 
@@ -70,7 +53,7 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
 
     public async Task<bool> OpenConfirmDialog(string content)
     {
-        return await PopupService.SimpleConfirmAsync(T("Operation confirmation"), content, AlertTypes.Error);
+        return await PopupService.SimpleConfirmAsync(I18n.T("Operation confirmation"), content, AlertTypes.Error);
     }
 
     public async Task<bool> OpenConfirmDialog(string title, string content)

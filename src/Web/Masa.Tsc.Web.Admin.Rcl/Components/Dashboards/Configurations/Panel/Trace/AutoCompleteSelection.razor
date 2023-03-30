@@ -5,7 +5,7 @@
             <MHover Context="hContext">
                 <div @attributes="hContext.Attrs" class="hover-pointer d-flex align-left">
                     <div @onclick="() => Copy(ValueFunc(Value))" @onclick:stopPropagation>
-                        <SIcon Tooltip="@T("Copy value")"
+                        <SIcon Tooltip="@I18n.T("Copy value")"
                                Color="@(_copyClicked ? "success" : "gray")"
                                Style="@(hContext.Hover ? "width: 18px; transition: 0.5s;" : "opacity:0; height: 0px; margin-left: -24px; transition: 0.4s;")">
                             @(_copyClicked ? _checkSvg : _copySvg)

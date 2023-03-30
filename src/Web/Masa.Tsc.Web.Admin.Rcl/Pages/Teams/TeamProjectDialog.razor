@@ -20,7 +20,7 @@
                             <MTooltip Top>
                                 <ActivatorContent>
                                     <MLabel @attributes="@context.Attrs" Class="regular2--text body2" Style="max-width: 200px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">
-                                        @T("APPID"):@ServiceAutoComplete!.CurrentApp?.Identity
+                                        @I18n.Team("APPID"):@ServiceAutoComplete!.CurrentApp?.Identity
                                     </MLabel>
                                 </ActivatorContent>
                                 <ChildContent>
@@ -38,7 +38,7 @@
                                 OnUpdate="OnDateTimeUpdateAsync"
                                 OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
                             <SButton OnClick=NavigateToDashboardConfiguration Class="ml-6" Small BorderRadiusClass="rounded-lg">
-                                @T("Show Detail")
+                                @I18n.T("Show Detail")
                             </SButton>
                         </MCol>
                     </MRow>
@@ -47,8 +47,8 @@
                     {
                         <MRow Class="pa-3">
                             <MCol Class="rounded-lg d-flex justify-space-between" Style="background-color:#FF5252">
-                                <div class="d-flex align-center white--text"><MIcon Class="px-4" Color="white text-#FF5252">info</MIcon> @T("Currently the application has {0} error logs",ErrorCount.ToString())</div>
-                                <MButton Depressed Color="white--text" Style="background-color:#FF5252;text-decoration:underline" OnClick="OpenLogAsync">@T("Show Detail")</MButton>
+                                    <div class="d-flex align-center white--text"><MIcon Class="px-4" Color="white text-#FF5252">info</MIcon> @string.Format(I18n.Team("Currently the application has {0} error logs"),ErrorCount.ToString())</div>
+                                    <MButton Depressed Color="white--text" Style="background-color:#FF5252;text-decoration:underline" OnClick="OpenLogAsync">@I18n.T("Show Detail")</MButton>
                             </MCol>
                         </MRow>
                     }

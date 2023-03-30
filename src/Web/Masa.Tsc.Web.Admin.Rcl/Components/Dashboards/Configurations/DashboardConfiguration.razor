@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<AutoHeight AutoStyle="@($"max-height: calc(100vh - 185px);{Style}")">
+<AutoHeight AutoStyle="@($"max-height: calc(100vh - 185px);{Style}")" Class="mt-1">
     <HeaderContent>
         <div class="d-flex mb-6 @HeaderClass" style="@HeaderStyle">
             @HeaderContent
@@ -10,7 +10,7 @@
                              ValueChanged="ServiceRelationChanged"
                              ModelType="ConfigurationRecord.ModelType" />
             <MSpacer />
-            <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"                                
+            <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
                                   OnUpdate="OnDateTimeUpdateAsync"
                                   OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
             @if (!View)
@@ -18,25 +18,25 @@
                 <MTooltip Top>
                     <ActivatorContent>
                         <div @attributes="@context.Attrs" @onclick="SwitchEdit" class="mr-6 my-auto d-flex">
-                            <MSwitch Value="ConfigurationRecord.IsEdit" Readonly TValue="bool" LeftText="@T("V")" RightText="@T("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="my-auto" />
+                            <MSwitch Value="ConfigurationRecord.IsEdit" Readonly TValue="bool" LeftText="@I18n.Dashboard("V")" RightText="@I18n.Dashboard("E")" HideDetails="@("auto")" TrackColor="white" Color="primary" Class="my-auto" />
                         </div>
                     </ActivatorContent>
                     <ChildContent>
                         @if (ConfigurationRecord.IsEdit)
                         {
-                            <span>@T("In edit mode, click to switch to view mode")</span>
+                            <span>@I18n.Dashboard("In edit mode, click to switch to view mode")</span>
                         }
                         else
                         {
-                            <span>@T("In view mode, click to switch to edit mode")</span>
+                            <span>@I18n.Dashboard("In view mode, click to switch to edit mode")</span>
                         }
                     </ChildContent>
                 </MTooltip>
                 <SButton Icon Class="mr-3 my-auto" Style="@(ConfigurationRecord.IsEdit ?"":"visibility:hidden;")" OnClick="AddPanel">
-                    <SIcon Tooltip="@T("Add Panel")" Size=28>@IconConstants.Chart</SIcon>
+                    <SIcon Tooltip="@I18n.Dashboard("Add Panel")" Size=28>@IconConstants.Chart</SIcon>
                 </SButton>
                 <SButton Icon Class="my-auto" Style="@(ConfigurationRecord.IsEdit ?"":"visibility:hidden;")" OnClick="SaveAsync">
-                    <SIcon Tooltip="@T("Save")" Size=28>@IconConstants.Save</SIcon>
+                    <SIcon Tooltip="@I18n.T("Save")" Size=28>@IconConstants.Save</SIcon>
                 </SButton>
             }
         </div>

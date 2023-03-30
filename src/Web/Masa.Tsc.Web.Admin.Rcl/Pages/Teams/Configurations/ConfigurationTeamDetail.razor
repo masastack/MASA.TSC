@@ -2,7 +2,7 @@
 @page "/teamDetail/configuration/record/{projectId}/{teamId}/{serviceName}"
 @inherits TscComponentBase
 
-<PageTitle>@T("Configure Team Detail")</PageTitle>
+<PageTitle>@I18n.TeamDashboard("Configure Team Detail")</PageTitle>
 
 <DashboardConfiguration ConfigurationRecord="ConfigurationRecord"
                         View
@@ -15,7 +15,7 @@
     <HeaderContent>
         <div class="mr-4 d-flex my-auto" style="width: 40px;height: 40px;border: 1px solid #E4E8F3;border-radius: 40px;">
             <div class="ma-auto">
-                <SIcon OnClick=NavigateToTeamProjectDialog Color="emphasis2" Size=24 Tooltip="@T("Return to team details page")">
+                <SIcon OnClick=NavigateToTeamProjectDialog Color="emphasis2" Size=24 Tooltip="@I18n.TeamDashboard("Return to team details page")">
                     mdi-arrow-left
                 </SIcon>       
             </div>

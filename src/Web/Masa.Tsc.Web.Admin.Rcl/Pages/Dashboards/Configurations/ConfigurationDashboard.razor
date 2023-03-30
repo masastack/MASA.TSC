@@ -2,6 +2,6 @@
 @page "/dashboard/configuration/record/{dashboardId}/{serviceName?}/{instanceName?}/{endpointName?}"
 @inherits TscComponentBase
 
-<PageTitle>@T("Configure Dashboard")</PageTitle>
+<PageTitle>@I18n.Dashboard("Configure Dashboard")</PageTitle>
 
 <DashboardConfiguration ConfigurationRecord="ConfigurationRecord" SavePanelsAction="SavePanelsAsync" GetPanelsAction="GetPanelsAsync" />

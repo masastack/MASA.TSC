@@ -16,4 +16,8 @@ public sealed class ElasticSearchConst
     public const string ServiceName = "Resource.service.name";
 
     public const string URL = "Attributes.http.target";
+
+    public const string LogIndex = "masa-stack-logs-0.6.1";
+
+    public const string TraceIndex = "masa-stack-traces-0.6.1";
 }

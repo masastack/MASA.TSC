@@ -81,8 +81,6 @@ public partial class Dashboard
 
     Guid CurrentFolderId { get; set; }
 
-    protected override string? PageName { get; set; } = "DashboardBlock";
-
     protected override async Task OnInitializedAsync()
     {
         await GetFoldersAsync();
@@ -94,7 +92,7 @@ public partial class Dashboard
         Loading = true;
         var result = await ApiCaller.DirectoryService.GetListAsync(Page, PageSize, Search);
         var folders = result.Result ?? new();
-        folders.ForEach(folder => 
+        folders.ForEach(folder =>
         {
             folder.IsActive = Folders.FirstOrDefault(item => item.Id == folder.Id)?.IsActive ?? false;
         });
@@ -117,11 +115,11 @@ public partial class Dashboard
 
     List<DataTableHeader<DashboardDto>> GetHeaders() => new()
     {
-        new() { Text = T(nameof(DashboardDto.Name)), Value = nameof(DashboardDto.Name), Sortable = false },
-        new() { Text = T(nameof(DashboardDto.Folder)), Value = nameof(DashboardDto.Folder), Sortable = false },
-        new() { Text = T(nameof(DashboardDto.Layer)), Value = nameof(DashboardDto.Layer), Sortable = false },
-        new() { Text = T(nameof(DashboardDto.Model)), Value = nameof(DashboardDto.Model), Sortable = false },
-        new() { Text = T("Action"), Value = "Action", Sortable = false, Align = DataTableHeaderAlign.Center, Width = "105px" },
+        new() { Text = I18n.T(nameof(DashboardDto.Name)), Value = nameof(DashboardDto.Name), Sortable = false },
+        new() { Text = I18n.T(nameof(DashboardDto.Folder)), Value = nameof(DashboardDto.Folder), Sortable = false },
+        new() { Text = I18n.T(nameof(DashboardDto.Layer)), Value = nameof(DashboardDto.Layer), Sortable = false },
+        new() { Text = I18n.T(nameof(DashboardDto.Model)), Value = nameof(DashboardDto.Model), Sortable = false },
+        new() { Text = I18n.T("Action"), Value = "Action", Sortable = false, Align = DataTableHeaderAlign.Center, Width = "105px" },
     };
 
     void OpenAddFolderDialog()
@@ -148,7 +146,7 @@ public partial class Dashboard
 
     async Task OpenRemoveDashboardDialogAsync(DashboardDto dashboard)
     {
-        var confirm = await OpenConfirmDialog(T("Delete Dashboard"), T("Are you sure delete dashboard \"{0}\"?", dashboard.Name));
+        var confirm = await OpenConfirmDialog(I18n.Dashboard("Delete Dashboard"), string.Format(I18n.Dashboard("Are you sure delete dashboard \"{0}\"?"), dashboard.Name));
         if (confirm) await RemoveDashboardAsync(dashboard.Id);
     }
 
@@ -156,14 +154,14 @@ public partial class Dashboard
     {
         Loading = true;
         await ApiCaller.InstrumentService.DeleteAsync(dashboardId);
-        OpenSuccessMessage(T("Delete dashboard data success"));
+        OpenSuccessMessage(I18n.Dashboard("Delete dashboard data success"));
         await GetFoldersAsync();
         Loading = false;
     }
 
     async Task OpenRemoveFolderDialogAsync(FolderDto folder)
     {
-        var confirm = await OpenConfirmDialog(T("Delete Folder"), T("Are you sure delete folder \"{0}\"?", folder.Name));
+        var confirm = await OpenConfirmDialog(I18n.Dashboard("Delete Folder"), string.Format(I18n.Dashboard("Are you sure delete folder \"{0}\"?"), folder.Name));
         if (confirm) await RemoveFolderAsync(folder.Id);
     }
 
@@ -171,7 +169,7 @@ public partial class Dashboard
     {
         Loading = true;
         await ApiCaller.DirectoryService.DeleteAsync(folderId);
-        OpenSuccessMessage(T("Delete folder data success"));
+        OpenSuccessMessage(I18n.Dashboard("Delete folder data success"));
         await GetFoldersAsync();
         Loading = false;
     }

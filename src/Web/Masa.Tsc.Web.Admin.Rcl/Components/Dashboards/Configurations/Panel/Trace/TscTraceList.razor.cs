@@ -45,11 +45,11 @@ public partial class TscTraceList : TscComponentBase
 
     private List<DataTableHeader<TraceResponseDto>> _headers => new()
     {
-        new() { Text = T("Service"), Value = "Service", Sortable = false,Width=250},
-        new() { Text = T("TraceId"), Value = "TraceId", Sortable = false },
-        new() { Text = T("Endpoint"), Value = "Endpoint", Sortable = false },
-        new() { Text = $"{T("Duration")}", Value = "Duration", Sortable = false,Width=150},
-        new() { Text = T("Timestamp"), Value = "Timestamp", Sortable = true,Width=200}
+        new() { Text = I18n.T("Service"), Value = "Service", Sortable = false,Width=250},
+        new() { Text = I18n.Trace("TraceId"), Value = "TraceId", Sortable = false },
+        new() { Text = I18n.T("Endpoint"), Value = "Endpoint", Sortable = false },
+        new() { Text = $"{ I18n.Trace("Duration")}", Value = "Duration", Sortable = false,Width=150},
+        new() { Text = I18n.Trace("Timestamp"), Value = "Timestamp", Sortable = true,Width=200}
     };
 
     protected override void OnParametersSet()

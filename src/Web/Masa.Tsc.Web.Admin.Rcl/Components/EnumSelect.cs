@@ -5,7 +5,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public class EnumSelect<TValue> : SSelect<KeyValuePair<string, TValue>, TValue, TValue> where TValue : struct, Enum
 {
-    [CascadingParameter]
+    [Inject]
     public I18n I18N { get; set; } = default!;
 
     public override async Task SetParametersAsync(ParameterView parameters)

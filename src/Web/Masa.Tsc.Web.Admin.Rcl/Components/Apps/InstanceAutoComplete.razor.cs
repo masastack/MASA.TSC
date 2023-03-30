@@ -40,7 +40,7 @@ public partial class InstanceAutoComplete
             Instances = new();
             if (IncludeAll)
             {
-                Instances.Add(new("All", T("All")));
+                Instances.Add(new("All", I18n.T("All")));
             }
             Instances.TryAddRange(data?.ToDictionary(item => item, item => item) ?? new());
             if (Instances.Any())

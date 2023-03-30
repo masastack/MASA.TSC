@@ -18,8 +18,6 @@ public partial class AddFloderDialog
 
     private AddFolderDto Folder { get; set; } = new();
 
-    protected override string? PageName { get; set; } = "DashboardBlock";
-
     private async Task UpdateVisible(bool visible)
     {
         if (VisibleChanged.HasDelegate)
@@ -46,7 +44,7 @@ public partial class AddFloderDialog
         if (success)
         {
             await ApiCaller.DirectoryService.AddAsync(Folder);
-            OpenSuccessMessage(T("Add folder data success"));
+            OpenSuccessMessage(I18n.Dashboard( "Add folder data success"));
             await UpdateVisible(false);
             await OnSubmitSuccess.InvokeAsync();
         }
