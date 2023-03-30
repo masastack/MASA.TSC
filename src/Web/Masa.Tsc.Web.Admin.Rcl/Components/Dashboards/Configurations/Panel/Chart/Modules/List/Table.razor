@@ -1,6 +1,6 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 
-<MCard MinHeight="410" Class="@(Class +"d-flex flex-column")">
+<MCard MinHeight="410" Class="@($"{Class} d-flex flex-column")">
     <MCardTitle Class="d-flex justify-space-between">
         <MLabel Class="emphasis2--text h6" Style="@(string.IsNullOrEmpty(Value.Title)?"display:none":"")">@Value.Title</MLabel>
         <MTooltip Top>
@@ -129,16 +129,19 @@
         if (Value.ListType is ListTypes.ServiceList)
         {
             var service = dessert.Text;
-            NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, ConfigurationRecord.Service, service);
+            ConfigurationRecord.Service = service;
+            NavigationManager.NavigateToDashboardConfiguration(dessert.JumpId, service);
         }
         else if (Value.ListType is ListTypes.InstanceList)
         {
             var instance = dessert.Text;
+            ConfigurationRecord.Instance = instance;
             NavigationManager.NavigateToDashboardConfiguration(dashboard, ConfigurationRecord.Service, instance);
         }
         else if (Value.ListType is ListTypes.EndpointList)
         {
             var endpoint = dessert.Text;
+            ConfigurationRecord.Endpoint = endpoint;
             NavigationManager.NavigateToDashboardConfiguration(dashboard, ConfigurationRecord.Service, ConfigurationRecord.Instance, endpoint);
         }
     }
