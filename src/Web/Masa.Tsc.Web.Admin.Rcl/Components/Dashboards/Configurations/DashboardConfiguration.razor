@@ -53,6 +53,10 @@
                     {
                         <PanelGrids Panels="ConfigurationRecord.Panels" />
                     }
+                    else if (!ConfigurationRecord.IsEdit)
+                    {
+                        <SEmptyPlaceholder />
+                    }
                 </div>
             </CascadingValue>
         </DefaultCard>
