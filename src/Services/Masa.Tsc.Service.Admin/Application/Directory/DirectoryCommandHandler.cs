@@ -15,7 +15,7 @@ public class DirectoryCommandHandler
     [EventHandler]
     public async Task AddAsync(AddDirectoryCommand command)
     {
-        if (await _directoryRepository.ToQueryable().AnyAsync(t => t.UserId == command.UserId && t.Name == command.Name))
+        if (await _directoryRepository.GetCountAsync(t => (t.UserId == Guid.Empty || t.UserId == command.UserId) && t.Name == command.Name) > 0)
             throw new UserFriendlyException($"Directory name \"{command.Name}\" is exists");
 
         await _directoryRepository.AddAsync(new Domain.Aggregates.Directory
@@ -33,8 +33,11 @@ public class DirectoryCommandHandler
         if (directory == null)
             throw new UserFriendlyException($"Directory \"{command.Id}\" is not exists");
 
-        //if (directory.UserId != command.UserId)
-        //    throw new UserFriendlyException($"No permission");
+        if (directory.UserId == Guid.Empty || directory.UserId != command.UserId)
+            throw new UserFriendlyException($"No permission");
+
+        if (await _directoryRepository.GetCountAsync(t => (t.UserId == Guid.Empty || t.UserId == command.UserId) && t.Id != directory.Id && t.Name == command.Name) > 0)
+            throw new UserFriendlyException($"Directory name \"{command.Name}\" is exists");
 
         directory.Update(command.Name);
         await _directoryRepository.UpdateAsync(directory);
@@ -48,8 +51,9 @@ public class DirectoryCommandHandler
             return;
         if (directory.Instruments != null && directory.Instruments.Any())
             throw new UserFriendlyException($"directory {directory.Name} contains instruments");
-        //if (directory.UserId != command.UserId)
-        //    throw new UserFriendlyException($"No permission");
+
+        if (directory.UserId == Guid.Empty || directory.UserId != command.UserId)
+            throw new UserFriendlyException($"No permission");
 
         await _directoryRepository.RemoveAsync(directory);
     }
