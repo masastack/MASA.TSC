@@ -41,7 +41,7 @@ public class TscGridstackJSModule : IAsyncDisposable
     public async ValueTask ReloadAsync()
     {
         var helper = await GetJSObjectReference();
-        await helper.InvokeVoidAsync("reload", _options, _dotNetObjectReference);
+        await helper.InvokeVoidAsync("reload", _options);
     }
 
     public async ValueTask MakeWidgetsAsync(IEnumerable<string> elementIds)
@@ -54,6 +54,12 @@ public class TscGridstackJSModule : IAsyncDisposable
     {
         var helper = await GetJSObjectReference();
         await helper.InvokeVoidAsync("destroy", _options, destoryDom);
+    }
+
+    public async ValueTask RemoveAllAsync(bool destoryDom)
+    {
+        var helper = await GetJSObjectReference();
+        await helper.InvokeVoidAsync("removeAll", _options, destoryDom);
     }
 
     public async ValueTask CompactAsync()

@@ -20,6 +20,7 @@
 
 @code {
     string? _prevItemKeys;
+    //List<Guid> _prevItemKeys = new();
     bool _prevReadonly;
     bool _lodaing;
 
@@ -78,6 +79,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        /*mode 1*/
         if (firstRender)
         {
             _prevItemKeys = string.Join(',', Items.Select(item => item.Id));
@@ -85,12 +87,6 @@
         }
         else
         {
-            //var excepts = Items.ExceptBy(_prevItemKeys, item => item.Id.ToString()).Select(item => item.Id.ToString());
-            //_prevItemKeys = Items.Select(item => item.Id.ToString()).ToList();
-            //if (excepts.Any())
-            //{
-            //    await GridstackJSModule.MakeWidgetsAsync(excepts);
-            //}
             var itemKeys = string.Join(',', Items.Select(item => item.Id));
             if (_prevItemKeys != itemKeys)
             {
@@ -104,6 +100,33 @@
                 await GridstackJSModule.SwitchStateAsync(!Readonly);
             }
         }
+
+        /*mode 2*/
+        //if (firstRender)
+        //{
+        //    _prevItemKeys = Items.Select(item => item.Id).ToList();
+        //    await GridstackJSModule.InitAsync(Options);
+        //}
+        //else
+        //{
+        //    var adds = Items.ExceptBy(_prevItemKeys, item => item.Id).Select(item => item.Id);
+        //    var removes = _prevItemKeys.Except(Items.Select(item => item.Id));
+        //    _prevItemKeys = Items.Select(item => item.Id).ToList();
+        //    if (adds.Any())
+        //    {
+        //        await GridstackJSModule.MakeWidgetsAsync(adds.Select(id => id.ToString()));
+        //    }
+        //    if(removes.Any())
+        //    {
+        //        await GridstackJSModule.MakeWidgetsAsync(adds.Select(id => id.ToString()));
+        //    }
+        //}
+        //var excepts = Items.ExceptBy(_prevItemKeys, item => item.Id.ToString()).Select(item => item.Id.ToString());
+        //_prevItemKeys = Items.Select(item => item.Id.ToString()).ToList();
+        //if (excepts.Any())
+        //{
+        //    await GridstackJSModule.MakeWidgetsAsync(excepts);
+        //}
     }
 
     public void Dispose()

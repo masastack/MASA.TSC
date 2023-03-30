@@ -377,7 +377,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         PropertyNameCaseInsensitive = true
     };
 
-    public UpsertChartPanelDto(Guid id)
+    public UpsertChartPanelDto(Guid id) : base()
     {
         Id = id;
         Metrics = new()

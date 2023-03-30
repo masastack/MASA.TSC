@@ -13,7 +13,7 @@ public class UpsertTabsPanelDto : UpsertPanelDto
         set => _currentTabItem = value;
     }
 
-    public UpsertTabsPanelDto(Guid id)
+    public UpsertTabsPanelDto(Guid id):base()
     {
         Id = id;
         PanelType = PanelTypes.Tabs;

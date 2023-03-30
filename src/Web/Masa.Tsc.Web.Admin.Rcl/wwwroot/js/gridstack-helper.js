@@ -1,20 +1,24 @@
-function getElement(options) {
-    return document.getElementById(options.id);
-}
-
 export function init(options, dotNetHelper) {
     var el = getElement(options);
-    var grid = GridStack.init(options, el);
-    grid.on('change', function (e, items) {
-        dotNetHelper.invokeMethodAsync('OnChange', {
-            id: items[0].el.id,
-            x: items[0].x,
-            y: items[0].y,
-            width: items[0].w,
-            height: items[0].h,
+    if (el.gridstack?.engine) {
+        el.gridstack.destroy(false);
+        initByElement(options, el, dotNetHelper);
+        var els = el.querySelectorAll('.grid-stack');
+        els.forEach(el => {
+            try {
+                el.gridstack?.destroy(false);
+            }
+            catch (error) {
+
+            }
         });
-    });
-    return grid;
+        els.forEach(el => {
+            initByElement(options, el, dotNetHelper);
+        });
+    }
+    else initByElement(options, el, dotNetHelper);
+
+    return el.gridstack;
 }
 
 export function initAll(options, dotNetHelper) {
@@ -32,30 +36,19 @@ export function initAll(options, dotNetHelper) {
     });
 }
 
-export function reload(options, dotNetHelper) {
-    destroy(options,false);
-    var els = document.getElementsByClassName('grid-stack');
-    els.forEach(el =>
+export function reload(options) {
+    var el = getElement(options);
+    el.gridstack.removeAll(false);
+    var childs = el.querySelectorAll(':scope > .grid-stack-item');
+    childs.forEach(child =>
     {
-        try {
-            el.gridstack?.destroy(false);
-        }
-        catch (error) {
+        el.gridstack.makeWidget(child);
+    });
+}
 
-        }
-    });
-    els.forEach(el => {
-        var grid = GridStack.init(options, el);
-        grid.on('change', function (e, items) {
-            dotNetHelper.invokeMethodAsync('OnChange', {
-                id: items[0].el.id,
-                x: items[0].x,
-                y: items[0].y,
-                width: items[0].w,
-                height: items[0].h,
-            });
-        });
-    });
+export function removeAll(options, destroyDom) {
+    var grid = getElement(options).gridstack;
+    grid.removeAll(destroyDom);
 }
 
 export function makeWidgets(options, elementIds) {
@@ -79,4 +72,21 @@ export function switchState(options, state) {
     var grid = getElement(options).gridstack;
     grid.enableMove(state);
     grid.enableResize(state);
+}
+
+function initByElement(options, el, dotNetHelper) {
+    var grid = GridStack.init(options, el);
+    grid.on('change', function (e, items) {
+        dotNetHelper.invokeMethodAsync('OnChange', {
+            id: items[0].el.id,
+            x: items[0].x,
+            y: items[0].y,
+            width: items[0].w,
+            height: items[0].h,
+        });
+    });
+}
+
+function getElement(options) {
+    return document.getElementById(options.id);
 }
