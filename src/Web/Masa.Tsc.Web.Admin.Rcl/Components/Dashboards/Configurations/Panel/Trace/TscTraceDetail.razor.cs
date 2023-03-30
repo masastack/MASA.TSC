@@ -41,6 +41,26 @@ public partial class TscTraceDetail
         }
     }
 
+    private List<double> NumberSplit(double number)
+    {
+        List<double> sections = new();
+
+        var steps = 5d;
+        var step = Math.Ceiling(number / steps);
+
+        for (int i = 1; i < steps; i++)
+        {
+            var curNumber = step * i;
+
+            if (curNumber >= number)
+                break;
+
+            sections.Add(step * i);
+        }
+
+        return sections;
+    }
+
     private async Task QueryTraceDetailAndToTree(string traceId)
     {
         var data = await ApiCaller.TraceService.GetAsync(traceId);

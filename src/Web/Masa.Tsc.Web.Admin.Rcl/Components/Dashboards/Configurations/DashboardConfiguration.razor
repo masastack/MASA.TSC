@@ -49,7 +49,14 @@
         <DefaultCard Class="full-height pa-3">
             <CascadingValue Value="ConfigurationRecord" IsFixed>
                 <div id="@_scrollElementId" style="overflow-y:auto;overflow-x:hidden;" class="full-height">
-                    @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady) && _timeRangeReady)
+                    @if (!ConfigurationRecord.Panels.Any())
+                    {
+                        if (!ConfigurationRecord.IsEdit)
+                        {
+                            <SEmptyPlaceholder />
+                        }
+                    }
+                    else @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady) && _timeRangeReady)
                     {
                         <PanelGrids Panels="ConfigurationRecord.Panels" />
                     }

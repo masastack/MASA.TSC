@@ -53,17 +53,16 @@
 
                 @if (_rootTreeItem is not null)
                 {
-                    var scale = Math.Ceiling(_rootTreeItem.Duration / 5d);
+                    var sections = NumberSplit(_rootTreeItem.DoubleDuration);
+                    var avgPercentage = 100.0 / (sections.Count + 1);
 
                     <div class="trace-timelines-view">
                         <div class="trace-timelines-view__line">
                             <div class="trace-timelines-view__line-item body2" style="left: 0;">0</div>
-                            @if (_rootTreeItem.Duration >= 5)
+                            @for (var i = 0; i < sections.Count; i++)
                             {
-                                <div class="trace-timelines-view__line-item body2" style="left: 20%;">@(FormatDuration(scale * 1))</div>
-                                <div class="trace-timelines-view__line-item body2" style="left: 40%;">@(FormatDuration(scale * 2))</div>
-                                <div class="trace-timelines-view__line-item body2" style="left: 60%;">@(FormatDuration(scale * 3))</div>
-                                <div class="trace-timelines-view__line-item body2" style="left: 80%;">@(FormatDuration(scale * 4))</div>
+                                var left = avgPercentage * (i + 1);
+                                <div class="trace-timelines-view__line-item body2" style="left: @(left)%;">@(FormatDuration(sections[i]))</div>
                             }
                             <div class="trace-timelines-view__line-item body2" style="right: 0;">@FormatDuration(_rootTreeItem.DoubleDuration)</div>
                         </div>
