@@ -128,9 +128,9 @@ public class InstrumentQueryHandler
                 type = ModelTypes.ServiceInstance;
             else
                 type = ModelTypes.Endpoint;
-            var instrument = await _instrumentRepository.ToQueryable().Where(item => item.Model == type.ToString("G") && item.Layer == query.Layer).OrderBy(item => item.CreationTime).FirstOrDefaultAsync();
+            var instrument = (await _instrumentRepository.GetListAsync(item => item.Model == type.ToString("G") && item.Layer == query.Layer)).OrderBy(item => item.CreationTime).FirstOrDefault();
             if (instrument == null)
-                instrument = await _instrumentRepository.ToQueryable().Where(item => item.Model == type.ToString("G") && item.Layer == MetricConstants.DEFAULT_LAYER).OrderBy(item => item.CreationTime).FirstOrDefaultAsync();
+                instrument = (await _instrumentRepository.GetListAsync(item => item.Model == type.ToString("G") && item.Layer == MetricConstants.DEFAULT_LAYER)).OrderBy(item => item.CreationTime).FirstOrDefault();
             query.Result = new LinkResultDto { InstrumentId = instrument?.Id };
         }
         else

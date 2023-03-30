@@ -58,7 +58,7 @@ public class DirectoryQueryHandler
     [EventHandler]
     public async Task GetTreeAsync(DirectoryTreeQuery query)
     {
-        var list = await _directoryRepository.ToQueryable().Where(t => t.UserId == Guid.Empty || t.UserId == query.UserId).ToListAsync();
+        var list = (await _directoryRepository.GetListAsync(t => t.UserId == Guid.Empty || t.UserId == query.UserId)).ToList();
         if (list == null || !list.Any())
         {
             query.Result = Array.Empty<DirectoryTreeDto>();
@@ -68,7 +68,7 @@ public class DirectoryQueryHandler
         query.Result = ToTree(list, Guid.Empty);
         if (query.IsContainsInstrument)
         {
-            var instruments = await _instrumentRepository.ToQueryable().Where(t => t.Creator == Guid.Empty || t.Creator == query.UserId).ToListAsync();
+            var instruments = (await _instrumentRepository.GetListAsync(t => t.Creator == Guid.Empty || t.Creator == query.UserId)).ToList();
             if (instruments != null && instruments.Any())
             {
                 var dic = instruments.GroupBy(item => item.DirectoryId).Select(item => new
