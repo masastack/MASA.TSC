@@ -2,18 +2,18 @@
 
 <MRow>
     <MCol Md="12" Class="d-flex">
-        <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"                             
+        <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
                               OnUpdate="OnDateTimeUpdateAsync"
                               OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
         <MSpacer />
         <SButton Icon OnClick="GetGetMetricsAsync">
-            <SIcon Tooltip="@T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon>
+            <SIcon Tooltip="@I18n.T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon>
         </SButton>
         <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg" OnClick="Cancel">
-            @T("Cancel")
+            @I18n.T("Cancel")
         </SButton>
         <SButton Small BorderRadiusClass="rounded-lg" OnClick="() => NavigateToPanelConfigurationPageAsync()">
-            @T("Apply")
+            @I18n.T("Apply")
         </SButton>
     </MCol>
     <MCol Cols="8">
@@ -30,7 +30,7 @@
                         @if (ConfigurationRecord.ModelType is not ModelTypes.All)
                         {
                             <MCol Md="4">
-                                <ServiceAutoComplete Label="@T("Project")" Readonly Value="@ConfigurationRecord.Service" />
+                                <ServiceAutoComplete Label="@I18n.Dashboard("Project")" Readonly Value="@ConfigurationRecord.Service" />
                             </MCol>
                             <MCol Md="8">
                                 <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
@@ -72,7 +72,7 @@
                                         <MCardText>
                                             <MRow>
                                                 <MCol Md="12">
-                                                    <STextField BackgroundColor="white" DebounceInterval="500" TValue="string" Value="Value.Metrics[0].DisplayName" ValueChanged="value => MetricNameChanged(Value.Metrics[0],value) " Label="@T("Metric name")" />
+                                                    <STextField BackgroundColor="white" DebounceInterval="500" TValue="string" Value="Value.Metrics[0].DisplayName" ValueChanged="value => MetricNameChanged(Value.Metrics[0],value) " Label="@I18n.Dashboard("Metric name")" />
                                                 </MCol>
                                                 <MCol Md="12">
                                                     <MetricsExpression Value="Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value)" />
@@ -94,7 +94,7 @@
                                             <MCardText>
                                                 <MRow>
                                                     <MCol Md="12">
-                                                        <STextField BackgroundColor="white" Value="@item.DisplayName" TValue="string" ValueChanged="value => MetricNameChanged(item,value)" DebounceInterval="500" Label="@(Value.ChartType is ChartTypes.Table ?T("Column name"):T("Metrics name"))" />
+                                                        <STextField BackgroundColor="white" Value="@item.DisplayName" TValue="string" ValueChanged="value => MetricNameChanged(item,value)" DebounceInterval="500" Label="@I18n.Dashboard(Value.ChartType is ChartTypes.Table?"Column name":"Metrics name")" />
                                                     </MCol>
                                                     <MCol Md="12">
                                                         <MetricsExpression Value="@item.Expression" ValueChanged="async value => await MetricExpressionChangedAsync(item,value)" />
@@ -102,10 +102,10 @@
                                                     @if (Value.ChartType is ChartTypes.Table)
                                                     {
                                                         <MCol Md="12">
-                                                            <STextField BackgroundColor="white" @bind-Value="item.Icon" Label="@T("Icon")" />
+                                                            <STextField BackgroundColor="white" @bind-Value="item.Icon" Label="@I18n.T("Icon")" />
                                                         </MCol>
                                                         <MCol Md="12">
-                                                            <STextField BackgroundColor="white" @bind-Value="item.Unit" Label="@T("Unit")" />
+                                                            <STextField BackgroundColor="white" @bind-Value="item.Unit" Label="@I18n.T("Unit")" />
                                                         </MCol>
                                                     }
                                                 </MRow>

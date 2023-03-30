@@ -18,8 +18,6 @@ public partial class TeamProjectDialog
     [Parameter]
     public EventCallback<bool> VisibleChanged { get; set; }
 
-    protected override string? PageName => "Team";
-
     [Parameter]
     public TeamDetailConfigurationRecord ConfigurationRecord { get; set; }
 

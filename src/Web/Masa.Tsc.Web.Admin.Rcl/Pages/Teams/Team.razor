@@ -1,7 +1,7 @@
 ﻿@page "/team"
 @inherits TscComponentBase
 
-<PageTitle>@T("ProjectTeam")</PageTitle>
+<PageTitle>@I18n.Team("ProjectTeam")</PageTitle>
 
 <div class="d-flex align-center" style="overflow:auto;">
     <div class="flex-grow-1" style="min-width:220px;width:calc(100% - 750 px)">
@@ -27,14 +27,14 @@
         else
         {
             var _viewProjects = GetProjectViewData();
-            if (_viewProjects == null || !_viewProjects.Any())
+            if (_projects == null || !_projects.Any())
             {
                 <NoData />
             }
             else
             {
                 <MCol Style="min-width:220px">
-                    <HoneyCombGridItem Data="GetProjectViewData()" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor" TItem="ProjectOverviewDto">
+                    <HoneyCombGridItem Data="_viewProjects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor" TItem="ProjectOverviewDto">
                         <CellBack>
                             <div class="d-flex flex-column align-center pt-7">
                                 <span class="d-inline-block text-truncate masa btn body @GetHexTitleClass(context.Status)" style="width:120px;">@context.Name</span>
@@ -68,10 +68,10 @@
                             <div style="min-height:150px;background-color:transparent;">
                                 <MCard Class="emphasis2" Style="border-bottom-left-radius:20px;border-bottom-right-radius:20px;min-width:240px;max-width:300px;">
                                     <MCardText Class="d-flex flex-column white--text masa body">
-                                        <span>@T("Project name")：@context.Name</span>
+                                        <span>@I18n.Team("Project name")：@context.Name</span>
                                         <span>ID：@context.Id</span>
-                                        <span>@T("Application count")：@context.Apps.Count</span>
-                                        <p>@T("Description")：@context.Description</p>
+                                        <span>@I18n.Team("Application count")：@context.Apps.Count</span>
+                                        <p>@I18n.T("Description")：@context.Description</p>
                                     </MCardText>
                                 </MCard>
                                 <div class="d-flex justify-center" style="margin-top: -10px;margin-bottom:10px;">

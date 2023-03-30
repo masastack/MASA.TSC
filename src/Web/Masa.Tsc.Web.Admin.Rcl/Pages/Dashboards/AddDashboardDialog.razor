@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<DefaultDialog Value=Visible ValueChanged=UpdateVisible Title="@T("Add dashboard")">
+<DefaultDialog Value=Visible ValueChanged=UpdateVisible Title="@I18n.Dashboard("Add dashboard")">
     <ChildContent>
         <MForm @ref="Form" Model=Dashboard EnableValidation EnableI18n>
             <STextField Required @bind-Value="@Dashboard.Name" Class="mb-6" />
@@ -12,9 +12,9 @@
     </ChildContent>
     <FooterContent>
         <div class="d-flex">
-            <SCheckbox @bind-Value="Dashboard.IsRoot" Label="@T("Set as root")" Class="my-auto" Style="display:none" />
+            <SCheckbox @bind-Value="Dashboard.IsRoot" Label="@I18n.Dashboard("Set as root")" Class="my-auto" Style="display:none" />
             <MSpacer />
-            <SButton Large OnClick="AddFolderAsync" Width="140" Style="min-width:140px !important;" Class="my-auto">@T("Save")</SButton>
+            <SButton Large OnClick="AddFolderAsync" Width="140" Style="min-width:140px !important;" Class="my-auto">@I18n.T("Save")</SButton>
         </div>       
     </FooterContent>
 </DefaultDialog>

@@ -21,8 +21,6 @@ public partial class UpdateFolderDialog
 
     private UpdateFolderDto Folder { get; set; } = new();
 
-    protected override string? PageName { get; set; } = "DashboardBlock";
-
     protected override async Task OnParametersSetAsync()
     {
         if (Visible)
@@ -54,7 +52,7 @@ public partial class UpdateFolderDialog
         if (success)
         {
             await ApiCaller.DirectoryService.UpdateAsync(Folder);
-            OpenSuccessMessage(T("Update folder data success"));
+            OpenSuccessMessage(I18n.Dashboard("Update folder data success"));
             await UpdateVisible(false);
             await OnSubmitSuccess.InvokeAsync();
         }

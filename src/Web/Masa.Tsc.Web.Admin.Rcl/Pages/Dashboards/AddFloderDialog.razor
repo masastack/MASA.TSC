@@ -1,12 +1,12 @@
 ﻿@inherits TscComponentBase
 
-<DefaultDialog Value=Visible ValueChanged=UpdateVisible Title="@T("Add folder")">
+<DefaultDialog Value=Visible ValueChanged=UpdateVisible Title="@I18n.Dashboard("Add folder")">
     <ChildContent>
         <MForm @ref="Form" Model=Folder EnableValidation EnableI18n>
             <STextField Required @bind-Value="@Folder.Name" />
         </MForm>
     </ChildContent>
     <FooterContent>
-        <SButton Large OnClick="AddFolderAsync">@T("Save")</SButton>
+        <SButton Large OnClick="AddFolderAsync">@I18n.T("Save")</SButton>
     </FooterContent>
 </DefaultDialog>

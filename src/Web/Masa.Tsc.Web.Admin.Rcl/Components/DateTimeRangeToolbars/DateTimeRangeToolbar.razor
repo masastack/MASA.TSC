@@ -14,7 +14,7 @@
 
     <Dropdown @bind-Value="_selectedQuickRangeKey"
               Items="_quickRangeItems"
-              ItemText="item => I18n.T(item.Key.ToString())"
+              ItemText="item => I18n.DateTimeRange(item.Key.ToString())"
               ItemValue="item => item.Key"
               ItemDisabled="item => item.Disabled"
               TItem="QuickRange"
@@ -24,7 +24,7 @@
               NudgeBottom="@((StringNumber)8)" Class="text-capitalize">
         <ActivatorContent>
             <MButton Small @attributes="@context.Attrs" Text Class="text-capitalize">
-                @I18n.T(_selectedQuickRangeKey.ToString())
+                @I18n.DateTimeRange(_selectedQuickRangeKey.ToString())
                 <MIcon Right>mdi-menu-down</MIcon>
             </MButton>
         </ActivatorContent>
@@ -34,7 +34,7 @@
 
     <Dropdown Items="IntervalItem.Items"
               ItemValue="item => item"
-              ItemText="item => I18n.T(item.Text)"
+              ItemText="item => I18n.DateTimeRange(item.Text)"
               @bind-Value="Interval"
               TItem="IntervalItem"
               TValue="IntervalItem"
@@ -49,7 +49,7 @@
                 var exists = Interval is not null;
                 <MButton Text Small Icon="!exists"
                          @attributes="@context.Attrs">
-                    <span class="mr-1">@I18n.T(Interval?.Text)</span>
+                    <span class="mr-1">@I18n.DateTimeRange(Interval?.Text!)</span>
                     <MIcon Small Right="@exists">mdi-menu-down</MIcon>
                 </MButton>
             }

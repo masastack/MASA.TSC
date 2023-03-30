@@ -21,8 +21,6 @@ public partial class UpdateDashboardDialog
 
     private UpdateDashboardDto Dashboard { get; set; } = new();
 
-    protected override string? PageName { get; set; } = "DashboardBlock";
-
     protected override async Task OnParametersSetAsync()
     {
         if (Visible)
@@ -54,7 +52,7 @@ public partial class UpdateDashboardDialog
         if (success)
         {
             await ApiCaller.InstrumentService.UpdateAsync(Dashboard);
-            OpenSuccessMessage(T("Update dashboard data success"));
+            OpenSuccessMessage(I18n.Dashboard("Update dashboard data success"));
             await UpdateVisible(false);
             await OnSubmitSuccess.InvokeAsync(Dashboard);
         }

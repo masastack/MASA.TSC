@@ -6,8 +6,8 @@
             <SAutoComplete Value="Value"
                            ValueChanged="ValueChanged"
                            ValueExpression="ValueExpression"
-                           Label="@T("Metrics expression")"
-                           Placeholder="@T("Please select metrics expression")"
+                           Label="@I18n.Dashboard("Metrics expression")"
+                           Placeholder="@I18n.Dashboard("Please select metrics expression")"
                            AutoLabel=false
                            Required
                            BackgroundColor="white"
@@ -19,9 +19,9 @@
             <STextField Value="Value"
                         ValueChanged="ValueChanged"
                         ValueExpression="ValueExpression"
-                        Label="@T("Metrics expression")"
+                        Label="@I18n.Dashboard("Metrics expression")"
                         AutoLabel=false
-                        Placeholder="@T("Please enter metrics expression")"
+                        Placeholder="@I18n.Dashboard("Please enter metrics expression")"
                         BackgroundColor="white"
                         Class="full-width"
                         Required
@@ -41,7 +41,7 @@
     </div>
     <div style="@(_autocomplete ? "display:none;":"width:20px; padding-left:10px;")">
         <a href="https://docs.masastack.com/stack/tsc/introduce" target="_blank">
-            <SIcon Tooltip="@T("Clike me view metrics expression docs")">
+                <SIcon Tooltip="@I18n.Dashboard("Clike me view metrics expression docs")">
                 mdi-help-circle-outline
             </SIcon>
         </a>

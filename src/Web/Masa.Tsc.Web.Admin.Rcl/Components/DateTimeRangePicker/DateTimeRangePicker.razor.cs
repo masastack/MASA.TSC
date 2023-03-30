@@ -255,9 +255,7 @@ public partial class DateTimeRangePicker
 
     private string FormatDateTime(DateTimeOffset dateTime)
     {
-        return dateTime.ToString(T("$DateTimeFormat"));
-        //var lastIndex = str.LastIndexOf(" ", StringComparison.Ordinal);
-        //return str[..lastIndex];
+        return dateTime.ToString(I18n?.T("$DateTimeFormat"));
     }
 
     private TimeZoneInfo GetSelectTimeZone()
