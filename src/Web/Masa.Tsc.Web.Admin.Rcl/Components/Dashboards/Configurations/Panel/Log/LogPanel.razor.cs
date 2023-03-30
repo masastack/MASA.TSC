@@ -217,7 +217,7 @@ public partial class LogPanel
             },
             legend = new
             {
-                data = new[] { "Log Count" },
+                data = new[] { I18n.Log("Log Count") },
                 bottom = true
             },
             xAxis = new[]
@@ -236,15 +236,14 @@ public partial class LogPanel
             {
                 new
                 {
-                    type = "value",
-                    //name = $"span({T("Total Count")})"
+                    type = "value"
                 },
             },
             series = new[]
             {
                 new
                 {
-                    name = "Log Count" ,
+                    name = I18n.Log("Log Count") ,
                     type = "bar",
                     yAxisIndex = 0,
                     data =(object)durations,
@@ -268,53 +267,5 @@ public partial class LogPanel
                 bottom = 50
             }
         };
-
-        //return new
-        //{
-        //    tooltip = new
-        //    {
-        //        trigger = "axis",
-        //        axisPointer = new
-        //        {
-        //            type = "cross",
-        //            crossStyle = new { color = "#A18BFF66" }
-        //        }
-        //    },
-        //    xAxis = new
-        //    {
-        //        type = "category",
-        //        data = xAxisData,
-        //        axisPointer = new
-        //        {
-        //            type = "shadow"
-        //        }
-        //    },
-        //    yAxis = new
-        //    {
-        //        name = T("Total Count"),
-        //        type = "value"
-        //    },
-        //    series = new[]
-        //     {
-        //        new
-        //        {
-        //            type = "bar",
-        //            yAxisIndex = 0,
-        //            data = (object)durations,
-        //            itemStyle = new
-        //            {
-        //                color = "#4318FF"
-        //            },
-        //            smooth = false
-        //        }
-        //    },
-        //    grid = new
-        //    {
-        //        top = 30,
-        //        left = 80,
-        //        right = 20,
-        //        bottom = 40
-        //    }
-        //};
     }
 }

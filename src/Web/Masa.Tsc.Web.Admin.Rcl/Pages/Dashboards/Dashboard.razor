@@ -1,7 +1,7 @@
 ﻿@page "/dashboard"
 @inherits TscComponentBase
 
-<PageTitle>@T("Dashboard")</PageTitle>
+<PageTitle>@I18n.Dashboard("Dashboard")</PageTitle>
 
 <AutoHeight>
     <HeaderContent>
@@ -17,13 +17,13 @@
             @if (Mode is ModeTypes.Folder)
             {
                 <MButton Depressed Text Outlined Class="mr-6 my-auto regular--text body2 white" OnClick="() => ExpandAll = !ExpandAll">
-                    @(ExpandAll ? T("Close all") : T("Expend all"))
+                    @I18n.Dashboard( ExpandAll ? "Close all" : "Expend all")
                 </MButton>
             }
             <SearchTextField @bind-Value="Search" Clearable FillBackground=false Class="my-auto" Style="flex:none;width: 300px !important;" />
             <MSpacer />
-            <SButton OnClick="OpenAddFolderDialog" Small Class="mr-6 my-auto" Style="min-width:108px !important;">@T("Add folder")</SButton>
-            <SButton OnClick="OpenAddDashboardDialog" Small Class="my-auto" Style="min-width:140px !important;">@T("Add dashboard")</SButton>
+            <SButton OnClick="OpenAddFolderDialog" Small Class="mr-6 my-auto" Style="min-width:108px !important;">@I18n.Dashboard("Add folder")</SButton>
+            <SButton OnClick="OpenAddDashboardDialog" Small Class="my-auto" Style="min-width:140px !important;">@I18n.Dashboard("Add dashboard")</SButton>
         </div>
     </HeaderContent>
     <AutoHeightContent>
@@ -31,10 +31,10 @@
             @if (Mode is ModeTypes.Table)
             {
                 <SDataTable Items="Dashboards"
-                            TItem="DashboardDto"
-                            ItemsPerPage="PageSize"
-                            Headers="GetHeaders()"
-                            Height="@("calc(100vh - 289px)")">
+                        TItem="DashboardDto"
+                        ItemsPerPage="PageSize"
+                        Headers="GetHeaders()"
+                        Height="@("calc(100vh - 289px)")">
                     <HeaderColContent Context="header">
                         <span>@header.Text</span>
                     </HeaderColContent>
@@ -45,16 +45,16 @@
                                 <div class="hover-pointer" @onclick="()=> NavigateToConfiguration(context.Item)">@context.Item.Name</div>
                                 break;
                             case nameof(DashboardDto.Folder):
-                                <div >@context.Item.Folder.Name</div>
+                                <div>@context.Item.Folder.Name</div>
                                 break;
                             case "Action":
                                 <div class="d-flex">
-                                    <SButton Icon Class="mr-4"><SIcon Tooltip="@T("Edit")" OnClick="() => OpenUpdateDashboardDialog(context.Item)" Style="color: #4318FF !important;">@IconConstants.Update</SIcon></SButton>
-                                    <SButton Icon Color="red" OnClick="async () => await OpenRemoveDashboardDialogAsync(context.Item)"><SIcon Tooltip="@T("Remove")" Style="color:#F44336 !important;">@IconConstants.Remove</SIcon></SButton>
+                                    <SButton Icon Class="mr-4"><SIcon Tooltip="@I18n.T("Edit")" OnClick="() => OpenUpdateDashboardDialog(context.Item)" Style="color: #4318FF !important;">@IconConstants.Update</SIcon></SButton>
+                                    <SButton Icon Color="red" OnClick="async () => await OpenRemoveDashboardDialogAsync(context.Item)"><SIcon Tooltip="@I18n.T("Remove")" Style="color:#F44336 !important;">@IconConstants.Remove</SIcon></SButton>
                                 </div>
                                 break;
                             case nameof(DashboardDto.Model):
-                                <span class="subtitle">@T(context.Value?.ToString() ?? "")</span>
+                                <span class="subtitle">@I18n.Dashboard(context.Value?.ToString() ?? "")</span>
                                 break;
                             default:
                                 <span class="subtitle">@context.Value</span>
@@ -69,16 +69,16 @@
                     @foreach (var folder in Folders)
                     {
                         <MListGroup PrependIcon="@(IconConstants.Folder)"
-                                    NoAction
-                                    @bind-Value=folder.IsActive>
+                            NoAction
+                            @bind-Value=folder.IsActive>
                             <ActivatorContent>
                                 <MListItemContent>
                                     <MListItemTitle Class="h8">@folder.Name</MListItemTitle>
                                 </MListItemContent>
                             </ActivatorContent>
                             <AppendIconContent>
-                                <SButton Icon OnClick="() => OpenUpdateFolderDialog(folder)" Class="mr-4" StopPropagation><SIcon Tooltip="@T("Edit")" Style="transform: none !important">@IconConstants.Update</SIcon></SButton>
-                                <SButton Icon Color="red" Class="mr-10" OnClick="async () => await OpenRemoveFolderDialogAsync(folder)" StopPropagation><SIcon Tooltip="@T("Remove")" Color="red" Style="transform: none !important">@IconConstants.Remove</SIcon></SButton>
+                                <SButton Icon OnClick="() => OpenUpdateFolderDialog(folder)" Class="mr-4" StopPropagation><SIcon Tooltip="@I18n.T("Edit")" Style="transform: none !important">@IconConstants.Update</SIcon></SButton>
+                                <SButton Icon Color="red" Class="mr-10" OnClick="async () => await OpenRemoveFolderDialogAsync(folder)" StopPropagation><SIcon Tooltip="@I18n.T("Remove")" Color="red" Style="transform: none !important">@IconConstants.Remove</SIcon></SButton>
                                 <SIcon Size="28" Color="@(folder.IsActive ? "primary" : "")">@IconConstants.Down</SIcon>
                             </AppendIconContent>
                             <ChildContent>
@@ -92,8 +92,8 @@
                                                 </MListItemTitle>
                                             </MListItemContent>
                                             <MListItemAction>
-                                                <SButton StopPropagation Icon Class="mr-4" Style="@(context.Hover?"":"visibility: hidden")" OnClick="() => OpenUpdateDashboardDialog(dashboard)"><SIcon Tooltip="@T("Edit")">@IconConstants.Update</SIcon></SButton>
-                                                <SButton StopPropagation Icon Color="red" Style="@(context.Hover?"":"visibility: hidden")" OnClick="async () => await OpenRemoveDashboardDialogAsync(dashboard)"><SIcon Tooltip="@T("Remove")" Color="red">@IconConstants.Remove</SIcon></SButton>
+                                                <SButton StopPropagation Icon Class="mr-4" Style="@(context.Hover?"":"visibility: hidden")" OnClick="() => OpenUpdateDashboardDialog(dashboard)"><SIcon Tooltip="@I18n.T("Edit")">@IconConstants.Update</SIcon></SButton>
+                                                <SButton StopPropagation Icon Color="red" Style="@(context.Hover?"":"visibility: hidden")" OnClick="async () => await OpenRemoveDashboardDialogAsync(dashboard)"><SIcon Tooltip="@I18n.T("Remove")" Color="red">@IconConstants.Remove</SIcon></SButton>
                                             </MListItemAction>
                                         </MListItem>
                                         @if (folder.Dashboards.Last() != dashboard)

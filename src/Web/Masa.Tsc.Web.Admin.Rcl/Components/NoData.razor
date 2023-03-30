@@ -1,8 +1,8 @@
 ﻿<div class="full-height full-width d-flex">
-    <div class="ma-auto">@I18N.T("No Data")</div>
+    <div class="ma-auto">@I18n?.T("No Data")</div>
 </div>
 
 @code {
-    [CascadingParameter]
-    public I18n I18N { get; set; }
+    [Inject]
+    public I18n I18n { get; set; }
 }

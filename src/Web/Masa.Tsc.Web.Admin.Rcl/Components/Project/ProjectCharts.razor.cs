@@ -76,8 +76,8 @@ public partial class ProjectCharts
             {
                 ChartType = ChartTypes.Table,
                 ListType = ListTypes.TopList,
-                Title = T("Service Endpoint Load") + "(" + T("calls/min") + ")",
-                Description = T("For HTTP 1/2, gRPC, RPC services, this means Calls Per Minute (calls/min)"),
+                Title = I18n.Team("Service Endpoint Load") + "(" + I18n.Team("calls/min") + ")",
+                Description = I18n.Team( "For HTTP 1/2, gRPC, RPC services, this means Calls Per Minute (calls/min)"),
                 Metrics = new List<PanelMetricDto>
                 {
                     new PanelMetricDto()
@@ -94,7 +94,7 @@ public partial class ProjectCharts
             {
                 ChartType = ChartTypes.Table,
                 ListType = ListTypes.TopList,
-                Title = T("Service Slow Endpoint") + "(" + T("ms") + ")",
+                Title =I18n.Team("Service Slow Endpoint") + "(" + I18n.T("ms") + ")",
                 //Description = "Service Slow Endpont(ms)",
                 Metrics = new List<PanelMetricDto>
                 {

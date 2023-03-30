@@ -1,7 +1,7 @@
 ﻿@page "/dashboard/configuration/chart/{panelId}/{dashboardId}/{serviceName?}/{instanceName?}/{endpointName?}"
 @inherits TscComponentBase
 
-<PageTitle>@T("Configure Chart")</PageTitle>
+<PageTitle>@I18n.Dashboard("Configure Chart")</PageTitle>
 
 @if (Panel is not null)
 {
@@ -70,7 +70,7 @@
         if (_findPanelFailed)
         {
             _findPanelFailed = false;
-            await OpenConfirmDialog(T("This chart does not exist, it will jump back to the dashboard configuration page"));
+            await OpenConfirmDialog(I18n.Dashboard("This chart does not exist, it will jump back to the dashboard configuration page"));
             ConfigurationRecord.IsEdit = true;
             ConfigurationRecord.NavigateToConfiguration();
         }

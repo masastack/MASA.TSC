@@ -13,7 +13,7 @@
                             <span class="masa h8 ml-1">/ @Value.AppTotal</span>
                         }
                     </div>
-                    <span class="masa h8 regular3--text">@T(Value.Text)</span>
+                    <span class="masa h8 regular3--text">@I18n.Team(Value.Text)</span>
                 </div>
                 <img src="_content/Masa.Tsc.Web.Admin.Rcl/img/team/@(Value.Icon+".svg")" />
             </MCardText>
@@ -23,14 +23,14 @@
         </MCard>
     </ActivatorContent>
     <ChildContent>
-        <div>@T("Project Count")：@Value.ServiceTotal</div>
+        <div>@I18n.Team("Project Count")：@Value.ServiceTotal</div>
         @if (Value.Value is MonitorStatuses.Error or MonitorStatuses.Warn)
         {
-            <div>@T("Log Count")：@Value.AppTotal</div>
+            <div>@I18n.Team("Log Count")：@Value.AppTotal</div>
         }
         else if (Value.Value != MonitorStatuses.Normal)
         {
-            <div>@T("Service Count")：@Value.AppTotal</div>
+            <div>@I18n.Team("Service Count")：@Value.AppTotal</div>
         }
     </ChildContent>
 </MTooltip>

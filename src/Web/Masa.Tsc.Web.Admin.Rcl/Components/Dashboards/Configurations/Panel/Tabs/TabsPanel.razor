@@ -15,7 +15,7 @@
             @if(IsEdit)
             {
                 <SButton Icon Color="regular3" Class="ml-3">
-                    <SIcon Tooltip="@T("Close Tab Item")" Size="24" OnClickStopPropagation OnClick="() => CloseTabItem(tabItem)">mdi-close-circle</SIcon>
+                    <SIcon Tooltip="@I18n.Dashboard("Close Tab Item")" Size="24" OnClickStopPropagation OnClick="() => CloseTabItem(tabItem)">mdi-close-circle</SIcon>
                 </SButton>               
             }
         </MTab>
@@ -23,7 +23,7 @@
     @if (IsEdit)
     {
         <SButton Icon Color="regular3" Class="ml-3 my-auto" OnClick="AddTabItem">
-            <SIcon Tooltip="@T("Add Tab Item")" Size="24" OnClickStopPropagation>mdi-plus-circle-outline</SIcon>
+            <SIcon Tooltip="@I18n.Dashboard("Add Tab Item")" Size="24" OnClickStopPropagation>mdi-plus-circle-outline</SIcon>
         </SButton>
     }
 </MTabs>

@@ -21,7 +21,7 @@
         }
     </MCardText>
     <MCardActions Class="regular3--text body2 text-left px-4 pt-0">
-        @T("The average success rate of the service in the current time period")<EmptySpace Value="@_success" Suffix="%" /><br />
-        @T("The average failure rate of the service in the current time period")<EmptySpace Value="@(_success.HasValue?Math.Round(100 - _success.Value, 2):null)" Suffix="%" />
+        @I18n.Team("The average success rate of the service in the current time period")<EmptySpace Value="@_success" Suffix="%" /><br />
+        @I18n.Team("The average failure rate of the service in the current time period")<EmptySpace Value="@(_success.HasValue?Math.Round(100 - _success.Value, 2):null)" Suffix="%" />
     </MCardActions>
 </MCard>
