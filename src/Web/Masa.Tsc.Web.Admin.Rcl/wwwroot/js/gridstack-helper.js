@@ -25,13 +25,15 @@ export function initAll(options, dotNetHelper) {
     var grids = GridStack.initAll(options);
     grids.forEach(grid => {
         grid.on('change', function (e, items) {
-            dotNetHelper.invokeMethodAsync('OnChange', {
-                id: items[0].el.id,
-                x: items[0].x,
-                y: items[0].y,
-                width: items[0].w,
-                height: items[0].h,
-            });
+            dotNetHelper.invokeMethodAsync('OnChange', items.map(item => {
+                return {
+                    id: item.el.id,
+                    x: item.x,
+                    y: item.y,
+                    width: item.w,
+                    height: item.h,
+                }
+            }))
         });
     });
 }
@@ -40,8 +42,7 @@ export function reload(options) {
     var el = getElement(options);
     el.gridstack.removeAll(false);
     var childs = el.querySelectorAll(':scope > .grid-stack-item');
-    childs.forEach(child =>
-    {
+    childs.forEach(child => {
         el.gridstack.makeWidget(child);
     });
 }
@@ -56,6 +57,21 @@ export function makeWidgets(options, elementIds) {
     elementIds.forEach(id => {
         grid.makeWidget('#' + id);
     });
+}
+
+export function save(options, dotNetHelper) {
+    var grid = getElement(options).gridstack;
+    var datas = grid.save();
+    dotNetHelper.invokeMethodAsync('OnChange', datas.map(item =>
+    {
+        return {
+            id: item.id,
+            x: item.x,
+            y: item.y,
+            width: item.w,
+            height: item.h,
+        }
+    }));
 }
 
 export function compact(options) {
@@ -77,13 +93,15 @@ export function switchState(options, state) {
 function initByElement(options, el, dotNetHelper) {
     var grid = GridStack.init(options, el);
     grid.on('change', function (e, items) {
-        dotNetHelper.invokeMethodAsync('OnChange', {
-            id: items[0].el.id,
-            x: items[0].x,
-            y: items[0].y,
-            width: items[0].w,
-            height: items[0].h,
-        });
+        dotNetHelper.invokeMethodAsync('OnChange', items.map(item => {
+            return {
+                id: item.el.id,
+                x: item.x,
+                y: item.y,
+                width: item.w,
+                height: item.h,
+            }
+        }))
     });
 }
 

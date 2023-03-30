@@ -9,7 +9,7 @@ public class GridstackOptions
 
     public int Column { get; set; } = 12;
 
-    public bool AcceptWidgets { get; set; }
+    public bool AcceptWidgets { get; set; } = true;
 
     public bool AlwaysShowResizeHandle { get; set; } = true;
 
@@ -29,10 +29,10 @@ public class GridstackOptions
 
     public bool DisableDrag { get; set; }
 
-    public bool OneColumnModeDomSort { get; set; } = true;
+    public bool OneColumnModeDomSort { get; set; }
 
     public bool DisableOneColumnMode { get; set; } = true;
 
     [JsonIgnore]
-    public Func<GridstackChangeEventArgs, Task>? OnChange { get; set; }
+    public Func<IEnumerable<GridstackChangeEventArgs>, Task>? OnChange { get; set; }
 }

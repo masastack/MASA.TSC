@@ -9,7 +9,7 @@ public class TscGridstackJSModule : IAsyncDisposable
     IJSRuntime _jsRuntime;
     IJSObjectReference? _helper;
     GridstackOptions? _options;
-    public event Func<GridstackChangeEventArgs, Task>? OnChangeEvent;
+    public event Func<IEnumerable<GridstackChangeEventArgs>, Task>? OnChangeEvent;
 
     public TscGridstackJSModule(IJSRuntime js)
     {
@@ -74,8 +74,14 @@ public class TscGridstackJSModule : IAsyncDisposable
         await helper.InvokeVoidAsync("switchState", _options, enabled);
     }
 
+    public async ValueTask SaveAsync()
+    {
+        var helper = await GetJSObjectReference();
+        await helper.InvokeVoidAsync("save", _options, _dotNetObjectReference);
+    }
+
     [JSInvokable]
-    public async Task OnChange(GridstackChangeEventArgs args)
+    public async Task OnChange(IEnumerable<GridstackChangeEventArgs> args)
     {
         if (OnChangeEvent is not null)
             await OnChangeEvent.Invoke(args);

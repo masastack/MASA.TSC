@@ -2,16 +2,22 @@
 @implements IDisposable
 
 <div class="@Class grid-stack" name="@Readonly.ToString()" id="@Options.Id" style="@(_lodaing?"display:none;":"") @Style">
-    @foreach (var item in Items.OrderBy(item => item.Y).ThenBy(item => item.X))
+    @{
+        var firstItem = Items.FirstOrDefault(item => item.X==0 && item.Y==0);
+    }
+    @foreach (var item in Items)
     {
         <div class="grid-stack-item"
              id="@item.Id"
+             gs-id="@item.Id"             
              @key="@item.Id"
              gs-w="@item.Width"
              gs-h="@item.Height"
              gs-x="@item.X"
-             gs-y="@item.Y">
+             gs-y="@item.Y"
+             gs-auto-position="@((item.X!=0 || item.Y!=0) || item==firstItem ?"false":"true")">
             <div class="grid-stack-item-content @ItemClass" style="@ItemStyle">
+                @item.Id
                 @ItemContent(item)
             </div>
         </div>
@@ -20,7 +26,6 @@
 
 @code {
     string? _prevItemKeys;
-    //List<Guid> _prevItemKeys = new();
     bool _prevReadonly;
     bool _lodaing;
 
@@ -61,16 +66,19 @@
         GridstackJSModule.OnChangeEvent += OnItemChangeAsync;
     }
 
-    async Task OnItemChangeAsync(GridstackChangeEventArgs args)
+    async Task OnItemChangeAsync(IEnumerable<GridstackChangeEventArgs> args)
     {
-        var item = Items.FirstOrDefault(e => e.Id == args.Id);
-        if (item is not null)
+        args.ForEach(arg =>
         {
-            item.Width = args.Width;
-            item.Height = args.Height;
-            item.X = args.X;
-            item.Y = args.Y;
-        }
+            var item = Items.FirstOrDefault(e => e.Id == arg.Id);
+            if (item is not null)
+            {
+                item.Width = arg.Width;
+                item.Height = arg.Height;
+                item.X = arg.X;
+                item.Y = arg.Y;
+            }
+        });
         if (Options.OnChange is not null)
         {
             await Options.OnChange(args);
@@ -79,7 +87,6 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        /*mode 1*/
         if (firstRender)
         {
             _prevItemKeys = string.Join(',', Items.Select(item => item.Id));
@@ -90,9 +97,10 @@
             var itemKeys = string.Join(',', Items.Select(item => item.Id));
             if (_prevItemKeys != itemKeys)
             {
-                _prevItemKeys = itemKeys;
+                _prevItemKeys = itemKeys;               
                 await GridstackJSModule.ReloadAsync();
-                await GridstackJSModule.CompactAsync();
+                await GridstackJSModule.SaveAsync();
+                //await GridstackJSModule.CompactAsync();
             }
             if (_prevReadonly != Readonly)
             {
@@ -100,33 +108,6 @@
                 await GridstackJSModule.SwitchStateAsync(!Readonly);
             }
         }
-
-        /*mode 2*/
-        //if (firstRender)
-        //{
-        //    _prevItemKeys = Items.Select(item => item.Id).ToList();
-        //    await GridstackJSModule.InitAsync(Options);
-        //}
-        //else
-        //{
-        //    var adds = Items.ExceptBy(_prevItemKeys, item => item.Id).Select(item => item.Id);
-        //    var removes = _prevItemKeys.Except(Items.Select(item => item.Id));
-        //    _prevItemKeys = Items.Select(item => item.Id).ToList();
-        //    if (adds.Any())
-        //    {
-        //        await GridstackJSModule.MakeWidgetsAsync(adds.Select(id => id.ToString()));
-        //    }
-        //    if(removes.Any())
-        //    {
-        //        await GridstackJSModule.MakeWidgetsAsync(adds.Select(id => id.ToString()));
-        //    }
-        //}
-        //var excepts = Items.ExceptBy(_prevItemKeys, item => item.Id.ToString()).Select(item => item.Id.ToString());
-        //_prevItemKeys = Items.Select(item => item.Id.ToString()).ToList();
-        //if (excepts.Any())
-        //{
-        //    await GridstackJSModule.MakeWidgetsAsync(excepts);
-        //}
     }
 
     public void Dispose()
