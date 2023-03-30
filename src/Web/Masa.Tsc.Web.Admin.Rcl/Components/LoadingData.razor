@@ -1,10 +1,10 @@
 ﻿<div class="d-flex full-height full-width @Class">
-    <div class="ma-auto">@I18N.T("Loading data")</div>
+    <div class="ma-auto">@I18n?.T("Loading data")</div>
 </div>
 
 @code {
     [Inject]
-    public I18n I18N { get; set; }
+    public I18n I18n { get; set; }
 
     [Parameter]
     public string? Class { get; set; }

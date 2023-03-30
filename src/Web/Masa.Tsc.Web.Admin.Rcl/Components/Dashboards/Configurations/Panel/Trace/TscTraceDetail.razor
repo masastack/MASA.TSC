@@ -11,15 +11,15 @@
                 {
                     <div class="d-flex align-center">
                         <div class="mr-6">
-                            <MChip Label Small Color="emphasis2 mr-3" Dark>@T("Start")</MChip>
+                            <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Start")</MChip>
                             <span class="regular--text">@(_rootTreeItem.Timestamp+CurrentTimeZone.BaseUtcOffset)</span>
                         </div>
                         <div class="mr-6">
-                            <MChip Label Small Color="emphasis2 mr-3" Dark>@T("Duration")</MChip>
+                            <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Duration")</MChip>
                             <span class="regular--text">@FormatDuration(_rootTreeItem.DoubleDuration)</span>
                         </div>
                         <div>
-                            <MChip Label Small Color="emphasis2 mr-3" Dark>@T("Span Count")</MChip>
+                            <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Span Count")</MChip>
                             <span class="regular--text">@_count</span>
                         </div>
                     </div>
@@ -147,7 +147,7 @@
                 <MList Dense Class="emphasis2 mb-4 rounded" Dark>
                     <MListItem Dense>
                         <MListItemContent>
-                            <MListItemTitle>SelfDuration</MListItemTitle>
+                            <MListItemTitle>@I18n.Trace("SelfDuration")</MListItemTitle>
                         </MListItemContent>
                         <MListItemAction>
                             <MListItemActionText>
@@ -157,7 +157,7 @@
                     </MListItem>
                     <MListItem Dense>
                         <MListItemContent>
-                            <MListItemTitle>TotalDuration</MListItemTitle>
+                            <MListItemTitle>@I18n.Trace("TotalDuration")</MListItemTitle>
                         </MListItemContent>
                         <MListItemAction>
                             <MListItemActionText>
@@ -257,7 +257,7 @@
                         <MHover Context="hContext">
                             <div @attributes="hContext.Attrs" class="hover-pointer d-flex align-center">                                
                                 <div @onclick="() => Copy(value)" @onclick:stopPropagation>
-                                    <SIcon Tooltip="@T("Copy value")"
+                                    <SIcon Tooltip="@I18n.T("Copy value")"
                                Color="@(_copyClicked ? "success" : "gray")"
                                Style="@(hContext.Hover ? "width: 18px; height: 18px; margin-right: 12px; transition: 0.5s;" : "opacity:0; width: 18px; height: 0px; margin-left: -24px; transition: 0.4s;")">
                                         @(_copyClicked ? _checkSvg : _copySvg)

@@ -3,7 +3,7 @@
 @if (IsLoading)
 {
     <div style="position:absolute;top:20%;left:49%;">
-        <div>@T("Loading data")</div>
+        <div>@I18n.T("Loading data")</div>
     </div>
 }
 <div style="height: calc(100% - 18px);width: calc(100% - 18px);@(IsLoading?"visibility: hidden;":"")">
@@ -12,20 +12,20 @@
 <div style="min-width:242px;overflow:auto;position:absolute;top:24px;right:24px;">
     <div class="d-flex mt-1">
         <SSelect @bind-Value=Depth
-                    Items="_depthItems"
-                    ItemText='item => T("{0} layer deep",item.ToString())'
-                    ItemValue="item => item"
-                    TItem="int"
-                    TItemValue="int"
-                    TValue="int"
-                    Small
-                    BackgroundColor="fill-background"
-                    Style="width:135px">
+                 Items="_depthItems"
+                 ItemText='item =>string.Format(I18n.Dashboard("{0} layer deep"),item.ToString())'
+                 ItemValue="item => item"
+                 TItem="int"
+                 TItemValue="int"
+                 TValue="int"
+                 Small
+                 BackgroundColor="fill-background"
+                 Style="width:135px">
         </SSelect>
         <SButton Icon Color="black" OnClick="RefreshAsync">
-            <SIcon Tooltip="@T("Refresh")" Size=16>
+            <SIcon Tooltip="@I18n.T("Refresh")" Size=16>
                 @IconConstants.Refresh
             </SIcon>
         </SButton>
-    </div>        
+    </div>
 </div>

@@ -2,7 +2,7 @@
 @inherits TscComponentBase
 
 <div class="d-flex mb-6">
-    <SAutoComplete Placeholder="@T("Service")" Label="@T("Service")"
+    <SAutoComplete Placeholder="@I18n.T("Service")" Label="@I18n.T("Service")"
                    Items="_services"
                    @bind-Value="_service"
                    ItemText="item => item"
@@ -28,7 +28,7 @@
         </SelectionContent>
     </SAutoComplete>
 
-    <SAutoComplete Placeholder="@T("Instance")" Label="@T("Instance")"
+    <SAutoComplete Placeholder="@I18n.T("Instance")" Label="@I18n.T("Instance")"
                    Items="_instances"
                    @bind-Value="_instance"
                    TItem=string
@@ -55,7 +55,7 @@
         </SelectionContent>
     </SAutoComplete>
 
-    <SAutoComplete Placeholder="@T("Endpoint")" Label="@T("Endpoint")"
+    <SAutoComplete Placeholder="@I18n.T("Endpoint")" Label="@I18n.T("Endpoint")"
                    Items="_endpoints"
                    @bind-Value="_endpoint"
                    TItem=string

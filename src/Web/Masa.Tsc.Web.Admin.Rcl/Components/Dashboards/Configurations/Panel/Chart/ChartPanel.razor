@@ -3,7 +3,7 @@
 @if (IsLoading)
 {
     <div class="d-flex full-height full-width white @(Class)" style="border-radius: 8px;">
-        <div class="ma-auto">@T("Loading data")</div>
+        <div class="ma-auto">@I18n.T("Loading data")</div>
     </div>
 }
 @if (Value.ChartType is ChartTypes.Table)
