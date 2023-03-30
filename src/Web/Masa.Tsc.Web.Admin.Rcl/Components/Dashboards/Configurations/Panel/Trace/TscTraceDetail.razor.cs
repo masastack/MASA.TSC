@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Google.Protobuf.WellKnownTypes;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceDetail
@@ -44,6 +46,7 @@ public partial class TscTraceDetail
     private List<double> NumberSplit(double number)
     {
         List<double> sections = new();
+        number = Math.Round(number, 0);
 
         var steps = 5d;
         var step = Math.Ceiling(number / steps);
