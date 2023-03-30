@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "DAPR_GRPC_PORT": "3601",
         "DAPR_HTTP_PORT": "3600",
-        "DCC_SECRET": "dcc_secret",
+        "DCC_SECRET": "masastack.com",
         "REDIS": "{\"RedisHost\": \"10.175.207.202\", \"RedisPort\": 30260, \"RedisDb\": 0,\"RedisPassword\": \"Hzss@123redis\"}",
         "MASA_SERVER": "{\"pm\":{\"server\":\"pm-service-develop\"},\"dcc\":{\"server\":\"dcc-service-develop\"},\"auth\":{\"server\":\"auth-service-develop\"},\"mc\":{\"server\":\"mc-service-develop\"},\"scheduler\":{\"server\":\"scheduler-service-server-develop\",\"worker\":\"scheduler-service-worker-develop\"},\"tsc\":{\"server\":\"tsc-service-develop\"},\"alert\":{\"server\":\"alert-service-develop\"}}"
       }
