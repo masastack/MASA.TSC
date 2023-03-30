@@ -121,19 +121,14 @@
     .fixed-table thead tr th {
         position: sticky;
         top: 0;
-        opacity:1.0;
-        background-color:#fff
+        opacity: 1.0;
+        background-color: #fff
     }
 
 
-
-
-
-
-
-    .fa-arrows-rotate:before {
-        content: '\f021'
-    }
+.fa-arrows-rotate:before {
+    content: '\f021'
+}
 
 .fa-rotate:before {
     content: '\f2f1'
@@ -223,6 +218,7 @@
     background-color: transparent !important;
     box-shadow: none !important;
 }
+
 }
 
 .hover-pointer {
@@ -249,7 +245,7 @@
 }
 
 .borderNone {
-    border:none !important;
+    border: none !important;
 }
 
 .m-sheet.m-stepper:not(.m-sheet--outlined) {
@@ -291,7 +287,7 @@
 }
 
 .m-tooltip.m-tooltip--top.m-tooltip--attached {
-    display:none !important;
+    display: none !important;
 }
 
 /*
@@ -316,14 +312,16 @@
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
 }
+
 .bordershadow {
     border-radius: 4px;
-    transition: all 200ms ease-out;   
+    transition: all 200ms ease-out;
 }
 
     .bordershadow:hover {
         box-shadow: 0 0 6px lightsalmon;
     }
+
 .grid-stack > .grid-stack-item > .grid-stack-item-content {
     overflow: auto !important;
 }
@@ -339,5 +337,5 @@ div[name="True"] .ui-resizable-se {
 }
 
 .hide {
-    visibility:hidden !important;
+    visibility: hidden !important;
 }

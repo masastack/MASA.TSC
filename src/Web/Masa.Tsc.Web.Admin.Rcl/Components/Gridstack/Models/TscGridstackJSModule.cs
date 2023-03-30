@@ -9,7 +9,9 @@ public class TscGridstackJSModule : IAsyncDisposable
     IJSRuntime _jsRuntime;
     IJSObjectReference? _helper;
     GridstackOptions? _options;
-    public event Func<GridstackChangeEventArgs, Task>? OnChangeEvent;
+    public event Func<IEnumerable<GridstackChangeEventArgs>, Task>? OnChangeEvent;
+    public event Func<IEnumerable<GridstackAddEventArgs>, Task>? OnAddEvent;
+    public event Func<IEnumerable<GridstackRemoveEventArgs>, Task>? OnRemoveEvent;
 
     public TscGridstackJSModule(IJSRuntime js)
     {
@@ -41,7 +43,7 @@ public class TscGridstackJSModule : IAsyncDisposable
     public async ValueTask ReloadAsync()
     {
         var helper = await GetJSObjectReference();
-        await helper.InvokeVoidAsync("reload", _options, _dotNetObjectReference);
+        await helper.InvokeVoidAsync("reload", _options);
     }
 
     public async ValueTask MakeWidgetsAsync(IEnumerable<string> elementIds)
@@ -56,6 +58,12 @@ public class TscGridstackJSModule : IAsyncDisposable
         await helper.InvokeVoidAsync("destroy", _options, destoryDom);
     }
 
+    public async ValueTask RemoveAllAsync(bool destoryDom)
+    {
+        var helper = await GetJSObjectReference();
+        await helper.InvokeVoidAsync("removeAll", _options, destoryDom);
+    }
+
     public async ValueTask CompactAsync()
     {
         var helper = await GetJSObjectReference();
@@ -68,11 +76,31 @@ public class TscGridstackJSModule : IAsyncDisposable
         await helper.InvokeVoidAsync("switchState", _options, enabled);
     }
 
+    public async ValueTask SaveAsync()
+    {
+        var helper = await GetJSObjectReference();
+        await helper.InvokeVoidAsync("save", _options, _dotNetObjectReference);
+    }
+
     [JSInvokable]
-    public async Task OnChange(GridstackChangeEventArgs args)
+    public async Task OnChange(IEnumerable<GridstackChangeEventArgs> args)
     {
         if (OnChangeEvent is not null)
             await OnChangeEvent.Invoke(args);
+    }
+
+    [JSInvokable]
+    public async Task OnAdd(IEnumerable<GridstackAddEventArgs> args)
+    {
+        if (OnAddEvent is not null)
+            await OnAddEvent.Invoke(args);
+    }
+
+    [JSInvokable]
+    public async Task OnRemove(IEnumerable<GridstackRemoveEventArgs> args)
+    {
+        if (OnRemoveEvent is not null)
+            await OnRemoveEvent.Invoke(args);
     }
 
     public async ValueTask DisposeAsync()

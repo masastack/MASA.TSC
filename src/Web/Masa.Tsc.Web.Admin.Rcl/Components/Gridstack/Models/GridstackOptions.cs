@@ -19,6 +19,8 @@ public class GridstackOptions
 
     public int CellHeightThrottle { get; set; } = 100;
 
+    public int MinRow { get; set; } = 1;
+
     public string? Nonce { get; set; }
 
     public int Margin { get; set; } = 10;
@@ -29,10 +31,7 @@ public class GridstackOptions
 
     public bool DisableDrag { get; set; }
 
-    public bool OneColumnModeDomSort { get; set; } = true;
+    public bool OneColumnModeDomSort { get; set; }
 
     public bool DisableOneColumnMode { get; set; } = true;
-
-    [JsonIgnore]
-    public Func<GridstackChangeEventArgs, Task>? OnChange { get; set; }
 }
