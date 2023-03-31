@@ -323,7 +323,7 @@
     }
 
 .grid-stack > .grid-stack-item > .grid-stack-item-content {
-    overflow: auto !important;
+   /*overflow: auto !important;*/
 }
 
 .ui-resizable-se {
@@ -337,5 +337,5 @@ div[name="True"] .ui-resizable-se {
 }
 
 .hide {
-    visibility: hidden !important;
+    display: none !important;
 }
