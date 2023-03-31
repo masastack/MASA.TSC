@@ -10,9 +10,6 @@ var tscUrl = "https://tsc-service-develop.masastack.com";//builder.Environment.I
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
-
 builder.Services.Configure<JsonOptions>(option =>
 {
     option.JsonSerializerOptions.Converters.Add(new QueryResultDataResponseConverter());
