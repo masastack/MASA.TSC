@@ -30,6 +30,13 @@ public partial class TscTrace
     [Parameter]
     public DateTime EndDateTime { get; set; }
 
+    [Parameter]
+    public string? TraceId
+    {
+        get { return _traceId; }
+        set { _traceId = value; }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         await CompontentSearchAsync();

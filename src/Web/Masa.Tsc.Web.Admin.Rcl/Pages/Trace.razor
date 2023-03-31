@@ -1,6 +1,12 @@
-﻿@page "/dashbord/trace"
+﻿@page "/dashbord/trace/{traceId?}"
 @inject I18n I18n
 
 <PageTitle>@I18n.Trace("Trace")</PageTitle>
 
-<TscTrace PageMode />
+<TscTrace PageMode TraceId="@TraceId" />
+
+@code{
+
+    [Parameter]
+    public string? TraceId { get; set; }
+}

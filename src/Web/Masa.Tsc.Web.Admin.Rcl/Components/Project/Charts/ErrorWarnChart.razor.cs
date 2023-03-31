@@ -51,7 +51,7 @@ public partial class ErrorWarnChart
         if (query.Start == null)
             query.Start = query.End.Value.AddDays(-1);
 
-        var step = 60;// (long)Math.Floor((query.End.Value - query.Start.Value).TotalSeconds);
+        var step = 60;
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
