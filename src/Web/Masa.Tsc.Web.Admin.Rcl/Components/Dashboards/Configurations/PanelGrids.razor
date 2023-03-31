@@ -1,28 +1,20 @@
 ﻿@inherits TscComponentBase
 
-<Gridstack Items="Panels" Id="@(ParentPanel is null ? null : ParentPanel.Id.ToString())" Readonly="!IsEdit" Class="@Class" ItemStyle="@("border:solid #E4E8F3 1px;position:absolute;overflow:hidden;"+(IsEdit?"cursor: move;":""))">
+<Gridstack Items="Panels" Id="@(ParentPanel is null ? null : ParentPanel.Id.ToString())" Readonly="!IsEdit" Class="@Class" ItemStyle="@("background-color:white;border: 1px solid #F0F3FA;border-radius: 12px;position:absolute;overflow:hidden;"+(IsEdit?"cursor: move;":""))">
     <ItemContent>
-        @if (IsEdit)
+        @if (IsEdit && context.PanelType != PanelTypes.Tabs)
         {
-            <div style="height:35px;" class="d-flex">
+            <div style="height:48px;" class="d-flex">
                 <MSpacer />
                 <MMenu OpenOnHover OffsetY>
-                    <ActivatorContent Context="menuContext">
-                        <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
-                            <SIcon Size="24">@IconConstants.More</SIcon>
+                <ActivatorContent Context="menuContext">
+                    <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
+                        <SIcon Size="24">@IconConstants.More</SIcon>
                         </SButton>
                     </ActivatorContent>
                     <ChildContent>
                         <MList>
-                            @if (context.PanelType == PanelTypes.Tabs)
-                            {
-                                <MListItem OnClick="() => AddChildPanel(context as UpsertTabsPanelDto)">
-                                    <MListItemTitle>
-                                        @I18n.Dashboard("Add Panel")
-                                    </MListItemTitle>
-                                </MListItem>
-                            }
-                            else if (context.PanelType == PanelTypes.Chart)
+                        @if (context.PanelType == PanelTypes.Chart)
                             {
                                 <MListItem OnClick="() => ConfigurationChartPanel(context)">
                                     <MListItemTitle>
@@ -40,11 +32,35 @@
                 </MMenu>
             </div>
         }
-        <div style="@(context.PanelType==PanelTypes.Chart?"":"overflow:auto;") @(IsEdit?"height:calc(100% - 35px);":"height:calc(100%);")">
+        <div style="@(context.PanelType==PanelTypes.Chart?"":"overflow:auto;") @(IsEdit?"height:calc(100% - 50px);":"height:calc(100%);")">
             @switch (context.PanelType)
             {
                 case PanelTypes.Tabs:
-                    <TabsPanel Panel="context as UpsertTabsPanelDto" />
+                    <TabsPanel Panel="context as UpsertTabsPanelDto">
+                        <HeaderRightContent>
+                            <MMenu OpenOnHover OffsetY>
+                            <ActivatorContent Context="menuContext">
+                                <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
+                                    <SIcon Size="24">@IconConstants.More</SIcon>
+                                    </SButton>
+                                </ActivatorContent>
+                                <ChildContent>
+                                    <MList>
+                                        <MListItem OnClick="async () =>AddChildPanel(context as UpsertTabsPanelDto)">
+                                            <MListItemTitle>
+                                                @I18n.Dashboard("Add Panel")
+                                            </MListItemTitle>
+                                        </MListItem>
+                                        <MListItem OnClick="() => RemovePanel(context)">
+                                            <MListItemTitle>
+                                                @I18n.Dashboard("Remove Panel")
+                                            </MListItemTitle>
+                                        </MListItem>
+                                    </MList>
+                                </ChildContent>
+                            </MMenu>
+                        </HeaderRightContent>
+                    </TabsPanel>
                     break;
                 case PanelTypes.Text:
                     <TextPanel Value=context />

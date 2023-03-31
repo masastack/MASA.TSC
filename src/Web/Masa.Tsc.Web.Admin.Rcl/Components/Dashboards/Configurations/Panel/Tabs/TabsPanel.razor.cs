@@ -16,6 +16,9 @@ public partial class TabsPanel
 
     public bool IsEdit => ConfigurationRecord.IsEdit;
 
+    [Parameter]
+    public RenderFragment? HeaderRightContent { get; set; }
+
     [DisallowNull]
     StringNumber? CurrentTab
     {
