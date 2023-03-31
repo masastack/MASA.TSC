@@ -116,9 +116,9 @@ public partial class Dashboard
     List<DataTableHeader<DashboardDto>> GetHeaders() => new()
     {
         new() { Text = I18n.T(nameof(DashboardDto.Name)), Value = nameof(DashboardDto.Name), Sortable = false },
-        new() { Text = I18n.T(nameof(DashboardDto.Folder)), Value = nameof(DashboardDto.Folder), Sortable = false },
-        new() { Text = I18n.T(nameof(DashboardDto.Layer)), Value = nameof(DashboardDto.Layer), Sortable = false },
-        new() { Text = I18n.T(nameof(DashboardDto.Model)), Value = nameof(DashboardDto.Model), Sortable = false },
+        new() { Text = I18n.Dashboard(nameof(DashboardDto.Folder)), Value = nameof(DashboardDto.Folder), Sortable = false },
+        new() { Text = I18n.Dashboard(nameof(DashboardDto.Layer)), Value = nameof(DashboardDto.Layer), Sortable = false },
+        new() { Text = I18n.Dashboard(nameof(DashboardDto.Model)), Value = nameof(DashboardDto.Model), Sortable = false },
         new() { Text = I18n.T("Action"), Value = "Action", Sortable = false, Align = DataTableHeaderAlign.Center, Width = "105px" },
     };
 
