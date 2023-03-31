@@ -18,7 +18,29 @@ export function init(options, dotNetHelper) {
     }
     else initByElement(options, el, dotNetHelper);
 
-    return el.gridstack;
+    if (options.id === 'grid-stack') {
+        var grid = el.gridstack;
+        grid.cellHeight = cellHeight;
+        var val = grid.cellWidth() * 0.98;
+        grid.cellHeight(val, false);
+        window.addEventListener('resize', () => {
+            window.setTimeout(() => {
+                var val = grid.cellWidth() * 0.98;
+                grid.cellHeight(val, true);
+            }, 100);
+        });
+    }
+
+    return grid;
+}
+
+function cellHeight(val, update = true){
+    this.opts.cellHeight = val;
+
+    if (update) {
+        this._updateStyles(true); // true = force re-create for current # of rows
+    }
+    return this;
 }
 
 export function initAll(options, dotNetHelper) {

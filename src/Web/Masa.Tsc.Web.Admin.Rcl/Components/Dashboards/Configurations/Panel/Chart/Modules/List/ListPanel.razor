@@ -20,7 +20,7 @@ else
 
     string jumpName { get; set; }
 
-    List<string> services { get; set; }
+    List<string> services { get; set; } = new();
 
     [Parameter]
     public ITablePanelValue Value { get; set; }
