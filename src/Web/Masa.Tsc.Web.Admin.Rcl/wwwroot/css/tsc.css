@@ -339,3 +339,7 @@ div[name="True"] .ui-resizable-se {
 .hide {
     display: none !important;
 }
+
+div[style*="visibility: hidden; opacity: 0;"] {
+    display:none !important;
+}
