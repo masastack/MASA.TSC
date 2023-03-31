@@ -18,4 +18,6 @@ public interface ITopListPanelValue : IPanelValue
     public List<TopListOption> GetTopListOption();
 
     public void SetTopListOption(string href);
+
+    public Func<TopListOption, Task>? TopListOnclick { get; set; }
 }

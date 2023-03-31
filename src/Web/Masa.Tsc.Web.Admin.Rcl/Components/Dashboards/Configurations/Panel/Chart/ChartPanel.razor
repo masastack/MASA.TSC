@@ -2,9 +2,7 @@
 
 @if (IsLoading)
 {
-    <div class="d-flex full-height full-width white @(Class)" style="border-radius: 8px;">
-        <div class="ma-auto">@I18n.T("Loading data")</div>
-    </div>
+    <LoadingData />
 }
 @if (Value.ChartType is ChartTypes.Table)
 {

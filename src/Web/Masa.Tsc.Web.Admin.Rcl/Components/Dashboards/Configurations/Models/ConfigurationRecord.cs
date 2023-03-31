@@ -62,8 +62,6 @@ public abstract class ConfigurationRecord
         }
     }
 
-    public Func<TopListOption, Task>? TopListOnclick { get; set; }
-
     public NavigationManager NavigationManager { get; }
 
     public IJSRuntime JSRuntime { get; }

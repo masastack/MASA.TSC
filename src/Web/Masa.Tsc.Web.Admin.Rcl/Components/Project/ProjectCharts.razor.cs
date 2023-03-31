@@ -20,12 +20,6 @@ public partial class ProjectCharts
 
     protected override void OnInitialized()
     {
-        ConfigurationRecord.TopListOnclick += async (TopListOption options) =>
-        {
-            var url = options.Text;
-            var traceId = await ApiCaller.TraceService.GetTraceIdByMetricAsync(ConfigurationRecord.Service!, url, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
-            await _tscTraceDetail.OpenAsync(traceId);
-        };
         UpSetMetrics();
     }
 
@@ -102,6 +96,12 @@ public partial class ProjectCharts
                     {
                         Expression = "topk(10, sort_desc( round(sum by(http_target) (increase(http_response_sum[1m]))/sum by(http_target) (increase(http_response_count[1m])))),1)"
                     }
+                },
+                TopListOnclick = async (TopListOption options) =>
+                {
+                    var url = options.Text;
+                    var traceId = await ApiCaller.TraceService.GetTraceIdByMetricAsync(ConfigurationRecord.Service!, url, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
+                    await _tscTraceDetail.OpenAsync(traceId);
                 }
             };
     }

@@ -7,11 +7,11 @@ public static class PanelGridsExtensions
 {
     public static void AdaptiveUI(this List<UpsertPanelDto> panels, UpsertPanelDto panel)
     {
-        if (panels.Count == 0)
-        {
-            panels.Add(panel);
-            return;
-        }
+        //if (panels.Count == 0)
+        //{
+        //    panels.Add(panel);
+        //    return;
+        //}
         //panels.ForEach(panel => panel.Y = panel.Y + GlobalPanelConfig.Height);
         //var minYPanels = panels.Where(panel => panel.Y == GlobalPanelConfig.Height);
         //var sumX = minYPanels.Sum(panel => panel.Width);

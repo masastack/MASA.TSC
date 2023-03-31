@@ -17,118 +17,125 @@
         </SButton>
     </MCol>
     <MCol Cols="8">
-        <div style="height:410px;overflow:auto;">
-            <CascadingValue Value="ConfigurationRecord" IsFixed>
-                <ChartPanel @ref="_chartPanel" Value="Value" />
-            </CascadingValue>
-        </div>
-        <MCard Class="mt-6">
-            <MCardText>
-                <MRow>
-                    @if (Value.ChartType == ChartTypes.Table)
-                    {
-                        @if (ConfigurationRecord.ModelType is not ModelTypes.All)
-                        {
-                            <MCol Md="4">
-                                <ServiceAutoComplete Label="@I18n.Dashboard("Project")" Readonly Value="@ConfigurationRecord.Service" />
-                            </MCol>
-                            <MCol Md="8">
-                                <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
-                                    @foreach (var item in TableMap[ConfigurationRecord.ModelType])
-                                    {
-                                        <MButton Class="text-capitalize" Value="@item.ToString()">
-                                            @item.ToString()
-                                        </MButton>
-                                    }
-                                </MButtonGroup>
-                            </MCol>
-                        }
-                        else
-                        {
-                            <MCol Md="12">
-                                <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
-                                    @foreach (var item in TableMap[ConfigurationRecord.ModelType])
-                                    {
-                                        <MButton Class="text-capitalize" Value="@item.ToString()">
-                                            @item.ToString()
-                                        </MButton>
-                                    }
-                                </MButtonGroup>
-                            </MCol>
-                        }
-                    }
-                    <MCol Md="4">
-                        <STextField @bind-Value="@Value.Title" />
-                    </MCol>
-                    <MCol Md="8">
-                        <STextField @bind-Value="@Value.Description" />
-                    </MCol>
-                    <MCol Md="12">
+        <MRow>
+            <MCol Cols="12">
+                <MCard Style="height:410px;overflow:auto;">
+                    <CascadingValue Value="ConfigurationRecord" IsFixed>
+                        <ChartPanel @ref="_chartPanel" Value="Value" />
+                    </CascadingValue>
+                </MCard>
+            </MCol>
+            <MCol Cols="12">
+                <MCard>
+                    <MCardText>
                         <MRow>
-                            @if (Value.ChartType is ChartTypes.Table && Value.ListType is ListTypes.TopList)
+                            @if (Value.ChartType == ChartTypes.Table)
                             {
-                                <MCol Md="4">
-                                    <MCard Class="pa-2" Style="background-color:#F6F8FD">
-                                        <MCardText>
-                                            <MRow>
-                                                <MCol Md="12">
-                                                    <STextField BackgroundColor="white" DebounceInterval="500" TValue="string" Value="Value.Metrics[0].DisplayName" ValueChanged="value => MetricNameChanged(Value.Metrics[0],value) " Label="@I18n.Dashboard("Metric name")" />
-                                                </MCol>
-                                                <MCol Md="12">
-                                                    <MetricsExpression Value="Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value)" />
-                                                </MCol>
-                                            </MRow>
-                                        </MCardText>
-                                        <MCardActions Class="d-flex justify-space-between">
-                                            <ColorGroup Value="@Value.Metrics[0].Color" ValueChanged="value => MetricColorChanged(Value.Metrics[0],value)" />
-                                        </MCardActions>
-                                    </MCard>
-                                </MCol>
-                            }
-                            else
-                            {
-                                @foreach (var item in Value.Metrics)
+                                @if (ConfigurationRecord.ModelType is not ModelTypes.All)
                                 {
                                     <MCol Md="4">
-                                        <MCard Class="pa-2" Style="background-color:#F6F8FD">
-                                            <MCardText>
-                                                <MRow>
-                                                    <MCol Md="12">
-                                                        <STextField BackgroundColor="white" Value="@item.DisplayName" TValue="string" ValueChanged="value => MetricNameChanged(item,value)" DebounceInterval="500" Label="@I18n.Dashboard(Value.ChartType is ChartTypes.Table?"Column name":"Metrics name")" />
-                                                    </MCol>
-                                                    <MCol Md="12">
-                                                        <MetricsExpression Value="@item.Expression" ValueChanged="async value => await MetricExpressionChangedAsync(item,value)" />
-                                                    </MCol>
-                                                    @if (Value.ChartType is ChartTypes.Table)
-                                                    {
-                                                        <MCol Md="12">
-                                                            <STextField BackgroundColor="white" @bind-Value="item.Icon" Label="@I18n.T("Icon")" />
-                                                        </MCol>
-                                                        <MCol Md="12">
-                                                            <STextField BackgroundColor="white" @bind-Value="item.Unit" Label="@I18n.T("Unit")" />
-                                                        </MCol>
-                                                    }
-                                                </MRow>
-                                            </MCardText>
-                                            <MCardActions Class="d-flex justify-space-between">
-                                                <ColorGroup Value="@item.Color" ValueChanged="value => MetricColorChanged(item,value)" />
-                                                <MIcon OnClick="() => Remove(item)" Color="red">mdi-delete</MIcon>
-                                            </MCardActions>
-                                        </MCard>
+                                        <ServiceAutoComplete Label="@I18n.Dashboard("Project")" Readonly Value="@ConfigurationRecord.Service" />
+                                    </MCol>
+                                    <MCol Md="8">
+                                        <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
+                                            @foreach (var item in TableMap[ConfigurationRecord.ModelType])
+                                            {
+                                                <MButton Class="text-capitalize" Value="@item.ToString()">
+                                                    @item.ToString()
+                                                </MButton>
+                                            }
+                                        </MButtonGroup>
                                     </MCol>
                                 }
-                                <MCol Md="4">
-                                    <MCard Height=@(Value.ChartType is ChartTypes.Table ? 350 : 208) OnClick="Add" Class="d-flex justify-center align-center" Style="background-color:#F6F8FD">
-                                        <MIcon XLarge>mdi-plus</MIcon>
-                                    </MCard>
-                                </MCol>
+                                else
+                                {
+                                    <MCol Md="12">
+                                        <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
+                                            @foreach (var item in TableMap[ConfigurationRecord.ModelType])
+                                            {
+                                                <MButton Class="text-capitalize" Value="@item.ToString()">
+                                                    @item.ToString()
+                                                </MButton>
+                                            }
+                                        </MButtonGroup>
+                                    </MCol>
+                                }
                             }
+                            <MCol Md="4">
+                                <STextField @bind-Value="@Value.Title" />
+                            </MCol>
+                            <MCol Md="8">
+                                <STextField @bind-Value="@Value.Description" />
+                            </MCol>
+                            <MCol Md="12">
+                                <MRow>
+                                    @if (Value.ChartType is ChartTypes.Table && Value.ListType is ListTypes.TopList)
+                                    {
+                                        <MCol Md="4">
+                                            <MCard Class="pa-2" Style="background-color:#F6F8FD">
+                                                <MCardText>
+                                                    <MRow>
+                                                        <MCol Md="12">
+                                                            <STextField BackgroundColor="white" DebounceInterval="500" TValue="string" Value="Value.Metrics[0].DisplayName" ValueChanged="value => MetricNameChanged(Value.Metrics[0],value) " Label="@I18n.Dashboard("Metric name")" />
+                                                        </MCol>
+                                                        <MCol Md="12">
+                                                            <MetricsExpression Value="Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value)" />
+                                                        </MCol>
+                                                    </MRow>
+                                                </MCardText>
+                                                <MCardActions Class="d-flex justify-space-between">
+                                                    <ColorGroup Value="@Value.Metrics[0].Color" ValueChanged="value => MetricColorChanged(Value.Metrics[0],value)" />
+                                                </MCardActions>
+                                            </MCard>
+                                        </MCol>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var item in Value.Metrics)
+                                        {
+                                            <MCol Md="4">
+                                                <MCard Class="pa-2" Style="background-color:#F6F8FD">
+                                                    <MCardText>
+                                                        <MRow>
+                                                            <MCol Md="12">
+                                                                <STextField BackgroundColor="white" Value="@item.DisplayName" TValue="string" ValueChanged="value => MetricNameChanged(item,value)" DebounceInterval="500" Label="@I18n.Dashboard(Value.ChartType is ChartTypes.Table?"Column name":"Metrics name")" />
+                                                            </MCol>
+                                                            <MCol Md="12">
+                                                                <MetricsExpression Value="@item.Expression" ValueChanged="async value => await MetricExpressionChangedAsync(item,value)" />
+                                                            </MCol>
+                                                            @if (Value.ChartType is ChartTypes.Table)
+                                                            {
+                                                                <MCol Md="12">
+                                                                    <STextField BackgroundColor="white" @bind-Value="item.Icon" Label="@I18n.T("Icon")" />
+                                                                </MCol>
+                                                                <MCol Md="12">
+                                                                    <STextField BackgroundColor="white" @bind-Value="item.Unit" Label="@I18n.T("Unit")" />
+                                                                </MCol>
+                                                            }
+                                                        </MRow>
+                                                    </MCardText>
+                                                    <MCardActions Class="d-flex justify-space-between">
+                                                        <ColorGroup Value="@item.Color" ValueChanged="value => MetricColorChanged(item,value)" />
+                                                        <MIcon OnClick="() => Remove(item)" Color="red">mdi-delete</MIcon>
+                                                    </MCardActions>
+                                                </MCard>
+                                            </MCol>
+                                        }
+                                        <MCol Md="4">
+                                            <MCard Height=@(Value.ChartType is ChartTypes.Table ? 350 : 208) OnClick="Add" Class="d-flex justify-center align-center" Style="background-color:#F6F8FD">
+                                                <MIcon XLarge>mdi-plus</MIcon>
+                                            </MCard>
+                                        </MCol>
+                                    }
+                                </MRow>
+                            </MCol>
                         </MRow>
-                    </MCol>
-                </MRow>
-            </MCardText>
-        </MCard>
+                    </MCardText>
+                </MCard>
+            </MCol>
+        </MRow> 
     </MCol>
+   
     <MCol Cols="4">
         <MCard>
             <MCardText>

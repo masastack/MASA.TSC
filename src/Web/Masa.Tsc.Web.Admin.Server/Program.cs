@@ -10,9 +10,6 @@ var tscUrl = builder.Environment.IsDevelopment() ? AppSettings.Get("ServiceAddre
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
-
 builder.Services.Configure<JsonOptions>(option =>
 {
     option.JsonSerializerOptions.Converters.Add(new QueryResultDataResponseConverter());
