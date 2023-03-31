@@ -372,6 +372,8 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         set => _eChartType = value;
     }
 
+    public Func<TopListOption, Task>? TopListOnclick { get; set; }
+
     static JsonSerializerOptions JsonOption = new()
     {
         PropertyNameCaseInsensitive = true
