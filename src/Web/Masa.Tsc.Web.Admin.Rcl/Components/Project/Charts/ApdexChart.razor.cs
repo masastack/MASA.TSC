@@ -123,16 +123,7 @@ public partial class ApdexChart
 
         var values = data.Select(str => double.Parse(str)).ToArray();
         Total = FormatValue(values[0], values.Last());
-        var result = data[1..];
-        var index = 1;
-        do
-        {
-            double pre = values[index - 1], current = values[index];
-            result[index - 1] = FormatValue(pre, current);
-            index++;
-        }
-        while (data.Length - index > 0);
-        return result;
+        return data;
     }
 
     private string FormatValue(double pre, double current)
@@ -147,11 +138,11 @@ public partial class ApdexChart
     private string DoubleToString(double value)
     {
         if (value > 0)
-            return value.ToString("+0.##");
+            return value.ToString("+0.##%");
         else if (value < 0)
-            return value.ToString("0.##");
+            return value.ToString("0.##%");
         else
-            return value.ToString();
+            return value.ToString("%");
     }
 
     protected override bool IsSubscribeTimeZoneChange => true;

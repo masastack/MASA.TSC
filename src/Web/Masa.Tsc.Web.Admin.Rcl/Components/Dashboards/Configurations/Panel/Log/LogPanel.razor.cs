@@ -79,9 +79,9 @@ public partial class LogPanel
 
     protected override async Task OnParametersSetAsync()
     {
-        if (string.IsNullOrEmpty(Search) && !string.IsNullOrEmpty(Service))
+        if (string.IsNullOrEmpty(Search) && !string.IsNullOrEmpty(Service) && !string.IsNullOrEmpty(LogLevel))
         {
-            Search = Service;
+            Search = $"{{{{\"term\":{{{{\"Resource.service.name.keyword\":\"{Service}\"}},{{{{\"term\":{{{{\"SeverityText.keyword\": \"{LogLevel}\"}}";
         }
 
         await GetCompontentLogsAsync();
