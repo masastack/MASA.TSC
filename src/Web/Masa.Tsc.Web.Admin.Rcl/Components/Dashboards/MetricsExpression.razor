@@ -84,7 +84,7 @@
         _autocomplete = !_autocomplete;
         if (_autocomplete && string.IsNullOrEmpty(Value) is false && Metrics.ContainsValue(Value) is false)
         {
-            await ValueChanged.InvokeAsync(null);
+            //await ValueChanged.InvokeAsync(null);
         }
     }
 }
