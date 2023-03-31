@@ -3,7 +3,7 @@
 <SAutoComplete Value=Value
                ValueChanged=ValueChanged
                Items="@(Services?? new())"
-               ItemText="app => app.Name"
+               ItemText="app =>Metric?app.Identity:app.Name"
                ItemValue="app => app.Identity"
                Small
                Disabled=Readonly

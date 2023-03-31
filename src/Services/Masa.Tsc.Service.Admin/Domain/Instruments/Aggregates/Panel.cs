@@ -155,6 +155,7 @@ public class Panel : AggregateRoot<Guid>
 
         Index = index;
         Title = update.Title;
+        Panels ??= new();
 
         if (update.ChildPanels == null || !update.ChildPanels.Any())
         {

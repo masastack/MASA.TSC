@@ -717,6 +717,8 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
     {
         _tableData.Clear();
         var data = GetTableInstantVectorData();
+        if (services == null || !services.Any())
+            return;
         foreach (var service in services)
         {
             var rowData = new List<Dessert>();
