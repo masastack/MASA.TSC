@@ -103,7 +103,6 @@ public partial class ApdexChart
             var seriesData = ((QueryResultMatrixRangeResponse)_data[0].Result!.First()).Values!.Select(items => (string)items[1]).ToArray();
             var timeSpans = ((QueryResultMatrixRangeResponse)_data[0].Result!.First()).Values!.Select(items => Convert.ToDouble(items[0])).ToArray();
             seriesData = Caculate(seriesData);
-            Total = seriesData.Last();
             var format = StartTime.Format(EndTime);
             _options.SetValue("xAxis.data", timeSpans.Skip(1).Select(value => ToDateTimeStr(value, format)));
             _options.SetValue("series[0].data", seriesData);
@@ -118,25 +117,32 @@ public partial class ApdexChart
 
     private string[] Caculate(string[] data)
     {
-        if (data == null || !data.Any())
+        Total = "0";
+        if (data == null || data.Length - 1 <= 0)
             return data!;
 
         var values = data.Select(str => double.Parse(str)).ToArray();
-
+        Total = FormatValue(values[0], values.Last());
         var result = data[1..];
         var index = 1;
         do
         {
             double pre = values[index - 1], current = values[index];
-            if (pre is double.NaN || current is double.NaN || pre == 0)
-                result[index - 1] = "0";
-            else
-                result[index - 1] = DoubleToString(Math.Round((current - pre) * 100.0 / pre, 2));
+            result[index - 1] = FormatValue(pre, current);
             index++;
         }
         while (data.Length - index > 0);
         return result;
     }
+
+    private string FormatValue(double pre, double current)
+    {
+        if (pre is double.NaN || current is double.NaN || pre == 0)
+            return "0";
+        else
+            return DoubleToString(Math.Round((current - pre) * 100.0 / pre, 2));
+    }
+
 
     private string DoubleToString(double value)
     {

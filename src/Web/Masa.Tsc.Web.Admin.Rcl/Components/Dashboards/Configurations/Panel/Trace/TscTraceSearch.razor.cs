@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceSearch
@@ -17,6 +19,9 @@ public partial class TscTraceSearch
     [Parameter, EditorRequired]
     public Func<string, string?, Task<IEnumerable<string>>> QueryEndpoints { get; set; }
 
+    [Parameter]
+    public string? TraceId { get; set; }
+
     private List<string> _services = new();
     private List<string> _instances = new();
     private List<string> _endpoints = new();
@@ -32,6 +37,7 @@ public partial class TscTraceSearch
 
     protected override async Task OnInitializedAsync()
     {
+        _keyword = TraceId;
         await SearchServices();
         await base.OnInitializedAsync();
     }
