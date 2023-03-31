@@ -81,7 +81,7 @@ public partial class LogPanel
     {
         if (string.IsNullOrEmpty(Search) && !string.IsNullOrEmpty(Service) && !string.IsNullOrEmpty(LogLevel))
         {
-            Search = $"{{{{\"term\":{{{{\"Resource.service.name.keyword\":\"{Service}\"}},{{{{\"term\":{{{{\"SeverityText.keyword\": \"{LogLevel}\"}}";
+            Search = $"{{\"term\":{{\"Resource.service.name.keyword\":\"{Service}\"}}}},{{\"term\":{{\"SeverityText.keyword\": \"{LogLevel}\"}}}}";
         }
 
         await GetCompontentLogsAsync();
