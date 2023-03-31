@@ -79,11 +79,6 @@ public partial class LogPanel
 
     protected override async Task OnParametersSetAsync()
     {
-        if (string.IsNullOrEmpty(Search) && !string.IsNullOrEmpty(Service))
-        {
-            Search = Service;
-        }
-
         await GetCompontentLogsAsync();
     }
 
@@ -145,9 +140,7 @@ public partial class LogPanel
             End = end,
             Page = Page,
             TaskId = TaskId,
-            Query = _search!,
-            Service = Service,
-            LogLevel = LogLevel
+            Query = _search!
         };
         var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
         Logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
@@ -177,6 +170,7 @@ public partial class LogPanel
                 Value = TaskId
             });
         }
+        bool isRawQuery = (_search?.IndexOfAny(new char[] { '{', '}' }) ?? -1) >= 0;
         var result = await ApiCaller.LogService.AggregateAsync<List<KeyValuePair<long, long>>>(new SimpleAggregateRequestDto
         {
             Start = start,
@@ -184,10 +178,20 @@ public partial class LogPanel
             Name = "@timestamp",
             Type = AggregateTypes.DateHistogram,
             Interval = "5m",
-            Keyword = _search!,
+            Keyword = isRawQuery ? string.Empty : _search!,
+            RawQuery = isRawQuery ? _search! : string.Empty,
             Conditions = conditions
         });
         ChartData = result ?? new();
+    }
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrEmpty(Search) && !string.IsNullOrEmpty(Service) && !string.IsNullOrEmpty(LogLevel))
+        {
+            Search = $"{{\"term\":{{\"Resource.service.name.keyword\":\"{Service}\"}}}},{{\"term\":{{\"SeverityText.keyword\": \"{LogLevel}\"}}}}";
+        }
+        base.OnInitialized();
     }
 
     private object FormatChartData()

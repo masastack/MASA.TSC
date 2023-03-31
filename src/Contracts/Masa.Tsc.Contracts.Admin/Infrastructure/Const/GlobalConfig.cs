@@ -7,5 +7,5 @@ public static class GlobalPanelConfig
 {
     public static int Width { get; } = 4;
 
-    public static int Height { get; } = 3;
+    public static int Height { get; } = 2;
 }

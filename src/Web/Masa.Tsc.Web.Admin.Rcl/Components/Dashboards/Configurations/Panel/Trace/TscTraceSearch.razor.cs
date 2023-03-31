@@ -17,6 +17,9 @@ public partial class TscTraceSearch
     [Parameter, EditorRequired]
     public Func<string, string?, Task<IEnumerable<string>>> QueryEndpoints { get; set; }
 
+    [Parameter]
+    public string? TraceId { get; set; }
+
     private List<string> _services = new();
     private List<string> _instances = new();
     private List<string> _endpoints = new();
@@ -32,6 +35,7 @@ public partial class TscTraceSearch
 
     protected override async Task OnInitializedAsync()
     {
+        _keyword = TraceId;
         await SearchServices();
         await base.OnInitializedAsync();
     }
