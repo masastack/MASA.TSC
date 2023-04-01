@@ -35,9 +35,9 @@ public partial class TscTraceSearch
 
     protected override async Task OnInitializedAsync()
     {
-        _keyword = TraceId;
-        await SearchServices();
+        _keyword = TraceId;        
         await base.OnInitializedAsync();
+        await SearchServices();
     }
 
     private async Task SearchServices()

@@ -216,9 +216,10 @@ public class QueryHandler
         {
             if (query.Result == null || !query.Result.Any())
                 query.Result = new List<string> { MetricConstants.DEFAULT_LAYER };
-            else if (!query.Result.Contains(MetricConstants.DEFAULT_LAYER))
+            else
             {
-                query.Result.Add(MetricConstants.DEFAULT_LAYER);
+                if ((!query.Result.Contains(MetricConstants.DEFAULT_LAYER)))
+                    query.Result.Add(MetricConstants.DEFAULT_LAYER);
                 query.Result.Sort();
             }
         }

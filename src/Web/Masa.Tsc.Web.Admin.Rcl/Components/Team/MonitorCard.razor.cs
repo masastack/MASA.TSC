@@ -25,11 +25,11 @@ public partial class MonitorCard
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        await base.SetParametersAsync(parameters);
         if (parameters.TryGetValue<AppMonitorDto>(nameof(Data), out var data))
         {
             UpdateItems();
         }
+        await base.SetParametersAsync(parameters);
     }
 
     private List<AppMonitorViewDto> _items;
