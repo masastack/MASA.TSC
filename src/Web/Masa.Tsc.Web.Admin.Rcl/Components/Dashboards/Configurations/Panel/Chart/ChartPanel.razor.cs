@@ -65,7 +65,7 @@ public partial class ChartPanel
                 Time = ConfigurationRecord.EndTime.UtcDateTime,
                 Service = ConfigurationRecord.Service,
                 Instance = ConfigurationRecord.Instance,
-                EndPoint = ConfigurationRecord.ConvertEndpoint,
+                EndPoint = ConfigurationRecord.Endpoint,
                 Queries = Value.Metrics.Select(item => item.Expression).ToList()
             });
         }
@@ -77,7 +77,7 @@ public partial class ChartPanel
                 End = ConfigurationRecord.EndTime.UtcDateTime,
                 Service = ConfigurationRecord.Service,
                 Instance = ConfigurationRecord.Instance,
-                EndPoint = ConfigurationRecord.ConvertEndpoint,
+                EndPoint = ConfigurationRecord.Endpoint,
                 Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
                 MetricNames = Value.Metrics.Select(item => item.Expression).ToList()
             });

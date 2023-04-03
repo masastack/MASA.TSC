@@ -347,3 +347,7 @@ div[style*="visibility: hidden; opacity: 0;"] {
 .dashboard-editor-ui-btn:active {
     background-color: #E4E8F3 !important;
 }
+
+.m-label.m-label--active{
+    z-index:9999
+}

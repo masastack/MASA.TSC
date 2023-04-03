@@ -8,18 +8,17 @@
                         View
                         SavePanelsAction="SavePanelsAsync"
                         GetPanelsAction="GetPanelsAsync"
-                        Style="max-height: calc(100vh - 216px)"
-                        HeaderStyle="height: 72px;background: #FFFFFF;border-radius: 16px;"
-                        ContentStyle="max-height: calc(100vh - 264px);min-height: calc(100vh - 264px);">
+                        Style="max-height: calc(100% - 84px)"
+                        HeaderStyle="height: 72px;background: #FFFFFF;border-radius: 16px;">
     <HeaderContent>
-        <div class="mr-4 d-flex my-auto" style="width: 40px;height: 40px;border: 1px solid #E4E8F3;border-radius: 40px;">
+        <div class="ml-4 d-flex my-auto" style="width: 40px;height: 40px;border: 1px solid #E4E8F3;border-radius: 40px;">
             <div class="ma-auto">
                 <SIcon OnClick=NavigateToTeamProjectDialog Color="emphasis2" Size=24 Tooltip="@I18n.TeamDashboard("Return to team details page")">
                     mdi-arrow-left
                 </SIcon>       
             </div>
         </div>
-        <div class="h6 emphasis2--text my-auto">
+        <div class="ml-4 h6 emphasis2--text my-auto">
             @(ConfigurationRecord.ServiceName ?? _serviceAutoComplete?.CurrentApp?.Name)           
         </div>
         <ServiceAutoComplete @ref=_serviceAutoComplete DataReady=" () => {}" Value="@ConfigurationRecord.Service" Style="visibility:hidden;" />

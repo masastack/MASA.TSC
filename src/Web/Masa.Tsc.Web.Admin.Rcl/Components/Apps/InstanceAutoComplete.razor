@@ -1,18 +1,15 @@
 ﻿@inherits TscComponentBase
-<div class="instance-autoComplete">
-    <MenuTooltip Tooltip="@Value">
-        <SAutoComplete Value=Value
-                       ValueChanged=ValueChanged
-                       Items="@Instances"
-                       ItemText="item => item.Value"
-                       ItemValue='item => item.Key'
-                       Small
-                       HideSelected=false
-                       Label="@I18n.T("Instance")"
-                       BackgroundColor="@(FillBackground?"fill-background":"white")"
-                       Loading="_isLoading"
-                       Class="@("rounded-2 " + Class)"
-                       Style="@Style">
-        </SAutoComplete>
-    </MenuTooltip>
-</div>
+
+<SAutoComplete Value=Value
+               ValueChanged=ValueChanged
+               Items="@Instances"
+               ItemText="item => item"
+               ItemValue='item => item'
+               Small
+               HideSelected=false
+               Clearable=IncludeAll
+               Label="@I18n.T("Instance")"
+               BackgroundColor="@(FillBackground?"fill-background":"white")"
+               Loading="_isLoading"
+               Class="@("rounded-2 " + Class)"
+               Style="@Style" />

@@ -19,8 +19,6 @@ public abstract class ConfigurationRecord
 
     public string? Endpoint { get; set; }
 
-    public string? ConvertEndpoint => Endpoint == "All" ? null : Endpoint;
-
     public string? PanelId { get; set; }
 
     public ModelTypes ModelType

@@ -17,7 +17,7 @@
              gs-y="@item.Y"
              gs-min-w="4"
              gs-min-h="2"
-             gs-auto-position="@(((item.X!=0 || item.Y!=0) && item!=firstItem) ?"false":"true")">
+             gs-auto-position="@(IsAutoPosition(item) ?"true":"false")">
             <div class="grid-stack-item-content @ItemClass" style="@ItemStyle">
                 @ItemContent(item)
             </div>
@@ -123,6 +123,11 @@
                 await GridstackJSModule.SwitchStateAsync(!Readonly);
             }
         }
+    }
+
+    bool IsAutoPosition(TItem item)
+    {
+        return item.X == 0 && item.Y == 0 && item.AutoPosition;
     }
 
     public void Dispose()
