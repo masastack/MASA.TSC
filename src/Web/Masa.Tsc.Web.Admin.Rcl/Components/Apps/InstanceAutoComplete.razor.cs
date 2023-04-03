@@ -23,7 +23,7 @@ public partial class InstanceAutoComplete
     [Parameter]
     public bool IncludeAll { get; set; }
 
-    public List<KeyValuePair<string, string>> Instances { get; set; } = new();
+    public List<string> Instances { get; set; } = new();
 
     protected override async Task OnParametersSetAsync()
     {
@@ -37,18 +37,14 @@ public partial class InstanceAutoComplete
                 Service = Service
             };
             var data = await ApiCaller.MetricService.GetValues(query);
-            Instances = new();
-            if (IncludeAll)
-            {
-                Instances.Add(new("All", I18n.T("All")));
-            }
-            Instances.TryAddRange(data?.ToDictionary(item => item, item => item) ?? new());
+            Instances = data ?? new();
             if (Instances.Any())
             {
-                if (string.IsNullOrEmpty(Value) || Instances.Any(item => item.Key == Value) is false)
+                if (IncludeAll is false && (string.IsNullOrEmpty(Value) || Instances.Any(item => item == Value) is false))
                 {
-                    await ValueChanged.InvokeAsync(Instances.First().Key);
+                    await ValueChanged.InvokeAsync(Instances.First());
                 }
+                else await ValueChanged.InvokeAsync(default);
             }
             _isLoading = false;
         }

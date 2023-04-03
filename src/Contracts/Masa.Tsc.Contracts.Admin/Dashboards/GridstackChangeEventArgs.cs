@@ -14,4 +14,6 @@ public class GridstackChangeEventArgs
     public int Width { get; set; }
 
     public int Height { get; set; }
+
+    public bool AutoPosition { get; set; }
 }

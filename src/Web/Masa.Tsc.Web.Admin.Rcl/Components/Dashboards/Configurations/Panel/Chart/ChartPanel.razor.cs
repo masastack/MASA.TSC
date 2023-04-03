@@ -64,34 +64,10 @@ public partial class ChartPanel
             End = ConfigurationRecord.EndTime.UtcDateTime,
             Service = ConfigurationRecord.Service,
             Instance = ConfigurationRecord.Instance,
-            EndPoint = ConfigurationRecord.ConvertEndpoint,
+            EndPoint = ConfigurationRecord.Endpoint,
             Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
             MetricNames = Value.Metrics.Select(item => item.Expression).ToList()
-        });
-        //if (Value.ChartType is ChartTypes.Pie or ChartTypes.Gauge or ChartTypes.Table)
-        //{
-        //    return await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto()
-        //    {
-        //        Time = ConfigurationRecord.EndTime.UtcDateTime,
-        //        Service = ConfigurationRecord.Service,
-        //        Instance = ConfigurationRecord.Instance,
-        //        EndPoint = ConfigurationRecord.ConvertEndpoint,
-        //        Queries = Value.Metrics.Select(item => item.Expression).ToList()
-        //    });
-        //}
-        //else
-        //{
-        //    return await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto()
-        //    {
-        //        Start = ConfigurationRecord.StartTime.UtcDateTime,
-        //        End = ConfigurationRecord.EndTime.UtcDateTime,
-        //        Service = ConfigurationRecord.Service,
-        //        Instance = ConfigurationRecord.Instance,
-        //        EndPoint = ConfigurationRecord.ConvertEndpoint,
-        //        Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
-        //        MetricNames = Value.Metrics.Select(item => item.Expression).ToList()
-        //    });
-        //}
+        });      
     }
 
     public async Task ReloadAsync()

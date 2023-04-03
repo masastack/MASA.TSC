@@ -15,6 +15,7 @@ public class UpsertTabItemPanelDto : UpsertPanelDto
             {
                 ParentPanel = this,
                 Width = 12,
+                Height = 4
             }
         };
         ParentPanel = parentPanel;
@@ -25,6 +26,7 @@ public class UpsertTabItemPanelDto : UpsertPanelDto
         ChildPanels.AdaptiveUI(new UpsertPanelDto()
         {
             PanelType = panelType,
+            AutoPosition = true,
             ParentPanel = this
         });
     }

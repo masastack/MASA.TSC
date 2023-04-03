@@ -76,10 +76,10 @@
                                                 <MCardText>
                                                     <MRow>
                                                         <MCol Md="12">
-                                                            <STextField BackgroundColor="white" DebounceInterval="500" TValue="string" Value="Value.Metrics[0].DisplayName" ValueChanged="value => MetricNameChanged(Value.Metrics[0],value) " Label="@I18n.Dashboard("Metric name")" />
+                                                            <STextField BackgroundColor="white" DebounceInterval="500" TValue="string" Value="@Value.Metrics[0].DisplayName" ValueChanged="value => MetricNameChanged(Value.Metrics[0],value) " Label="@I18n.Dashboard("Metric name")" />
                                                         </MCol>
                                                         <MCol Md="12">
-                                                            <MetricsExpression Value="Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value)" />
+                                                            <MetricsExpression Value="@Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value)" />
                                                         </MCol>
                                                     </MRow>
                                                 </MCardText>

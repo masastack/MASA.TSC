@@ -21,11 +21,6 @@ public partial class ConfigurationTeamDetail
 
     protected override void OnInitialized()
     {
-        if (ConfigurationRecord.NavigationManager.Uri.Contains("record") is false)
-        {
-            ConfigurationRecord.Clear();
-        }
-
         ConfigurationRecord.Service = ServiceName;
         ConfigurationRecord.ProjectId = ProjectId;
         ConfigurationRecord.TeamId = Guid.Parse(TeamId);
@@ -43,6 +38,7 @@ public partial class ConfigurationTeamDetail
 
     void NavigateToTeamProjectDialog()
     {
+        ConfigurationRecord.TeamProjectDialogVisible = true;
         ConfigurationRecord.NavigateToTeamProjectDialog();
     }
 }

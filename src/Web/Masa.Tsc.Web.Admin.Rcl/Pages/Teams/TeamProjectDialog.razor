@@ -32,9 +32,9 @@
                             <DateTimeRangeToolbar                               
                                 StartDateTime="@ConfigurationRecord.StartTime"
                                 EndDateTime="@ConfigurationRecord.EndTime"
-                                DefaultQuickRange="@ConfigurationRecord.DefaultQuickRangeKey"
-                                Interval="@ConfigurationRecord.Interval"
-                                UseAbsoluteTime="@ConfigurationRecord.UseAbsoluteTime"
+                                @bind-DefaultQuickRange="@ConfigurationRecord.DefaultQuickRangeKey"
+                                @bind-Interval="@ConfigurationRecord.Interval"
+                                @bind-UseAbsoluteTime="@ConfigurationRecord.UseAbsoluteTime"
                                 OnUpdate="OnDateTimeUpdateAsync"
                                 OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
                             <SButton OnClick=NavigateToDashboardConfiguration Class="ml-6" Small BorderRadiusClass="rounded-lg">

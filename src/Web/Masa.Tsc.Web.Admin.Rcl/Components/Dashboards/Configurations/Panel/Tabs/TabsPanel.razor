@@ -34,11 +34,13 @@
         @HeaderRightContent
     }
 </div>
-<MTabsItems Value="CurrentTab">
-    @foreach (var tabItem in Panel.ChildPanels)
-    {
-        <MTabItem Value="tabItem.Id.ToString()">
-            <PanelGrids ParentPanel=tabItem Panels="tabItem.ChildPanels" />
-        </MTabItem>
-    }
-</MTabsItems>
+<div style="padding-left:10px;padding-bottom:10px;height:calc(100% - 48px);overflow:auto;">
+    <MTabsItems Value="CurrentTab">
+        @foreach (var tabItem in Panel.ChildPanels)
+        {
+            <MTabItem Value="tabItem.Id.ToString()">
+                <PanelGrids ParentPanel=tabItem Panels="tabItem.ChildPanels" />
+            </MTabItem>
+        }
+    </MTabsItems>
+</div>

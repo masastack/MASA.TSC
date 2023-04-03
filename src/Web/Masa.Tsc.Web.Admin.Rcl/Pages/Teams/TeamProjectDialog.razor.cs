@@ -106,6 +106,7 @@ public partial class TeamProjectDialog
 
     void NavigateToDashboardConfiguration()
     {
+        ConfigurationRecord.TeamProjectDialogVisible = false;
         ConfigurationRecord.NavigateToConfiguration();
     }
 }

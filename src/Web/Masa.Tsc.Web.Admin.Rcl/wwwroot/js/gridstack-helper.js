@@ -18,20 +18,22 @@ export function init(options, dotNetHelper) {
     }
     else initByElement(options, el, dotNetHelper);
 
-    if (options.id === 'grid-stack') {
-        var grid = el.gridstack;
-        grid.cellHeight = cellHeight;
-        var val = grid.cellWidth() * 0.98;
-        grid.cellHeight(val, false);
-        window.addEventListener('resize', () => {
-            window.setTimeout(() => {
-                var val = grid.cellWidth() * 0.98;
-                grid.cellHeight(val, true);
-            }, 100);
-        });
-    }
+    //if (options.id === 'grid-stack') {
+    //    var grid = el.gridstack;
+    //    grid.cellHeight = cellHeight;
+    //    window.setTimeout(() => {
+    //        var val = grid.cellWidth() * 0.90;//1.02;
+    //        grid.cellHeight(val, true);
+    //    }, 10);
+    //    window.addEventListener('resize', () => {
+    //        window.setTimeout(() => {
+    //            var val = grid.cellWidth() * 0.90;//1.02;
+    //            grid.cellHeight(val, true);
+    //        }, 100);
+    //    });
+    //}
 
-    return grid;
+    return el.gridstack;
 }
 
 function cellHeight(val, update = true){
@@ -92,8 +94,8 @@ export function save(options, dotNetHelper) {
             id: item.id,
             x: item.x,
             y: item.y,
-            width: item.w,
-            height: item.h,
+            width: item.w || item.minW,
+            height: item.h || item.minH,
         }
     }));
 }
