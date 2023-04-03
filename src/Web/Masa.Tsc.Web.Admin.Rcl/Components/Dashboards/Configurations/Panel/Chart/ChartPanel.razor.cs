@@ -58,30 +58,40 @@ public partial class ChartPanel
     async Task<List<QueryResultDataResponse>> GetMetricsAsync()
     {
         if (Value.Metrics.Any(item => item.Expression is not null) is false) return new();
-        if (Value.ChartType is ChartTypes.Pie or ChartTypes.Gauge or ChartTypes.Table)
+        return await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto()
         {
-            return await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto()
-            {
-                Time = ConfigurationRecord.EndTime.UtcDateTime,
-                Service = ConfigurationRecord.Service,
-                Instance = ConfigurationRecord.Instance,
-                EndPoint = ConfigurationRecord.ConvertEndpoint,
-                Queries = Value.Metrics.Select(item => item.Expression).ToList()
-            });
-        }
-        else
-        {
-            return await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto()
-            {
-                Start = ConfigurationRecord.StartTime.UtcDateTime,
-                End = ConfigurationRecord.EndTime.UtcDateTime,
-                Service = ConfigurationRecord.Service,
-                Instance = ConfigurationRecord.Instance,
-                EndPoint = ConfigurationRecord.ConvertEndpoint,
-                Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
-                MetricNames = Value.Metrics.Select(item => item.Expression).ToList()
-            });
-        }
+            Start = ConfigurationRecord.StartTime.UtcDateTime,
+            End = ConfigurationRecord.EndTime.UtcDateTime,
+            Service = ConfigurationRecord.Service,
+            Instance = ConfigurationRecord.Instance,
+            EndPoint = ConfigurationRecord.ConvertEndpoint,
+            Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
+            MetricNames = Value.Metrics.Select(item => item.Expression).ToList()
+        });
+        //if (Value.ChartType is ChartTypes.Pie or ChartTypes.Gauge or ChartTypes.Table)
+        //{
+        //    return await ApiCaller.MetricService.GetMultiQueryAsync(new RequestMultiQueryDto()
+        //    {
+        //        Time = ConfigurationRecord.EndTime.UtcDateTime,
+        //        Service = ConfigurationRecord.Service,
+        //        Instance = ConfigurationRecord.Instance,
+        //        EndPoint = ConfigurationRecord.ConvertEndpoint,
+        //        Queries = Value.Metrics.Select(item => item.Expression).ToList()
+        //    });
+        //}
+        //else
+        //{
+        //    return await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto()
+        //    {
+        //        Start = ConfigurationRecord.StartTime.UtcDateTime,
+        //        End = ConfigurationRecord.EndTime.UtcDateTime,
+        //        Service = ConfigurationRecord.Service,
+        //        Instance = ConfigurationRecord.Instance,
+        //        EndPoint = ConfigurationRecord.ConvertEndpoint,
+        //        Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
+        //        MetricNames = Value.Metrics.Select(item => item.Expression).ToList()
+        //    });
+        //}
     }
 
     public async Task ReloadAsync()
