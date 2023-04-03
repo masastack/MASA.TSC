@@ -159,12 +159,23 @@
         //new QuickRange(QuickRangeKey.Off, TimeSpan.Zero, true),
     };
 
+    protected override async Task OnInitializedAsync()
+    {
+        await GetOffset();
+
+        if (DefaultQuickRange is not null)
+        {
+            _quickRange = _quickRangeItems.FirstOrDefault(item => item.Key == DefaultQuickRange) ?? s_internalDefaultQuickRange;
+        }
+
+        _selectedQuickRangeKey = _quickRange.Key;
+        await base.OnInitializedAsync();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
-            GetOffset();
             if (DefaultQuickRange is not null)
             {
                 _quickRange = _quickRangeItems.FirstOrDefault(item => item.Key == DefaultQuickRange) ?? s_internalDefaultQuickRange;
@@ -193,6 +204,7 @@
             handleIntervalUpdate(Interval);
             StateHasChanged();
         }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task OnTimeZoneInfoChange(TimeZoneInfo timeZoneInfo)
@@ -215,24 +227,12 @@
         if (OnTimeZoneUpdate.HasDelegate)
             await OnTimeZoneUpdate.InvokeAsync(timeZoneInfo);
         StateHasChanged();
-    }
+    }   
 
-    protected override void OnInitialized()
+    private async Task GetOffset()
     {
-        base.OnInitialized();
-
-        GetOffset();
-
-        if (DefaultQuickRange is not null)
-        {
-            _quickRange = _quickRangeItems.FirstOrDefault(item => item.Key == DefaultQuickRange) ?? s_internalDefaultQuickRange;
-        }
-
-        _selectedQuickRangeKey = _quickRange.Key;
-    }
-
-    private void GetOffset()
-    {
+        if (Math.Floor(JsInitVariables.TimezoneOffset.TotalMinutes) == 0)
+            await JsInitVariables.SetTimezoneOffset();
         Offset = JsInitVariables.TimezoneOffset;
     }
 

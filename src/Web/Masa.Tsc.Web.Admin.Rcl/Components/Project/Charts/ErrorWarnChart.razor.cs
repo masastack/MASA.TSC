@@ -14,10 +14,11 @@ public partial class ErrorWarnChart
     [Parameter]
     public string Title { get; set; }
 
-    private double? _success;
+    private double _success = 100;
     private EChartType _options = EChartConst.Pie;
     private List<QueryResultDataResponse>? _data;
     private double[] values = new double[2];
+    private bool _hasData = false;
 
     protected override void OnInitialized()
     {
@@ -43,7 +44,8 @@ public partial class ErrorWarnChart
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        _success = null;
+        _hasData = false;
+        _success = 100;
         if (query == null)
             return;
         if (query.End == null)
@@ -51,45 +53,33 @@ public partial class ErrorWarnChart
         if (query.Start == null)
             query.Start = query.End.Value.AddDays(-1);
 
-        var step = 60;
+        var step = 300;
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
-            $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"}}[{step}s])),1)",
-            $"round(sum by(service_name) (increase(http_server_duration_count[{step}s])),1)"
+                $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"}}[{step}s]))/sum by(service_name) (increase(http_server_duration_count[{step}s]))*100,0.01)"
            },
             Service = query.AppId,
             Start = query.Start.Value,
             End = query.End.Value,
-            Step = $"{(long)Math.Floor((query.End.Value - query.Start.Value).TotalSeconds)}s"
+            Step = query.Start.Value.Interval(query.End.Value)
         });
-
-        var index = 0;
-        foreach (var item in _data)
+        
+        if (_data != null && _data[0] != null && _data[0].ResultType == ResultTypes.Matrix && _data[0].Result != null && _data[0].Result.Any())
         {
-            if (item != null && item.ResultType == ResultTypes.Matrix && item.Result != null && item.Result.Any())
+            var first = (QueryResultMatrixRangeResponse)_data[0].Result.First();
+            var values = first.Values.Select(values => Convert.ToDouble(values[1])).Where(val => !double.IsNaN(val));
+            if (values.Any())
             {
-                var first = (QueryResultMatrixRangeResponse)item.Result.First()!;
-                values[index++] = first.Values.Sum(values => Convert.ToDouble(values[1]));
+                _hasData = true;
+                _success = values.Average().FloorDouble(2);
             }
         }
 
-        if (values[1] == 0)
-        {
-            values[0] = 1;
-            _success = 100;
-        }
-        else
-        {
-            _success = Math.Round(values[0] * 100 / values[1], 2, MidpointRounding.ToNegativeInfinity);
-        }
+        values[0] = _success;
+        values[1] = (100 - _success).FloorDouble(2);
 
-        if (_success.HasValue)
-        {
-            _success = Math.Round(_success.Value, 2, MidpointRounding.ToNegativeInfinity);
-        }
-
-        if (_data?.Any(item => item?.Result?.Any() is true) is true || Math.Round(values[0], 2) <= 0 || Math.Round(values[1]) <= 0)
+        if (_hasData && (Math.Round(values[0], 2) == 0 || Math.Round(values[1]) == 0))
         {
             _options.SetValue("series[0].itemStyle.normal.borderWidth", 0);
         }

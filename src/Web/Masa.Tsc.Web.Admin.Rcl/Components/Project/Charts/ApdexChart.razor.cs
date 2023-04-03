@@ -79,7 +79,7 @@ public partial class ApdexChart
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        var step = query.Start!.Value.Interval(query.End!.Value);
+        var step = "5m";
         string metric = $@"round((sum(rate(http_server_duration_bucket{{le=""250""}}[{step}])) by (service_name) + 
                                  sum(rate(http_server_duration_bucket{{le=""1000""}}[{step}])) by (service_name)
                                ) /2/sum(rate(http_server_duration_bucket{{le=""+Inf""}}[{step}])) by (service_name),0.0001)";
@@ -91,7 +91,7 @@ public partial class ApdexChart
             Start = query.Start.Value,
             End = query.End.Value,
             Service = query.AppId,
-            Step = step
+            Step = query.Start!.Value.Interval(query.End!.Value)
         });
         SetData();
     }
@@ -122,7 +122,7 @@ public partial class ApdexChart
             return data!;
 
         var values = data.Select(str => double.Parse(str)).ToArray();
-        Total = FormatValue(values[0], values.Last());
+        Total = FormatValue(values.FirstOrDefault(val => !double.IsNaN(val)), values.LastOrDefault(val => !double.IsNaN(val)));
         return data;
     }
 
@@ -142,7 +142,7 @@ public partial class ApdexChart
         else if (value < 0)
             return value.ToString("0.##%");
         else
-            return value.ToString("%");
+            return value.ToString();
     }
 
     protected override bool IsSubscribeTimeZoneChange => true;

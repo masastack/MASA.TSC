@@ -447,9 +447,9 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         if (IsLoadChartData is false) return;
         IsLoadChartData = false;
 
+        var data = GetMatrixRangeData();
         if (ChartType is ChartTypes.Line or ChartTypes.Bar)
         {
-            var data = GetMatrixRangeData();
             EChartType.Json["series"] = new JsonArray(data.Select(item => new JsonObject
             {
                 ["type"] = ChartType.ToString().ToLower(),
@@ -460,7 +460,6 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         }
         else if (ChartType is ChartTypes.LineArea)
         {
-            var data = GetMatrixRangeData();
             EChartType.Json["series"] = new JsonArray(data.Select(item => new JsonObject
             {
                 ["type"] = "line",
@@ -477,24 +476,22 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         }
         else if (ChartType is ChartTypes.Pie)
         {
-            var data = GetInstantVectorData();
             var serie = EChartType.Json["series"]!.AsArray().First()!;
             serie["color"] = new JsonArray(data.Select(item => (JsonNode)item.Key.Color).ToArray());
             serie["data"] = new JsonArray(data.Select(item => new JsonObject
             {
                 ["name"] = item.Key.Name,
-                ["value"] = item.Value.Value![1].ToString()
+                ["value"] = GetQueryResultMatrixRangeResponseValue(item.Value)
             }).ToArray());
         }
         else if (ChartType is ChartTypes.Gauge)
         {
-            var data = GetInstantVectorData();
             var serie = EChartType.Json["series"]!.AsArray().First()!;
             serie["color"] = new JsonArray(data.Select(item => (JsonNode)item.Key.Color).ToArray());
             serie["data"] = new JsonArray(data.Select(item => new JsonObject
             {
                 ["name"] = item.Key.Name,
-                ["value"] = item.Value.Value![1].ToString(),
+                ["value"] = GetQueryResultMatrixRangeResponseValue(item.Value),
                 ["title"] = new JsonObject()
                 {
                     ["offsetCenter"] = new JsonArray($"{GetPosition(data.IndexOf(item) + 1)}%", "80%")
@@ -635,6 +632,29 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         return data;
     }
 
+    List<List<QueryResultMatrixRangeResponse>> GetTableMatrixRangeData()
+    {
+        List<List<QueryResultMatrixRangeResponse>> data = new();
+
+        if (_chartData is not null)
+        {
+            foreach (var item in _chartData)
+            {
+                if (item is not null)
+                {
+                    var matrixs = new List<QueryResultMatrixRangeResponse>();
+                    foreach (var result in item.Result!)
+                    {
+                        if (result is QueryResultMatrixRangeResponse matrix) matrixs.Add(matrix);
+                    }
+                    data.Add(matrixs);
+                }
+            }
+        }
+
+        return data;
+    }
+
     string[] _defaultColors = new string[] { "#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc" };
 
     void LoadChartOption()
@@ -718,7 +738,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
     public void SetTableOption(List<string> services, string jumpName, string jumpId)
     {
         _tableData.Clear();
-        var data = GetTableInstantVectorData();
+        var data = GetTableMatrixRangeData();
         if (services == null || !services.Any())
             return;
         foreach (var service in services)
@@ -737,7 +757,8 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                 });
                 if (firstData is not null)
                 {
-                    return new Dessert { Text = firstData.Value![1].ToString() ?? "" };
+                    var value = GetQueryResultMatrixRangeResponseValue(firstData).ToString();
+                    return new Dessert { Text = value };
                 }
                 return new Dessert { Text = "" };
             }));
@@ -749,15 +770,28 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
     {
         _topListData.Clear();
 
-        var data = GetTableInstantVectorData().FirstOrDefault();
+        var data = GetTableMatrixRangeData().FirstOrDefault();
         if (data is null) return;
-        _topListData.AddRange(data.Where(item => item.Value![1].ToString() != "NaN")
-                                .Select(item => new TopListOption
-                                {
-                                    Href = href,
-                                    Text = string.Join('-', item.Metric!.Select(metric => metric.Value)),
-                                    Value = Convert.ToDouble(item.Value![1] ?? 0)
-                                }));
+        _topListData.AddRange(data.Select(item => new TopListOption
+        {
+            Href = href,
+            Text = string.Join('-', item.Metric!.Select(metric => metric.Value)),
+            Value = GetQueryResultMatrixRangeResponseValue(item)
+        }));
+    }
+
+    private double GetQueryResultMatrixRangeResponseValue(QueryResultMatrixRangeResponse item)
+    {
+        var values = item.Values.Select(ToDouble).Where(val => !double.IsNaN(val));
+        if (values.Any())
+            return values.Average().FloorDouble(2);
+        return default;
+    }
+
+    private double ToDouble(object[] itemValue)
+    {
+        double val = Convert.ToDouble(itemValue[1]);
+        return val;
     }
 
     private void YAxis_PropertyChanged(object? sender, PropertyChangedEventArgs e)

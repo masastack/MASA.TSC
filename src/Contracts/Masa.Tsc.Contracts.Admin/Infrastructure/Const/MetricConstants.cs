@@ -9,7 +9,7 @@ public sealed class MetricConstants
 
     public const string DEFAULT_LAYER = "General";
 
-    public const string MASASTACK_LAYER = "MasaStack";
-
     public const string ALL_METRICS_KEY = "all_metrics";
+
+    public const string DAPR_LAYER = "Dapr";
 }

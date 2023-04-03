@@ -39,11 +39,13 @@ public partial class TscTrace
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         await CompontentSearchAsync();
     }
 
     protected override async Task OnParametersSetAsync()
     {
+        await base.OnParametersSetAsync();
         await CompontentSearchAsync();
     }
 

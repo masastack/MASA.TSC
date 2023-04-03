@@ -81,7 +81,8 @@ public partial class ServiceResponseTimePercentile
     {
         Dictionary<string, List<string>> dddd = new();
         var timeSpans = new List<double>();
-
+        if (_data == null)
+            return;
         var legend = new string[] { "P50", "P75", "P90", "P95", "P99" };
         var index = 0;
         foreach (var item in _data)

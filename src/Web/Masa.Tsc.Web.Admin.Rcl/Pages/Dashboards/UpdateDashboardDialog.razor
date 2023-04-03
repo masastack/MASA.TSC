@@ -6,8 +6,8 @@
             <STextField Required @bind-Value="@Dashboard.Name" Class="mb-6" />
             <FolderSelect @bind-Value="Dashboard.Folder" Class="mb-6" />
             <LayerSelect @bind-Value="Dashboard.Layer" Class="mb-6" />
-            <EnumSelect TValue="ModelTypes" @bind-Value="Dashboard.Model" Disabled Clearable=false Class="mb-6" />           
-            <STextField Type="number" TValue="int" @bind-Value="Dashboard.Order" />
+            <EnumSelect TValue="ModelTypes" @bind-Value="Dashboard.Model" Disabled Clearable=false Class="mb-6" Label="@I18n.Dashboard("Model")" />           
+            <STextField Type="number" TValue="int" @bind-Value="Dashboard.Order" Label="@I18n.Dashboard("Order")" />
         </MForm>
     </ChildContent>
     <FooterContent>

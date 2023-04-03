@@ -51,49 +51,12 @@ public partial class DateTimeRangePicker
     private DateTimeOffset? _lastStartDateTime;
     private DateTimeOffset? _lastEndDateTime;
 
-    public override async Task SetParametersAsync(ParameterView parameters)
-    {        
-        await base.SetParametersAsync(parameters);
-        //has bugs
-        //EnsureValidDateTimes();
-    }
-
-    private void EnsureValidDateTimes()
-    {
-        if (_disableEnsureValidDateTimes)
-        {
-            return;
-        }
-
-        ArgumentNullException.ThrowIfNull(StartDateTime);
-        ArgumentNullException.ThrowIfNull(EndDateTime);
-
-        if (StartDateTime == default)
-        {
-            throw new ArgumentException($"{nameof(StartDateTime)} can not be default");
-        }
-
-        if (EndDateTime == default)
-        {
-            throw new ArgumentException($"{nameof(EndDateTime)} can not be default");
-        }
-
-        if (StartDateTime > EndDateTime)
-        {
-            throw new ArgumentException($"{nameof(StartDateTime)} must be less than {nameof(EndDateTime)}");
-        }
-
-        if (StartDateTime.Offset != EndDateTime.Offset)
-        {
-            throw new ArgumentException($"Inconsistency of 'Offset' between {nameof(StartDateTime)} and {nameof(EndDateTime)}");
-        }
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
+            await JsInitVariables.SetTimezoneOffset();
             if (StartDateTime != default)
             {
                 UpdateInternalStartDateTime(StartDateTime);
