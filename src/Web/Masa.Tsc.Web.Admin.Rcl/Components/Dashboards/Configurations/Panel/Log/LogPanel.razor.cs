@@ -26,8 +26,8 @@ public partial class LogPanel
     [Parameter]
     public string LogLevel { get; set; }
 
-    [CascadingParameter]
-    ConfigurationRecord? ConfigurationRecord { get; set; }
+    [Parameter]
+    public ConfigurationRecord? ConfigurationRecord { get; set; }
 
     [Parameter]
     public string TaskId { get; set; }
@@ -71,6 +71,12 @@ public partial class LogPanel
 
     protected override bool IsSubscribeTimeZoneChange => true;
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (StartTime.HasValue && StartTime.Value > DateTime.MinValue)
+            await GetPageLogsAsync();
+    }
+
     protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
     {
         await base.OnTimeZoneInfoChanged(timeZoneInfo);
@@ -97,30 +103,20 @@ public partial class LogPanel
 
     async Task OnAutoUpdate((DateTimeOffset start, DateTimeOffset end) times)
     {
-        await OnUpdate(times);
-        StateHasChanged();
+        await InvokeAsync(() => OnUpdate(times));
     }
 
     async Task GetCompontentLogsAsync()
     {
-        bool isLoadData = false;
         if (PageMode is false && ConfigurationRecord is not null)
         {
             if ((StartTime, EndTime) != (ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime))
             {
                 StartTime = ConfigurationRecord.StartTime.UtcDateTime;
                 EndTime = ConfigurationRecord.EndTime.UtcDateTime;
-                isLoadData = true;
+                await GetPageLogsAsync();
             }
-
-            if (ConfigurationRecord.Service != Service)
-                isLoadData = true;
         }
-        else if (StartTime.HasValue && StartTime.Value > DateTime.MinValue)
-            isLoadData = true;
-
-        if (isLoadData)
-            await GetPageLogsAsync();
     }
 
     async Task GetPageLogsAsync()

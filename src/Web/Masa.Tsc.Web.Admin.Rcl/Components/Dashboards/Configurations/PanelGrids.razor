@@ -69,16 +69,16 @@
                     <TextPanel Value=context />
                     break;
                 case PanelTypes.Trace:
-                    <TscTrace />
+                    <TscTrace ConfigurationRecord="ConfigurationRecord" />
                     break;
                 case PanelTypes.Topology:
-                    <TopologyPanel />
+                    <TopologyPanel ConfigurationRecord="ConfigurationRecord" />
                     break;
                 case PanelTypes.Chart or PanelTypes.Table:
                     <ChartPanel Value="context as UpsertChartPanelDto" />
                     break;
                 case PanelTypes.Log:
-                    <LogPanel />
+                    <LogPanel ConfigurationRecord="ConfigurationRecord" />
                     break;
                 case PanelTypes.Select:
                     <PanelSelect PanelId="context.Id" OnSelect="ReplacePanel" />

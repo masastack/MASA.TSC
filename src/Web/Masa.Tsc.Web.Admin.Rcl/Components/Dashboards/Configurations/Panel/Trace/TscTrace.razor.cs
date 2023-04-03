@@ -18,8 +18,8 @@ public partial class TscTrace
     private bool _isDesc = true;
     private bool _loading;
 
-    [CascadingParameter]
-    ConfigurationRecord? ConfigurationRecord { get; set; }
+    [Parameter]
+    public ConfigurationRecord? ConfigurationRecord { get; set; }
 
     [Parameter]
     public bool PageMode { get; set; }

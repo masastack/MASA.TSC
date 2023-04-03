@@ -38,7 +38,7 @@ public abstract class ConfigurationRecord
 
     public string? Layer { get; set; }
 
-    public QuickRangeKey? DefaultQuickRangeKey = QuickRangeKey.Last15Minutes;
+    public QuickRangeKey? DefaultQuickRangeKey { get; set; } = QuickRangeKey.Last15Minutes;
 
     public DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow.AddMinutes(-15);
 

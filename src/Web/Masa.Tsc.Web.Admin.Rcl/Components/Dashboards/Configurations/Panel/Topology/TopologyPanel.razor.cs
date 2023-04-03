@@ -23,8 +23,8 @@ public partial class TopologyPanel
 
     Antvg6Option Antvg6Option { get; set; } = new();
 
-    [CascadingParameter]
-    ConfigurationRecord ConfigurationRecord { get; set; }
+    [Parameter]
+    public ConfigurationRecord ConfigurationRecord { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
