@@ -42,6 +42,8 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
     protected override async Task OnInitializedAsync()
     {
         Loading = true;
+        if (Math.Floor(JsInitVariables.TimezoneOffset.TotalMinutes) == 0)
+            await JsInitVariables.SetTimezoneOffset();
         if (IsSubscribeTimeZoneChange)
             JsInitVariables.TimezoneOffsetChanged += OnTimeZoneInfoChanged;
         if (UserContext != null && !string.IsNullOrEmpty(UserContext.UserId))

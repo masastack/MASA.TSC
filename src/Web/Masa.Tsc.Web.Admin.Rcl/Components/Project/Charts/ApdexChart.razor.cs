@@ -142,7 +142,7 @@ public partial class ApdexChart
         else if (value < 0)
             return value.ToString("0.##%");
         else
-            return value.ToString("%");
+            return value.ToString();
     }
 
     protected override bool IsSubscribeTimeZoneChange => true;
