@@ -23,7 +23,16 @@ public class GridstackOptions
 
     public string? Nonce { get; set; }
 
-    public int Margin { get; set; } = 10;
+    public int Margin { get; set; }
+
+    public int MarginTop { get; set; } = 10;
+
+    public int MarginRight { get; set; } = 10;
+
+    public int MarginBottom { get; set; }
+
+    public int MarginLeft { get; set; }
+
 
     public bool Float { get; set; }
 

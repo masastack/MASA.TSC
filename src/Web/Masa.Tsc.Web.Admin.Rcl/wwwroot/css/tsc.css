@@ -343,8 +343,6 @@ div[name="True"] .ui-resizable-se {
 div[style*="visibility: hidden; opacity: 0;"] {
     display:none !important;
 }
-    visibility:hidden !important;
-}
 
 .dashboard-editor-ui-btn:active {
     background-color: #E4E8F3 !important;

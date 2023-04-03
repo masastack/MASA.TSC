@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<AutoHeight AutoStyle="@($"max-height: calc(100vh - 170px);{Style}")" Class="pt-1">
+<AutoHeight AutoStyle="@($"max-height: calc(100vh - 176px);{Style}")">
     <HeaderContent>
         <div class="d-flex mb-3 @HeaderClass" style="@HeaderStyle">
             @HeaderContent
@@ -46,19 +46,18 @@
         {
             <LoadingData />
         }
-        <DefaultCard Class="full-height" Style="background-color:transparent;padding:0px !important">
-            <CascadingValue Value="ConfigurationRecord" IsFixed>
-                <div style="overflow-y:auto;overflow-x:hidden;" class="full-height">
-                    @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady) && _timeRangeReady)
-                    {
-                        <PanelGrids Panels="ConfigurationRecord.Panels" />
-                    }
-                    else if (!ConfigurationRecord.IsEdit)
-                    {
-                        <SEmptyPlaceholder />
-                    }
-                </div>
-            </CascadingValue>
-        </DefaultCard>
+
+        <CascadingValue Value="ConfigurationRecord" IsFixed>
+            <div style="overflow-y:auto;overflow-x:hidden;" class="full-height">
+                @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady) && _timeRangeReady)
+                {
+                    <PanelGrids Panels="ConfigurationRecord.Panels" />
+                }
+                else if (!ConfigurationRecord.IsEdit)
+                {
+                    <SEmptyPlaceholder />
+                }
+            </div>
+        </CascadingValue>
     </AutoHeightContent>
 </AutoHeight>

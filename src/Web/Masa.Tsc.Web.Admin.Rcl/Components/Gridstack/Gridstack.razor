@@ -15,7 +15,9 @@
              gs-h="@item.Height"
              gs-x="@item.X"
              gs-y="@item.Y"
-             gs-auto-position="@((item.X!=0 || item.Y!=0) && item!=firstItem ?"false":"true")">
+             gs-min-w="4"
+             gs-min-h="2"
+             gs-auto-position="@(((item.X!=0 || item.Y!=0) && item!=firstItem) ?"false":"true")">
             <div class="grid-stack-item-content @ItemClass" style="@ItemStyle">
                 @ItemContent(item)
             </div>

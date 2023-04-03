@@ -1,6 +1,8 @@
 ﻿@if (ConfigurationRecord.IsEdit)
 {
-    <MEditor @ref="_editor" Class="full-height mx-4" Value="@Content" ValueChanged="ContentChanged" Placeholder="请输入内容" ContentStyle="height:calc(100% - 70px);" />
+    <div class="px-6 pb-6 full-height">
+        <MEditor @ref="_editor" Value="@Content" ValueChanged="ContentChanged" Placeholder="请输入内容" ContentStyle="height:calc(100% - 80px);" />
+    </div> 
 }
 else
 {

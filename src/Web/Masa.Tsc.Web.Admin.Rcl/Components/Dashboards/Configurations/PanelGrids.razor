@@ -2,19 +2,22 @@
 
 <Gridstack Items="Panels" Id="@(ParentPanel is null ? null : ParentPanel.Id.ToString())" Readonly="!IsEdit" Class="@Class" ItemStyle="@("background-color:white;border: 1px solid #F0F3FA;border-radius: 12px;position:absolute;overflow:hidden;"+(IsEdit?"cursor: move;":""))">
     <ItemContent>
+        @{
+            var actionHeight = context.PanelType == PanelTypes.Tabs || !IsEdit ? 0 : 48;
+        }
         @if (IsEdit && context.PanelType != PanelTypes.Tabs)
         {
-            <div style="height:48px;" class="d-flex">
+            <div style=@($"height:{actionHeight}px;") class="d-flex">
                 <MSpacer />
                 <MMenu OpenOnHover OffsetY>
-                <ActivatorContent Context="menuContext">
-                    <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
-                        <SIcon Size="24">@IconConstants.More</SIcon>
+                    <ActivatorContent Context="menuContext">
+                        <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
+                            <SIcon Size="24">@IconConstants.More</SIcon>
                         </SButton>
                     </ActivatorContent>
                     <ChildContent>
                         <MList>
-                        @if (context.PanelType == PanelTypes.Chart)
+                            @if (context.PanelType == PanelTypes.Chart)
                             {
                                 <MListItem OnClick="() => ConfigurationChartPanel(context)">
                                     <MListItemTitle>
@@ -32,16 +35,16 @@
                 </MMenu>
             </div>
         }
-        <div style="@(context.PanelType==PanelTypes.Chart?"":"overflow:auto;") @(IsEdit?"height:calc(100% - 50px);":"height:calc(100%);")">
+        <div style="overflow:auto; @($"height:calc(100% - {actionHeight}px);")">
             @switch (context.PanelType)
             {
                 case PanelTypes.Tabs:
                     <TabsPanel Panel="context as UpsertTabsPanelDto">
                         <HeaderRightContent>
                             <MMenu OpenOnHover OffsetY>
-                            <ActivatorContent Context="menuContext">
-                                <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
-                                    <SIcon Size="24">@IconConstants.More</SIcon>
+                                <ActivatorContent Context="menuContext">
+                                    <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
+                                        <SIcon Size="24">@IconConstants.More</SIcon>
                                     </SButton>
                                 </ActivatorContent>
                                 <ChildContent>

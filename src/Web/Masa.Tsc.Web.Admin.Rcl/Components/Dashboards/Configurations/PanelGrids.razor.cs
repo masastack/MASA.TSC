@@ -33,6 +33,8 @@ public partial class PanelGrids
         panel.X = data.X;
         panel.Y = data.Y;
         panel.ParentPanel = data.ParentPanel;
+        panel.Width = data.Width;
+        panel.Height = data.Height;
         if ((data.Width != GlobalPanelConfig.Width || data.Height != GlobalPanelConfig.Height))
         {
             panel.Width = data.Width;
