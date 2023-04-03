@@ -5,5 +5,5 @@ namespace Masa.Tsc.Service.Admin.Infrastructure.Const;
 
 internal static class InstrumentConstants
 {
-    public readonly static Guid TEAM_INSTRUMENT_ID = Guid.Parse("d6c4a8da-ab85-45ff-1d89-08daef8970bf");
+    public readonly static Guid TEAM_INSTRUMENT_ID = Guid.Parse("303d6055-af4d-453e-ba41-34021a8c36f0");
 }

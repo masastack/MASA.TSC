@@ -17,7 +17,7 @@ public class InstrumentCommandHandler
     [EventHandler]
     public async Task AddInstrumentAsync(AddInstrumentCommand command)
     {
-        await ValidateAsync(command.Data.Layer, command.Data.Model.ToString());
+        await ValidateAsync(command.Data.Folder, command.Data.Name, Guid.Empty);
         var model = new Instrument
         {
             Name = command.Data.Name,
@@ -42,7 +42,7 @@ public class InstrumentCommandHandler
             throw new UserFriendlyException($"instrument {command.Data.Id} is not exists");
         if (!entry.EnableEdit)
             throw new UserFriendlyException(errorCode: ErrorCodes.NOT_ALLOW_EDIT);
-        await ValidateAsync(command.Data.Layer, command.Data.Model.ToString(), entry.Id);
+        await ValidateAsync(command.Data.Folder, command.Data.Name, entry.Id);
         entry.Update(command.Data);
         await _instrumentRepository.UpdateAsync(entry);
     }
@@ -52,7 +52,7 @@ public class InstrumentCommandHandler
     {
         var instrument = await _instrumentRepository.GetAsync(command.Id, command.UserId);
         if (instrument == null)
-            throw new UserFriendlyException("数据不存在");
+            throw new UserFriendlyException($"instrument {command.Id} is not exists");
 
         instrument.SetRoot(command.IsRoot);
         await _instrumentRepository.UpdateAsync(instrument);
@@ -82,7 +82,7 @@ public class InstrumentCommandHandler
     {
         var list = await _instrumentRepository.GetListAsync(command.InstrumentIds, command.UserId);
         if (list == null || !list.Any())
-            throw new UserFriendlyException("数据不存在");
+            return;
 
         if (list.Any(item => !item.EnableEdit))
             throw new UserFriendlyException(errorCode: ErrorCodes.CONTAINS_NOT_ALLOW_EDIT);
@@ -91,12 +91,12 @@ public class InstrumentCommandHandler
     }
     #endregion    
 
-    private async Task ValidateAsync(string layer, string model, Guid? id = null)
+    private async Task ValidateAsync(Guid parentId, string name, Guid id)
     {
-        var instrument = await _instrumentRepository.FindAsync(e => e.Model == model && e.Layer == layer && e.Id != id);
+        var instrument = await _instrumentRepository.FindAsync(e => e.DirectoryId == parentId && e.Name == name && (id == Guid.Empty || e.Id == id));
         if (instrument != null)
         {
-            throw new UserFriendlyException($@"Model '{model}' must not be repeated in the same layer '{layer}'");
+            throw new UserFriendlyException($"instrument {name} is exists");
         }
     }
 }

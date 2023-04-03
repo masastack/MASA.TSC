@@ -64,7 +64,7 @@ public partial class ProjectCharts
     {
         DateTime start = ConfigurationRecord.StartTime.UtcDateTime,
             end = ConfigurationRecord.EndTime.UtcDateTime;
-        var step = start.Interval(end);
+        var step = "1m";
         if (_endpoint == null)
             _endpoint = new UpsertChartPanelDto(Guid.Empty)
             {
@@ -94,7 +94,7 @@ public partial class ProjectCharts
                 {
                     new PanelMetricDto()
                     {
-                        Expression = "topk(10, sort_desc( round(sum by(http_target) (increase(http_response_sum[1m]))/sum by(http_target) (increase(http_response_count[1m])))),1)"
+                        Expression = "topk(10, sort_desc( round(sum by(http_target) (increase(http_response_sum[1m]))/sum by(http_target) (increase(http_response_count[1m])),1))>0)"
                     }
                 },
                 TopListOnclick = async (TopListOption options) =>

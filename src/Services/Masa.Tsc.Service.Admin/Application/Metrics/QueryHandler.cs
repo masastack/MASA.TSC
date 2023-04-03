@@ -312,6 +312,9 @@ public class QueryHandler
         var metrics = await GetAllMetricsAsync();
         if (metrics == null || !metrics.Any())
             return str;
+        metrics = metrics.Where(s => str.Contains(s, StringComparison.OrdinalIgnoreCase)).ToList();
+        if(!metrics.Any())
+            return str;
 
         StringBuilder text = new();
         if (!string.IsNullOrEmpty(service))
