@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<div style="height:48px;" class="d-flex">
+<div style="height:48px;max-width: calc(100% - 36px);" class="d-flex tab">
     <MTabs @ref=_tabs Color="primary" Style="border-bottom:1px solid #E4E8F3;" @bind-Value="CurrentTab">
         @foreach (var tabItem in Panel.ChildPanels)
         {
@@ -34,7 +34,7 @@
         @HeaderRightContent
     }
 </div>
-<div style="padding-left:10px;padding-bottom:10px;height:calc(100% - 48px);overflow:auto;">
+<div style="padding-left:10px;padding-bottom:10px;height:calc(100% - 48px);overflow:auto;overflow-x: hidden;">
     <MTabsItems Value="CurrentTab">
         @foreach (var tabItem in Panel.ChildPanels)
         {

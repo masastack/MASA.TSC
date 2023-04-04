@@ -35,7 +35,7 @@
                 </MMenu>
             </div>
         }
-        <div style="overflow:auto; @($"height:calc(100% - {actionHeight}px);")">
+        <div style="overflow:auto;overflow-x:hidden; @($"height:calc(100% - {actionHeight}px);")">
             @switch (context.PanelType)
             {
                 case PanelTypes.Tabs:

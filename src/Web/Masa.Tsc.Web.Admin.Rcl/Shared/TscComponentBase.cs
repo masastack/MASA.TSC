@@ -5,6 +5,9 @@ namespace Masa.Tsc.Web.Admin.Rcl.Shared;
 
 public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
 {
+    [CascadingParameter(Name = "Culture")]
+    private string Culture { get; set; } = null!;
+
     [Inject]
     public IUserContext UserContext { get; set; }
 
