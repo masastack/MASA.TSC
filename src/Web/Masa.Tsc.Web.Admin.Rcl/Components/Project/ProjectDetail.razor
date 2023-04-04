@@ -3,24 +3,24 @@
 
 <MCard>
     <MCardText>
-        <div class="emphasis--text h6">
-            <div>@Value.Name</div>
+        <div class="emphasis--text h6 d-flex justify-space-between">
+            <div style="width:86%">
+                <EllipsisText>
+                    @Value.Name
+                </EllipsisText>
+            </div>
+            <span>@Value.Apps?.Count</span>
         </div>
-        <div class="d-flex justify-space-between">
-            <span class="regular3--text body2">@I18n.Team("Application count")：</span>
-            <span class="regular3--text body2">@Value.Apps?.Count</span>
-        </div>   
-        <div class="d-flex justify-space-between">
-            <span class="regular3--text body2">@I18n.Team("Project ID")：</span>
+        <div>
             <span class="regular3--text body2">@Value.Identity</span>
-        </div>        
-        <p class="regular--text body2 mt-4" style="min-height:105px">
+        </div>
+        <p class="regular--text body2 mt-4" style="min-height:68px">
             @Value.Description
         </p>
         <div class="mt-6">
             <span class="regular3--text body2">@I18n.T("Creator")</span>
             <MListItem Class="px-0 mt-2">
-                <MListItemAvatar>
+                <MListItemAvatar Size="36">
                     <MImage alt="Admin Avatar" Src="@Value?.Creator?.Avatar">
                     </MImage>
                 </MListItemAvatar>
