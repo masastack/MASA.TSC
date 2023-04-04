@@ -75,6 +75,7 @@ public partial class ApdexChart
                 }
             }
         });
+        _options.SetValue("tooltip.formatter", "{b}<br /><div style=\"display:flex;align-items: center;\"><div style=\"width:8px;height:8px;background-color:rgba(255, 82, 82, 1);border-radius:50px;\"></div><div>&nbsp;&nbsp;" + I18n.Team("Service Apdex") + "&nbsp;&nbsp;{c}</div></div>");
     }
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
