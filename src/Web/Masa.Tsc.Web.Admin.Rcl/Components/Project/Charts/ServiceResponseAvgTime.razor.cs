@@ -73,7 +73,8 @@ public partial class ServiceResponseAvgTime : TscEChartBase
 
             _options.SetValue("series[0].max", currentTotal);
             _options.SetValue("series[0].data[0].value", Total);
-            _options.SetValue("series[0].detail.formatter", $"{Total} {Unit}");
+            //_options.SetValue("series[0].detail.formatter", $"{Total} {Unit}"); 
+            _options.SetValue("series[0].detail.formatter", $"{{value|{Total}}}{{unit|{Unit}}}");
         }
     }
 }
