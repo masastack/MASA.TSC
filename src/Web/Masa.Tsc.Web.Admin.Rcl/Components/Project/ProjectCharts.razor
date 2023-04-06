@@ -19,10 +19,10 @@
             <ServiceResponseTimePercentile Title="@(I18n.Team("Service Response Time Percentile")+"("+I18n.T("ms")+")")" @ref="_serviceResponseTimePercentile" />
         </MCol>
         <CascadingValue Value="ConfigurationRecord" IsFixed>
-            <MCol Cols="6" Class="overflow-y">
+            <MCol Cols="6">
                 <ChartPanel Value="_endpoint" Class="rounded-lg" />
             </MCol>
-            <MCol Cols="6" Class="overflow-y">
+            <MCol Cols="6">
                 <ChartPanel Value="_slowEndpoint" Class="rounded-lg" />
             </MCol>
         </CascadingValue>
