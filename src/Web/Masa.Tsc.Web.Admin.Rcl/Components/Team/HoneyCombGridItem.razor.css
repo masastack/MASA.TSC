@@ -8,6 +8,12 @@
 .m-honeycomb-cell__border:hover {
     background-color:lightsalmon !important;
 }
+.m-honeycomb-cell-warning__border:hover {
+    background-color:#FF7D00 !important;
+}
+.m-honeycomb-cell-error__border:hover {
+    background-color:#FF5252 !important;
+}
 
 .m-honeycomb-cell__border-parent {
     /*filter: url('#goo');*/
