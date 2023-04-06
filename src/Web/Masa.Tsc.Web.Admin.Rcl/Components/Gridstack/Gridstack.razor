@@ -106,9 +106,16 @@
         if (firstRender)
         {
             _prevItemKeys = string.Join(',', Items.Select(item => item.Id));
-            await GridstackJSModule.InitAsync(Options);
             _prevReadonly = Readonly;
-            await GridstackJSModule.SwitchStateAsync(!Readonly);
+            if (Id is null)
+            {
+                await GridstackJSModule.InitAllAsync(Options);
+                await GridstackJSModule.SwitchStateAsync(!Readonly);
+            }
+            else
+            {
+                await GridstackJSModule.InitAsync(Options);
+            }
         }
         else
         {
