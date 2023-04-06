@@ -67,8 +67,8 @@ public partial class ServiceCallChart
         _options.SetValue("series[0].areaStyle", new { color = new { colorStops = new[] { new { offset = 0, color = "rgba(255, 82, 82, 1)" }, new { offset = 1, color = "rgba(255, 82, 82, 0)" } }, x = 0, y = 0, x2 = 0, y2 = 1, type = "linear", global = false } });
         _options.SetValue("tooltip.formatter", "{b}<br /><div style=\"display:flex;align-items: center;\"><div style=\"width:8px;height:8px;background-color:red;border-radius:50px;\"></div><div>&nbsp;&nbsp;" + I18n.Team("Calls") + "&nbsp;&nbsp;{c}</div></div>");
         _options.SetValue("series[0].color", "#FF5252");
-        _options.SetValue("series[0].name", I18n.T("ServiceDelay"));
-        _options.SetValue("legend.data[0]", new { name = I18n.T("ServiceDelay"), icon = "roundRect" });
+        _options.SetValue("series[0].name", I18n.Team("Service Load"));
+        _options.SetValue("legend.data[0]", new { name = I18n.Team("Service Load"), icon = "roundRect" });
         _options.SetValue("legend.top", "bottom");
         _options.SetValue("grid.bottom", 60);
     }
