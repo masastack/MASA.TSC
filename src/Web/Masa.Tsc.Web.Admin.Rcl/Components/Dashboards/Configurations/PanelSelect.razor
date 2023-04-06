@@ -2,13 +2,12 @@
 
 @if (ConfigurationRecord.IsEdit)
 {
-    <div style="height:100%;width:100%;" class="d-flex">
-        <div class="pt-3 pl-3 ma-auto" style="width:504px; display: flex;flex-wrap: wrap;">
+    <div style="height:100%;width:100%;" class="d-flex pa-3">
+        <div class="ma-auto" style="display: flex;flex-wrap: wrap;max-width: 480px;">
             @foreach (var panelType in GetPanelTypes())
             {
                 <MHover>
                     <div @attributes="context.Attrs" @onclick="() => SelectPanelAsync(panelType.Key)" style="width: 144px;min-width:144px;height: 60px;min-height:60px;border: 1px solid #E4E8F3;" class="d-flex hover-pointer px-3 mr-4 mb-4 emphasis2--text fill rounded-2 dashboard-editor-ui-btn @(context.Hover?" fill-hover":"")">
-
                         <div class="d-flex my-auto borderNone" style="width:100%;">
                             <SIcon Class="mr-2" Color="#323D6F">@panelType.Value</SIcon>
                             <span class="borderNone">@I18n.Dashboard(panelType.Key.ToString())</span>

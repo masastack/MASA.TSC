@@ -1,13 +1,13 @@
-﻿@if (ConfigurationRecord.IsEdit)
-{
-    <div class="px-6 pb-6 full-height">
-        <MEditor @ref="_editor" Class="full-height" Value="@Content" ValueChanged="ContentChanged" Placeholder="请输入内容" ContentStyle="height:calc(100% - 80px);" />
-    </div> 
-}
-else
-{
-    @(new MarkupString(Content))
-}
+﻿<div class="full-height" style="padding:10px;">
+    @if (ConfigurationRecord.IsEdit)
+    {
+        <MEditor @ref="_editor" Class="full-height" Value="@Content" ValueChanged="ContentChanged" Placeholder="请输入内容" ContentStyle="height:calc(100% - 95px);" />
+    }
+    else
+    {
+        @(new MarkupString(Content))
+    }
+</div>
 
 @code {
     private MEditor _editor;

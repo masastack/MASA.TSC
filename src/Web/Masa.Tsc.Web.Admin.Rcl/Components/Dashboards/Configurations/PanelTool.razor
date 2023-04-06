@@ -1,0 +1,48 @@
+﻿@inherits TscComponentBase
+
+<MMenu OpenOnHover OffsetY>
+    <ActivatorContent Context="menuContext">
+        <SButton Icon Class="my-auto" Style="@($"z-index:5;{Style}")" @attributes="@menuContext.Attrs">
+            <SIcon Size="24">@IconConstants.More</SIcon>
+        </SButton>
+    </ActivatorContent>
+    <ChildContent>
+        <MList>
+            @if (Value.PanelType is PanelTypes.Chart)
+            {
+                <MListItem OnClick="() => ConfigurationChartPanel.InvokeAsync(Value)">
+                    <MListItemTitle>
+                        @I18n.Dashboard("Edit Panel")
+                    </MListItemTitle>
+                </MListItem>
+            }
+            else if(Value.PanelType is PanelTypes.Tabs)
+            {
+                <MListItem OnClick="() => AddPanel.InvokeAsync(Value as UpsertTabsPanelDto)">
+                    <MListItemTitle>
+                        @I18n.Dashboard("Add Panel")
+                    </MListItemTitle>
+                </MListItem>
+            }
+            <MListItem OnClick="() => RemovePanel.InvokeAsync(Value)">
+                <MListItemTitle>
+                    @I18n.Dashboard("Remove Panel")
+                </MListItemTitle>
+            </MListItem>
+        </MList>
+    </ChildContent>
+</MMenu>
+
+@code {
+    [Parameter]
+    public UpsertPanelDto Value { get; set; }
+
+    [Parameter]
+    public EventCallback<UpsertTabsPanelDto> AddPanel { get; set; }
+
+    [Parameter]
+    public EventCallback<UpsertPanelDto> RemovePanel { get; set; }
+
+    [Parameter]
+    public EventCallback<UpsertPanelDto> ConfigurationChartPanel { get; set; }
+}
