@@ -66,7 +66,7 @@ public partial class MonitorCard
                     Text="NORMAL",
                     Color="#69F0AE",
                     Icon="default",
-                    IsShowApp=false,
+                    IsShowApp=true,
                     Value=MonitorStatuses.Normal
                 }
             };
@@ -81,6 +81,7 @@ public partial class MonitorCard
         _items[2].AppTotal = _appMonitorDto.ErrorCount;
 
         _items[3].ServiceTotal = _appMonitorDto.Normal;
+        _items[3].AppTotal = _appMonitorDto.NormalAppTotal;
     }
 
     private string ItemStyle(AppMonitorViewDto appMonitor)
