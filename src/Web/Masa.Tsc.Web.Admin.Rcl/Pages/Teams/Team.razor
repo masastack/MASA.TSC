@@ -42,11 +42,11 @@
                                 {
                                     if (app.Status == MonitorStatuses.Normal)
                                     {
-                                        <span class="masa regular2--text body2 pa-1 d-inline-block text-truncate text-center bordershadow" style="cursor:pointer;width:96%" @onclick="@(()=>OnProjectServiceClick(context,app))">@app.Name</span>
+                                        <span @onmouseover="()=>_hoverAppId=app.Id" @onmouseout="()=>_hoverAppId=string.Empty" class="masa regular2--text body2 pa-1 d-inline-block text-truncate text-center bordershadow" style="cursor:pointer;width:96%" @onclick="@(()=>OnProjectServiceClick(context,app))">@app.Name</span>
                                     }
                                     else
                                     {
-                                        <div @onclick="()=>OnProjectServiceClick(context,app)" @onclick:stopPropagation="true" class="bordershadow pa-1" style="cursor:pointer;width:96%">
+                                      <div @onclick="()=>OnProjectServiceClick(context,app)" @onclick:stopPropagation="true" class="bordershadow pa-1" style="cursor:pointer;width:96%" @onmouseover="()=>_hoverAppId=app.Id" @onmouseout="()=>_hoverAppId=string.Empty">
                                             <TscTeamChip Class="masa body2 ma-0 p-1 bordershadow" Style="cursor:pointer"
                                          Color="@ChipLabelColor(app)"
                                          TextColor="white"
@@ -60,18 +60,38 @@
                                 }
                                 @if (context.Apps.Count > 3)
                                 {
-                                    <span class="masa regular2--text body2 bordershadow pa-1" style="cursor:pointer;width:60%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))">...</span>
+                                    <MTooltip Bottom>
+                                        <ActivatorContent Context="tooltipContext">
+                                            <span @attributes="@tooltipContext.Attrs" class="masa regular2--text body2 bordershadow pa-1" style="cursor:pointer;width:60%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))" @onmouseover='()=>_hoverAppId="more"' @onmouseout="()=>_hoverAppId=null">...</span>
+                                        </ActivatorContent>
+                                        <ChildContent>
+                                            <span>@I18n.T("More")</span>
+                                        </ChildContent>
+                                    </MTooltip>
                                 }
                             </div>
                         </CellBack>
                         <CellHoverTip>
-                            <div style="min-height:150px;background-color:transparent;">
-                                <MCard Class="emphasis2" Style="border-bottom-left-radius:20px;border-bottom-right-radius:20px;min-width:240px;max-width:300px;">
+                            <div style="background-color:transparent;@(_hoverAppId=="more"?"display:none":"")">
+                                <MCard Class="emphasis2 rounded-b-xl" Width="240" style="border-radius: 12px;">
                                     <MCardText Class="d-flex flex-column white--text masa body">
-                                        <span>@I18n.Team("Project name")：@context.Name</span>
-                                        <span>ID：@context.Id</span>
-                                        <span>@I18n.Team("Application count")：@context.Apps.Count</span>
-                                        <p>@I18n.T("Description")：@context.Description</p>
+                                        @if(string.IsNullOrWhiteSpace(_hoverAppId))
+                                        {
+                                            <div class="d-flex">
+                                                <span class="h8">@context.Name</span>
+                                                <span class="h8 ml-auto">@context.Apps.Count</span>
+                                            </div>
+                                            <span class="caption">@context.Id</span>
+                                        }
+                                        else
+                                        {
+                                            var app = @context.Apps.FirstOrDefault(p=>p.Id==_hoverAppId);
+                                            if(app!=null)
+                                            {
+                                                <span class="h8">@app.Name</span>
+                                                <span class="caption">@app.Id</span>
+                                            }
+                                        }
                                     </MCardText>
                                 </MCard>
                                 <div class="d-flex justify-center" style="margin-top: -10px;margin-bottom:10px;">
