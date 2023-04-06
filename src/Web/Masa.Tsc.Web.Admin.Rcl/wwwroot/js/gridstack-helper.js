@@ -111,9 +111,14 @@ export function destroy(options, destroyDom) {
 }
 
 export function switchState(options, state) {
-    var grid = getElement(options).gridstack;
-    grid.enableMove(state);
-    grid.enableResize(state);
+    try {
+        var grid = getElement(options).gridstack;
+        grid.enableMove(state);
+        grid.enableResize(state);
+    }
+    catch (error) {
+
+    }
 }
 
 function initByElement(options, el, dotNetHelper) {
