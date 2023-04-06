@@ -421,6 +421,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         if (ChartType is not ChartTypes.Table)
         {
             IsLoadChartData = true;
+            IsLoadOption = true;
             Key = "ReloadChartData" + Guid.NewGuid();
         }
     }
@@ -724,11 +725,11 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         EChartType.SetValue("color", _defaultColors);
         EChartType.SetValue("grid", new
         {
-            x = 60,
-            x2 = 20,
+            x = 30,
+            x2 = 10,
             y2 = 20,
-            y = 25
-        });
+            y = Metrics.Any(metric => string.IsNullOrEmpty(metric.DisplayName) is false) ? 40 : 10
+        }); ;
     }
 
     public List<List<Dessert>> GetTableOption() => _tableData;

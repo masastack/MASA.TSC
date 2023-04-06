@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<div style="height:48px;max-width: calc(100% - 36px);" class="d-flex tab">
+<div style="height:48px;" class="d-flex tab">
     <MTabs @ref=_tabs Color="primary" Style="border-bottom:1px solid #E4E8F3;" @bind-Value="CurrentTab">
         @foreach (var tabItem in Panel.ChildPanels)
         {
@@ -11,7 +11,7 @@
                 }
                 else
                 {
-                    <span class="regular2--text btn"></span> @tabItem.Title
+                    <span class="regular2--text btn">@tabItem.Title</span>
                 }
                 @if (IsEdit)
                 {

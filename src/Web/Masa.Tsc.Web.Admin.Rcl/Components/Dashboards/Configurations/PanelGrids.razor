@@ -3,36 +3,13 @@
 <Gridstack Items="Panels" Id="@(ParentPanel is null ? null : ParentPanel.Id.ToString())" Readonly="!IsEdit" Class="@Class" ItemStyle="@("background-color:white;border: 1px solid #F0F3FA;border-radius: 12px;position:absolute;overflow:hidden;"+(IsEdit?"cursor: move;":""))">
     <ItemContent>
         @{
-            var actionHeight = context.PanelType == PanelTypes.Tabs || !IsEdit ? 0 : 48;
+            var actionHeight = context.PanelType == PanelTypes.Tabs || !IsEdit ? 0 : 28;
         }
         @if (IsEdit && context.PanelType != PanelTypes.Tabs)
         {
             <div style=@($"height:{actionHeight}px;") class="d-flex">
                 <MSpacer />
-                <MMenu OpenOnHover OffsetY>
-                    <ActivatorContent Context="menuContext">
-                        <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
-                            <SIcon Size="24">@IconConstants.More</SIcon>
-                        </SButton>
-                    </ActivatorContent>
-                    <ChildContent>
-                        <MList>
-                            @if (context.PanelType == PanelTypes.Chart)
-                            {
-                                <MListItem OnClick="() => ConfigurationChartPanel(context)">
-                                    <MListItemTitle>
-                                        @I18n.Dashboard("Edit Panel")
-                                    </MListItemTitle>
-                                </MListItem>
-                            }
-                            <MListItem OnClick="() => RemovePanel(context)">
-                                <MListItemTitle>
-                                    @I18n.Dashboard("Remove Panel")
-                                </MListItemTitle>
-                            </MListItem>
-                        </MList>
-                    </ChildContent>
-                </MMenu>
+                <PanelTool Value="context" ConfigurationChartPanel="ConfigurationChartPanel" RemovePanel="RemovePanel" />
             </div>
         }
         <div style="overflow:auto;overflow-x:hidden; @($"height:calc(100% - {actionHeight}px);")">
@@ -41,27 +18,7 @@
                 case PanelTypes.Tabs:
                     <TabsPanel Panel="context as UpsertTabsPanelDto">
                         <HeaderRightContent>
-                            <MMenu OpenOnHover OffsetY>
-                                <ActivatorContent Context="menuContext">
-                                    <SButton Icon Class="my-auto" @attributes="@menuContext.Attrs">
-                                        <SIcon Size="24">@IconConstants.More</SIcon>
-                                    </SButton>
-                                </ActivatorContent>
-                                <ChildContent>
-                                    <MList>
-                                        <MListItem OnClick="async () =>AddChildPanel(context as UpsertTabsPanelDto)">
-                                            <MListItemTitle>
-                                                @I18n.Dashboard("Add Panel")
-                                            </MListItemTitle>
-                                        </MListItem>
-                                        <MListItem OnClick="() => RemovePanel(context)">
-                                            <MListItemTitle>
-                                                @I18n.Dashboard("Remove Panel")
-                                            </MListItemTitle>
-                                        </MListItem>
-                                    </MList>
-                                </ChildContent>
-                            </MMenu>
+                            <PanelTool Value="context" AddPanel="AddChildPanel" RemovePanel="RemovePanel" Style="z-index:1000;" />
                         </HeaderRightContent>
                     </TabsPanel>
                     break;
