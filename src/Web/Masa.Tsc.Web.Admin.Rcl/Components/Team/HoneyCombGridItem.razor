@@ -8,7 +8,7 @@
         <MMenu OpenOnHover Top OffsetY ContentClass="m-honeycomb-cell__tip">
             <ActivatorContent>
                 <div class="m-honeycomb-cell__border-parent">
-                    <div class="m-honeycomb-cell__border" style="background-color:@CellBorderColor(item)">
+                    <div class="@CellBorderClass(item)" style="background-color:@CellBorderColor(item)">
                         <div class="m-honeycomb-cell-parent">
                             <div @attributes="@context.Attrs" class="@SplicingCellClass(item)" @onclick="()=>OnClickHandler(item)" style="@(OnItemClick.HasDelegate?"cursor:pointer;":"")z-index:1 !important;">
                                 @if (CellBack != null)
@@ -92,6 +92,27 @@
         }
         if (CellFront != null)
             text.Append(" m-honeycomb-hover-cell");
+        return text.ToString();
+    }
+
+    private string CellBorderClass(TItem item)
+    {
+        StringBuilder text = new StringBuilder("m-honeycomb-cell__border");
+        if (item is ProjectOverviewDto project)
+        {
+            switch (project.Status)
+            {
+                case MonitorStatuses.Normal:
+                    text.Append(" m-honeycomb-cell-normal__border");
+                    break;
+                case MonitorStatuses.Warn:
+                    text.Append(" m-honeycomb-cell-warning__border");
+                    break;
+                case MonitorStatuses.Error:
+                    text.Append(" m-honeycomb-cell-error__border");
+                    break;
+            }
+        }
         return text.ToString();
     }
 
