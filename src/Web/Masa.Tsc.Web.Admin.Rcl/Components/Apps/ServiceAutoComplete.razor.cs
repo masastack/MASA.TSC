@@ -90,4 +90,35 @@ public partial class ServiceAutoComplete
             await ValueChanged.InvokeAsync(value);
         }
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async Task OnBlurAsync(FocusEventArgs focusEventArgs)
+    {
+        if (Value.IsNullOrEmpty())
+        {
+            NextTick(async () =>
+              {
+                  await Task.Delay(1);
+                  var value = Services.First().Identity;
+                  Value = value;
+                  await ValueChanged.InvokeAsync(value);
+              });
+        }
+    }
+
+    public async Task InputValueChangedAsync(string? newValue)
+    {
+        if (!newValue.IsNullOrEmpty())
+        {
+            await ValueChanged.InvokeAsync(newValue);
+        }
+        else
+        {
+            Value = null;
+        }
+    }
 }
