@@ -108,7 +108,7 @@
             _prevItemKeys = string.Join(',', Items.Select(item => item.Id));
             await GridstackJSModule.InitAsync(Options);
             _prevReadonly = Readonly;
-            _ = Task.Delay(100).ContinueWith(t => _ = GridstackJSModule.SwitchStateAsync(!Readonly));
+            await GridstackJSModule.SwitchStateAsync(!Readonly);
         }
         else
         {
