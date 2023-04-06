@@ -17,16 +17,11 @@
                                 <ServiceAutoComplete Services="Apps" Value="@ConfigurationRecord.Service" ValueChanged="OnServiceChanged" @ref="ServiceAutoComplete" FillBackground=false Metric=false />
                             </div>
                             <MChip Class="mx-6" Color="#05CD99" TextColor="white">@ServiceAutoComplete?.CurrentApp?.Type</MChip>
-                            <MTooltip Top>
-                                <ActivatorContent>
-                                    <MLabel @attributes="@context.Attrs" Class="regular2--text body2" Style="max-width: 200px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">
-                                        @I18n.Team("APPID"):@ServiceAutoComplete!.CurrentApp?.Identity
-                                    </MLabel>
-                                </ActivatorContent>
-                                <ChildContent>
-                                    <span>@ServiceAutoComplete!.CurrentApp?.Identity</span>
-                                </ChildContent>
-                            </MTooltip>
+                            <div style="width:160px;">
+                                <EllipsisText>
+                                    @I18n.Team("APPID"):@ServiceAutoComplete!.CurrentApp?.Identity
+                                </EllipsisText>
+                            </div>
                         </MCol>
                         <MCol Cols="6" Class="d-flex justify-end align-center">
                             <DateTimeRangeToolbar                               
