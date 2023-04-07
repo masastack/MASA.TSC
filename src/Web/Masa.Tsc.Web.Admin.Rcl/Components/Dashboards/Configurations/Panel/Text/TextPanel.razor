@@ -1,4 +1,6 @@
-﻿<div class="full-height" style="padding:10px;">
+﻿@inherits MasaComponentBase
+
+<div class="full-height" style="padding:10px;">
     @if (ConfigurationRecord.IsEdit)
     {
         <MEditor @ref="_editor" Class="full-height" Value="@Content" ValueChanged="ContentChanged" Placeholder="请输入内容" ContentStyle="height:calc(100% - 95px);" BeforeAllUploadAsync="BeforeAllUploadAsync" />
@@ -35,6 +37,9 @@
     [Parameter]
     public UpsertPanelDto Value { get; set; }
 
+    [Parameter]
+    public int MaximumFileSize { get; set; } = 1024 * 1024 * 2;
+
     string Content => Value[ExtensionFieldTypes.Content]?.ToString() ?? "";
 
     void ContentChanged(string content)
@@ -44,6 +49,14 @@
 
     private async Task<bool> BeforeAllUploadAsync(List<EditorUploadFileItem> flist)
     {
+        foreach (var item in flist)
+        {
+            if (item.Size > MaximumFileSize)
+            {
+                await PopupService.EnqueueSnackbarAsync($"{item.FileName} of {item.Size} bytes is larger than the limit of {MaximumFileSize} bytes", AlertTypes.Error);
+                return false;
+            }
+        }
         var response = Client.GetSecurityToken();
         var stsToken = response.SessionToken;
         var accessId = response.AccessKeyId;
