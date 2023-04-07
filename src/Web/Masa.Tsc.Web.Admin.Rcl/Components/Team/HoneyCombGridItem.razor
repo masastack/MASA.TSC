@@ -2,10 +2,10 @@
 @typeparam TItem
 @inherits TscComponentBase
 
-<div class="m-honeycomb">
+<div class="m-honeycomb ma-6 mr-0 d-flex justify-start">
     @foreach (var item in Data)
     {
-        <MMenu OpenOnHover Top OffsetY ContentClass="m-honeycomb-cell__tip">
+        <MMenu OpenOnHover Top OffsetY NudgeLeft="20" NudgeBottom="10" ContentClass="m-honeycomb-cell__tip">
             <ActivatorContent>
                 <div class="m-honeycomb-cell__border-parent">
                     <div class="@CellBorderClass(item)" style="background-color:@CellBorderColor(item)">

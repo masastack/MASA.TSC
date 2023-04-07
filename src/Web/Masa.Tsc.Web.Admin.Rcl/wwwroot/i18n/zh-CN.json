@@ -37,6 +37,7 @@
   "Service": "服务",
   "Instance": "实例",
   "Endpoint": "接口",
+  "More": "更多",
   "DateTimeRange": {
     "Off": "关闭",
     "Last5Minutes": "最近5分钟",

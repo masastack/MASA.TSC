@@ -11,6 +11,7 @@ public partial class Team
     private bool _isLoading;
     private string? _projectType = "";
     private string? _search;
+    private string? _hoverAppId;
 
     [Inject]
     public TeamDetailConfigurationRecord ConfigurationRecord { get; set; }
@@ -80,7 +81,7 @@ public partial class Team
         {
             result = result.Where(item => item.Name.Contains(_search, StringComparison.OrdinalIgnoreCase) || item.Apps.Any(app => app.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)));
         }
-
+	
         return result;
     }
 
