@@ -11,8 +11,7 @@ public partial class Team
     private bool _isLoading;
     private string? _projectType = "";
     private string? _search;
-    [CascadingParameter]
-    private string? _hoverAppId{ get;set; }
+    private string? _hoverAppId;
 
     [Inject]
     public TeamDetailConfigurationRecord ConfigurationRecord { get; set; }
