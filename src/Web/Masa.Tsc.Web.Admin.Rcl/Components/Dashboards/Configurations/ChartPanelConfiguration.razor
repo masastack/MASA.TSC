@@ -1,270 +1,271 @@
 ﻿@inherits TscComponentBase
 
-<MRow>
-    <MCol Md="12" Class="d-flex">
-        <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
-                              OnUpdate="OnDateTimeUpdateAsync"
-                              OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
-        <MSpacer />
-        <SButton Icon OnClick="GetGetMetricsAsync">
-            <SIcon Tooltip="@I18n.T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon>
-        </SButton>
-        <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg" OnClick="Cancel">
-            @I18n.T("Cancel")
-        </SButton>
-        <SButton Small BorderRadiusClass="rounded-lg" OnClick="() => NavigateToPanelConfigurationPageAsync()">
-            @I18n.T("Apply")
-        </SButton>
-    </MCol>
-    <MCol Cols="8">
+<AutoHeight Overflow AutoClass="mt-6 pr-0" AutoStyle="max-height: calc(100vh - 184px);">
+    <HeaderContent>
+        <div class="d-flex">
+            <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
+                                  OnUpdate="OnDateTimeUpdateAsync"
+                                  OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
+            <MSpacer />
+            <SButton Icon OnClick="GetGetMetricsAsync">
+                <SIcon Tooltip="@I18n.T("Refresh")" Color="emphasis2" Size=24>mdi-refresh</SIcon>
+            </SButton>
+            <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg" OnClick="Cancel">
+                @I18n.T("Cancel")
+            </SButton>
+            <SButton Small BorderRadiusClass="rounded-lg" OnClick="() => NavigateToPanelConfigurationPageAsync()">
+                @I18n.T("Apply")
+            </SButton>
+        </div>
+    </HeaderContent>
+    <AutoHeightContent>
         <MRow>
-            <MCol Cols="12">
-                <MCard Style="height:410px;overflow:auto;">
-                    <CascadingValue Value="ConfigurationRecord" IsFixed>
-                        <ChartPanel @ref="_chartPanel" Value="Value" />
-                    </CascadingValue>
-                </MCard>
-            </MCol>
-            <MCol Cols="12">
-                <MCard>
-                    <MCardText>
-                        <MRow>
-                            @if (Value.ChartType == ChartTypes.Table)
-                            {
-                                @if (ConfigurationRecord.ModelType is not ModelTypes.All)
-                                {
-                                    <MCol Md="4">
-                                        <ServiceAutoComplete Label="@I18n.Dashboard("Project")" Readonly Value="@ConfigurationRecord.Service" />
-                                    </MCol>
-                                    <MCol Md="8">
-                                        <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
-                                            @foreach (var item in TableMap[ConfigurationRecord.ModelType])
-                                            {
-                                                <MButton Class="text-capitalize" Value="@item.ToString()">
-                                                    @item.ToString()
-                                                </MButton>
-                                            }
-                                        </MButtonGroup>
-                                    </MCol>
-                                }
-                                else
-                                {
-                                    <MCol Md="12">
-                                        <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
-                                            @foreach (var item in TableMap[ConfigurationRecord.ModelType])
-                                            {
-                                                <MButton Class="text-capitalize" Value="@item.ToString()">
-                                                    @item.ToString()
-                                                </MButton>
-                                            }
-                                        </MButtonGroup>
-                                    </MCol>
-                                }
-                            }
-                            <MCol Md="4">
-                                <STextField @bind-Value="@Value.Title" />
-                            </MCol>
-                            <MCol Md="8">
-                                <STextField @bind-Value="@Value.Description" />
-                            </MCol>
-                            <MCol Md="12">
+            <MCol Cols="8">
+                <MRow>
+                    <MCol Cols="12">
+                        <MCard Style="height:410px;overflow:auto;">
+                            <CascadingValue Value="ConfigurationRecord" IsFixed>
+                                <ChartPanel @ref="_chartPanel" Value="Value" />
+                            </CascadingValue>
+                        </MCard>
+                    </MCol>
+                    <MCol Cols="12">
+                        <MCard>
+                            <MCardText>
                                 <MRow>
-                                    @if (Value.ChartType is ChartTypes.Table && Value.ListType is ListTypes.TopList)
+                                    @if (Value.ChartType == ChartTypes.Table)
                                     {
-                                        <MCol Md="4">
-                                            <MCard Class="pa-2" Style="background-color:#F6F8FD">
-                                                <MCardText>
-                                                    <MRow>
-                                                        <MCol Md="12">
-                                                            <STextField BackgroundColor="white" DebounceInterval="500" TValue="string" Value="@Value.Metrics[0].DisplayName" ValueChanged="value => MetricNameChanged(Value.Metrics[0],value) " Label="@I18n.Dashboard("Metric name")" />
-                                                        </MCol>
-                                                        <MCol Md="12">
-                                                            <MetricsExpression Value="@Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value)" />
-                                                        </MCol>
-                                                    </MRow>
-                                                </MCardText>
-                                                <MCardActions Class="d-flex justify-space-between">
-                                                    <ColorGroup Value="@Value.Metrics[0].Color" ValueChanged="value => MetricColorChanged(Value.Metrics[0],value)" />
-                                                </MCardActions>
-                                            </MCard>
-                                        </MCol>
-                                    }
-                                    else
-                                    {
-                                        @foreach (var item in Value.Metrics)
+                                        @if (ConfigurationRecord.ModelType is not ModelTypes.All)
                                         {
                                             <MCol Md="4">
-                                                <MCard Class="pa-2" Style="background-color:#F6F8FD">
-                                                    <MCardText>
-                                                        <MRow>
-                                                            <MCol Md="12">
-                                                                <STextField BackgroundColor="white" Value="@item.DisplayName" TValue="string" ValueChanged="value => MetricNameChanged(item,value)" DebounceInterval="500" Label="@I18n.Dashboard(Value.ChartType is ChartTypes.Table?"Column name":"Metrics name")" />
-                                                            </MCol>
-                                                            <MCol Md="12">
-                                                                <MetricsExpression Value="@item.Expression" ValueChanged="async value => await MetricExpressionChangedAsync(item,value)" />
-                                                            </MCol>
-                                                            @if (Value.ChartType is ChartTypes.Table)
-                                                            {
-                                                                <MCol Md="12">
-                                                                    <STextField BackgroundColor="white" @bind-Value="item.Icon" Label="@I18n.T("Icon")" />
-                                                                </MCol>
-                                                                <MCol Md="12">
-                                                                    <STextField BackgroundColor="white" @bind-Value="item.Unit" Label="@I18n.T("Unit")" />
-                                                                </MCol>
-                                                            }
-                                                        </MRow>
-                                                    </MCardText>
-                                                    <MCardActions Class="d-flex justify-space-between">
-                                                        <ColorGroup Value="@item.Color" ValueChanged="value => MetricColorChanged(item,value)" />
-                                                        <MIcon OnClick="() => Remove(item)" Color="red">mdi-delete</MIcon>
-                                                    </MCardActions>
-                                                </MCard>
+                                                <ServiceAutoComplete Label="@I18n.Dashboard("Project")" Readonly Value="@ConfigurationRecord.Service" />
+                                            </MCol>
+                                            <MCol Md="8">
+                                                <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
+                                                    @foreach (var item in TableMap[ConfigurationRecord.ModelType])
+                                                    {
+                                                        <MButton Class="text-capitalize" Value="@item.ToString()">
+                                                            @item.ToString()
+                                                        </MButton>
+                                                    }
+                                                </MButtonGroup>
                                             </MCol>
                                         }
-                                        <MCol Md="4">
-                                            <MCard Height=@(Value.ChartType is ChartTypes.Table ? 350 : 208) OnClick="Add" Class="d-flex justify-center align-center" Style="background-color:#F6F8FD">
-                                                <MIcon XLarge>mdi-plus</MIcon>
-                                            </MCard>
-                                        </MCol>
+                                        else
+                                        {
+                                            <MCol Md="12">
+                                                <MButtonGroup Value="@Value.ListType.ToString()" ValueChanged="ListTypeChanged" Mandatory>
+                                                    @foreach (var item in TableMap[ConfigurationRecord.ModelType])
+                                                    {
+                                                        <MButton Class="text-capitalize" Value="@item.ToString()">
+                                                            @item.ToString()
+                                                        </MButton>
+                                                    }
+                                                </MButtonGroup>
+                                            </MCol>
+                                        }
                                     }
+                                    <MCol Md="4">
+                                        <STextField @bind-Value="@Value.Title" />
+                                    </MCol>
+                                    <MCol Md="8">
+                                        <STextField @bind-Value="@Value.Description" />
+                                    </MCol>
+                                    <MCol Md="12">
+                                        <MRow>
+                                            @if (Value.ChartType is ChartTypes.Table && Value.ListType is ListTypes.TopList)
+                                            {
+                                                <MCol Md="4">
+                                                    <MCard Class="pa-2" Style="background-color:#F6F8FD">
+                                                        <MCardText>
+                                                            <MRow>
+                                                                <MCol Md="12">
+                                                                    <STextField BackgroundColor="white" DebounceInterval="500" TValue="string" Value="@Value.Metrics[0].DisplayName" ValueChanged="value => MetricNameChanged(Value.Metrics[0],value) " Label="@I18n.Dashboard("Metric name")" />
+                                                                </MCol>
+                                                                <MCol Md="12">
+                                                                    <MetricsExpression Value="@Value.Metrics[0].Expression" ValueChanged="async value => await MetricExpressionChangedAsync(Value.Metrics[0],value)" />
+                                                                </MCol>
+                                                            </MRow>
+                                                        </MCardText>
+                                                        <MCardActions Class="d-flex justify-space-between">
+                                                            <ColorGroup Value="@Value.Metrics[0].Color" ValueChanged="value => MetricColorChanged(Value.Metrics[0],value)" />
+                                                        </MCardActions>
+                                                    </MCard>
+                                                </MCol>
+                                            }
+                                            else
+                                            {
+                                                @foreach (var item in Value.Metrics)
+                                                {
+                                                    <MCol Md="4">
+                                                        <MCard Class="pa-2" Style="background-color:#F6F8FD">
+                                                            <MCardText>
+                                                                <MRow>
+                                                                    <MCol Md="12">
+                                                                        <STextField BackgroundColor="white" Value="@item.DisplayName" TValue="string" ValueChanged="value => MetricNameChanged(item,value)" DebounceInterval="500" Label="@I18n.Dashboard(Value.ChartType is ChartTypes.Table?"Column name":"Metrics name")" />
+                                                                    </MCol>
+                                                                    <MCol Md="12">
+                                                                        <MetricsExpression Value="@item.Expression" ValueChanged="async value => await MetricExpressionChangedAsync(item,value)" />
+                                                                    </MCol>
+                                                                    @if (Value.ChartType is ChartTypes.Table)
+                                                                    {
+                                                                        <MCol Md="12">
+                                                                            <STextField BackgroundColor="white" @bind-Value="item.Icon" Label="@I18n.T("Icon")" />
+                                                                        </MCol>
+                                                                        <MCol Md="12">
+                                                                            <STextField BackgroundColor="white" @bind-Value="item.Unit" Label="@I18n.T("Unit")" />
+                                                                        </MCol>
+                                                                    }
+                                                                </MRow>
+                                                            </MCardText>
+                                                            <MCardActions Class="d-flex justify-space-between">
+                                                                <ColorGroup Value="@item.Color" ValueChanged="value => MetricColorChanged(item,value)" />
+                                                                <MIcon OnClick="() => Remove(item)" Color="red">mdi-delete</MIcon>
+                                                            </MCardActions>
+                                                        </MCard>
+                                                    </MCol>
+                                                }
+                                                <MCol Md="4">
+                                                    <MCard Height=@(Value.ChartType is ChartTypes.Table ? 350 : 208) OnClick="Add" Class="d-flex justify-center align-center" Style="background-color:#F6F8FD">
+                                                        <MIcon XLarge>mdi-plus</MIcon>
+                                                    </MCard>
+                                                </MCol>
+                                            }
+                                        </MRow>
+                                    </MCol>
                                 </MRow>
-                            </MCol>
-                        </MRow>
-                    </MCardText>
-                </MCard>
+                            </MCardText>
+                        </MCard>
+                    </MCol>
+                </MRow>
             </MCol>
-        </MRow> 
-    </MCol>
-   
-    <MCol Cols="4">
-        <MCard>
-            <MCardText>
-                <MExpansionPanels @bind-Values=_trash Multiple Style="z-index:auto !important;max-height:855px;overflow:auto;">
-                    <MExpansionPanel Value="1">
-                        <MExpansionPanelHeader Class="emphasis2--text h6">Visualization</MExpansionPanelHeader>
-                        <MExpansionPanelContent>
-                            <WidgetType @bind-Value="@Value.ChartType" />
-                        </MExpansionPanelContent>
-                    </MExpansionPanel>
-                    @if (Value.ChartType is ChartTypes.Table)
-                    {
-                        @if (Value.ListType is ListTypes.TopList)
+
+            <MCol Cols="4">
+                <MCard>
+                    <MExpansionPanels @bind-Values=_trash Multiple Style="z-index:auto !important;max-height:775px;overflow:auto;">
+                        <MExpansionPanel Value="1">
+                            <MExpansionPanelHeader Class="emphasis2--text h6">Visualization</MExpansionPanelHeader>
+                            <MExpansionPanelContent>
+                                <WidgetType @bind-Value="@Value.ChartType" />
+                            </MExpansionPanelContent>
+                        </MExpansionPanel>
+                        @if (Value.ChartType is ChartTypes.Table)
                         {
-                            <MExpansionPanel Value="2">
-                                <MExpansionPanelHeader Class="emphasis2--text h6">Options</MExpansionPanelHeader>
-                                <MExpansionPanelContent>
-                                    <MRow>
-                                        <MCol Md="12">
-                                            <ButtonGroupItem @bind-Value="@Value.Desc" Label="Desc" Items='new List<string>{"auto","asc","desc"}' />
-                                        </MCol>
-                                        <MCol Md="12">
-                                            <ColorGroupItem @bind-Value="@Value.Color" Label="Color" Items='new List<string>{"#4318FF","#05CD99","#FFB547","#37A7FF","#FF5252"}' />
-                                        </MCol>
-                                        <MCol Md="12">
-                                            <STextField @bind-Value="@Value.MaxCount" Type="number" Label="Max Count" />
-                                        </MCol>
-                                    </MRow>
-                                </MExpansionPanelContent>
-                            </MExpansionPanel>
+                            @if (Value.ListType is ListTypes.TopList)
+                            {
+                                <MExpansionPanel Value="2">
+                                    <MExpansionPanelHeader Class="emphasis2--text h6">Options</MExpansionPanelHeader>
+                                    <MExpansionPanelContent>
+                                        <MRow>
+                                            <MCol Md="12">
+                                                <ButtonGroupItem @bind-Value="@Value.Desc" Label="Desc" Items='new List<string>{"auto","asc","desc"}' />
+                                            </MCol>
+                                            <MCol Md="12">
+                                                <STextField @bind-Value="@Value.MaxCount" Type="number" Label="Max Count" />
+                                            </MCol>
+                                        </MRow>
+                                    </MExpansionPanelContent>
+                                </MExpansionPanel>
+                            }
+                            else
+                            {
+                                <MExpansionPanel Value="2">
+                                    <MExpansionPanelHeader Class="emphasis2--text h6">Options</MExpansionPanelHeader>
+                                    <MExpansionPanelContent>
+                                        <MRow>
+                                            <MCol Md="12">
+                                                <SwitchItem Label="Show table header" @bind-Value="@Value.ShowTableHeader" />
+                                            </MCol>
+                                            <MCol Md="12">
+                                                <ButtonGroupItem @bind-Value="@Value.ColumnAlignment" Label="Column alignment" Items='new List<string>{"auto","left","center","right"}' />
+                                            </MCol>
+                                        </MRow>
+                                    </MExpansionPanelContent>
+                                </MExpansionPanel>
+                            }
                         }
                         else
                         {
                             <MExpansionPanel Value="2">
-                                <MExpansionPanelHeader Class="emphasis2--text h6">Options</MExpansionPanelHeader>
+                                <MExpansionPanelHeader Class="emphasis2--text h6">Tooltip</MExpansionPanelHeader>
                                 <MExpansionPanelContent>
                                     <MRow>
                                         <MCol Md="12">
-                                            <SwitchItem Label="Show table header" @bind-Value="@Value.ShowTableHeader" />
+                                            <SwitchItem Label="Tooltip mode" @bind-Value="@Value.Tooltip.Show" />
                                         </MCol>
                                         <MCol Md="12">
-                                            <ButtonGroupItem @bind-Value="@Value.ColumnAlignment" Label="Column alignment" Items='new List<string>{"auto","left","center","right"}' />
+                                            <ButtonGroupItem @bind-Value="@Value.Tooltip.Trigger" Label="Trigger" Items='new List<string>{"item","axis","none"}' />
+                                        </MCol>
+                                        <MCol Md="12">
+                                            <ButtonGroupItem @bind-Value="@Value.Tooltip.RenderModel" Label="Render mode" Items='new List<string>{"html","richText"}' />
+                                        </MCol>
+                                        <MCol Md="12">
+                                            <STextField @bind-Value="@Value.Tooltip.ClassName" Label="Class Name" TValue="string" />
+                                        </MCol>
+                                    </MRow>
+                                </MExpansionPanelContent>
+                            </MExpansionPanel>
+                            <MExpansionPanel Value="3">
+                                <MExpansionPanelHeader Class="emphasis2--text h6">Legend</MExpansionPanelHeader>
+                                <MExpansionPanelContent>
+                                    <MRow>
+                                        <MCol Md="12">
+                                            <SwitchItem Label="Legend mode" @bind-Value="@Value.Legend.Show" />
+                                        </MCol>
+                                        <MCol Md="12">
+                                            <ButtonGroupItem @bind-Value="@Value.Legend.Type" Label="Type" Items='new List<string>{"plain","scroll"}' />
+                                        </MCol>
+                                        <MCol Md="12">
+                                            <ButtonGroupItem @bind-Value="@Value.Legend.Orient" Label="Orient" Items='new List<string>{"horizontal","vertical"}' />
+                                        </MCol>
+                                        <MCol Md="12">
+                                            <ButtonGroupItem @bind-Value="@Value.Legend.XPositon" Label="X Position" Items='new List<string>{"left","center","right"}' />
+                                        </MCol>
+                                        <MCol Md="12">
+                                            <ButtonGroupItem @bind-Value="@Value.Legend.YPositon" Label="Y Position" Items='new List<string>{"top","center","bottom"}' />
+                                        </MCol>
+                                    </MRow>
+                                </MExpansionPanelContent>
+                            </MExpansionPanel>
+                            <MExpansionPanel Value="4">
+                                <MExpansionPanelHeader Class="emphasis2--text h6">Axis</MExpansionPanelHeader>
+                                <MExpansionPanelContent>
+                                    <SwitchItem Label="X轴" @bind-Value="@Value.XAxis.Show" />
+                                    <SwitchItem Label="X轴轴线" @bind-Value="@Value.XAxis.ShowLine" />
+                                    <SwitchItem Label="X轴刻度标签" @bind-Value="@Value.XAxis.ShowLabel" />
+                                    <SwitchItem Label="X轴刻度" @bind-Value="@Value.XAxis.ShowTick" />
+                                    <SwitchItem Label="Y轴" @bind-Value="@Value.YAxis.Show" />
+                                    <SwitchItem Label="Y轴轴线" @bind-Value="@Value.YAxis.ShowLine" />
+                                    <SwitchItem Label="Y轴刻度标签" @bind-Value="@Value.YAxis.ShowLabel" />
+                                    <SwitchItem Label="Y轴刻度" @bind-Value="@Value.YAxis.ShowTick" />
+                                </MExpansionPanelContent>
+                            </MExpansionPanel>
+                            <MExpansionPanel Value="5">
+                                <MExpansionPanelHeader Class="emphasis2--text h6">Toolbox</MExpansionPanelHeader>
+                                <MExpansionPanelContent>
+                                    <MRow>
+                                        <MCol Md="12">
+                                            <SwitchItem Label="Toolbox mode" @bind-Value="@Value.Toolbox.Show" />
+                                        </MCol>
+                                        <MCol Md="12">
+                                            <ButtonGroupItem @bind-Values="@Value.Toolbox.Feature" Label="Feature" Multiple Items='new List<string>{"saveAsImage","dataView","restore","dataZoom"}' />
+                                        </MCol>
+                                        <MCol Md="12">
+                                            <ButtonGroupItem @bind-Value="@Value.Toolbox.Orient" Label="Orient" Items='new List<string>{"horizontal","vertical"}' />
+                                        </MCol>
+                                        <MCol Md="12">
+                                            <ButtonGroupItem @bind-Value="@Value.Toolbox.XPositon" Label="X Position" Items='new List<string>{"left","center","right"}' />
+                                        </MCol>
+                                        <MCol Md="12">
+                                            <ButtonGroupItem @bind-Value="@Value.Toolbox.YPositon" Label="Y Position" Items='new List<string>{"top","center","bottom"}' />
                                         </MCol>
                                     </MRow>
                                 </MExpansionPanelContent>
                             </MExpansionPanel>
                         }
-                    }
-                    else
-                    {
-                        <MExpansionPanel Value="2">
-                            <MExpansionPanelHeader Class="emphasis2--text h6">Tooltip</MExpansionPanelHeader>
-                            <MExpansionPanelContent>
-                                <MRow>
-                                    <MCol Md="12">
-                                        <SwitchItem Label="Tooltip mode" @bind-Value="@Value.Tooltip.Show" />
-                                    </MCol>
-                                    <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@Value.Tooltip.Trigger" Label="Trigger" Items='new List<string>{"item","axis","none"}' />
-                                    </MCol>
-                                    <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@Value.Tooltip.RenderModel" Label="Render mode" Items='new List<string>{"html","richText"}' />
-                                    </MCol>
-                                    <MCol Md="12">
-                                        <STextField @bind-Value="@Value.Tooltip.ClassName" Label="Class Name" TValue="string" />
-                                    </MCol>
-                                </MRow>
-                            </MExpansionPanelContent>
-                        </MExpansionPanel>
-                        <MExpansionPanel Value="3">
-                            <MExpansionPanelHeader Class="emphasis2--text h6">Legend</MExpansionPanelHeader>
-                            <MExpansionPanelContent>
-                                <MRow>
-                                    <MCol Md="12">
-                                        <SwitchItem Label="Legend mode" @bind-Value="@Value.Legend.Show" />
-                                    </MCol>
-                                    <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@Value.Legend.Type" Label="Type" Items='new List<string>{"plain","scroll"}' />
-                                    </MCol>
-                                    <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@Value.Legend.Orient" Label="Orient" Items='new List<string>{"horizontal","vertical"}' />
-                                    </MCol>
-                                    <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@Value.Legend.XPositon" Label="X Position" Items='new List<string>{"left","center","right"}' />
-                                    </MCol>
-                                    <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@Value.Legend.YPositon" Label="Y Position" Items='new List<string>{"top","center","bottom"}' />
-                                    </MCol>
-                                </MRow>
-                            </MExpansionPanelContent>
-                        </MExpansionPanel>
-                        <MExpansionPanel Value="4">
-                            <MExpansionPanelHeader Class="emphasis2--text h6">Axis</MExpansionPanelHeader>
-                            <MExpansionPanelContent>
-                                <SwitchItem Label="X轴" @bind-Value="@Value.XAxis.Show" />
-                                <SwitchItem Label="X轴轴线" @bind-Value="@Value.XAxis.ShowLine" />
-                                <SwitchItem Label="X轴刻度标签" @bind-Value="@Value.XAxis.ShowLabel" />
-                                <SwitchItem Label="X轴刻度" @bind-Value="@Value.XAxis.ShowTick" />
-                                <SwitchItem Label="Y轴" @bind-Value="@Value.YAxis.Show" />
-                                <SwitchItem Label="Y轴轴线" @bind-Value="@Value.YAxis.ShowLine" />
-                                <SwitchItem Label="Y轴刻度标签" @bind-Value="@Value.YAxis.ShowLabel" />
-                                <SwitchItem Label="Y轴刻度" @bind-Value="@Value.YAxis.ShowTick" />
-                            </MExpansionPanelContent>
-                        </MExpansionPanel>
-                        <MExpansionPanel Value="5">
-                            <MExpansionPanelHeader Class="emphasis2--text h6">Toolbox</MExpansionPanelHeader>
-                            <MExpansionPanelContent>
-                                <MRow>
-                                    <MCol Md="12">
-                                        <SwitchItem Label="Toolbox mode" @bind-Value="@Value.Toolbox.Show" />
-                                    </MCol>
-                                    <MCol Md="12">
-                                        <ButtonGroupItem @bind-Values="@Value.Toolbox.Feature" Label="Feature" Multiple Items='new List<string>{"saveAsImage","dataView","restore","dataZoom"}' />
-                                    </MCol>
-                                    <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@Value.Toolbox.Orient" Label="Orient" Items='new List<string>{"horizontal","vertical"}' />
-                                    </MCol>
-                                    <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@Value.Toolbox.XPositon" Label="X Position" Items='new List<string>{"left","center","right"}' />
-                                    </MCol>
-                                    <MCol Md="12">
-                                        <ButtonGroupItem @bind-Value="@Value.Toolbox.YPositon" Label="Y Position" Items='new List<string>{"top","center","bottom"}' />
-                                    </MCol>
-                                </MRow>
-                            </MExpansionPanelContent>
-                        </MExpansionPanel>
-                    }
-                </MExpansionPanels>
-            </MCardText>
-        </MCard>
-    </MCol>
-</MRow>
+                    </MExpansionPanels>
+                </MCard>
+            </MCol>
+        </MRow>
+    </AutoHeightContent>
+</AutoHeight>

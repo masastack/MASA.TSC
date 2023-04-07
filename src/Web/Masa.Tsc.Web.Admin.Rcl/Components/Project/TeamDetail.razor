@@ -14,8 +14,8 @@
                     </MListItemContent>
                 </MListItem>
             </MCol>
-            <MCol Cols=6 Class="regular--text"><MLabel Class="body2">@I18n.Team("Monitoring Projects") ：</MLabel> <span class="subtitle2">@Value.ProjectTotal</span></MCol>
-            <MCol Cols=6 Class="regular--text"><MLabel Class="body2">@I18n.Team("Monitoring Applications") ：</MLabel><span class="subtitle2">@Value.AppTotal</span></MCol>
+            <MCol Cols=6 Class="regular--text"><span class="body2">@I18n.Team("Monitoring Projects")</span><span class="subtitle2">@($" {Value.ProjectTotal}")</span></MCol>
+            <MCol Cols=6 Class="regular--text"><span class="body2">@I18n.Team("Monitoring Applications")</span><span class="subtitle2">@($" {Value.AppTotal}")</span></MCol>
         </MRow>
         <MRow>
             @foreach (var user in Value.Admins!)
@@ -31,7 +31,7 @@
             }
         </MRow>
         <MRow>
-            <MCol Cols=12 Class="regular2--text body2" Style="min-height:120px">
+            <MCol Cols=12 Class="regular--text body2" Style="min-height:120px">
                 @(Value.Description)
             </MCol>
         </MRow>

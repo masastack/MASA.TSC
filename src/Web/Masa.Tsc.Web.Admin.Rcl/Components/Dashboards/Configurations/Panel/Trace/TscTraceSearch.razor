@@ -1,7 +1,7 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<div class="d-flex mb-6">
+<div class="d-flex mb-6" style="@Style">
     <SAutoComplete Placeholder="@I18n.T("Service")" Label="@I18n.T("Service")"
                    Items="_services"
                    @bind-Value="_service"

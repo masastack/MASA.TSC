@@ -33,21 +33,21 @@
             }
             else
             {
-                <MCol Style="min-width:220px">
+                <MCol Style="min-width:220px" class="d-flex justify-center align-start">
                     <HoneyCombGridItem Data="_viewProjects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor" TItem="ProjectOverviewDto">
                         <CellBack>
                             <div class="d-flex flex-column align-center pt-7">
-                                <span class="d-inline-block text-truncate masa btn body @GetHexTitleClass(context.Status)" style="width:120px;">@context.Name</span>
+                                <span class="d-inline-block text-truncate masa h8 my-1 @GetHexTitleClass(context.Status)" style="width:120px;">@context.Name</span>
                                 @foreach (var app in context.Apps.Take(3))
                                 {
                                     if (app.Status == MonitorStatuses.Normal)
                                     {
-                                        <span @onmouseover="()=>_hoverAppId=app.Id" @onmouseout="()=>_hoverAppId=string.Empty" class="masa regular2--text body2 pa-1 d-inline-block text-truncate text-center bordershadow" style="cursor:pointer;width:96%" @onclick="@(()=>OnProjectServiceClick(context,app))">@app.Name</span>
+                                        <span @onmouseover="()=>_hoverAppId=app.Id" @onmouseout="()=>_hoverAppId=string.Empty" class="masa regular2--text body2 pa-1 d-inline-block text-truncate text-center cell-item rounded-sm" style="cursor:pointer;width:96%" @onclick="@(()=>OnProjectServiceClick(context,app))">@app.Name</span>
                                     }
                                     else
                                     {
-                                      <div @onclick="()=>OnProjectServiceClick(context,app)" @onclick:stopPropagation="true" class="bordershadow pa-1" style="cursor:pointer;width:96%" @onmouseover="()=>_hoverAppId=app.Id" @onmouseout="()=>_hoverAppId=string.Empty">
-                                            <TscTeamChip Class="masa body2 ma-0 p-1 bordershadow" Style="cursor:pointer"
+                                      <div @onclick="()=>OnProjectServiceClick(context,app)" @onclick:stopPropagation="true" class="pa-1" style="cursor:pointer;width:96%" @onmouseover="()=>_hoverAppId=app.Id" @onmouseout="()=>_hoverAppId=string.Empty">
+                                            <TscTeamChip Class="masa body2 ma-0 p-1 cell-item rounded-sm" Style="cursor:pointer"
                                          Color="@ChipLabelColor(app)"
                                          TextColor="white"
                                          Label
@@ -62,7 +62,7 @@
                                 {
                                     <MTooltip Bottom>
                                         <ActivatorContent Context="tooltipContext">
-                                            <span @attributes="@tooltipContext.Attrs" class="masa regular2--text body2 bordershadow pa-1" style="cursor:pointer;width:60%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))" @onmouseover='()=>_hoverAppId="more"' @onmouseout="()=>_hoverAppId=null">...</span>
+                                            <span @attributes="@tooltipContext.Attrs" class="masa regular2--text body2 pa-1 cell-item rounded-sm" style="cursor:pointer;width:60%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))" @onmouseover='()=>_hoverAppId="more"' @onmouseout="()=>_hoverAppId=null">...</span>
                                         </ActivatorContent>
                                         <ChildContent>
                                             <span>@I18n.T("More")</span>
@@ -73,7 +73,7 @@
                         </CellBack>
                         <CellHoverTip>
                             <div style="background-color:transparent;@(_hoverAppId=="more"?"display:none":"")">
-                                <MCard Class="emphasis2 rounded-b-xl" Width="240" style="border-radius: 12px;">
+                                <MCard Class="emphasis2" Width="240" style="border-radius: 12px;">
                                     <MCardText Class="d-flex flex-column white--text masa body">
                                         @if(string.IsNullOrWhiteSpace(_hoverAppId))
                                         {

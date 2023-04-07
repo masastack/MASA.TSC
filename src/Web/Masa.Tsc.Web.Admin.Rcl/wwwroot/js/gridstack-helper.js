@@ -1,48 +1,13 @@
 export function init(options, dotNetHelper) {
+    var topEl = document.getElementById('grid-stack');
     var el = getElement(options);
-    if (el.gridstack?.engine) {
-        el.gridstack.destroy(false);
-        initByElement(options, el, dotNetHelper);
-        var els = el.querySelectorAll('.grid-stack');
-        els.forEach(el => {
-            try {
-                el.gridstack?.destroy(false);
-            }
-            catch (error) {
-
-            }
-        });
-        els.forEach(el => {
+    if (topEl.loadComplete) {
+        if (!el.gridstack) {
             initByElement(options, el, dotNetHelper);
-        });
+        }
     }
-    else initByElement(options, el, dotNetHelper);
-
-    //if (options.id === 'grid-stack') {
-    //    var grid = el.gridstack;
-    //    grid.cellHeight = cellHeight;
-    //    window.setTimeout(() => {
-    //        var val = grid.cellWidth() * 0.90;//1.02;
-    //        grid.cellHeight(val, true);
-    //    }, 10);
-    //    window.addEventListener('resize', () => {
-    //        window.setTimeout(() => {
-    //            var val = grid.cellWidth() * 0.90;//1.02;
-    //            grid.cellHeight(val, true);
-    //        }, 100);
-    //    });
-    //}
 
     return el.gridstack;
-}
-
-function cellHeight(val, update = true){
-    this.opts.cellHeight = val;
-
-    if (update) {
-        this._updateStyles(true); // true = force re-create for current # of rows
-    }
-    return this;
 }
 
 export function initAll(options, dotNetHelper) {
@@ -60,6 +25,7 @@ export function initAll(options, dotNetHelper) {
             }))
         });
     });
+    getElement(options).loadComplete = true;
 }
 
 export function reload(options) {
@@ -112,8 +78,13 @@ export function destroy(options, destroyDom) {
 
 export function switchState(options, state) {
     var grid = getElement(options).gridstack;
-    grid.enableMove(state);
-    grid.enableResize(state);
+    if (grid) {
+        grid.enableMove(state);
+        grid.enableResize(state);
+    }
+    else {
+        debugger
+    }
 }
 
 function initByElement(options, el, dotNetHelper) {

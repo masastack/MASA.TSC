@@ -8,6 +8,15 @@
 .m-honeycomb-cell__border:hover {
     background-color:lightsalmon !important;
 }
+.m-honeycomb-cell-normal__border:hover {
+    background-color:#05CD99 !important;
+}
+.m-honeycomb-cell-warning__border:hover {
+    background-color:#FF7D00 !important;
+}
+.m-honeycomb-cell-error__border:hover {
+    background-color:#FF5252 !important;
+}
 
 .m-honeycomb-cell__border-parent {
     /*filter: url('#goo');*/
@@ -25,14 +34,15 @@
 position: fixed;
 right: -50px;*/
     /* margin-top: 2vw;*/
-    z-index: -2
+    z-index: -2;
+    margin-top: -28px;
 }
 
 .m-honeycomb {
     display: flex;
     flex-wrap: wrap;
     list-style: none;
-    justify-content: center;
+    /* justify-content: center; */
     align-items: center;
     max-width: 1200px;
     margin: 0 auto;
@@ -155,65 +165,42 @@ right: -50px;*/
 }
 
 /*nth-child*/
-@media (max-width: 640px) {
-    .m-honeycomb-cell:nth-of-type(3n) {
-        margin-right: calc(50% - 125px);
-        margin-left: calc(50% - 125px);
-    }
-
-    .m-honeycomb__placeholder:nth-of-type(3n+5) {
-        display: block;
+@media (max-width: 1066px) {
+    .m-honeycomb-cell__border-parent:nth-of-type(4n) {
+        margin-left: 105px;
     }
 }
 
-@media (min-width: 640px) and (max-width: 960px) {
-    .m-honeycomb-cell:nth-of-type(5n+4) {
-        margin-left: calc(50% - 235px);
-    }
-
-    .m-honeycomb-cell:nth-of-type(5n+5) {
-        margin-right: calc(50% - 235px);
-    }
-
-    .m-honeycomb__placeholder:nth-of-type(5n),
-    .m-honeycomb__placeholder:nth-of-type(5n+3) {
-        display: block;
+@media (min-width: 1067px) and (max-width: 1382px) {
+    .m-honeycomb-cell__border-parent:nth-of-type(3n) {
+        margin-left: 105px;
+        margin-right: 210px;
     }
 }
 
-@media (min-width: 960px) and (max-width: 1264px) {
-    .m-honeycomb-cell:nth-of-type(7n+5) {
-        margin-left: calc(50% - 292px);
+@media (min-width: 1383px) and (max-width: 1592px) {
+    .m-honeycomb-cell__border-parent:nth-of-type(10n-2) {
+        margin-left: 105px;
     }
-
-        .m-honeycomb-cell:nth-of-type(7n+7),
-        .m-honeycomb-cell:nth-of-type(7n+5):nth-last-child(2) {
-            margin-right: calc(50% - 292px);
-        }
-
-    .m-honeycomb__placeholder:nth-of-type(7n+7),
-    .m-honeycomb__placeholder:nth-of-type(7n+9),
-    .m-honeycomb__placeholder:nth-of-type(7n+11) {
-        display: block;
+    .m-honeycomb-cell__border-parent:nth-of-type(10n) {
+        margin-right: 210px;
     }
 }
 
-@media (min-width: 1264px) {
-    .m-honeycomb-cell:nth-of-type(11n+7) {
-        margin-left: calc(50% - 588px);
+@media (min-width: 1593px) and (max-width: 1802px) {
+    .m-honeycomb-cell__border-parent:nth-of-type(14n-4) {
+        margin-left: 105px;
     }
+    .m-honeycomb-cell__border-parent:nth-of-type(14n) {
+        margin-right: 210px;
+    }
+}
 
-        .m-honeycomb-cell:nth-of-type(11n+11),
-        .m-honeycomb-cell:nth-of-type(11n+7):nth-last-child(2) {
-            margin-right: calc(50% - 588px);
-        }
-
-    .m-honeycomb__placeholder:nth-of-type(11n+7),
-    .m-honeycomb__placeholder:nth-of-type(11n+10),
-    .m-honeycomb__placeholder:nth-of-type(11n+11),
-    .m-honeycomb__placeholder:nth-of-type(11n+13),
-    .m-honeycomb__placeholder:nth-of-type(11n+15),
-    .m-honeycomb__placeholder:nth-of-type(11n+17) {
-        display: block;
+@media (min-width: 1803px) {
+    .m-honeycomb-cell__border-parent:nth-of-type(18n-6) {
+        margin-left: 105px;
+    }
+    .m-honeycomb-cell__border-parent:nth-of-type(18n) {
+        margin-right: 210px;
     }
 }

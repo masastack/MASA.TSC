@@ -137,6 +137,7 @@ public class QueryHandler
         query.Result.Monitor.ServiceWarn = query.Result.Projects.Count(m => m.HasWarning);
         query.Result.Monitor.AppWarn = query.Result.Projects.Sum(p => p.Apps.Count(a => a.HasError));
         query.Result.Monitor.Normal = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Normal);
+        query.Result.Monitor.NormalAppTotal = query.Result.Projects.Sum(m => m.Apps.Count(a => !a.HasError && !a.HasWarning));
 
         var (errorCount, warnCount) = await GetErrorAndWarnCountAsync(query.StartTime, query.EndTime, appids);
         query.Result.Monitor.ErrorCount = errorCount;

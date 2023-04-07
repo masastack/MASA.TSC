@@ -1,0 +1,9 @@
+.m-honeycomb-cell-normal__border .cell-item:hover {
+    background-color:#CDF5EB !important;
+}
+.m-honeycomb-cell-warning__border .cell-item:hover {
+    background-color:#FFE4BA !important;
+}
+.m-honeycomb-cell-error__border .cell-item:hover {
+    background-color:#FDCDC5 !important;
+}
