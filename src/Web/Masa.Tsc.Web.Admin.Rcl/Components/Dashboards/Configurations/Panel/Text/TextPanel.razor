@@ -1,7 +1,7 @@
 ﻿<div class="full-height" style="padding:10px;">
     @if (ConfigurationRecord.IsEdit)
     {
-        <MEditor @ref="_editor" Class="full-height" Value="@Content" ValueChanged="ContentChanged" Placeholder="请输入内容" ContentStyle="height:calc(100% - 95px);" />
+        <MEditor @ref="_editor" Class="full-height" Value="@Content" ValueChanged="ContentChanged" Placeholder="请输入内容" ContentStyle="height:calc(100% - 95px);" BeforeAllUploadAsync="BeforeAllUploadAsync" />
     }
     else
     {
@@ -12,16 +12,47 @@
 @code {
     private MEditor _editor;
 
+    [Inject]
+    public IObjectStorageClient Client { get; set; } = default!;
+
+    [Inject]
+    private IJSRuntime JS { get; set; }
+
+    [Inject]
+    public IConfiguration Configuration { get; set; } = default!;
+
+    public OssOptions OssOptions
+    {
+        get
+        {
+            return Configuration.GetSection("ConfigurationApi:public-$Config:$public.oss").Get<OssOptions>();
+        }
+    }
+
     [CascadingParameter]
     public ConfigurationRecord ConfigurationRecord { get; set; }
 
     [Parameter]
     public UpsertPanelDto Value { get; set; }
 
-    string Content => Value[ExtensionFieldTypes.Content]?.ToString()??"";
+    string Content => Value[ExtensionFieldTypes.Content]?.ToString() ?? "";
 
     void ContentChanged(string content)
     {
         Value[ExtensionFieldTypes.Content] = content;
+    }
+
+    private async Task<bool> BeforeAllUploadAsync(List<EditorUploadFileItem> flist)
+    {
+        var response = Client.GetSecurityToken();
+        var stsToken = response.SessionToken;
+        var accessId = response.AccessKeyId;
+        var accessSecret = response.AccessKeySecret;
+        var region = "oss-cn-hangzhou";
+        var bucket = OssOptions.Bucket;
+        var paramter = new SecurityTokenModel(region, accessId, accessSecret, stsToken, bucket);
+
+        await JS.InvokeVoidAsync("EditorUploadImageToOss", _editor.ContentRef, _editor.Ref, paramter);
+        return true;
     }
 }
