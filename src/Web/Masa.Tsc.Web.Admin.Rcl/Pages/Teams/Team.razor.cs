@@ -109,7 +109,6 @@ public partial class Team
 
         _appMonitorDto.Normal = projects.Count(project => project.Apps.All(app => !app.HasError && !app.HasWarning));
         _appMonitorDto.NormalAppTotal = projects.Sum(project => project.Apps.Count(app => !app.HasError && !app.HasWarning));
-        Console.WriteLine(_appMonitorDto.NormalAppTotal);
 
         var appids = string.Join(',', projects.Select(project => string.Join(',', project.Apps.Select(app => app.Identity)))).Split(',').Where(s => !string.IsNullOrEmpty(s)).ToArray();
         var tasks = new Task<int>[] {
