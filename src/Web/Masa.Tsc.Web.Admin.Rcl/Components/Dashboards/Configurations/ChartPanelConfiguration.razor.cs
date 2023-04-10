@@ -47,6 +47,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
         _valueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
         if (Value.Metrics.Any() is false) Value.Metrics.Add(new());
 
+        Value.PanelType = PanelTypes.Chart;
         InitListType();
     }
 

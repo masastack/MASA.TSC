@@ -72,6 +72,7 @@ public partial class PanelGrids
         Panels.Add(panel);
         if (panel.PanelType is PanelTypes.Chart)
         {
+            panel.PanelType = PanelTypes.Select;
             ConfigurationChartPanel(panel);
         }
     }
