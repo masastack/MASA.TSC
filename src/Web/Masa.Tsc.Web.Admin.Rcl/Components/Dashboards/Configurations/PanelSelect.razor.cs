@@ -27,7 +27,7 @@ public partial class PanelSelect
             new (PanelTypes.Log,"fas fa-list", false),
             new (PanelTypes.Trace,"fas fa-eye", false),
         };
-        if (Panel.ParentPanel == null || Panel.ParentPanel.ParentPanel == null || Panel.ParentPanel.ParentPanel.ParentPanel == null)
+        if (Panel.ParentPanel == null || Panel.ParentPanel.PanelType != PanelTypes.TabItem || Panel.ParentPanel.ParentPanel == null || Panel.ParentPanel.ParentPanel.ParentPanel == null)
         {
             types.Insert(0, new(PanelTypes.Tabs, "mdi-tab", false));
         }
