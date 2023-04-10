@@ -109,13 +109,13 @@
             _prevReadonly = Readonly;
             if (Id is null)
             {
-                await GridstackJSModule.InitAllAsync(Options);
-                await GridstackJSModule.SwitchStateAsync(!Readonly);
+                await GridstackJSModule.InitAllAsync(Options);               
             }
             else
             {
                 await GridstackJSModule.InitAsync(Options);
             }
+            await GridstackJSModule.SwitchStateAsync(!Readonly);
         }
         else
         {

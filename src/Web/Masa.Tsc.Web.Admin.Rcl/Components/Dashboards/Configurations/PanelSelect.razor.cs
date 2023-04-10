@@ -17,25 +17,26 @@ public partial class PanelSelect
     [CascadingParameter]
     public ConfigurationRecord ConfigurationRecord { get; set; }
 
-    List<(PanelTypes PannelType, string Icon, bool Disabled)> GetPanelTypes(PanelTypes type = default)
+    public List<(PanelTypes PannelType, string Icon, bool Disabled)> Types = new List<(PanelTypes PannelType, string Icon, bool Disabled)>
     {
-        var types = new List<(PanelTypes PannelType, string Icon, bool Disabled)>
+        new (PanelTypes.Text,"mdi-format-size", false),
+        new (PanelTypes.Chart,"mdi-chart-box", false),
+        new (PanelTypes.Topology,"mdi-sitemap", false),
+        new (PanelTypes.Log,"fas fa-list", false),
+        new (PanelTypes.Trace,"fas fa-eye", false),
+    };
+
+    IEnumerable<(PanelTypes PannelType, string Icon, bool Disabled)> GetPanelTypes()
+    {
+        if(Panel.ParentPanel?.PanelType is PanelTypes.TabItem)
         {
-            new (PanelTypes.Text,"mdi-format-size", false),
-            new (PanelTypes.Chart,"mdi-chart-box", false),
-            new (PanelTypes.Topology,"mdi-sitemap", false),
-            new (PanelTypes.Log,"fas fa-list", false),
-            new (PanelTypes.Trace,"fas fa-eye", false),
-        };
-        if (Panel.ParentPanel == null || Panel.ParentPanel.PanelType != PanelTypes.TabItem || Panel.ParentPanel.ParentPanel == null || Panel.ParentPanel.ParentPanel.ParentPanel == null)
-        {
-            types.Insert(0, new(PanelTypes.Tabs, "mdi-tab", false));
+            if(Panel.ParentPanel.ParentPanel!.ParentPanel is not null)
+            {
+                return Types.Prepend(new(PanelTypes.Tabs, "mdi-tab", true));
+            }
         }
-        else
-        {
-            types.Insert(0, new(PanelTypes.Tabs, "mdi-tab", true));
-        }
-        return types;
+
+        return Types.Prepend(new(PanelTypes.Tabs, "mdi-tab", false));
     }
 
     async Task SelectPanelAsync(PanelTypes type)

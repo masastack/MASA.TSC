@@ -227,19 +227,22 @@
                                     </MRow>
                                 </MExpansionPanelContent>
                             </MExpansionPanel>
-                            <MExpansionPanel Value="4">
-                                <MExpansionPanelHeader Class="emphasis2--text h6">Axis</MExpansionPanelHeader>
-                                <MExpansionPanelContent>
-                                    <SwitchItem Label="X轴" @bind-Value="@Value.XAxis.Show" />
-                                    <SwitchItem Label="X轴轴线" @bind-Value="@Value.XAxis.ShowLine" />
-                                    <SwitchItem Label="X轴刻度标签" @bind-Value="@Value.XAxis.ShowLabel" />
-                                    <SwitchItem Label="X轴刻度" @bind-Value="@Value.XAxis.ShowTick" />
-                                    <SwitchItem Label="Y轴" @bind-Value="@Value.YAxis.Show" />
-                                    <SwitchItem Label="Y轴轴线" @bind-Value="@Value.YAxis.ShowLine" />
-                                    <SwitchItem Label="Y轴刻度标签" @bind-Value="@Value.YAxis.ShowLabel" />
-                                    <SwitchItem Label="Y轴刻度" @bind-Value="@Value.YAxis.ShowTick" />
-                                </MExpansionPanelContent>
-                            </MExpansionPanel>
+                            @if (Value.ChartType is not ChartTypes.Pie && Value.ChartType is not ChartTypes.Gauge)
+                            {
+                                <MExpansionPanel Value="4">
+                                    <MExpansionPanelHeader Class="emphasis2--text h6">Axis</MExpansionPanelHeader>
+                                    <MExpansionPanelContent>
+                                        <SwitchItem Label="X轴" @bind-Value="@Value.XAxis.Show" />
+                                        <SwitchItem Label="X轴轴线" @bind-Value="@Value.XAxis.ShowLine" />
+                                        <SwitchItem Label="X轴刻度标签" @bind-Value="@Value.XAxis.ShowLabel" />
+                                        <SwitchItem Label="X轴刻度" @bind-Value="@Value.XAxis.ShowTick" />
+                                        <SwitchItem Label="Y轴" @bind-Value="@Value.YAxis.Show" />
+                                        <SwitchItem Label="Y轴轴线" @bind-Value="@Value.YAxis.ShowLine" />
+                                        <SwitchItem Label="Y轴刻度标签" @bind-Value="@Value.YAxis.ShowLabel" />
+                                        <SwitchItem Label="Y轴刻度" @bind-Value="@Value.YAxis.ShowTick" />
+                                    </MExpansionPanelContent>
+                                </MExpansionPanel>
+                            }
                             <MExpansionPanel Value="5">
                                 <MExpansionPanelHeader Class="emphasis2--text h6">Toolbox</MExpansionPanelHeader>
                                 <MExpansionPanelContent>

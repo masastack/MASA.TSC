@@ -530,6 +530,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         if (_chartData is not null)
         {
             var index = 0;
+            var defaultColorIndex = 0;
             foreach (var item in _chartData)
             {
                 if (item is not null)
@@ -547,10 +548,23 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                         {
                             metricName = Metrics[index].DisplayName ?? string.Join("-", matrix.Metric!.Values);
                         }
+                        var color = Metrics[index].Color;
+                        if(ChartType is ChartTypes.Pie or ChartTypes.Gauge)
+                        {
+                            if (string.IsNullOrEmpty(color))
+                            {
+                                color = _defaultColors[defaultColorIndex];
+                                defaultColorIndex++;
+                                if (defaultColorIndex == _defaultColors.Count())
+                                {
+                                    defaultColorIndex = 0;
+                                }
+                            }
+                        }
                         data.Add(new(new()
                         {
                             Name = metricName,
-                            Color = Metrics[index].Color,
+                            Color = color,
                         }, matrix));
                     }
                 }
@@ -695,7 +709,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                 ["show"] = XAxis.ShowLabel
             };
         }
-        else
+        else if(ChartType is not ChartTypes.Pie && ChartType is not ChartTypes.Gauge)
         {
             EChartType.SetValue("yAxis.show", YAxis.Show);
             EChartType.SetValue("yAxis.axisLine.show", YAxis.ShowLine);
