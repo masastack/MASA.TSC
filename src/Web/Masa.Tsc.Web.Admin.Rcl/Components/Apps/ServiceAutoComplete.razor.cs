@@ -7,6 +7,7 @@ public partial class ServiceAutoComplete
 {
     bool _firstValueChanged;
     bool _isLoading;
+    Guid _key = default;
 
     [Inject]
     public IPmClient PmClient { get; set; }
@@ -88,6 +89,28 @@ public partial class ServiceAutoComplete
             _firstValueChanged = true;
             var value = Services.First().Identity;
             await ValueChanged.InvokeAsync(value);
+        }
+    }
+
+    public async Task OnBlurAsync(FocusEventArgs focusEventArgs)
+    {
+        if (Value.IsNullOrEmpty())
+        {
+            _key = Guid.NewGuid();
+            var value = Services.First().Identity;
+            await ValueChanged.InvokeAsync(value);
+        }
+    }
+
+    public async Task InputValueChangedAsync(string? newValue)
+    {
+        if (!newValue.IsNullOrEmpty())
+        {
+            await ValueChanged.InvokeAsync(newValue);
+        }
+        else
+        {
+            Value = null;
         }
     }
 }

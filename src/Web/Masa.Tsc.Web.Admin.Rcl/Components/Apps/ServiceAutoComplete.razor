@@ -1,7 +1,9 @@
 ﻿@inherits TscComponentBase
 
 <SAutoComplete Value=Value
-               ValueChanged=ValueChanged
+               ValueChanged="(string? val)=>InputValueChangedAsync(val)"
+               @key="_key"
+               OnBlur=OnBlurAsync
                Items="@(Services?? new())"
                ItemText="app =>Metric?app.Identity:app.Name"
                ItemValue="app => app.Identity"
