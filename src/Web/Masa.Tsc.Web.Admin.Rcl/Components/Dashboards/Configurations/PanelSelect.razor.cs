@@ -9,7 +9,7 @@ public partial class PanelSelect
     public NavigationManager NavigationManager { get; set; }
 
     [Parameter]
-    public Guid PanelId { get; set; }
+    public UpsertPanelDto Panel { get; set; }
 
     [Parameter]
     public EventCallback<UpsertPanelDto> OnSelect { get; set; }
@@ -17,17 +17,24 @@ public partial class PanelSelect
     [CascadingParameter]
     public ConfigurationRecord ConfigurationRecord { get; set; }
 
-    List<KeyValuePair<PanelTypes, string>> GetPanelTypes(PanelTypes type = default)
+    List<(PanelTypes PannelType, string Icon, bool Disabled)> GetPanelTypes(PanelTypes type = default)
     {
-        var types = new List<KeyValuePair<PanelTypes, string>>
+        var types = new List<(PanelTypes PannelType, string Icon, bool Disabled)>
         {
-            new (PanelTypes.Tabs,"mdi-tab"),
-            new (PanelTypes.Text,"mdi-format-size"),
-            new (PanelTypes.Chart,"mdi-chart-box"),
-            new (PanelTypes.Topology,"mdi-sitemap"),
-            new (PanelTypes.Log,"fas fa-list"),
-            new (PanelTypes.Trace,"fas fa-eye"),
+            new (PanelTypes.Text,"mdi-format-size", false),
+            new (PanelTypes.Chart,"mdi-chart-box", false),
+            new (PanelTypes.Topology,"mdi-sitemap", false),
+            new (PanelTypes.Log,"fas fa-list", false),
+            new (PanelTypes.Trace,"fas fa-eye", false),
         };
+        if (Panel.ParentPanel == null || Panel.ParentPanel.PanelType != PanelTypes.TabItem || Panel.ParentPanel.ParentPanel == null || Panel.ParentPanel.ParentPanel.ParentPanel == null)
+        {
+            types.Insert(0, new(PanelTypes.Tabs, "mdi-tab", false));
+        }
+        else
+        {
+            types.Insert(0, new(PanelTypes.Tabs, "mdi-tab", true));
+        }
         return types;
     }
 
@@ -37,13 +44,13 @@ public partial class PanelSelect
         switch (type)
         {
             case PanelTypes.Tabs:
-                panel = new UpsertTabsPanelDto(PanelId);
+                panel = new UpsertTabsPanelDto(Panel.Id);
                 break;
             case PanelTypes.Chart or PanelTypes.Table:
-                panel = new UpsertChartPanelDto(PanelId);
+                panel = new UpsertChartPanelDto(Panel.Id);
                 break;
             default:
-                panel.Id = PanelId;
+                panel.Id = Panel.Id;
                 panel.PanelType = type;
                 break;
         }

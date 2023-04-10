@@ -6,13 +6,13 @@
         <div class="ma-auto" style="display: flex;flex-wrap: wrap;max-width: 480px;">
             @foreach (var panelType in GetPanelTypes())
             {
-                <MHover>
-                    <div @attributes="context.Attrs" @onclick="() => SelectPanelAsync(panelType.Key)" style="width: 144px;min-width:144px;height: 60px;min-height:60px;border: 1px solid #E4E8F3;" class="d-flex hover-pointer px-3 mr-4 mb-4 emphasis2--text fill rounded-2 dashboard-editor-ui-btn @(context.Hover?" fill-hover":"")">
+                <MHover Disabled=panelType.Disabled>
+                    <div @attributes="context.Attrs" @onclick="() => (panelType.Disabled?Task.CompletedTask:SelectPanelAsync(panelType.PannelType))" style="width: 144px;min-width:144px;height: 60px;min-height:60px;border: 1px solid #E4E8F3;@(panelType.Disabled?"cursor:not-allowed;":"")" class="d-flex px-3 mr-4 mb-4 fill rounded-2 @((context.Hover&&!panelType.Disabled) ? " fill-hover" : "") @(panelType.Disabled ? "regular3--text hover-" : "emphasis2--text hover-pointer dashboard-editor-ui-btn")">
                         <div class="d-flex my-auto borderNone" style="width:100%;">
-                            <SIcon Class="mr-2" Color="#323D6F">@panelType.Value</SIcon>
-                            <span class="borderNone">@I18n.Dashboard(panelType.Key.ToString())</span>
+                            <SIcon Class="mr-2" Color="@(panelType.Disabled?"#A3AED0":"#323D6F")">@panelType.Icon</SIcon>
+                            <span class="borderNone">@I18n.Dashboard(panelType.PannelType.ToString())</span>
                             <MSpacer Class="borderNone" />
-                            <SIcon Class="borderNone" Color="#323D6F" Size="16">@IconConstants.Add</SIcon>
+                            <SIcon Class="borderNone" Color="@(panelType.Disabled?"#A3AED0":"#323D6F")" Size="16">@IconConstants.Add</SIcon>
                         </div>
                     </div>
                 </MHover>
