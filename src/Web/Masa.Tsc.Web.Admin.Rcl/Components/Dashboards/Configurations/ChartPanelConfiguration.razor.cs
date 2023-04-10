@@ -47,6 +47,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
         _valueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
         if (Value.Metrics.Any() is false) Value.Metrics.Add(new());
 
+        Value.PanelType = PanelTypes.Chart;
         InitListType();
     }
 
@@ -66,7 +67,6 @@ public partial class ChartPanelConfiguration : TscComponentBase
             await PopupService.EnqueueSnackbarAsync(I18n.Dashboard("Metrics expression is required"), AlertTypes.Error);
             return;
         }
-        Value.PanelType = PanelTypes.Chart;
         ConfigurationRecord.NavigateToConfigurationRecord();
     }
 
@@ -114,7 +114,6 @@ public partial class ChartPanelConfiguration : TscComponentBase
     void ListTypeChanged(StringNumber listType)
     {
         Value.ListType = Enum.Parse<ListTypes>(listType.ToString()!);
-        Value.PanelType = PanelTypes.Chart;
     }
 
     void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
