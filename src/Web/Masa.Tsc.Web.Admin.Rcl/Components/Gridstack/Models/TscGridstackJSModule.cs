@@ -82,6 +82,18 @@ public class TscGridstackJSModule : IAsyncDisposable
         await helper.InvokeVoidAsync("save", _options, _dotNetObjectReference);
     }
 
+    public async ValueTask Movable(Guid itemId, bool enabled)
+    {
+        var helper = await GetJSObjectReference();
+        await helper.InvokeVoidAsync("movable", _options, itemId, enabled);
+    }
+
+    public async ValueTask Resizable(Guid itemId, bool enabled)
+    {
+        var helper = await GetJSObjectReference();
+        await helper.InvokeVoidAsync("resizable", _options, itemId, enabled);
+    }
+
     [JSInvokable]
     public async Task OnChange(IEnumerable<GridstackChangeEventArgs> args)
     {
