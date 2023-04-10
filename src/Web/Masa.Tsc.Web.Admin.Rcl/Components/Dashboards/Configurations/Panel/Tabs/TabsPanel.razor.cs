@@ -54,4 +54,13 @@ public partial class TabsPanel
             _tabs?.CallSlider();
         });
     }
+
+    void TitleValueChanged(UpsertPanelDto tabItem, string newval)
+    {
+        if (newval?.Length > 50)
+        {
+            return;
+        }
+        tabItem.Title = newval ?? "";
+    }
 }
