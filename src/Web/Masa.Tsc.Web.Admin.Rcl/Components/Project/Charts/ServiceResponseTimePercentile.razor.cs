@@ -38,7 +38,8 @@ public partial class ServiceResponseTimePercentile
             axisPointer = new
             {
                 type = "cross"
-            }
+            },
+            formatter = @$"function(params){{var html='';for(var i=0;i<params.length;i++){{html+=`<div style='display:flex;justify-content: space-between;padding-bottom:8px;'><div style='display:flex;align-items:center;'><div style='width:8px;height:8px;background-color:${{params[i].color}};border0radius:1px'></div><div>&nbsp;${{params[i].seriesName}}</div></div><div>${{params[i].value}}</div></div>`}}return`<div style='width:136px;margin:-2px'>${{html}}<div style='border-top:1px solid #E4E4E6;margin:0 -8px;'></div><div style='text-align:right;padding-top:2px;'>${{params[0].name}}</div></div>`}}"
         });
         _options.SetValue("xAxis.axisLabel.textStyle", new { color = "#A3AED0" });
         _options.SetValue("xAxis.axisLine.lineStyle", new
