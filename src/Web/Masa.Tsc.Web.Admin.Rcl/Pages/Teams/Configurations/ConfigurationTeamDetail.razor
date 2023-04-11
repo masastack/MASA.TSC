@@ -5,13 +5,13 @@
 <PageTitle>@I18n.TeamDashboard("Configure Team Detail")</PageTitle>
 
 <DashboardConfiguration ConfigurationRecord="ConfigurationRecord"
-                        View
                         SavePanelsAction="SavePanelsAsync"
                         GetPanelsAction="GetPanelsAsync"
                         Style="max-height: calc(100% - 84px)"
-                        HeaderStyle="height: 72px;background: #FFFFFF;border-radius: 16px;">
+                        HeaderStyle="height: 72px;background: #FFFFFF;border-radius: 16px;"
+                        HeaderClass="px-4" >
     <HeaderContent>
-        <div class="ml-4 d-flex my-auto" style="width: 40px;height: 40px;border: 1px solid #E4E8F3;border-radius: 40px;">
+        <div class="d-flex my-auto" style="width: 40px;height: 40px;border: 1px solid #E4E8F3;border-radius: 40px;">
             <div class="ma-auto">
                 <SIcon OnClick=NavigateToTeamProjectDialog Color="emphasis2" Size=24 Tooltip="@I18n.TeamDashboard("Return to team details page")">
                     mdi-arrow-left

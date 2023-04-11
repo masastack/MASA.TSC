@@ -3,7 +3,7 @@
     {
         <MCol Cols="6">
             <MCard OnClick="@(async ()=>await OnSelected(item))" Style="@(item.Selected?"border: 0.5px solid #4318FF;":"")">
-                <MImage Height=124 Contain Src="@item.Src" />
+                <MImage Height="@("100%")" Width="@("100%")" Contain Src="@item.Src" />
             </MCard>
         </MCol>
     }

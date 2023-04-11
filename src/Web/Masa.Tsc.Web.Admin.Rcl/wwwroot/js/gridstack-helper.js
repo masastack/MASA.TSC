@@ -4,12 +4,14 @@ export function init(options, dotNetHelper) {
     if (topEl.loadComplete) {
         if (!el.gridstack) {
             initByElement(options, el, dotNetHelper);
+            el.gridstack.cellHeight(el.gridstack.cellWidth() * 1);
             return el.gridstack;
         }
     }
     var timer = setInterval(function () {
         if (topEl.loadComplete) {
             clearInterval(timer);
+            el.gridstack.cellHeight(el.gridstack.cellWidth() * 1.2);
             el.gridstack.on('change', function (e, items) {
                 dotNetHelper.invokeMethodAsync('OnChange', items.map(item => {
                     return {

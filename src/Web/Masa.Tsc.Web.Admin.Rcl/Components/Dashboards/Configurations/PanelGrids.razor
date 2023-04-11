@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<Gridstack Items="Panels" Id="@(ParentPanel is null ? null : ParentPanel.Id.ToString())" Readonly="!IsEdit" Class="@Class" ItemStyle="@("background-color:white;border: 1px solid #F0F3FA;border-radius: 12px;position:absolute;overflow:hidden;"+(IsEdit?"cursor: move;":""))">
+<Gridstack Items="Panels" Id="@(ParentPanel is null ? null : ParentPanel.Id.ToString())" Readonly="!IsEdit" Class="@($"{Class}")" ItemStyle="@("background-color:white;border: 1px solid #F0F3FA;border-radius: 12px;"+(IsEdit?"cursor: move;":""))">
     <ItemContent>
         @{
             var actionHeight = context.PanelType == PanelTypes.Tabs || !IsEdit ? 0 : 28;
@@ -12,7 +12,7 @@
                 <PanelTool Value="context" ConfigurationChartPanel="ConfigurationChartPanel" RemovePanel="RemovePanel" />
             </div>
         }
-        <div style="overflow:auto;overflow-x:hidden; @($"height:calc(100% - {actionHeight}px);")">
+        <div style="@($"height:calc(100% - {actionHeight}px);")">
             @switch (context.PanelType)
             {
                 case PanelTypes.Tabs:

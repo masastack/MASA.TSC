@@ -33,7 +33,6 @@ public class GridstackOptions
 
     public int MarginLeft { get; set; }
 
-
     public bool Float { get; set; }
 
     public bool DisableResize { get; set; }
