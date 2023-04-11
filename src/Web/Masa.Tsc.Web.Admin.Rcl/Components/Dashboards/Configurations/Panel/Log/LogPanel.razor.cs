@@ -75,6 +75,11 @@ public partial class LogPanel
     {
         if (StartTime.HasValue && StartTime.Value > DateTime.MinValue)
             await GetPageLogsAsync();
+
+        if (!string.IsNullOrWhiteSpace(TaskId))
+        {
+            Search = $"{{\"term\":{{\"Attributes.TaskId.keyword\":\"{TaskId}\"}}}}";
+        }
     }
 
     protected override async Task OnTimeZoneInfoChanged(TimeZoneInfo timeZoneInfo)
