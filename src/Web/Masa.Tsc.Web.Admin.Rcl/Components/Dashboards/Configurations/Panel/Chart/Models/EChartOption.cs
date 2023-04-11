@@ -146,7 +146,7 @@ public class Tooltip : NotifyingEntity
     bool _show = true;
     string _className;
     string _renderModel = "html";
-    string _trigger = "axis";
+    string _trigger = "item";
 
     public bool Show
     {

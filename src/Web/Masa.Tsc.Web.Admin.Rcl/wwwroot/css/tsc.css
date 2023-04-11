@@ -372,3 +372,7 @@ div[style*="visibility: hidden; opacity: 0;"] {
 .tab .m-item-group {
     border-bottom: 1px solid #E4E8F3;
 }
+
+.m-text-field__slot .m-label {
+    z-index: 1;
+}
