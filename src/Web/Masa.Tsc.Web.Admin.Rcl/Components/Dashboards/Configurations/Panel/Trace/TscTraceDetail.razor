@@ -5,14 +5,14 @@
     <div class="d-flex">
         <div class="pa-12" style="width:100%">
             <div class="d-flex mb-6">
-                <SearchTextField FullWidth Small Clearable Class="my-auto mr-6" Style="max-width:300px" />
+                <SearchTextField FullWidth Small Clearable Class="my-auto mr-6" Style="max-width:300px;display:none" />
                 <MSpacer></MSpacer>
                 @if (_rootTreeItem is not null)
                 {
                     <div class="d-flex align-center">
                         <div class="mr-6">
                             <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Start")</MChip>
-                            <span class="regular--text">@(_rootTreeItem.Timestamp+CurrentTimeZone.BaseUtcOffset)</span>
+                            <span class="regular--text">@(_rootTreeItem.Timestamp + CurrentTimeZone.BaseUtcOffset)</span>
                         </div>
                         <div class="mr-6">
                             <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Duration")</MChip>
@@ -143,8 +143,8 @@
             if (detail.ContainsKey(key))
                 detail[key] = FormatDuration(_activeTreeItem.DoubleDuration);
 
-            <div class="pa-12" style="width:430px">
-                <MList Dense Class="emphasis2 mb-4 rounded" Dark>
+            <div class="py-12 px-6" style="width:430px">
+                <MList Dense Class="emphasis2 mb-4 rounded mx-6" Dark>
                     <MListItem Dense>
                         <MListItemContent>
                             <MListItemTitle>@I18n.Trace("SelfDuration")</MListItemTitle>
@@ -166,24 +166,24 @@
                         </MListItemAction>
                     </MListItem>
                 </MList>
-                <div>
-                    <MTabs Value="_tabValue" ValueChanged="OnTabValueChange" FixedTabs ShowArrows="false">
-                        <MTab>attr(@_activeTreeItem.Attributes.Count)</MTab>
-                        <MTab>res(@_activeTreeItem.Resource.Count)</MTab>
-                        <MTab>dt(@detail.Count)</MTab>
-                        <MTab>logs(@_logs.Count)</MTab>
-                    </MTabs>
-                    <MTabsItems @bind-Value="_tabValue">
-                        <MTabItem>
-                            @((RenderFragment)(dictRender => RenderDictionary(dictRender, _activeTreeItem.Attributes)))
+                <div class="trace_detail" style="width:382px">
+                    <MTabs Value="_tabValue" ValueChanged="OnTabValueChange" ShowArrows="false" Class="pl-6 pr-5">
+                        <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Trace("Attribute")}({_activeTreeItem.Attributes.Count})")</MTab>
+                            <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Trace("Resource")}({_activeTreeItem.Resource.Count})")</MTab>
+                            <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Trace("Detail")}({detail.Count})")</MTab>
+                            <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Log("Log")}({_logs.Count})")</MTab>
+                        </MTabs>
+                        <MTabsItems @bind-Value="_tabValue">
+                            <MTabItem Class="px-6">
+                                @((RenderFragment)(dictRender => RenderDictionary(dictRender, _activeTreeItem.Attributes)))
                         </MTabItem>
-                        <MTabItem>
+                        <MTabItem Class="px-6">
                             @((RenderFragment)(dictRender => RenderDictionary(dictRender, _activeTreeItem.Resource)))
                         </MTabItem>
-                        <MTabItem>
+                        <MTabItem Class="px-6">
                             @((RenderFragment)(dictRender => RenderDictionary(dictRender, detail)))
                         </MTabItem>
-                        <MTabItem>
+                        <MTabItem Class="px-6">
                             <MCard Style="overflow-x-hidden" Height="600">
                                 <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="_logs" Class="m-sheet theme--light" Style="width:100% !important">
                                     <ItemContent>
@@ -255,7 +255,7 @@
                     <MListItemActionText Class="text-truncate text-right masa body-2"
                              Style="width: 100%; cursor: auto;">
                         <MHover Context="hContext">
-                            <div @attributes="hContext.Attrs" class="hover-pointer d-flex align-center">                                
+                            <div @attributes="hContext.Attrs" class="hover-pointer d-flex align-center">
                                 <div @onclick="() => Copy(value)" @onclick:stopPropagation>
                                     <SIcon Tooltip="@I18n.T("Copy value")"
                                Color="@(_copyClicked ? "success" : "gray")"
@@ -263,16 +263,16 @@
                                         @(_copyClicked ? _checkSvg : _copySvg)
                                     </SIcon>
                                 </div>
-                                <MTooltip Top>
+                                <MTooltip Top ContentStyle="max-width:400px">
                                     <ActivatorContent>
-                                        <span class="mr-2" @attributes="@context.Attrs">@value</span>
+                                        <span class="text-truncate" @attributes="@context.Attrs">@value</span>
                                     </ActivatorContent>
                                     <ChildContent>
                                         <span>@value</span>
                                     </ChildContent>
                                 </MTooltip>
                             </div>
-                        </MHover>                        
+                        </MHover>
                     </MListItemActionText>
                 </MListItemAction>
             </MListItem>
