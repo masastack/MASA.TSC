@@ -13,8 +13,6 @@ public partial class ChartPanel
 
     bool IsLoading { get; set; }
 
-    ChartTypes? OldChartType { get; set; }
-
     string? OldConfigRecordKey { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -25,25 +23,6 @@ public partial class ChartPanel
 
     protected override async Task OnParametersSetAsync()
     {
-        if (OldChartType != Value.ChartType)
-        {
-            if (OldChartType is ChartTypes.Line or ChartTypes.Bar or ChartTypes.LineArea)
-            {
-                if (Value.ChartType is ChartTypes.Gauge or ChartTypes.Heatmap or ChartTypes.Pie or ChartTypes.Table)
-                {
-                    await ReloadAsync();
-                }
-            }
-            else if (OldChartType is ChartTypes.Gauge or ChartTypes.Heatmap or ChartTypes.Pie or ChartTypes.Table)
-            {
-                if (Value.ChartType is ChartTypes.Line or ChartTypes.Bar or ChartTypes.LineArea)
-                {
-                    await ReloadAsync();
-                }
-            }
-            OldChartType = Value.ChartType;
-        }
-
         if (OldConfigRecordKey != ConfigurationRecord.Key)
         {
             var back = OldConfigRecordKey;
@@ -53,6 +32,14 @@ public partial class ChartPanel
                 await ReloadAsync();
             }
         }
+    }
+
+    public async Task ReloadAsync()
+    {
+        IsLoading = true;
+        var data = await GetMetricsAsync();
+        Value.SetChartData(data, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
+        IsLoading = false;
     }
 
     async Task<List<QueryResultDataResponse>> GetMetricsAsync()
@@ -68,14 +55,6 @@ public partial class ChartPanel
             Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
             MetricNames = Value.Metrics.Select(item => item.Expression).ToList()
         });      
-    }
-
-    public async Task ReloadAsync()
-    {
-        IsLoading = true;
-        var data = await GetMetricsAsync();
-        Value.SetChartData(data, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
-        IsLoading = false;
     }
 
     protected override bool IsSubscribeTimeZoneChange => true;

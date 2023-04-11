@@ -34,6 +34,7 @@ public class UpsertPanelDto : GridstackChangeEventArgs
         Title = panel.Title;
         Description = panel.Description;
         PanelType = panel.PanelType;
+        ParentPanel = panel.ParentPanel;
         Width = panel.Width;
         Height = panel.Height;
         X = panel.X;

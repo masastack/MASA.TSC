@@ -67,6 +67,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
             await PopupService.EnqueueSnackbarAsync(I18n.Dashboard("Metrics expression is required"), AlertTypes.Error);
             return;
         }
+        ConfigurationRecord.IsEdit = true;
         ConfigurationRecord.NavigateToConfigurationRecord();
     }
 
@@ -74,6 +75,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
     {
         var backUp = JsonSerializer.Deserialize<UpsertPanelDto>(_valueBackup);
         Value.Clone(backUp!);
+        ConfigurationRecord.IsEdit = true;
         ConfigurationRecord.NavigateToConfigurationRecord();
     }
 
@@ -85,7 +87,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
     async Task Remove(PanelMetricDto metric)
     {
         Value.Metrics.Remove(metric);
-        await GetGetMetricsAsync();
+        if (string.IsNullOrEmpty(metric.Expression) is false) await GetGetMetricsAsync();
     }
 
     async Task GetGetMetricsAsync()

@@ -56,7 +56,7 @@ public abstract class ConfigurationRecord
         set
         {
             _isEdit = value;
-            JSRuntime.InvokeVoidAsync("eval", $"window.isEdit = {value}");
+            JSRuntime.InvokeVoidAsync("eval", $"window.isEdit = '{value}'");
         }
     }
 

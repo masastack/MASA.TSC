@@ -73,7 +73,7 @@
                                     </MCol>
                                     <MCol Md="12">
                                         <MRow>
-                                            @if (Value.ChartType is ChartTypes.Table && Value.ListType is ListTypes.TopList)
+                                            @if (Value.ListType is ListTypes.TopList || Value.ChartType is ChartTypes.Gauge)
                                             {
                                                 <MCol Md="4">
                                                     <MCard Class="pa-2" Style="background-color:#F6F8FD">
@@ -205,41 +205,47 @@
                                     </MRow>
                                 </MExpansionPanelContent>
                             </MExpansionPanel>
-                            <MExpansionPanel Value="3">
-                                <MExpansionPanelHeader Class="emphasis2--text h6">Legend</MExpansionPanelHeader>
-                                <MExpansionPanelContent>
-                                    <MRow>
-                                        <MCol Md="12">
-                                            <SwitchItem Label="Legend mode" @bind-Value="@Value.Legend.Show" />
-                                        </MCol>
-                                        <MCol Md="12">
-                                            <ButtonGroupItem @bind-Value="@Value.Legend.Type" Label="Type" Items='new List<string>{"plain","scroll"}' />
-                                        </MCol>
-                                        <MCol Md="12">
-                                            <ButtonGroupItem @bind-Value="@Value.Legend.Orient" Label="Orient" Items='new List<string>{"horizontal","vertical"}' />
-                                        </MCol>
-                                        <MCol Md="12">
-                                            <ButtonGroupItem @bind-Value="@Value.Legend.XPositon" Label="X Position" Items='new List<string>{"left","center","right"}' />
-                                        </MCol>
-                                        <MCol Md="12">
-                                            <ButtonGroupItem @bind-Value="@Value.Legend.YPositon" Label="Y Position" Items='new List<string>{"top","center","bottom"}' />
-                                        </MCol>
-                                    </MRow>
-                                </MExpansionPanelContent>
-                            </MExpansionPanel>
-                            <MExpansionPanel Value="4">
-                                <MExpansionPanelHeader Class="emphasis2--text h6">Axis</MExpansionPanelHeader>
-                                <MExpansionPanelContent>
-                                    <SwitchItem Label="X轴" @bind-Value="@Value.XAxis.Show" />
-                                    <SwitchItem Label="X轴轴线" @bind-Value="@Value.XAxis.ShowLine" />
-                                    <SwitchItem Label="X轴刻度标签" @bind-Value="@Value.XAxis.ShowLabel" />
-                                    <SwitchItem Label="X轴刻度" @bind-Value="@Value.XAxis.ShowTick" />
-                                    <SwitchItem Label="Y轴" @bind-Value="@Value.YAxis.Show" />
-                                    <SwitchItem Label="Y轴轴线" @bind-Value="@Value.YAxis.ShowLine" />
-                                    <SwitchItem Label="Y轴刻度标签" @bind-Value="@Value.YAxis.ShowLabel" />
-                                    <SwitchItem Label="Y轴刻度" @bind-Value="@Value.YAxis.ShowTick" />
-                                </MExpansionPanelContent>
-                            </MExpansionPanel>
+                            @if (Value.ChartType is not ChartTypes.Gauge)
+                            {
+                                <MExpansionPanel Value="3">
+                                    <MExpansionPanelHeader Class="emphasis2--text h6">Legend</MExpansionPanelHeader>
+                                    <MExpansionPanelContent>
+                                        <MRow>
+                                            <MCol Md="12">
+                                                <SwitchItem Label="Legend mode" @bind-Value="@Value.Legend.Show" />
+                                            </MCol>
+                                            <MCol Md="12">
+                                                <ButtonGroupItem @bind-Value="@Value.Legend.Type" Label="Type" Items='new List<string>{"plain","scroll"}' />
+                                            </MCol>
+                                            <MCol Md="12">
+                                                <ButtonGroupItem @bind-Value="@Value.Legend.Orient" Label="Orient" Items='new List<string>{"horizontal","vertical"}' />
+                                            </MCol>
+                                            <MCol Md="12">
+                                                <ButtonGroupItem @bind-Value="@Value.Legend.XPositon" Label="X Position" Items='new List<string>{"left","center","right"}' />
+                                            </MCol>
+                                            <MCol Md="12">
+                                                <ButtonGroupItem @bind-Value="@Value.Legend.YPositon" Label="Y Position" Items='new List<string>{"top","center","bottom"}' />
+                                            </MCol>
+                                        </MRow>
+                                    </MExpansionPanelContent>
+                                </MExpansionPanel>
+                            }
+                            @if (Value.ChartType is not ChartTypes.Pie && Value.ChartType is not ChartTypes.Gauge)
+                            {
+                                <MExpansionPanel Value="4">
+                                    <MExpansionPanelHeader Class="emphasis2--text h6">Axis</MExpansionPanelHeader>
+                                    <MExpansionPanelContent>
+                                        <SwitchItem Label="X轴" @bind-Value="@Value.XAxis.Show" />
+                                        <SwitchItem Label="X轴轴线" @bind-Value="@Value.XAxis.ShowLine" />
+                                        <SwitchItem Label="X轴刻度标签" @bind-Value="@Value.XAxis.ShowLabel" />
+                                        <SwitchItem Label="X轴刻度" @bind-Value="@Value.XAxis.ShowTick" />
+                                        <SwitchItem Label="Y轴" @bind-Value="@Value.YAxis.Show" />
+                                        <SwitchItem Label="Y轴轴线" @bind-Value="@Value.YAxis.ShowLine" />
+                                        <SwitchItem Label="Y轴刻度标签" @bind-Value="@Value.YAxis.ShowLabel" />
+                                        <SwitchItem Label="Y轴刻度" @bind-Value="@Value.YAxis.ShowTick" />
+                                    </MExpansionPanelContent>
+                                </MExpansionPanel>
+                            }
                             <MExpansionPanel Value="5">
                                 <MExpansionPanelHeader Class="emphasis2--text h6">Toolbox</MExpansionPanelHeader>
                                 <MExpansionPanelContent>

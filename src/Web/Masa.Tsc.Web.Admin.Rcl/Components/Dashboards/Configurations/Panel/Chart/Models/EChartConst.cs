@@ -148,7 +148,6 @@ internal static class EChartConst
   },
   ""series"": [
     {
-      ""name"": ""Access From"",
       ""type"": ""pie"",
       ""radius"": ""50%"",
       ""data"": [
@@ -170,11 +169,10 @@ internal static class EChartConst
 }";
     private const string GaugeBasicJson = @"{
   ""tooltip"": {
-    ""formatter"": ""{a} <br/>{b} : {c}%""
+    ""trigger"": ""item""
   },
   ""series"": [
     {
-      ""name"": ""Pressure"",
       ""type"": ""gauge"",
       ""anchor"": {
         ""show"": true,

@@ -379,16 +379,6 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         PropertyNameCaseInsensitive = true
     };
 
-    public UpsertChartPanelDto(Guid id) : base()
-    {
-        Id = id;
-        Metrics = new()
-        {
-            new()
-        };
-        PanelType = PanelTypes.Chart;
-    }
-
     bool IsLoadChartData { get; set; }
 
     bool IsLoadOption { get; set; } = true;
@@ -488,18 +478,18 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         else if (ChartType is ChartTypes.Gauge)
         {
             var serie = EChartType.Json["series"]!.AsArray().First()!;
-            serie["color"] = new JsonArray(data.Select(item => (JsonNode)item.Key.Color).ToArray());
-            serie["data"] = new JsonArray(data.Select(item => new JsonObject
+            serie["color"] = new JsonArray(data.Take(1).Select(item => (JsonNode)item.Key.Color).ToArray());
+            serie["data"] = new JsonArray(data.Take(1).Select(item => new JsonObject
             {
                 ["name"] = item.Key.Name,
                 ["value"] = GetQueryResultMatrixRangeResponseValue(item.Value),
                 ["title"] = new JsonObject()
                 {
-                    ["offsetCenter"] = new JsonArray($"{GetPosition(data.IndexOf(item) + 1)}%", "80%")
+                    ["offsetCenter"] = new JsonArray("0%", "120%")
                 },
                 ["detail"] = new JsonObject()
                 {
-                    ["offsetCenter"] = new JsonArray($"{GetPosition(data.IndexOf(item) + 1)}%", "95%")
+                    ["offsetCenter"] = new JsonArray("0%", "90%")
                 },
             }).ToArray());
         }
@@ -512,15 +502,6 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                 ["data"] = new JsonArray(new JsonArray(8, 0, 0), new JsonArray(11, 0, 2), new JsonArray(15, 0, 3), new JsonArray(11, 11, 11), new JsonArray(10, 3, 5))
             }).ToArray());
         }
-
-        int GetPosition(int index)
-        {
-            if (Metrics.Count == 1) return 0;
-            else
-            {
-                return 60 * index - 32 * Metrics.Count;
-            }
-        }
     }
 
     List<KeyValuePair<ChartSeriesOPtion, QueryResultMatrixRangeResponse>> GetMatrixRangeData()
@@ -530,6 +511,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         if (_chartData is not null)
         {
             var index = 0;
+            var defaultColorIndex = 0;
             foreach (var item in _chartData)
             {
                 if (item is not null)
@@ -547,10 +529,23 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                         {
                             metricName = Metrics[index].DisplayName ?? string.Join("-", matrix.Metric!.Values);
                         }
+                        var color = Metrics[index].Color;
+                        if (ChartType is ChartTypes.Pie or ChartTypes.Gauge)
+                        {
+                            if (string.IsNullOrEmpty(color))
+                            {
+                                color = _defaultColors[defaultColorIndex];
+                                defaultColorIndex++;
+                                if (defaultColorIndex == _defaultColors.Count())
+                                {
+                                    defaultColorIndex = 0;
+                                }
+                            }
+                        }
                         data.Add(new(new()
                         {
                             Name = metricName,
-                            Color = Metrics[index].Color,
+                            Color = color,
                         }, matrix));
                     }
                 }
@@ -695,7 +690,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                 ["show"] = XAxis.ShowLabel
             };
         }
-        else
+        else if (ChartType is not ChartTypes.Pie && ChartType is not ChartTypes.Gauge)
         {
             EChartType.SetValue("yAxis.show", YAxis.Show);
             EChartType.SetValue("yAxis.axisLine.show", YAxis.ShowLine);
@@ -706,17 +701,23 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
             EChartType.SetValue("xAxis.axisTick.show", XAxis.ShowTick);
             EChartType.SetValue("xAxis.axisLabel.show", XAxis.ShowLabel);
         }
+
         EChartType.SetValue("toolbox.show", Toolbox.Show);
         EChartType.SetValue("toolbox.orient", Toolbox.Orient);
         EChartType.SetValue("toolbox.left", Toolbox.XPositon);
         EChartType.SetValue("toolbox.top", Toolbox.YPositon);
         EChartType.SetValue("toolbox.feature", Toolbox.Feature.ToDictionary(f => f.AsT0, f => new object()));
-        EChartType.SetValue("legend.show", Legend.Show);
-        EChartType.SetValue("legend.orient", Legend.Orient);
-        EChartType.SetValue("legend.left", Legend.XPositon);
-        EChartType.SetValue("legend.top", Legend.YPositon);
-        EChartType.SetValue("legend.type", Legend.Type);
-        EChartType.SetValue("tooltip.show", Tooltip.Show);
+
+        if (ChartType is not ChartTypes.Gauge)
+        {
+            EChartType.SetValue("legend.show", Legend.Show);
+            EChartType.SetValue("legend.orient", Legend.Orient);
+            EChartType.SetValue("legend.left", Legend.XPositon);
+            EChartType.SetValue("legend.top", Legend.YPositon);
+            EChartType.SetValue("legend.type", Legend.Type);
+            EChartType.SetValue("tooltip.show", Tooltip.Show);
+        }
+
         EChartType.SetValue("tooltip.renderMode", Tooltip.RenderModel);
         EChartType.SetValue("tooltip.className", Tooltip.ClassName);
         EChartType.SetValue("tooltip.trigger", Tooltip.Trigger);
@@ -823,6 +824,21 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
     {
         Key = "Tooltip" + Guid.NewGuid();
         IsLoadOption = true;
+    }
+
+    public UpsertChartPanelDto(Guid id) : base()
+    {
+        Id = id;
+        Metrics = new()
+        {
+            new()
+        };
+        PanelType = PanelTypes.Chart;
+        Tooltip.PropertyChanged += Tooltip_PropertyChanged;
+        Legend.PropertyChanged += Legend_PropertyChanged;
+        Toolbox.PropertyChanged += Toolbox_PropertyChanged;
+        XAxis.PropertyChanged += XAxis_PropertyChanged;
+        YAxis.PropertyChanged += YAxis_PropertyChanged;
     }
 
     public override UpsertPanelDto Clone(UpsertPanelDto panel)

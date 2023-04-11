@@ -4,26 +4,40 @@ export function init(options, dotNetHelper) {
     if (topEl.loadComplete) {
         if (!el.gridstack) {
             initByElement(options, el, dotNetHelper);
+            return el.gridstack;
         }
     }
-
+    var timer = setInterval(function () {
+        if (topEl.loadComplete) {
+            clearInterval(timer);
+            el.gridstack.on('change', function (e, items) {
+                dotNetHelper.invokeMethodAsync('OnChange', items.map(item => {
+                    return {
+                        id: item.el.id,
+                        x: item.x,
+                        y: item.y,
+                        width: item.w,
+                        height: item.h,
+                    }
+                }))
+            });
+        }
+    }, 100);
     return el.gridstack;
 }
 
 export function initAll(options, dotNetHelper) {
     var grids = GridStack.initAll(options);
-    grids.forEach(grid => {
-        grid.on('change', function (e, items) {
-            dotNetHelper.invokeMethodAsync('OnChange', items.map(item => {
-                return {
-                    id: item.el.id,
-                    x: item.x,
-                    y: item.y,
-                    width: item.w,
-                    height: item.h,
-                }
-            }))
-        });
+    grids[0].on('change', function (e, items) {
+        dotNetHelper.invokeMethodAsync('OnChange', items.map(item => {
+            return {
+                id: item.el.id,
+                x: item.x,
+                y: item.y,
+                width: item.w,
+                height: item.h,
+            }
+        }))
     });
     getElement(options).loadComplete = true;
 }
