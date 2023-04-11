@@ -381,3 +381,11 @@ div[style*="visibility: hidden; opacity: 0;"] {
     padding: 0 0 !important;
     min-width: 16px !important;
 }
+
+.trace_detail .m-slide-group__prev {
+    justify-content:left;
+}
+
+.trace_detail .m-slide-group__next {
+    justify-content: right;
+}
