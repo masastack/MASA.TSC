@@ -41,12 +41,13 @@
                                 {
                                     if (app.Status == MonitorStatuses.Normal)
                                     {
-                                        <span @onmouseover="()=>SetAppId(app.Id)" @onmouseout="()=>SetAppId(string.Empty)" class="masa regular2--text body2 pa-1 d-inline-block text-truncate text-center cell-item rounded-sm" style="cursor:pointer;width:96%" @onclick="@(()=>OnProjectServiceClick(context,app))">@app.Name</span>
+                                        <span @onmouseover="()=>SetAppId(app.Id)" @onmouseout="()=>SetAppId(string.Empty)" class="masa regular2--text body2 d-inline-block text-truncate text-center cell-item rounded-sm" @onclick="@(()=>OnProjectServiceClick(context,app))">@app.Name</span>
                                     }
                                     else
                                     {
-                                        <div @onclick="()=>OnProjectServiceClick(context,app)" @onclick:stopPropagation="true" class="pa-1" style="cursor:pointer;width:96%" @onmouseover="()=>SetAppId(app.Id)" @onmouseout="()=>SetAppId(string.Empty)">
-                                            <TscTeamChip Class="masa body2 ma-0 pa-1 cell-item rounded-sm" Style="cursor:pointer"
+                                        <span @onmouseover="()=>SetAppId(app.Id)" @onmouseout="()=>SetAppId(string.Empty)" class="@ChipLabelClass(app) masa regular2--text body2 d-inline-block text-truncate text-center cell-item rounded-sm" @onclick="@(()=>OnProjectServiceClick(context,app))">@app.Name</span>
+                                        @* <div @onclick="()=>OnProjectServiceClick(context,app)" @onclick:stopPropagation="true" class="" @onmouseover="()=>SetAppId(app.Id)" @onmouseout="()=>SetAppId(string.Empty)">
+                                            <TscTeamChip Class="masa rounded-sm body2 cell-item" Style="cursor: pointer; width: 100%"
                                          Color="@ChipLabelColor(app)"
                                          TextColor="white"
                                          Label
@@ -54,20 +55,20 @@
                                          ContentClass="d-inline-block text-truncate">
                                                 @app.Name
                                             </TscTeamChip>
-                                        </div>
+                                        </div> *@
                                     }
                                 }
-                                @if (context.Apps.Count > 3)
-                                {
+                                @* @if (context.Apps.Count > 3)
+                                { *@
                                     <MTooltip Bottom>
                                         <ActivatorContent Context="tooltipContext">
-                                            <span @attributes="@tooltipContext.Attrs" class="masa regular2--text body2 pa-1 cell-item rounded-sm" style="cursor:pointer;width:30%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))">...</span>
+                                            <span @attributes="@tooltipContext.Attrs" class="masa regular2--text body2 cell-item rounded-sm" style="width:30%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))"  @onmouseover='()=>SetAppId("more")' @onmouseout="()=>SetAppId(string.Empty)">...</span>
                                         </ActivatorContent>
                                         <ChildContent>
                                             <span>@I18n.T("More")</span>
                                         </ChildContent>
                                     </MTooltip>
-                                }
+                                @* } *@
                             </div>
                         </CellBack>
                         <CellHoverTip>

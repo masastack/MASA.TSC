@@ -7,3 +7,28 @@
 .m-honeycomb-cell-error__border .cell-item:hover {
     background-color:#FDCDC5 !important;
 }
+
+.m-honeycomb .cell-item-error {
+    background-color:#FF5252 !important;
+    color: white !important;
+}
+.m-honeycomb .cell-item-error:hover {
+    background-color: #FDCDC5 !important;
+    color: #485585 !important;
+}
+.m-honeycomb .cell-item-warn {
+    background-color:#FF7D00 !important;
+    color: white !important;
+}
+.m-honeycomb .cell-item-warn:hover {
+    background-color: #FFE4BA !important;
+    color: #485585 !important;
+}
+.m-honeycomb .cell-item {
+    height: 24px;
+    line-height: 24px !important;
+    width: 94%;
+    cursor: pointer;
+    margin-bottom: 6px;
+    padding: 0 6px;
+}
