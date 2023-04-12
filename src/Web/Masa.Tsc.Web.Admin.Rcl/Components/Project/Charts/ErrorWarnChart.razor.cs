@@ -64,22 +64,27 @@ public partial class ErrorWarnChart
             End = query.End.Value,
             Step = query.Start.Value.Interval(query.End.Value)
         });
-        
+
         if (_data != null && _data[0] != null && _data[0].ResultType == ResultTypes.Matrix && _data[0].Result != null && _data[0].Result.Any())
         {
             var first = (QueryResultMatrixRangeResponse)_data[0].Result.First();
-            var values = first.Values.Select(values => Convert.ToDouble(values[1])).Where(val => !double.IsNaN(val));
+            var values = first.Values.Select(values => Convert.ToDouble(values[1])).Where(val => !double.IsNaN(val)).ToList();
             if (values.Any())
             {
                 _hasData = true;
-                _success = values.Average().FloorDouble(2);
+                _success = values.Average();
+                if (_success < 1 && _success > 0)
+                {
+                    _success = 1;
+                }
+                _success = Math.Floor(_success);
             }
         }
 
         values[0] = _success;
-        values[1] = (100 - _success).FloorDouble(2);
+        values[1] = (100 - _success);
 
-        if (_hasData && (Math.Round(values[0], 2) == 0 || Math.Round(values[1]) == 0))
+        if (_hasData && (values[0] == 0 || values[1] == 0))
         {
             _options.SetValue("series[0].itemStyle.normal.borderWidth", 0);
         }
@@ -87,11 +92,11 @@ public partial class ErrorWarnChart
         _options.SetValue("tooltip.formatter", "{d}%");
         _options.SetValue("legend.bottom", "1%");
         _options.SetValue("series[0].data", new object[] {GetModel(true,values[0]),
-            GetModel(false,values[1]-values[0]) });
+            GetModel(false,values[1]) });
     }
 
     private static object GetModel(bool isSuccess, double value)
     {
-        return new { name = isSuccess ? "Success" : "Fail", value = Math.Round(value, 2) < 0 ? 0 : Math.Round(value, 2) };
+        return new { name = isSuccess ? "Success" : "Fail", value = value };
     }
 }
