@@ -19,9 +19,6 @@
              gs-min-h="2"
              gs-auto-position="@(IsAutoPosition(item) ?"true":"false")">
             <div class="grid-stack-item-content @ItemClass" style="@ItemStyle">
-                @item.Id
-                <br/>
-                @item.Y
                 @ItemContent(item)
             </div>
         </div>
@@ -127,8 +124,8 @@
             {
                 _prevItemKeys = itemKeys;
                 await GridstackJSModule.ReloadAsync();
-                //await GridstackJSModule.CompactAsync();
                 await GridstackJSModule.SaveAsync();
+                await GridstackJSModule.CompactAsync();
             }
             if (_prevReadonly != Readonly)
             {
