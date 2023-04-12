@@ -30,8 +30,8 @@ public partial class TabsPanel
     }
 
     protected override void OnParametersSet()
-    {      
-        if(_oldIsEdit != IsEdit)
+    {
+        if (_oldIsEdit != IsEdit)
         {
             _oldIsEdit = IsEdit;
             NextTick(() =>

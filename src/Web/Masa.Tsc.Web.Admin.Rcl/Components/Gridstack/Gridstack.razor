@@ -3,13 +3,13 @@
 
 <div class="@Class grid-stack" name="@Readonly.ToString()" id="@Options.Id" style="@(_lodaing?"display:none;":"") @Style">
     @{
-        var firstItem = Items.FirstOrDefault(item => item.X==0 && item.Y==0);
+        var firstItem = Items.FirstOrDefault(item => item.X == 0 && item.Y == 0);
     }
     @foreach (var item in Items)
     {
         <div class="grid-stack-item"
              id="@item.Id"
-             gs-id="@item.Id"             
+             gs-id="@item.Id"
              @key="@item.Id"
              gs-w="@item.Width"
              gs-h="@item.Height"
@@ -122,7 +122,7 @@
             var itemKeys = string.Join(',', Items.Select(item => item.Id));
             if (_prevItemKeys != itemKeys)
             {
-                _prevItemKeys = itemKeys;               
+                _prevItemKeys = itemKeys;
                 await GridstackJSModule.ReloadAsync();
                 await GridstackJSModule.SaveAsync();
             }

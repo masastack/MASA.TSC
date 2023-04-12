@@ -70,8 +70,7 @@ export function makeWidgets(options, elementIds) {
 export function save(options, dotNetHelper) {
     var grid = getElement(options).gridstack;
     var datas = grid.save();
-    dotNetHelper.invokeMethodAsync('OnChange', datas.map(item =>
-    {
+    dotNetHelper.invokeMethodAsync('OnChange', datas.map(item => {
         return {
             id: item.id,
             x: item.x,
@@ -100,6 +99,22 @@ export function switchState(options, state) {
     }
     else {
         debugger
+    }
+}
+
+export function movable(options, elId, state) {
+    var grid = getElement(options).gridstack;
+    var el = document.getElementById(elId);
+    if (grid && el) {
+        grid.movable(el, state);
+    }
+}
+
+export function resizable(options, elId, state) {
+    var grid = getElement(options).gridstack;
+    var el = document.getElementById(elId);
+    if (grid && el) {
+        grid.resizable(el, state);
     }
 }
 
