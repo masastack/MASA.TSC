@@ -318,12 +318,8 @@
     transition: all 200ms ease-out;
 }
 
-    .bordershadow:hover {
-        box-shadow: 0 0 6px lightsalmon;
-    }
-
-.grid-stack > .grid-stack-item > .grid-stack-item-content {
-   /*overflow: auto !important;*/
+.bordershadow:hover {
+    box-shadow: 0 0 6px lightsalmon;
 }
 
 .ui-resizable-se {
@@ -354,6 +350,9 @@ div[style*="visibility: hidden; opacity: 0;"] {
 
 .m-window {
     height: 100%;
+    min-height: 100% !important;
+    overflow: auto;
+    overflow-x: hidden;
 }
 
 .m-window .m-window__container {
@@ -385,8 +384,6 @@ div[style*="visibility: hidden; opacity: 0;"] {
     z-index: 1;
 }
 
-.grid-stack {
-    min-height: 100% !important;
-    overflow: auto;
-    overflow-x: hidden;
+.edit .m-slide-group__content {
+    cursor: move;
 }

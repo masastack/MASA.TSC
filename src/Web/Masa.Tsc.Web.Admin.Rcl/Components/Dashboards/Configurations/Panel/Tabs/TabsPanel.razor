@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<div style="height:48px;" class="d-flex tab draggable">
+<div style="height:48px;" class="d-flex tab draggable @(IsEdit?"edit":"")">
     <MTabs @ref=_tabs Color="primary" @bind-Value="CurrentTab">
         @foreach (var tabItem in Panel.ChildPanels)
         {
