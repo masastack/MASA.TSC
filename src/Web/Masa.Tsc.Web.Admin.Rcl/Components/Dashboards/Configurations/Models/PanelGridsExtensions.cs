@@ -14,7 +14,7 @@ public static class PanelGridsExtensions
                 panels.Add(panel);
                 return;
             }
-            for (int i = 0; i < panels.Count; i++)
+            for (int i = panels.Count - 1; i >= 0; i--)
             {
                 var itemPanel = panels[i];
                 if ((itemPanel.X + panel.Width + itemPanel.Width) > 12)
@@ -28,6 +28,6 @@ public static class PanelGridsExtensions
                 }
             }
         }
-        panels.Add(panel);
+        panels.Insert(0, panel);
     }
 }

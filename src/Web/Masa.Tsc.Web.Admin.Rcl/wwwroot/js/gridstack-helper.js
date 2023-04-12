@@ -46,13 +46,14 @@ export function initAll(options, dotNetHelper) {
 
 export function reload(options) {
     var el = getElement(options);
+    var childs = el.querySelectorAll(':scope > .grid-stack-item');
     //el.gridstack.removeAll(false);
     el.gridstack.engine.nodes = [];
-    var childs = el.querySelectorAll(':scope > .grid-stack-item');
-    el.gridstack.batchUpdate(true);
+    debugger
     childs.forEach(child => {
         el.gridstack.makeWidget(child);
     });
+    //el.gridstack.compact();
     el.gridstack.batchUpdate(false);
 }
 
