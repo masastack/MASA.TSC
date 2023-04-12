@@ -10,12 +10,11 @@
     <div class="mx-6">
         <SearchTextField Value="@_search" ValueChanged="OnSearchChangedAsync" Style="width:220px;border-radius: 10px !important;" FillBackground=false Clearable />
     </div>
-    <DateTimeRangeToolbar       
-        OnUpdate="OnDateTimeUpdateAsync" 
-        OnAutoUpdate="OnAutoDateTimeUpdateAsync" 
-        @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
-        @bind-Interval="ConfigurationRecord.Interval"
-        @bind-UseAbsoluteTime="ConfigurationRecord.UseAbsoluteTime" />
+    <DateTimeRangeToolbar OnUpdate="OnDateTimeUpdateAsync"
+                          OnAutoUpdate="OnAutoDateTimeUpdateAsync"
+                          @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
+                          @bind-Interval="ConfigurationRecord.Interval"
+                          @bind-UseAbsoluteTime="ConfigurationRecord.UseAbsoluteTime" />
 </div>
 
 <MCard Class="d-flex mt-8" Style="min-width:464px">
@@ -42,12 +41,12 @@
                                 {
                                     if (app.Status == MonitorStatuses.Normal)
                                     {
-                                        <span @onmouseover="()=>_hoverAppId=app.Id" @onmouseout="()=>_hoverAppId=string.Empty" class="masa regular2--text body2 pa-1 d-inline-block text-truncate text-center cell-item rounded-sm" style="cursor:pointer;width:96%" @onclick="@(()=>OnProjectServiceClick(context,app))">@app.Name</span>
+                                        <span @onmouseover="()=>SetAppId(app.Id)" @onmouseout="()=>SetAppId(string.Empty)" class="masa regular2--text body2 pa-1 d-inline-block text-truncate text-center cell-item rounded-sm" style="cursor:pointer;width:96%" @onclick="@(()=>OnProjectServiceClick(context,app))">@app.Name</span>
                                     }
                                     else
                                     {
-                                      <div @onclick="()=>OnProjectServiceClick(context,app)" @onclick:stopPropagation="true" class="pa-1" style="cursor:pointer;width:96%" @onmouseover="()=>_hoverAppId=app.Id" @onmouseout="()=>_hoverAppId=string.Empty">
-                                            <TscTeamChip Class="masa body2 ma-0 p-1 cell-item rounded-sm" Style="cursor:pointer"
+                                        <div @onclick="()=>OnProjectServiceClick(context,app)" @onclick:stopPropagation="true" class="pa-1" style="cursor:pointer;width:96%" @onmouseover="()=>SetAppId(app.Id)" @onmouseout="()=>SetAppId(string.Empty)">
+                                            <TscTeamChip Class="masa body2 ma-0 pa-1 cell-item rounded-sm" Style="cursor:pointer"
                                          Color="@ChipLabelColor(app)"
                                          TextColor="white"
                                          Label
@@ -62,7 +61,7 @@
                                 {
                                     <MTooltip Bottom>
                                         <ActivatorContent Context="tooltipContext">
-                                            <span @attributes="@tooltipContext.Attrs" class="masa regular2--text body2 pa-1 cell-item rounded-sm" style="cursor:pointer;width:30%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))" @onmouseover='()=>_hoverAppId="more"' @onmouseout="()=>_hoverAppId=null">...</span>
+                                            <span @attributes="@tooltipContext.Attrs" class="masa regular2--text body2 pa-1 cell-item rounded-sm" style="cursor:pointer;width:30%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))">...</span>
                                         </ActivatorContent>
                                         <ChildContent>
                                             <span>@I18n.T("More")</span>
@@ -75,21 +74,21 @@
                             <div style="background-color:transparent;@(_hoverAppId=="more"?"display:none":"")">
                                 <MCard Class="emphasis2" Width="240" style="border-radius: 12px;">
                                     <MCardText Class="d-flex flex-column white--text masa body">
-                                        @if(string.IsNullOrWhiteSpace(_hoverAppId))
+                                        @if (string.IsNullOrWhiteSpace(_hoverAppId))
                                         {
                                             <div class="d-flex">
                                                 <span class="h8">@context.Name</span>
                                                 <span class="h8 ml-auto">@context.Apps.Count</span>
                                             </div>
-                                            <span class="caption">@context.Id</span>
+                                            <span class="caption">@context.Identity</span>
                                         }
                                         else
                                         {
-                                            var app = @context.Apps.FirstOrDefault(p=>p.Id==_hoverAppId);
-                                            if(app!=null)
+                                            var app = @context.Apps.FirstOrDefault(p => p.Id == _hoverAppId);
+                                            if (app != null)
                                             {
                                                 <span class="h8">@app.Name</span>
-                                                <span class="caption">@app.Id</span>
+                                                <span class="caption">@app.Identity</span>
                                             }
                                         }
                                     </MCardText>
