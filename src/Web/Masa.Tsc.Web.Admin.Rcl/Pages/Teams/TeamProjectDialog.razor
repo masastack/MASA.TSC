@@ -37,7 +37,6 @@
                             </SButton>
                         </MCol>
                     </MRow>
-                    <MRow Class="full-height overflow-y ml-0 mr-0">
                     @if (ErrorCount > 0)
                     {
                         <MRow Class="pa-3">
@@ -47,7 +46,8 @@
                             </MCol>
                         </MRow>
                     }
-                    <ProjectCharts Class="mt-2" ConfigurationRecord="ConfigurationRecord" />
+                    <MRow Class="full-height overflow-y ml-0 mr-0" Style="height: calc(100% - 108px) !important;">
+                        <ProjectCharts Class="mt-2" ConfigurationRecord="ConfigurationRecord" />
                     </MRow>
                 </MCol>
             </MRow>

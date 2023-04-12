@@ -65,10 +65,23 @@ public partial class ServiceCallChart
             color = "#FF5252"
         });
         _options.SetValue("series[0].areaStyle", new { color = new { colorStops = new[] { new { offset = 0, color = "rgba(255, 82, 82, 1)" }, new { offset = 1, color = "rgba(255, 82, 82, 0)" } }, x = 0, y = 0, x2 = 0, y2 = 1, type = "linear", global = false } });
-        _options.SetValue("tooltip.formatter", "{b}<br /><div style=\"display:flex;align-items: center;\"><div style=\"width:8px;height:8px;background-color:red;border-radius:50px;\"></div><div>&nbsp;&nbsp;" + I18n.Team("Calls") + "&nbsp;&nbsp;{c}</div></div>");
+
+        var formatter = @$"
+               <div style='width:136px;margin:-2px'>
+  		        <div style='display:flex;justify-content: space-between;padding-bottom:8px;'>
+  		          <div style='display:flex;align-items:center;'>
+    		          <div style='width:8px;height:8px;background-color:red;border0radius:1px'></div>
+    		          <div>&nbsp;{I18n.Team("Calls")}</div>
+  		          </div>
+  		          <div>{{c}}</div>
+  		        </div>
+  		        <div style='border-top:1px solid #E4E4E6;margin:0 -8px;'></div>
+  		        <div style='text-align:right;padding-top:2px;'>{{b}}</div>
+		       </div>";
+        _options.SetValue("tooltip.formatter", formatter);
         _options.SetValue("series[0].color", "#FF5252");
         _options.SetValue("series[0].name", I18n.Team("Service Load"));
-        _options.SetValue("legend.data[0]", new { name = I18n.Team("Service Load"), icon = "roundRect" });
+        _options.SetValue("legend.data[0]", new { name = I18n.Team("Service Load"), icon = "square" });
         _options.SetValue("legend.top", "bottom");
         _options.SetValue("grid.bottom", 60);
     }
