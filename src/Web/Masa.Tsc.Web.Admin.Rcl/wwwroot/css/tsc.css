@@ -337,15 +337,15 @@ div[name="True"] .ui-resizable-se {
 }
 
 div[style*="visibility: hidden; opacity: 0;"] {
-    display:none !important;
+    display: none !important;
 }
 
 .dashboard-editor-ui-btn:active {
     background-color: #E4E8F3 !important;
 }
 
-.m-label.m-label--active{
-    z-index:9999
+.m-label.m-label--active {
+    z-index: 9999
 }
 
 .m-window {
@@ -382,6 +382,20 @@ div[style*="visibility: hidden; opacity: 0;"] {
 
 .m-text-field__slot .m-label {
     z-index: 1;
+}
+
+.trace_detail .m-slide-group__prev, .trace_detail .m-slide-group__next {
+    padding: 0 0 !important;
+    min-width: 16px !important;
+}
+
+.trace_detail .m-slide-group__prev {
+    justify-content:left;
+}
+
+.trace_detail .m-slide-group__next {
+    justify-content: right;
+}
 }
 
 .edit .m-slide-group__content {

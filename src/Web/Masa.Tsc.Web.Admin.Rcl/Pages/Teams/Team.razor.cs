@@ -31,8 +31,8 @@ public partial class Team
     void TeamChange(Guid teamId)
     {
         MasaUser.CurrentTeamId = teamId;
-        _ = InvokeAsync(async () => 
-        { 
+        _ = InvokeAsync(async () =>
+        {
             _isLoading = true;
             StateHasChanged();
             await GetProjectsAsync();
@@ -81,7 +81,7 @@ public partial class Team
         {
             result = result.Where(item => item.Name.Contains(_search, StringComparison.OrdinalIgnoreCase) || item.Apps.Any(app => app.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)));
         }
-	
+
         return result;
     }
 
@@ -218,5 +218,12 @@ public partial class Team
     {
         await base.DisposeAsync();
         GlobalConfig.OnCurrentTeamChanged -= TeamChange;
+    }
+
+    private async Task SetAppId(string appid)
+    {
+        await Task.Delay(10);
+        if (_hoverAppId != appid)
+            _hoverAppId = appid;
     }
 }

@@ -53,8 +53,8 @@ deploy-dev:
   image: registry.cn-hangzhou.aliyuncs.com/masa/library:helm3_latest
   variables:
     EnviromentPath: Develop
-  tags:
-    - ydy-runner
+  #tags:
+  #  - ydy-runner
   only:
     - main  
   script:
@@ -65,8 +65,8 @@ deploy-dev:
     - cat ./config
     - helm version 
     - helm --kubeconfig ./config list   -n $NAMESPACE_DEV 
-    - helm upgrade --install $TSC_Service_Name ./charts/masa-service --set domain.name=$ServiceDomain_dev  --set domain.secret=masastack  --set service.port=80  --set environment.path=$EnviromentPath --set image.tag=dev-$CI_PIPELINE_ID -n $NAMESPACE_DEV  
-    - helm upgrade --install $TSC_Web_Name ./charts/masa-service  --set domain.name=$WebDomain_dev  --set domain.secret=masastack  --set service.port=443  --set environment.path=$EnviromentPath --set image.tag=dev-$CI_PIPELINE_ID -n $NAMESPACE_DEV 
+    - helm --kubeconfig ./config upgrade --install $TSC_Service_Name ./charts/masa-service --set domain.name=$ServiceDomain_dev  --set domain.secret=masastack  --set service.port=80  --set environment.path=$EnviromentPath --set image.tag=dev-$CI_PIPELINE_ID -n $NAMESPACE_DEV  
+    - helm --kubeconfig ./config upgrade --install $TSC_Web_Name ./charts/masa-service  --set domain.name=$WebDomain_dev  --set domain.secret=masastack  --set service.port=443  --set environment.path=$EnviromentPath --set image.tag=dev-$CI_PIPELINE_ID -n $NAMESPACE_DEV 
 
 
 deploy-staging:
@@ -74,8 +74,8 @@ deploy-staging:
   image: registry.cn-hangzhou.aliyuncs.com/masa/library:helm3_latest
   variables:
     EnviromentPath: Staging
-  tags:
-    - ydy-runner
+  #tags:
+  #  - ydy-runner
   only:
     - main  
   script:
@@ -86,8 +86,8 @@ deploy-staging:
     - cat ./config
     - helm version 
     - helm --kubeconfig ./config list   -n $NAMESPACE_STAGING
-    - helm upgrade --install $TSC_Service_Name ./charts/masa-service --set domain.name=$ServiceDomain_staging  --set domain.secret=masastack  --set service.port=80  --set environment.path=$EnviromentPath --set image.tag=dev-$CI_PIPELINE_ID -n $NAMESPACE_STAGING  
-    - helm upgrade --install $TSC_Web_Name ./charts/masa-service  --set domain.name=$WebDomain_staging  --set domain.secret=masastack  --set service.port=443  --set environment.path=$EnviromentPath --set image.tag=dev-$CI_PIPELINE_ID -n $NAMESPACE_STAGING  
+    - helm --kubeconfig ./config upgrade --install $TSC_Service_Name ./charts/masa-service --set domain.name=$ServiceDomain_staging  --set domain.secret=masastack  --set service.port=80  --set environment.path=$EnviromentPath --set image.tag=dev-$CI_PIPELINE_ID -n $NAMESPACE_STAGING  
+    - helm --kubeconfig ./config upgrade --install $TSC_Web_Name ./charts/masa-service  --set domain.name=$WebDomain_staging  --set domain.secret=masastack  --set service.port=443  --set environment.path=$EnviromentPath --set image.tag=dev-$CI_PIPELINE_ID -n $NAMESPACE_STAGING  
 
 
 docker-prd:

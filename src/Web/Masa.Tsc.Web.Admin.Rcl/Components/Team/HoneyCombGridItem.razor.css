@@ -44,7 +44,6 @@ right: -50px;*/
     list-style: none;
     /* justify-content: center; */
     align-items: center;
-    max-width: 1200px;
     margin: 0 auto;
     padding: 0;
     transform: translateY(34.375px);
@@ -119,12 +118,11 @@ right: -50px;*/
 .m-honeycomb-cell__border {
     width: 190px;
     height: 210px;
-    transform: scale(1.055);
     -webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
     z-index: -2;
   /*  padding: 4px;*/
-    margin: 10px;
+    margin: 7px;
 }
 
 .m-honeycomb-cell__border-normal {
@@ -165,42 +163,57 @@ right: -50px;*/
 }
 
 /*nth-child*/
-@media (max-width: 1066px) {
+@media (max-width: 1060px) {
+    .m-honeycomb {
+        max-width: 320px;
+    }
     .m-honeycomb-cell__border-parent:nth-of-type(4n) {
-        margin-left: 105px;
+        margin-left: 104px;
     }
 }
 
-@media (min-width: 1067px) and (max-width: 1382px) {
+@media (min-width: 1061px) and (max-width: 1376px) {
+    .m-honeycomb {
+        max-width: 420px;
+    }
     .m-honeycomb-cell__border-parent:nth-of-type(3n) {
-        margin-left: 105px;
-        margin-right: 210px;
+        margin-left: 104px;
+        margin-right: 105px;
     }
 }
 
-@media (min-width: 1383px) and (max-width: 1592px) {
+@media (min-width: 1377px) and (max-width: 1586px) {
+    .m-honeycomb {
+        max-width: 630px;
+    }
     .m-honeycomb-cell__border-parent:nth-of-type(10n-2) {
-        margin-left: 105px;
+        margin-left: 104px;
     }
     .m-honeycomb-cell__border-parent:nth-of-type(10n) {
-        margin-right: 210px;
+        margin-right: 105px;
     }
 }
 
-@media (min-width: 1593px) and (max-width: 1802px) {
+@media (min-width: 1587px) and (max-width: 1896px) {
+    .m-honeycomb {
+        max-width: 840px;
+    }
     .m-honeycomb-cell__border-parent:nth-of-type(14n-4) {
-        margin-left: 105px;
+        margin-left: 104px;
     }
     .m-honeycomb-cell__border-parent:nth-of-type(14n) {
-        margin-right: 210px;
+        margin-right: 105px;
     }
 }
 
-@media (min-width: 1803px) {
+@media (min-width: 1897px) {
+    .m-honeycomb {
+        max-width: 1050px;
+    }
     .m-honeycomb-cell__border-parent:nth-of-type(18n-6) {
-        margin-left: 105px;
+        margin-left: 104px;
     }
     .m-honeycomb-cell__border-parent:nth-of-type(18n) {
-        margin-right: 210px;
+        margin-right: 105px;
     }
 }

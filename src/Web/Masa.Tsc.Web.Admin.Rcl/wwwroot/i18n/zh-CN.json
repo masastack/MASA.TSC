@@ -182,7 +182,10 @@
     "Span Count": "跨度",
     "Start": "开始点",
     "SelfDuration": "当前耗时",
-    "TotalDuration": "总耗时"
+    "TotalDuration": "总耗时",
+    "Attribute": "属性",
+    "Resource": "资源",
+    "Detail": "详情"
   },
   "Log": {
     "Log": "日志",
