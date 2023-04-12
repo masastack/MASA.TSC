@@ -46,7 +46,8 @@ export function initAll(options, dotNetHelper) {
 
 export function reload(options) {
     var el = getElement(options);
-    el.gridstack.removeAll(false);
+    //el.gridstack.removeAll(false);
+    el.gridstack.engine.nodes = [];
     var childs = el.querySelectorAll(':scope > .grid-stack-item');
     el.gridstack.batchUpdate(true);
     childs.forEach(child => {

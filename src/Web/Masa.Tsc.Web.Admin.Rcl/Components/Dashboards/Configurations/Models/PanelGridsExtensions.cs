@@ -7,22 +7,27 @@ public static class PanelGridsExtensions
 {
     public static void AdaptiveUI(this List<UpsertPanelDto> panels, UpsertPanelDto panel)
     {
-        //if (panels.Count == 0)
-        //{
-        //    panels.Add(panel);
-        //    return;
-        //}
-        //panels.ForEach(panel => panel.Y = panel.Y + GlobalPanelConfig.Height);
-        //var minYPanels = panels.Where(panel => panel.Y == GlobalPanelConfig.Height);
-        //var sumX = minYPanels.Sum(panel => panel.Width);
-        //var maxY = panels.Max(panel => panel.Y);
-        //var maxYpanels = panels.Where(panel => panel.Y == maxY);
-        //var sumX = maxYpanels.Sum(panel => panel.Width);
-        //if (sumX + GlobalPanelConfig.Width <= 12)
-        //{
-        //    panel.X = sumX;
-        //}
-        //panel.Y = 10000;
+        if (panel.AutoPosition == false)
+        {
+            if (panels.Count == 0)
+            {
+                panels.Add(panel);
+                return;
+            }
+            for (int i = 0; i < panels.Count; i++)
+            {
+                var itemPanel = panels[i];
+                if ((itemPanel.X + panel.Width + itemPanel.Width) > 12)
+                {
+                    itemPanel.X = 0;
+                    itemPanel.Y += panel.Height;
+                }
+                else
+                {
+                    itemPanel.X += panel.Width;
+                }
+            }
+        }
         panels.Add(panel);
     }
 }
