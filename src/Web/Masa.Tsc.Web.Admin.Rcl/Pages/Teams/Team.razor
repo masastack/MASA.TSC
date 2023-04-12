@@ -62,7 +62,7 @@
                                 {
                                     <MTooltip Bottom>
                                         <ActivatorContent Context="tooltipContext">
-                                            <span @attributes="@tooltipContext.Attrs" class="masa regular2--text body2 pa-1 cell-item rounded-sm" style="cursor:pointer;width:60%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))" @onmouseover='()=>_hoverAppId="more"' @onmouseout="()=>_hoverAppId=null">...</span>
+                                            <span @attributes="@tooltipContext.Attrs" class="masa regular2--text body2 pa-1 cell-item rounded-sm" style="cursor:pointer;width:30%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))" @onmouseover='()=>_hoverAppId="more"' @onmouseout="()=>_hoverAppId=null">...</span>
                                         </ActivatorContent>
                                         <ChildContent>
                                             <span>@I18n.T("More")</span>
