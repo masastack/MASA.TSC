@@ -15,9 +15,8 @@ public static class PanelGridsExtensions
                 return;
             }
             var ys = panels.Select(panel => panel.Y).Distinct().ToList();
-            for (int i = panels.Count - 1; i >= 0; i--)
+            foreach(var itemPanel in panels.OrderByDescending(panel => panel.Y))
             {
-                var itemPanel = panels[i];
                 if (ys.Count > 1 && itemPanel.Y != 0)
                 {
                     var onTopY = ys.Where(y => y < itemPanel.Y).Max();
