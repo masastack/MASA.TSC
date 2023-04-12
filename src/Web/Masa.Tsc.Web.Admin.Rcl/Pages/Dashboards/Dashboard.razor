@@ -71,6 +71,7 @@
                         <MHover>
                             <MListGroup PrependIcon="@(IconConstants.Folder)"
                                         NoAction
+                                        Disabled=!folder.Dashboards.Any()
                                         @attributes="@context.Attrs"
                                         @bind-Value=folder.IsActive>
                                 <ActivatorContent>

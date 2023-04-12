@@ -50,10 +50,10 @@ public partial class Dashboard
 
     bool ExpandAll
     {
-        get => Folders.Any(folder => folder.IsActive);
+        get => Folders.Where(forder => forder.Dashboards.Any()).Any(folder => folder.IsActive);
         set
         {
-            Folders.ForEach(folder => folder.IsActive = value);
+            Folders.Where(forder => forder.Dashboards.Any()).ForEach(folder => folder.IsActive = value);
         }
     }
 
@@ -84,7 +84,7 @@ public partial class Dashboard
     protected override async Task OnInitializedAsync()
     {
         await GetFoldersAsync();
-        Folders.ForEach(folder => folder.IsActive = true);
+        Folders.Where(forder => forder.Dashboards.Any()).ForEach(folder => folder.IsActive = true);
     }
 
     async Task GetFoldersAsync()
