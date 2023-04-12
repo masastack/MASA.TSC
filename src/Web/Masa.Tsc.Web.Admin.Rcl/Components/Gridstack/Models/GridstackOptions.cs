@@ -42,4 +42,6 @@ public class GridstackOptions
     public bool OneColumnModeDomSort { get; set; }
 
     public bool DisableOneColumnMode { get; set; } = true;
+
+    public string Handle { get; set; } = ".draggable";
 }
