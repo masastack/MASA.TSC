@@ -150,7 +150,7 @@
                                 <WidgetType @bind-Value="@Value.ChartType" />
                             </MExpansionPanelContent>
                         </MExpansionPanel>
-                        <div style="max-height:290px;overflow:auto;">
+                        <div style="@($"max-height:{(_trash.Contains(1)?290:715)}px;overflow:auto;display: flex;flex-wrap: wrap;width: 100%;")">
                             @if (Value.ChartType is ChartTypes.Table)
                             {
                                 @if (Value.ListType is ListTypes.TopList)
