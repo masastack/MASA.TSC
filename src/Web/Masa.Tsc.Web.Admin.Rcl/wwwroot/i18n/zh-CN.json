@@ -88,7 +88,7 @@
     "Service Success Rate": "服务成功率",
     "Service Load": "服务负载",
     "Service Avg Response Time": "服务平均响应时间",
-    "Service Response Time Percentile": "服务响应时间百分比",
+    "Service Response Time Percentile": "服务响应时长",
     "Service Apdex": "服务满意度",
     "Service Endpoint Load": "API负载",
     "Service Slow Endpoint": "慢API",
