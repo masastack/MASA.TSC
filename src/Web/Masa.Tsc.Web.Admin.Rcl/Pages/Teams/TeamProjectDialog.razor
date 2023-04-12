@@ -6,11 +6,11 @@
     {
         <MCard Style="background-color:#F0F3FA;border-top-left-radius: 20px;border-top-right-radius: 20px;" Class="full-height">
             <MRow NoGutters Class="full-height">
-                <MCol Style="background-color:white;border-top-left-radius: 20px;" Cols="2" Class="d-flex flex-column justify-space-between pa-6 pb-9">
+                <MCol Style="background-color:white;border-top-left-radius: 20px;" Cols="2" Class="d-flex flex-column justify-space-between pa-6">
                     <ProjectDetail Value=@Team.CurrentProject></ProjectDetail>
                     <TeamDetail Value=@Team></TeamDetail>
                 </MCol>
-                <MCol Cols="10" Class="pa-9 full-height overflow-hidden">
+                <MCol Cols="10" Class="pa-6 full-height overflow-hidden">
                     <MRow Class="@Class">
                         <MCol Cols="6" Class="d-flex justify-start align-center">
                             <div style="width:210px;">
@@ -36,18 +36,18 @@
                                 @I18n.T("Show Detail")
                             </SButton>
                         </MCol>
-                    </MRow>
-                    <MRow Class="full-height overflow-y ml-0 mr-0">
-                    @if (ErrorCount > 0)
-                    {
-                        <MRow Class="pa-3">
-                            <MCol Class="rounded-lg d-flex justify-space-between" Style="background-color:#FF5252">
+                        @if (ErrorCount > 0)
+                        {
+                            <MCol Class="py-0">
+                                <div Class="rounded-lg d-flex justify-space-between py-3" Style="background-color:#FF5252">
                                     <div class="d-flex align-center white--text"><MIcon Class="px-4" Color="white text-#FF5252">info</MIcon> @string.Format(I18n.Team("Currently the application has {0} error logs"),ErrorCount.ToString())</div>
                                     <MButton Depressed Color="white--text" Style="background-color:#FF5252;text-decoration:underline" OnClick="OpenLogAsync">@I18n.T("Show Detail")</MButton>
+                                </div>      
                             </MCol>
-                        </MRow>
-                    }
-                    <ProjectCharts Class="mt-2" ConfigurationRecord="ConfigurationRecord" />
+                        }
+                    </MRow>
+                    <MRow Class="overflow-y mx-0" Style="max-height: calc(100% - 100px);">
+                        <ProjectCharts Class="mt-0" ConfigurationRecord="ConfigurationRecord" />
                     </MRow>
                 </MCol>
             </MRow>
