@@ -49,7 +49,6 @@ G6.registerEdge(
             // 获得该边的第一个图形，这里是边的 path
             const shape = group.get('children')[0];
             shape.attrs.lineAppendWidth = 40;
-            debugger;
             let index = 0;
             // 边 path 图形的动画
             shape.animate(

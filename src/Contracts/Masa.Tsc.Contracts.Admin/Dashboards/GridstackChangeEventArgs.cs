@@ -16,4 +16,8 @@ public class GridstackChangeEventArgs
     public int Height { get; set; }
 
     public bool AutoPosition { get; set; }
+
+    public bool Movable { get; set; } = true;
+
+    public bool Resizable { get; set; } = true;
 }

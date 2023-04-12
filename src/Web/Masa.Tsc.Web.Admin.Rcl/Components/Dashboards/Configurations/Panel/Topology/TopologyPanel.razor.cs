@@ -48,6 +48,10 @@ public partial class TopologyPanel
                 labelCfg = new
                 {
                     position = "bottom"
+                },
+                style = new
+                {
+                    cursor = "pointer"
                 }
             },
             defaultEdge = new
