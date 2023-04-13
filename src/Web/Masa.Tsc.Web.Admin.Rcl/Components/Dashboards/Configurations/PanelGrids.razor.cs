@@ -28,7 +28,8 @@ public partial class PanelGrids
 
     void ReplacePanel(UpsertPanelDto panel)
     {
-        var data = Panels.First(p => p.Id == panel.Id);
+        var index = Panels.FindIndex(p => p.Id == panel.Id);
+        var data = Panels[index];
         Panels.Remove(data);
         panel.X = data.X;
         panel.Y = data.Y;
@@ -69,7 +70,7 @@ public partial class PanelGrids
         }
 
         panel.Id = Guid.NewGuid();
-        Panels.Add(panel);
+        Panels.Insert(index, panel);
         if (panel.PanelType is PanelTypes.Chart)
         {
             panel.PanelType = PanelTypes.Select;

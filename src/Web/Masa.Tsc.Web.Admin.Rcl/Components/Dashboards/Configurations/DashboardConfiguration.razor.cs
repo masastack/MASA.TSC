@@ -59,7 +59,7 @@ public partial class DashboardConfiguration : IAsyncDisposable
 
     void AddPanel()
     {
-        ConfigurationRecord.Panels.AdaptiveUI(new() { AutoPosition = true });
+        ConfigurationRecord.Panels.AdaptiveUI(new() { AutoPosition = false });
     }
 
     async Task SaveAsync()
