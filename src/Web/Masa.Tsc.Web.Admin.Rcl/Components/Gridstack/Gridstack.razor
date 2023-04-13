@@ -125,7 +125,6 @@
                 _prevItemKeys = itemKeys;
                 await GridstackJSModule.ReloadAsync();
                 await GridstackJSModule.SaveAsync();
-                await GridstackJSModule.CompactAsync();
             }
             if (_prevReadonly != Readonly)
             {
