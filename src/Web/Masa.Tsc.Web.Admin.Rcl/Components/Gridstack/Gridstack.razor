@@ -2,9 +2,6 @@
 @implements IDisposable
 
 <div class="@Class grid-stack" name="@Readonly.ToString()" id="@Options.Id" style="@(_lodaing?"display:none;":"") @Style">
-    @{
-        var firstItem = Items.FirstOrDefault(item => item.X == 0 && item.Y == 0);
-    }
     @foreach (var item in Items)
     {
         <div class="grid-stack-item"
@@ -124,6 +121,7 @@
             {
                 _prevItemKeys = itemKeys;
                 await GridstackJSModule.ReloadAsync();
+                await GridstackJSModule.CompactAsync();
                 await GridstackJSModule.SaveAsync();
             }
             if (_prevReadonly != Readonly)

@@ -5,9 +5,14 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations;
 
 public partial class DashboardConfiguration : IAsyncDisposable
 {
+    string _scrollElementId = Guid.NewGuid().ToString();
+    IJSObjectReference? _helper;
     bool _serviceRelationReady;
     bool _timeRangeReady;
     bool _isLoading;
+
+    [Inject]
+    public IJSRuntime JS { get; set; }
 
     [Parameter]
     public ConfigurationRecord ConfigurationRecord { get; set; }
@@ -59,7 +64,9 @@ public partial class DashboardConfiguration : IAsyncDisposable
 
     void AddPanel()
     {
-        ConfigurationRecord.Panels.AdaptiveUI(new() { AutoPosition = false });
+        ConfigurationRecord.Panels.AdaptiveUI(new() { AutoPosition = true });
+        if (_helper is not null)
+            _ = _helper.InvokeVoidAsync("scrollBottom", _scrollElementId);
     }
 
     async Task SaveAsync()
@@ -104,5 +111,21 @@ public partial class DashboardConfiguration : IAsyncDisposable
         _serviceRelationReady = true;
         (ConfigurationRecord.Service, ConfigurationRecord.Instance, ConfigurationRecord.Endpoint) = serviceRelation;
         ConfigurationRecord.NavigateToConfiguration();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            _helper = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Masa.Tsc.Web.Admin.Rcl/js/scroll.js");
+        }
+    }
+
+    public new async ValueTask DisposeAsync()
+    {
+        await base.DisposeAsync();
+        if (_helper is not null)
+            await _helper.DisposeAsync();
     }
 }
