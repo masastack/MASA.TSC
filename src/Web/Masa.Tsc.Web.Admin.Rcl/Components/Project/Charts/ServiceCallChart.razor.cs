@@ -56,17 +56,8 @@ public partial class ServiceCallChart
             axisPointer = new
             {
                 type = "cross"
-            }
-        });
-        _options.SetValue("series[0].lineStyle", new
-        {
-            type = "solid",
-            width = 3,
-            color = "#FF5252"
-        });
-        _options.SetValue("series[0].areaStyle", new { color = new { colorStops = new[] { new { offset = 0, color = "rgba(255, 82, 82, 1)" }, new { offset = 1, color = "rgba(255, 82, 82, 0)" } }, x = 0, y = 0, x2 = 0, y2 = 1, type = "linear", global = false } });
-
-        var formatter = @$"
+            },
+            formatter= @$"
                <div style='width:136px;margin:-2px'>
   		        <div style='display:flex;justify-content: space-between;padding-bottom:8px;'>
   		          <div style='display:flex;align-items:center;'>
@@ -77,13 +68,27 @@ public partial class ServiceCallChart
   		        </div>
   		        <div style='border-top:1px solid #E4E4E6;margin:0 -8px;'></div>
   		        <div style='text-align:right;padding-top:2px;'>{{b}}</div>
-		       </div>";
-        _options.SetValue("tooltip.formatter", formatter);
+		       </div>"
+        });
+        _options.SetValue("series[0].lineStyle", new
+        {
+            type = "solid",
+            width = 3,
+            color = "#FF5252"
+        });
+        _options.SetValue("series[0].areaStyle", new { color = new { type = "linear", x = 0, y = 0, x2 = 0, y2 = 1, colorStops = new[] { new { offset = 0, color = "#FDCDC5" }, new { offset = 1, color = "#FFECE8" } }, global = false } });
+
         _options.SetValue("series[0].color", "#FF5252");
         _options.SetValue("series[0].name", I18n.Team("Service Load"));
         _options.SetValue("legend.data[0]", new { name = I18n.Team("Service Load"), icon = "square" });
         _options.SetValue("legend.top", "bottom");
-        _options.SetValue("grid.bottom", 60);
+        _options.SetValue("grid", new
+        {
+            x = 45,
+            x2 = 8,
+            y2 = 40,
+            y = 8
+        });
     }
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
