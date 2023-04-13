@@ -36,7 +36,7 @@
                     <HoneyCombGridItem Data="_viewProjects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor" TItem="ProjectOverviewDto">
                         <CellBack>
                             <div class="d-flex flex-column align-center pt-7">
-                                <span class="d-inline-block text-truncate masa h8 my-1 @GetHexTitleClass(context.Status)" style="width:120px;">@context.Name</span>
+                                <span class="d-inline-block text-truncate masa h8 my-1 @GetHexTitleClass(context.Status)" style="width:120px;margin:6px 0;">@context.Name</span>
                                 @foreach (var app in context.Apps.Take(3))
                                 {
                                     if (app.Status == MonitorStatuses.Normal)
@@ -46,23 +46,13 @@
                                     else
                                     {
                                         <span @onmouseover="()=>SetAppId(app.Id)" @onmouseout="()=>SetAppId(string.Empty)" class="@ChipLabelClass(app) masa regular2--text body2 d-inline-block text-truncate text-center cell-item rounded-sm" @onclick="@(()=>OnProjectServiceClick(context,app))">@app.Name</span>
-                                        @* <div @onclick="()=>OnProjectServiceClick(context,app)" @onclick:stopPropagation="true" class="" @onmouseover="()=>SetAppId(app.Id)" @onmouseout="()=>SetAppId(string.Empty)">
-                                            <TscTeamChip Class="masa rounded-sm body2 cell-item" Style="cursor: pointer; width: 100%"
-                                         Color="@ChipLabelColor(app)"
-                                         TextColor="white"
-                                         Label
-                                         Small
-                                         ContentClass="d-inline-block text-truncate">
-                                                @app.Name
-                                            </TscTeamChip>
-                                        </div> *@
                                     }
                                 }
                                 @* @if (context.Apps.Count > 3)
                                 { *@
                                     <MTooltip Bottom>
                                         <ActivatorContent Context="tooltipContext">
-                                            <span @attributes="@tooltipContext.Attrs" class="masa regular2--text body2 cell-item rounded-sm" style="width:30%" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))"  @onmouseover='()=>SetAppId("more")' @onmouseout="()=>SetAppId(string.Empty)">...</span>
+					    <i  @attributes="@tooltipContext.Attrs" class="m-icon theme--light mdi mdi-dots-horizontal rounded-circle cell-item" style="font-size:16px;width:32px;height:32px;" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))"  @onmouseover='()=>SetAppId("more")' @onmouseout="()=>SetAppId(string.Empty)"></i>
                                         </ActivatorContent>
                                         <ChildContent>
                                             <span>@I18n.T("More")</span>
