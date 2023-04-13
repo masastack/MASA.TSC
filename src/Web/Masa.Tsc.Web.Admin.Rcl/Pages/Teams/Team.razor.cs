@@ -204,13 +204,13 @@ public partial class Team
         };
     }
 
-    private string ChipLabelColor(AppDto appDto)
+    private string ChipLabelClass(AppDto appDto)
     {
         return appDto.Status switch
         {
-            MonitorStatuses.Warn => "#FF7D00",
-            MonitorStatuses.Error => "#FF5252",
-            _ => "#66BB6A"
+            MonitorStatuses.Warn => " cell-item-warn",
+            MonitorStatuses.Error => " cell-item-error",
+            _ => ""
         };
     }
 
