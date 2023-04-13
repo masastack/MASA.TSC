@@ -71,7 +71,7 @@
             </div>
 
             <MTreeview Items="@_treeData"
-                       ItemChildren="item => item.Children"
+                       ItemChildren="item => item.Children?.Any()??false?item.Children:default!"
                        ItemText="item => item.Name"
                        ItemKey="item => item.SpanId"
                        TItem="TraceResponseTree"
@@ -171,7 +171,7 @@
                         <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Trace("Attribute")}({_activeTreeItem.Attributes.Count})")</MTab>
                             <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Trace("Resource")}({_activeTreeItem.Resource.Count})")</MTab>
                             <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Trace("Detail")}({detail.Count})")</MTab>
-                            <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Log("Log")}({_logs.Count})")</MTab>
+                            <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Log("Log")}({_logCount})")</MTab>
                         </MTabs>
                         <MTabsItems @bind-Value="_tabValue">
                             <MTabItem Class="px-6">
