@@ -25,7 +25,7 @@
         <ActivatorContent>
             <MButton Small @attributes="@context.Attrs" Text Class="text-capitalize">
                 @I18n.DateTimeRange(_selectedQuickRangeKey.ToString())
-                <MIcon Right>mdi-menu-down</MIcon>
+                <SIcon Right>mdi-menu-down</SIcon>
             </MButton>
         </ActivatorContent>
     </Dropdown>
@@ -41,7 +41,7 @@
               OnItemClick="OnIntervalSelected">
         <PrependContent>
             <MButton Icon Small OnClick="Refresh">
-                <MIcon Small>mdi-refresh</MIcon>
+                <SIcon Small>mdi-refresh</SIcon>
             </MButton>
         </PrependContent>
         <ActivatorContent>
@@ -50,7 +50,7 @@
                 <MButton Text Small Icon="!exists"
                          @attributes="@context.Attrs">
                     <span class="mr-1">@I18n.DateTimeRange(Interval?.Text!)</span>
-                    <MIcon Small Right="@exists">mdi-menu-down</MIcon>
+                    <SIcon Small Right="@exists">mdi-menu-down</SIcon>
                 </MButton>
             }
         </ActivatorContent>

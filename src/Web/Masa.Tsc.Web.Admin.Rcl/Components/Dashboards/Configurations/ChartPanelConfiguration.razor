@@ -120,14 +120,14 @@
                                                             </MCardText>
                                                             <MCardActions Class="d-flex justify-space-between">
                                                                 <ColorGroup Value="@item.Color" ValueChanged="value => MetricColorChanged(item,value)" />
-                                                                <MIcon OnClick="() => Remove(item)" Color="red">mdi-delete</MIcon>
+                                                                <SIcon OnClick="() => Remove(item)" Color="red">mdi-delete</SIcon>
                                                             </MCardActions>
                                                         </MCard>
                                                     </MCol>
                                                 }
                                                 <MCol Md="4">
                                                     <MCard Height=@(Value.ChartType is ChartTypes.Table ? 350 : 208) OnClick="Add" Class="d-flex justify-center align-center" Style="background-color:#F6F8FD">
-                                                        <MIcon XLarge>mdi-plus</MIcon>
+                                                        <SIcon XLarge>mdi-plus</SIcon>
                                                     </MCard>
                                                 </MCol>
                                             }
