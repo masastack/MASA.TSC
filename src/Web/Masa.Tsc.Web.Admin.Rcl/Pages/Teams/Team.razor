@@ -48,17 +48,17 @@
                                         <span @onmouseover="()=>SetAppId(app.Id)" @onmouseout="()=>SetAppId(string.Empty)" class="@ChipLabelClass(app) masa regular2--text body2 d-inline-block text-truncate text-center cell-item rounded-sm" @onclick="@(()=>OnProjectServiceClick(context,app))">@app.Name</span>
                                     }
                                 }
-                                @* @if (context.Apps.Count > 3)
-                                { *@
+                                @if (context.Apps.Count > 3)
+                                {
                                     <MTooltip Bottom>
                                         <ActivatorContent Context="tooltipContext">
-					    <i  @attributes="@tooltipContext.Attrs" class="m-icon theme--light mdi mdi-dots-horizontal rounded-circle cell-item" style="font-size:16px;width:32px;height:32px;" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))"  @onmouseover='()=>SetAppId("more")' @onmouseout="()=>SetAppId(string.Empty)"></i>
+					    <i  @attributes="@tooltipContext.Attrs" class="m-icon theme--light mdi mdi-dots-horizontal rounded-circle cell-item text-truncate" style="font-size:16px;width:36px;height:36px;" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))"  @onmouseover='()=>SetAppId("more")' @onmouseout="()=>SetAppId(string.Empty)"></i>
                                         </ActivatorContent>
                                         <ChildContent>
                                             <span>@I18n.T("More")</span>
                                         </ChildContent>
                                     </MTooltip>
-                                @* } *@
+                                }
                             </div>
                         </CellBack>
                         <CellHoverTip>
