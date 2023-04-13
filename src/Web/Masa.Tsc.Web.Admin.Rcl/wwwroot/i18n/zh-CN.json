@@ -36,6 +36,7 @@
   "Description": "描述",
   "Service": "服务",
   "Instance": "实例",
+  "ServiceInstance": "实例",
   "Endpoint": "接口",
   "More": "更多",
   "DateTimeRange": {
