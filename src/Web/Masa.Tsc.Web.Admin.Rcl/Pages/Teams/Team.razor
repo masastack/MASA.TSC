@@ -52,9 +52,9 @@
                                 {
                                     <MTooltip Bottom>
                                         <ActivatorContent Context="tooltipContext">
-					    <i  @attributes="@tooltipContext.Attrs" class="m-icon theme--light mdi mdi-dots-horizontal rounded-circle cell-item text-truncate" style="font-size:16px;width:36px;height:36px;" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))"  @onmouseover='()=>SetAppId("more")' @onmouseout="()=>SetAppId(string.Empty)"></i>
+					    <i  @attributes="@tooltipContext.Attrs" class="m-icon theme--light mdi mdi-dots-horizontal regular2--text rounded-circle cell-item text-truncate" style="font-size:16px;width:36px;height:36px;" @onclick="@(()=>OnProjectServiceClick(context,context.Apps.First()))"  @onmouseover='()=>SetAppId("more")' @onmouseout="()=>SetAppId(string.Empty)"></i>
                                         </ActivatorContent>
-                                        <ChildContent>
+                                        <ChildContent>dddd
                                             <span>@I18n.T("More")</span>
                                         </ChildContent>
                                     </MTooltip>
