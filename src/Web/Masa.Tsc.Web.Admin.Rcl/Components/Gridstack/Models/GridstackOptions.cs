@@ -33,7 +33,6 @@ public class GridstackOptions
 
     public int MarginLeft { get; set; }
 
-
     public bool Float { get; set; }
 
     public bool DisableResize { get; set; }
@@ -43,4 +42,6 @@ public class GridstackOptions
     public bool OneColumnModeDomSort { get; set; }
 
     public bool DisableOneColumnMode { get; set; } = true;
+
+    public string Handle { get; set; } = ".draggable";
 }
