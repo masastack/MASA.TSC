@@ -1,26 +1,25 @@
 ﻿@inherits TscComponentBase
 
-<AutoResize Class="@Class" Delay="10" OnResize="ResizeAsync">
+<div class="@Class full-height">
     <MCard Class="d-flex flex-column rounded-lg full-height">
-        <MCardTitle>
-            <PanelTooltip Title="@Value.Title" Description="@Value.Description" />
-        </MCardTitle>
-        <MCardText Class="flex-grow-1">
-            @{
-                var options = Value.GetChartOption(CurrentTimeZone);
-                if (options is null)
-                {
-                    <NoData />
+        <PanelTooltip Title="@Value.Title" Description="@Value.Description" />
+        <AutoResize Delay="10" OnResize="ResizeAsync">
+            <MCardText Class="flex-grow-1 full-height">
+                @{
+                    var options = Value.GetChartOption(CurrentTimeZone);
+                    if (options is null)
+                    {
+                        <NoData />
+                    }
+                    else
+                    {
+                        <MECharts Option="options" @ref=Chart />
+                    }
                 }
-                else
-                {
-                    <MECharts Option="options" @ref=Chart />
-                }
-            }
-
-        </MCardText>
+            </MCardText>
+        </AutoResize>
     </MCard>
-</AutoResize>
+</div>
 
 @code {
     [Parameter]
