@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Google.Protobuf.WellKnownTypes;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceDetail
@@ -15,9 +13,11 @@ public partial class TscTraceDetail
     private TraceResponseTree? _activeTreeItem;
     private TraceResponseTree? _rootTreeItem;
     private int _count;
+    private int _logCount;
     private List<List<TraceResponseTimeline>> _timelinesView = new();
     private List<LogModel> _logs = new();
     private bool _loadLogs = false;
+    private string? lastQuerySpanId;
     private MVirtualScroll<TraceResponseTree> _vs;
 
     internal async Task OpenAsync(string traceId)
@@ -27,6 +27,7 @@ public partial class TscTraceDetail
         StateHasChanged();
 
         await QueryTraceDetailAndToTree(traceId);
+        await LoadSpanLogsAsync(_treeData.FirstOrDefault()?.SpanId, true);
         StateHasChanged();
     }
 
@@ -68,11 +69,7 @@ public partial class TscTraceDetail
     {
         var data = await ApiCaller.TraceService.GetAsync(traceId);
 
-        _count = data.Count() - 1;
-        if (_count == -1)
-        {
-            _count = 0;
-        }
+        _count = data.Count();
 
         _treeData = ToTree(data.OrderBy(item => item.Timestamp), null);
         _timelinesView.Clear();
@@ -127,6 +124,10 @@ public partial class TscTraceDetail
         {
             await LoadSpanLogsAsync(items.FirstOrDefault()?.SpanId);
         }
+        else
+        {
+            await LoadSpanLogsAsync(items.FirstOrDefault()?.SpanId, true);
+        }
 
         if (items.Count == 0)
         {
@@ -147,12 +148,13 @@ public partial class TscTraceDetail
             {
                 var first = items.First();
                 parentSpanId = first.ParentSpanId;
-                root = new TraceResponseTree(new TraceResponseDto {
+                root = new TraceResponseTree(new TraceResponseDto
+                {
                     SpanId = parentSpanId,
-                    TraceId= first.TraceId,
-                    Timestamp=first.Timestamp,
-                    EndTimestamp= items.Last().EndTimestamp
-                }, 0);                
+                    TraceId = first.TraceId,
+                    Timestamp = first.Timestamp,
+                    EndTimestamp = items.Last().EndTimestamp
+                }, 0);
             }
         }
 
@@ -222,27 +224,38 @@ public partial class TscTraceDetail
         return nodes;
     }
 
-    private async Task LoadSpanLogsAsync(string? spanId)
+    private async Task LoadSpanLogsAsync(string? spanId, bool isTotal = false)
     {
-        if (_loadLogs)
+        if (_loadLogs || lastQuerySpanId == spanId)
             return;
         _loadLogs = true;
         if (string.IsNullOrEmpty(spanId))
         {
-            _logs.Clear();
+            if (!isTotal)
+                _logs.Clear();
+            _logCount = 0;
+            _loadLogs = false;
             return;
         }
 
+        int pageSize = isTotal ? 0 : 9999;
         Loading = true;
         var query = new LogPageQueryDto
         {
-            PageSize = 9999,
+            PageSize = pageSize,
             Page = 1,
             SpanId = spanId
         };
         var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
-        _logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
+        if (!isTotal)
+        {
+            lastQuerySpanId = spanId;
+            _logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
+        }
+
+        _logCount = (int)response.Total;
         Loading = false;
+        _loadLogs = false;
     }
 
     private static string FormatDuration(double duration)

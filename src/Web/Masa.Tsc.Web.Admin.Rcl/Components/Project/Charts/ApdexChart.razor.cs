@@ -123,7 +123,7 @@ public partial class ApdexChart
             return data!;
 
         var values = data.Select(str => double.Parse(str)).ToArray();
-        Total = FormatValue(values.FirstOrDefault(val => !double.IsNaN(val)), values.LastOrDefault(val => !double.IsNaN(val)));
+        Total = FormatValue(values.FirstOrDefault(val => !double.IsNaN(val) && val - 1 >= 0), values.LastOrDefault(val => !double.IsNaN(val) && val - 1 >= 0));
         return data;
     }
 
