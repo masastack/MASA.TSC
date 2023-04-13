@@ -111,7 +111,9 @@
     "NORMAL": "正常",
     "MONITORING": "监控",
     "Calls": "调用次数",
-    "Total Count": "总条数"
+    "Total Count": "总条数",
+    "Success": "成功",
+    "Fail": "失败"
   },
   "Dashboard": {
     "Dashboard": "仪表盘",
