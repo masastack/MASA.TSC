@@ -86,12 +86,13 @@
     "Monitoring Projects": "监测项目",
     "Monitoring Applications": "监测应用",
     "Service Success Rate": "服务成功率",
-    "Service Load": "服务负载",
+    "Service Load": "调用次数/服务负载",
     "Service Avg Response Time": "服务平均响应时间",
     "Service Response Time Percentile": "服务响应时间百分比",
     "Service Apdex": "服务满意度",
-    "Service Endpoint Load": "API负载",
-    "Service Slow Endpoint": "慢API",
+    "Service Endpoint Load(calls/min)": "调用次数/接口负载",
+    "Service Endpoint Load": "调用次数/接口负载",
+    "Service Slow Endpoint": "慢接口",
     "call/min": "调用次数/每分钟",
     "APPID": "应用ID",
     "App identity": "应用标识",
@@ -100,7 +101,7 @@
     "The sum of the total duration/executions during the period, the lower the relative value, the better": "该时间段内执行数总时长/执行数总和，相对值越低越好。",
     "The average success rate of the service in the current time period": "该服务目前时间段内平均成功率",
     "The average failure rate of the service in the current time period": "该服务目前时间段内平均失败率",
-    "For HTTP, gRPC, RPC services, this means Calls Per Minute (calls/min)": "例如 HTTP, gRPC, RPC的服务负载 (调用次数/分钟)",
+    "For HTTP, gRPC, RPC services, this means Calls Per Minute (calls/min)": "例如 HTTP, gRPC, RPC的调用次数/服务负载",
     "Currently the application has {0} error logs": "目前该应用程序有{0}条错误日志",
     "Project Count": "项目数量",
     "Service Count": "服务数量",
@@ -189,6 +190,7 @@
   },
   "Log": {
     "Log": "日志",
-    "Log Count": "日志数量"
+    "Log Count": "日志数量",
+    "Clike me view log advanced usage": "点击查看日志高级查询文档"
   }
 }
