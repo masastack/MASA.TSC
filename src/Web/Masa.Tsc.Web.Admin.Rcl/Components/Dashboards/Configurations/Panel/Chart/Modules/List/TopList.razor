@@ -23,7 +23,7 @@
                             </MListItemAvatar>
                             <MListItemContent>
                                 <MListItemTitle Class="d-flex justify-space-between">
-                                    <MLabel Class="body2 regular2--text d-inline-block text-truncate">@(multiple ? item.Text : (Value.Metrics[0].DisplayName ?? item.Text))</MLabel>
+                                    <MLabel Class="body2 regular2--text d-inline-block text-truncate">@(multiple ? item.Text : (string.IsNullOrEmpty(Value.Metrics[0].DisplayName) ? item.Text : Value.Metrics[0].DisplayName))</MLabel>
                                     </MListItemTitle>
                                     <MListItemSubtitle>
                                         <MProgressLinear Height="8" Color="@(multiple?GetTextColorStyle(options.IndexOf(item)):(Value.Metrics[0].Color ?? GetTextColorStyle(options.IndexOf(item))))" Rounded Value="@item.Value"></MProgressLinear>
