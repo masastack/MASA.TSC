@@ -46,8 +46,9 @@ export function initAll(options, dotNetHelper) {
 
 export function reload(options) {
     var el = getElement(options);
+    el.gridstack.removeAll(false);
     var childs = el.querySelectorAll(':scope > .grid-stack-item');
-    el.gridstack.engine.nodes = [];
+    el.gridstack.batchUpdate(true);
     childs.forEach(child => {
         el.gridstack.makeWidget(child);
     });

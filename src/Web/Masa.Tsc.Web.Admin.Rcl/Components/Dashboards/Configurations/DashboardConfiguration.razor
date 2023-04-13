@@ -48,7 +48,7 @@
         }
 
         <CascadingValue Value="ConfigurationRecord" IsFixed>
-            <div style="overflow-y:auto;overflow-x:hidden;" class="full-height">
+            <div id="@_scrollElementId" style="overflow-y:auto;overflow-x:hidden;margin-right:-10px;" class="full-height">
                 @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady) && _timeRangeReady)
                 {
                     <PanelGrids Panels="ConfigurationRecord.Panels" />
