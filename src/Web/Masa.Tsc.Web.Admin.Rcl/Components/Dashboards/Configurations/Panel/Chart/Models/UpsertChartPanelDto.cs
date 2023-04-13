@@ -779,7 +779,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
             Href = href,
             Text = string.Join('-', item.Metric!.Select(metric => metric.Value)),
             Value = GetQueryResultMatrixRangeResponseValue(item)
-        }));
+        }).OrderByDescending(item => item.Value));
     }
 
     private double GetQueryResultMatrixRangeResponseValue(QueryResultMatrixRangeResponse item)
