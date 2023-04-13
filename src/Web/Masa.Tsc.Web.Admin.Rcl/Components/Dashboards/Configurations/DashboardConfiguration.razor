@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<AutoHeight AutoStyle="@($"max-height: calc(100vh - 176px);{Style}")">
+<AutoHeight AutoStyle="@($"max-height: calc(100vh - 176px);margin-right: -10px;{Style}")">
     <HeaderContent>
         <div class="d-flex mb-3 @HeaderClass" style="@HeaderStyle">
             @HeaderContent
@@ -46,9 +46,8 @@
         {
             <LoadingData />
         }
-
         <CascadingValue Value="ConfigurationRecord" IsFixed>
-            <div style="overflow-y:auto;overflow-x:hidden;" class="full-height">
+            <div id="@_scrollElementId" style="overflow-y:auto;overflow-x:hidden;" class="full-height">
                 @if (ConfigurationRecord.ServiceRelationReady(_serviceRelationReady) && _timeRangeReady)
                 {
                     <PanelGrids Panels="ConfigurationRecord.Panels" />
