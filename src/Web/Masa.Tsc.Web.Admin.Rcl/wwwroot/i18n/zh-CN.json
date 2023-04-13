@@ -100,7 +100,7 @@
     "The sum of the total duration/executions during the period, the lower the relative value, the better": "该时间段内执行数总时长/执行数总和，相对值越低越好。",
     "The average success rate of the service in the current time period": "该服务目前时间段内平均成功率",
     "The average failure rate of the service in the current time period": "该服务目前时间段内平均失败率",
-    "For HTTP 1/2, gRPC, RPC services, this means Calls Per Minute (calls/min)": "例如 HTTP 1/2, gRPC, RPC的服务负载 (调用次数/分钟)",
+    "For HTTP, gRPC, RPC services, this means Calls Per Minute (calls/min)": "例如 HTTP, gRPC, RPC的服务负载 (调用次数/分钟)",
     "Currently the application has {0} error logs": "目前该应用程序有{0}条错误日志",
     "Project Count": "项目数量",
     "Service Count": "服务数量",

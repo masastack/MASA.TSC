@@ -71,7 +71,7 @@ public partial class ProjectCharts
                 ChartType = ChartTypes.Table,
                 ListType = ListTypes.TopList,
                 Title = I18n.Team("Service Endpoint Load") + "(" + I18n.Team("calls/min") + ")",
-                Description = I18n.Team( "For HTTP 1/2, gRPC, RPC services, this means Calls Per Minute (calls/min)"),
+                Description = I18n.Team( "For HTTP, gRPC, RPC services, this means Calls Per Minute (calls/min)"),
                 Metrics = new List<PanelMetricDto>
                 {
                     new PanelMetricDto()
