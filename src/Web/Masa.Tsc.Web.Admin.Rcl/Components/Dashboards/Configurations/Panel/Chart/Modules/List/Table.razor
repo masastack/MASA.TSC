@@ -3,7 +3,7 @@
 <div class="@Class full-height">
     <MCard Class="d-flex flex-column rounded-lg full-height">
         <PanelTooltip Title="@Value.Title" Description="@Value.Description" />
-        <AutoResize OnResize="arg=> _height = arg.height">           
+        <AutoResize Delay="10" OnResize="arg=> _height = arg.height">
             <MCardText Class="flex-grow-1">
                 <MSimpleTable Height="_height-35" FixedHeader>
                     @if (Value.ShowTableHeader)
@@ -60,7 +60,7 @@
 @code {
     int _page = 1;
     int _pageSize = 10;
-    double _height = 325;
+    double _height = 0;
     ListTypes oldListType;
 
     int Page

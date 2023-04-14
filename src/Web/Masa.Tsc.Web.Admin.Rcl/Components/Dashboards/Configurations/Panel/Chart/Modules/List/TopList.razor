@@ -7,7 +7,7 @@
             var options = Value.GetTopListOption();
             var multiple = options.Count > 1;
         }
-        <AutoResize OnResize="arg=> _height = arg.height" Class="@Class">
+        <AutoResize Delay="10" OnResize="arg=> _height = arg.height" Class="@Class">
             <MCardText Class="flex-grow-1">
                 <MList Height="_height-35" Class="overflow-y">
                     @foreach (var item in options)
@@ -33,6 +33,7 @@
 </div>
 
 @code {
+    double _height = 0;
     string[] _defaultColors = new string[] { "#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc" };
 
     [Parameter]
