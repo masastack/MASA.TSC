@@ -1,29 +1,8 @@
 ﻿@inherits TscComponentBase
-<MListItem Style="min-height: 40px !important" Class="pl-0">
-    <MListItemAction Class="my-0">
-        <MListItemActionText>
-            <MHover Context="hContext">
-                <div @attributes="hContext.Attrs" class="hover-pointer d-flex align-left">
-                    <div @onclick="() => Copy(ValueFunc(Value))" @onclick:stopPropagation>
-                        <SIcon Tooltip="@I18n.T("Copy value")"
-                               Color="@(_copyClicked ? "success" : "gray")"
-                               Style="@(hContext.Hover ? "width: 18px; transition: 0.5s;" : "opacity:0; height: 0px; margin-left: -24px; transition: 0.4s;")">
-                            @(_copyClicked ? _checkSvg : _copySvg)
-                        </SIcon>
-                    </div>
-                    <MTooltip Top>
-                        <ActivatorContent>
-                            <div @attributes="@context.Attrs" class="text-truncate text-left masa subtitle2 black--text" style="width:164px">@TextFunc(Value)</div>
-                        </ActivatorContent>
-                         <ChildContent>
-                            <span>@TextFunc(Value)</span>
-                        </ChildContent>
-                    </MTooltip>
-                </div>
-            </MHover>
-        </MListItemActionText>
-    </MListItemAction>
-</MListItem>
+
+<div style="@Style">
+    <TooltipCopy TextFunc="TextFunc" ValueFunc="ValueFunc" Value="Value" TooltipContentStyle="@Style" TextClass="text-truncate text-left masa subtitle2 black--text" />
+</div>
 
 @code {
     [Parameter]
@@ -35,22 +14,10 @@
     [Parameter]
     public Func<object, string> ValueFunc { get; set; } = obj => obj?.ToString()!;
 
-    [Inject]
-    public IJSRuntime Js { get; set; }
-
-    private bool _copyClicked = false;
-    private readonly string _checkSvg = "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z";
-    private readonly string _copySvg =
-        "M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z";
-
-    private async Task Copy(string value)
+    protected override void OnInitialized()
     {
-        _copyClicked = true;
-
-        await Js.InvokeVoidAsync(JsInteropConstants.Copy, value);
-
-        await Task.Delay(500);
-
-        _copyClicked = false;
+        base.OnInitialized();
+        if (string.IsNullOrEmpty(Style))
+            Style = "width:164px";
     }
 }

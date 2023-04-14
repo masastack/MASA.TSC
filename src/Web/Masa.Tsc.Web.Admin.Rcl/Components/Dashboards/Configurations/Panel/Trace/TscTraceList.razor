@@ -7,7 +7,8 @@
             Items="_data"
             TItem="TraceResponseDto"
             Loading="@Loading"
-            Style="@(PageMode ? "" : "height:calc(100% - 475px);")"
+            Style="@(PageMode ? "" : "height:calc(100% - 475px);width:100%")"
+            Class="overflow-x-hidden"
             Height='@(PageMode ? "calc(100vh - 605px)" : "calc(100%);")' SortBy="_sortBy" SortDesc="_sortDesc" OnOptionsUpdate="OnOptionsUpdate">
     <ItemColContent>
         <div class="hover-pointer" @onclick="e=> OpenAsync(context.Item)">
@@ -27,7 +28,9 @@
             }
             else if (context.Header.Value == "Endpoint")
             {
-                @context.Item.GetDispalyName()
+                <div style="max-width:400px">
+                    <TooltipCopy Value="@context.Item.GetDispalyName()" TooltipContentStyle="max-width:400px" />
+                </div>
             }
             else if (context.Header.Value == nameof(TraceResponseDto.Duration))
             {
