@@ -46,7 +46,7 @@
                             </MCol>
                         }
                     </MRow>
-                    <MRow Class="overflow-y mx-0" Style="@(ErrorCount > 0?"height: calc(100% - 100px);":"height: 100%;")">
+                    <MRow Class="overflow-y mx-0" Style="@(ErrorCount > 0?"max-height: calc(100% - 100px);":"max-height: calc(100%);height: 100%;")">
                         <ProjectCharts Class="mt-0" ConfigurationRecord="ConfigurationRecord" />
                     </MRow>
                 </MCol>

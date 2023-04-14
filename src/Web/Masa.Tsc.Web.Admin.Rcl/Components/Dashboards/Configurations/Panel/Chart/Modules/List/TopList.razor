@@ -1,20 +1,15 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 
-<AutoResize OnResize="arg=> _height = arg.height-80" Class="@Class">
-    <MCard>
+<div class="@Class full-height">
+    <MCard Class="d-flex flex-column rounded-lg full-height">
         <PanelTooltip Title="@Value.Title" Description="@Value.Description" />
         @{
             var options = Value.GetTopListOption();
             var multiple = options.Count > 1;
         }
-        @if (options.Any() is false)
-        {
-            <NoData />
-        }
-        else
-        {
-            <MCardText Class="flex-grow-1 overflow-y" Style="@("height:calc(100% - 62px)")">
-                <MList Height="_height">
+        <AutoResize Delay="10" OnResize="arg=> _height = arg.height" Class="@Class">
+            <MCardText Class="flex-grow-1">
+                <MList Height="_height-35" Class="overflow-y">
                     @foreach (var item in options)
                     {
                         <MListItem Class="px-0" Dense OnClick="() => ToDashboardConfiguration(item)">
@@ -22,25 +17,23 @@
                                 <span>@item.Value</span>
                             </MListItemAvatar>
                             <MListItemContent>
-                                <MListItemTitle Class="d-flex justify-space-between">
-                                    <MLabel Class="body2 regular2--text d-inline-block text-truncate">@(multiple ? item.Text : (string.IsNullOrEmpty(Value.Metrics[0].DisplayName) ? item.Text : Value.Metrics[0].DisplayName))</MLabel>
-                                    </MListItemTitle>
-                                    <MListItemSubtitle>
-                                        <MProgressLinear Height="8" Color="@(multiple?GetTextColorStyle(options.IndexOf(item)):(Value.Metrics[0].Color ?? GetTextColorStyle(options.IndexOf(item))))" Rounded Value="@item.Value"></MProgressLinear>
-                                    </MListItemSubtitle>
-                                </MListItemContent>
-                            </MListItem>
+                            <MListItemTitle Class="d-flex justify-space-between">
+                                <MLabel Class="body2 regular2--text d-inline-block text-truncate">@(multiple ? item.Text : (string.IsNullOrEmpty(Value.Metrics[0].DisplayName) ? item.Text : Value.Metrics[0].DisplayName))</MLabel>
+                                </MListItemTitle>
+                                <MListItemSubtitle>
+                                    <MProgressLinear Height="8" Color="@(multiple?GetTextColorStyle(options.IndexOf(item)):(Value.Metrics[0].Color ?? GetTextColorStyle(options.IndexOf(item))))" Rounded Value="@item.Value"></MProgressLinear>
+                                </MListItemSubtitle>
+                            </MListItemContent>
+                        </MListItem>
                     }
                 </MList>
             </MCardText>
-        }
-
+        </AutoResize>
     </MCard>
-</AutoResize>
-
+</div>
 
 @code {
-    double _height = 325;
+    double _height = 0;
     string[] _defaultColors = new string[] { "#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc" };
 
     [Parameter]
