@@ -1,69 +1,61 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 
-<AutoResize OnResize="arg=> _height = arg.height-80" Class="@Class">
-    <MCard Class="@($"d-flex flex-column")">
-        <MCardTitle Class="d-flex justify-space-between">
-            <MLabel Class="emphasis2--text h6" Style="@(string.IsNullOrEmpty(Value.Title)?"display:none":"")">@Value.Title</MLabel>
-            <MTooltip Top>
-                <ActivatorContent>
-                    <MIcon @attributes="@context.Attrs" Style="@(string.IsNullOrEmpty(Value.Description)?"display:none":"")">mdi-information-outline</MIcon>
-                </ActivatorContent>
-                <ChildContent>
-                    <span>@Value.Description</span>
-                </ChildContent>
-            </MTooltip>
-        </MCardTitle>
-        <MCardText Class="flex-grow-1">
-            <MSimpleTable Height="_height" FixedHeader>
-                @if (Value.ShowTableHeader)
-                {
-                    <thead>
-                        <tr>
-                            <th class="text-left">
-                                @GetFirstHeaderName()
-                            </th>
-                            @foreach (var field in Value.Metrics)
-                            {
-                                <th class="text-left" style="@(string.IsNullOrEmpty(field.Color)?"":$"color:{field.Color} !important;")">
-                                    @(string.IsNullOrWhiteSpace(field.Unit) ? field.DisplayName : $"{field.DisplayName}({field.Unit})")
-                                </th>
-                            }
-                        </tr>
-                    </thead>
-                }
-                <tbody>
-                    @{
-                        var options = Value.GetTableOption();
-                        if (Value.EnablePaginaton) options = options.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
-                    }
-                    @foreach (var option in options)
+<div class="@Class full-height">
+    <MCard Class="d-flex flex-column rounded-lg full-height">
+        <PanelTooltip Title="@Value.Title" Description="@Value.Description" />
+        <AutoResize OnResize="arg=> _height = arg.height">           
+            <MCardText Class="flex-grow-1">
+                <MSimpleTable Height="_height-35" FixedHeader>
+                    @if (Value.ShowTableHeader)
                     {
-                        <tr>
-                            @for (int i = 0; i < option.Count; i++)
-                            {
-                                var item = option[i];
-                                @if (item.JumpId is not null)
+                        <thead>
+                            <tr>
+                                <th class="text-left">
+                                    @GetFirstHeaderName()
+                                </th>
+                                @foreach (var field in Value.Metrics)
                                 {
-                                    <td @onclick="() => ToDashboardConfiguration(item)" style="@GetTextColorStyle(i)" class="@($"text-{Value.ColumnAlignment}") primary--text @(ConfigurationRecord.IsEdit?"":"hover-pointer")">
-                                        @item.Text
-                                    </td>
+                                    <th class="text-left" style="@(string.IsNullOrEmpty(field.Color)?"":$"color:{field.Color} !important;")">
+                                        @(string.IsNullOrWhiteSpace(field.Unit) ? field.DisplayName : $"{field.DisplayName}({field.Unit})")
+                                    </th>
                                 }
-                                else
-                                {
-                                    <td style="@GetTextColorStyle(i)" class="@($"text-{Value.ColumnAlignment}")">@item.Text</td>
-                                }
-                            }
-                        </tr>
+                            </tr>
+                        </thead>
                     }
-                </tbody>
-            </MSimpleTable>
-            @if (Value.EnablePaginaton)
-            {
-                <SPagination Class="mt-1" @bind-Page="Page" @bind-PageSize=PageSize Total=Value.GetTableOption().Count() />
-            }
-        </MCardText>
+                    <tbody>
+                        @{
+                            var options = Value.GetTableOption();
+                            if (Value.EnablePaginaton) options = options.Skip((_page - 1) * _pageSize).Take(_pageSize).ToList();
+                        }
+                        @foreach (var option in options)
+                        {
+                            <tr>
+                                @for (int i = 0; i < option.Count; i++)
+                                {
+                                    var item = option[i];
+                                    @if (item.JumpId is not null)
+                                    {
+                                        <td @onclick="() => ToDashboardConfiguration(item)" style="@GetTextColorStyle(i)" class="@($"text-{Value.ColumnAlignment}") primary--text @(ConfigurationRecord.IsEdit?"":"hover-pointer")">
+                                            @item.Text
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td style="@GetTextColorStyle(i)" class="@($"text-{Value.ColumnAlignment}")">@item.Text</td>
+                                    }
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </MSimpleTable>
+                @if (Value.EnablePaginaton)
+                {
+                    <SPagination Class="mt-1" @bind-Page="Page" @bind-PageSize=PageSize Total=Value.GetTableOption().Count() />
+                }
+            </MCardText>
+        </AutoResize>
     </MCard>
-</AutoResize>
+</div>
 
 @code {
     int _page = 1;
