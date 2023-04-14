@@ -85,5 +85,5 @@
 
     <MSpacer></MSpacer>
 
-    <SSearch BackgroundColor="white" Value="@_keyword" ValueChanged="KeywordChanged" MaxWidth="0" Style="flex:none;width:368px !important;" Placeholder="TraceId" />
+    <SSearch BackgroundColor="white" @bind-Value="@_keyword" OnEnter="OnEnterSearch" MaxWidth="0" Style="flex:none;width:368px !important;" Placeholder="TraceId" />
 </div>

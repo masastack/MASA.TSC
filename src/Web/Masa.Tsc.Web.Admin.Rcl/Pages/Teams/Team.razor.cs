@@ -153,9 +153,8 @@ public partial class Team
         await UpdateCardDataAsync();
     }
 
-    async Task OnSearchChangedAsync(string search)
+    async Task OnSearchChangedAsync()
     {
-        _search = search;
         await GetProjectsAsync();
     }
 

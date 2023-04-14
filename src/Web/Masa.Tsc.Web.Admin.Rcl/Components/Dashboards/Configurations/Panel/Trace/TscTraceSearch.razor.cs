@@ -61,9 +61,8 @@ public partial class TscTraceSearch
         _endpointSearching = false;
     }
 
-    private void KeywordChanged(string? val)
+    private void OnEnterSearch()
     {
-        _keyword = val;
         Query();
     }
 

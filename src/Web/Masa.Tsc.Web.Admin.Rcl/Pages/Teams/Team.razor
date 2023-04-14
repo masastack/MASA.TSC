@@ -8,7 +8,7 @@
         <ProjectTabs Value="@_projectType" ValueChanged="ProjectTypeChangedAsync" />
     </div>
     <div class="mx-6">
-        <SSearch Value="@_search" ValueChanged="OnSearchChangedAsync" Style="width:220px !important;" BackgroundColor="white" />
+        <SSearch @bind-Value="@_search" OnEnter="OnSearchChangedAsync" Style="width:220px !important;" BackgroundColor="white" />
     </div>
     <DateTimeRangeToolbar OnUpdate="OnDateTimeUpdateAsync"
                           OnAutoUpdate="OnAutoDateTimeUpdateAsync"
@@ -25,7 +25,7 @@
         }
         else
         {
-            var _viewProjects = GetProjectViewData();
+            var _viewProjects = GetProjectViewData(); 
             if (_projects == null || !_projects.Any())
             {
                 <SEmptyPlaceholder />
