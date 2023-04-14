@@ -13,9 +13,9 @@
         <div class="hover-pointer" @onclick="e=> OpenAsync(context.Item)">
             @if (context.Header.Value == "Operate")
             {
-                <MButton Icon>
+                <SButton Icon>
                     <SIcon OnClick="@(() => OpenAsync(context.Item))">mdi-view-headline</SIcon>
-                </MButton>
+                </SButton>
             }
             else if (context.Header.Value == "Timestamp")
             {

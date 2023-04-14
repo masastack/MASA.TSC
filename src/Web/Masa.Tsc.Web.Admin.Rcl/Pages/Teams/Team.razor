@@ -8,7 +8,7 @@
         <ProjectTabs Value="@_projectType" ValueChanged="ProjectTypeChangedAsync" />
     </div>
     <div class="mx-6">
-        <SearchTextField Value="@_search" ValueChanged="OnSearchChangedAsync" Style="width:220px;border-radius: 10px !important;" FillBackground=false Clearable />
+        <SSearch Value="@_search" ValueChanged="OnSearchChangedAsync" Style="width:220px !important;" BackgroundColor="white" />
     </div>
     <DateTimeRangeToolbar OnUpdate="OnDateTimeUpdateAsync"
                           OnAutoUpdate="OnAutoDateTimeUpdateAsync"

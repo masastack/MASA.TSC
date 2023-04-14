@@ -16,11 +16,11 @@
             </SLabeledRadioGroup>
             @if (Mode is ModeTypes.Folder)
             {
-                <MButton Depressed Text Outlined Class="mr-6 my-auto regular--text body2 white" OnClick="() => ExpandAll = !ExpandAll">
+                <SButton BorderRadiusClass="" Color="" Depressed Text Outlined Class="mr-6 my-auto regular--text body2 white" OnClick="() => ExpandAll = !ExpandAll">
                     @I18n.Dashboard( ExpandAll ? "Close all" : "Expend all")
-                </MButton>
+                </SButton>
             }
-            <SearchTextField @bind-Value="Search" Clearable FillBackground=false Class="my-auto" Style="flex:none;width: 300px !important;" />
+            <SSearch @bind-Value="Search" Style="flex:none;width:300px !important;" BackgroundColor="white" />
             <MSpacer />
             <SButton OnClick="OpenAddFolderDialog" Small Class="mr-6 my-auto" Style="min-width:108px !important;">@I18n.Dashboard("Add folder")</SButton>
             <SButton OnClick="OpenAddDashboardDialog" Small Class="my-auto" Style="min-width:140px !important;">@I18n.Dashboard("Add dashboard")</SButton>
