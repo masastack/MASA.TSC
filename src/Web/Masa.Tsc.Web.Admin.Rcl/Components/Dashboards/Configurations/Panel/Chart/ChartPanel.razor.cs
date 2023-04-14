@@ -53,7 +53,7 @@ public partial class ChartPanel
             Instance = ConfigurationRecord.Instance,
             EndPoint = ConfigurationRecord.Endpoint,
             Step = ConfigurationRecord.StartTime.UtcDateTime.Interval(ConfigurationRecord.EndTime.UtcDateTime),
-            MetricNames = Value.Metrics.Select(item => item.Expression).ToList()
+            MetricNames = Value.Metrics.Where(item => string.IsNullOrEmpty(item.Expression) is false).Select(item => item.Expression).ToList()
         });      
     }
 

@@ -512,6 +512,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         {
             var index = 0;
             var defaultColorIndex = 0;
+            var metrics = Metrics.Where(item => string.IsNullOrEmpty(item.Expression) is false).ToList();
             foreach (var item in _chartData)
             {
                 if (item is not null)
@@ -527,9 +528,9 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                         }
                         else
                         {
-                            metricName = Metrics[index].DisplayName ?? string.Join("-", matrix.Metric!.Values);
+                            metricName = metrics[index].DisplayName ?? string.Join("-", matrix.Metric!.Values);
                         }
-                        var color = Metrics[index].Color;
+                        var color = metrics[index].Color;
                         if (ChartType is ChartTypes.Pie or ChartTypes.Gauge)
                         {
                             if (string.IsNullOrEmpty(color))
@@ -844,6 +845,9 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
     public override UpsertPanelDto Clone(UpsertPanelDto panel)
     {
         base.Clone(panel);
+        _tableData.Clear();
+        _topListData.Clear();
+        _chartData.Clear();
         var value = this[ExtensionFieldTypes.ChartType];
         if (value is string strValue)
         {
