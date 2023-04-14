@@ -254,29 +254,10 @@
                 <MListItemAction Style="max-width: 38%">
                     <MListItemActionText Class="text-truncate text-right masa body-2"
                              Style="width: 100%; cursor: auto;">
-                        <MHover Context="hContext">
-                            <div @attributes="hContext.Attrs" class="hover-pointer d-flex align-center">
-                                <div @onclick="() => Copy(value)" @onclick:stopPropagation>
-                                    <SIcon Tooltip="@I18n.T("Copy value")"
-                               Color="@(_copyClicked ? "success" : "gray")"
-                               Style="@(hContext.Hover ? "width: 18px; height: 18px; margin-right: 12px; transition: 0.5s;" : "opacity:0; width: 18px; height: 0px; margin-left: -24px; transition: 0.4s;")">
-                                        @(_copyClicked ? _checkSvg : _copySvg)
-                                    </SIcon>
-                                </div>
-                                <MTooltip Top ContentStyle="max-width:400px">
-                                    <ActivatorContent>
-                                        <span class="text-truncate" @attributes="@context.Attrs">@value</span>
-                                    </ActivatorContent>
-                                    <ChildContent>
-                                        <span>@value</span>
-                                    </ChildContent>
-                                </MTooltip>
-                            </div>
-                        </MHover>
+                        <TooltipCopy Value="@value" IconStyle="opacity:0; width: 18px; height: 0px; margin-left: -24px; transition: 0.4s;" IconHoverStyle="width: 18px; height: 18px; margin-right: 12px; transition: 0.5s;"></TooltipCopy>                       
                     </MListItemActionText>
                 </MListItemAction>
             </MListItem>
         }
     }
-
 }
