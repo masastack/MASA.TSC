@@ -2,8 +2,8 @@
 
 @if (ConfigurationRecord.IsEdit)
 {
-    <div style="height:100%;width:100%;" class="d-flex pa-3">
-        <div class="ma-auto" style="display: flex;flex-wrap: wrap;max-width: 480px;">
+    <div style="height:100%;width:100%;" class="d-flex">
+        <div class="ma-auto pl-5" style="display: flex;flex-wrap: wrap;max-width: 504px;">
             @foreach (var panelType in GetPanelTypes())
             {
                 <MHover Disabled=panelType.Disabled>

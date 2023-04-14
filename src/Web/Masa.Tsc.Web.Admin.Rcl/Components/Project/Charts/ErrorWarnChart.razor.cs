@@ -91,12 +91,14 @@ public partial class ErrorWarnChart
 
         _options.SetValue("tooltip.formatter", "{d}%");
         _options.SetValue("legend.bottom", "1%");
+        _options.SetValue("legend.itemWidth", 8);
+        _options.SetValue("legend.itemHeight", 8);
         _options.SetValue("series[0].data", new object[] {GetModel(true,values[0]),
             GetModel(false,values[1]) });
     }
 
-    private static object GetModel(bool isSuccess, double value)
+    private object GetModel(bool isSuccess, double value)
     {
-        return new { name = isSuccess ? "Success" : "Fail", value = value };
+        return new { name = isSuccess ? I18n.Team("Success") : I18n.Team("Fail"), value = value };
     }
 }

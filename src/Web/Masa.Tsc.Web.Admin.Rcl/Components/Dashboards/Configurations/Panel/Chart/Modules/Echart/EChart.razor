@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<AutoResize Class="@Class" Delay="10" OnResize="ResizeAsync">
+<div class="@Class full-height">
     <MCard Class="d-flex flex-column rounded-lg full-height">
         <PanelTooltip Title="@Value.Title" Description="@Value.Description" />
         <MCardText Class="flex-grow-1">
@@ -18,7 +18,7 @@
 
         </MCardText>
     </MCard>
-</AutoResize>
+</div>
 
 @code {
     [Parameter]
