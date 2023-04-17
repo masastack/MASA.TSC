@@ -48,7 +48,15 @@ public class TeamDetailConfigurationRecord : ConfigurationRecord
 
     public override void Clear()
     {
-        base.Clear();
+        ClearPanels();
+        ModelType = default;
+        Layer = default;
+        Service = default;
+        Instance = default;
+        Endpoint = default;
+        PanelId = default;
+        IsEdit = false;
+        DefaultQuickRangeKey = QuickRangeKey.Last15Minutes;
         ModelType = ModelTypes.All;
     }
 }

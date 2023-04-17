@@ -21,7 +21,7 @@ public partial class ConfigurationTeamDetail
 
     protected override void OnInitialized()
     {
-        ConfigurationRecord.Clear();
+        ConfigurationRecord.ModelType = ModelTypes.All;
         ConfigurationRecord.Service = ServiceName;
         ConfigurationRecord.ProjectId = ProjectId;
         ConfigurationRecord.TeamId = Guid.Parse(TeamId);

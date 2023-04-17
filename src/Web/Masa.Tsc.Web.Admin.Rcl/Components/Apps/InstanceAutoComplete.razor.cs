@@ -44,7 +44,7 @@ public partial class InstanceAutoComplete
                 {
                     await ValueChanged.InvokeAsync(Instances.First());
                 }
-                else await ValueChanged.InvokeAsync(default);
+                //else await ValueChanged.InvokeAsync(default);
             }
             _isLoading = false;
         }

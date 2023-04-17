@@ -439,6 +439,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         IsLoadChartData = false;
 
         var data = GetMatrixRangeData();
+        EChartType.SetValue("grid.y", data.Any(item => string.IsNullOrEmpty(item.Key.Name) is false) ? 40 : 10);
         if (ChartType is ChartTypes.Line or ChartTypes.Bar)
         {
             EChartType.Json["series"] = new JsonArray(data.Select(item => new JsonObject
@@ -528,7 +529,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                         }
                         else
                         {
-                            metricName = metrics[index].DisplayName ?? string.Join("-", matrix.Metric!.Values);
+                            metricName = string.IsNullOrEmpty(metrics[index].DisplayName) ? string.Join("-", matrix.Metric!.Values) : metrics[index].DisplayName;
                         }
                         var color = metrics[index].Color;
                         if (ChartType is ChartTypes.Pie or ChartTypes.Gauge)
@@ -542,7 +543,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                                     defaultColorIndex = 0;
                                 }
                             }
-                        }
+                        }                       
                         data.Add(new(new()
                         {
                             Name = metricName,
@@ -730,7 +731,6 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
             x = 30,
             x2 = 10,
             y2 = 20,
-            y = Metrics.Any(metric => string.IsNullOrEmpty(metric.DisplayName) is false) ? 40 : 10
         }); ;
     }
 
