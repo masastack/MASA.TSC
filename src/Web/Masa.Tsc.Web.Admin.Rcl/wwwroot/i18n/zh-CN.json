@@ -180,7 +180,7 @@
   },
   "Trace": {
     "Trace": "链路",
-    "TraceId": "追踪Id",
+    "TraceID": "追踪ID",
     "Duration": "耗时",
     "Timestamp": "时间",
     "Span Count": "跨度",

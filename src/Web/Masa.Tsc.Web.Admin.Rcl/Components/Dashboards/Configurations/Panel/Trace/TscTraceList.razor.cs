@@ -46,7 +46,7 @@ public partial class TscTraceList : TscComponentBase
     private List<DataTableHeader<TraceResponseDto>> _headers => new()
     {
         new() { Text = I18n.T("Service"), Value = "Service", Sortable = false,Width=250},
-        new() { Text = I18n.Trace("TraceId"), Value = "TraceId", Sortable = false },
+        new() { Text = I18n.Trace("TraceID"), Value = "TraceId", Sortable = false },
         new() { Text = I18n.T("Endpoint"), Value = "Endpoint", Sortable = false},
         new() { Text = $"{ I18n.Trace("Duration")}", Value = "Duration", Sortable = false,Width=150},
         new() { Text = I18n.Trace("Timestamp"), Value = "Timestamp", Sortable = true,Width=200}
