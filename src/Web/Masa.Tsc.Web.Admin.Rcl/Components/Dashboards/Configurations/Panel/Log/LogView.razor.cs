@@ -58,7 +58,7 @@ public partial class LogView
         }
     }
 
-    string MarginRightClass => Small ? "mr-1" : "mr-6";
+    string MarginRightClass =>"";
 
-    string MarginLeftClass => Small ? "" : "ml-4";
+    string MarginLeftClass => "";
 }
