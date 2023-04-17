@@ -171,7 +171,7 @@
                         <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Trace("Attribute")}({_activeTreeItem.Attributes.Count})")</MTab>
                             <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Trace("Resource")}({_activeTreeItem.Resource.Count})")</MTab>
                             <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Trace("Detail")}({detail.Count})")</MTab>
-                            <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Log("Log")}({_logCount})")</MTab>
+                            <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Log("Log")}")</MTab>
                         </MTabs>
                         <MTabsItems @bind-Value="_tabValue">
                             <MTabItem Class="px-6">
@@ -254,7 +254,10 @@
                 <MListItemAction Style="max-width: 38%">
                     <MListItemActionText Class="text-truncate text-right masa body-2"
                              Style="width: 100%; cursor: auto;">
-                        <TooltipCopy Value="@value" IconStyle="opacity:0; width: 18px; height: 0px; margin-left: -24px; transition: 0.4s;" IconHoverStyle="width: 18px; height: 18px; margin-right: 12px; transition: 0.5s;"></TooltipCopy>                       
+                        <TooltipCopy Value="@value"
+                         IconStyle="opacity:0; width: 18px; height: 0px; margin-left: -24px; transition: 0.4s;"
+                         IconHoverStyle="width: 18px; height: 18px; margin-right: 12px; transition: 0.5s;"
+                         TooltipContentStyle="max-width:400px"></TooltipCopy>
                     </MListItemActionText>
                 </MListItemAction>
             </MListItem>

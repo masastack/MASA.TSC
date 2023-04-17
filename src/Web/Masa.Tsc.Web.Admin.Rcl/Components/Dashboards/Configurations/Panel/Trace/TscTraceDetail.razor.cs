@@ -13,7 +13,6 @@ public partial class TscTraceDetail
     private TraceResponseTree? _activeTreeItem;
     private TraceResponseTree? _rootTreeItem;
     private int _count;
-    private int _logCount;
     private List<List<TraceResponseTimeline>> _timelinesView = new();
     private List<LogModel> _logs = new();
     private bool _loadLogs = false;
@@ -27,7 +26,6 @@ public partial class TscTraceDetail
         StateHasChanged();
 
         await QueryTraceDetailAndToTree(traceId);
-        await LoadSpanLogsAsync(_treeData.FirstOrDefault()?.SpanId, true);
         StateHasChanged();
     }
 
@@ -123,10 +121,6 @@ public partial class TscTraceDetail
         if (_tabValue.AsT1 == 3)
         {
             await LoadSpanLogsAsync(items.FirstOrDefault()?.SpanId);
-        }
-        else
-        {
-            await LoadSpanLogsAsync(items.FirstOrDefault()?.SpanId, true);
         }
 
         if (items.Count == 0)
@@ -224,21 +218,20 @@ public partial class TscTraceDetail
         return nodes;
     }
 
-    private async Task LoadSpanLogsAsync(string? spanId, bool isTotal = false)
+    private async Task LoadSpanLogsAsync(string? spanId)
     {
         if (_loadLogs || lastQuerySpanId == spanId)
             return;
         _loadLogs = true;
         if (string.IsNullOrEmpty(spanId))
         {
-            if (!isTotal)
-                _logs.Clear();
-            _logCount = 0;
+
+            _logs.Clear();
             _loadLogs = false;
             return;
         }
 
-        int pageSize = isTotal ? 0 : 9999;
+        int pageSize = 9999;
         Loading = true;
         var query = new LogPageQueryDto
         {
@@ -247,13 +240,9 @@ public partial class TscTraceDetail
             SpanId = spanId
         };
         var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
-        if (!isTotal)
-        {
-            lastQuerySpanId = spanId;
-            _logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
-        }
 
-        _logCount = (int)response.Total;
+        lastQuerySpanId = spanId;
+        _logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
         Loading = false;
         _loadLogs = false;
     }
@@ -276,21 +265,5 @@ public partial class TscTraceDetail
         }
 
         return $"{(ms / 60000d):F}m";
-    }
-
-    private bool _copyClicked = false;
-    private readonly string _checkSvg = "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z";
-    private readonly string _copySvg =
-        "M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z";
-
-    private async Task Copy(string value)
-    {
-        _copyClicked = true;
-
-        await Js.InvokeVoidAsync(JsInteropConstants.Copy, value);
-
-        await Task.Delay(500);
-
-        _copyClicked = false;
     }
 }
