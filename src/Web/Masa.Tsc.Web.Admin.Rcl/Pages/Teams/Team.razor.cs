@@ -6,6 +6,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Teams;
 public partial class Team
 {
     private List<ProjectOverviewDto> _projects = new();
+    private List<ProjectOverviewDto> _projectViewDatas;
     private AppMonitorDto _appMonitorDto = new();
     private MonitorStatuses _projectStatus;
     private bool _isLoading;
@@ -21,6 +22,16 @@ public partial class Team
 
     [Inject]
     public GlobalConfig GlobalConfig { get; set; } = default!;
+
+    public MonitorStatuses ProjectStatus
+    {
+        get => _projectStatus;
+        set
+        {
+            _projectStatus = value;
+            GetProjectViewData();
+        }
+    }
 
     protected override void OnInitialized()
     {
@@ -53,6 +64,7 @@ public partial class Team
         });
         _appMonitorDto = data?.Monitor ?? new();
         _projects = data?.Projects ?? new();
+        GetProjectViewData();
         _isLoading = false;
     }
 
@@ -81,6 +93,8 @@ public partial class Team
         {
             result = result.Where(item => item.Name.Contains(_search, StringComparison.OrdinalIgnoreCase) || item.Apps.Any(app => app.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)));
         }
+
+        _projectViewDatas = result.ToList();
 
         return result;
     }
@@ -153,9 +167,8 @@ public partial class Team
         await UpdateCardDataAsync();
     }
 
-    async Task OnSearchChangedAsync(string search)
+    async Task OnSearchChangedAsync()
     {
-        _search = search;
         await GetProjectsAsync();
     }
 

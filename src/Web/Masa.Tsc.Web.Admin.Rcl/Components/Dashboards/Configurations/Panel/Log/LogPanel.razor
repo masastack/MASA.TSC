@@ -16,7 +16,7 @@
     </HeaderContent>
     <AutoHeightContent>
         <div class="d-flex px-6 py-2 my-1" style="background: #FFFFFF;">
-            <SearchTextField FullWidth @bind-Value="@Search" Small Clearable Class="my-auto mr-1" style="max-width:100%;" />
+            <SSearch @bind-Value="@Search" OnEnter=OnSearch Class="my-auto mr-1" MaxWidth="0" />
             <a href="https://docs.masastack.com/stack/tsc/introduce" target="_blank" style="text-decoration:none" class="pt-2 mr-4">
                 <SIcon Tooltip="@I18n.Log("Clike me view log advanced usage")">
                     mdi-help-circle-outline

@@ -8,7 +8,7 @@
         <ProjectTabs Value="@_projectType" ValueChanged="ProjectTypeChangedAsync" />
     </div>
     <div class="mx-6">
-        <SearchTextField Value="@_search" ValueChanged="OnSearchChangedAsync" Style="width:220px;border-radius: 10px !important;" FillBackground=false Clearable />
+        <SSearch @bind-Value="@_search" OnEnter="OnSearchChangedAsync" Style="width:220px !important;" BackgroundColor="white" />
     </div>
     <DateTimeRangeToolbar OnUpdate="OnDateTimeUpdateAsync"
                           OnAutoUpdate="OnAutoDateTimeUpdateAsync"
@@ -25,7 +25,6 @@
         }
         else
         {
-            var _viewProjects = GetProjectViewData();
             if (_projects == null || !_projects.Any())
             {
                 <SEmptyPlaceholder />
@@ -33,7 +32,7 @@
             else
             {
                 <MCol Style="min-width:220px" class="d-flex justify-center align-start">
-                    <HoneyCombGridItem Data="_viewProjects" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor" TItem="ProjectOverviewDto">
+                    <HoneyCombGridItem Data="_projectViewDatas" CellBackStyle="CellBackBackgroundStyle" CellBorderColor="CellBorderColor" TItem="ProjectOverviewDto">
                         <CellBack>
                             <div class="d-flex flex-column align-center pt-7">
                                 <span class="d-inline-block text-truncate masa h8 my-1 @GetHexTitleClass(context.Status)" style="width:120px;margin:6px 0;">@context.Name</span>
@@ -92,7 +91,7 @@
                     </HoneyCombGridItem>
                 </MCol>
                 <MCol Style="max-width:266px">
-                    <MonitorCard Class="ml-8" Data=_appMonitorDto @bind-Value="@_projectStatus" />
+                    <MonitorCard Class="ml-8" Data=_appMonitorDto @bind-Value="@ProjectStatus" />
                 </MCol>
             }
         }

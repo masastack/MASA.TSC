@@ -85,5 +85,5 @@
 
     <MSpacer></MSpacer>
 
-    <SearchTextField Class="rounded-lg" Style="width:368px" Placeholder="TraceId" Value="@_keyword" ValueChanged="KeywordChanged" FillBackground=false Clearable />
+    <SSearch BackgroundColor="white" @bind-Value="@_keyword" OnEnter="OnEnterSearch" MaxWidth="0" Style="flex:none;width:368px !important;" Placeholder="TraceId" />
 </div>
