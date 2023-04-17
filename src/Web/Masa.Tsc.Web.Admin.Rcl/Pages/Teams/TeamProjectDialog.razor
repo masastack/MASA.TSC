@@ -38,7 +38,7 @@
                         </MCol>
                         @if (ErrorCount > 0)
                         {
-                            <MCol Class="py-0">
+                            <MCol Class="py-0 mb-3">
                                 <div class="rounded-lg d-flex justify-space-between py-3" style="background-color:#FF5252">
                                     <div class="d-flex align-center white--text"><SIcon Class="px-4" Color="white text-#FF5252">info</SIcon> @string.Format(I18n.Team("Currently the application has {0} error logs"),ErrorCount.ToString())</div>
                                     <SButton Depressed Color="white--text" Style="background-color:#FF5252;text-decoration:underline" OnClick="OpenLogAsync">@I18n.T("Show Detail")</SButton>
@@ -46,7 +46,7 @@
                             </MCol>
                         }
                     </MRow>
-                    <MRow Class="overflow-y mx-0" Style="@(ErrorCount > 0?"max-height: calc(100% - 100px);":"max-height: calc(100%);height: 100%;")">
+                    <MRow Class="overflow-y mx-0" Style="@(ErrorCount > 0?"max-height: calc(100% - 112px);":"height: 100%;")">
                         <ProjectCharts Class="mt-0" ConfigurationRecord="ConfigurationRecord" />
                     </MRow>
                 </MCol>
