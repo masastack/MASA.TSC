@@ -20,7 +20,7 @@
                     @I18n.Dashboard( ExpandAll ? "Close all" : "Expend all")
                 </SButton>
             }
-            <SSearch @bind-Value="Search" Style="flex:none;width:300px !important;" BackgroundColor="white" />
+            <SSearch @bind-Value="Search" OnEnter=OnSearchAsync Style="flex:none;width:300px !important;" BackgroundColor="white" />
             <MSpacer />
             <SButton OnClick="OpenAddFolderDialog" Small Class="mr-6 my-auto" Style="min-width:108px !important;">@I18n.Dashboard("Add folder")</SButton>
             <SButton OnClick="OpenAddDashboardDialog" Small Class="my-auto" Style="min-width:140px !important;">@I18n.Dashboard("Add dashboard")</SButton>

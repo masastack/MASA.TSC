@@ -18,12 +18,6 @@ public partial class Dashboard
         set
         {
             _search = value;
-            _page = 1;
-            var isNeedExpand = !string.IsNullOrEmpty(value);
-            if (isNeedExpand | ExpandAll)
-                ExpandAll = isNeedExpand;
-
-            GetFoldersAsync().ContinueWith(_ => InvokeAsync(StateHasChanged));
         }
     }
 
@@ -94,7 +88,7 @@ public partial class Dashboard
         var folders = result.Result ?? new();
         folders.ForEach(folder =>
         {
-            folder.IsActive = Folders.FirstOrDefault(item => item.Id == folder.Id)?.IsActive ?? false;
+            folder.IsActive = ExpandAll || (Folders.FirstOrDefault(item => item.Id == folder.Id)?.IsActive ?? false);
         });
         Folders = folders;
         Total = result.Total;
@@ -177,5 +171,13 @@ public partial class Dashboard
     void NavigateToConfiguration(DashboardDto dashboard)
     {
         NavigationManager.NavigateToDashboardConfiguration(dashboard.Id.ToString(), default!);
+    }
+
+    async Task OnSearchAsync()
+    {
+        _page = 1;
+         ExpandAll = true;
+
+        await GetFoldersAsync();
     }
 }

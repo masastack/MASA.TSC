@@ -15,8 +15,6 @@ public partial class LogPanel
         set
         {
             _search = value;
-            TaskId = default!;
-            Page = 1;
         }
     }
 
@@ -272,5 +270,11 @@ public partial class LogPanel
                 bottom = 50
             }
         };
+    }
+
+    void OnSearch()
+    {
+        TaskId = default!;
+        Page = 1;
     }
 }
