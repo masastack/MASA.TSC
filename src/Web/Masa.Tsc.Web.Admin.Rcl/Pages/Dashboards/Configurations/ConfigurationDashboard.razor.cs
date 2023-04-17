@@ -29,6 +29,7 @@ public partial class ConfigurationDashboard
 
         ConfigurationRecord.DashboardId = DashboardId;
         ConfigurationRecord.Service = ServiceName;
+        if (InstanceName == "all") InstanceName = null;
         ConfigurationRecord.Instance = InstanceName;
         ConfigurationRecord.Endpoint = EndpointName;
     }
