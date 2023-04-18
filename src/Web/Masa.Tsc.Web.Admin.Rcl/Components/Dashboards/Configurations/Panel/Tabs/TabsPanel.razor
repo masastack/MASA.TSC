@@ -7,7 +7,7 @@
             <MTab @key="tabItem.Id" Value="tabItem.Id.ToString()">
                 @if (IsEdit && Panel.CurrentTabItem == tabItem)
                 {
-                    <MTextField Dense HideDetails="@("auto")" Autofocus Style="width:60px;" @bind-Value="@tabItem.Title" />
+                    <MTextField Dense HideDetails="@("auto")" Autofocus Style="width:60px;" Value="tabItem.Title" ValueChanged="(string val)=>TitleValueChanged(tabItem,val)" />
                 }
                 else
                 {
