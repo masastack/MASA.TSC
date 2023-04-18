@@ -124,7 +124,7 @@ var app = builder.Services
                 .UseEventLog<TscDbContext>()
                 .UseEventBus();
             })
-            .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(AppSettings.Get("DBName"))).UseFilter())
+            .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackConstant.TSC)).UseFilter())
             .UseRepository<TscDbContext>();
     })
     .AddTopologyRepository()
