@@ -17,7 +17,7 @@ public sealed class ElasticSearchConst
 
     public const string URL = "Attributes.http.target";
 
-    public const string LogIndex = "qyz-logs-test";
+    public const string LogIndex = "masa-stack-logs-0.6.1";
 
-    public const string TraceIndex = "qyz-traces-test";
+    public const string TraceIndex = "masa-stack-traces-0.6.1";
 }

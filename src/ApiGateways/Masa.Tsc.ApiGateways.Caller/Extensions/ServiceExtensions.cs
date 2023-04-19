@@ -7,7 +7,7 @@ public static class ServiceExtensions
 {
     internal const string DEFAULT_CLIENT_NAME = "masa.tsc.apigateways.caller";
 
-    public static IServiceCollection AddTscApiCaller(this IServiceCollection services, string tscApiUrl)
+    public static IServiceCollection AddTscApiCaller(this IServiceCollection services)
     {
         try
         {
@@ -18,18 +18,11 @@ public static class ServiceExtensions
         catch
         {
             IServiceProvider serviceProviderCopy = services.BuildServiceProvider();
+            IMasaStackConfig masaStackConfig = serviceProviderCopy.GetRequiredService<IMasaStackConfig>();
             services.AddCaller(DEFAULT_CLIENT_NAME, builder =>
             {
-                builder.UseHttpClient(options =>
-                 {
-                     options.BaseAddress = tscApiUrl;
-                     options.Configure = (http) =>
-                     {
-                         var token = serviceProviderCopy.GetRequiredService<TokenProvider>();
-                         if (token != null && !string.IsNullOrEmpty(token.AccessToken))
-                             http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
-                     };
-                 });
+                builder.UseDapr(options => options.AppId = masaStackConfig.GetServerId(MasaStackConstant.TSC),
+                    builder => builder.UseDaprApiToken(serviceProviderCopy.GetRequiredService<TokenProvider>()?.AccessToken));
             });
 
             services.AddScoped(serviceProvider =>

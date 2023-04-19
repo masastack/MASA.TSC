@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 await builder.Services.AddMasaStackConfigAsync();
 var masaStackConfig = builder.Services.GetMasaStackConfig();
 
-var elasearchUrls = new string[] { "http://es-dev.lonsid.cn:9200" };    //masaStackConfig.ElasticModel.Nodes?.ToArray() ?? Array.Empty<string>();
+var elasearchUrls = masaStackConfig.ElasticModel.Nodes?.ToArray() ?? Array.Empty<string>();
 var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus");
 
 builder.Services.AddElasticClientLogAndTrace(elasearchUrls, ElasticSearchConst.LogIndex, ElasticSearchConst.TraceIndex)
@@ -46,6 +46,7 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddDaprStarter(opt =>
     {
+        opt.AppId = masaStackConfig.GetServerId(MasaStackConstant.TSC);
         opt.DaprHttpPort = 3600;
         opt.DaprGrpcPort = 3601;
     });
