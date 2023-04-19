@@ -220,6 +220,8 @@ public class QueryHandler
             {
                 if ((!query.Result.Contains(MetricConstants.DEFAULT_LAYER)))
                     query.Result.Add(MetricConstants.DEFAULT_LAYER);
+                if ((!query.Result.Contains(MetricConstants.DAPR_LAYER)))
+                    query.Result.Add(MetricConstants.DAPR_LAYER);
                 query.Result.Sort();
             }
         }
@@ -290,7 +292,7 @@ public class QueryHandler
                 {
                     _logger.LogError("GetAllMetricsAsync", ex);
                     max--;
-                    Task.WaitAll(Task.Delay(20));
+                    Task.Delay(20).ConfigureAwait(false).GetAwaiter().GetResult();
                 }
             } while (max > 0);
         }
@@ -313,7 +315,7 @@ public class QueryHandler
         if (metrics == null || !metrics.Any())
             return str;
         metrics = metrics.Where(s => str.Contains(s, StringComparison.OrdinalIgnoreCase)).ToList();
-        if(!metrics.Any())
+        if (!metrics.Any())
             return str;
 
         StringBuilder text = new();
@@ -323,7 +325,7 @@ public class QueryHandler
             text.Append($"service_instance_id=\"{instance}\",");
         if (!string.IsNullOrEmpty(endpoint))
             text.Append($"endpoint=\"{endpoint}\",");
-        if (!string.IsNullOrEmpty(layer))
+        if (!string.IsNullOrEmpty(layer) && !string.Equals(MetricConstants.DAPR_LAYER, layer, StringComparison.InvariantCultureIgnoreCase))
             text.Append($"service_layer=\"{layer}\",");
         if (text.Length == 0)
             return str;
@@ -343,7 +345,7 @@ public class QueryHandler
         if (string.IsNullOrEmpty(str) || string.IsNullOrEmpty(replace))
             return false;
         int start = 0, itemLenth = metric.Length;
-        List<int> positions = new List<int>();
+        List<int> positions = new();
         var not = new Regex("[_a-zA-Z0-9]");
         do
         {

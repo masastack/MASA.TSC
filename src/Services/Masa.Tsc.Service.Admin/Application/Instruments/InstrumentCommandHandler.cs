@@ -93,7 +93,7 @@ public class InstrumentCommandHandler
 
     private async Task ValidateAsync(Guid parentId, string name, Guid id)
     {
-        var instrument = await _instrumentRepository.FindAsync(e => e.DirectoryId == parentId && e.Name == name && (id == Guid.Empty || e.Id == id));
+        var instrument = await _instrumentRepository.FindAsync(e => e.DirectoryId == parentId && e.Name == name && (id == Guid.Empty || e.Id != id));
         if (instrument != null)
         {
             throw new UserFriendlyException($"instrument {name} is exists");
