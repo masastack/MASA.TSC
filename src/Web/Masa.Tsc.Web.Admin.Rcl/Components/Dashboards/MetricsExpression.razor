@@ -2,7 +2,7 @@
 
 <div class="d-flex textfield-autocomplete @Class" style="align-items:center;@(Style)">
     <div class="d-flex" style="@(_autocomplete ? "width: 100%":"width:calc(100% - 35px);")">
-        <div style="@(_autocomplete ? "width:100%;":"width:0;")transition-property: width;transition-duration: 0.2s;transition-timing-function:ease;">
+        <div style="@(_autocomplete ? "opacity:1;":"opacity:0;display:none;")transition-property: opacity;transition-duration: 0.2s;transition-timing-function:ease;width: 100%;">
             <SAutoComplete Value="Value"
                            ValueChanged="ValueChanged"
                            ValueExpression="ValueExpression"
@@ -14,7 +14,7 @@
                            ItemText="e => e.Key"
                            ItemValue="e => e.Value" />
         </div>
-        <div style="@(_autocomplete ? "width:0;":"width: 100%;")transition-property: width;transition-duration: 0.2s;transition-timing-function:ease;">
+        <div style="@(_autocomplete ? "opacity:0;display:none;":"opacity:1;")transition-property: opacity;transition-duration: 0.2s;transition-timing-function:ease;width: 100%;">
             <STextField Value="Value"
                         ValueChanged="ValueChanged"
                         ValueExpression="ValueExpression"
@@ -32,21 +32,21 @@
             <div @onclick="SwitchMode" class="d-flex hover-pointer" style="background-color:white;height:46.5px;min-width:46.5px;z-index:1;margin-left:0;margin-top:1px;">
                 <KeyTransitionElement Value="_autocomplete.ToString()" Class="ma-auto">
                     <SIcon>@(_autocomplete ? IconConstants.Update : "mdi-arrow-left")</SIcon>
-                </KeyTransitionElement>
-            </div>
-        </FadeTransition>
-        
-    </div>
-    <div style="@(_autocomplete ? "display:none;":"width:20px; padding-left:10px;")">
+                    </KeyTransitionElement>
+                </div>
+            </FadeTransition>
+
+        </div>
+        <div style="@(_autocomplete ? "display:none;":"width:20px; padding-left:10px;")">
             <a href="https://docs.masastack.com/stack/tsc/use-guide/metric" target="_blank" style="text-decoration:none">
                 <SIcon Tooltip="@I18n.Dashboard("Clike me view metrics expression docs")">
-                mdi-help-circle-outline
-            </SIcon>
-        </a>
+                    mdi-help-circle-outline
+                </SIcon>
+            </a>
+        </div>
     </div>
-</div>
 
-@code {
+    @code {
     bool _autocomplete = true;
 
     [Parameter]
@@ -60,13 +60,13 @@
 
     [Parameter]
     public Dictionary<string, string> Metrics { get; set; } = new()
-    {
-        ["p99"] = "histogram_quantile(0.99,sum(increase(http_server_duration_bucket[5m])) by (le))",
-        ["p95"] = "histogram_quantile(0.95,sum(increase(http_server_duration_bucket[5m])) by (le))",
-        ["p90"] = "histogram_quantile(0.90,sum(increase(http_server_duration_bucket[5m])) by (le))",
-        ["p75"] = "histogram_quantile(0.75,sum(increase(http_server_duration_bucket[5m])) by (le))",
-        ["p50"] = "histogram_quantile(0.50,sum(increase(http_server_duration_bucket[5m])) by (le))",
-    };
+        {
+            ["p99"] = "histogram_quantile(0.99,sum(increase(http_server_duration_bucket[5m])) by (le))",
+            ["p95"] = "histogram_quantile(0.95,sum(increase(http_server_duration_bucket[5m])) by (le))",
+            ["p90"] = "histogram_quantile(0.90,sum(increase(http_server_duration_bucket[5m])) by (le))",
+            ["p75"] = "histogram_quantile(0.75,sum(increase(http_server_duration_bucket[5m])) by (le))",
+            ["p50"] = "histogram_quantile(0.50,sum(increase(http_server_duration_bucket[5m])) by (le))",
+        };
 
     protected override void OnInitialized()
     {
