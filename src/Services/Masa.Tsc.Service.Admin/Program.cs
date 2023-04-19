@@ -46,6 +46,7 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddDaprStarter(opt =>
     {
+        opt.AppId = masaStackConfig.GetServerId(MasaStackConstant.TSC);
         opt.DaprHttpPort = 3600;
         opt.DaprGrpcPort = 3601;
     });
@@ -124,7 +125,7 @@ var app = builder.Services
                 .UseEventLog<TscDbContext>()
                 .UseEventBus();
             })
-            .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(AppSettings.Get("DBName"))).UseFilter())
+            .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackConstant.TSC)).UseFilter())
             .UseRepository<TscDbContext>();
     })
     .AddTopologyRepository()

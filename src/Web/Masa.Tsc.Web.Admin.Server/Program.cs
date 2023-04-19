@@ -5,7 +5,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 await builder.Services.AddMasaStackConfigAsync();
 var masaStackConfig = builder.Services.GetMasaStackConfig();
-var tscUrl = builder.Environment.IsDevelopment() ? AppSettings.Get("ServiceAddress") : masaStackConfig.GetTscServiceDomain();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -63,10 +62,23 @@ var redisOption = new RedisConfigurationOptions
     Password = masaStackConfig.RedisModel.RedisPassword
 };
 builder.AddMasaStackComponentsForServer();
-builder.Services.AddTscApiCaller(tscUrl).AddDccClient(redisOption);
+builder.Services.AddTscApiCaller().AddDccClient(redisOption);
 builder.Services.AddRcl().AddScoped<TokenProvider>();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDaprStarter(opt =>
+    {
+        opt.AppId = masaStackConfig.GetWebId(MasaStackConstant.TSC);
+        opt.DaprHttpPort = 3602;
+        opt.DaprGrpcPort = 3603;
+    });
+}
+builder.Services.AddDaprClient();
+
+builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
