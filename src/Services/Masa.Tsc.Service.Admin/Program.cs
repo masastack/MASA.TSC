@@ -64,6 +64,10 @@ builder.Services.AddAuthorization()
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters.ValidateAudience = false;
         options.MapInboundClaims = false;
+        options.BackchannelHttpHandler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+        };
     });
 builder.Services.AddMasaIdentity(options =>
 {
