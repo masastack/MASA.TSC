@@ -7,7 +7,7 @@ public static class ServiceExtensions
 {
     internal const string DEFAULT_CLIENT_NAME = "masa.tsc.apigateways.caller";
 
-    public static IServiceCollection AddTscApiCaller(this IServiceCollection services)
+    public static IServiceCollection AddTscApiCaller(this IServiceCollection services, string appid)
     {
         try
         {
@@ -18,10 +18,9 @@ public static class ServiceExtensions
         catch
         {
             IServiceProvider serviceProviderCopy = services.BuildServiceProvider();
-            IMasaStackConfig masaStackConfig = serviceProviderCopy.GetRequiredService<IMasaStackConfig>();
             services.AddCaller(DEFAULT_CLIENT_NAME, builder =>
             {
-                builder.UseDapr(options => options.AppId = masaStackConfig.GetServerId(MasaStackConstant.TSC),
+                builder.UseDapr(options => options.AppId = appid,
                     builder => builder.UseDaprApiToken(serviceProviderCopy.GetRequiredService<TokenProvider>()?.AccessToken));
             });
 
