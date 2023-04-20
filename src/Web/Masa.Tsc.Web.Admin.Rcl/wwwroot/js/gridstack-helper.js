@@ -4,14 +4,14 @@ export function init(options, dotNetHelper) {
     if (topEl.loadComplete) {
         if (!el.gridstack) {
             initByElement(options, el, dotNetHelper);
-            el.gridstack.cellHeight(el.gridstack.cellWidth() * 1);
+            el.gridstack.cellHeight(el.gridstack.cellWidth() * 0.85);
             return el.gridstack;
         }
     }
     var timer = setInterval(function () {
         if (topEl.loadComplete) {
             clearInterval(timer);
-            el.gridstack.cellHeight(el.gridstack.cellWidth() * 1.2);
+            el.gridstack.cellHeight(el.gridstack.cellWidth() * 1.05);
             el.gridstack.on('change', function (e, items) {
                 dotNetHelper.invokeMethodAsync('OnChange', items.map(item => {
                     return {
@@ -30,6 +30,7 @@ export function init(options, dotNetHelper) {
 
 export function initAll(options, dotNetHelper) {
     var grids = GridStack.initAll(options);
+    grids[0].cellHeight(grids[0].cellWidth() * 0.965);
     grids[0].on('change', function (e, items) {
         dotNetHelper.invokeMethodAsync('OnChange', items.map(item => {
             return {

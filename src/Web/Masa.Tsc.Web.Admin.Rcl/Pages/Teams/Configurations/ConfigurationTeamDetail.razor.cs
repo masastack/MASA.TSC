@@ -6,6 +6,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Teams.Configurations;
 public partial class ConfigurationTeamDetail
 {
     ServiceAutoComplete _serviceAutoComplete;
+    string? _serviceName;
 
     [Inject]
     public TeamDetailConfigurationRecord ConfigurationRecord { get; set; }
@@ -35,6 +36,11 @@ public partial class ConfigurationTeamDetail
     async Task<List<UpsertPanelDto>> GetPanelsAsync()
     {
         return await ApiCaller.InstrumentService.GetTeamInstraumentDetailAsync();
+    }
+
+    void ServicesDataReady()
+    {
+        _serviceName = _serviceAutoComplete?.CurrentApp()?.Name ?? ConfigurationRecord.Service;
     }
 
     void NavigateToTeamProjectDialog()

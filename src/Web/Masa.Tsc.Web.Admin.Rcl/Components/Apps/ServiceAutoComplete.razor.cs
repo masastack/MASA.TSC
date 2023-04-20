@@ -34,9 +34,7 @@ public partial class ServiceAutoComplete
     public bool Readonly { get; set; }
 
     [Parameter]
-    public string? Label { get; set; }
-
-    public AppDetailModel? CurrentApp => Services?.FirstOrDefault(app => app.Identity == Value);
+    public string? Label { get; set; }   
 
     protected override async Task OnInitializedAsync()
     {
@@ -113,4 +111,6 @@ public partial class ServiceAutoComplete
             Value = null;
         }
     }
+
+    public AppDetailModel? CurrentApp(string? service = null) => Services?.FirstOrDefault(app => app.Identity == (service ?? Value));
 }
