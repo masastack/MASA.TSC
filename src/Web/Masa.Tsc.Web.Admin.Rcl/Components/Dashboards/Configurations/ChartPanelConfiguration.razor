@@ -23,7 +23,7 @@
             <MCol Cols="8">
                 <MRow>
                     <MCol Cols="12">
-                        <MCard Style="height:410px;overflow:auto;">
+                        <MCard Style="height:410px;" Class="overflow-y">
                             <CascadingValue Value="ConfigurationRecord" IsFixed>
                                 <ChartPanel @ref="_chartPanel" Value="Value" />
                             </CascadingValue>
@@ -152,7 +152,7 @@
                                 <WidgetType @bind-Value="@Value.ChartType" />
                             </MExpansionPanelContent>
                         </MExpansionPanel>
-                        <div style="@($"max-height:{(_trash.Contains(1)?290:715)}px;overflow:auto;display: flex;flex-wrap: wrap;width: 100%;")">
+                        <div style="@($"max-height:{(_trash.Contains(1)?290:715)}px;display: flex;flex-wrap: wrap;width: 100%;")" class="overflow-y">
                             @if (Value.ChartType is ChartTypes.Table)
                             {
                                 @if (Value.ListType is ListTypes.TopList)

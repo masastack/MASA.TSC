@@ -12,7 +12,7 @@
                 <PanelTool Value="context" ConfigurationChartPanel="ConfigurationChartPanel" RemovePanel="RemovePanel" />
             </div>
         }
-        <div style="@($"height:calc(100% - {actionHeight}px);overflow-y: auto;")">
+        <div style="@($"height:calc(100% - {actionHeight}px);")" class="overflow-y">
             @switch (context.PanelType)
             {
                 case PanelTypes.Tabs:

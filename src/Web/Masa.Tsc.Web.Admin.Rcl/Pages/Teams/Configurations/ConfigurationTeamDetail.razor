@@ -19,8 +19,8 @@
             </div>
         </div>
         <div class="ml-4 h6 emphasis2--text my-auto">
-            @(ConfigurationRecord.ServiceName ?? _serviceAutoComplete?.CurrentApp?.Name)           
+            @(_serviceName)
         </div>
-        <ServiceAutoComplete @ref=_serviceAutoComplete DataReady=" () => {}" Value="@ConfigurationRecord.Service" Style="visibility:hidden;" />
+        <ServiceAutoComplete @ref=_serviceAutoComplete Value="@ConfigurationRecord.Service" DataReady="ServicesDataReady" Style="visibility:hidden;" />
     </HeaderContent>
 </DashboardConfiguration>

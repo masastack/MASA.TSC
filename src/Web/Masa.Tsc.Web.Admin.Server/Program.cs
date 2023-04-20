@@ -65,7 +65,12 @@ builder.AddMasaStackComponentsForServer();
 var appid = builder.Configuration.GetValue<string>(DaprConst.APPID);
 if (string.IsNullOrEmpty(appid))
     appid = masaStackConfig.GetServerId(MasaStackConstant.TSC);
-builder.Services.AddTscApiCaller(appid).AddDccClient(redisOption);
+#if DEBUG
+    builder.Services.AddDebugerTscApiCaller("https://tsc-service-develop.masastack.com").AddDccClient(redisOption);
+#else
+    builder.Services.AddTscApiCaller(appid).AddDccClient(redisOption);
+#endif
+
 builder.Services.AddRcl().AddScoped<TokenProvider>();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);

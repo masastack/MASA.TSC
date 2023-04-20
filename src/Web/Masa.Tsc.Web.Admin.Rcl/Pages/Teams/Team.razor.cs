@@ -106,7 +106,6 @@ public partial class Team
         ConfigurationRecord.TeamProjectCount = _projects.Count(p => p.TeamId == item.TeamId);
         ConfigurationRecord.TeamServiceCount = _projects.Where(p => p.TeamId == item.TeamId).Sum(p => p.Apps.Count);
         ConfigurationRecord.Service = app.Identity;
-        ConfigurationRecord.ServiceName = app.Name;
         ConfigurationRecord.TeamProjectDialogVisible = true;
     }
 
