@@ -1,9 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Google.Protobuf.WellKnownTypes;
-using static Nest.JoinField;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceDetail
