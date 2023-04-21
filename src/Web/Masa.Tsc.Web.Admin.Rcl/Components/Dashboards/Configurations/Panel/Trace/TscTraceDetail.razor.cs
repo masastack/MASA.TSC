@@ -213,9 +213,7 @@ public partial class TscTraceDetail
             {
                 var marginLeft = internalParentLeft / root.DoubleDuration;
 
-                var durationPercent = Math.Round(node.DoubleDuration / root.DoubleDuration, 4, MidpointRounding.ToPositiveInfinity);
-                //if (durationPercent - 1 > 0)
-                //    durationPercent = 0;
+                var durationPercent = Math.Round(node.DoubleDuration / root.DoubleDuration, 4, MidpointRounding.ToPositiveInfinity);               
                 node.Timelines.Add(new TraceResponseTimeline(true, durationPercent, marginLeft));
             }
             else
