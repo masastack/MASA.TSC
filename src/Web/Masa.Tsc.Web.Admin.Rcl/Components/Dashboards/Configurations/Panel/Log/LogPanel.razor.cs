@@ -131,7 +131,6 @@ public partial class LogPanel
             start = DateTime.MinValue;
         }
         Loading = true;
-        await InvokeStateHasChangedAsync();
         var query = new LogPageQueryDto
         {
             PageSize = _pageSize,
