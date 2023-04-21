@@ -92,7 +92,6 @@ public partial class TscTrace
     private async Task PageSearchAsync()
     {
         _loading = true;
-        await InvokeStateHasChangedAsync();
         RequestTraceListDto query = new()
         {
             Service = _service!,
@@ -111,7 +110,6 @@ public partial class TscTrace
         await GetChartDataAsync(query);
 
         _loading = false;
-        await InvokeStateHasChangedAsync();
     }
 
     private async Task GetChartDataAsync(RequestTraceListDto query)
