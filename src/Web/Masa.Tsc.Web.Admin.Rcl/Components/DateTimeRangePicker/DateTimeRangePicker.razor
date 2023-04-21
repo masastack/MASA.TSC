@@ -51,8 +51,8 @@
                 @FormatDateTime(_internalStartDateTime) to @FormatDateTime(_internalEndDateTime)
             </div>
             <div>
-                <MButton Color="primary" Outlined OnClick="CancelClick">Cancel</MButton>
-                <MButton Color="primary" OnClick="HandleOnConfirm">Confirm</MButton>
+                <MButton Color="primary" Outlined OnClick="CancelClick">@I18n.T("Cancel")</MButton>
+                <MButton Color="primary" OnClick="HandleOnConfirm">@I18n.T("Confirm")</MButton>
             </div>
         </div>
     </ChildContent>

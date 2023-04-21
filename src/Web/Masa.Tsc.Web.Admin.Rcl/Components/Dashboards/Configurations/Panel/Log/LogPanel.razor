@@ -16,8 +16,8 @@
     </HeaderContent>
     <AutoHeightContent>
         <div class="d-flex px-6 py-2 my-1" style="background: #FFFFFF;">
-            <SSearch @bind-Value="@Search" OnEnter=OnSearch Class="my-auto mr-1" MaxWidth="0" />
-            <a href="https://docs.masastack.com/stack/tsc/introduce" target="_blank" style="text-decoration:none" class="pt-2 mr-4">
+            <SSearch @bind-Value="@Search" OnEnter=OnSearchAsync Class="my-auto mr-1" MaxWidth="0" />
+            <a href="https://docs.masastack.com/stack/tsc/use-guide/log" target="_blank" style="text-decoration:none" class="pt-2 mr-4">
                 <SIcon Tooltip="@I18n.Log("Clike me view log advanced usage")">
                     mdi-help-circle-outline
                 </SIcon>
@@ -31,7 +31,7 @@
                                   OnAutoUpdate="OnAutoUpdate" />
             }
         </div>
-        <MCard Class="overflow-hidden" Style="@("border-radius:0 !important;"+ (PageMode ? "height: calc(100vh - 612px)" : "height: calc(100% - 120px)"))">
+        <MCard Class="overflow-hidden" Style="@("border-radius:0 !important;"+ (PageMode ? "height: calc(100vh - 612px)" : "height: calc(100% - 120px)"))" Loading="@Loading">
             <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="Logs" Class="pa-6 pt-5 pb-0 m-sheet theme--light">
                 <ItemContent>
                     <div class="d-flex">
@@ -47,7 +47,7 @@
                     {
                         <MDivider Class="mb-6" />
                     }
-                </ItemContent>
+                </ItemContent>                
             </MVirtualScroll>
         </MCard>
         <MCard Rounded=true Class="px-6 py-2" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">

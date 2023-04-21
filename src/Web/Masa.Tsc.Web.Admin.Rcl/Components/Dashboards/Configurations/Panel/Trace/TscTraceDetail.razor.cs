@@ -1,6 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Google.Protobuf.WellKnownTypes;
+using static Nest.JoinField;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceDetail
@@ -66,7 +69,7 @@ public partial class TscTraceDetail
     private async Task QueryTraceDetailAndToTree(string traceId)
     {
         var data = await ApiCaller.TraceService.GetAsync(traceId);
-
+        data = data.DistinctBy(span => span.SpanId).ToList();
         _count = data.Count();
 
         _treeData = ToTree(data.OrderBy(item => item.Timestamp), null);
@@ -179,19 +182,22 @@ public partial class TscTraceDetail
                 foreach (var (child, index) in children.Select((child, index) => (child, index)))
                 {
                     var duration = (child.Timestamp - lastTimestamp).TotalMilliseconds;
+                    var percent = Math.Round(duration / root.DoubleDuration, 4, MidpointRounding.ToPositiveInfinity);
+                    if (percent - 1 > 0)
+                        percent = 0;
 
                     if (index == 0 && internalParentLeft > 0)
                     {
                         var marginLeft = internalParentLeft / root.DoubleDuration;
-                        node.Timelines.Add(new TraceResponseTimeline(true, duration / root.DoubleDuration, marginLeft));
+                        node.Timelines.Add(new TraceResponseTimeline(true, percent, marginLeft));
                     }
                     else
                     {
-                        node.Timelines.Add(new TraceResponseTimeline(true, duration / root.DoubleDuration));
+                        node.Timelines.Add(new TraceResponseTimeline(true, percent));
                     }
 
                     var childDuration = child.DoubleDuration;
-                    node.Timelines.Add(new TraceResponseTimeline(false, childDuration / root.DoubleDuration));
+                    node.Timelines.Add(new TraceResponseTimeline(false, percent));
 
                     lastTimestamp = child.EndTimestamp;
                 }
@@ -199,14 +205,17 @@ public partial class TscTraceDetail
                 if (lastTimestamp < node.EndTimestamp)
                 {
                     var duration = (node.EndTimestamp - lastTimestamp).TotalMilliseconds;
-                    node.Timelines.Add(new TraceResponseTimeline(true, duration / root.DoubleDuration));
+                    var percent = Math.Round(duration / root.DoubleDuration, 4, MidpointRounding.ToPositiveInfinity);
+                    node.Timelines.Add(new TraceResponseTimeline(true, percent));
                 }
             }
             else if (parent is not null)
             {
                 var marginLeft = internalParentLeft / root.DoubleDuration;
 
-                var durationPercent = (node.DoubleDuration / root.DoubleDuration);
+                var durationPercent = Math.Round(node.DoubleDuration / root.DoubleDuration, 4, MidpointRounding.ToPositiveInfinity);
+                //if (durationPercent - 1 > 0)
+                //    durationPercent = 0;
                 node.Timelines.Add(new TraceResponseTimeline(true, durationPercent, marginLeft));
             }
             else

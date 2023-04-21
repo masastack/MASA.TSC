@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceSearch
@@ -61,7 +63,7 @@ public partial class TscTraceSearch
         _endpointSearching = false;
     }
 
-    private void OnEnterSearch()
+    private void OnEnter()
     {
         Query();
     }

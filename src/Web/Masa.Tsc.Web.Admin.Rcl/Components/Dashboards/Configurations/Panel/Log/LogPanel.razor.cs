@@ -130,8 +130,8 @@ public partial class LogPanel
             end = DateTime.MinValue;
             start = DateTime.MinValue;
         }
-
         Loading = true;
+        await InvokeStateHasChangedAsync();
         var query = new LogPageQueryDto
         {
             PageSize = _pageSize,
@@ -272,9 +272,9 @@ public partial class LogPanel
         };
     }
 
-    void OnSearch()
+    async Task OnSearchAsync()
     {
-        TaskId = default!;
         Page = 1;
+       await GetPageLogsAsync();
     }
 }
