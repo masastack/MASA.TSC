@@ -53,7 +53,7 @@ public partial class TscTrace
     {
         StartDateTime = dateTimes.start;
         EndDateTime = dateTimes.end;
-        _page = 1;
+        _page = 1;       
         await PageSearchAsync();
     }
 
@@ -92,7 +92,6 @@ public partial class TscTrace
     private async Task PageSearchAsync()
     {
         _loading = true;
-
         RequestTraceListDto query = new()
         {
             Service = _service!,
@@ -135,9 +134,9 @@ public partial class TscTrace
             _chartData = Array.Empty<ValueTuple<long, string, string>>();
             return;
         }
-
+     
         var spans = (QueryResultMatrixRangeResponse)spanResult.Result[0];
-        var durations = (QueryResultMatrixRangeResponse)durationResult.Result![0];
+        var durations = (QueryResultMatrixRangeResponse)durationResult!?.Result![0]!;
 
         var spanArray = spans?.Values?.ToArray();
         var durationArray = durations?.Values?.ToArray();

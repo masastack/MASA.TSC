@@ -52,7 +52,7 @@ public class QueryHandler
             var list = queryDto.Conditions?.ToList() ?? new();
             var endpointCondition = new FieldConditionDto
             {
-                Name = "Attributes.http.url",
+                Name = "Attributes.http.target",
                 Type = ConditionTypes.Equal,
                 Value = query.Endpoint
             };
@@ -69,6 +69,14 @@ public class QueryHandler
     public async Task GetAttrValuesAsync(TraceAttrValuesQuery query)
     {
         var list = query.Data.Conditions?.ToList() ?? new();
+
+        list.Add(new FieldConditionDto
+        {
+            Name = "Kind",
+            Type = ConditionTypes.Equal,
+            Value = "SPAN_KIND_SERVER"
+        });
+
         if (string.IsNullOrEmpty(query.Data.Service))
         {
             query.Data.Name = ElasticConstant.ServiceName;
@@ -97,8 +105,7 @@ public class QueryHandler
         }
         else
         {
-            // ElasticConstant.Endpoint;
-            query.Data.Name = "Attributes.http.url";
+            query.Data.Name = "Attributes.http.target";
             if (!string.IsNullOrEmpty(query.Data.Keyword))
             {
                 list.Add(new FieldConditionDto

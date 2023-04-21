@@ -15,18 +15,14 @@
                    Clearable
                    Flat
                    Solo
-                   PrependInnerIcon="mdi-magnify"
+                   HideSelected=false
                    ClearIcon="mdi-close"
                    Outlined="false"
                    Loading="_serviceSearching"
                    Class="mr-6 rounded-2 m-input--h-40"
-                   Style="max-width: 280px"                   
+                   Style="max-width: 280px"
                    OnSelectedItemUpdate="()=>Query(isService:true)"
-                   OnClearClick="()=>Query(isService:true)">
-        <SelectionContent>
-            <AutoCompleteSelection Value="@context.Item" />
-        </SelectionContent>
-    </SAutoComplete>
+                   OnClearClick="()=>Query(isService:true)" />
 
     <SAutoComplete Placeholder="@I18n.T("Instance")" Label="@I18n.T("Instance")"
                    Items="_instances"
@@ -41,7 +37,7 @@
                    Clearable
                    Flat
                    Solo
-                   PrependInnerIcon="mdi-magnify"
+                   HideSelected=false
                    ClearIcon="mdi-close"
                    Outlined="false"
                    Loading="_instanceSearching"
@@ -49,11 +45,7 @@
                    Style="max-width: 280px"
                    Disabled="@(string.IsNullOrWhiteSpace(_service))"
                    OnSelectedItemUpdate="()=>Query(isInstance:true)"
-                   OnClearClick="()=>Query(isInstance:true)">
-        <SelectionContent>
-            <AutoCompleteSelection Value="@context.Item" />
-        </SelectionContent>
-    </SAutoComplete>
+                   OnClearClick="()=>Query(isInstance:true)" />
 
     <SAutoComplete Placeholder="@I18n.T("Endpoint")" Label="@I18n.T("Endpoint")"
                    Items="_endpoints"
@@ -64,12 +56,12 @@
                    ItemValue="item => item"
                    TItemValue=string
                    OnSearchInputUpdate="@SearchEndpoints"
+                   HideSelected=false
                    Small
                    BackgroundColor="white"
                    Clearable
                    Flat
                    Solo
-                   PrependInnerIcon="mdi-magnify"
                    ClearIcon="mdi-close"
                    Outlined="false"
                    Loading="_endpointSearching"
@@ -77,13 +69,9 @@
                    Class="rounded-2 m-input--h-40"
                    Style="max-width: 280px;"
                    OnSelectedItemUpdate="()=>Query()"
-                   OnClearClick="()=>Query()">
-        <SelectionContent>
-            <AutoCompleteSelection Value="@context.Item" />
-        </SelectionContent>
-    </SAutoComplete>
+                   OnClearClick="()=>Query()" />
 
     <MSpacer></MSpacer>
 
-    <SSearch BackgroundColor="white" @bind-Value="@_keyword" OnEnter="OnEnterSearch" MaxWidth="0" Style="flex:none;width:368px !important;" Placeholder="TraceId" />
+    <SSearch BackgroundColor="white" @bind-Value="@_keyword" OnEnter="OnEnter" MaxWidth="0" Style="flex:none;width:368px !important;" Placeholder="TraceId" />
 </div>

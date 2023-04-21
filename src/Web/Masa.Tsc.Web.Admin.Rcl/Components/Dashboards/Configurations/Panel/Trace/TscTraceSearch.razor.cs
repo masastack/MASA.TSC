@@ -61,7 +61,7 @@ public partial class TscTraceSearch
         _endpointSearching = false;
     }
 
-    private void OnEnterSearch()
+    private void OnEnter()
     {
         Query();
     }

@@ -130,7 +130,6 @@ public partial class LogPanel
             end = DateTime.MinValue;
             start = DateTime.MinValue;
         }
-
         Loading = true;
         var query = new LogPageQueryDto
         {
@@ -272,9 +271,9 @@ public partial class LogPanel
         };
     }
 
-    void OnSearch()
+    async Task OnSearchAsync()
     {
-        TaskId = default!;
         Page = 1;
+       await GetPageLogsAsync();
     }
 }

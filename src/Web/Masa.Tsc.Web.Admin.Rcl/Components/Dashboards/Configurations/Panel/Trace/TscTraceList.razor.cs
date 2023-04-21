@@ -12,7 +12,7 @@ public partial class TscTraceList : TscComponentBase
     public PaginatedListBase<TraceResponseDto>? SearchResult { get; set; }
 
     [Parameter]
-    public bool SearchLoading { get; set; }
+    public bool SearchLoading { get { return Loading; } set { Loading = value; } }
 
     [Parameter]
     public bool PageMode { get; set; }
