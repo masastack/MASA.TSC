@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<Gridstack Items="Panels" Id="@(ParentPanel is null ? null : ParentPanel.Id.ToString())" Readonly="!IsEdit" Class="@($"{Class}")" ItemStyle="@("background-color:white;border: 1px solid #F0F3FA;border-radius: 12px;")">
+<Gridstack Items="Panels" Id="@(ParentPanel?.Id.ToString())" Readonly="!IsEdit" Class="@($"{Class}")" ItemStyle="@("background-color:white;border: 1px solid #E1E3EA;border-radius: 12px;")">
     <ItemContent>
         @{
             var actionHeight = context.PanelType == PanelTypes.Tabs || !IsEdit ? 0 : 28;
