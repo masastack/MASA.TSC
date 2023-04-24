@@ -1,10 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Google.Api;
-using Nest;
-using static Grpc.Core.Metadata;
-
 namespace Masa.Tsc.Service.Admin.Application.Metrics;
 
 public class QueryHandler
@@ -12,7 +8,6 @@ public class QueryHandler
     private readonly IMasaPrometheusClient _prometheusClient;
     private readonly IMultilevelCacheClient _multilevelCacheClient;
     private readonly ILogger _logger;
-    private readonly object lockObj = new();
 
     public QueryHandler(IMasaStackConfig masaStackConfig, IMasaPrometheusClient masaPrometheusClient, IMultilevelCacheClientFactory multilevelCacheClientFactory, ILogger<QueryHandler> logger)
     {

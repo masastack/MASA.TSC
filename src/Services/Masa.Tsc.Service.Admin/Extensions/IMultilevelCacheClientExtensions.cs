@@ -77,6 +77,6 @@ public static class IMultilevelCacheClientExtensions
             return;
         var key = MD5Utils.Encrypt(expression);
         var cacheKey = string.Format(MetricConstants.METRIC_TEMPLATE_PREF, key);
-        _multilevelCacheClient.Set(cacheKey, template, new CacheEntryOptions(new DateTimeOffset(System.DateTime.UtcNow.AddHours(6))));
+        _multilevelCacheClient.Set(cacheKey, template, new CacheEntryOptions(new DateTimeOffset(System.DateTime.UtcNow.AddDays(3))));
     }
 }
