@@ -1,7 +1,7 @@
 ﻿@typeparam TItem where TItem : GridstackChangeEventArgs
 @implements IDisposable
 
-<div class="@Class grid-stack" name="@Readonly.ToString()" id="@Options.Id" style="@(_lodaing?"display:none;":"") @Style">
+<div class="@Class grid-stack" name="@Readonly.ToString()" id="@Options.Id" style="@(_loading?"display:none;":"") @Style">
     @foreach (var item in Items)
     {
         <div class="grid-stack-item"
@@ -25,7 +25,7 @@
 @code {
     string? _prevItemKeys;
     bool _prevReadonly;
-    bool _lodaing;
+    bool _loading;
 
     [Inject]
     public TscGridstackJSModule GridstackJSModule { get; set; }
