@@ -8,7 +8,7 @@
             var multiple = options.Count > 1;
         }
         <AutoResize Delay="10" OnResize="arg=> _height = arg.height" Class="@Class">
-            <MCardText Class="flex-grow-1">
+            <MCardText Class="flex-grow-1 pt-0">
                 <MList Height="_height-35" Class="overflow-y">
                     @foreach (var item in options)
                     {
