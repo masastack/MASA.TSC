@@ -1,9 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Google.Type;
-using Masa.Utils.Security.Cryptography;
-
 namespace Masa.BuildingBlocks.Caching;
 
 public static class IMultilevelCacheClientExtensions
