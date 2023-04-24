@@ -17,6 +17,7 @@ public partial class TscTrace
     private int _pageSize = 10;
     private bool _isDesc = true;
     private bool _loading;
+    private TscTraceSearch _tscTraceSearch;
 
     [Parameter]
     public ConfigurationRecord? ConfigurationRecord { get; set; }
@@ -53,7 +54,8 @@ public partial class TscTrace
     {
         StartDateTime = dateTimes.start;
         EndDateTime = dateTimes.end;
-        _page = 1;       
+        _page = 1;
+        await _tscTraceSearch.SearchServices();
         await PageSearchAsync();
     }
 
@@ -84,6 +86,8 @@ public partial class TscTrace
                 StartDateTime = ConfigurationRecord.StartTime.UtcDateTime;
                 EndDateTime = ConfigurationRecord.EndTime.UtcDateTime;
                 _page = 1;
+                if (_tscTraceSearch != null)
+                    await _tscTraceSearch.SearchServices();
                 await PageSearchAsync();
             }
         }
@@ -123,18 +127,18 @@ public partial class TscTrace
             Start = query.Start,
             End = query.End,
             Step = interval,
-            MetricNames = new List<string> { $"round(sum (increase(http_server_duration_count[{interval}])),1)", $"round(sum (increase(http_server_duration_sum[{interval}]))/sum (increase(http_server_duration_count[{interval}])),1)" }
+            MetricNames = new List<string> { $"round(sum (increase(http_server_duration_count[{MetricConstants.TimePeriod}])),1)", $"round(sum (increase(http_server_duration_sum[{MetricConstants.TimePeriod}]))/sum (increase(http_server_duration_count[{MetricConstants.TimePeriod}])),1)" }
         });
 
         var spanResult = queryResult[0];
         var durationResult = queryResult[1];
 
-        if (spanResult.Result!.Length == 0 && durationResult.Result!.Length == 0)
+        if (spanResult == null || spanResult.Result!.Length == 0 && durationResult.Result!.Length == 0)
         {
             _chartData = Array.Empty<ValueTuple<long, string, string>>();
             return;
         }
-     
+
         var spans = (QueryResultMatrixRangeResponse)spanResult.Result[0];
         var durations = (QueryResultMatrixRangeResponse)durationResult!?.Result![0]!;
 
@@ -167,6 +171,8 @@ public partial class TscTrace
 
     private Task<IEnumerable<string>> QueryServices()
     {
+        if (StartDateTime == DateTime.MinValue)
+            return Task.FromResult<IEnumerable<string>>(default!);
         var query = new SimpleAggregateRequestDto
         {
             MaxCount = 1000,
