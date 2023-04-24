@@ -12,4 +12,10 @@ public sealed class MetricConstants
     public const string ALL_METRICS_KEY = "all_metrics";
 
     public const string DAPR_LAYER = "Dapr";
+
+    public const string TimePeriod = "1m";
+
+    public const string METRIC_TEMPLATE_PREF = "metic_template_{0}";
+
+    public const string APPEND_TEMPLATE = "{template_condition}";
 }

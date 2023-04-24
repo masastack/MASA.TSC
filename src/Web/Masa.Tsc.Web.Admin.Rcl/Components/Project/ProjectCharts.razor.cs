@@ -64,7 +64,6 @@ public partial class ProjectCharts
     {
         DateTime start = ConfigurationRecord.StartTime.UtcDateTime,
             end = ConfigurationRecord.EndTime.UtcDateTime;
-        var step = "1m";
         if (_endpoint == null)
             _endpoint = new UpsertChartPanelDto(Guid.Empty)
             {
@@ -76,12 +75,12 @@ public partial class ProjectCharts
                 {
                     new PanelMetricDto()
                     {
-                        Expression = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{step}])),0.01)>0.01))"
+                        Expression = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{MetricConstants.TimePeriod}])),0.01)>0.01))"
                     }
                 }
             };
         else
-            _endpoint.Metrics[0].Expression = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{step}])),1)>0))";
+            _endpoint.Metrics[0].Expression = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{MetricConstants.TimePeriod}])),1)>0))";
 
         if (_slowEndpoint == null)
             _slowEndpoint = new UpsertChartPanelDto(Guid.Empty)
@@ -94,7 +93,7 @@ public partial class ProjectCharts
                 {
                     new PanelMetricDto()
                     {
-                        Expression = "topk(10, sort_desc( round(sum by(http_target) (increase(http_response_sum[1m]))/sum by(http_target) (increase(http_response_count[1m])),1))>0)"
+                        Expression = $"topk(10, sort_desc( round(sum by(http_target) (increase(http_response_sum[{MetricConstants.TimePeriod}]))/sum by(http_target) (increase(http_response_count[{MetricConstants.TimePeriod}])),1))>0)"
                     }
                 },
                 TopListOnclick = async (TopListOption options) =>

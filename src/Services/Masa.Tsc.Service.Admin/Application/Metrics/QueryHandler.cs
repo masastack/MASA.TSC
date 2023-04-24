@@ -1,6 +1,10 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Google.Api;
+using Nest;
+using static Grpc.Core.Metadata;
+
 namespace Masa.Tsc.Service.Admin.Application.Metrics;
 
 public class QueryHandler
@@ -150,7 +154,7 @@ public class QueryHandler
         var index = 0;
         foreach (var name in query.Data.MetricNames)
         {
-            var metric = await AppendCondition(name, query.Data.Layer!, query.Data.Service!, query.Data.Instance!, query.Data.EndPoint!);
+            var metric = await ReplaceCondition(name, query.Data.Layer!, query.Data.Service!, query.Data.Instance!, query.Data.EndPoint!);
             tasks[index] = _prometheusClient.QueryRangeAsync(new QueryRangeRequest
             {
                 End = query.Data.End.ToUnixTimestamp().ToString(),
@@ -171,7 +175,7 @@ public class QueryHandler
         var index = 0;
         foreach (var name in query.Data.Queries)
         {
-            var metric = await AppendCondition(name, query.Data.Layer!, query.Data.Service!, query.Data.Instance!, query.Data.EndPoint!);
+            var metric = await ReplaceCondition(name, query.Data.Layer!, query.Data.Service!, query.Data.Instance!, query.Data.EndPoint!);
             tasks[index] = _prometheusClient.QueryAsync(new QueryRequest
             {
                 Time = query.Data.Time.ToUnixTimestamp().ToString(),
@@ -196,7 +200,7 @@ public class QueryHandler
         else if (query.Type == MetricValueTypes.Layer)
             metric = $"group by (service_layer) (http_client_duration_bucket)";
 
-        metric = await AppendCondition(metric, query.Layer, query.Service, query.Instance, query.Endpint);
+        metric = await ReplaceCondition(metric, query.Layer, query.Service, query.Instance, query.Endpint);
 
         var result = await _prometheusClient.QueryAsync(new QueryRequest
         {
@@ -275,49 +279,23 @@ public class QueryHandler
         return result;
     }
 
-    private async Task<List<string>> GetAllMetricsAsync()
+    private async Task<string> ReplaceCondition(string expression, string layer, string service, string instance, string endpoint)
     {
-        List<string>? data = null;
-        lock (lockObj)
+        var template = _multilevelCacheClient.GetMetricTemplateAsync(expression, _logger);
+        if (string.IsNullOrEmpty(template))
         {
-            int max = 3;
-            do
-            {
-                try
-                {
-                    data = _multilevelCacheClient.Get<List<string>>(MetricConstants.ALL_METRICS_KEY);
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("GetAllMetricsAsync", ex);
-                    max--;
-                    Task.Delay(20).ConfigureAwait(false).GetAwaiter().GetResult();
-                }
-            } while (max > 0);
+            var allMetrics = await _multilevelCacheClient.GetAllMetricsAsync(_prometheusClient, _logger);
+            template = InsertMetricsTemplate(expression, allMetrics, MetricConstants.APPEND_TEMPLATE);
         }
-        if (data == null)
+        if (template.Contains(MetricConstants.APPEND_TEMPLATE))
         {
-            var result = await _prometheusClient.LabelValuesQueryAsync(new() { Lable = "__name__" });
-            if (result.Status == ResultStatuses.Success)
-            {
-                data = result.Data?.ToList() ?? new();
-            }
+            return template.Replace(MetricConstants.APPEND_TEMPLATE, CombineCondition(layer, service, instance, endpoint));
         }
-        if (data != null)
-            await _multilevelCacheClient.SetAsync(MetricConstants.ALL_METRICS_KEY, data, new CacheEntryOptions(new DateTimeOffset(DateTime.UtcNow.AddMinutes(5))));
-        return data!;
+        return template;
     }
 
-    private async Task<string> AppendCondition(string str, string layer, string service, string instance, string endpoint)
+    private static string CombineCondition(string layer, string service, string instance, string endpoint)
     {
-        var metrics = await GetAllMetricsAsync();
-        if (metrics == null || !metrics.Any())
-            return str;
-        metrics = metrics.Where(s => str.Contains(s, StringComparison.OrdinalIgnoreCase)).ToList();
-        if (!metrics.Any())
-            return str;
-
         StringBuilder text = new();
         if (!string.IsNullOrEmpty(service))
             text.Append($"service_name=\"{service}\",");
@@ -327,19 +305,27 @@ public class QueryHandler
             text.Append($"endpoint=\"{endpoint}\",");
         if (!string.IsNullOrEmpty(layer) && !string.Equals(MetricConstants.DAPR_LAYER, layer, StringComparison.InvariantCultureIgnoreCase))
             text.Append($"service_layer=\"{layer}\",");
-        if (text.Length == 0)
-            return str;
+        return text.ToString();
+    }
+
+    private string InsertMetricsTemplate(string expresstion, IEnumerable<string> metrics, string template)
+    {
+        if (string.IsNullOrEmpty(template) || metrics == null || !metrics.Any())
+            return expresstion;
+        metrics = metrics.Where(s => expresstion.Contains(s, StringComparison.OrdinalIgnoreCase)).ToList();
+        if (!metrics.Any())
+            return expresstion;
 
         foreach (var metric in metrics)
         {
-            if (ReplaceMetric(str, metric, text.ToString(), out var result))
-                str = result;
+            if (InsertTemplate(expresstion, metric, template, out var result))
+                expresstion = result;
         }
 
-        return str;
+        return expresstion;
     }
 
-    private bool ReplaceMetric(string str, string metric, string replace, out string result)
+    private bool InsertTemplate(string str, string metric, string replace, out string result)
     {
         result = default!;
         if (string.IsNullOrEmpty(str) || string.IsNullOrEmpty(replace))
@@ -371,11 +357,11 @@ public class QueryHandler
             return false;
 
         start = positions.Count - 1;
-        StringBuilder text = new StringBuilder(str);
+        StringBuilder text = new(str);
         do
         {
             var position = positions[start] + itemLenth;
-            bool has = str.Length - position - 1 < 0 ? false : str[position] == '{';
+            bool has = str.Length - position - 1 >= 0 && str[position] == '{';
             if (!has)
                 text.Insert(position, '{');
 
