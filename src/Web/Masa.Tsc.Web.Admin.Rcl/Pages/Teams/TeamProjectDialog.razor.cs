@@ -63,7 +63,7 @@ public partial class TeamProjectDialog
     async Task OpenLogAsync()
     {
         var url = $"/dashbord/log/{ConfigurationRecord.Service}/{ConfigurationRecord.StartTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/{ConfigurationRecord.EndTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/Error";
-        await JSRuntime.InvokeAsync<object>("open", url, "_blank");
+        await JSRuntime.InvokeVoidAsync("open", url, "_blank");
     }
 
     async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
