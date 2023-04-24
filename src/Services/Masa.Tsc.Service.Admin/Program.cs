@@ -14,7 +14,7 @@ builder.Services.AddElasticClientLogAndTrace(elasearchUrls, ElasticSearchConst.L
     {
         ServiceNameSpace = builder.Environment.EnvironmentName,
         ServiceVersion = masaStackConfig.Version,
-        ServiceName = masaStackConfig.GetServerId(MasaStackConstant.TSC),
+        ServiceName = masaStackConfig.GetServiceId(MasaStackConstant.TSC),
         Layer = masaStackConfig.Namespace,
         ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
     }, masaStackConfig.OtlpUrl, false)
@@ -46,7 +46,7 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddDaprStarter(opt =>
     {
-        opt.AppId = masaStackConfig.GetServerId(MasaStackConstant.TSC);
+        opt.AppId = masaStackConfig.GetServiceId(MasaStackConstant.TSC);
         opt.DaprHttpPort = 3600;
         opt.DaprGrpcPort = 3601;
     });
@@ -80,7 +80,7 @@ builder.Services.AddMasaIdentity(options =>
 }).AddAuthenticationCore()
     .AddAuthClient(masaStackConfig.GetAuthServiceDomain(), redisOption)
     .AddPmClient(masaStackConfig.GetPmServiceDomain())
-    .AddMultilevelCache(masaStackConfig.GetServerId(MasaStackConstant.TSC),
+    .AddMultilevelCache(masaStackConfig.GetServiceId(MasaStackConstant.TSC),
         distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
         multilevelCacheOptions =>
         {
