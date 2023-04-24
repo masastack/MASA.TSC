@@ -13,7 +13,7 @@ public sealed class MetricConstants
 
     public const string DAPR_LAYER = "Dapr";
 
-    public const string TimePeriod = "1m";
+    public const string TIME_PERIOD = "1m";
 
     public const string METRIC_TEMPLATE_PREF = "metic_template_{0}";
 

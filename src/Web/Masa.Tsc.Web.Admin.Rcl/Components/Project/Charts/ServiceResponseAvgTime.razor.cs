@@ -34,7 +34,7 @@ public partial class ServiceResponseAvgTime : TscEChartBase
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         var step = (long)Math.Floor((query.End!.Value - query.Start!.Value).TotalSeconds);
-        var metric = $"round(sum by(service_name) (increase(http_server_duration_sum{{service_name=\"{query.AppId}\"}}[{MetricConstants.TimePeriod}]))/sum by(service_name) (increase(http_server_duration_count{{service_name=\"{query.AppId}\"}}[{MetricConstants.TimePeriod}])),1)";
+        var metric = $"round(sum by(service_name) (increase(http_server_duration_sum{{service_name=\"{query.AppId}\"}}[{MetricConstants.TIME_PERIOD}]))/sum by(service_name) (increase(http_server_duration_count{{service_name=\"{query.AppId}\"}}[{MetricConstants.TIME_PERIOD}])),1)";
         Total = 0;
         var result = await ApiCaller.MetricService.GetQueryRangeAsync(new RequestMetricAggDto
         {

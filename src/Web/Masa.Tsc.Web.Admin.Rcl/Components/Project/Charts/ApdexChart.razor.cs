@@ -80,9 +80,9 @@ public partial class ApdexChart
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        string metric = $@"round((sum(rate(http_server_duration_bucket{{le=""250""}}[{MetricConstants.TimePeriod}])) by (service_name) + 
-                                 sum(rate(http_server_duration_bucket{{le=""1000""}}[{MetricConstants.TimePeriod}])) by (service_name)
-                               ) /2/sum(rate(http_server_duration_bucket{{le=""+Inf""}}[{MetricConstants.TimePeriod}])) by (service_name),0.0001)";
+        string metric = $@"round((sum(rate(http_server_duration_bucket{{le=""250""}}[{MetricConstants.TIME_PERIOD}])) by (service_name) + 
+                                 sum(rate(http_server_duration_bucket{{le=""1000""}}[{MetricConstants.TIME_PERIOD}])) by (service_name)
+                               ) /2/sum(rate(http_server_duration_bucket{{le=""+Inf""}}[{MetricConstants.TIME_PERIOD}])) by (service_name),0.0001)";
         StartTime = query.Start.Value;
         EndTime = query.End.Value;
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto

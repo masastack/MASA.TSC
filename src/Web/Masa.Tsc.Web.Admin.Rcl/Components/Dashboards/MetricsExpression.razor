@@ -61,11 +61,11 @@
     [Parameter]
     public Dictionary<string, string> Metrics { get; set; } = new()
         {
-            ["p99"] = $"histogram_quantile(0.99,sum(increase(http_server_duration_bucket[{MetricConstants.TimePeriod}])) by (le))",
-            ["p95"] = $"histogram_quantile(0.95,sum(increase(http_server_duration_bucket[{MetricConstants.TimePeriod}])) by (le))",
-            ["p90"] = $"histogram_quantile(0.90,sum(increase(http_server_duration_bucket[{MetricConstants.TimePeriod}])) by (le))",
-            ["p75"] = $"histogram_quantile(0.75,sum(increase(http_server_duration_bucket[{MetricConstants.TimePeriod}])) by (le))",
-            ["p50"] = $"histogram_quantile(0.50,sum(increase(http_server_duration_bucket[{MetricConstants.TimePeriod}])) by (le))",
+            ["p99"] = $"histogram_quantile(0.99,sum(increase(http_server_duration_bucket[{MetricConstants.TIME_PERIOD}])) by (le))",
+            ["p95"] = $"histogram_quantile(0.95,sum(increase(http_server_duration_bucket[{MetricConstants.TIME_PERIOD}])) by (le))",
+            ["p90"] = $"histogram_quantile(0.90,sum(increase(http_server_duration_bucket[{MetricConstants.TIME_PERIOD}])) by (le))",
+            ["p75"] = $"histogram_quantile(0.75,sum(increase(http_server_duration_bucket[{MetricConstants.TIME_PERIOD}])) by (le))",
+            ["p50"] = $"histogram_quantile(0.50,sum(increase(http_server_duration_bucket[{MetricConstants.TIME_PERIOD}])) by (le))",
         };
 
     protected override void OnInitialized()

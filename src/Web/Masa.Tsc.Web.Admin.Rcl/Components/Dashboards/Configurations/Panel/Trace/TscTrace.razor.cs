@@ -127,7 +127,7 @@ public partial class TscTrace
             Start = query.Start,
             End = query.End,
             Step = interval,
-            MetricNames = new List<string> { $"round(sum (increase(http_server_duration_count[{MetricConstants.TimePeriod}])),1)", $"round(sum (increase(http_server_duration_sum[{MetricConstants.TimePeriod}]))/sum (increase(http_server_duration_count[{MetricConstants.TimePeriod}])),1)" }
+            MetricNames = new List<string> { $"round(sum (increase(http_server_duration_count[{MetricConstants.TIME_PERIOD}])),1)", $"round(sum (increase(http_server_duration_sum[{MetricConstants.TIME_PERIOD}]))/sum (increase(http_server_duration_count[{MetricConstants.TIME_PERIOD}])),1)" }
         });
 
         var spanResult = queryResult[0];

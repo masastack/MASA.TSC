@@ -56,7 +56,7 @@ public partial class ErrorWarnChart
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
-                $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"}}[{MetricConstants.TimePeriod}]))/sum by(service_name) (increase(http_server_duration_count[{MetricConstants.TimePeriod}]))*100,0.01)"
+                $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"}}[{MetricConstants.TIME_PERIOD}]))/sum by(service_name) (increase(http_server_duration_count[{MetricConstants.TIME_PERIOD}]))*100,0.01)"
            },
             Service = query.AppId,
             Start = query.Start.Value,
