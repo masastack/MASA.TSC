@@ -14,7 +14,7 @@ public class QueryHandler
         IMultilevelCacheClientFactory multilevelCacheClientFactory,
         ITraceServiceStateRepository traceServiceStateRepository)
     {
-        _multilevelCacheClient = multilevelCacheClientFactory.Create(masaStackConfig.GetServerId(MasaStackConstant.TSC));
+        _multilevelCacheClient = multilevelCacheClientFactory.Create(masaStackConfig.GetServiceId(MasaStackConstant.TSC));
         _traceServiceStateRepository = traceServiceStateRepository;
         _masaStackConfig = masaStackConfig;
     }
@@ -23,7 +23,7 @@ public class QueryHandler
     public async Task GetTopologyAsync(TopologyQuery query)
     {
         var result = new TopologyResultDto();
-        var serviceName = string.IsNullOrEmpty(query.Data.ServiceName) ? _masaStackConfig.GetServerId(MasaStackConstant.AUTH) : query.Data.ServiceName;
+        var serviceName = string.IsNullOrEmpty(query.Data.ServiceName) ? _masaStackConfig.GetServiceId(MasaStackConstant.AUTH) : query.Data.ServiceName;
         var services = (await _multilevelCacheClient.GetAsync<List<TraceServiceCache>>(TopologyConstants.TOPOLOGY_SERVICES_KEY))!;
         var service = services?.FirstOrDefault(m => m.Service == serviceName);
         if (service == null)

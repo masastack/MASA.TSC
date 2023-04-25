@@ -64,7 +64,7 @@ var redisOption = new RedisConfigurationOptions
 builder.AddMasaStackComponentsForServer();
 var appid = builder.Configuration.GetValue<string>(DaprConst.APPID);
 if (string.IsNullOrEmpty(appid))
-    appid = masaStackConfig.GetServerId(MasaStackConstant.TSC);
+    appid = masaStackConfig.GetServiceId(MasaStackConstant.TSC);
 #if DEBUG
     builder.Services.AddDebugerTscApiCaller("https://tsc-service-develop.masastack.com").AddDccClient(redisOption);
 #else
