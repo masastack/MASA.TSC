@@ -1,6 +1,12 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using BlazorComponent;
+using Nest;
+using Newtonsoft.Json.Linq;
+using OneOf.Types;
+using System.Collections.Generic;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceDetail
@@ -13,12 +19,11 @@ public partial class TscTraceDetail
     private TraceResponseTree? _activeTreeItem;
     private TraceResponseTree? _rootTreeItem;
     private int _count;
-    private List<List<TraceResponseTimeline>> _timelinesView = new();
+    private List<List<TraceResponseTimelineView>> _timelinesView = new();
     private List<LogModel> _logs = new();
     private bool _loadLogs = false;
     private string? lastQuerySpanId;
     private MVirtualScroll<TraceResponseTree> _vs;
-
     internal async Task OpenAsync(string traceId)
     {
         _tabValue = 0;
@@ -69,43 +74,40 @@ public partial class TscTraceDetail
         data = data.DistinctBy(span => span.SpanId).ToList();
         _count = data.Count();
 
-        _treeData = ToTree(data.OrderBy(item => item.Timestamp), null);
         _timelinesView.Clear();
+        _treeData = ToTree(data.OrderBy(item => item.Timestamp), null);
         if (_treeData.Any())
         {
             _rootTreeItem = _treeData.First();
             _activeTreeItem = _treeData.First();
             _actives = new List<string>() { _activeTreeItem.SpanId };
 
-            _timelinesView.Add(_rootTreeItem.Timelines);
-
-            if (_rootTreeItem.Children is not null)
-            {
-                Test(_rootTreeItem.Children, 2);
-            }
-
-            void Test(List<TraceResponseTree> trees, int level)
-            {
-                if (_timelinesView.Count < level)
-                {
-                    _timelinesView.Add(new List<TraceResponseTimeline>());
-                }
-
-                var timelines = _timelinesView[level - 1];
-
-                foreach (var tree in trees)
-                {
-                    timelines.AddRange(tree.Timelines);
-
-                    if (tree.Children is null || tree.Children.Count == 0)
-                    {
-                        continue;
-                    }
-
-                    Test(tree.Children, level + 1);
-                }
-            }
+            CalcTraceTimeConsuming(_treeData, _rootTreeItem.Timestamp, _rootTreeItem.EndTimestamp);
+            _timelinesView.Reverse();
         }
+    }
+
+    /*Serial is on one line, while parallel requires multiple lines*/
+    /*Prioritize finding serial, not within a time range*/
+    private void CalcTraceTimeConsuming(List<TraceResponseTree> treeData, DateTime rootTimestamp,DateTime rootEndTimestamp)
+    {
+        List<TraceResponseTimelineView> timelineViews = new();
+        double sumLeft = 0;
+        double rootTimespan = (rootEndTimestamp - rootTimestamp).TotalMilliseconds;
+        foreach (var item in treeData)
+        {
+            double percent = (item.EndTimestamp - item.Timestamp).TotalMilliseconds / rootTimespan;
+            double left = (item.Timestamp - rootTimestamp).TotalMilliseconds / rootTimespan - sumLeft;
+            var traceView = new TraceResponseTimelineView(true, percent, left);
+            timelineViews.Add(traceView);
+
+            if (item.Children is not null && item.Children.Any())
+            {
+                CalcTraceTimeConsuming(item.Children, rootTimestamp, rootEndTimestamp);
+            }
+            sumLeft += percent;
+        }
+        _timelinesView.Add(timelineViews);
     }
 
     private async Task OnTabValueChange(StringNumber value)
@@ -210,7 +212,7 @@ public partial class TscTraceDetail
             {
                 var marginLeft = internalParentLeft / root.DoubleDuration;
 
-                var durationPercent = Math.Round(node.DoubleDuration / root.DoubleDuration, 4, MidpointRounding.ToPositiveInfinity);               
+                var durationPercent = Math.Round(node.DoubleDuration / root.DoubleDuration, 4, MidpointRounding.ToPositiveInfinity);
                 node.Timelines.Add(new TraceResponseTimeline(true, durationPercent, marginLeft));
             }
             else

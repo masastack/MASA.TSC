@@ -29,17 +29,15 @@
             <div class="mb-6">
                 @foreach (var timelines in _timelinesView)
                 {
-                    double sumOfMarginLeft = 0;
-
                     <div class="trace-timelines mb-2 overflow-x-hidden">
                         @foreach (var timeline in timelines)
                         {
                             if (timeline.marginLeft > 0)
                             {
-                                var marginLeft = timeline.marginLeft - sumOfMarginLeft;
-                                sumOfMarginLeft += timeline.marginLeft + timeline.Percent;
-
-                                <div style="width: @(marginLeft * 100)%"></div>
+                                <div class="trace-timeline__section" style="width: @(timeline.marginLeft * 100)%">
+                                    <div class="trace-timeline__background">
+                                    </div>
+                                </div>
                             }
 
                             <div class="trace-timeline__section" style="width: @(timeline.Percent * 100)%;">
