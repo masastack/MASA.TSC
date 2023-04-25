@@ -543,7 +543,7 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
                                     defaultColorIndex = 0;
                                 }
                             }
-                        }                       
+                        }
                         data.Add(new(new()
                         {
                             Name = metricName,
@@ -769,25 +769,35 @@ public class UpsertChartPanelDto : UpsertPanelDto, ITablePanelValue, IEChartPane
         }
     }
 
+    //此处修改
     public void SetTopListOption(string href)
     {
         _topListData.Clear();
-
         var data = GetTableMatrixRangeData().FirstOrDefault();
+        Func<IEnumerable<double>, double> caculate = Enumerable.Average;
+        switch (Metrics.First().Caculate?.ToLower()?.Trim())
+        {
+            case "max": caculate = Enumerable.Max; break;
+            case "min": caculate = Enumerable.Min; break;
+            case "sum": caculate = Enumerable.Sum; break;
+            case "count": caculate = data => data.Count(); break;
+            case "avg": caculate = Enumerable.Average; break;
+        }
         if (data is null) return;
         _topListData.AddRange(data.Select(item => new TopListOption
         {
             Href = href,
             Text = string.Join('-', item.Metric!.Select(metric => metric.Value)),
-            Value = GetQueryResultMatrixRangeResponseValue(item)
+            Value = GetQueryResultMatrixRangeResponseValue(item, caculate)
         }).OrderByDescending(item => item.Value));
     }
 
-    private double GetQueryResultMatrixRangeResponseValue(QueryResultMatrixRangeResponse item)
+    private double GetQueryResultMatrixRangeResponseValue(QueryResultMatrixRangeResponse item, Func<IEnumerable<double>, double>? caculate = null)
     {
         var values = item.Values.Select(ToDouble).Where(val => !double.IsNaN(val));
+        caculate ??= Enumerable.Average;
         if (values.Any())
-            return values.Average().FloorDouble(2);
+            return caculate.Invoke(values).FloorDouble(2);
         return default;
     }
 

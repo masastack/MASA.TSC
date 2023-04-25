@@ -70,12 +70,12 @@ public partial class ProjectCharts
                 ChartType = ChartTypes.Table,
                 ListType = ListTypes.TopList,
                 Title = I18n.Team("Service Endpoint Load(calls/min)"),
-                Description = I18n.Team( "For HTTP, gRPC, RPC services, this means Calls Per Minute (calls/min)"),
+                Description = I18n.Team("For HTTP, gRPC, RPC services, this means Calls Per Minute (calls/min)"),
                 Metrics = new List<PanelMetricDto>
                 {
                     new()
                     {
-                        Expression = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{MetricConstants.TIME_PERIOD}])),0.01)>0.01))"
+                        Expression = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{MetricConstants.TIME_PERIOD}])),0.01)>0.01))",
                     }
                 }
             };
@@ -87,13 +87,14 @@ public partial class ProjectCharts
             {
                 ChartType = ChartTypes.Table,
                 ListType = ListTypes.TopList,
-                Title =I18n.Team("Service Slow Endpoint") + "(" + I18n.T("ms") + ")",
+                Title = I18n.Team("Service Slow Endpoint") + "(" + I18n.T("ms") + ")",
                 //Description = "Service Slow Endpont(ms)",
                 Metrics = new List<PanelMetricDto>
                 {
                     new()
                     {
-                        Expression = $"topk(10, sort_desc( round(sum by(http_target) (increase(http_response_sum[{MetricConstants.TIME_PERIOD}]))/sum by(http_target) (increase(http_response_count[{MetricConstants.TIME_PERIOD}])),1))>0)"
+                        Expression = $"topk(10, sort_desc( round(sum by(http_target) (increase(http_response_sum[{MetricConstants.TIME_PERIOD}]))/sum by(http_target) (increase(http_response_count[{MetricConstants.TIME_PERIOD}])),1))>0)",
+                        Caculate="MAX"
                     }
                 },
                 TopListOnclick = async options =>
