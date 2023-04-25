@@ -9,3 +9,8 @@
     width: 18px;
     transition: 0.5s;
 }
+
+
+tooltip ::deep .tooltip_content {
+    max-width: 430px !important;
+}
