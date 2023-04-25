@@ -55,14 +55,3 @@ public class TraceResponseTimeline
         marginLeft = this.marginLeft;
     }
 }
-
-public class TraceResponseTimelineView: TraceResponseTimeline
-{
-    public TraceResponseTimelineView(bool render, double percent, double marginLeft = 0) : base(render,percent, marginLeft)
-    {
-    }
-
-    public DateTime Timestamp { get; set; }
-
-    public DateTime EndTimestamp { get; set; }
-}

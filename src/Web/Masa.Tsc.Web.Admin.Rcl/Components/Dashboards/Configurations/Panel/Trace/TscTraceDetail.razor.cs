@@ -19,7 +19,7 @@ public partial class TscTraceDetail
     private TraceResponseTree? _activeTreeItem;
     private TraceResponseTree? _rootTreeItem;
     private int _count;
-    private List<List<TraceResponseTimelineView>> _timelinesView = new();
+    private List<List<TraceResponseTimeline>> _timelinesView = new();
     private List<LogModel> _logs = new();
     private bool _loadLogs = false;
     private string? lastQuerySpanId;
@@ -91,14 +91,14 @@ public partial class TscTraceDetail
     /*Prioritize finding serial, not within a time range*/
     private void CalcTraceTimeConsuming(List<TraceResponseTree> treeData, DateTime rootTimestamp,DateTime rootEndTimestamp)
     {
-        List<TraceResponseTimelineView> timelineViews = new();
+        List<TraceResponseTimeline> timelineViews = new();
         double sumLeft = 0;
         double rootTimespan = (rootEndTimestamp - rootTimestamp).TotalMilliseconds;
         foreach (var item in treeData)
         {
             double percent = (item.EndTimestamp - item.Timestamp).TotalMilliseconds / rootTimespan;
             double left = (item.Timestamp - rootTimestamp).TotalMilliseconds / rootTimespan - sumLeft;
-            var traceView = new TraceResponseTimelineView(true, percent, left);
+            var traceView = new TraceResponseTimeline(true, percent, left);
             timelineViews.Add(traceView);
 
             if (item.Children is not null && item.Children.Any())
