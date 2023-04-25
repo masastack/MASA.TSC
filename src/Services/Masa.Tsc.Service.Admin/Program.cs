@@ -47,8 +47,8 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddDaprStarter(opt =>
     {
         opt.AppId = masaStackConfig.GetServiceId(MasaStackConstant.TSC);
-        opt.DaprHttpPort = 3600;
-        opt.DaprGrpcPort = 3601;
+        opt.DaprHttpPort = 3606;
+        opt.DaprGrpcPort = 3607;
     });
 }
 
