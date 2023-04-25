@@ -64,11 +64,11 @@ public partial class ServiceResponseTimePercentile
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
-                $"round(histogram_quantile(0.50,sum(increase(http_server_duration_bucket[5m])) by (le)),0.01)",
-                $"round(histogram_quantile(0.75,sum(increase(http_server_duration_bucket[5m])) by (le)),0.01)",
-                $"round(histogram_quantile(0.90,sum(increase(http_server_duration_bucket[5m])) by (le)),0.01)",
-                $"round(histogram_quantile(0.95,sum(increase(http_server_duration_bucket[5m])) by (le)),0.01)",
-                $"round(histogram_quantile(0.99,sum(increase(http_server_duration_bucket[5m])) by (le)),0.01)"
+                $"round(histogram_quantile(0.50,sum(increase(http_server_duration_bucket[{MetricConstants.TIME_PERIOD}])) by (le)),0.01)",
+                $"round(histogram_quantile(0.75,sum(increase(http_server_duration_bucket[{MetricConstants.TIME_PERIOD}])) by (le)),0.01)",
+                $"round(histogram_quantile(0.90,sum(increase(http_server_duration_bucket[{MetricConstants.TIME_PERIOD}])) by (le)),0.01)",
+                $"round(histogram_quantile(0.95,sum(increase(http_server_duration_bucket[{MetricConstants.TIME_PERIOD}])) by (le)),0.01)",
+                $"round(histogram_quantile(0.99,sum(increase(http_server_duration_bucket[{MetricConstants.TIME_PERIOD}])) by (le)),0.01)"
             },
             Start = StartTime,
             Service = query.AppId,

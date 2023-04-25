@@ -53,11 +53,10 @@ public partial class ErrorWarnChart
         if (query.Start == null)
             query.Start = query.End.Value.AddDays(-1);
 
-        var step = 300;
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
-                $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"}}[{step}s]))/sum by(service_name) (increase(http_server_duration_count[{step}s]))*100,0.01)"
+                $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"}}[{MetricConstants.TIME_PERIOD}]))/sum by(service_name) (increase(http_server_duration_count[{MetricConstants.TIME_PERIOD}]))*100,0.01)"
            },
             Service = query.AppId,
             Start = query.Start.Value,
@@ -99,6 +98,6 @@ public partial class ErrorWarnChart
 
     private object GetModel(bool isSuccess, double value)
     {
-        return new { name = isSuccess ? I18n.Team("Success") : I18n.Team("Fail"), value = value };
+        return new { name = isSuccess ? I18n.Team("Success") : I18n.Team("Fail"), value };
     }
 }

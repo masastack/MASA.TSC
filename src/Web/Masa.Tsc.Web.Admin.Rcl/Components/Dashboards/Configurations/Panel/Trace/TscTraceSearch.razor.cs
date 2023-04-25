@@ -35,29 +35,32 @@ public partial class TscTraceSearch
 
     protected override async Task OnInitializedAsync()
     {
-        _keyword = TraceId;        
-        await base.OnInitializedAsync();
+        _keyword = TraceId;
         await SearchServices();
+        await base.OnInitializedAsync();
     }
 
-    private async Task SearchServices()
+    public async Task SearchServices()
     {
         _serviceSearching = true;
-        _services = (await QueryServices.Invoke()).ToList();
+        _services = (await QueryServices.Invoke())?.ToList();
+        _service = default;
+        _instance = default;
+        _endpoint = default;
         _serviceSearching = false;
     }
 
     private async Task SearchInstances()
     {
         _instanceSearching = true;
-        _instances = (await QueryInstances(_service)).ToList();
+        _instances = (await QueryInstances(_service))?.ToList();
         _instanceSearching = false;
     }
 
     private async Task SearchEndpoints()
     {
         _endpointSearching = true;
-        _endpoints = (await QueryEndpoints(_service, _instance)).ToList();
+        _endpoints = (await QueryEndpoints(_service, _instance))?.ToList();
         _endpointSearching = false;
     }
 
