@@ -73,7 +73,7 @@ public partial class DashboardConfiguration : IAsyncDisposable
 
     async Task SaveAsync()
     {
-        _originalPannels= ConfigurationRecord.Panels.DeepClone();
+        _originalPannels = ConfigurationRecord.Panels.DeepClone();
         await SavePanelsAction.Invoke(ConfigurationRecord.Panels);
         OpenSuccessMessage(I18n.T("Save success"));
     }
@@ -83,7 +83,7 @@ public partial class DashboardConfiguration : IAsyncDisposable
         if (ConfigurationRecord.IsEdit is true)
         {
             var confirm = true;
-            if (ConfigurationRecord.Panels.ExceptBy(_originalPannels.Select(e => e.Id), e => e.Id).Count() > 0)
+            if (JsonSerializer.Serialize(_originalPannels) != JsonSerializer.Serialize(ConfigurationRecord.Panels))
             {
                 confirm = await OpenConfirmDialog(I18n.T("Operation confirmation"), I18n.Dashboard("Are you sure switch view mode,unsaved data will be lost"), AlertTypes.Warning);
             }
