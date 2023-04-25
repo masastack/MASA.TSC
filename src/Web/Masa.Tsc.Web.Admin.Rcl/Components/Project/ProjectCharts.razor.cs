@@ -10,8 +10,8 @@ public partial class ProjectCharts
     private ServiceResponseTimePercentile? _serviceResponseTimePercentile;
     private ServiceResponseAvgTime? _serviceResponseAvgTime;
     private ApdexChart? _apdexChart;
-    private UpsertChartPanelDto _endpoint;
-    private UpsertChartPanelDto _slowEndpoint;
+    private UpsertChartPanelDto? _endpoint;
+    private UpsertChartPanelDto? _slowEndpoint;
     string? _oldConfigRecordKey;
     TscTraceDetail _tscTraceDetail = default!;
 
@@ -31,12 +31,12 @@ public partial class ProjectCharts
             _oldConfigRecordKey = ConfigurationRecord.Key;
             if (back is not null)
             {
-                await OnLoadDataAsyc();
+                await OnLoadDataAsync();
             }
         }
     }
 
-    internal async Task OnLoadDataAsyc(ProjectAppSearchModel? query = null)
+    internal async Task OnLoadDataAsync(ProjectAppSearchModel? query = null)
     {
         query = new()
         {
@@ -73,7 +73,7 @@ public partial class ProjectCharts
                 Description = I18n.Team( "For HTTP, gRPC, RPC services, this means Calls Per Minute (calls/min)"),
                 Metrics = new List<PanelMetricDto>
                 {
-                    new PanelMetricDto()
+                    new()
                     {
                         Expression = $"topk(10, sort_desc(round(sum by (http_target) (increase(http_response_count[{MetricConstants.TIME_PERIOD}])),0.01)>0.01))"
                     }
@@ -91,16 +91,15 @@ public partial class ProjectCharts
                 //Description = "Service Slow Endpont(ms)",
                 Metrics = new List<PanelMetricDto>
                 {
-                    new PanelMetricDto()
+                    new()
                     {
                         Expression = $"topk(10, sort_desc( round(sum by(http_target) (increase(http_response_sum[{MetricConstants.TIME_PERIOD}]))/sum by(http_target) (increase(http_response_count[{MetricConstants.TIME_PERIOD}])),1))>0)"
                     }
                 },
-                TopListOnclick = async (TopListOption options) =>
+                TopListOnclick = async options =>
                 {
                     var url = options.Text;
-                    var traceId = await ApiCaller.TraceService.GetTraceIdByMetricAsync(ConfigurationRecord.Service!, url, ConfigurationRecord.StartTime.UtcDateTime, ConfigurationRecord.EndTime.UtcDateTime);
-                    await _tscTraceDetail.OpenAsync(traceId);
+                    await _tscTraceDetail.OpenAsync(ConfigurationRecord, url);
                 }
             };
     }

@@ -6,10 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 await builder.Services.AddMasaStackConfigAsync();
 var masaStackConfig = builder.Services.GetMasaStackConfig();
 
-var elasearchUrls = masaStackConfig.ElasticModel.Nodes?.ToArray() ?? Array.Empty<string>();
+var elasticsearchUrls = masaStackConfig.ElasticModel.Nodes?.ToArray() ?? Array.Empty<string>();
 var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus");
 
-builder.Services.AddElasticClientLogAndTrace(elasearchUrls, ElasticSearchConst.LogIndex, ElasticSearchConst.TraceIndex)
+builder.Services.AddElasticClientLogAndTrace(elasticsearchUrls, ElasticSearchConst.LogIndex, ElasticSearchConst.TraceIndex)
     .AddObservable(builder.Logging, new MasaObservableOptions
     {
         ServiceNameSpace = builder.Environment.EnvironmentName,
@@ -19,7 +19,7 @@ builder.Services.AddElasticClientLogAndTrace(elasearchUrls, ElasticSearchConst.L
         ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
     }, masaStackConfig.OtlpUrl, false)
     .AddPrometheusClient(prometheusUrl, 15)
-    .AddTopology(elasearchUrls);
+    .AddTopology(elasticsearchUrls);
 
 builder.Services.AddDaprClient();
 await builder.Services.AddDccClient().AddSchedulerClient(masaStackConfig.GetSchedulerServiceDomain()).AddSchedulerJobAsync();
