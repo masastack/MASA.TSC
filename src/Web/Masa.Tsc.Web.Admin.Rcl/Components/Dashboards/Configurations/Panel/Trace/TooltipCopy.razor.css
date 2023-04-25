@@ -1,0 +1,11 @@
+﻿.tooltip ::deep .icon {
+    opacity: 0;
+    height: 0px;
+    margin-left: -24px;
+    transition: 0.4s;
+}
+
+.tooltip ::deep .icon_hover {
+    width: 18px;
+    transition: 0.5s;
+}

@@ -158,7 +158,7 @@ public class CommandHandler
         foreach (var item in result)
         {
             var type = item.GetServiceType();
-            string service = item.Resource["service.name"].ToString()!, instance = item.Resource["service.instance.id"].ToString()!;
+            string service = item.Resource[TraceKeyConst.Resource.ServiceName].ToString()!, instance = item.Resource["service.instance.id"].ToString()!;
             string endpoint = "";
             bool isSuccess = !item.TryParseException(out _);
             if (type == TraceNodeTypes.Database)
@@ -212,8 +212,8 @@ public class CommandHandler
                 if (traceCacheItem is null)
                     continue;
                 var key = string.Format(TopologyConstants.TOPOLOGY_TRACE_KEY, traceCacheItem.TraceId);
-                if (dicValues.ContainsKey(key))
-                    dicValues[key].Add(traceCacheItem);
+                if (dicValues.TryGetValue(key, out List<TraceNodeCache>? value))
+                    value.Add(traceCacheItem);
                 else
                 {
                     addKeys.Add(key);
@@ -237,8 +237,8 @@ public class CommandHandler
                         if (items == null || !items.Any())
                             continue;
                         var key = string.Format(TopologyConstants.TOPOLOGY_TRACE_KEY, items.First().TraceId);
-                        if (dicValues.ContainsKey(key))
-                            dicValues[key].InsertRange(0, items);
+                        if (dicValues.TryGetValue(key, out List<TraceNodeCache>? value))
+                            value.InsertRange(0, items);
                     }
                 }
                 page++;
@@ -254,9 +254,9 @@ public class CommandHandler
             do
             {
                 var sliceDic = dicValues.Skip(start).Take(size).ToDictionary(item => item.Key, item => item.Value);
-#pragma warning disable CS8620 // 由于引用类型的可为 null 性差异，实参不能用于形参。
-                _multilevelCacheClient.SetList(sliceDic, new CacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(20) });
-#pragma warning restore CS8620 // 由于引用类型的可为 null 性差异，实参不能用于形参。
+#pragma warning disable CS8620
+                await _multilevelCacheClient.SetListAsync(sliceDic, new CacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(20) });
+#pragma warning restore CS8620
                 page++;
                 start += size;
             }
@@ -283,7 +283,7 @@ public class CommandHandler
             //检查每个节点是否在已知节点列表内
             Dictionary<string, string> dicNodes = new();
 
-            //填充serviceid
+            //填充serviceId
             foreach (var traceNode in traces)
             {
                 var service = services.FirstOrDefault(m => m.Service == traceNode.Service && m.Type == traceNode.Type && m.Instance == traceNode.Instance);
@@ -344,14 +344,14 @@ public class CommandHandler
                     }
                 }
 
-                var CallTrace = traces.FirstOrDefault(s => !s.IsServer && s.SpanId == trace.ParentId);
-                if (CallTrace != null)
+                var callTrace = traces.FirstOrDefault(s => !s.IsServer && s.SpanId == trace.ParentId);
+                if (callTrace != null)
                     addStateList.Add(new TraceServiceState
                     {
-                        ServiceId = CallTrace.ServiceId,
-                        ServiceName = CallTrace.Service,
-                        Instance = CallTrace.Instance,
-                        Timestamp = CallTrace.Start,
+                        ServiceId = callTrace.ServiceId,
+                        ServiceName = callTrace.Service,
+                        Instance = callTrace.Instance,
+                        Timestamp = callTrace.Start,
 
                         DestServiceId = trace.ServiceId,
                         DestEndpint = trace.EndPoint,

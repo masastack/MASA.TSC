@@ -25,7 +25,7 @@ public class InstrumentService : BaseService
 
     public async Task<LinkResultDto> GetLinkAsync(string layer, MetricValueTypes type) => (await Caller.GetAsync<LinkResultDto>($"{RootPath}/link", new { layer, type }))!;
 
-    public async Task<List<UpsertPanelDto>> GetTeamInstraumentDetailAsync() => (await Caller.GetAsync<InstrumentDetailDto>($"{RootPath}/team")).Panels!;
+    public async Task<List<UpsertPanelDto>> GetTeamInstrumentDetailAsync() => (await Caller.GetAsync<InstrumentDetailDto>($"{RootPath}/team"))?.Panels!;
 
-    public async Task UpdateTeamInstraumentAsync(params UpsertPanelDto[] panels) => await Caller.PutAsync($"{RootPath}/team", panels);
+    public async Task UpdateTeamInstrumentAsync(params UpsertPanelDto[] panels) => await Caller.PutAsync($"{RootPath}/team", panels);
 }

@@ -1,15 +1,15 @@
 ﻿@inherits TscComponentBase
 
 <MHover Context="hContext">
-    <div @attributes="hContext.Attrs" class="hover-pointer d-flex align-left">
+    <div @attributes="hContext.Attrs" class="hover-pointer d-flex align-left tooltip">
         <div @onclick="() => Copy(ValueFunc(Value))" @onclick:stopPropagation>
             <SIcon Tooltip="@I18n.T("Copy value")"
                    Color="@(_copyClicked ? "success" : "gray")"
-                   Style="@(hContext.Hover ? IconHoverStyle : IconStyle)">
-                @(_copyClicked ? _checkSvg : _copySvg)
+                   Class="@(hContext.Hover ? IconHoverClass : IconClass)">
+                   @(_copyClicked ? _checkSvg : _copySvg)
             </SIcon>
         </div>
-        <MTooltip Top ContentStyle="@TooltipContentStyle" ContentClass="@TooltipContenClass">
+        <MTooltip Top ContentStyle="@TooltipContentStyle" ContentClass="@TooltipContentClass">
             <ActivatorContent>
                 <div @attributes="@context.Attrs" class="text-truncate @TextClass" style="@TextStyle">@TextFunc(Value)</div>
             </ActivatorContent>
@@ -25,22 +25,22 @@
     public object Value { get; set; }
 
     [Parameter]
-    public string IconStyle { get; set; } = "opacity:0; height: 0px; margin-left: -24px; transition: 0.4s;";
+    public string IconClass { get; set; } = "icon";
 
     [Parameter]
-    public string IconHoverStyle { get; set; } = "width: 18px; transition: 0.5s;";
+    public string IconHoverClass { get; set; } = "icon_hover";
 
     [Parameter]
-    public string TooltipContentStyle { get; set; }
+    public string? TooltipContentStyle { get; set; }
 
     [Parameter]
-    public string TooltipContenClass { get; set; }
+    public string? TooltipContentClass { get; set; }
 
     [Parameter]
-    public string TextClass { get; set; }
+    public string? TextClass { get; set; }
 
     [Parameter]
-    public string TextStyle { get; set; }
+    public string? TextStyle { get; set; }
 
     [Parameter]
     public Func<object, string> TextFunc { get; set; } = obj => obj?.ToString()!;

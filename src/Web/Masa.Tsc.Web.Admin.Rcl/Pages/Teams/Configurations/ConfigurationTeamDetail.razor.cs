@@ -30,12 +30,12 @@ public partial class ConfigurationTeamDetail
 
     async Task SavePanelsAsync(List<UpsertPanelDto> panels)
     {
-        await ApiCaller.InstrumentService.UpdateTeamInstraumentAsync(panels.ToArray());
+        await ApiCaller.InstrumentService.UpdateTeamInstrumentAsync(panels.ToArray());
     }
 
     async Task<List<UpsertPanelDto>> GetPanelsAsync()
     {
-        return await ApiCaller.InstrumentService.GetTeamInstraumentDetailAsync();
+        return await ApiCaller.InstrumentService.GetTeamInstrumentDetailAsync();
     }
 
     void ServicesDataReady()
