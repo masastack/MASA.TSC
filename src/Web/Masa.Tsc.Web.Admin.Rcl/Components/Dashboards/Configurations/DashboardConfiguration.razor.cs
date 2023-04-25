@@ -10,6 +10,7 @@ public partial class DashboardConfiguration : IAsyncDisposable
     bool _serviceRelationReady;
     bool _timeRangeReady;
     bool _isLoading;
+    List<UpsertPanelDto> _originalPannels;
 
     [Inject]
     public IJSRuntime JS { get; set; }
@@ -60,6 +61,7 @@ public partial class DashboardConfiguration : IAsyncDisposable
         {
             ConfigurationRecord.IsEdit = true;
         }
+        _originalPannels = ConfigurationRecord.Panels.DeepClone();
     }
 
     void AddPanel()
@@ -71,6 +73,7 @@ public partial class DashboardConfiguration : IAsyncDisposable
 
     async Task SaveAsync()
     {
+        _originalPannels = ConfigurationRecord.Panels.DeepClone();
         await SavePanelsAction.Invoke(ConfigurationRecord.Panels);
         OpenSuccessMessage(I18n.T("Save success"));
     }
@@ -79,7 +82,11 @@ public partial class DashboardConfiguration : IAsyncDisposable
     {
         if (ConfigurationRecord.IsEdit is true)
         {
-            var confirm = await OpenConfirmDialog(I18n.T("Operation confirmation"), I18n.Dashboard("Are you sure switch view mode,unsaved data will be lost"), AlertTypes.Warning);
+            var confirm = true;
+            if (JsonSerializer.Serialize(_originalPannels) != JsonSerializer.Serialize(ConfigurationRecord.Panels))
+            {
+                confirm = await OpenConfirmDialog(I18n.T("Operation confirmation"), I18n.Dashboard("Are you sure switch view mode,unsaved data will be lost"), AlertTypes.Warning);
+            }
             if (confirm)
             {
                 await GetPanelsAsync();
