@@ -47,9 +47,6 @@ public class CommandHandler
             var stateModel = await _multilevelCacheClient.GetAsync<TaskRunStateDto>(TopologyConstants.TOPOLOGY_TASK_KEY);
             if (stateModel != null)
             {
-                //if (stateModel.Status == 1)
-                //    throw new UserFriendlyException("Task has running !");
-                //else
                 if (stateModel.Status == 2)
                 {
                     stateModel.Status = 1;
@@ -222,7 +219,7 @@ public class CommandHandler
             }
         } while (true);
 
-        //批量更新
+        //batch update
         if (addKeys.Any())
         {
             int size = 50, start = 0, page = 1, total = dicValues.Count;
@@ -247,7 +244,7 @@ public class CommandHandler
             while (total - start > 0);
         }
 
-        //保存trace数据
+        //save trace data
         if (dicValues.Any())
         {
             int size = 50, start = 0, page = 1, total = dicValues.Count;
@@ -268,7 +265,7 @@ public class CommandHandler
 
     private async Task AnalysisTrace(List<string> traceIds)
     {
-        //获取已有的节点数据
+        //Get existing node data
         var services = await _multilevelCacheClient.GetAsync<List<TraceServiceCache>>(TopologyConstants.TOPOLOGY_SERVICES_KEY);
         if (services == null)
             services = new();
@@ -280,10 +277,10 @@ public class CommandHandler
             if (traces == null || !traces.Any() || traces.Count - 2 < 0)
                 continue;
 
-            //检查每个节点是否在已知节点列表内
+            //Check if each node is in the list of known nodes
             Dictionary<string, string> dicNodes = new();
 
-            //填充serviceId
+            //Fill in serviceId
             foreach (var traceNode in traces)
             {
                 var service = services.FirstOrDefault(m => m.Service == traceNode.Service && m.Type == traceNode.Type && m.Instance == traceNode.Instance);
@@ -310,16 +307,16 @@ public class CommandHandler
                 dicNodes.Add(traceNode.SpanId, service.Id);
             }
 
-            //设置parentId
+            //set parentId
             foreach (var traceNode in traces)
             {
-                if (!string.IsNullOrEmpty(traceNode.ParentId) && dicNodes.ContainsKey(traceNode.ParentId))
+                if (!string.IsNullOrEmpty(traceNode.ParentId) && dicNodes.TryGetValue(traceNode.ParentId, out string? node))
                 {
-                    traceNode.CallServiceId = dicNodes[traceNode.ParentId];
+                    traceNode.CallServiceId = node;
                 }
             }
 
-            //没有一条有效关系依赖关系，全部为自我依赖
+            //None of the valid relationship dependencies are all self-dependent
             if (!traces.Any(node => node.IsServer
                                     && !string.IsNullOrEmpty(node.ServiceId)
                                     && !string.IsNullOrEmpty(node.CallServiceId)
@@ -383,7 +380,7 @@ public class CommandHandler
     }
 
     /// <summary>
-    /// 需要服务启动时加载
+    /// Need to be loaded when the service starts
     /// </summary>
     /// <returns></returns>
     private async Task SetServiceCacheAsync()
@@ -410,7 +407,7 @@ public class CommandHandler
     }
 
     /// <summary>
-    /// 需要服务启动时加载
+    /// Need to be loaded when the service starts
     /// </summary>
     /// <returns></returns>
     private async Task SetRelationCacheASync()
