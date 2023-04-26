@@ -317,13 +317,13 @@ public partial class TscTraceDetail
         spanIds.Sort();
         parentIds.Sort();
 
-        spanIds.RemoveAll(spanId => parentIds.Contains(spanId));
-        if (!spanIds.Any())
+        parentIds.RemoveAll(spanId => spanIds.Contains(spanId));
+        if (!parentIds.Any())
         {
             //没有root
             return items;
         }
-        return items.Where(item => spanIds.Contains(item.SpanId)).ToList();
+        return items.Where(item => parentIds.Contains(item.ParentSpanId)).ToList();
     }
 
     private async Task LoadSpanLogsAsync(string? spanId)
