@@ -6,6 +6,7 @@ using Nest;
 using Newtonsoft.Json.Linq;
 using OneOf.Types;
 using System.Collections.Generic;
+using System;
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
@@ -19,31 +20,49 @@ public partial class TscTraceDetail
     private TraceResponseTree? _activeTreeItem;
     private TraceResponseTree? _rootTreeItem;
     private int _count;
-    private List<List<TraceResponseTimeline>> _timelinesView = new();
+    private readonly List<List<TraceResponseTimeline>> _timelineView = new();
     private List<LogModel> _logs = new();
     private bool _loadLogs = false;
-    private string? lastQuerySpanId;
+    private string? _lastQuerySpanId;
+    private SSheetDialog.MProgressInfo _loading = new();
     private MVirtualScroll<TraceResponseTree> _vs;
+    private int? _logsCount;
+    
     internal async Task OpenAsync(string traceId)
     {
         _tabValue = 0;
         _dialogValue = true;
+        _loading.Loading = true;
+        _logsCount = null;
         StateHasChanged();
-
         await QueryTraceDetailAndToTree(traceId);
+        _loading.Loading = false;
+        StateHasChanged();
+    }
+
+    internal async Task OpenAsync(ConfigurationRecord configurationRecord, string url)
+    {
+        _tabValue = 0;
+        _dialogValue = true;
+        _loading.Loading = true;
+        _logsCount = null;
+        StateHasChanged();
+        var traceId = await ApiCaller.TraceService.GetTraceIdByMetricAsync(configurationRecord.Service!, url, configurationRecord.StartTime.UtcDateTime, configurationRecord.EndTime.UtcDateTime);
+        await QueryTraceDetailAndToTree(traceId);
+        _loading.Loading = false;
         StateHasChanged();
     }
 
     private void DialogValueChanged(bool val)
     {
         _dialogValue = val;
-
         if (!val)
         {
             _activeTreeItem = null;
             _rootTreeItem = null;
+            _logsCount = null;
             _treeData.Clear();
-            _timelinesView.Clear();
+            _timelineView.Clear();
         }
     }
 
@@ -74,8 +93,8 @@ public partial class TscTraceDetail
         data = data.DistinctBy(span => span.SpanId).ToList();
         _count = data.Count();
 
-        _timelinesView.Clear();
         _treeData = ToTree(data.OrderBy(item => item.Timestamp), null);
+        _timelineView.Clear();
         if (_treeData.Any())
         {
             _rootTreeItem = _treeData.First();
@@ -83,10 +102,10 @@ public partial class TscTraceDetail
             _actives = new List<string>() { _activeTreeItem.SpanId };
 
             CalcTraceTimeConsuming(_treeData, _rootTreeItem.Timestamp, _rootTreeItem.EndTimestamp);
-            _timelinesView.Reverse();
+            _timelineView.Reverse();
         }
     }
-
+    
     /*Serial is on one line, while parallel requires multiple lines*/
     /*Prioritize finding serial, not within a time range*/
     private void CalcTraceTimeConsuming(List<TraceResponseTree> treeData, DateTime rootTimestamp,DateTime rootEndTimestamp)
@@ -107,7 +126,7 @@ public partial class TscTraceDetail
             }
             sumLeft += percent;
         }
-        _timelinesView.Add(timelineViews);
+        _timelineView.Add(timelineViews);
     }
 
     private async Task OnTabValueChange(StringNumber value)
@@ -120,6 +139,7 @@ public partial class TscTraceDetail
     private async Task OnActiveUpdate(List<TraceResponseTree> items)
     {
         _loadLogs = false;
+        _logsCount = null;
         if (_tabValue.AsT1 == 3)
         {
             await LoadSpanLogsAsync(items.FirstOrDefault()?.SpanId);
@@ -132,7 +152,7 @@ public partial class TscTraceDetail
         _activeTreeItem = items.First();
     }
 
-    private List<TraceResponseTree> ToTree(IEnumerable<TraceResponseDto> items, TraceResponseTree? parent, TraceResponseTree? root = null,
+    private List<TraceResponseTree> ToTree(IEnumerable<TraceResponseDto>? items, TraceResponseTree? parent, TraceResponseTree? root = null,
         double parentLeft = 0)
     {
         int parentLevel = parent?.Level ?? 0;
@@ -226,19 +246,17 @@ public partial class TscTraceDetail
 
     private async Task LoadSpanLogsAsync(string? spanId)
     {
-        if (_loadLogs || lastQuerySpanId == spanId)
+        if (_loadLogs || _lastQuerySpanId == spanId)
             return;
         _loadLogs = true;
+        int pageSize = 9999;
         if (string.IsNullOrEmpty(spanId))
         {
-
             _logs.Clear();
             _loadLogs = false;
             return;
         }
-
-        int pageSize = 9999;
-        Loading = true;
+        await InvokeStateHasChangedAsync();
         var query = new LogPageQueryDto
         {
             PageSize = pageSize,
@@ -247,10 +265,13 @@ public partial class TscTraceDetail
         };
         var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
 
-        lastQuerySpanId = spanId;
-        _logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
-        Loading = false;
+        _lastQuerySpanId = spanId;
+        _logs = response.Result.Select(item =>
+                new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(i => i.Key, i => new LogTree(i.Value))))
+            .ToList();
+        _logsCount = _logs.Count;
         _loadLogs = false;
+        await InvokeStateHasChangedAsync();
     }
 
     private static string FormatDuration(double duration)

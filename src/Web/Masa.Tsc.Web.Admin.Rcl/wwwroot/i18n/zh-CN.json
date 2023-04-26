@@ -179,6 +179,8 @@
     "Return to team details page": "返回团队详情页面"
   },
   "Trace": {
+    "service.name": "服务",
+    "http.target": "调用",
     "Trace": "链路",
     "TraceID": "追踪ID",
     "Duration": "耗时",

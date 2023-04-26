@@ -47,9 +47,6 @@ public class CommandHandler
             var stateModel = await _multilevelCacheClient.GetAsync<TaskRunStateDto>(TopologyConstants.TOPOLOGY_TASK_KEY);
             if (stateModel != null)
             {
-                //if (stateModel.Status == 1)
-                //    throw new UserFriendlyException("Task has running !");
-                //else
                 if (stateModel.Status == 2)
                 {
                     stateModel.Status = 1;
@@ -158,7 +155,7 @@ public class CommandHandler
         foreach (var item in result)
         {
             var type = item.GetServiceType();
-            string service = item.Resource["service.name"].ToString()!, instance = item.Resource["service.instance.id"].ToString()!;
+            string service = item.Resource[TraceKeyConst.Resource.ServiceName].ToString()!, instance = item.Resource["service.instance.id"].ToString()!;
             string endpoint = "";
             bool isSuccess = !item.TryParseException(out _);
             if (type == TraceNodeTypes.Database)
@@ -212,8 +209,8 @@ public class CommandHandler
                 if (traceCacheItem is null)
                     continue;
                 var key = string.Format(TopologyConstants.TOPOLOGY_TRACE_KEY, traceCacheItem.TraceId);
-                if (dicValues.ContainsKey(key))
-                    dicValues[key].Add(traceCacheItem);
+                if (dicValues.TryGetValue(key, out List<TraceNodeCache>? value))
+                    value.Add(traceCacheItem);
                 else
                 {
                     addKeys.Add(key);
@@ -222,7 +219,7 @@ public class CommandHandler
             }
         } while (true);
 
-        //批量更新
+        //batch update
         if (addKeys.Any())
         {
             int size = 50, start = 0, page = 1, total = dicValues.Count;
@@ -237,8 +234,8 @@ public class CommandHandler
                         if (items == null || !items.Any())
                             continue;
                         var key = string.Format(TopologyConstants.TOPOLOGY_TRACE_KEY, items.First().TraceId);
-                        if (dicValues.ContainsKey(key))
-                            dicValues[key].InsertRange(0, items);
+                        if (dicValues.TryGetValue(key, out List<TraceNodeCache>? value))
+                            value.InsertRange(0, items);
                     }
                 }
                 page++;
@@ -247,16 +244,16 @@ public class CommandHandler
             while (total - start > 0);
         }
 
-        //保存trace数据
+        //save trace data
         if (dicValues.Any())
         {
             int size = 50, start = 0, page = 1, total = dicValues.Count;
             do
             {
                 var sliceDic = dicValues.Skip(start).Take(size).ToDictionary(item => item.Key, item => item.Value);
-#pragma warning disable CS8620 // 由于引用类型的可为 null 性差异，实参不能用于形参。
-                _multilevelCacheClient.SetList(sliceDic, new CacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(20) });
-#pragma warning restore CS8620 // 由于引用类型的可为 null 性差异，实参不能用于形参。
+#pragma warning disable CS8620
+                await _multilevelCacheClient.SetListAsync(sliceDic, new CacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(20) });
+#pragma warning restore CS8620
                 page++;
                 start += size;
             }
@@ -268,7 +265,7 @@ public class CommandHandler
 
     private async Task AnalysisTrace(List<string> traceIds)
     {
-        //获取已有的节点数据
+        //Get existing node data
         var services = await _multilevelCacheClient.GetAsync<List<TraceServiceCache>>(TopologyConstants.TOPOLOGY_SERVICES_KEY);
         if (services == null)
             services = new();
@@ -280,10 +277,10 @@ public class CommandHandler
             if (traces == null || !traces.Any() || traces.Count - 2 < 0)
                 continue;
 
-            //检查每个节点是否在已知节点列表内
+            //Check if each node is in the list of known nodes
             Dictionary<string, string> dicNodes = new();
 
-            //填充serviceid
+            //Fill in serviceId
             foreach (var traceNode in traces)
             {
                 var service = services.FirstOrDefault(m => m.Service == traceNode.Service && m.Type == traceNode.Type && m.Instance == traceNode.Instance);
@@ -310,16 +307,16 @@ public class CommandHandler
                 dicNodes.Add(traceNode.SpanId, service.Id);
             }
 
-            //设置parentId
+            //set parentId
             foreach (var traceNode in traces)
             {
-                if (!string.IsNullOrEmpty(traceNode.ParentId) && dicNodes.ContainsKey(traceNode.ParentId))
+                if (!string.IsNullOrEmpty(traceNode.ParentId) && dicNodes.TryGetValue(traceNode.ParentId, out string? node))
                 {
-                    traceNode.CallServiceId = dicNodes[traceNode.ParentId];
+                    traceNode.CallServiceId = node;
                 }
             }
 
-            //没有一条有效关系依赖关系，全部为自我依赖
+            //None of the valid relationship dependencies are all self-dependent
             if (!traces.Any(node => node.IsServer
                                     && !string.IsNullOrEmpty(node.ServiceId)
                                     && !string.IsNullOrEmpty(node.CallServiceId)
@@ -344,14 +341,14 @@ public class CommandHandler
                     }
                 }
 
-                var CallTrace = traces.FirstOrDefault(s => !s.IsServer && s.SpanId == trace.ParentId);
-                if (CallTrace != null)
+                var callTrace = traces.FirstOrDefault(s => !s.IsServer && s.SpanId == trace.ParentId);
+                if (callTrace != null)
                     addStateList.Add(new TraceServiceState
                     {
-                        ServiceId = CallTrace.ServiceId,
-                        ServiceName = CallTrace.Service,
-                        Instance = CallTrace.Instance,
-                        Timestamp = CallTrace.Start,
+                        ServiceId = callTrace.ServiceId,
+                        ServiceName = callTrace.Service,
+                        Instance = callTrace.Instance,
+                        Timestamp = callTrace.Start,
 
                         DestServiceId = trace.ServiceId,
                         DestEndpint = trace.EndPoint,
@@ -383,7 +380,7 @@ public class CommandHandler
     }
 
     /// <summary>
-    /// 需要服务启动时加载
+    /// Need to be loaded when the service starts
     /// </summary>
     /// <returns></returns>
     private async Task SetServiceCacheAsync()
@@ -410,7 +407,7 @@ public class CommandHandler
     }
 
     /// <summary>
-    /// 需要服务启动时加载
+    /// Need to be loaded when the service starts
     /// </summary>
     /// <returns></returns>
     private async Task SetRelationCacheASync()
