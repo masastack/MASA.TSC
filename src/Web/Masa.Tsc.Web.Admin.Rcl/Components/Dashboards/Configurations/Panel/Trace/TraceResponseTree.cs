@@ -48,6 +48,10 @@ public class TraceResponseTimeline
     public double Percent { get; set; }
     public double marginLeft { get; set; }
 
+    public string Id { get; set; }
+
+    public string ParentId { get; set; }
+
     public void Deconstruct(out bool Render, out double Percent, out double marginLeft)
     {
         Render = this.Render;

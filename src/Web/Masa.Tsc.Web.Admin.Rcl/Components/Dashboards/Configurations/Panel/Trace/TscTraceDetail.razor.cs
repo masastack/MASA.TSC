@@ -1,6 +1,12 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using BlazorComponent;
+using Masa.Blazor;
+using Nest;
+using Newtonsoft.Json.Linq;
+using OneOf.Types;
+using System.Collections.Generic;
 using System;
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
@@ -22,7 +28,7 @@ public partial class TscTraceDetail
     private SSheetDialog.MProgressInfo _loading = new();
     private MVirtualScroll<TraceResponseTree> _vs;
     private int? _logsCount;
-
+    
     internal async Task OpenAsync(string traceId)
     {
         _tabValue = 0;
@@ -96,32 +102,92 @@ public partial class TscTraceDetail
             _activeTreeItem = _treeData.First();
             _actives = new List<string>() { _activeTreeItem.SpanId };
 
-            _timelineView.Add(_rootTreeItem.Timelines);
+            CalcTraceTimeConsuming(_treeData, _rootTreeItem.Timestamp, _rootTreeItem.EndTimestamp);
+            CalculateOverlapDisplayDlank();
+            _timelineView.Reverse();
+        }
+    }
+    
+    /*Serial is on one line, while parallel requires multiple lines*/
+    /*Prioritize finding serial, not within a time range*/
+    private void CalcTraceTimeConsuming(List<TraceResponseTree> treeData, DateTime rootTimestamp, DateTime rootEndTimestamp)
+    {
+        List<TraceResponseTimeline> timelineViews = new();
+        //double sumLeft = 0;
+        double rootTimespan = Math.Round((rootEndTimestamp - rootTimestamp).TotalMilliseconds, 4);
+        foreach (var item in treeData)
+        {
+            double percent = Math.Round((item.EndTimestamp - item.Timestamp).TotalMilliseconds / rootTimespan, 4);
+            double left = Math.Round((item.Timestamp - rootTimestamp).TotalMilliseconds / rootTimespan, 4);
+            percent = percent > 1 ? 1 : percent;
+            left = left < 0 ? 0 : left;
+            var traceView = new TraceResponseTimeline(true, percent, left);
+            traceView.Id = item.SpanId;
+            traceView.ParentId = item.ParentSpanId;
+            timelineViews.Add(traceView);
 
-            if (_rootTreeItem.Children is not null)
+            if (item.Children is not null && item.Children.Any())
             {
-                Test(_rootTreeItem.Children, 2);
+                CalcTraceTimeConsuming(item.Children, rootTimestamp, rootEndTimestamp);
             }
+        }
+        _timelineView.Add(timelineViews);
+    }
 
-            void Test(List<TraceResponseTree> trees, int level)
+    /*Calculate Overlap Display Blank Above*/
+    private void CalculateOverlapDisplayDlank()
+    {
+        /*Ignore root*/
+        var timelinesViewCopy = _timelineView.DeepClone();
+        for (int i = 0; i < timelinesViewCopy.Count - 1; i++)
+        {
+            var timeLines = timelinesViewCopy[i];
+            List<TraceResponseTimeline> parentLineList = new List<TraceResponseTimeline>();
+            for (int j = 0; j < timeLines.Count; j++)
             {
-                if (_timelineView.Count < level)
+                //next line
+                TraceResponseTimeline? nextTimeLine = j + 1 < timeLines.Count ? timeLines[j + 1] : null;
+                SplitLines(timeLines[j], nextTimeLine, timelinesViewCopy, ref parentLineList);
+            }
+            if (parentLineList.Any())
+            {
+                for (int k = 0; k < timelinesViewCopy.Count; k++)
                 {
-                    _timelineView.Add(new List<TraceResponseTimeline>());
-                }
-
-                var timeline = _timelineView[level - 1];
-
-                foreach (var tree in trees)
-                {
-                    timeline.AddRange(tree.Timelines);
-
-                    if (tree.Children is null || tree.Children.Count == 0)
+                    if (_timelineView[k].Any(x => x.Id == parentLineList[0].Id))
                     {
-                        continue;
+                        _timelineView[k].Clear();
+                        _timelineView[k] = parentLineList;
                     }
+                }
+            }
+        }
+    }
 
-                    Test(tree.Children, level + 1);
+    private void SplitLines(TraceResponseTimeline timeline, TraceResponseTimeline? nextTimeLine, List<List<TraceResponseTimeline>> timelinesViewCopy, ref List<TraceResponseTimeline> parentLineList)
+    {
+        for (var i = 0; i < timelinesViewCopy.Count - 1; i++)
+        {
+            var parentLines = timelinesViewCopy[i].Where(x => x.Id == timeline.ParentId).ToList();
+            foreach (var parentLine in parentLines.ToArray())
+            {
+                //parent is not root
+                if (!string.IsNullOrEmpty(parentLine.ParentId))
+                {
+                    //split left              
+                    var leftParentLine = parentLine.DeepClone();
+                    leftParentLine.marginLeft = parentLine.marginLeft;
+                    if (!parentLineList.Any())
+                    {
+                        leftParentLine.Percent = Math.Round(timeline.marginLeft - leftParentLine.marginLeft, 4);
+                        if (leftParentLine.Percent > 0)
+                            parentLineList.Add(leftParentLine);
+                    }
+                    //split right
+                    var rightParentLine = parentLine.DeepClone();
+                    rightParentLine.marginLeft = Math.Round(timeline.marginLeft + timeline.Percent, 4);
+                    rightParentLine.Percent = Math.Round(nextTimeLine is not null ? nextTimeLine.marginLeft - rightParentLine.marginLeft : parentLine.Percent - rightParentLine.marginLeft, 4);
+                    if (rightParentLine.Percent > 0)
+                        parentLineList.Add(rightParentLine);
                 }
             }
         }
@@ -158,27 +224,24 @@ public partial class TscTraceDetail
 
         if (parent == null && items != null && items.Any())
         {
-            if (!items.Any(item => string.IsNullOrEmpty(item.ParentSpanId)))
+            var first = GetRoots(items).FirstOrDefault();
+            parentSpanId = first.ParentSpanId;
+            root = new TraceResponseTree(new TraceResponseDto
             {
-                var first = items.First();
-                parentSpanId = first.ParentSpanId;
-                root = new TraceResponseTree(new TraceResponseDto
-                {
-                    SpanId = parentSpanId,
-                    TraceId = first.TraceId,
-                    Timestamp = first.Timestamp,
-                    EndTimestamp = items.Last().EndTimestamp
-                }, 0);
-            }
+                SpanId = parentSpanId,
+                TraceId = first.TraceId,
+                Timestamp = first.Timestamp,
+                EndTimestamp = items.Last().EndTimestamp
+            }, 0);
         }
 
         var currentLevel = parentLevel + 1;
         var found = items.Where(item => item.ParentSpanId == parentSpanId);
         var nodes = found.Select(item => new TraceResponseTree(item, currentLevel)).ToList();
+        var restItems = items.Except(found).ToList();
 
         foreach (var node in nodes)
         {
-            var restItems = items.Except(found).ToList();
             node.Children ??= new();
 
             double internalParentLeft = parentLeft;
@@ -240,6 +303,27 @@ public partial class TscTraceDetail
         }
 
         return nodes;
+    }
+
+    private IEnumerable<TraceResponseDto> GetRoots(IEnumerable<TraceResponseDto> items)
+    {
+        var roots = items.Where(item => string.IsNullOrEmpty(item.ParentSpanId));
+        if (roots.Any())
+            return roots.ToList();
+
+        var spanIds = roots.Select(item => item.SpanId).Distinct().ToList();
+        var parentIds = roots.Select(item => item.ParentSpanId).Distinct().ToList();
+
+        spanIds.Sort();
+        parentIds.Sort();
+
+        parentIds.RemoveAll(spanId => spanIds.Contains(spanId));
+        if (!parentIds.Any())
+        {
+            //没有root
+            return items;
+        }
+        return items.Where(item => parentIds.Contains(item.ParentSpanId)).ToList();
     }
 
     private async Task LoadSpanLogsAsync(string? spanId)

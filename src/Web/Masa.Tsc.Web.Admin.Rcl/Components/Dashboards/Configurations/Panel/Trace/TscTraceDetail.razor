@@ -30,22 +30,30 @@
             <div class="mb-6">
                 @foreach (var timelineView in _timelineView)
                 {
-                    double sumOfMarginLeft = 0;
-
+                    double sumLeft = 0;
+                    double sumWidth = 0;
                     <div class="trace-timelines mb-2 overflow-x-hidden">
                         @foreach (var timeline in timelineView)
                         {
                             if (timeline.marginLeft > 0)
                             {
-                                var marginLeft = timeline.marginLeft - sumOfMarginLeft;
-                                sumOfMarginLeft += timeline.marginLeft + timeline.Percent;
-
-                                <div style="width: @(marginLeft * 100)%"></div>
-                            }
-
+                                <div class="trace-timeline__section" style="width: @((timeline.marginLeft - sumLeft) * 100)%">
+                                    <div class="trace-timeline__background">
+                                    </div>
+                                </div>
+                            }                     
                             <div class="trace-timeline__section" style="width: @(timeline.Percent * 100)%;">
                                 <div class="trace-timeline__background">
                                     <div class="trace-timeline__leaner @(timeline.Render ? "" : "d-none")"></div>
+                                </div>
+                            </div>
+                            sumWidth += (timeline.marginLeft - sumLeft) + timeline.Percent;
+                            sumLeft = timeline.marginLeft + timeline.Percent;
+                        }
+                        @if (sumWidth < 1)
+                        {
+                            <div class="trace-timeline__section" style="width: @((1 - sumWidth) * 100)%">
+                                <div class="trace-timeline__background">
                                 </div>
                             </div>
                         }
