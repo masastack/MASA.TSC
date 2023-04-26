@@ -39,7 +39,7 @@
         ConfigurationRecord.PanelId = PanelId;
         if(ConfigurationRecord.Panels.Any() is false)
         {
-            ConfigurationRecord.Panels = await ApiCaller.InstrumentService.GetTeamInstraumentDetailAsync();
+            ConfigurationRecord.Panels = await ApiCaller.InstrumentService.GetTeamInstrumentDetailAsync();
             ConfigurationRecord.Panels.ConvertToConfigurationFormat();            
         }
         Panel = FindPanel(ConfigurationRecord.Panels) as UpsertChartPanelDto;

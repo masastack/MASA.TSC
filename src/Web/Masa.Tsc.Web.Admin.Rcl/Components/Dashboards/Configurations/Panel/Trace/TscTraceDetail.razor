@@ -1,7 +1,8 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
+@using Mapster
 @inherits TscComponentBase
 
-<SSheetDialog Value="_dialogValue" ValueChanged="DialogValueChanged" Title="@_rootTreeItem?.Resource["service.name"]?.ToString()">
+<SSheetDialog Value="_dialogValue" ValueChanged="DialogValueChanged" ContentLoading="_loading" Title="@_rootTreeItem?.Resource[TraceKeyConst.Resource.ServiceName]?.ToString()">
     <div class="d-flex">
         <div class="pa-12" style="width:100%">
             <div class="d-flex mb-6">
@@ -12,27 +13,27 @@
                     <div class="d-flex align-center">
                         <div class="mr-6">
                             <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Start")</MChip>
-                            <span class="regular--text">@(_rootTreeItem.Timestamp + CurrentTimeZone.BaseUtcOffset)</span>
+                        <span class="regular--text">@(_rootTreeItem.Timestamp + CurrentTimeZone.BaseUtcOffset)</span>
                         </div>
                         <div class="mr-6">
                             <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Duration")</MChip>
-                            <span class="regular--text">@FormatDuration(_rootTreeItem.DoubleDuration)</span>
-                        </div>
-                        <div>
-                            <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Span Count")</MChip>
-                            <span class="regular--text">@_count</span>
-                        </div>
+                        <span class="regular--text">@FormatDuration(_rootTreeItem.DoubleDuration)</span>
                     </div>
+                    <div>
+                        <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Span Count")</MChip>
+                        <span class="regular--text">@_count</span>
+                    </div>
+                </div>
                 }
             </div>
 
             <div class="mb-6">
-                @foreach (var timelines in _timelinesView)
+                @foreach (var timelineView in _timelineView)
                 {
                     double sumLeft = 0;
                     double sumWidth = 0;
                     <div class="trace-timelines mb-2 overflow-x-hidden">
-                        @foreach (var timeline in timelines)
+                        @foreach (var timeline in timelineView)
                         {
                             if (timeline.marginLeft > 0)
                             {
@@ -79,65 +80,24 @@
             </div>
 
             <MTreeview Items="@_treeData"
-                       ItemChildren="item => item.Children?.Any()??false?item.Children:default!"
+                       ItemChildren="item => item.Children?.Any() ?? false ? item.Children : default!"
                        ItemText="item => item.Name"
                        ItemKey="item => item.SpanId"
                        TItem="TraceResponseTree"
                        TKey="string"
-                       OpenAll
-                       Activatable
+                              OpenAll
+                              Activatable
                        @bind-Active="_actives"
                        OnActiveUpdate="OnActiveUpdate"
                        Class="flex-fill overflow-y-auto"
-                       Style='@($"height: calc(100vh - {_timelinesView.Count * 20 + 254}px)")'
+                       Style='@($"height: calc(100vh - {_timelineView.Count * 20 + 254}px)")'
                        @key="@_treeData">
-                <ChildContent>
-                    <MCard Width="500" Style="margin: 0 auto">
-                        <MVirtualScroll Height="250" Items="_treeData" @ref="_vs" TItem="TraceResponseTree">
-                            <ItemContent>
-                                <MListItem Dense>
-                                    <MListItemContent>
-                                        <div class="d-flex align-center">
-                                            @{
-                                                int level = context.Level - 1;
-
-                                                <div style="min-width:calc(542px - @(level * 24)px)">
-                                                    @context.Name
-                                                    @{
-                                                        if (context.Resource.ContainsKey("service.name"))
-                                                        {
-                                                            <div>
-                                                                @context.Resource["service.name"]
-                                                                @((RenderFragment)(labelBuilder => RenderItemLabel(labelBuilder, context)))
-                                                            </div>
-                                                        }
-                                                    }
-                                                </div>
-                                            }
-                                            <div class="trace-timelines">
-                                                @foreach (var timeline in context.Timelines)
-                                                {
-                                                    if (timeline.marginLeft > 0)
-                                                    {
-                                                        <div style="width: @(timeline.marginLeft * 100)%"></div>
-                                                    }
-                                                    <div class="trace-timeline__section" style="width: @(timeline.Percent * 100)%;">
-                                                        <div class="trace-timeline__background">
-                                                            <div class="trace-timeline__leaner @(timeline.Render ? "" : "d-none")"></div>
-                                                        </div>
-                                                    </div>
-                                                }
-                                            </div>
-                                            <div class="d-inline-block ml-2" style="min-width: 52px;">
-                                                @FormatDuration(context.DoubleDuration)
-                                            </div>
-                                        </div>
-                                    </MListItemContent>
-                                </MListItem>
-                            </ItemContent>
-                        </MVirtualScroll>
-                    </MCard>
-                </ChildContent>
+                <LabelContent>
+                    @context.Item.Name
+                    @((RenderFragment)(labelBuilder => RenderItemLabel(labelBuilder, context.Item)))
+                </LabelContent>
+                <AppendContent>
+                </AppendContent>
             </MTreeview>
         </div>
 
@@ -146,109 +106,123 @@
         @if (_activeTreeItem is not null)
         {
             var detail = _activeTreeItem.ToDictionary(nameof(TraceResponseTree.Children), nameof(TraceResponseTree.Attributes), nameof(TraceResponseTree.Resource), nameof(TraceResponseTree.Timelines), nameof(TraceResponseTree.Level), nameof(TraceResponseTree.DoubleDuration));
-
-            var key = nameof(TraceResponseTree.Duration);
-            if (detail.ContainsKey(key))
-                detail[key] = FormatDuration(_activeTreeItem.DoubleDuration);
-
-            <div class="py-12 px-6" style="width:430px">
-                <MList Dense Class="emphasis2 mb-4 rounded mx-6" Dark>
-                    <MListItem Dense>
-                        <MListItemContent>
-                            <MListItemTitle>@I18n.Trace("SelfDuration")</MListItemTitle>
+            <div class="pa-12">
+                <MList Flat Class="mb-4 rounded tracedetail" style="width:334px">
+                <MListItem>
+                    <MListItemContent>
+                        <MListItemTitle>@I18n.Trace(TraceKeyConst.Resource.ServiceName)</MListItemTitle>
+                        <MListItemSubtitle>
+                            @if (!_activeTreeItem.Resource.TryGetValue(TraceKeyConst.Resource.ServiceName, out var serviceName))
+                                {
+                                    serviceName = "- -";
+                                }
+                                <TooltipCopy Value="@serviceName" TextClass="text-lg-h6 copy_text"
+                                         IconClass="icon_large"
+                                         IconHoverClass="icon_large_hover"></TooltipCopy>
+                            </MListItemSubtitle>
                         </MListItemContent>
-                        <MListItemAction>
-                            <MListItemActionText>
-                                @FormatDuration(_activeTreeItem.DoubleDuration)
-                            </MListItemActionText>
-                        </MListItemAction>
                     </MListItem>
-                    <MListItem Dense>
+                    <MListItem>
                         <MListItemContent>
-                            <MListItemTitle>@I18n.Trace("TotalDuration")</MListItemTitle>
+                            <MListItemTitle>@I18n.Trace(TraceKeyConst.Attributes.Target)</MListItemTitle>
+                            <MListItemSubtitle>
+                                @if (!_activeTreeItem.Attributes.TryGetValue(TraceKeyConst.Attributes.Target, out var target))
+                                {
+                                    target = "- -";
+                                }
+                                <TooltipCopy Value="@target" TextClass="text-lg-h6 copy_text"
+                                         IconClass="icon_large"
+                                         IconHoverClass="icon_large_hover"></TooltipCopy>
+                            </MListItemSubtitle>
                         </MListItemContent>
-                        <MListItemAction>
-                            <MListItemActionText>
-                                @FormatDuration(_rootTreeItem!.DoubleDuration)
-                            </MListItemActionText>
-                        </MListItemAction>
                     </MListItem>
                 </MList>
                 <div class="trace_detail" style="width:382px">
-                    <MTabs Value="_tabValue" ValueChanged="OnTabValueChange" ShowArrows="false" Class="pl-6 pr-5">
-                        <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Trace("Attribute")}({_activeTreeItem.Attributes.Count})")</MTab>
-                            <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Trace("Resource")}({_activeTreeItem.Resource.Count})")</MTab>
-                            <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Trace("Detail")}({detail.Count})")</MTab>
-                            <MTab Style="text-transform:none;border-bottom: 1px solid #E4E8F3;min-width:40px;">@($"{I18n.Log("Log")}")</MTab>
+                    <MTabs Value="_tabValue" ValueChanged="OnTabValueChange" ShowArrows="false">
+                        <MTab>@($"{I18n.Trace("Attribute")}({_activeTreeItem.Attributes.Count})")</MTab>
+                            <MTab>@($"{I18n.Trace("Resource")}({_activeTreeItem.Resource.Count})")</MTab>
+                            <MTab>@($"{I18n.Trace("Detail")}({detail.Count})")</MTab>
+                            <MTab>@($"{I18n.Log("Log")}{(_logsCount == null ? "" : "(" + _logsCount + ")")}")</MTab>
                         </MTabs>
                         <MTabsItems @bind-Value="_tabValue">
-                            <MTabItem Class="px-6">
+                            <MTabItem>
                                 @((RenderFragment)(dictRender => RenderDictionary(dictRender, _activeTreeItem.Attributes)))
                         </MTabItem>
-                        <MTabItem Class="px-6">
+                        <MTabItem>
                             @((RenderFragment)(dictRender => RenderDictionary(dictRender, _activeTreeItem.Resource)))
                         </MTabItem>
-                        <MTabItem Class="px-6">
+                        <MTabItem>
                             @((RenderFragment)(dictRender => RenderDictionary(dictRender, detail)))
                         </MTabItem>
-                        <MTabItem Class="px-6">
-                            <MCard Style="overflow-x-hidden" Height="600">
-                                <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="_logs" Class="m-sheet theme--light" Style="width:100% !important">
-                                    <ItemContent>
-                                        <div class="d-flex">
-                                            <div>
-                                                <LogView Small JsonObject="context.ExtensionData" />
+                        <MTabItem>
+                            @if (_loadLogs)
+                            {
+                                <MProgressLinear Indeterminate Color="primary"></MProgressLinear>
+                            }
+                            else
+                            {
+                                <MCard Style="overflow-x-hidden" Height="600">
+                                    <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="_logs" Class="m-sheet theme--light" Style="width:100% !important">
+                                        <ItemContent>
+                                            <div class="d-flex @(_logs != null && _logs.First().Equals(context)?"mt-4":"")">
+                                                <div>
+                                                    <LogView Small JsonObject="context.ExtensionData" />
+                                                </div>
                                             </div>
-                                        </div>
-                                        @if (_logs != null && !_logs.Last().Equals(context))
-                                        {
-                                            <MDivider Class="mb-6" />
-                                        }
-                                    </ItemContent>
-                                </MVirtualScroll>
-                            </MCard>
+                                            @if (_logs != null && !_logs.Last().Equals(context))
+                                            {
+                                                <MDivider Class="mb-4" />
+                                            }
+                                        </ItemContent>
+                                    </MVirtualScroll>
+                                </MCard>
+                            }
                         </MTabItem>
                     </MTabsItems>
                 </div>
             </div>
         }
-
     </div>
 </SSheetDialog>
 
 @code {
+
     private void RenderItemLabel(RenderTreeBuilder __builder, TraceResponseTree item)
     {
-        const string dbKey = "db.system";
-        const string httpKey = "http.method";
-
-        string? label = null;
-        if (item.Attributes.ContainsKey(dbKey))
+        Dictionary<string, string> labelDictionary = new();
+        if (item.Attributes.TryGetValue(TraceKeyConst.Attributes.Db, out var dbName))
         {
-            label = item.Attributes[dbKey].ToString();
+            if (dbName is not null)
+                labelDictionary.TryAdd(dbName.ToString()!, "#DCFFDB");
         }
-        else if (item.Attributes.ContainsKey(httpKey))
+        if (item.Attributes.ContainsKey(TraceKeyConst.Attributes.HttpKey))
         {
-            // label = item.Attributes[httpKey].ToString();
-            label = "HTTP";
+            labelDictionary.TryAdd("HTTP", "#FFFDD4");
         }
 
-        if (label is null)
+        if (item.Attributes.TryGetValue(TraceKeyConst.Attributes.HttpStatusCode, out object? statusCodeObj))
         {
-            return;
+            var statusCode = statusCodeObj?.ToString();
+            if (statusCode != null && statusCode.StartsWith("5"))
+            {
+                labelDictionary.TryAdd("ERROR", "#FFDBDC");
+            }
         }
 
-        <MChip Label XSmall Class="ml-1" Color="#05CD99" Dark>@label</MChip>
+        foreach (var dic in labelDictionary)
+        {
+            <MChip Label Class="ml-3" Color="@dic.Value">@dic.Key</MChip>
+        }
     }
 
     private void RenderDictionary(RenderTreeBuilder __builder, IDictionary<string, object> dictionary)
     {
-        @foreach (var item in dictionary)
+        foreach (var item in dictionary)
         {
-            string value;
-            if (item.Value is DateTime _value)
+            string? value;
+            if (item.Value is DateTime dateTime)
             {
-                value = _value.ToString("yyyy/MM/dd HH:mm:ss.fff");
+                value = dateTime.ToString("yyyy/MM/dd HH:mm:ss.fff");
             }
             else
             {
@@ -262,10 +236,7 @@
                 <MListItemAction Style="max-width: 38%">
                     <MListItemActionText Class="text-truncate text-right masa body-2"
                              Style="width: 100%; cursor: auto;">
-                        <TooltipCopy Value="@value"
-                         IconStyle="opacity:0; width: 18px; height: 0px; margin-left: -24px; transition: 0.4s;"
-                         IconHoverStyle="width: 18px; height: 18px; margin-right: 12px; transition: 0.5s;"
-                         TooltipContentStyle="max-width:400px"></TooltipCopy>
+                        <TooltipCopy Value="@value" TextClass="copy_text"></TooltipCopy>
                     </MListItemActionText>
                 </MListItemAction>
             </MListItem>
