@@ -104,7 +104,7 @@ public partial class TscTraceDetail
 
             CalcTraceTimeConsuming(_treeData, _rootTreeItem.Timestamp, _rootTreeItem.EndTimestamp);
             CalculateOverlapDisplayDlank();
-            _timelinesView.Reverse();
+            _timelineView.Reverse();
         }
     }
     
@@ -138,7 +138,7 @@ public partial class TscTraceDetail
     private void CalculateOverlapDisplayDlank()
     {
         /*Ignore root*/
-        var timelinesViewCopy = _timelinesView.DeepClone();
+        var timelinesViewCopy = _timelineView.DeepClone();
         for (int i = 0; i < timelinesViewCopy.Count - 1; i++)
         {
             var timeLines = timelinesViewCopy[i];
@@ -153,10 +153,10 @@ public partial class TscTraceDetail
             {
                 for (int k = 0; k < timelinesViewCopy.Count; k++)
                 {
-                    if (_timelinesView[k].Any(x => x.Id == parentLineList[0].Id))
+                    if (_timelineView[k].Any(x => x.Id == parentLineList[0].Id))
                     {
-                        _timelinesView[k].Clear();
-                        _timelinesView[k] = parentLineList;
+                        _timelineView[k].Clear();
+                        _timelineView[k] = parentLineList;
                     }
                 }
             }
