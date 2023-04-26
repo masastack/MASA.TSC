@@ -42,6 +42,8 @@ public partial class ChartPanelConfiguration : TscComponentBase
         },
     };
 
+    List<string> Caculates = new List<string> { "MAX", "MIN", "SUM", "COUNT", "AVG" };
+
     protected override void OnInitialized()
     {
         _valueBackup = JsonSerializer.Serialize<UpsertPanelDto>(Value);
@@ -127,5 +129,11 @@ public partial class ChartPanelConfiguration : TscComponentBase
     {
         (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
         await base.InvokeAsync(base.StateHasChanged);
+    }
+
+    async Task OnCaculateChange(string? value)
+    {
+        Value.Metrics[0].Caculate = value!;
+        //_chartPanel.ReloadAsync();
     }
 }

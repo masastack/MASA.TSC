@@ -172,7 +172,14 @@
     "Are you sure switch view mode,unsaved data will be lost": "确定切换到查看模式中吗,未保存的数据将会丢失",
     "Please select metrics expression": "请选择指标表达式",
     "Please enter metrics expression": "请输入指标表达式",
-    "Clike me view metrics expression docs": "点击查看指标表达式使用文档"
+    "Clike me view metrics expression docs": "点击查看指标表达式使用文档",
+    "Caculate": "计算公式",
+    "Please select caculate": "请选择计算公式",
+    "MAX": "最大值",
+    "MIN": "最小值",
+    "SUM": "求和",
+    "COUNT": "计数",
+    "AVG": "平均值"
   },
   "TeamDashboard": {
     "Configure Team Detail": "配置团队详情",
