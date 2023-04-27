@@ -34,6 +34,7 @@
 		<PackageReference Include="Masa.Contrib.Development.DaprStarter.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="MASA.Utils.Configuration.Json" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Utils.Extensions.Enums" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Globalization.I18n.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.6" />
