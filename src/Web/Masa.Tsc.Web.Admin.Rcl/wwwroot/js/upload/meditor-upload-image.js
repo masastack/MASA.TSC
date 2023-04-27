@@ -11,7 +11,7 @@
 }
 
 async function UploadImage(element, ossParamter) {
-    var imageFiles = element.files
+    var imageFiles = element.files ?? element;
     console.log("UploadImage", ossParamter);
     const client = new OSS(ossParamter);
 
