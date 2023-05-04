@@ -66,7 +66,7 @@ var appid = builder.Configuration.GetValue<string>(DaprConst.APPID);
 if (string.IsNullOrEmpty(appid))
     appid = masaStackConfig.GetServiceId(MasaStackConstant.TSC);
 #if DEBUG
-    builder.Services.AddDebugerTscApiCaller("http://localhost:18010").AddDccClient(redisOption);
+    builder.Services.AddDebugerTscApiCaller("https://tsc-service-develop.masastack.com").AddDccClient(redisOption);
 #else
     builder.Services.AddTscApiCaller(appid).AddDccClient(redisOption);
 #endif

@@ -88,7 +88,7 @@ public partial class LogPanel
 
     protected override async Task OnParametersSetAsync()
     {
-        await GetCompontentLogsAsync();
+        await GetComponentLogsAsync();
     }
 
     protected async Task ResizeEChartAsync()
@@ -97,19 +97,22 @@ public partial class LogPanel
             await MECharts.Resize();
     }
 
-    async Task OnUpdate((DateTimeOffset start, DateTimeOffset end) times)
+    async Task OnUpdate((DateTimeOffset? start, DateTimeOffset? end) times)
     {
-        StartTime = times.start.UtcDateTime;
-        EndTime = times.end.UtcDateTime;
-        await GetPageLogsAsync();
+        if (times is { start: not null, end: not null })
+        {
+            StartTime = times.start?.UtcDateTime;
+            EndTime = times.end?.UtcDateTime;
+            await GetPageLogsAsync();
+        }
     }
 
-    async Task OnAutoUpdate((DateTimeOffset start, DateTimeOffset end) times)
+    async Task OnAutoUpdate((DateTimeOffset? start, DateTimeOffset? end) times)
     {
         await InvokeAsync(() => OnUpdate(times));
     }
 
-    async Task GetCompontentLogsAsync()
+    async Task GetComponentLogsAsync()
     {
         if (PageMode is false && ConfigurationRecord is not null)
         {

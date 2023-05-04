@@ -3,8 +3,9 @@
 <AutoHeight Overflow AutoClass="mt-6 pr-0" AutoStyle="max-height: calc(100vh - 184px);">
     <HeaderContent>
         <div class="d-flex">
-            <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
-                                  OnUpdate="OnDateTimeUpdateAsync"
+            <SDateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
+                                  OnUpdate="OnDateTimeUpdateAsync" 
+                                  ShowInterval ShowQuickChange  ShowTimeZoneSelector
                                   OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
             <MSpacer />
             <SButton Icon OnClick="GetGetMetricsAsync">
@@ -13,7 +14,7 @@
             <SButton Outlined Class="mx-4" Small BorderRadiusClass="rounded-lg" OnClick="Cancel">
                 @I18n.T("Cancel")
             </SButton>
-            <SButton Small BorderRadiusClass="rounded-lg" OnClick="() => NavigateToPanelConfigurationPageAsync()">
+            <SButton Small BorderRadiusClass="rounded-lg" OnClick="NavigateToPanelConfigurationPageAsync">
                 @I18n.T("Apply")
             </SButton>
         </div>

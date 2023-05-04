@@ -10,8 +10,9 @@
                              ValueChanged="ServiceRelationChanged"
                              ModelType="ConfigurationRecord.ModelType" />
             <MSpacer />
-            <DateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
+            <SDateTimeRangeToolbar Class="mr-6 my-auto" @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
                                   OnUpdate="OnDateTimeUpdateAsync"
+                                  ShowInterval ShowQuickChange ShowTimeZoneSelector
                                   OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
             @if (!View)
             {

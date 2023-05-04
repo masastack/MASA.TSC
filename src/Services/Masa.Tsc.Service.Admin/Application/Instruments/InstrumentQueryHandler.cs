@@ -135,7 +135,7 @@ public class InstrumentQueryHandler
         }
         else
         {
-            query.Result = new LinkResultDto { Href = "/dashbord/trace" };
+            query.Result = new LinkResultDto { Href = "/dashboard/trace" };
         }
     }
 }

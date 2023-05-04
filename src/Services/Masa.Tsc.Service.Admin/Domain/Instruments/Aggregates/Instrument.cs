@@ -29,18 +29,18 @@ public class Instrument : FullAggregateRoot<Guid, Guid>
 
     public Instrument() { }
 
-    public Instrument(Guid Id) : base(Id) { }
+    public Instrument(Guid id) : base(id) { }
 
-    public void Update(UpdateDashboardDto dashbord)
+    public void Update(UpdateDashboardDto dashboard)
     {
-        if (dashbord.Name != Name)
-            Name = dashbord.Name;
-        Layer = dashbord.Layer;
-        Model = dashbord.Model.ToString();
-        Lable = dashbord.Type;
-        Sort = dashbord.Order;
-        DirectoryId = dashbord.Folder;
-        IsRoot = dashbord.IsRoot;
+        if (dashboard.Name != Name)
+            Name = dashboard.Name;
+        Layer = dashboard.Layer;
+        Model = dashboard.Model.ToString();
+        Lable = dashboard.Type;
+        Sort = dashboard.Order;
+        DirectoryId = dashboard.Folder;
+        IsRoot = dashboard.IsRoot;
     }
 
     public void UpdatePanels(UpsertPanelDto[] data)

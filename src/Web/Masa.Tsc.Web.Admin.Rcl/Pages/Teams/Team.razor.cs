@@ -171,13 +171,13 @@ public partial class Team
         await GetProjectsAsync();
     }
 
-    async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    async Task OnDateTimeUpdateAsync((DateTimeOffset?, DateTimeOffset?) times)
     {
-        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
-        await GetProjectsAsync();        
+        ConfigurationRecord.UpdateDateTimesFromTuple(times);
+        await GetProjectsAsync();
     }
 
-    async Task OnAutoDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    async Task OnAutoDateTimeUpdateAsync((DateTimeOffset?, DateTimeOffset?) times)
     {
         await OnDateTimeUpdateAsync(times);
         await InvokeAsync(StateHasChanged);

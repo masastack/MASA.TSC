@@ -49,7 +49,7 @@ public partial class SearchBar
     private ProjectAppSearchModel _value = new();
     private List<AppDto> _apps = new();
 
-    private AppDto GetApp() => Apps?.FirstOrDefault(item => item.Identity == _value.AppId);
+    private AppDto? GetApp() => Apps?.FirstOrDefault(item => item.Identity == _value.AppId);
 
     private async Task SearchAsync()
     {
@@ -57,11 +57,19 @@ public partial class SearchBar
             await OnSearch.InvokeAsync(Value);
     }
 
-    private async Task UpdateTimeAsync((DateTimeOffset start, DateTimeOffset end) times)
+    private async Task InvokeDateTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) range)
     {
-        _value.Start = times.start.ToUniversalTime().UtcDateTime;
-        _value.End = times.end.ToUniversalTime().UtcDateTime;
-        await SearchAsync();
+        if (range is { start: not null, end: not null })
+        {
+            _value.Start = range.start.Value.UtcDateTime;
+            _value.End = range.end.Value.UtcDateTime;
+            await SearchAsync();
+        }
+    }
+
+    private Task UpdateTimeAsync((DateTimeOffset? start, DateTimeOffset? end) times)
+    {
+        return InvokeDateTimeUpdate(times);
     }
 
     public override async Task SetParametersAsync(ParameterView parameters)

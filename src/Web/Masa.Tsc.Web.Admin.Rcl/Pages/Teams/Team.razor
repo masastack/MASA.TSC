@@ -10,7 +10,8 @@
     <div class="mx-6">
         <SSearch @bind-Value="@_search" OnEnter="OnSearchChangedAsync" Style="width:220px !important;" BackgroundColor="white" />
     </div>
-    <DateTimeRangeToolbar OnUpdate="OnDateTimeUpdateAsync"
+    <SDateTimeRangeToolbar OnUpdate="OnDateTimeUpdateAsync"
+                          ShowInterval ShowQuickChange ShowTimeZoneSelector
                           OnAutoUpdate="OnAutoDateTimeUpdateAsync"
                           @bind-DefaultQuickRange="ConfigurationRecord.DefaultQuickRangeKey"
                           @bind-Interval="ConfigurationRecord.Interval"
