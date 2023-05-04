@@ -260,9 +260,6 @@
 
     private async Task OnAbsoluteDateTimeUpdated()
     {
-        // _selectedQuickRangeKey = QuickRangeKey.Off;
-        await updateUseAbsoluteTimeState(true);
-
         if (OnUpdate.HasDelegate)
         {
             await OnUpdate.InvokeAsync((_startDateTime, _endDateTime));

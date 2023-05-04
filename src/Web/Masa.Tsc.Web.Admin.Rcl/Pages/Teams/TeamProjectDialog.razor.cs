@@ -27,16 +27,32 @@ public partial class TeamProjectDialog
 
     TeamDto? Team { get; set; }
 
+    QuickRangeKey? DefaultQuickRangeKey { get; set; } = QuickRangeKey.Last15Minutes;
+
+    DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow.AddMinutes(-15);
+
+    DateTimeOffset EndTime { get; set; } = DateTimeOffset.UtcNow;
+
+    IntervalItem Interval { get; set; } = IntervalItem.Off;
+
     protected override async Task OnParametersSetAsync()
     {
         if (!Visible || string.IsNullOrEmpty(ConfigurationRecord.ProjectId) || ConfigurationRecord.TeamId == Guid.Empty)
+        {
             return;
+        }
 
-        var key = $"{ConfigurationRecord.ProjectId}{ConfigurationRecord.TeamId}";
+        var key = $"{ConfigurationRecord.Service}_{ConfigurationRecord.ProjectId}_{ConfigurationRecord.TeamId}_{ConfigurationRecord.StartTime}_{ConfigurationRecord.EndTime}";
         if (_oldKey != key)
         {
+            firstRender = true;
             _oldKey = key;
+            Interval = ConfigurationRecord.Interval;
+            StartTime = ConfigurationRecord.StartTime;
+            EndTime = ConfigurationRecord.EndTime;
+            DefaultQuickRangeKey = ConfigurationRecord.DefaultQuickRangeKey;
             await InitDataAsync();
+            ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
         }
     }
 
@@ -62,19 +78,25 @@ public partial class TeamProjectDialog
 
     async Task OpenLogAsync()
     {
-        var url = $"/dashbord/log/{ConfigurationRecord.Service}/{ConfigurationRecord.StartTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/{ConfigurationRecord.EndTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/Error";
+        var url = $"/dashbord/log/{ConfigurationRecord.Service}/{StartTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/{EndTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/Error";
         await JSRuntime.InvokeVoidAsync("open", url, "_blank");
     }
 
     async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
-        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;        
+        if (firstRender)
+        {
+            firstRender = false;
+            return;
+        }
+        (StartTime, EndTime) = times;
+        _oldKey = $"{ConfigurationRecord.Service}_{ConfigurationRecord.ProjectId}_{ConfigurationRecord.TeamId}_{StartTime}_{EndTime}";
         ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
     }
 
     async Task OnAutoDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
-        OnDateTimeUpdateAsync(times);
+        await OnDateTimeUpdateAsync(times);
         await InvokeAsync(StateHasChanged);
     }
 
@@ -83,8 +105,8 @@ public partial class TeamProjectDialog
         var query = new SimpleAggregateRequestDto
         {
             Type = AggregateTypes.Count,
-            Start = ConfigurationRecord.StartTime.UtcDateTime,
-            End = ConfigurationRecord.EndTime.UtcDateTime,
+            Start = StartTime.UtcDateTime,
+            End = EndTime.UtcDateTime,
             Service = service,
             Name = ElasticSearchConst.ServiceName,
             Conditions = new List<FieldConditionDto> {
@@ -99,7 +121,7 @@ public partial class TeamProjectDialog
     }
 
     async Task DialogVisibleChanged()
-    {      
+    {
         await VisibleChanged.InvokeAsync(false);
     }
 
@@ -108,4 +130,6 @@ public partial class TeamProjectDialog
         ConfigurationRecord.TeamProjectDialogVisible = false;
         ConfigurationRecord.NavigateToConfiguration();
     }
+
+    bool firstRender = true;
 }

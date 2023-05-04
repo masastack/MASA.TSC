@@ -2,7 +2,7 @@
 @namespace Masa.Tsc.Web.Admin.Rcl.Components
 
 <SSheetDialog Value=Visible OnClosed=DialogVisibleChanged Title="@Team?.CurrentProject?.Name" EnableDomReload>
-    @if(Team is not null)
+    @if (Team is not null)
     {
         <MCard Style="background-color:#F0F3FA;border-top-left-radius: 20px;border-top-right-radius: 20px;" Class="full-height">
             <MRow NoGutters Class="full-height">
@@ -24,14 +24,13 @@
                             </div>
                         </MCol>
                         <MCol Cols="6" Class="d-flex justify-end align-center">
-                            <DateTimeRangeToolbar                               
-                                StartDateTime="@ConfigurationRecord.StartTime"
-                                EndDateTime="@ConfigurationRecord.EndTime"
-                                @bind-DefaultQuickRange="@ConfigurationRecord.DefaultQuickRangeKey"
-                                @bind-Interval="@ConfigurationRecord.Interval"
-                                @bind-UseAbsoluteTime="@ConfigurationRecord.UseAbsoluteTime"
-                                OnUpdate="OnDateTimeUpdateAsync"
-                                OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
+                            <DateTimeRangeToolbar @bind-DefaultQuickRange="@DefaultQuickRangeKey"
+                                              @bind-Interval="@Interval"
+                                              @bind-UseAbsoluteTime="@ConfigurationRecord.UseAbsoluteTime"
+                                              StartDateTime="@StartTime"
+                                              EndDateTime="@EndTime"
+                                              OnUpdate="OnDateTimeUpdateAsync"
+                                              OnAutoUpdate="OnAutoDateTimeUpdateAsync" />
                             <SButton OnClick=NavigateToDashboardConfiguration Class="ml-6" Small BorderRadiusClass="rounded-lg">
                                 @I18n.T("Show Detail")
                             </SButton>
@@ -42,7 +41,7 @@
                                 <div class="rounded-lg d-flex justify-space-between py-1 px-4 align-center" style="background-color:#FF5252;height: 56px;">
                                     <div class="d-flex align-center white--text"><SIcon Class="pr-3" Color="white text-#FF5252">info</SIcon> @string.Format(I18n.Team("Currently the application has {0} error logs"),ErrorCount.ToString())</div>
                                     <SButton Depressed Color="white--text" Style="background-color:#FF5252;text-decoration:underline" OnClick="OpenLogAsync">@I18n.T("Show Detail")</SButton>
-                                </div>      
+                                </div>
                             </MCol>
                         }
                     </MRow>
