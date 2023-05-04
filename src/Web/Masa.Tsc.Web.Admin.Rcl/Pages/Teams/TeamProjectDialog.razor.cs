@@ -37,7 +37,6 @@ public partial class TeamProjectDialog
 
     private ConfigurationRecord childConfiguration;
 
-
     private int ErrorCount { get; set; }   
 
     protected override async Task OnParametersSetAsync()
