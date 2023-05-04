@@ -18,7 +18,7 @@ public partial class TscEChartBase : TscComponentBase
 
     internal virtual async Task LoadAsync(ProjectAppSearchModel query)
     {
-        await Task.Delay(200);
+        //await Task.Delay(200);
         await Task.CompletedTask;
     }
 

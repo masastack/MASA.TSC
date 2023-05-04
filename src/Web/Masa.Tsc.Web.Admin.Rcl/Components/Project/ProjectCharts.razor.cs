@@ -25,15 +25,8 @@ public partial class ProjectCharts
 
     protected override async Task OnParametersSetAsync()
     {
-        if (_oldConfigRecordKey != ConfigurationRecord.Key)
-        {
-            var back = _oldConfigRecordKey;
-            _oldConfigRecordKey = ConfigurationRecord.Key;
-            if (back is not null)
-            {
-                await OnLoadDataAsync();
-            }
-        }
+        await OnLoadDataAsync();
+        await base.OnParametersSetAsync();
     }
 
     internal async Task OnLoadDataAsync(ProjectAppSearchModel? query = null)
@@ -57,7 +50,11 @@ public partial class ProjectCharts
         if (_apdexChart != null)
             tasks.Add(_apdexChart.OnLoadAsync(query));
 
-        await Task.WhenAll(tasks);
+        if (_oldConfigRecordKey != ConfigurationRecord.Key && tasks.Count - 5 == 0)
+        {
+            _oldConfigRecordKey = ConfigurationRecord.Key;
+            await Task.WhenAll(tasks);
+        }
     }
 
     private void UpSetMetrics()

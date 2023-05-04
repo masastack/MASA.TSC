@@ -35,7 +35,10 @@ public partial class TeamProjectDialog
 
     private string? _oldKey;
 
-    private int ErrorCount { get; set; }
+    private ConfigurationRecord childConfiguration;
+
+
+    private int ErrorCount { get; set; }   
 
     protected override async Task OnParametersSetAsync()
     {
@@ -47,6 +50,7 @@ public partial class TeamProjectDialog
         var key = $"{ConfigurationRecord.Service}_{ConfigurationRecord.ProjectId}_{ConfigurationRecord.TeamId}_{ConfigurationRecord.StartTime}_{ConfigurationRecord.EndTime}";
         if (_oldKey != key)
         {
+            childConfiguration = ConfigurationRecord.ShallowClone();
             _firstRender = true;
             _oldKey = key;
             Interval = ConfigurationRecord.Interval;
@@ -92,8 +96,7 @@ public partial class TeamProjectDialog
             return;
         }
         (StartTime, EndTime) = times;
-        ConfigurationRecord.UpdateDateTimesFromTuple(times);
-        ConfigurationRecord.DefaultQuickRangeKey = DefaultQuickRangeKey;
+        childConfiguration.UpdateDateTimesFromTuple(times);
         ErrorCount = await GetErrorCountAsync(ConfigurationRecord.Service!);
     }
 
