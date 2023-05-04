@@ -107,4 +107,12 @@ public abstract class ConfigurationRecord
     {
         Panels.Clear();
     }
+
+    public void UpdateDateTimesFromTuple((DateTimeOffset?, DateTimeOffset?) times)
+    {
+        if (times.Item1 is not null && times.Item2 is not null)
+        {
+            (StartTime, EndTime) = (times.Item1.Value, times.Item2.Value);
+        }
+    }
 }

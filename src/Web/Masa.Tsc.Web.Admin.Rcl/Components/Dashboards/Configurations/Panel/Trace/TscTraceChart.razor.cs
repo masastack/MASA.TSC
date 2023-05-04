@@ -144,19 +144,25 @@ public partial class TscTraceChart
         };
     }
 
-    private async Task OnDateTimeUpdate((DateTimeOffset start, DateTimeOffset end) range)
+    private Task InvokeDateTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) range)
     {
-        var localStart = range.start.UtcDateTime;
-        var localEnd = range.end.UtcDateTime;
-
-        await OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd));
+        if (range is { start: not null, end: not null })
+        {
+            var localStart = range.start.Value.UtcDateTime;
+            var localEnd = range.end.Value.UtcDateTime;
+            return OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd));
+        }
+        return Task.CompletedTask;
     }
 
-    private async Task OnDateTimeAutoUpdate((DateTimeOffset start, DateTimeOffset end) range)
+    private async Task OnDateTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) range)
     {
-        var localStart = range.start.UtcDateTime;
-        var localEnd = range.end.UtcDateTime;
-        await base.InvokeAsync(async () => await OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd)));
+        await InvokeDateTimeUpdate(range);
+    }
+
+    private async Task OnDateTimeAutoUpdate((DateTimeOffset? start, DateTimeOffset? end) range)
+    {
+        await InvokeDateTimeUpdate(range);
     }
 
     protected override bool IsSubscribeTimeZoneChange => true;

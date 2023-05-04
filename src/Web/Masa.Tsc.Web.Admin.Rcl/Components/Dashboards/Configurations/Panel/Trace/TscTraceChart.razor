@@ -7,7 +7,12 @@
         <MSpacer></MSpacer>
         @if (PageMode)
         {
-            <DateTimeRangeToolbar OnUpdate="OnDateTimeUpdate" OnAutoUpdate="OnDateTimeAutoUpdate" />
+            <SDateTimeRangeToolbar Class="mr-6 my-auto"
+                                   OnUpdate="OnDateTimeUpdate"
+                                   OnAutoUpdate="OnDateTimeAutoUpdate"
+                                   ShowInterval
+                                   ShowQuickChange
+                                   ShowTimeZoneSelector />
         }
     </MCardTitle>
     <MCardText Class="pa-0">

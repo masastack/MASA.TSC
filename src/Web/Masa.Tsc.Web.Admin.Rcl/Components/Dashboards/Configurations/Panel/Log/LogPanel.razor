@@ -24,11 +24,14 @@
             </a>
             @if (PageMode)
             {
-                <DateTimeRangeToolbar Class="mr-6 my-auto"
-                                  StartDateTime="@StartTime.ToDateTimeOffset(CurrentTimeZone)"
-                                  EndDateTime="@EndTime.ToDateTimeOffset(CurrentTimeZone)"
-                                  OnUpdate="OnUpdate"
-                                  OnAutoUpdate="OnAutoUpdate" />
+                <SDateTimeRangeToolbar Class="mr-6 my-auto"
+                                       StartDateTime="@StartTime.ToDateTimeOffset(CurrentTimeZone)"
+                                       EndDateTime="@EndTime.ToDateTimeOffset(CurrentTimeZone)"
+                                       OnUpdate="OnUpdate"
+                                       OnAutoUpdate="OnAutoUpdate"
+                                       ShowInterval
+                                       ShowQuickChange
+                                       ShowTimeZoneSelector />
             }
         </div>
         <MCard Class="overflow-hidden" Style="@("border-radius:0 !important;"+ (PageMode ? "height: calc(100vh - 612px)" : "height: calc(100% - 120px)"))" Loading="@Loading">

@@ -5,10 +5,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TeamProjectDialog
 {
-    string? _oldKey;
-
-    int ErrorCount { get; set; }
-
     [Inject]
     IJSRuntime JSRuntime { get; set; }
 
@@ -29,11 +25,19 @@ public partial class TeamProjectDialog
 
     QuickRangeKey? DefaultQuickRangeKey { get; set; } = QuickRangeKey.Last15Minutes;
 
-    DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow.AddMinutes(-15);
+    DateTimeOffset? StartTime { get; set; } = DateTimeOffset.UtcNow.AddMinutes(-15);
 
-    DateTimeOffset EndTime { get; set; } = DateTimeOffset.UtcNow;
+    DateTimeOffset? EndTime { get; set; } = DateTimeOffset.UtcNow;
 
     IntervalItem Interval { get; set; } = IntervalItem.Off;
+
+    private bool _firstRender = true;
+
+    private string? _oldKey;
+
+    private ConfigurationRecord childConfiguration;
+
+    private int ErrorCount { get; set; }   
 
     protected override async Task OnParametersSetAsync()
     {
@@ -45,21 +49,22 @@ public partial class TeamProjectDialog
         var key = $"{ConfigurationRecord.Service}_{ConfigurationRecord.ProjectId}_{ConfigurationRecord.TeamId}_{ConfigurationRecord.StartTime}_{ConfigurationRecord.EndTime}";
         if (_oldKey != key)
         {
-            firstRender = true;
+            childConfiguration = ConfigurationRecord.ShallowClone();
+            _firstRender = true;
             _oldKey = key;
             Interval = ConfigurationRecord.Interval;
             StartTime = ConfigurationRecord.StartTime;
             EndTime = ConfigurationRecord.EndTime;
             DefaultQuickRangeKey = ConfigurationRecord.DefaultQuickRangeKey;
             await InitDataAsync();
-            ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
+            ErrorCount = await GetErrorCountAsync(ConfigurationRecord.Service!);
         }
     }
 
     async Task OnServiceChanged(string service)
     {
         ConfigurationRecord.Service = service;
-        ErrorCount = await GetErroCountAsync(service);
+        ErrorCount = await GetErrorCountAsync(service);
     }
 
     async Task InitDataAsync()
@@ -78,35 +83,35 @@ public partial class TeamProjectDialog
 
     async Task OpenLogAsync()
     {
-        var url = $"/dashbord/log/{ConfigurationRecord.Service}/{StartTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/{EndTime.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}/Error";
+        var url = $"/dashboard/log/{ConfigurationRecord.Service}/{StartTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/{EndTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/Error";
         await JSRuntime.InvokeVoidAsync("open", url, "_blank");
     }
 
-    async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    async Task OnDateTimeUpdateAsync((DateTimeOffset?, DateTimeOffset?) times)
     {
-        if (firstRender)
+        if (_firstRender)
         {
-            firstRender = false;
+            _firstRender = false;
             return;
         }
         (StartTime, EndTime) = times;
-        _oldKey = $"{ConfigurationRecord.Service}_{ConfigurationRecord.ProjectId}_{ConfigurationRecord.TeamId}_{StartTime}_{EndTime}";
-        ErrorCount = await GetErroCountAsync(ConfigurationRecord.Service!);
+        childConfiguration.UpdateDateTimesFromTuple(times);
+        ErrorCount = await GetErrorCountAsync(ConfigurationRecord.Service!);
     }
 
-    async Task OnAutoDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    async Task OnAutoDateTimeUpdateAsync((DateTimeOffset?, DateTimeOffset?) times)
     {
         await OnDateTimeUpdateAsync(times);
         await InvokeAsync(StateHasChanged);
     }
 
-    async Task<int> GetErroCountAsync(string service)
+    async Task<int> GetErrorCountAsync(string service)
     {
         var query = new SimpleAggregateRequestDto
         {
             Type = AggregateTypes.Count,
-            Start = StartTime.UtcDateTime,
-            End = EndTime.UtcDateTime,
+            Start = StartTime!.Value.UtcDateTime,
+            End = EndTime!.Value.UtcDateTime,
             Service = service,
             Name = ElasticSearchConst.ServiceName,
             Conditions = new List<FieldConditionDto> {
@@ -131,5 +136,4 @@ public partial class TeamProjectDialog
         ConfigurationRecord.NavigateToConfiguration();
     }
 
-    bool firstRender = true;
 }

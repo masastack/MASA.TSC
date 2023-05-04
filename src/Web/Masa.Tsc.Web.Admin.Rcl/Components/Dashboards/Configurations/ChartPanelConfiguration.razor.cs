@@ -120,14 +120,14 @@ public partial class ChartPanelConfiguration : TscComponentBase
         Value.ListType = Enum.Parse<ListTypes>(listType.ToString()!);
     }
 
-    void OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    void OnDateTimeUpdateAsync((DateTimeOffset?, DateTimeOffset?) times)
     {
-        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
+        ConfigurationRecord.UpdateDateTimesFromTuple(times);
     }
 
-    async Task OnAutoDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
+    async Task OnAutoDateTimeUpdateAsync((DateTimeOffset?, DateTimeOffset?) times)
     {
-        (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
+        ConfigurationRecord.UpdateDateTimesFromTuple(times);
         await base.InvokeAsync(base.StateHasChanged);
     }
 
