@@ -174,7 +174,7 @@ public partial class Team
     async Task OnDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
     {
         (ConfigurationRecord.StartTime, ConfigurationRecord.EndTime) = times;
-        await GetProjectsAsync();
+        await GetProjectsAsync();        
     }
 
     async Task OnAutoDateTimeUpdateAsync((DateTimeOffset, DateTimeOffset) times)
