@@ -83,7 +83,7 @@ public partial class TeamProjectDialog
 
     async Task OpenLogAsync()
     {
-        var url = $"/dashboard/log/{ConfigurationRecord.Service}/{StartTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/{EndTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/Error";
+        var url = $"/log/{ConfigurationRecord.Service}/{StartTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/{EndTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/Error";
         await JSRuntime.InvokeVoidAsync("open", url, "_blank");
     }
 
