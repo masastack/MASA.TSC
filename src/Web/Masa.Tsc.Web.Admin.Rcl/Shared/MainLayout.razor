@@ -25,7 +25,8 @@
     private readonly List<string> _whiteUrlRoutes = new()
     {
         // for scheduler logs jump
-        "/log/*",
+        "log/*",
+        "trace/*",
         // for instrument like serviceList,endpointList,instanceList  jump to child instrument
         "dashboard/*",
         "teamDetail/*"
