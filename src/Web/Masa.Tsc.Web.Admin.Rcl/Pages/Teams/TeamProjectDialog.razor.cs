@@ -31,13 +31,11 @@ public partial class TeamProjectDialog
 
     IntervalItem Interval { get; set; } = IntervalItem.Off;
 
-    private bool _firstRender = true;
-
     private string? _oldKey;
 
     private ConfigurationRecord childConfiguration;
 
-    private int ErrorCount { get; set; }   
+    private int ErrorCount { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -50,7 +48,6 @@ public partial class TeamProjectDialog
         if (_oldKey != key)
         {
             childConfiguration = ConfigurationRecord.ShallowClone();
-            _firstRender = true;
             _oldKey = key;
             Interval = ConfigurationRecord.Interval;
             StartTime = ConfigurationRecord.StartTime;
@@ -89,11 +86,6 @@ public partial class TeamProjectDialog
 
     async Task OnDateTimeUpdateAsync((DateTimeOffset?, DateTimeOffset?) times)
     {
-        if (_firstRender)
-        {
-            _firstRender = false;
-            return;
-        }
         (StartTime, EndTime) = times;
         childConfiguration.UpdateDateTimesFromTuple(times);
         ErrorCount = await GetErrorCountAsync(ConfigurationRecord.Service!);
@@ -135,5 +127,4 @@ public partial class TeamProjectDialog
         ConfigurationRecord.TeamProjectDialogVisible = false;
         ConfigurationRecord.NavigateToConfiguration();
     }
-
 }
