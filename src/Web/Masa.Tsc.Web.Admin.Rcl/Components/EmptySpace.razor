@@ -1,9 +1,9 @@
-﻿@(Value?.ToString()??"-")@Suffix
+﻿@(Value is null ? "-" : Value.ToString() + Suffix)
 
 @code {
     [Parameter]
     public object? Value { get; set; }
 
     [Parameter]
-    public string Suffix{ get; set; }
+    public string Suffix { get; set; }
 }
