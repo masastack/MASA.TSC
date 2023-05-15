@@ -14,10 +14,10 @@ public partial class ErrorWarnChart
     [Parameter]
     public string Title { get; set; }
 
-    private double _success = 100;
+    private double? _success;
     private EChartType _options = EChartConst.Pie;
     private List<QueryResultDataResponse>? _data;
-    private double[] values = new double[2];
+    private double?[] values = new double?[2];
     private bool _hasData = false;
 
     protected override void OnInitialized()
@@ -45,7 +45,7 @@ public partial class ErrorWarnChart
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
         _hasData = false;
-        _success = 100;
+
         if (query == null)
             return;
         if (query.End == null)
@@ -76,12 +76,12 @@ public partial class ErrorWarnChart
                 {
                     _success = 1;
                 }
-                _success = Math.Floor(_success);
+                _success = Math.Floor(_success.Value);
             }
         }
 
         values[0] = _success;
-        values[1] = (100 - _success);
+        values[1] = _success.HasValue ? (100 - _success) : null;
 
         if (_hasData && (values[0] == 0 || values[1] == 0))
         {
@@ -96,8 +96,9 @@ public partial class ErrorWarnChart
             GetModel(false,values[1]) });
     }
 
-    private object GetModel(bool isSuccess, double value)
+    private object GetModel(bool isSuccess, double? value)
     {
+        value = value ?? 0;
         return new { name = isSuccess ? I18n.Team("Success") : I18n.Team("Fail"), value };
     }
 }

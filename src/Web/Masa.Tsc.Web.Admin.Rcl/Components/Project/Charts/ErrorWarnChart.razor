@@ -4,7 +4,7 @@
 <MCard Width="Width" Height="Height" Class="d-flex flex-column rounded-lg">
     <MCardTitle Class="d-flex justify-space-between">
         <MLabel Class="emphasis2--text h6">@Title</MLabel>
-        <MLabel Class="emphasis2--text h6"><EmptySpace Value="@_success.ToString("0.##")" Suffix="%" /></MLabel>
+        <MLabel Class="emphasis2--text h6"><EmptySpace Value="@_success?.ToString("0.##")" Suffix="%" /></MLabel>
     </MCardTitle>
     <MCardText Class="flex-grow-1 pb-0">
         @if (_isLoading)
@@ -21,7 +21,7 @@
         }
     </MCardText>
     <MCardActions Class="regular3--text body2 text-left px-4 pt-0">
-        @I18n.Team("The average success rate of the service in the current time period")<EmptySpace Value="@values[0]" Suffix="%" /><br />
-        @I18n.Team("The average failure rate of the service in the current time period")<EmptySpace Value="@values[1]" Suffix="%" />
+        @I18n.Team("The average success rate of the service in the current time period") <EmptySpace Value="@values[0]" Suffix="%" /><br />
+        @I18n.Team("The average failure rate of the service in the current time period") <EmptySpace Value="@values[1]" Suffix="%" />
     </MCardActions>
 </MCard>
