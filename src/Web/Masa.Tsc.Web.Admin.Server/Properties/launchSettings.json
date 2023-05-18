@@ -18,7 +18,7 @@
         "DAPR_GRPC_PORT": "3601",
         "DAPR_HTTP_PORT": "3600",
         "DCC_SECRET": "masastack.com",
-        "REDIS": "{\"RedisHost\": \"10.175.207.202\", \"RedisPort\": 30260, \"RedisDb\": 0,\"RedisPassword\": \"Hzss@123redis\"}",
+        "REDIS": "{\"RedisHost\": \"10.130.0.235\", \"RedisPort\": 24615, \"RedisDb\": 0,\"RedisPassword\": \"Hzss@123\"}",
         "NAMESPACE": "masastack",
         "CLUSTER": "Default",
         "OTLP_URL": "https://localhost:4317",

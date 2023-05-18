@@ -21,7 +21,7 @@ public static class SchedulerJobServiceCollectionExtensions
     {
         var url = _masaStackConfig.GetTscServiceDomain();
         var schedulerClient = serviceProvider.GetRequiredService<ISchedulerClient>();
-        await schedulerClient.SchedulerJobService.AddAsync(new AddSchedulerJobRequest()
+        await schedulerClient.SchedulerJobService.AddAsync(new UpsertSchedulerJobRequest()
         {
             ProjectIdentity = MasaStackConstant.TSC,
             JobIdentity = "masa-tsc-topology",
