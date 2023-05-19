@@ -82,8 +82,8 @@
                                 <AppendIconContent>
                                     @if(context.Hover)
                                     {
-                                        <SButton Icon OnClick="() => OpenUpdateFolderDialog(folder)" Class="mr-4" StopPropagation><SIcon Tooltip="@I18n.T("Edit")" Style="transform: none !important">@IconConstants.Update</SIcon></SButton>
-                                        <SButton Icon Color="red" Class="mr-10" OnClick="async () => await OpenRemoveFolderDialogAsync(folder)" StopPropagation><SIcon Tooltip="@I18n.T("Remove")" Color="red" Style="transform: none !important">@IconConstants.Remove</SIcon></SButton>
+                                        <SButton Icon OnClick="() => OpenUpdateFolderDialog(folder)" Class="mr-4" OnClickStopPropagation><SIcon Tooltip="@I18n.T("Edit")" Style="transform: none !important">@IconConstants.Update</SIcon></SButton>
+                                        <SButton Icon Color="red" Class="mr-10" OnClick="async () => await OpenRemoveFolderDialogAsync(folder)" OnClickStopPropagation><SIcon Tooltip="@I18n.T("Remove")" Color="red" Style="transform: none !important">@IconConstants.Remove</SIcon></SButton>
                                     }
                                     @if (folder.Dashboards.Any())
                                     {
@@ -101,8 +101,8 @@
                                                     </MListItemTitle>
                                                 </MListItemContent>
                                                 <MListItemAction>
-                                                    <SButton StopPropagation Icon Class="mr-4" Style="@(childContext.Hover?"":"visibility: hidden")" OnClick="() => OpenUpdateDashboardDialog(dashboard)"><SIcon Tooltip="@I18n.T("Edit")">@IconConstants.Update</SIcon></SButton>
-                                                    <SButton StopPropagation Icon Color="red" Style="@(childContext.Hover?"":"visibility: hidden")" OnClick="async () => await OpenRemoveDashboardDialogAsync(dashboard)"><SIcon Tooltip="@I18n.T("Remove")" Color="red">@IconConstants.Remove</SIcon></SButton>
+                                            <SButton OnClickStopPropagation Icon Class="mr-4" Style="@(childContext.Hover?"":"visibility: hidden")" OnClick="() => OpenUpdateDashboardDialog(dashboard)"><SIcon Tooltip="@I18n.T("Edit")">@IconConstants.Update</SIcon></SButton>
+                                                    <SButton OnClickStopPropagation Icon Color="red" Style="@(childContext.Hover?"":"visibility: hidden")" OnClick="async () => await OpenRemoveDashboardDialogAsync(dashboard)"><SIcon Tooltip="@I18n.T("Remove")" Color="red">@IconConstants.Remove</SIcon></SButton>
                                                 </MListItemAction>
                                             </MListItem>
                                             @if (folder.Dashboards.Last() != dashboard)
