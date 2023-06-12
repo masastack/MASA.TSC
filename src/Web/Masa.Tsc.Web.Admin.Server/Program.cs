@@ -1,6 +1,8 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Contrib.StackSdks.Config;
+
 var builder = WebApplication.CreateBuilder(args);
 
 await builder.Services.AddMasaStackConfigAsync();
@@ -37,7 +39,7 @@ builder.Services.AddObservable(builder.Logging, new MasaObservableOptions
     ServiceName = masaStackConfig.GetWebId(MasaStackConstant.TSC),
     Layer = masaStackConfig.Namespace,
     ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
-}, masaStackConfig.OtlpUrl, true);
+}, default, true);
 
 MasaOpenIdConnectOptions masaOpenIdConnectOptions = new()
 {
@@ -62,13 +64,10 @@ var redisOption = new RedisConfigurationOptions
     Password = masaStackConfig.RedisModel.RedisPassword
 };
 builder.AddMasaStackComponentsForServer();
-var appid = builder.Configuration.GetValue<string>(DaprConst.APPID);
-if (string.IsNullOrEmpty(appid))
-    appid = masaStackConfig.GetServiceId(MasaStackConstant.TSC);
 #if DEBUG
-    builder.Services.AddDebugerTscApiCaller("https://tsc-service-develop.masastack.com").AddDccClient(redisOption);
+    builder.Services.AddTscHttpApiCaller("http://localhost:18010").AddDccClient(redisOption);
 #else
-    builder.Services.AddTscApiCaller(appid).AddDccClient(redisOption);
+    builder.Services.AddTscHttpApiCaller(masaStackConfig.GetTscServiceDomain()).AddDccClient(redisOption);
 #endif
 
 builder.Services.AddRcl().AddScoped<TokenProvider>();

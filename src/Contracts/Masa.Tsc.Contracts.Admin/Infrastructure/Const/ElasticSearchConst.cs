@@ -17,7 +17,17 @@ public sealed class ElasticSearchConst
 
     public const string URL = "Attributes.http.target";
 
-    public const string LogIndex = "masa-stack-logs-0.6.1";
+    public static string LogIndex { get; private set; } = "masa-stack-logs-0.6.1";
 
-    public const string TraceIndex = "masa-stack-traces-0.6.1";
+    public static string TraceIndex { get; private set; } = "masa-stack-traces-0.6.1";
+
+    public static void SetLogIndex(string index)
+    {
+        LogIndex = index;
+    }
+
+    public static void SetTraceIndex(string index)
+    {
+        TraceIndex = index;
+    }
 }
