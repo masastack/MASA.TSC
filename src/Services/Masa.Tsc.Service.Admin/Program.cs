@@ -147,7 +147,7 @@ app.UseMasaExceptionHandler(opt =>
         }
         else if (context.Exception is UserStatusException userStatusException)
         {
-            context.ToResult(userStatusException.GetLocalizedMessage(), 293);
+            context.ToResult(userStatusException.Message, 293);
         }
     };
 });

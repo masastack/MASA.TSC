@@ -47,7 +47,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Dapr.AspNetCore" Version="1.7.0" />
+		<PackageReference Include="Dapr.AspNetCore" Version="1.10.0" />
 	</ItemGroup>
 
 	<ItemGroup>

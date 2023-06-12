@@ -3,7 +3,7 @@
 
 <div class="d-flex mb-6" style="@Style">
     <SAutoComplete Placeholder="@I18n.T("Service")" Label="@I18n.T("Service")"
-                   Items="_services"
+                   Items="_services?? new()"
                    @bind-Value="_service"
                    ItemText="item => item"
                    ItemValue="item => item"
@@ -25,7 +25,7 @@
                    OnClearClick="()=>Query(isService:true)" />
 
     <SAutoComplete Placeholder="@I18n.T("Instance")" Label="@I18n.T("Instance")"
-                   Items="_instances"
+                   Items="_instances?? new()"
                    @bind-Value="_instance"
                    TItem=string
                    TValue=string
@@ -48,7 +48,7 @@
                    OnClearClick="()=>Query(isInstance:true)" />
 
     <SAutoComplete Placeholder="@I18n.T("Endpoint")" Label="@I18n.T("Endpoint")"
-                   Items="_endpoints"
+                   Items="_endpoints?? new()"
                    @bind-Value="_endpoint"
                    TItem=string
                    TValue=string
