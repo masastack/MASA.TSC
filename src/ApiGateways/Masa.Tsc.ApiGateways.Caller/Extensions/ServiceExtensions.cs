@@ -36,7 +36,7 @@ public static class ServiceExtensions
         return services;
     }
 
-    public static IServiceCollection AddDebugerTscApiCaller(this IServiceCollection services, string tscApiUrl)
+    public static IServiceCollection AddTscHttpApiCaller(this IServiceCollection services, string tscApiUrl)
     {
         try
         {

@@ -5,11 +5,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 await builder.Services.AddMasaStackConfigAsync();
 var masaStackConfig = builder.Services.GetMasaStackConfig();
-
 var elasticsearchUrls = masaStackConfig.ElasticModel.Nodes?.ToArray() ?? Array.Empty<string>();
 var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus");
-
-builder.Services.AddElasticClientLogAndTrace(elasticsearchUrls, ElasticSearchConst.LogIndex, ElasticSearchConst.TraceIndex)
+builder.Services.AddTraceLog(masaStackConfig, elasticsearchUrls)
     .AddObservable(builder.Logging, new MasaObservableOptions
     {
         ServiceNameSpace = builder.Environment.EnvironmentName,

@@ -62,13 +62,10 @@ var redisOption = new RedisConfigurationOptions
     Password = masaStackConfig.RedisModel.RedisPassword
 };
 builder.AddMasaStackComponentsForServer();
-var appid = builder.Configuration.GetValue<string>(DaprConst.APPID);
-if (string.IsNullOrEmpty(appid))
-    appid = masaStackConfig.GetServiceId(MasaStackConstant.TSC);
 #if DEBUG
-    builder.Services.AddDebugerTscApiCaller("http://localhost:18010").AddDccClient(redisOption);
+    builder.Services.AddTscHttpApiCaller("http://localhost:18010").AddDccClient(redisOption);
 #else
-    builder.Services.AddTscApiCaller(appid).AddDccClient(redisOption);
+    builder.Services.AddTscHttpApiCaller(masaStackConfig.GetTscServiceDomain()).AddDccClient(redisOption);
 #endif
 
 builder.Services.AddRcl().AddScoped<TokenProvider>();
