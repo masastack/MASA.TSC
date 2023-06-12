@@ -1,8 +1,6 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Contrib.StackSdks.Config;
-
 var builder = WebApplication.CreateBuilder(args);
 
 await builder.Services.AddMasaStackConfigAsync();
@@ -39,7 +37,7 @@ builder.Services.AddObservable(builder.Logging, new MasaObservableOptions
     ServiceName = masaStackConfig.GetWebId(MasaStackConstant.TSC),
     Layer = masaStackConfig.Namespace,
     ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
-}, default, true);
+}, masaStackConfig.OtlpUrl, true);
 
 MasaOpenIdConnectOptions masaOpenIdConnectOptions = new()
 {

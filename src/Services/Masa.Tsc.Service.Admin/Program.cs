@@ -10,12 +10,12 @@ var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus");
 builder.Services.AddTraceLog(masaStackConfig, elasticsearchUrls)
     .AddObservable(builder.Logging, new MasaObservableOptions
     {
-        ServiceNameSpace = builder.Environment.EnvironmentName, 
+        ServiceNameSpace = builder.Environment.EnvironmentName,
         ServiceVersion = masaStackConfig.Version,
         ServiceName = masaStackConfig.GetServiceId(MasaStackConstant.TSC),
         Layer = masaStackConfig.Namespace,
-        //ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
-    }, "http://localhost:4317", false)
+        ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
+    }, masaStackConfig.OtlpUrl, false)
     .AddPrometheusClient(prometheusUrl, 15)
     .AddTopology(elasticsearchUrls);
 
