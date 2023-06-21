@@ -10,7 +10,7 @@ public static class AddTraceLogExtenstion
         var configration = services.BuildServiceProvider().GetRequiredService<IMasaConfiguration>();
         var config = configration.ConfigurationApi.Get(masaStackConfig.GetServiceId(MasaStackConstant.TSC));
 
-        var logIndex = config.GetValue<string>("Appsettings:traceIndex");
+        var logIndex = config.GetValue<string>("Appsettings:logIndex");
         var traceIndex = config.GetValue<string>("Appsettings:traceIndex");
 
         if (!string.IsNullOrEmpty(logIndex))

@@ -61,10 +61,12 @@ var redisOption = new RedisConfigurationOptions
     DefaultDatabase = masaStackConfig.RedisModel.RedisDb,
     Password = masaStackConfig.RedisModel.RedisPassword
 };
-builder.AddMasaStackComponentsForServer();
+
 #if DEBUG
+    builder.AddMasaStackComponentsForServer(authHost: "https://auth-service-dev.masastack.com", mcHost: "https://mc-service-dev.masastack.com", pmHost: "https://pm-service-dev.masastack.com");
     builder.Services.AddTscHttpApiCaller("http://localhost:18010").AddDccClient(redisOption);
 #else
+    builder.AddMasaStackComponentsForServer();
     builder.Services.AddTscHttpApiCaller(masaStackConfig.GetTscServiceDomain()).AddDccClient(redisOption);
 #endif
 

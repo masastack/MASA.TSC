@@ -6,7 +6,6 @@ namespace Masa.BuildingBlocks.Caching;
 public static class IMultilevelCacheClientExtensions
 {
     private static readonly object lockObj = new();
-    private static readonly object lockReadTemplate = new();
 
     public static async Task<List<string>> GetAllMetricsAsync(this IMultilevelCacheClient _multilevelCacheClient, IMasaPrometheusClient _prometheusClient, ILogger? _logger = null)
     {
@@ -48,25 +47,21 @@ public static class IMultilevelCacheClientExtensions
             return default;
 
         var key = MD5Utils.Encrypt(expression);
-
-        lock (lockReadTemplate)
+        int max = 3;
+        do
         {
-            int max = 3;
-            do
+            var cacheKey = string.Format(MetricConstants.METRIC_TEMPLATE_PREF, key);
+            try
             {
-                var cacheKey = string.Format(MetricConstants.METRIC_TEMPLATE_PREF, key);
-                try
-                {
-                    return _multilevelCacheClient.Get<string>(cacheKey);
-                }
-                catch (Exception ex)
-                {
-                    _logger?.LogError("GetAllMetricsAsync", ex);
-                    max--;
-                    Task.Delay(10).ConfigureAwait(false).GetAwaiter().GetResult();
-                }
-            } while (max > 0);
-        }
+                return _multilevelCacheClient.Get<string>(cacheKey);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError("GetAllMetricsAsync", ex);
+                max--;
+                Task.Delay(10).ConfigureAwait(false).GetAwaiter().GetResult();
+            }
+        } while (max > 0);
 
         return null;
     }

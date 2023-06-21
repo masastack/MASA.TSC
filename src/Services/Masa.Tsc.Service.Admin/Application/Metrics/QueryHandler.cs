@@ -147,6 +147,7 @@ public class QueryHandler
     {
         var tasks = new Task<QueryResultCommonResponse>[query.Data.MetricNames.Count];
         var index = 0;
+        var result=new List<QueryResultCommonResponse>();
         foreach (var name in query.Data.MetricNames)
         {
             var metric = await ReplaceCondition(name, query.Data.Layer!, query.Data.Service!, query.Data.Instance!, query.Data.EndPoint!);
@@ -157,9 +158,10 @@ public class QueryHandler
                 Query = metric,
                 Step = query.Data.Step,
             });
+            result.Add( await tasks[index]);
             index++;
         }
-        var result = await Task.WhenAll(tasks);
+        //var result = await Task.WhenAll(tasks);
         query.Result = result.Select(item => item.Data!).ToList();
     }
 
@@ -168,6 +170,7 @@ public class QueryHandler
     {
         var tasks = new Task<QueryResultCommonResponse>[query.Data.Queries.Count];
         var index = 0;
+        var result = new List<QueryResultCommonResponse>();
         foreach (var name in query.Data.Queries)
         {
             var metric = await ReplaceCondition(name, query.Data.Layer!, query.Data.Service!, query.Data.Instance!, query.Data.EndPoint!);
@@ -176,9 +179,10 @@ public class QueryHandler
                 Time = query.Data.Time.ToUnixTimestamp().ToString(),
                 Query = metric
             });
+            result.Add(await tasks[index]);
             index++;
         }
-        var result = await Task.WhenAll(tasks);
+        //var result = await Task.WhenAll(tasks);
         query.Result = result.Select(item => item.Data!).ToList();
     }
 

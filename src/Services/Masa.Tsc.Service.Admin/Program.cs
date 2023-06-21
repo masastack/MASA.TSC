@@ -5,8 +5,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 await builder.Services.AddMasaStackConfigAsync();
 var masaStackConfig = builder.Services.GetMasaStackConfig();
+
 var elasticsearchUrls = masaStackConfig.ElasticModel.Nodes?.ToArray() ?? Array.Empty<string>();
 var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus");
+
 builder.Services.AddTraceLog(masaStackConfig, elasticsearchUrls)
     .AddObservable(builder.Logging, new MasaObservableOptions
     {
@@ -67,6 +69,23 @@ builder.Services.AddAuthorization()
             ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
         };
     });
+
+var pmServiceUrl =
+#if DEBUG
+    "https://pm-service-dev.masastack.com"
+#else
+    masaStackConfig.GetAuthServiceDomain()
+#endif
+    ;
+
+var authServiceUrl =
+#if DEBUG
+    "https://auth-service-dev.masastack.com"
+#else
+    masaStackConfig.GetAuthServiceDomain()
+#endif
+    ;
+
 builder.Services.AddMasaIdentity(options =>
 {
     options.Environment = "environment";
@@ -76,8 +95,8 @@ builder.Services.AddMasaIdentity(options =>
     options.Mapping(nameof(MasaUser.StaffId), IdentityClaimConsts.STAFF);
     options.Mapping(nameof(MasaUser.Account), IdentityClaimConsts.ACCOUNT);
 }).AddAuthenticationCore()
-    .AddAuthClient(masaStackConfig.GetAuthServiceDomain(), redisOption)
-    .AddPmClient(masaStackConfig.GetPmServiceDomain())
+    .AddAuthClient(authServiceUrl, redisOption)
+    .AddPmClient(pmServiceUrl)
     .AddMultilevelCache(masaStackConfig.GetServiceId(MasaStackConstant.TSC),
         distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
         multilevelCacheOptions =>
@@ -153,11 +172,10 @@ app.UseMasaExceptionHandler(opt =>
 });
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+#if DEBUG
+app.UseSwagger();
+app.UseSwaggerUI();
+#endif
 app.UseRouting();
 
 app.UseAuthentication();
