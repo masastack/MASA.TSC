@@ -1,11 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using System;
-
 namespace Masa.Tsc.ApiGateways.Caller;
 
 public static class ServiceExtensions
@@ -59,26 +54,11 @@ public static class ServiceExtensions
                     options.BaseAddress = tscApiUrl;
                     options.Configure = (http) =>
                     {
-                        var httpContext=serviceProviderCopy.GetRequiredService<IHttpContextAccessor>();
+                        var httpContext = serviceProviderCopy.GetRequiredService<IHttpContextAccessor>();
                         if (httpContext.HttpContext == null)
                             return;
                         var token = httpContext.HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken).ConfigureAwait(false).GetAwaiter().GetResult();
-                        //var tokens = new TokenProvider
-                        //{
-                        //    AccessToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken),
-                        //    RefreshToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.RefreshToken),
-                        //    IdToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.IdToken)
-                        //};
-
-
-
-
-
-
-
-                        //var token = serviceProviderCopy.GetRequiredService<TokenProvider>();
-                        //if (token != null && !string.IsNullOrEmpty(token.AccessToken))
-                        if(!string.IsNullOrEmpty(token))
+                        if (!string.IsNullOrEmpty(token))
                             http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                     };
                 });
@@ -86,7 +66,6 @@ public static class ServiceExtensions
 
             services.AddScoped(serviceProvider =>
             {
-                //serviceProviderCopy = serviceProvider;
                 var caller = serviceProvider.GetRequiredService<ICallerFactory>().Create(DEFAULT_CLIENT_NAME);
                 var client = new TscCaller(serviceProvider, caller);
                 return client;
