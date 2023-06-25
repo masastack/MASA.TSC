@@ -12,9 +12,6 @@ public partial class TscTraceChart
     public ValueTuple<long, string, string>[] Data { get; set; } = Array.Empty<(long, string, string)>();
 
     [Parameter]
-    public bool PageMode { get; set; }
-
-    [Parameter]
     public double Height { get; set; }
 
     [Parameter]
@@ -142,27 +139,6 @@ public partial class TscTraceChart
                 y2 = 50
             }
         };
-    }
-
-    private Task InvokeDateTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) range)
-    {
-        if (range is { start: not null, end: not null })
-        {
-            var localStart = range.start.Value.UtcDateTime;
-            var localEnd = range.end.Value.UtcDateTime;
-            return OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd));
-        }
-        return Task.CompletedTask;
-    }
-
-    private async Task OnDateTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) range)
-    {
-        await InvokeDateTimeUpdate(range);
-    }
-
-    private async Task OnDateTimeAutoUpdate((DateTimeOffset? start, DateTimeOffset? end) range)
-    {
-        await InvokeDateTimeUpdate(range);
     }
 
     protected override bool IsSubscribeTimeZoneChange => true;

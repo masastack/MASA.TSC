@@ -19,7 +19,26 @@ builder.Services.AddTraceLog(masaStackConfig, elasticsearchUrls)
         ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
     }, masaStackConfig.OtlpUrl, false)
     .AddPrometheusClient(prometheusUrl, 15)
-    .AddTopology(elasticsearchUrls);
+    .AddTopology(elasticsearchUrls)
+    .AddAuthorization()
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = masaStackConfig.GetSsoDomain();
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters.ValidateAudience = false;
+        options.MapInboundClaims = false;
+        options.BackchannelHttpHandler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+        };
+    });
+
+builder.Services.AddIsolation(services => services.UseMultiEnvironment(parserProviders: new List<Masa.Contrib.Isolation.Parser.IParserProvider> { new CurrentUserEnvironmentParseProvider() }));
 
 builder.Services.AddDaprClient();
 await builder.Services.AddDccClient().AddSchedulerClient(masaStackConfig.GetSchedulerServiceDomain()).AddSchedulerJobAsync();
@@ -51,24 +70,6 @@ if (builder.Environment.IsDevelopment())
         opt.DaprGrpcPort = 3607;
     });
 }
-
-builder.Services.AddAuthorization()
-    .AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer("Bearer", options =>
-    {
-        options.Authority = masaStackConfig.GetSsoDomain();
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters.ValidateAudience = false;
-        options.MapInboundClaims = false;
-        options.BackchannelHttpHandler = new HttpClientHandler
-        {
-            ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
-        };
-    });
 
 var pmServiceUrl =
 #if DEBUG
@@ -152,8 +153,17 @@ var app = builder.Services
     .AddTopologyRepository()
     .AddServices(builder);
 
-app.UseI18n();
+#if DEBUG
+app.UseSwagger();
+app.UseSwaggerUI();
+#endif
+app.UseRouting();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseI18n();
+app.UseIsolation();
 app.UseStackMiddleware();
 await builder.Services.MigrateAsync();
 app.UseMasaExceptionHandler(opt =>
@@ -170,16 +180,6 @@ app.UseMasaExceptionHandler(opt =>
         }
     };
 });
-
-// Configure the HTTP request pipeline.
-#if DEBUG
-app.UseSwagger();
-app.UseSwaggerUI();
-#endif
-app.UseRouting();
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.UseCloudEvents();
 app.UseEndpoints(endpoints =>

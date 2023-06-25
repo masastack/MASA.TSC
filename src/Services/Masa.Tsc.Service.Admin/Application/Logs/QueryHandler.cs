@@ -6,26 +6,23 @@ namespace Masa.Tsc.Service.Admin.Application.Logs;
 public class QueryHandler
 {
     private readonly ILogService _logService;
+    private readonly IMasaStackConfig _masaStackConfig;
+    private readonly IWebHostEnvironment _environment;
+    private readonly IMultiEnvironmentContext _multiEnvironment;
 
-    public QueryHandler(ILogService logService)
+    public QueryHandler(ILogService logService, IMasaStackConfig masaStackConfig, IWebHostEnvironment environment, IMultiEnvironmentContext multiEnvironment)
     {
         _logService = logService;
+        _masaStackConfig = masaStackConfig;
+        _environment = environment;
+        _multiEnvironment = multiEnvironment;
     }
 
     [EventHandler]
     public async Task AggregateAsync(LogAggQuery query)
     {
-        if (query.Data.Conditions != null)
-        {
-            foreach (var item in query.Data.Conditions)
-            {
-                if (item.Type == ConditionTypes.In && item.Value is JsonElement json)
-                {
-                    item.Value = json.EnumerateArray().Select(value => value.ToString());
-                }
-            }
-        }
-
+        query.Data.SetValues();
+        query.Data.SetEnv(_masaStackConfig.GetServiceEnvironmentName(_environment, query.Data.Service, _multiEnvironment.CurrentEnvironment));
         query.Result = await _logService.AggregateAsync(query.Data);
     }
 
@@ -39,6 +36,13 @@ public class QueryHandler
             Keyword = queryData.Query,
             Page = 1,
             PageSize = 1,
+            Conditions = new FieldConditionDto[] {
+                new FieldConditionDto{
+                    Name= ElasticSearchConst.Environment,
+                    Type= ConditionTypes.Equal,
+                    Value=_multiEnvironment.CurrentEnvironment
+                }
+            },
             Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = !queryData.IsDesc }
         });
 
@@ -56,6 +60,9 @@ public class QueryHandler
     [EventHandler]
     public async Task GetPageListAsync(LogsQuery queryData)
     {
+
+        bool isMasaStack = false;
+
         var conditions = new List<FieldConditionDto>();
         if (!string.IsNullOrEmpty(queryData.JobTaskId))
         {
@@ -65,6 +72,7 @@ public class QueryHandler
                 Type = ConditionTypes.Equal,
                 Value = queryData.JobTaskId
             });
+            isMasaStack = true;
         }
 
         if (!string.IsNullOrEmpty(queryData.SpanId))
@@ -88,6 +96,25 @@ public class QueryHandler
         }
 
         bool isRawQuery = (queryData.Query?.IndexOfAny(new char[] { '{', '}' }) ?? -1) >= 0;
+
+        if (isMasaStack)
+        {
+            conditions.Add(new FieldConditionDto
+            {
+                Name = ElasticSearchConst.Environment,
+                Type = ConditionTypes.Equal,
+                Value = _environment.EnvironmentName
+            });
+        }
+        else
+        {
+            conditions.Add(new FieldConditionDto
+            {
+                Name = ElasticSearchConst.Environment,
+                Type = ConditionTypes.Equal,
+                Value = _masaStackConfig.GetServiceEnvironmentName(_environment, queryData.Service!, _multiEnvironment.CurrentEnvironment)
+            });
+        }
 
         var data = await _logService.ListAsync(new BaseRequestDto
         {

@@ -1,41 +1,38 @@
 ﻿@inherits TscComponentBase
 
-<AutoHeight AutoClass="full-height">
+<div class="d-flex mb-4">   
+    <SSearch BackgroundColor="white" @bind-Value="@Search" OnEnter=OnSearchAsync Class="my-auto mr-1" MaxWidth="0" />
+    <a href="https://docs.masastack.com/stack/tsc/use-guide/log" target="_blank" style="text-decoration:none" class="pt-2 mr-4">
+        <SIcon Tooltip="@I18n.Log("Clike me view log advanced usage")">
+            mdi-help-circle-outline
+        </SIcon>
+    </a>
+    @if (PageMode)
+    {
+        <SDateTimeRangeToolbar Class="my-auto"
+                           StartDateTime="@StartTime.ToDateTimeOffset(CurrentTimeZone)"
+                           EndDateTime="@EndTime.ToDateTimeOffset(CurrentTimeZone)"
+                           OnUpdate="OnUpdate"
+                           OnAutoUpdate="OnAutoUpdate"
+                           ShowInterval
+                           ShowQuickChange
+                           ShowTimeZoneSelector />
+    }
+    </div>
+
+<AutoHeight AutoStyle="height:cacl(100% - 56px )">
     <HeaderContent>
         <MCard Rounded=true Style="border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important;">
-            <MCardTitle>
-                <span>Log</span>
-            </MCardTitle>
-            <MCardText Class="pa-0">
-                <MDivider Class="mb-2" />
+            <MCardText>
                 <AutoResize OnResize="ResizeEChartAsync" Delay="10">
-                    <MECharts @ref=MECharts Option="FormatChartData()" Width="@("100%")" Height="280" />
+                    <MECharts @ref=MECharts Option="FormatChartData()" Width="@("100%")" Height="235" />
                 </AutoResize>
             </MCardText>
         </MCard>
     </HeaderContent>
     <AutoHeightContent>
-        <div class="d-flex px-6 py-2 my-1" style="background: #FFFFFF;">
-            <SSearch @bind-Value="@Search" OnEnter=OnSearchAsync Class="my-auto mr-1" MaxWidth="0" />
-            <a href="https://docs.masastack.com/stack/tsc/use-guide/log" target="_blank" style="text-decoration:none" class="pt-2 mr-4">
-                <SIcon Tooltip="@I18n.Log("Clike me view log advanced usage")">
-                    mdi-help-circle-outline
-                </SIcon>
-            </a>
-            @if (PageMode)
-            {
-                <SDateTimeRangeToolbar Class="mr-6 my-auto"
-                                       StartDateTime="@StartTime.ToDateTimeOffset(CurrentTimeZone)"
-                                       EndDateTime="@EndTime.ToDateTimeOffset(CurrentTimeZone)"
-                                       OnUpdate="OnUpdate"
-                                       OnAutoUpdate="OnAutoUpdate"
-                                       ShowInterval
-                                       ShowQuickChange
-                                       ShowTimeZoneSelector />
-            }
-        </div>
-        <MCard Class="overflow-hidden" Style="@("border-radius:0 !important;"+ (PageMode ? "height: calc(100vh - 612px)" : "height: calc(100% - 120px)"))" Loading="@Loading">
-            <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="Logs" Class="pa-6 pt-5 pb-0 m-sheet theme--light">
+        <MCard Class="overflow-hidden mt-2" Style="@("border-radius:0 !important;"+ (PageMode ? "height: calc(100vh - 517px)" : "height: calc(100% - 120px)"))" Loading="@Loading">
+            <MVirtualScroll OverscanCount=5 TItem="LogModel" Items="Logs" Class="pa-6 pb-0 m-sheet theme--light">
                 <ItemContent>
                     <div class="d-flex">
                         <div style="min-width:234px;">                           

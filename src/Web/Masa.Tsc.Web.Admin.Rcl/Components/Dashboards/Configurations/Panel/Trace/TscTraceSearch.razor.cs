@@ -18,7 +18,22 @@ public partial class TscTraceSearch
     public Func<string, string?, Task<IEnumerable<string>>> QueryEndpoints { get; set; }
 
     [Parameter]
-    public string? TraceId { get; set; }
+    public EventCallback<(DateTime, DateTime)> OnDateTimeRangeUpdate { get; set; }
+
+    [Parameter]
+    public bool PageMode { get; set; }
+
+    [Parameter]
+    public DateTime? StartDateTime { get; set; }
+
+    [Parameter]
+    public DateTime? EndDateTime { get; set; }
+
+    [Parameter]
+    public string Service { get; set; }
+
+    [Parameter]
+    public string Keyword { get { return Search; } set { Search = Keyword; } }
 
     private List<string> _services = new();
     private List<string> _instances = new();
@@ -27,24 +42,41 @@ public partial class TscTraceSearch
     private string _service = string.Empty;
     private string? _instance;
     private string? _endpoint;
-    private string? _keyword;
+    private string? Search;
 
     private bool _serviceSearching;
     private bool _instanceSearching;
     private bool _endpointSearching;
+    private int width = 268;
+    private string _style = "flex:none;width:{0}px !important;";
 
     protected override async Task OnInitializedAsync()
     {
-        _keyword = TraceId;
+        Search = Keyword;
         await SearchServices();
+        if (PageMode)
+            width = 208;
+        _style = string.Format(_style, width);
         await base.OnInitializedAsync();
+    }
+
+    private bool IsTraceId()
+    {
+        if (!string.IsNullOrEmpty(Keyword) && Keyword.Length - 32 == 0)
+        {
+            return Regex.IsMatch("[a-zA-Z0-9]{32}", Keyword);
+        }
+        return false;
     }
 
     public async Task SearchServices()
     {
         _serviceSearching = true;
         _services = (await QueryServices.Invoke())?.ToList();
-        _service = default;
+        if (!string.IsNullOrEmpty(Service) && _services != null && _services.Contains(Service))
+            _service = Service;
+        else
+            _service = default;
         _instance = default;
         _endpoint = default;
         _serviceSearching = false;
@@ -85,8 +117,29 @@ public partial class TscTraceSearch
                 await SearchEndpoints();
             }
 
-            await OnQueryUpdate.InvokeAsync((_service, _instance, _endpoint, _keyword));
+            await OnQueryUpdate.InvokeAsync((_service, _instance, _endpoint, Search));
             StateHasChanged();
         });
+    }
+
+    private async Task OnDateTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) range)
+    {
+        await InvokeDateTimeUpdate(range);
+    }
+
+    private async Task OnDateTimeAutoUpdate((DateTimeOffset? start, DateTimeOffset? end) range)
+    {
+        await InvokeDateTimeUpdate(range);
+    }
+
+    private Task InvokeDateTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) range)
+    {
+        if (range is { start: not null, end: not null })
+        {
+            var localStart = range.start.Value.UtcDateTime;
+            var localEnd = range.end.Value.UtcDateTime;
+            return OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd));
+        }
+        return Task.CompletedTask;
     }
 }

@@ -57,7 +57,7 @@ public class QueryHandler
         {
             query.Result = await GetAllProjectsAsync(teams.Select(t => t.Id).ToList());
         }
-    }
+    }   
 
     private async Task<List<ProjectDto>> GetAllProjectsAsync(List<Guid> teamIds)
     {

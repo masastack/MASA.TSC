@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Contracts.Admin.Infrastructure.Const;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TeamProjectDialog
@@ -84,6 +86,12 @@ public partial class TeamProjectDialog
         await JSRuntime.InvokeVoidAsync("open", url, "_blank");
     }
 
+    async Task OpenTraceAsync()
+    {
+        var url = $"/trace/{ConfigurationRecord.Service}/{StartTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/{EndTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/Error";
+        await JSRuntime.InvokeVoidAsync("open", url, "_blank");
+    }
+
     async Task OnDateTimeUpdateAsync((DateTimeOffset?, DateTimeOffset?) times)
     {
         (StartTime, EndTime) = times;
@@ -99,22 +107,23 @@ public partial class TeamProjectDialog
 
     async Task<int> GetErrorCountAsync(string service)
     {
-        var query = new SimpleAggregateRequestDto
-        {
-            Type = AggregateTypes.Count,
-            Start = StartTime!.Value.UtcDateTime,
-            End = EndTime!.Value.UtcDateTime,
-            Service = service,
-            Name = ElasticSearchConst.ServiceName,
-            Conditions = new List<FieldConditionDto> {
-                new FieldConditionDto{
-                Name=ElasticSearchConst.LogLevelText,
-                Type= ConditionTypes.Equal,
-                Value=ElasticSearchConst.LogErrorText
-                }
-            }
-        };
-        return await ApiCaller.LogService.AggregateAsync<int>(query);
+        return await ApiCaller.AppService.GetAppErrorCountAsync(service, StartTime!.Value.UtcDateTime, EndTime!.Value.UtcDateTime);
+        //var query = new SimpleAggregateRequestDto
+        //{
+        //    Type = AggregateTypes.Count,
+        //    Start = StartTime!.Value.UtcDateTime,
+        //    End = EndTime!.Value.UtcDateTime,
+        //    Service = service,
+        //    Name = ElasticSearchConst.ServiceName,
+        //    Conditions = new List<FieldConditionDto> {
+        //        new FieldConditionDto{
+        //        Name=ElasticSearchConst.LogLevelText,
+        //        Type= ConditionTypes.Equal,
+        //        Value=ElasticSearchConst.LogErrorText
+        //        }
+        //    }
+        //};
+        //return await ApiCaller.LogService.AggregateAsync<int>(query);
     }
 
     async Task DialogVisibleChanged()

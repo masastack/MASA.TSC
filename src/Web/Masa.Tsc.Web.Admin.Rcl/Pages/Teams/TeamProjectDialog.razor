@@ -43,8 +43,8 @@
                         {
                             <MCol Class="py-0 mb-3">
                                 <div class="rounded-lg d-flex justify-space-between py-1 px-4 align-center" style="background-color:#FF5252;height: 56px;">
-                                    <div class="d-flex align-center white--text"><SIcon Class="pr-3" Color="white text-#FF5252">info</SIcon> @string.Format(I18n.Team("Currently the application has {0} error logs"),ErrorCount.ToString())</div>
-                                    <SButton Depressed Color="white--text" Style="background-color:#FF5252;text-decoration:underline" OnClick="OpenLogAsync">@I18n.T("Show Detail")</SButton>
+                                    <div class="d-flex align-center white--text"><SIcon Class="pr-3" Color="white text-#FF5252">info</SIcon> @string.Format(I18n.Team("Currently the application has {0} error records"),ErrorCount.ToString())</div>
+                                    <SButton Depressed Color="white--text" Style="background-color:#FF5252;text-decoration:underline" OnClick="OpenTraceAsync">@I18n.T("Show Detail")</SButton>
                                 </div>
                             </MCol>
                         }

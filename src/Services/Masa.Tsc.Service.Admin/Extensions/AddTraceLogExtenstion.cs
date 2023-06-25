@@ -1,6 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Google.Api;
+using Nest;
+
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class AddTraceLogExtenstion
@@ -8,10 +11,7 @@ public static class AddTraceLogExtenstion
     public static IServiceCollection AddTraceLog(this IServiceCollection services, IMasaStackConfig masaStackConfig, string[] elasticsearchUrls)
     {
         var configration = services.BuildServiceProvider().GetRequiredService<IMasaConfiguration>();
-        var config = configration.ConfigurationApi.Get(masaStackConfig.GetServiceId(MasaStackConstant.TSC));
-
-        var logIndex = config.GetValue<string>("Appsettings:logIndex");
-        var traceIndex = config.GetValue<string>("Appsettings:traceIndex");
+        (string logIndex, string traceIndex) = configration.GetElasticsearchLogTraceIndex(masaStackConfig);
 
         if (!string.IsNullOrEmpty(logIndex))
             ElasticSearchConst.SetLogIndex(logIndex);
