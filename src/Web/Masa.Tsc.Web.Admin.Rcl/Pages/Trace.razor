@@ -2,12 +2,15 @@
 @page "/trace/{Keyword}"
 @page "/trace/{Service}/{StartTime}/{EndTime}/{Type}"
 @inject I18n I18n
+@inject NavigationManager navigation
 
 <PageTitle>@I18n.Trace("Trace")</PageTitle>
 
 <TscTrace PageMode StartDateTime="ToDateTime(StartTime)" EndDateTime="ToDateTime(EndTime)" Keyword="@Keyword" Type="@Type"  Service="@Service"/>
 
 @code {
+
+
 
     [Parameter]
     public string Keyword { get; set; }
@@ -29,5 +32,14 @@
         if (DateTime.TryParse(str, out var time))
             return time;
         return DateTime.MinValue;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            navigation.NavigateTo("/trace", true);
+            return;        }
+        base.OnAfterRender(firstRender);        
     }
 }

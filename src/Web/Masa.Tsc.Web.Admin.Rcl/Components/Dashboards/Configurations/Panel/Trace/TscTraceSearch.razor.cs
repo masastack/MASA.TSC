@@ -6,7 +6,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TscTraceSearch
 {
     [Parameter, EditorRequired]
-    public EventCallback<(string?, string?, string?, string?)> OnQueryUpdate { get; set; }
+    public EventCallback<(string? service, string? instance, string? endpoint, string? keyword)> OnQueryUpdate { get; set; }
 
     [Parameter, EditorRequired]
     public Func<Task<IEnumerable<string>>> QueryServices { get; set; }
@@ -33,16 +33,14 @@ public partial class TscTraceSearch
     public string Service { get; set; }
 
     [Parameter]
-    public string Keyword { get { return Search; } set { Search = Keyword; } }
+    public string Keyword { get; set; }
 
     private List<string> _services = new();
     private List<string> _instances = new();
     private List<string> _endpoints = new();
 
-    private string _service = string.Empty;
     private string? _instance;
     private string? _endpoint;
-    private string? Search;
 
     private bool _serviceSearching;
     private bool _instanceSearching;
@@ -52,7 +50,6 @@ public partial class TscTraceSearch
 
     protected override async Task OnInitializedAsync()
     {
-        Search = Keyword;
         await SearchServices();
         if (PageMode)
             width = 208;
@@ -60,39 +57,39 @@ public partial class TscTraceSearch
         await base.OnInitializedAsync();
     }
 
-    private bool IsTraceId()
-    {
-        if (!string.IsNullOrEmpty(Keyword) && Keyword.Length - 32 == 0)
-        {
-            return Regex.IsMatch("[a-zA-Z0-9]{32}", Keyword);
-        }
-        return false;
-    }
-
     public async Task SearchServices()
     {
         _serviceSearching = true;
-        _services = (await QueryServices.Invoke())?.ToList();
+        _services = (await QueryServices.Invoke())?.ToList()!;
         if (!string.IsNullOrEmpty(Service) && _services != null && _services.Contains(Service))
-            _service = Service;
+        {
+            await SearchEndpoints();
+            await SearchEndpoints();
+        }
         else
-            _service = default;
-        _instance = default;
-        _endpoint = default;
+        {
+            Service = default!;
+            _instance = default;
+            _endpoint = default;
+        }
         _serviceSearching = false;
     }
 
     private async Task SearchInstances()
     {
         _instanceSearching = true;
-        _instances = (await QueryInstances(_service))?.ToList();
+        _instances = (await QueryInstances(Service!))?.ToList()!;
+        if (!(!string.IsNullOrEmpty(_instance) && _instances != null && _instances.Contains(_instance)))
+            _instance = default!;
         _instanceSearching = false;
     }
 
     private async Task SearchEndpoints()
     {
         _endpointSearching = true;
-        _endpoints = (await QueryEndpoints(_service, _instance))?.ToList();
+        _endpoints = (await QueryEndpoints(Service!, _instance))?.ToList()!;
+        if (!(!string.IsNullOrEmpty(_endpoint) && _endpoints != null && _endpoints.Contains(_endpoint)))
+            _endpoint = default!;
         _endpointSearching = false;
     }
 
@@ -117,7 +114,7 @@ public partial class TscTraceSearch
                 await SearchEndpoints();
             }
 
-            await OnQueryUpdate.InvokeAsync((_service, _instance, _endpoint, Search));
+            await OnQueryUpdate.InvokeAsync((Service, _instance, _endpoint, Keyword));
             StateHasChanged();
         });
     }

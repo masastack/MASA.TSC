@@ -8,10 +8,8 @@ public partial class TscTrace
     private PaginatedListBase<TraceResponseDto> _queryResult;
     private ValueTuple<long, string, string>[] _chartData;
 
-    private string? _service;
     private string? _instance;
     private string? _endpoint;
-    private string? _traceId;
 
     private int _page = 1;
     private int _pageSize = 10;
@@ -35,9 +33,6 @@ public partial class TscTrace
     public DateTime EndDateTime { get; set; }
 
     [Parameter]
-    public string? TraceId { get; set; }
-
-    [Parameter]
     public string? Keyword { get; set; }
 
     [Parameter]
@@ -46,9 +41,6 @@ public partial class TscTrace
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        if (!string.IsNullOrEmpty(TraceId) && string.IsNullOrEmpty(Keyword))
-            Keyword = TraceId;
-        _service = Service;
         await CompontentSearchAsync();
     }
 
@@ -63,10 +55,10 @@ public partial class TscTrace
 
     private async Task Search((string? service, string? instance, string? endpoint, string? keyword) query)
     {
-        _service = query.service;
+        Service = query.service!;
+        Keyword = query.keyword;
         _instance = query.instance;
         _endpoint = query.endpoint;
-        _traceId = query.keyword;
         _page = 1;
         await PageSearchAsync();
     }
@@ -105,13 +97,13 @@ public partial class TscTrace
     {
         _loading = true;
 
-        string traceId = null;
-        if (IsTraceId(_traceId))
-            traceId = _traceId;
+        string traceId = default!;
+        if (IsTraceId(Keyword!))
+            traceId = Keyword!;
 
         RequestTraceListDto query = new()
         {
-            Service = _service!,
+            Service = Service!,
             Instance = _instance!,
             Endpoint = _endpoint!,
             TraceId = traceId!,
@@ -120,7 +112,7 @@ public partial class TscTrace
             Page = _page,
             PageSize = _pageSize,
             IsDesc = _isDesc,
-            Keyword = traceId == null ? _traceId : default,
+            Keyword = traceId == null ? Keyword : default,
             IsError = string.Equals(Type, "Error", StringComparison.InvariantCultureIgnoreCase)
         };
 
@@ -195,21 +187,22 @@ public partial class TscTrace
 
     private void SetQuery(SimpleAggregateRequestDto query)
     {
-        var list = new List<FieldConditionDto>();
-        if (!string.IsNullOrEmpty(TraceId) && Keyword == null || IsTraceId(Keyword))
+        if (IsTraceId(Keyword))
         {
-            var traceId = !string.IsNullOrEmpty(TraceId) && Keyword == null ? TraceId : Keyword;
-
+            var list = new List<FieldConditionDto>();
+            var traceId = Keyword;
             list.Add(new FieldConditionDto
             {
                 Name = ElasticSearchConst.TraceId,
                 Type = ConditionTypes.Equal,
                 Value = traceId
             });
+            query.Conditions = list;
         }
-        query.Conditions = list;
-        if (!string.IsNullOrEmpty(Keyword) && Keyword.IndexOf('}') >= 0)
+        else
+        {
             query.RawQuery = Keyword;
+        }
     }
 
     private Task<IEnumerable<string>> QueryServices()

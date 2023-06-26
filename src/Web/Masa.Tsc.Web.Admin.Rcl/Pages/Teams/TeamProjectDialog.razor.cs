@@ -78,12 +78,6 @@ public partial class TeamProjectDialog
         Team.AppTotal = ConfigurationRecord.TeamServiceCount;
     }
 
-    async Task OpenLogAsync()
-    {
-        var url = $"/log/{ConfigurationRecord.Service}/{StartTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/{EndTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/Error";
-        await JSRuntime.InvokeVoidAsync("open", url, "_blank");
-    }
-
     async Task OpenTraceAsync()
     {
         var url = $"/trace/{ConfigurationRecord.Service}/{StartTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/{EndTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/Error";
@@ -106,22 +100,6 @@ public partial class TeamProjectDialog
     async Task<int> GetErrorCountAsync(string service)
     {
         return await ApiCaller.AppService.GetAppErrorCountAsync(service, StartTime!.Value.UtcDateTime, EndTime!.Value.UtcDateTime);
-        //var query = new SimpleAggregateRequestDto
-        //{
-        //    Type = AggregateTypes.Count,
-        //    Start = StartTime!.Value.UtcDateTime,
-        //    End = EndTime!.Value.UtcDateTime,
-        //    Service = service,
-        //    Name = ElasticSearchConst.ServiceName,
-        //    Conditions = new List<FieldConditionDto> {
-        //        new FieldConditionDto{
-        //        Name=ElasticSearchConst.LogLevelText,
-        //        Type= ConditionTypes.Equal,
-        //        Value=ElasticSearchConst.LogErrorText
-        //        }
-        //    }
-        //};
-        //return await ApiCaller.LogService.AggregateAsync<int>(query);
     }
 
     async Task DialogVisibleChanged()

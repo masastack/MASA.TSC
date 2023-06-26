@@ -4,7 +4,7 @@
 <div class="d-flex mb-4" style="@Style">
     <SAutoComplete Placeholder="@I18n.T("Service")" Label="@I18n.T("Service")"
                    Items="_services?? new()"
-                   @bind-Value="_service"
+                   @bind-Value="Service"
                    ItemText="item => item"
                    ItemValue="item => item"
                    TItem=string
@@ -43,7 +43,7 @@
                    Loading="_instanceSearching"
                    Class="mr-4 rounded-2 m-input--h-40"
                    Style="max-width: 280px"
-                   Disabled="@(string.IsNullOrWhiteSpace(_service))"
+                   Disabled="@(string.IsNullOrWhiteSpace(Service))"
                    OnSelectedItemUpdate="()=>Query(isInstance:true)"
                    OnClearClick="()=>Query(isInstance:true)" />
 
@@ -65,7 +65,7 @@
                    ClearIcon="mdi-close"
                    Outlined="false"
                    Loading="_endpointSearching"
-                   Disabled="@(string.IsNullOrWhiteSpace(_service))"
+                   Disabled="@(string.IsNullOrWhiteSpace(Service))"
                    Class="mr-4 rounded-2 m-input--h-40"
                    Style="max-width: 280px;"
                    OnSelectedItemUpdate="()=>Query()"
@@ -74,7 +74,7 @@
     {
         <MSpacer />
     }
-    <SSearch BackgroundColor="white" @bind-Value="@Search" OnEnter="OnEnter" MaxWidth="0" Style="@_style" Class="mr-4" />
+    <SSearch BackgroundColor="white" @bind-Value="@Keyword" OnEnter="OnEnter" MaxWidth="0" Style="@_style" Class="mr-4" />
     @if (PageMode)
     {
         <SDateTimeRangeToolbar Class="my-auto"
