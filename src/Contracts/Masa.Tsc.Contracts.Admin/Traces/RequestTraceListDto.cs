@@ -17,5 +17,9 @@ public class RequestTraceListDto : Pagination<RequestTraceListDto>
 
     public DateTime End { get; set; }
 
+    public string Keyword { get; set; }
+
     public bool IsDesc { get; set; } = true;
+
+    public bool IsError { get; set; }
 }

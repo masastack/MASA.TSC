@@ -9,7 +9,7 @@
             Loading="@Loading"
             Style="@(PageMode ? "" : "height:calc(100% - 475px);width:100%")"
             Class="overflow-x-hidden"
-            Height='@(PageMode ? "calc(100vh - 605px)" : "calc(100%);")' SortBy="_sortBy" SortDesc="_sortDesc" OnOptionsUpdate="OnOptionsUpdate">
+            Height='@(PageMode ? "calc(100vh - 515px)" : "calc(100%);")' SortBy="_sortBy" SortDesc="_sortDesc" OnOptionsUpdate="OnOptionsUpdate">
     <ItemColContent>
         <div class="hover-pointer" @onclick="e=> OpenAsync(context.Item)">
             @if (context.Header.Value == "Operate")

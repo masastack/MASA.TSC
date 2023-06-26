@@ -5,13 +5,16 @@
                 QueryServices="QueryServices"
                 QueryInstances="QueryInstances"
                 QueryEndpoints="QueryEndpoints"
-                TraceId="@TraceId"
+                Keyword="@Keyword"
                 Style="@Style"
+                PageMode=PageMode
+                OnDateTimeRangeUpdate="Search"
+                StartDateTime="StartDateTime"
+                EndDateTime="EndDateTime"
+                Service="@Service"
                 @ref="_tscTraceSearch" />
 
-<TscTraceChart PageMode=PageMode
-               OnDateTimeRangeUpdate="Search"
-               Data="_chartData" Start="@StartDateTime" End="@EndDateTime" />
+<TscTraceChart Data="_chartData" Start="@StartDateTime" End="@EndDateTime" />
 
 <TscTraceList PageMode=PageMode
               Page="_page"

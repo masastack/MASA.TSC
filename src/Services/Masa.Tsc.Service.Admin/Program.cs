@@ -5,8 +5,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 await builder.Services.AddMasaStackConfigAsync();
 var masaStackConfig = builder.Services.GetMasaStackConfig();
+
 var elasticsearchUrls = masaStackConfig.ElasticModel.Nodes?.ToArray() ?? Array.Empty<string>();
 var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus");
+
 builder.Services.AddTraceLog(masaStackConfig, elasticsearchUrls)
     .AddObservable(builder.Logging, new MasaObservableOptions
     {
@@ -17,7 +19,26 @@ builder.Services.AddTraceLog(masaStackConfig, elasticsearchUrls)
         ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
     }, masaStackConfig.OtlpUrl, false)
     .AddPrometheusClient(prometheusUrl, 15)
-    .AddTopology(elasticsearchUrls);
+    .AddTopology(elasticsearchUrls)
+    .AddAuthorization()
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = masaStackConfig.GetSsoDomain();
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters.ValidateAudience = false;
+        options.MapInboundClaims = false;
+        options.BackchannelHttpHandler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+        };
+    });
+
+builder.Services.AddIsolation(services => services.UseMultiEnvironment(parserProviders: new List<Masa.Contrib.Isolation.Parser.IParserProvider> { new CurrentUserEnvironmentParseProvider() }));
 
 builder.Services.AddDaprClient();
 await builder.Services.AddDccClient().AddSchedulerClient(masaStackConfig.GetSchedulerServiceDomain()).AddSchedulerJobAsync();
@@ -50,23 +71,22 @@ if (builder.Environment.IsDevelopment())
     });
 }
 
-builder.Services.AddAuthorization()
-    .AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer("Bearer", options =>
-    {
-        options.Authority = masaStackConfig.GetSsoDomain();
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters.ValidateAudience = false;
-        options.MapInboundClaims = false;
-        options.BackchannelHttpHandler = new HttpClientHandler
-        {
-            ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
-        };
-    });
+var pmServiceUrl =
+#if DEBUG
+    "https://pm-service-dev.masastack.com"
+#else
+    masaStackConfig.GetAuthServiceDomain()
+#endif
+    ;
+
+var authServiceUrl =
+#if DEBUG
+    "https://auth-service-dev.masastack.com"
+#else
+    masaStackConfig.GetAuthServiceDomain()
+#endif
+    ;
+
 builder.Services.AddMasaIdentity(options =>
 {
     options.Environment = "environment";
@@ -76,8 +96,8 @@ builder.Services.AddMasaIdentity(options =>
     options.Mapping(nameof(MasaUser.StaffId), IdentityClaimConsts.STAFF);
     options.Mapping(nameof(MasaUser.Account), IdentityClaimConsts.ACCOUNT);
 }).AddAuthenticationCore()
-    .AddAuthClient(masaStackConfig.GetAuthServiceDomain(), redisOption)
-    .AddPmClient(masaStackConfig.GetPmServiceDomain())
+    .AddAuthClient(authServiceUrl, redisOption)
+    .AddPmClient(pmServiceUrl)
     .AddMultilevelCache(masaStackConfig.GetServiceId(MasaStackConstant.TSC),
         distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
         multilevelCacheOptions =>
@@ -133,8 +153,17 @@ var app = builder.Services
     .AddTopologyRepository()
     .AddServices(builder);
 
-app.UseI18n();
+#if DEBUG
+app.UseSwagger();
+app.UseSwaggerUI();
+#endif
+app.UseRouting();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseI18n();
+app.UseIsolation();
 app.UseStackMiddleware();
 await builder.Services.MigrateAsync();
 app.UseMasaExceptionHandler(opt =>
@@ -151,17 +180,6 @@ app.UseMasaExceptionHandler(opt =>
         }
     };
 });
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-app.UseRouting();
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.UseCloudEvents();
 app.UseEndpoints(endpoints =>

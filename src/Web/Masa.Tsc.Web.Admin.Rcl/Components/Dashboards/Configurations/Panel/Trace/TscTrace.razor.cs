@@ -8,10 +8,8 @@ public partial class TscTrace
     private PaginatedListBase<TraceResponseDto> _queryResult;
     private ValueTuple<long, string, string>[] _chartData;
 
-    private string? _service;
     private string? _instance;
     private string? _endpoint;
-    private string? _traceId;
 
     private int _page = 1;
     private int _pageSize = 10;
@@ -23,6 +21,9 @@ public partial class TscTrace
     public ConfigurationRecord? ConfigurationRecord { get; set; }
 
     [Parameter]
+    public string Service { get; set; }
+
+    [Parameter]
     public bool PageMode { get; set; }
 
     [Parameter]
@@ -32,17 +33,10 @@ public partial class TscTrace
     public DateTime EndDateTime { get; set; }
 
     [Parameter]
-    public string? TraceId
-    {
-        get { return _traceId; }
-        set { _traceId = value; }
-    }
+    public string? Keyword { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-        await CompontentSearchAsync();
-    }
+    [Parameter]
+    public string Type { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -59,12 +53,12 @@ public partial class TscTrace
         await PageSearchAsync();
     }
 
-    private async Task Search((string? service, string? instance, string? endpoint, string? traceId) query)
+    private async Task Search((string? service, string? instance, string? endpoint, string? keyword) query)
     {
-        _service = query.service;
+        Service = query.service!;
+        Keyword = query.keyword;
         _instance = query.instance;
         _endpoint = query.endpoint;
-        _traceId = query.traceId;
         _page = 1;
         await PageSearchAsync();
     }
@@ -91,22 +85,35 @@ public partial class TscTrace
                 await PageSearchAsync();
             }
         }
+        else if (StartDateTime != DateTime.MinValue && EndDateTime != DateTime.MinValue)
+        {
+            if (_tscTraceSearch != null)
+                await _tscTraceSearch.SearchServices();
+            await PageSearchAsync();
+        }
     }
 
     private async Task PageSearchAsync()
     {
         _loading = true;
+
+        string traceId = default!;
+        if (IsTraceId(Keyword!))
+            traceId = Keyword!;
+
         RequestTraceListDto query = new()
         {
-            Service = _service!,
+            Service = Service!,
             Instance = _instance!,
             Endpoint = _endpoint!,
-            TraceId = _traceId!,
+            TraceId = traceId!,
             Start = StartDateTime,
             End = EndDateTime,
             Page = _page,
             PageSize = _pageSize,
             IsDesc = _isDesc,
+            Keyword = traceId == null ? Keyword : default,
+            IsError = string.Equals(Type, "Error", StringComparison.InvariantCultureIgnoreCase)
         };
 
         _queryResult = await ApiCaller.TraceService.GetListAsync(query);
@@ -169,10 +176,40 @@ public partial class TscTrace
         _chartData = values;
     }
 
+    private bool IsTraceId(string value)
+    {
+        if (!string.IsNullOrEmpty(value) && value.Length - 32 == 0)
+        {
+            return Regex.IsMatch("[a-zA-Z0-9]{32}", value);
+        }
+        return false;
+    }
+
+    private void SetQuery(SimpleAggregateRequestDto query)
+    {
+        if (IsTraceId(Keyword))
+        {
+            var list = new List<FieldConditionDto>();
+            var traceId = Keyword;
+            list.Add(new FieldConditionDto
+            {
+                Name = ElasticSearchConst.TraceId,
+                Type = ConditionTypes.Equal,
+                Value = traceId
+            });
+            query.Conditions = list;
+        }
+        else
+        {
+            query.RawQuery = Keyword;
+        }
+    }
+
     private Task<IEnumerable<string>> QueryServices()
     {
         if (StartDateTime == DateTime.MinValue)
             return Task.FromResult<IEnumerable<string>>(default!);
+
         var query = new SimpleAggregateRequestDto
         {
             MaxCount = 1000,
@@ -181,7 +218,7 @@ public partial class TscTrace
             Start = StartDateTime,
             End = EndDateTime
         };
-
+        SetQuery(query);
         return ApiCaller.TraceService.GetAttrValuesAsync(query);
     }
 
@@ -195,7 +232,7 @@ public partial class TscTrace
             Start = StartDateTime,
             End = EndDateTime
         };
-
+        SetQuery(query);
         return ApiCaller.TraceService.GetAttrValuesAsync(query);
     }
 
@@ -210,7 +247,7 @@ public partial class TscTrace
             Start = StartDateTime,
             End = EndDateTime
         };
-
+        SetQuery(query);
         return ApiCaller.TraceService.GetAttrValuesAsync(query);
     }
 }

@@ -1,23 +1,10 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<MCard Style="border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important;" Class="mb-1">
-    <MCardTitle>
-        <span>Trace</span>
-        <MSpacer></MSpacer>
-        @if (PageMode)
-        {
-            <SDateTimeRangeToolbar Class="mr-6 my-auto"
-                                   OnUpdate="OnDateTimeUpdate"
-                                   OnAutoUpdate="OnDateTimeAutoUpdate"
-                                   ShowInterval
-                                   ShowQuickChange
-                                   ShowTimeZoneSelector />
-        }
-    </MCardTitle>
-    <MCardText Class="pa-0">
+<MCard Style="border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important;" Class="mb-1">   
+    <MCardText>
         <AutoResize OnResize="ResizeEChartAsync" Delay="10">
-            <MECharts @ref=MECharts Option="GenOption()" Height="285" />
+            <MECharts @ref=MECharts Option="GenOption()" Height="235" />
         </AutoResize>
     </MCardText>
 </MCard>

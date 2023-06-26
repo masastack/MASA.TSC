@@ -1,10 +1,10 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components
 @inherits TscComponentBase
 
-<div class="d-flex mb-6" style="@Style">
+<div class="d-flex mb-4" style="@Style">
     <SAutoComplete Placeholder="@I18n.T("Service")" Label="@I18n.T("Service")"
                    Items="_services?? new()"
-                   @bind-Value="_service"
+                   @bind-Value="Service"
                    ItemText="item => item"
                    ItemValue="item => item"
                    TItem=string
@@ -19,7 +19,7 @@
                    ClearIcon="mdi-close"
                    Outlined="false"
                    Loading="_serviceSearching"
-                   Class="mr-6 rounded-2 m-input--h-40"
+                   Class="mr-4 rounded-2 m-input--h-40"
                    Style="max-width: 280px"
                    OnSelectedItemUpdate="()=>Query(isService:true)"
                    OnClearClick="()=>Query(isService:true)" />
@@ -41,9 +41,9 @@
                    ClearIcon="mdi-close"
                    Outlined="false"
                    Loading="_instanceSearching"
-                   Class="mr-6 rounded-2 m-input--h-40"
+                   Class="mr-4 rounded-2 m-input--h-40"
                    Style="max-width: 280px"
-                   Disabled="@(string.IsNullOrWhiteSpace(_service))"
+                   Disabled="@(string.IsNullOrWhiteSpace(Service))"
                    OnSelectedItemUpdate="()=>Query(isInstance:true)"
                    OnClearClick="()=>Query(isInstance:true)" />
 
@@ -65,13 +65,25 @@
                    ClearIcon="mdi-close"
                    Outlined="false"
                    Loading="_endpointSearching"
-                   Disabled="@(string.IsNullOrWhiteSpace(_service))"
-                   Class="rounded-2 m-input--h-40"
+                   Disabled="@(string.IsNullOrWhiteSpace(Service))"
+                   Class="mr-4 rounded-2 m-input--h-40"
                    Style="max-width: 280px;"
                    OnSelectedItemUpdate="()=>Query()"
                    OnClearClick="()=>Query()" />
-
-    <MSpacer></MSpacer>
-
-    <SSearch BackgroundColor="white" @bind-Value="@_keyword" OnEnter="OnEnter" MaxWidth="0" Style="flex:none;width:368px !important;" Placeholder="TraceId" />
+    @if (!PageMode)
+    {
+        <MSpacer />
+    }
+    <SSearch BackgroundColor="white" @bind-Value="@Keyword" OnEnter="OnEnter" MaxWidth="0" Style="@_style" Class="mr-4" />
+    @if (PageMode)
+    {
+        <SDateTimeRangeToolbar Class="my-auto"
+                           OnUpdate="OnDateTimeUpdate"
+                           OnAutoUpdate="OnDateTimeAutoUpdate"
+                           StartDateTime="StartDateTime.ToDateTimeOffset(CurrentTimeZone)"
+                           EndDateTime="EndDateTime.ToDateTimeOffset(CurrentTimeZone)"
+                           ShowInterval
+                           ShowQuickChange
+                           ShowTimeZoneSelector />
+    }
 </div>

@@ -1,12 +1,43 @@
-﻿@page "/trace/{traceId?}"
+﻿@page "/trace"
+@page "/trace/{Keyword}"
+@page "/trace/{Service}/{StartTime}/{EndTime}/{Type}"
 @inject I18n I18n
+@inject NavigationManager navigation
 
 <PageTitle>@I18n.Trace("Trace")</PageTitle>
 
-<TscTrace PageMode TraceId="@TraceId" />
+<TscTrace PageMode StartDateTime="ToDateTime(StartTime)" EndDateTime="ToDateTime(EndTime)" Keyword="@Keyword" Type="@Type"  Service="@Service"/>
 
-@code{
+@code {
 
     [Parameter]
-    public string? TraceId { get; set; }
+    public string Keyword { get; set; }
+
+    [Parameter]
+    public string StartTime { get; set; }
+
+    [Parameter]
+    public string Service { get; set; }
+
+    [Parameter]
+    public string EndTime { get; set; }
+
+    [Parameter]
+    public string Type { get; set; }
+
+    DateTime ToDateTime(string str)
+    {
+        if (DateTime.TryParse(str, out var time))
+            return time;
+        return DateTime.MinValue;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            navigation.NavigateTo("/trace", true);
+            return;        }
+        base.OnAfterRender(firstRender);        
+    }
 }

@@ -54,16 +54,18 @@ public static class ServiceExtensions
                     options.BaseAddress = tscApiUrl;
                     options.Configure = (http) =>
                     {
-                        var token = serviceProviderCopy.GetRequiredService<TokenProvider>();
-                        if (token != null && !string.IsNullOrEmpty(token.AccessToken))
-                            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+                        var httpContext = serviceProviderCopy.GetRequiredService<IHttpContextAccessor>();
+                        if (httpContext.HttpContext == null)
+                            return;
+                        var token = httpContext.HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken).ConfigureAwait(false).GetAwaiter().GetResult();
+                        if (!string.IsNullOrEmpty(token))
+                            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                     };
                 });
             });
 
             services.AddScoped(serviceProvider =>
             {
-                serviceProviderCopy = serviceProvider;
                 var caller = serviceProvider.GetRequiredService<ICallerFactory>().Create(DEFAULT_CLIENT_NAME);
                 var client = new TscCaller(serviceProvider, caller);
                 return client;

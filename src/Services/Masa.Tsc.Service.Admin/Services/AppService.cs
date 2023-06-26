@@ -16,4 +16,11 @@ public class AppService : ServiceBase
         await eventBus.PublishAsync(query);
         return query.Result;
     }
+
+    public async Task<long> GetErrorCountAsync([FromServices] IEventBus eventBus, string appid, DateTime start, DateTime end)
+    {
+        var query = new AppErrorCountQuery(appid, start, end);
+        await eventBus.PublishAsync(query);
+        return query.Result;
+    }
 }

@@ -76,13 +76,14 @@ internal static class IElasticClientExtenstion
         return result;
     }
 
-    public static async Task<string> GetByMetricAsync(this IElasticClient client, string service, string url, DateTime start, DateTime end)
+    public static async Task<string> GetByMetricAsync(this IElasticClient client, string service, string url, DateTime start, DateTime end, string env)
     {
         ISearchResponse<object> searchResponse = await client.SearchAsync<object>(searchDescriptor => searchDescriptor.Index(AppSettings.Get("Masa:Elastic:TraceIndex"))
                 .Query(q => q.Bool(
                     b => b.Must(
                             q1 => q1.Term(f => f.Field($"{ElasticConstant.ServiceName}.keyword").Value(service)),
                             q2 => q2.DateRange(f => f.Name(ElasticConstant.Trace.Timestamp).LessThanOrEquals(end).GreaterThanOrEquals(start)),
+                            q4 => q4.Term(f => f.Field($"{ElasticSearchConst.Environment}.keyword").Value(env)),
                             q3 => url.Contains('*') ? q3.QueryString(f => f.Name($"{ElasticSearchConst.URL}").Query(url)) : q3.Term(f => f.Field($"{ElasticSearchConst.URL}.keyword").Value(url))
                             )
                 ))

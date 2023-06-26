@@ -17,9 +17,15 @@ public sealed class ElasticSearchConst
 
     public const string URL = "Attributes.http.target";
 
+    public const string HttpPort = "Attributes.http.status_code";
+
+    public static string TraceId { get; private set; } = "masa-stack-traces-0.6.1";
+
     public static string LogIndex { get; private set; } = "masa-stack-logs-0.6.1";
 
     public static string TraceIndex { get; private set; } = "masa-stack-traces-0.6.1";
+
+    public static string Environment => "Resource.service.namespace";
 
     public static void SetLogIndex(string index)
     {

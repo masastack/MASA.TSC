@@ -6,7 +6,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components;
 public partial class TscTraceSearch
 {
     [Parameter, EditorRequired]
-    public EventCallback<(string?, string?, string?, string?)> OnQueryUpdate { get; set; }
+    public EventCallback<(string? service, string? instance, string? endpoint, string? keyword)> OnQueryUpdate { get; set; }
 
     [Parameter, EditorRequired]
     public Func<Task<IEnumerable<string>>> QueryServices { get; set; }
@@ -18,49 +18,78 @@ public partial class TscTraceSearch
     public Func<string, string?, Task<IEnumerable<string>>> QueryEndpoints { get; set; }
 
     [Parameter]
-    public string? TraceId { get; set; }
+    public EventCallback<(DateTime, DateTime)> OnDateTimeRangeUpdate { get; set; }
+
+    [Parameter]
+    public bool PageMode { get; set; }
+
+    [Parameter]
+    public DateTime? StartDateTime { get; set; }
+
+    [Parameter]
+    public DateTime? EndDateTime { get; set; }
+
+    [Parameter]
+    public string Service { get; set; }
+
+    [Parameter]
+    public string Keyword { get; set; }
 
     private List<string> _services = new();
     private List<string> _instances = new();
     private List<string> _endpoints = new();
 
-    private string _service = string.Empty;
     private string? _instance;
     private string? _endpoint;
-    private string? _keyword;
 
     private bool _serviceSearching;
     private bool _instanceSearching;
     private bool _endpointSearching;
+    private int width = 268;
+    private string _style = "flex:none;width:{0}px !important;";
 
     protected override async Task OnInitializedAsync()
     {
-        _keyword = TraceId;
         await SearchServices();
+        if (PageMode)
+            width = 208;
+        _style = string.Format(_style, width);
         await base.OnInitializedAsync();
     }
 
     public async Task SearchServices()
     {
         _serviceSearching = true;
-        _services = (await QueryServices.Invoke())?.ToList();
-        _service = default;
-        _instance = default;
-        _endpoint = default;
+        _services = (await QueryServices.Invoke())?.ToList()!;
+        if (!string.IsNullOrEmpty(Service) && _services != null && _services.Contains(Service))
+        {
+            await SearchEndpoints();
+            await SearchEndpoints();
+        }
+        else
+        {
+            Service = default!;
+            _instance = default;
+            _endpoint = default;
+        }
         _serviceSearching = false;
     }
 
     private async Task SearchInstances()
     {
         _instanceSearching = true;
-        _instances = (await QueryInstances(_service))?.ToList();
+        _instances = (await QueryInstances(Service!))?.ToList()!;
+        if (!(!string.IsNullOrEmpty(_instance) && _instances != null && _instances.Contains(_instance)))
+            _instance = default!;
         _instanceSearching = false;
     }
 
     private async Task SearchEndpoints()
     {
         _endpointSearching = true;
-        _endpoints = (await QueryEndpoints(_service, _instance))?.ToList();
+        _endpoints = (await QueryEndpoints(Service!, _instance))?.ToList()!;
+        if (!(!string.IsNullOrEmpty(_endpoint) && _endpoints != null && _endpoints.Contains(_endpoint)))
+            _endpoint = default!;
         _endpointSearching = false;
     }
 
@@ -85,8 +114,29 @@ public partial class TscTraceSearch
                 await SearchEndpoints();
             }
 
-            await OnQueryUpdate.InvokeAsync((_service, _instance, _endpoint, _keyword));
+            await OnQueryUpdate.InvokeAsync((Service, _instance, _endpoint, Keyword));
             StateHasChanged();
         });
+    }
+
+    private async Task OnDateTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) range)
+    {
+        await InvokeDateTimeUpdate(range);
+    }
+
+    private async Task OnDateTimeAutoUpdate((DateTimeOffset? start, DateTimeOffset? end) range)
+    {
+        await InvokeDateTimeUpdate(range);
+    }
+
+    private Task InvokeDateTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) range)
+    {
+        if (range is { start: not null, end: not null })
+        {
+            var localStart = range.start.Value.UtcDateTime;
+            var localEnd = range.end.Value.UtcDateTime;
+            return OnDateTimeRangeUpdate.InvokeAsync((localStart, localEnd));
+        }
+        return Task.CompletedTask;
     }
 }
