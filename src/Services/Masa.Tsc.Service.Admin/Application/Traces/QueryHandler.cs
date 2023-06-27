@@ -33,9 +33,6 @@ public class QueryHandler
     {
         ArgumentNullException.ThrowIfNull(query.Service);
         ArgumentNullException.ThrowIfNull(query.Url);
-        var partten = @"\{([^\}/]+)\}";
-        Regex.Replace(query.Url, partten, "*");
-
         var env = _masaStackConfig.GetServiceEnvironmentName(_environment, query.Service, _multiEnvironment.CurrentEnvironment);
         var traceId = await _traceService.GetElasticClient().GetByMetricAsync(query.Service, query.Url, query.Start, query.End, env);
         query.Result = traceId ?? string.Empty;
@@ -86,10 +83,10 @@ public class QueryHandler
             });
         }
         queryDto.Conditions = list;
-       
+
         query.Result = await _traceService.ListAsync(queryDto);
         if (query.Result == null)
-            query.Result = new PaginatedListBase<TraceResponseDto>();       
+            query.Result = new PaginatedListBase<TraceResponseDto>();
     }
 
     [EventHandler]
@@ -158,5 +155,67 @@ public class QueryHandler
         query.Data.SetEnv(_masaStackConfig.GetServiceEnvironmentName(_environment, query.Data.Service, _multiEnvironment.CurrentEnvironment));
         var data = await _traceService.AggregateAsync(query.Data);
         query.Result = data;
+    }
+
+    [EventHandler]
+    public async Task GetNextPrevAsync(TraceDetailNextQuery query)
+    {
+        var queryDto = new SimpleAggregateRequestDto
+        {
+            Service = query.Service,
+            Sort = new FieldOrderDto
+            {
+                Name = ElasticConstant.Trace.Timestamp,
+                IsDesc = !query.IsNext
+            },
+            Page = 1,
+            PageSize = 1
+        };
+
+        var list = new List<FieldConditionDto>() {
+            new FieldConditionDto{
+                Name=ElasticSearchConst.URL,
+                Type =ConditionTypes.Equal,
+                Value=query.Url
+            },
+            new FieldConditionDto{
+                Name=ElasticConstant.TraceId,
+                Type =ConditionTypes.NotEqual,
+                Value=query.TraceId
+            }
+        };
+
+        if (query.IsNext)
+        {
+            list.Add(new FieldConditionDto
+            {
+                Name = ElasticConstant.Trace.Timestamp,
+                Type = ConditionTypes.Great,
+                Value = query.Time
+            });
+        }
+        else
+        {
+            list.Add(new FieldConditionDto
+            {
+                Name = ElasticConstant.Trace.Timestamp,
+                Type = ConditionTypes.Less,
+                Value = query.Time
+            });
+        }
+        queryDto.Conditions = list;
+        var env = _masaStackConfig.GetServiceEnvironmentName(_environment, query.Service, _multiEnvironment.CurrentEnvironment);
+        queryDto.SetEnv(env);
+        var data = await _traceService.ListAsync(queryDto);
+        if (data.Result == null || !data.Result.Any())
+        {
+            query.Result = Array.Empty<TraceResponseDto>();
+            return;
+        }
+
+        var traceId = data.Result.First().TraceId;
+        var detailQuery = new TraceDetailQuery(traceId);
+        await GetDetailAsync(detailQuery);
+        query.Result = detailQuery.Result;
     }
 }

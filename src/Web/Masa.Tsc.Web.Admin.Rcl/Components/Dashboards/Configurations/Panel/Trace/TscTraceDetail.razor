@@ -13,17 +13,17 @@
                     <div class="d-flex align-center">
                         <div class="mr-6">
                             <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Start")</MChip>
-                        <span class="regular--text">@(_rootTreeItem.Timestamp + CurrentTimeZone.BaseUtcOffset)</span>
+                            <span class="regular--text">@(_rootTreeItem.Timestamp + CurrentTimeZone.BaseUtcOffset)</span>
                         </div>
                         <div class="mr-6">
                             <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Duration")</MChip>
-                        <span class="regular--text">@FormatDuration(_rootTreeItem.DoubleDuration)</span>
+                            <span class="regular--text">@FormatDuration(_rootTreeItem.DoubleDuration)</span>
+                        </div>
+                        <div>
+                            <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Span Count")</MChip>
+                            <span class="regular--text">@_count</span>
+                        </div>
                     </div>
-                    <div>
-                        <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Span Count")</MChip>
-                        <span class="regular--text">@_count</span>
-                    </div>
-                </div>
                 }
             </div>
 
@@ -35,16 +35,17 @@
                     <div class="trace-timelines mb-2 overflow-x-hidden">
                         @foreach (var timeline in timelineView)
                         {
+                            bool isSelected = timeline.Id == _activeTreeItem.SpanId;
                             if (timeline.marginLeft > 0)
                             {
                                 <div class="trace-timeline__section" style="width: @((timeline.marginLeft - sumLeft) * 100)%">
                                     <div class="trace-timeline__background">
                                     </div>
                                 </div>
-                            }                     
+                            }
                             <div class="trace-timeline__section" style="width: @(timeline.Percent * 100)%;">
                                 <div class="trace-timeline__background">
-                                    <div class="trace-timeline__leaner @(timeline.Render ? "" : "d-none")"></div>
+                                    <div class="trace-timeline__leaner @(timeline.Render ? "" : "d-none") @(isSelected?"yellow":"")"></div>
                                 </div>
                             </div>
                             sumWidth += (timeline.marginLeft - sumLeft) + timeline.Percent;
@@ -85,8 +86,8 @@
                        ItemKey="item => item.SpanId"
                        TItem="TraceResponseTree"
                        TKey="string"
-                              OpenAll
-                              Activatable
+                       OpenAll
+                       Activatable
                        @bind-Active="_actives"
                        OnActiveUpdate="OnActiveUpdate"
                        Class="flex-fill overflow-y-auto"
@@ -108,11 +109,13 @@
             var detail = _activeTreeItem.ToDictionary(nameof(TraceResponseTree.Children), nameof(TraceResponseTree.Attributes), nameof(TraceResponseTree.Resource), nameof(TraceResponseTree.Timelines), nameof(TraceResponseTree.Level), nameof(TraceResponseTree.DoubleDuration));
             <div class="pa-12">
                 <MList Flat Class="mb-4 rounded tracedetail" style="width:334px">
-                <MListItem>
-                    <MListItemContent>
-                        <MListItemTitle>@I18n.Trace(TraceKeyConst.Resource.ServiceName)</MListItemTitle>
-                        <MListItemSubtitle>
-                            @if (!_activeTreeItem.Resource.TryGetValue(TraceKeyConst.Resource.ServiceName, out var serviceName))
+                    <MListItem>
+                        <MListItemContent>
+                            <MListItemTitle>
+                                @I18n.Trace(TraceKeyConst.Resource.ServiceName)
+                            </MListItemTitle>
+                            <MListItemSubtitle>
+                                @if (!_activeTreeItem.Resource.TryGetValue(TraceKeyConst.Resource.ServiceName, out var serviceName))
                                 {
                                     serviceName = "- -";
                                 }
@@ -126,13 +129,24 @@
                         <MListItemContent>
                             <MListItemTitle>@I18n.Trace(TraceKeyConst.Attributes.Target)</MListItemTitle>
                             <MListItemSubtitle>
-                                @if (!_activeTreeItem.Attributes.TryGetValue(TraceKeyConst.Attributes.Target, out var target))
-                                {
-                                    target = "- -";
-                                }
-                                <TooltipCopy Value="@target" TextClass="text-lg-h6 copy_text"
-                                         IconClass="icon_large"
-                                         IconHoverClass="icon_large_hover"></TooltipCopy>
+                                <div class="d-flex flex-row">
+                                    <div class="flex-column col-6">
+                                        @if (!_activeTreeItem.Attributes.TryGetValue(TraceKeyConst.Attributes.Target, out var target))
+                                        {
+                                            target = "- -";
+                                        }
+                                        <TooltipCopy Value="@target" TextClass="text-lg-h6 copy_text"
+                                                 IconClass="icon_large"
+                                                 IconHoverClass="icon_large_hover"></TooltipCopy>
+                                    </div>
+                                    @if (!string.Equals(target, "- -"))
+                                    {
+                                        <div class="d-flex flex-row col-6 justify-end">
+                                            <span class="flex-column my-2" style="cursor:pointer" @onclick="async ()=>await NextAsync(false)"> 上一条</span>
+                                            <span class="flex-column my-2 ml-4" style="cursor:pointer" @onclick="async ()=>await NextAsync()">下一条</span>
+                                        </div>
+                                    }
+                                </div>
                             </MListItemSubtitle>
                         </MListItemContent>
                     </MListItem>

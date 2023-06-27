@@ -14,7 +14,7 @@ public static class SchedulerJobServiceCollectionExtensions
         _masaStackConfig = services.GetMasaStackConfig();
         using IServiceScope scope = services.BuildServiceProvider().CreateScope();
         var serviceProvider = scope.ServiceProvider;
-        await serviceProvider.SafeExcuteAsync(AddTopologyAsync);
+       // await serviceProvider.SafeExcuteAsync(AddTopologyAsync);
     }
 
     public static async Task AddTopologyAsync(IServiceProvider serviceProvider)

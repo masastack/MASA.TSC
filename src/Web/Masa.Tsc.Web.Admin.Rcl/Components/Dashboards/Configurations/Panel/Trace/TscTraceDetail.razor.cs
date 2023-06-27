@@ -1,14 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using BlazorComponent;
-using Masa.Blazor;
-using Nest;
-using Newtonsoft.Json.Linq;
-using OneOf.Types;
-using System.Collections.Generic;
-using System;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceDetail
@@ -26,9 +18,8 @@ public partial class TscTraceDetail
     private bool _loadLogs = false;
     private string? _lastQuerySpanId;
     private SSheetDialog.MProgressInfo _loading = new();
-    private MVirtualScroll<TraceResponseTree> _vs;
     private int? _logsCount;
-    
+
     internal async Task OpenAsync(string traceId)
     {
         _tabValue = 0;
@@ -107,7 +98,7 @@ public partial class TscTraceDetail
             _timelineView.Reverse();
         }
     }
-    
+
     /*Serial is on one line, while parallel requires multiple lines*/
     /*Prioritize finding serial, not within a time range*/
     private void CalcTraceTimeConsuming(List<TraceResponseTree> treeData, DateTime rootTimestamp, DateTime rootEndTimestamp)
@@ -374,5 +365,75 @@ public partial class TscTraceDetail
         }
 
         return $"{(ms / 60000d):F}m";
+    }
+
+    private async Task NextAsync(bool isNext = true)
+    {
+        _activeTreeItem.Attributes.TryGetValue(TraceKeyConst.Attributes.Target, out var url);
+        _activeTreeItem.Resource.TryGetValue(TraceKeyConst.Resource.ServiceName, out var serviceName);
+        if (url == null || serviceName == null)
+        {
+             await PopupService.EnqueueSnackbarAsync(I18n.Trace("serviceName and url must not empty"));
+            return;
+        }
+        _loading.Loading = true;
+        StateHasChanged();
+        var query = new Contracts.Admin.Traces.RequestNextPrevTraceDetailDto
+        {
+            Service = serviceName?.ToString()!,
+            Time = isNext ? _activeTreeItem.EndTimestamp : _activeTreeItem.Timestamp,
+            Url = url?.ToString()!,
+            IsNext = isNext,
+            TraceId = _activeTreeItem.TraceId
+        };
+        var data = await ApiCaller.TraceService.GetNextAsync(query);
+        if (data == null || !data.Any())
+        {
+            await PopupService.EnqueueSnackbarAsync(I18n.Trace("no more data"));
+            _loading.Loading = false;
+            StateHasChanged();
+            return;
+        }
+
+        data = data.DistinctBy(span => span.SpanId).ToList();
+        _count = data.Count();
+        _logsCount = null;
+        _treeData = ToTree(data.OrderBy(item => item.Timestamp), null);
+        _timelineView.Clear();
+        if (_treeData.Any())
+        {
+            _rootTreeItem = _treeData.First();
+            _actives = new List<string>() { _activeTreeItem.SpanId };
+
+            CalcTraceTimeConsuming(_treeData, _rootTreeItem.Timestamp, _rootTreeItem.EndTimestamp);
+            CalculateOverlapDisplayDlank();
+            _timelineView.Reverse();
+        }
+        var selected = FindSelected(_treeData, query.Service, query.Url);
+        if (selected == null)
+            selected = _rootTreeItem;
+        _activeTreeItem = selected;
+        _actives = new() { _activeTreeItem!.SpanId };
+        _loading.Loading = false;
+        StateHasChanged();
+    }
+
+    private TraceResponseTree? FindSelected(IEnumerable<TraceResponseTree> data, string service, string url)
+    {
+        if (data == null || !data.Any())
+            return default;
+
+        var selected = data.FirstOrDefault(item => item.Attributes.TryGetValue(TraceKeyConst.Attributes.Target, out var url1) && url1 != null
+        && item.Resource.TryGetValue(TraceKeyConst.Resource.ServiceName, out var serviceName1) && serviceName1 != null
+        && url1.ToString() == url && serviceName1.ToString() == service);
+        if (selected != null)
+            return selected;
+        foreach (var item in data)
+        {
+            selected = FindSelected(item.Children!, service, url);
+            if (selected != null)
+                return selected;
+        }
+        return default;
     }
 }
