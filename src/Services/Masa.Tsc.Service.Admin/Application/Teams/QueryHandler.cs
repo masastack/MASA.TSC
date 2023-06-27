@@ -3,17 +3,13 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Teams;
 
-public class QueryHandler
+public class QueryHandler : TraceStatusQueryHandler
 {
     private readonly IAuthClient _authClient;
     private readonly IPmClient _pmClient;
     private readonly ILogService _logService;
     private readonly ITraceService _traceService;
     private readonly IMasaPrometheusClient _prometheusClient;
-    private readonly IMasaConfiguration _masaConfiguration;
-    private readonly IMasaStackConfig _masaStackConfig;
-    private readonly IWebHostEnvironment _environment;
-    private readonly IMultiEnvironmentContext _multiEnvironment;
 
     public QueryHandler(IPmClient pmClient,
         IAuthClient authClient,
@@ -24,17 +20,13 @@ public class QueryHandler
         IMasaStackConfig masaStackConfig,
         IWebHostEnvironment environment,
         IMultiEnvironmentContext multiEnvironment
-        )
+        ) : base(masaConfiguration, masaStackConfig, environment, multiEnvironment)
     {
         _authClient = authClient;
         _pmClient = pmClient;
         _logService = logService;
         _traceService = traceService;
         _prometheusClient = prometheusClient;
-        _masaConfiguration = masaConfiguration;
-        _masaStackConfig = masaStackConfig;
-        _environment = environment;
-        _multiEnvironment = multiEnvironment;
     }
 
     [EventHandler]
@@ -132,9 +124,9 @@ public class QueryHandler
             Projects = await GetAllProjects(teams.Select(t => t.Id).ToList(), monitors),
             Monitor = new AppMonitorDto()
         };
-        var errorPorts = _masaConfiguration.GetTraceErrorStatus(_masaStackConfig);
+        var errorPorts = GetTraceErrorStatus();
         var appids = string.Join(",", query.Result.Projects.Select(p => string.Join(",", p.Apps.Select(app => app.Identity)))).Split(',').Where(s => s.Length > 0).ToArray();
-        var env = _masaStackConfig.GetServiceEnvironmentName(_environment, appids, _multiEnvironment.CurrentEnvironment);
+        var env = GetServiceEnvironmentName(appids);
 
         var (errors, warnings) = await GetProjectErrorAndWarnAsync(appids, errorPorts, env, query.StartTime, query.EndTime);
 
@@ -163,8 +155,8 @@ public class QueryHandler
     [EventHandler]
     public async Task GetAppErrorCountAsync(AppErrorCountQuery query)
     {
-        var errorPorts = _masaConfiguration.GetTraceErrorStatus(_masaStackConfig);
-        var env = _masaStackConfig.GetServiceEnvironmentName(_environment, query.AppId, _multiEnvironment.CurrentEnvironment);
+        var errorPorts = GetTraceErrorStatus();
+        var env = GetServiceEnvironmentName(query.AppId);
         query.Result = await GetErrorOrWarnCountAsync(new string[] { query.AppId }, errorPorts, env, query.Start, query.End);
     }
 

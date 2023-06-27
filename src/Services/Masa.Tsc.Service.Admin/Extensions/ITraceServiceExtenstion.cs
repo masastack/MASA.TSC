@@ -7,9 +7,19 @@ public static class ITraceServiceExtenstion
 {
     private static Dictionary<Type, FieldInfo> _dic = new();
 
-    public static IElasticClient GetElasticClient(this ITraceService traceService)
+    public static IElasticClient GetElasticClient(this ITraceService service)
     {
-        var type = traceService.GetType();
+        return GetElasticClient((object)service);
+    }
+
+    public static IElasticClient GetElasticClient(this ILogService service)
+    {
+        return GetElasticClient((object)service);
+    }
+
+    private static IElasticClient GetElasticClient(object service)
+    {
+        var type = service.GetType();
         FieldInfo field;
         if (_dic.ContainsKey(type))
         {
@@ -21,9 +31,9 @@ public static class ITraceServiceExtenstion
             _dic.Add(type, field);
         }
 
-        if (field != null && field.GetValue(traceService) is IElasticClient client)
-                return client;        
+        if (field != null && field.GetValue(service) is IElasticClient client)
+            return client;
 
-        throw new UserFriendlyException("ITraceService not have field _client");
+        throw new UserFriendlyException($"{type.Name} not have field _client");
     }
 }

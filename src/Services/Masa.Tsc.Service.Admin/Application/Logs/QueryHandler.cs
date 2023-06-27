@@ -3,26 +3,21 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Logs;
 
-public class QueryHandler
+public class QueryHandler : EnvQueryHandler
 {
     private readonly ILogService _logService;
-    private readonly IMasaStackConfig _masaStackConfig;
-    private readonly IWebHostEnvironment _environment;
-    private readonly IMultiEnvironmentContext _multiEnvironment;
 
     public QueryHandler(ILogService logService, IMasaStackConfig masaStackConfig, IWebHostEnvironment environment, IMultiEnvironmentContext multiEnvironment)
+        : base(masaStackConfig, environment, multiEnvironment)
     {
         _logService = logService;
-        _masaStackConfig = masaStackConfig;
-        _environment = environment;
-        _multiEnvironment = multiEnvironment;
     }
 
     [EventHandler]
     public async Task AggregateAsync(LogAggQuery query)
     {
         query.Data.SetValues();
-        query.Data.SetEnv(_masaStackConfig.GetServiceEnvironmentName(_environment, query.Data.Service, _multiEnvironment.CurrentEnvironment));
+        query.Data.SetEnv(GetServiceEnvironmentName(query.Data.Service));
         query.Result = await _logService.AggregateAsync(query.Data);
     }
 
@@ -60,9 +55,7 @@ public class QueryHandler
     [EventHandler]
     public async Task GetPageListAsync(LogsQuery queryData)
     {
-
         bool isMasaStack = false;
-
         var conditions = new List<FieldConditionDto>();
         if (!string.IsNullOrEmpty(queryData.JobTaskId))
         {
@@ -112,11 +105,11 @@ public class QueryHandler
             {
                 Name = ElasticSearchConst.Environment,
                 Type = ConditionTypes.Equal,
-                Value = _masaStackConfig.GetServiceEnvironmentName(_environment, queryData.Service!, _multiEnvironment.CurrentEnvironment)
+                Value = GetServiceEnvironmentName(queryData.Service!)
             });
         }
 
-        var data = await _logService.ListAsync(new BaseRequestDto
+        var query = new BaseRequestDto
         {
             Service = queryData.Service!,
             Start = queryData.Start,
@@ -127,10 +120,20 @@ public class QueryHandler
             PageSize = queryData.Size,
             Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = queryData.IsDesc },
             Conditions = conditions
-        });
+        };
+
+        query.SetEnv(GetServiceEnvironmentName(queryData.Service!));
+
+        var data = await _logService.ListAsync(query);
 
         data ??= new PaginatedListBase<LogResponseDto>();
 
         queryData.Result = data;
+    }
+
+    [EventHandler]
+    public async Task GetErrorTypesAsync(LogErrorTypesQuery query)
+    {
+        query.Result = await _logService.GetElasticClient().GetLogErrorTypesAsync(query.Service, query.Start, query.End, GetServiceEnvironmentName(query.Service));
     }
 }

@@ -27,6 +27,8 @@ public sealed class ElasticSearchConst
 
     public static string Environment => "Resource.service.namespace";
 
+    public const string ExceptionMessage = "Attributes.exception.message";
+
     public static void SetLogIndex(string index)
     {
         LogIndex = index;

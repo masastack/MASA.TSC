@@ -40,4 +40,11 @@ public class LogService : ServiceBase
         await eventBus.PublishAsync(query);
         return query.Result;
     }
+
+    public async Task<List<LogErrorDto>> GetErrorTypesAsync([FromServices] IEventBus eventBus, string service, DateTime start, DateTime end)
+    {
+        var query = new LogErrorTypesQuery(service,start,end);
+        await eventBus.PublishAsync(query);
+        return query.Result;
+    }
 }

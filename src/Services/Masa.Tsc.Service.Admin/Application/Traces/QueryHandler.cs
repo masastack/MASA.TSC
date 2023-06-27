@@ -3,21 +3,14 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Traces;
 
-public class QueryHandler
+public class QueryHandler : TraceStatusQueryHandler
 {
     private readonly ITraceService _traceService;
-    private readonly IMasaStackConfig _masaStackConfig;
-    private readonly IWebHostEnvironment _environment;
-    private readonly IMultiEnvironmentContext _multiEnvironment;
-    private readonly IMasaConfiguration _masaConfiguration;
 
     public QueryHandler(ITraceService traceService, IMasaConfiguration masaConfiguration, IMasaStackConfig masaStackConfig, IWebHostEnvironment environment, IMultiEnvironmentContext multiEnvironment)
+        : base(masaConfiguration, masaStackConfig, environment, multiEnvironment)
     {
         _traceService = traceService;
-        _masaConfiguration = masaConfiguration;
-        _masaStackConfig = masaStackConfig;
-        _environment = environment;
-        _multiEnvironment = multiEnvironment;
     }
 
     [EventHandler]
@@ -33,7 +26,7 @@ public class QueryHandler
     {
         ArgumentNullException.ThrowIfNull(query.Service);
         ArgumentNullException.ThrowIfNull(query.Url);
-        var env = _masaStackConfig.GetServiceEnvironmentName(_environment, query.Service, _multiEnvironment.CurrentEnvironment);
+        var env = GetServiceEnvironmentName(query.Service);
         var traceId = await _traceService.GetElasticClient().GetByMetricAsync(query.Service, query.Url, query.Start, query.End, env);
         query.Result = traceId ?? string.Empty;
     }
@@ -52,7 +45,7 @@ public class QueryHandler
             TraceId = query.TraceId,
             Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = query.IsDesc }
         };
-        queryDto.SetEnv(_masaStackConfig.GetServiceEnvironmentName(_environment, query.Service, _multiEnvironment.CurrentEnvironment));
+        queryDto.SetEnv(GetServiceEnvironmentName(query.Service));
         var list = queryDto.Conditions?.ToList() ?? new();
         if (!string.IsNullOrEmpty(query.Endpoint))
         {
@@ -74,7 +67,7 @@ public class QueryHandler
 
         if (query.IsError)
         {
-            var errorPorts = _masaConfiguration.GetTraceErrorStatus(_masaStackConfig);
+            var errorPorts = GetTraceErrorStatus();
             list.Add(new FieldConditionDto
             {
                 Name = ElasticSearchConst.HttpPort,
@@ -143,7 +136,7 @@ public class QueryHandler
         query.Data.Conditions = list;
         query.Data.Keyword = default!;
 
-        query.Data.SetEnv(_masaStackConfig.GetServiceEnvironmentName(_environment, query.Data.Service, _multiEnvironment.CurrentEnvironment));
+        query.Data.SetEnv(GetServiceEnvironmentName(query.Data.Service));
         query.Result = (IEnumerable<string>)await _traceService.AggregateAsync(query.Data);
         if (query.Result == null)
             query.Result = Array.Empty<string>();
@@ -152,7 +145,7 @@ public class QueryHandler
     [EventHandler]
     public async Task AggregateAsync(TraceAggregationQuery query)
     {
-        query.Data.SetEnv(_masaStackConfig.GetServiceEnvironmentName(_environment, query.Data.Service, _multiEnvironment.CurrentEnvironment));
+        query.Data.SetEnv(GetServiceEnvironmentName(query.Data.Service));
         var data = await _traceService.AggregateAsync(query.Data);
         query.Result = data;
     }
@@ -204,7 +197,7 @@ public class QueryHandler
             });
         }
         queryDto.Conditions = list;
-        var env = _masaStackConfig.GetServiceEnvironmentName(_environment, query.Service, _multiEnvironment.CurrentEnvironment);
+        var env = GetServiceEnvironmentName(query.Service);
         queryDto.SetEnv(env);
         var data = await _traceService.ListAsync(queryDto);
         if (data.Result == null || !data.Result.Any())
