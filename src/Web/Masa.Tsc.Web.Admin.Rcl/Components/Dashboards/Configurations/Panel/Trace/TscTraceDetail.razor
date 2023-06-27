@@ -2,22 +2,22 @@
 @using Mapster
 @inherits TscComponentBase
 
-<SSheetDialog Value="_dialogValue" ValueChanged="DialogValueChanged" ContentLoading="_loading" Title="@_rootTreeItem?.Resource[TraceKeyConst.Resource.ServiceName]?.ToString()">
+<SSheetDialog Value="_dialogValue" ValueChanged="DialogValueChanged" ContentLoading="_loading" Title="@_treeData.FirstOrDefault()?.Resource?[TraceKeyConst.Resource.ServiceName]?.ToString()">
     <div class="d-flex">
         <div class="pa-12" style="width:100%">
             <div class="d-flex mb-6">
                 <SearchTextField FullWidth Small Clearable Class="my-auto mr-6" Style="max-width:300px;display:none" />
                 <MSpacer></MSpacer>
-                @if (_rootTreeItem is not null)
+                @if (_treeData.Any())
                 {
                     <div class="d-flex align-center">
                         <div class="mr-6">
                             <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Start")</MChip>
-                            <span class="regular--text">@(_rootTreeItem.Timestamp + CurrentTimeZone.BaseUtcOffset)</span>
+                            <span class="regular--text">@(_treeData[0].Timestamp + CurrentTimeZone.BaseUtcOffset)</span>
                         </div>
                         <div class="mr-6">
                             <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Duration")</MChip>
-                            <span class="regular--text">@FormatDuration(_rootTreeItem.DoubleDuration)</span>
+                            <span class="regular--text">@FormatDuration(_totalDuration)</span>
                         </div>
                         <div>
                             <MChip Label Small Color="emphasis2 mr-3" Dark>@I18n.Trace("Span Count")</MChip>
@@ -61,9 +61,9 @@
                     </div>
                 }
 
-                @if (_rootTreeItem is not null)
+                @if (_treeData.Any())
                 {
-                    var sections = NumberSplit(_rootTreeItem.DoubleDuration);
+                    var sections = NumberSplit(_totalDuration);
                     var avgPercentage = 100.0 / (sections.Count + 1);
 
                     <div class="trace-timelines-view">
@@ -74,7 +74,7 @@
                                 var left = avgPercentage * (i + 1);
                                 <div class="trace-timelines-view__line-item body2" style="left: @(left)%;">@(FormatDuration(sections[i]))</div>
                             }
-                            <div class="trace-timelines-view__line-item body2" style="right: 0;">@FormatDuration(_rootTreeItem.DoubleDuration)</div>
+                            <div class="trace-timelines-view__line-item body2" style="right: 0;">@FormatDuration(_totalDuration)</div>
                         </div>
                     </div>
                 }
