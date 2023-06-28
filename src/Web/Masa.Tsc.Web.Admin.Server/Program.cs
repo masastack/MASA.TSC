@@ -74,15 +74,14 @@ builder.Services.AddRcl().AddScoped<TokenProvider>();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 
-if (builder.Environment.IsDevelopment())
-{
+#if DEBUG
     builder.Services.AddDaprStarter(opt =>
     {
         opt.AppId = masaStackConfig.GetWebId(MasaStackConstant.TSC);
         opt.DaprHttpPort = 3602;
         opt.DaprGrpcPort = 3603;
     });
-}
+#endif
 builder.Services.AddDaprClient();
 
 builder.Services.AddHttpContextAccessor();

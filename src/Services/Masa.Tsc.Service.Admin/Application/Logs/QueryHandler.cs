@@ -122,12 +122,10 @@ public class QueryHandler : EnvQueryHandler
             Conditions = conditions
         };
 
-        query.SetEnv(GetServiceEnvironmentName(queryData.Service!));
-
+        var env = GetServiceEnvironmentName(queryData.Service!);
+        query.SetEnv(env);
         var data = await _logService.ListAsync(query);
-
         data ??= new PaginatedListBase<LogResponseDto>();
-
         queryData.Result = data;
     }
 
