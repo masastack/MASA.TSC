@@ -5,16 +5,22 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class AddTraceLogExtenstion
 {
-    public static IServiceCollection AddTraceLog(this IServiceCollection services, IMasaStackConfig masaStackConfig, string[] elasticsearchUrls)
+    private static IServiceCollection? _services;
+    private static string[] _elasticsearchUrls;
+
+    public static IServiceCollection AddTraceLog(this IServiceCollection services, string[] elasticsearchUrls)
     {
-        var configration = services.BuildServiceProvider().GetRequiredService<IMasaConfiguration>();
-        (string logIndex, string traceIndex) = configration.GetElasticsearchLogTraceIndex(masaStackConfig);
+        _services = services;
+        _elasticsearchUrls = elasticsearchUrls;
+        var client = services.BuildServiceProvider().GetRequiredService<IConfigurationApiClient>();
+        var config = client.GetAsync<AppSettingConfiguration>(ConfigConst.ConfigRoot, ValueChanged).ConfigureAwait(false).GetAwaiter().GetResult();
+        ConfigConst.SetConfiguration(config);
+        return services.AddElasticClientLogAndTrace(elasticsearchUrls, ConfigConst.LogIndex, ConfigConst.TraceIndex);
+    }
 
-        if (!string.IsNullOrEmpty(logIndex))
-            ElasticSearchConst.SetLogIndex(logIndex);
-        if (!string.IsNullOrEmpty(traceIndex))
-            ElasticSearchConst.SetTraceIndex(traceIndex);
-
-        return services.AddElasticClientLogAndTrace(elasticsearchUrls, ElasticSearchConst.LogIndex, ElasticSearchConst.TraceIndex);
+    private static void ValueChanged(AppSettingConfiguration config)
+    {
+        ConfigConst.SetConfiguration(config);
+        _services?.AddElasticClientLogAndTrace(_elasticsearchUrls, ConfigConst.LogIndex, ConfigConst.TraceIndex);
     }
 }

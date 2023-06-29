@@ -3,12 +3,12 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Traces;
 
-public class QueryHandler : TraceStatusQueryHandler
+public class QueryHandler : EnvQueryHandler
 {
     private readonly ITraceService _traceService;
 
-    public QueryHandler(ITraceService traceService, IMasaConfiguration masaConfiguration, IMasaStackConfig masaStackConfig, IWebHostEnvironment environment, IMultiEnvironmentContext multiEnvironment)
-        : base(masaConfiguration, masaStackConfig, environment, multiEnvironment)
+    public QueryHandler(ITraceService traceService, IMasaStackConfig masaStackConfig, IWebHostEnvironment environment, IMultiEnvironmentContext multiEnvironment)
+        : base(masaStackConfig, environment, multiEnvironment)
     {
         _traceService = traceService;
     }
@@ -67,12 +67,11 @@ public class QueryHandler : TraceStatusQueryHandler
 
         if (query.IsError)
         {
-            var errorPorts = GetTraceErrorStatus();
             list.Add(new FieldConditionDto
             {
                 Name = ElasticSearchConst.HttpPort,
                 Type = ConditionTypes.In,
-                Value = errorPorts.Select(num => (object)num)
+                Value = ConfigConst.TraceErrorStatus.Select(num => (object)num)
             });
         }
         queryDto.Conditions = list;

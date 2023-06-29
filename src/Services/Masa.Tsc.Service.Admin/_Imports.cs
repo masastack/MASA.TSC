@@ -66,6 +66,7 @@ global using Masa.Tsc.Service.Admin.Domain.Topologies.Aggregates;
 global using Masa.Tsc.Service.Admin.Domain.Topologies.Repositories;
 global using Masa.Tsc.Service.Admin.Infrastructure.Caching;
 global using Masa.Tsc.Service.Admin.Infrastructure.Const;
+global using Masa.Tsc.Service.Admin.Infrastructure.DccConfigurations;
 global using Masa.Tsc.Service.Admin.Infrastructure.Handler;
 global using Masa.Tsc.Service.Admin.Infrastructure.Repositories.Topologies;
 global using Masa.Tsc.Service.Infrastructure;

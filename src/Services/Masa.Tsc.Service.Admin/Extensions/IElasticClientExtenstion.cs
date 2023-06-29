@@ -78,7 +78,7 @@ internal static class IElasticClientExtenstion
 
     public static async Task<string> GetByMetricAsync(this IElasticClient client, string service, string url, DateTime start, DateTime end, string env)
     {
-        ISearchResponse<object> searchResponse = await client.SearchAsync<object>(searchDescriptor => searchDescriptor.Index(ElasticSearchConst.TraceIndex)
+        ISearchResponse<object> searchResponse = await client.SearchAsync<object>(searchDescriptor => searchDescriptor.Index(ConfigConst.TraceIndex)
                 .Query(q => q.Bool(
                     b => b.Must(
                             q1 => q1.Term(f => f.Field($"{ElasticConstant.ServiceName}.keyword").Value(service)),
@@ -105,7 +105,7 @@ internal static class IElasticClientExtenstion
 
     public static async Task<List<LogErrorDto>> GetLogErrorTypesAsync(this IElasticClient client, string service, DateTime start, DateTime end, string env)
     {
-        ISearchResponse<object> searchResponse = await client.SearchAsync<object>(searchDescriptor => searchDescriptor.Index(ElasticSearchConst.LogIndex)
+        ISearchResponse<object> searchResponse = await client.SearchAsync<object>(searchDescriptor => searchDescriptor.Index(ConfigConst.LogIndex)
                     .Query(q => q.Bool(
                             b => b.Must(
                                     q1 => q1.Term(f => f.Field($"{ElasticConstant.ServiceName}.keyword").Value(service)),

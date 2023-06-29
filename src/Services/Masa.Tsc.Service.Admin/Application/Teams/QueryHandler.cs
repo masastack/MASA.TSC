@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Teams;
 
-public class QueryHandler : TraceStatusQueryHandler
+public class QueryHandler : EnvQueryHandler
 {
     private readonly IAuthClient _authClient;
     private readonly IPmClient _pmClient;
@@ -16,11 +16,10 @@ public class QueryHandler : TraceStatusQueryHandler
         ILogService logService,
         IMasaPrometheusClient prometheusClient,
         ITraceService traceService,
-        IMasaConfiguration masaConfiguration,
         IMasaStackConfig masaStackConfig,
         IWebHostEnvironment environment,
         IMultiEnvironmentContext multiEnvironment
-        ) : base(masaConfiguration, masaStackConfig, environment, multiEnvironment)
+        ) : base(masaStackConfig, environment, multiEnvironment)
     {
         _authClient = authClient;
         _pmClient = pmClient;
@@ -123,12 +122,11 @@ public class QueryHandler : TraceStatusQueryHandler
         {
             Projects = await GetAllProjects(teams.Select(t => t.Id).ToList(), monitors),
             Monitor = new AppMonitorDto()
-        };
-        var errorPorts = GetTraceErrorStatus();
+        };        
         var appids = string.Join(",", query.Result.Projects.Select(p => string.Join(",", p.Apps.Select(app => app.Identity)))).Split(',').Where(s => s.Length > 0).ToArray();
         var env = GetServiceEnvironmentName(appids);
 
-        var (errors, warnings) = await GetProjectErrorAndWarnAsync(appids, errorPorts, env, query.StartTime, query.EndTime);
+        var (errors, warnings) = await GetProjectErrorAndWarnAsync(appids, ConfigConst.TraceErrorStatus, env, query.StartTime, query.EndTime);
 
         SetProjectErrorOrWarn(query, errors, true);
         SetProjectErrorOrWarn(query, warnings, false);
@@ -147,7 +145,7 @@ public class QueryHandler : TraceStatusQueryHandler
         query.Result.Monitor.Normal = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Normal);
         query.Result.Monitor.NormalAppTotal = query.Result.Projects.Sum(m => m.Apps.Count(a => !a.HasError && !a.HasWarning));
 
-        var (errorCount, warnCount) = await GetErrorAndWarnCountAsync(appids, errorPorts, env, query.StartTime, query.EndTime);
+        var (errorCount, warnCount) = await GetErrorAndWarnCountAsync(appids, ConfigConst.TraceErrorStatus, env, query.StartTime, query.EndTime);
         query.Result.Monitor.ErrorCount = errorCount;
         query.Result.Monitor.WarnCount = warnCount;
     }
@@ -155,9 +153,8 @@ public class QueryHandler : TraceStatusQueryHandler
     [EventHandler]
     public async Task GetAppErrorCountAsync(AppErrorCountQuery query)
     {
-        var errorPorts = GetTraceErrorStatus();
         var env = GetServiceEnvironmentName(query.AppId);
-        query.Result = await GetErrorOrWarnCountAsync(new string[] { query.AppId }, errorPorts, env, query.Start, query.End);
+        query.Result = await GetErrorOrWarnCountAsync(new string[] { query.AppId }, ConfigConst.TraceErrorStatus, env, query.Start, query.End);
     }
 
     private async Task<(List<string> errorAppids, List<string> warningAppids)> GetProjectErrorAndWarnAsync(IEnumerable<string> appids, int[] errorPorts, string env, DateTime start, DateTime end)

@@ -19,23 +19,9 @@ public sealed class ElasticSearchConst
 
     public const string HttpPort = "Attributes.http.status_code";
 
-    public static string TraceId { get; private set; } = "masa-stack-traces-0.6.1";
-
-    public static string LogIndex { get; private set; } = "masa-stack-logs-0.6.1";
-
-    public static string TraceIndex { get; private set; } = "masa-stack-traces-0.6.1";
+    public static string TraceId { get; private set; } = "TraceId";    
 
     public static string Environment => "Resource.service.namespace";
 
-    public const string ExceptionMessage = "Attributes.exception.message";
-
-    public static void SetLogIndex(string index)
-    {
-        LogIndex = index;
-    }
-
-    public static void SetTraceIndex(string index)
-    {
-        TraceIndex = index;
-    }
+    public const string ExceptionMessage = "Attributes.exception.message";    
 }

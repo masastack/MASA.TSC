@@ -89,26 +89,6 @@ public class QueryHandler : EnvQueryHandler
         }
 
         bool isRawQuery = (queryData.Query?.IndexOfAny(new char[] { '{', '}' }) ?? -1) >= 0;
-
-        if (isMasaStack)
-        {
-            conditions.Add(new FieldConditionDto
-            {
-                Name = ElasticSearchConst.Environment,
-                Type = ConditionTypes.Equal,
-                Value = _environment.EnvironmentName
-            });
-        }
-        else
-        {
-            conditions.Add(new FieldConditionDto
-            {
-                Name = ElasticSearchConst.Environment,
-                Type = ConditionTypes.Equal,
-                Value = GetServiceEnvironmentName(queryData.Service!)
-            });
-        }
-
         var query = new BaseRequestDto
         {
             Service = queryData.Service!,
@@ -121,9 +101,21 @@ public class QueryHandler : EnvQueryHandler
             Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = queryData.IsDesc },
             Conditions = conditions
         };
-
-        var env = GetServiceEnvironmentName(queryData.Service!);
-        query.SetEnv(env);
+        if (isMasaStack)
+        {
+            conditions.Add(new FieldConditionDto
+            {
+                Name = ElasticSearchConst.Environment,
+                Type = ConditionTypes.Equal,
+                Value = _environment.EnvironmentName
+            });
+        }
+        else
+        {
+            var env = GetServiceEnvironmentName(queryData.Service!);
+            query.SetEnv(env);
+        }
+       
         var data = await _logService.ListAsync(query);
         data ??= new PaginatedListBase<LogResponseDto>();
         queryData.Result = data;

@@ -5,11 +5,21 @@ namespace Masa.Tsc.Service.Admin.Infrastructure.Const;
 
 internal class ConfigConst
 {
-    private const string ConfigRoot = "Appsettings";
+    public const string ConfigRoot = "Appsettings";
 
-    public const string TraceErrorPort = $"{ConfigRoot}:Trace:ErrorStatus";
+    private static AppSettingConfiguration Configuration;
 
-    public const string LogIndex = $"{ConfigRoot}:LogIndex";
+    private readonly static int[] DefaultErrorStatus = new int[] { 500 };
 
-    public const string TraceIndex = $"{ConfigRoot}:TraceIndex";
+    public static void SetConfiguration(AppSettingConfiguration config)
+    {
+        Configuration = config;
+    }
+
+    public static string LogIndex => Configuration?.LogIndex ?? "masa-stack-logs-0.6.1";
+
+    public static string TraceIndex => Configuration?.TraceIndex ?? "masa-stack-traces-0.6.1";
+
+    public static int[] TraceErrorStatus => Configuration?.Trace?.ErrorStatus ?? DefaultErrorStatus;
+
 }

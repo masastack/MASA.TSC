@@ -8,7 +8,7 @@ var masaStackConfig = builder.Services.GetMasaStackConfig();
 var elasticsearchUrls = masaStackConfig.ElasticModel.Nodes?.ToArray() ?? Array.Empty<string>();
 var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus");
 var appid = masaStackConfig.GetServiceId(MasaStackConstant.TSC);
-builder.Services.AddTraceLog(masaStackConfig, elasticsearchUrls)
+builder.Services.AddTraceLog(elasticsearchUrls)
     .AddObservable(builder.Logging, new MasaObservableOptions
     {
         ServiceNameSpace = builder.Environment.EnvironmentName,
@@ -52,8 +52,7 @@ var redisOption = new RedisConfigurationOptions
     DefaultDatabase = masaStackConfig.RedisModel.RedisDb,
     Password = masaStackConfig.RedisModel.RedisPassword
 };
-await builder.Services.AddDccClient().AddSchedulerClient(masaStackConfig.GetSchedulerServiceDomain()).AddSchedulerJobAsync();
-
+await builder.Services.AddSchedulerClient(masaStackConfig.GetSchedulerServiceDomain()).AddSchedulerJobAsync();
 
 RedisConfigurationOptions redis;
 string pmServiceUrl, authServiceUrl;
