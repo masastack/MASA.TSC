@@ -97,7 +97,7 @@ internal static class IElasticClientExtenstion
         foreach (var item in obj)
         {
             if (item.Key == ElasticConstant.TraceId)
-                return item.Value.ToString();
+                return item.Value.ToString()!;
         }
 
         return default!;

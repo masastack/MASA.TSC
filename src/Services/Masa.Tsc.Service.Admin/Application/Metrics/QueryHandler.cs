@@ -12,7 +12,7 @@ public class QueryHandler
     public QueryHandler(IMasaStackConfig masaStackConfig, IMasaPrometheusClient masaPrometheusClient, IMultilevelCacheClientFactory multilevelCacheClientFactory, ILogger<QueryHandler> logger)
     {
         _prometheusClient = masaPrometheusClient;
-        _multilevelCacheClient = multilevelCacheClientFactory.Create(masaStackConfig.GetServiceId(MasaStackConstant.TSC));
+        _multilevelCacheClient = multilevelCacheClientFactory.Create(masaStackConfig.GetServiceId(MasaStackProject.TSC));
         _logger = logger;
     }
 

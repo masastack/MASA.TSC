@@ -29,7 +29,7 @@ public class CommandHandler
         ILogger<CommandHandler> logger)
     {
         _traceService = traceService;
-        _multilevelCacheClient = multilevelCacheClientFactory.Create(masaStackConfig.GetServiceId(MasaStackConstant.TSC));
+        _multilevelCacheClient = multilevelCacheClientFactory.Create(masaStackConfig.GetServiceId(MasaStackProject.TSC));
         _traceServiceNodeRepository = traceServiceNodeRepository;
         _traceServiceRelationRepository = traceServiceRelationRepository;
         _traceServiceStateRepository = traceServiceStateRepository;

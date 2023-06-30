@@ -13,8 +13,12 @@ public static class AddTraceLogExtenstion
         _services = services;
         _elasticsearchUrls = elasticsearchUrls;
         var client = services.BuildServiceProvider().GetRequiredService<IConfigurationApiClient>();
-        var config = client.GetAsync<AppSettingConfiguration>(ConfigConst.ConfigRoot, ValueChanged).ConfigureAwait(false).GetAwaiter().GetResult();
-        ConfigConst.SetConfiguration(config);
+        try
+        {
+            var config = client.GetAsync<AppSettingConfiguration>(ConfigConst.ConfigRoot, ValueChanged).ConfigureAwait(false).GetAwaiter().GetResult();
+            ConfigConst.SetConfiguration(config);
+        }
+        catch { }
         return services.AddElasticClientLogAndTrace(elasticsearchUrls, ConfigConst.LogIndex, ConfigConst.TraceIndex);
     }
 

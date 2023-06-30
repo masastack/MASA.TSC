@@ -36,16 +36,16 @@ public static class IMasaStackConfigExtenstion
         return isMasaService ? environment.EnvironmentName : environmentName;
     }
 
-    private static string[] GetServices()
+    private static MasaStackProject[] GetServices()
     {
-        return new string[] {
-        MasaStackConstant.AUTH,
-        MasaStackConstant.DCC,
-        MasaStackConstant.PM,
-        MasaStackConstant.MC,
-        MasaStackConstant.SCHEDULER,
-        MasaStackConstant.ALERT,
-        MasaStackConstant.TSC
+        return new MasaStackProject[] {
+        MasaStackProject.Auth,
+        MasaStackProject.DCC,
+        MasaStackProject.PM,
+        MasaStackProject.MC,
+        MasaStackProject.Scheduler,
+        MasaStackProject.Alert,
+        MasaStackProject.TSC
     };
     }
 
@@ -56,8 +56,8 @@ public static class IMasaStackConfigExtenstion
         lock (serviceLock)
         {
             var result = new List<string>() {
-            masaStackConfig.GetId(MasaStackConstant.AUTH, MasaStackConstant.SSO),
-            masaStackConfig.GetId(MasaStackConstant.SCHEDULER, MasaStackConstant.WORKER)
+            masaStackConfig.GetId(MasaStackProject.Auth, MasaStackApp.SSO),
+            masaStackConfig.GetId(MasaStackProject.Scheduler, MasaStackApp.Worker)
         };
             var services = GetServices();
             foreach (var service in services)

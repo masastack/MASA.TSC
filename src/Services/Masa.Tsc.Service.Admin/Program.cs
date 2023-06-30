@@ -2,12 +2,12 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 var builder = WebApplication.CreateBuilder(args);
-await builder.Services.AddMasaStackConfigAsync();
+await builder.Services.AddMasaStackConfigAsync(MasaStackProject.TSC, MasaStackApp.Service, true);
 var masaStackConfig = builder.Services.GetMasaStackConfig();
 
 var elasticsearchUrls = masaStackConfig.ElasticModel.Nodes?.ToArray() ?? Array.Empty<string>();
 var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus");
-var appid = masaStackConfig.GetServiceId(MasaStackConstant.TSC);
+var appid = masaStackConfig.GetServiceId(MasaStackProject.TSC);
 builder.Services.AddTraceLog(elasticsearchUrls)
     .AddObservable(builder.Logging, new MasaObservableOptions
     {
@@ -88,7 +88,7 @@ builder.Services.AddMasaIdentity(options =>
         distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
         multilevelCacheOptions =>
         {
-            multilevelCacheOptions.SubscribeKeyPrefix = MasaStackConstant.TSC;
+            multilevelCacheOptions.SubscribeKeyPrefix = MasaStackProject.TSC.Name;
             multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
         });
 
@@ -135,7 +135,7 @@ var app = builder.Services
                 .UseEventLog<TscDbContext>()
                 .UseEventBus();
             })
-            .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackConstant.TSC)).UseFilter())
+            .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name)).UseFilter())
             .UseRepository<TscDbContext>();
     })
     .AddTopologyRepository()
