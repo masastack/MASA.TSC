@@ -30,7 +30,7 @@
         "ELASTIC": "{\"Nodes\": [\"http://es-ydy-new.lonsid.cn:9200\"],\"Index\": \"auth_user_development\"}",
         "ADMIN_PWD": "admin123",
         "DCC_SECRET": "masastack.com",
-        "PROMETHEUS": "http://192.168.10.98:9090",
+        "PROMETHEUS": "http://10.130.0.61:30092",
         "SUFFIX_IDENTITY": "dev"
       }
     },
