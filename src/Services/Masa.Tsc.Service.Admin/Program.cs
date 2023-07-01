@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 var builder = WebApplication.CreateBuilder(args);
-await builder.Services.AddMasaStackConfigAsync(MasaStackProject.TSC, MasaStackApp.Service, true);
+await builder.Services.AddMasaStackConfigAsync(MasaStackProject.TSC, MasaStackApp.Service);
 var masaStackConfig = builder.Services.GetMasaStackConfig();
 
 var elasticsearchUrls = masaStackConfig.ElasticModel.Nodes?.ToArray() ?? Array.Empty<string>();
@@ -16,7 +16,7 @@ builder.Services.AddTraceLog(elasticsearchUrls)
         ServiceName = appid,
         Layer = masaStackConfig.Namespace,
         ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
-    }, masaStackConfig.OtlpUrl, false)
+    }, masaStackConfig.OtlpUrl)
     .AddPrometheusClient(prometheusUrl, 15)
     .AddTopology(elasticsearchUrls)
     .AddAuthorization()
