@@ -2,22 +2,21 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 var builder = WebApplication.CreateBuilder(args);
-
-await builder.Services.AddMasaStackConfigAsync();
+await builder.Services.AddMasaStackConfigAsync(MasaStackProject.TSC, MasaStackApp.Service);
 var masaStackConfig = builder.Services.GetMasaStackConfig();
 
 var elasticsearchUrls = masaStackConfig.ElasticModel.Nodes?.ToArray() ?? Array.Empty<string>();
 var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus");
-
-builder.Services.AddTraceLog(masaStackConfig, elasticsearchUrls)
+var appid = masaStackConfig.GetServiceId(MasaStackProject.TSC);
+builder.Services.AddTraceLog(elasticsearchUrls)
     .AddObservable(builder.Logging, new MasaObservableOptions
     {
         ServiceNameSpace = builder.Environment.EnvironmentName,
         ServiceVersion = masaStackConfig.Version,
-        ServiceName = masaStackConfig.GetServiceId(MasaStackConstant.TSC),
+        ServiceName = appid,
         Layer = masaStackConfig.Namespace,
         ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
-    }, masaStackConfig.OtlpUrl, false)
+    }, masaStackConfig.OtlpUrl)
     .AddPrometheusClient(prometheusUrl, 15)
     .AddTopology(elasticsearchUrls)
     .AddAuthorization()
@@ -41,7 +40,6 @@ builder.Services.AddTraceLog(masaStackConfig, elasticsearchUrls)
 builder.Services.AddIsolation(services => services.UseMultiEnvironment(parserProviders: new List<Masa.Contrib.Isolation.Parser.IParserProvider> { new CurrentUserEnvironmentParseProvider() }));
 
 builder.Services.AddDaprClient();
-await builder.Services.AddDccClient().AddSchedulerClient(masaStackConfig.GetSchedulerServiceDomain()).AddSchedulerJobAsync();
 var redisOption = new RedisConfigurationOptions
 {
     Servers = new List<RedisServerOptions> {
@@ -54,38 +52,26 @@ var redisOption = new RedisConfigurationOptions
     DefaultDatabase = masaStackConfig.RedisModel.RedisDb,
     Password = masaStackConfig.RedisModel.RedisPassword
 };
+await builder.Services.AddSchedulerClient(masaStackConfig.GetSchedulerServiceDomain()).AddSchedulerJobAsync();
 
 RedisConfigurationOptions redis;
-if (builder.Environment.IsDevelopment())
-    redis = AppSettings.GetModel<RedisConfigurationOptions>("LocalRedisOptions");
-else
-    redis = redisOption;
+string pmServiceUrl, authServiceUrl;
 
-if (builder.Environment.IsDevelopment())
+#if DEBUG
+redis = AppSettings.GetModel<RedisConfigurationOptions>("LocalRedisOptions");
+pmServiceUrl = "https://pm-service-dev.masastack.com";
+authServiceUrl = "https://auth-service-dev.masastack.com";
+builder.Services.AddDaprStarter(opt =>
 {
-    builder.Services.AddDaprStarter(opt =>
-    {
-        opt.AppId = masaStackConfig.GetServiceId(MasaStackConstant.TSC);
-        opt.DaprHttpPort = 3606;
-        opt.DaprGrpcPort = 3607;
-    });
-}
-
-var pmServiceUrl =
-#if DEBUG
-    "https://pm-service-dev.masastack.com"
+    opt.AppId = appid;
+    opt.DaprHttpPort = 3606;
+    opt.DaprGrpcPort = 3607;
+});
 #else
-    masaStackConfig.GetAuthServiceDomain()
+    redis = redisOption;
+    pmServiceUrl=masaStackConfig.GetAuthServiceDomain();
+    authServiceUrl= masaStackConfig.GetAuthServiceDomain();
 #endif
-    ;
-
-var authServiceUrl =
-#if DEBUG
-    "https://auth-service-dev.masastack.com"
-#else
-    masaStackConfig.GetAuthServiceDomain()
-#endif
-    ;
 
 builder.Services.AddMasaIdentity(options =>
 {
@@ -98,11 +84,11 @@ builder.Services.AddMasaIdentity(options =>
 }).AddAuthenticationCore()
     .AddAuthClient(authServiceUrl, redisOption)
     .AddPmClient(pmServiceUrl)
-    .AddMultilevelCache(masaStackConfig.GetServiceId(MasaStackConstant.TSC),
+    .AddMultilevelCache(appid,
         distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
         multilevelCacheOptions =>
         {
-            multilevelCacheOptions.SubscribeKeyPrefix = MasaStackConstant.TSC;
+            multilevelCacheOptions.SubscribeKeyPrefix = MasaStackProject.TSC.Name;
             multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
         });
 
@@ -112,6 +98,7 @@ builder.Services.AddStackMiddleware().AddHealthChecks();
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     .AddEndpointsApiExplorer()
+#if DEBUG
     .AddSwaggerGen(options =>
     {
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
@@ -138,6 +125,7 @@ var app = builder.Services
             }
         });
     })
+#endif
     .AddDomainEventBus(dispatcherOptions =>
     {
         dispatcherOptions
@@ -147,7 +135,7 @@ var app = builder.Services
                 .UseEventLog<TscDbContext>()
                 .UseEventBus();
             })
-            .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackConstant.TSC)).UseFilter())
+            .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name)).UseFilter())
             .UseRepository<TscDbContext>();
     })
     .AddTopologyRepository()

@@ -198,7 +198,9 @@
     "TotalDuration": "总耗时",
     "Attribute": "属性",
     "Resource": "资源",
-    "Detail": "详情"
+    "Detail": "详情",
+    "serviceName and url must not empty": "服务名称和Ur不能为空",
+    "no more data": "没有更多的数据了"
   },
   "Log": {
     "Log": "日志",

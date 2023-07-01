@@ -22,7 +22,7 @@ public partial class LogPanel
     public string Service { get; set; }
 
     [Parameter]
-    public string LogLevel { get; set; }
+    public string Keyword { get; set; }
 
     [Parameter]
     public ConfigurationRecord? ConfigurationRecord { get; set; }
@@ -141,7 +141,8 @@ public partial class LogPanel
             End = end,
             Page = Page,
             TaskId = TaskId,
-            Query = _search!
+            Query = _search!,
+            Service = Service
         };
         var response = await ApiCaller.LogService.GetDynamicPageAsync(query);
         Logs = response.Result.Select(item => new LogModel(item.Timestamp, item.ExtensionData.ToDictionary(item => item.Key, item => new LogTree(item.Value)))).ToList();
@@ -188,9 +189,16 @@ public partial class LogPanel
 
     protected override void OnInitialized()
     {
-        if (string.IsNullOrEmpty(Search) && !string.IsNullOrEmpty(Service) && !string.IsNullOrEmpty(LogLevel))
+        if (string.IsNullOrEmpty(Search) && !string.IsNullOrEmpty(Service) && !string.IsNullOrEmpty(Keyword))
         {
-            Search = $"{{\"term\":{{\"Resource.service.name.keyword\":\"{Service}\"}}}},{{\"term\":{{\"SeverityText.keyword\": \"{LogLevel}\"}}}}";
+            if (string.Equals("error", Keyword, StringComparison.InvariantCultureIgnoreCase))
+            {
+                Search = $"{{\"term\":{{\"{ElasticSearchConst.ServiceName}.keyword\":\"{Service}\"}}}},{{\"term\":{{\"{ElasticSearchConst.LogLevelText}.keyword\": \"{Keyword}\"}}}}";
+            }
+            else
+            {
+                Search = $"{{\"term\":{{\"{ElasticSearchConst.ServiceName}.keyword\":\"{Service}\"}}}},{{\"term\":{{\"{ElasticSearchConst.ExceptionMessage}.keyword\": \"{Keyword}\"}}}}";
+            }
         }
         base.OnInitialized();
     }
@@ -277,6 +285,6 @@ public partial class LogPanel
     async Task OnSearchAsync()
     {
         Page = 1;
-       await GetPageLogsAsync();
+        await GetPageLogsAsync();
     }
 }

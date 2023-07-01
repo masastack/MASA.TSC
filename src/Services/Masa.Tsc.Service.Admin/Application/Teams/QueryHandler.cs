@@ -3,38 +3,29 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Teams;
 
-public class QueryHandler
+public class QueryHandler : EnvQueryHandler
 {
     private readonly IAuthClient _authClient;
     private readonly IPmClient _pmClient;
     private readonly ILogService _logService;
     private readonly ITraceService _traceService;
     private readonly IMasaPrometheusClient _prometheusClient;
-    private readonly IMasaConfiguration _masaConfiguration;
-    private readonly IMasaStackConfig _masaStackConfig;
-    private readonly IWebHostEnvironment _environment;
-    private readonly IMultiEnvironmentContext _multiEnvironment;
 
     public QueryHandler(IPmClient pmClient,
         IAuthClient authClient,
         ILogService logService,
         IMasaPrometheusClient prometheusClient,
         ITraceService traceService,
-        IMasaConfiguration masaConfiguration,
         IMasaStackConfig masaStackConfig,
         IWebHostEnvironment environment,
         IMultiEnvironmentContext multiEnvironment
-        )
+        ) : base(masaStackConfig, environment, multiEnvironment)
     {
         _authClient = authClient;
         _pmClient = pmClient;
         _logService = logService;
         _traceService = traceService;
         _prometheusClient = prometheusClient;
-        _masaConfiguration = masaConfiguration;
-        _masaStackConfig = masaStackConfig;
-        _environment = environment;
-        _multiEnvironment = multiEnvironment;
     }
 
     [EventHandler]
@@ -131,12 +122,11 @@ public class QueryHandler
         {
             Projects = await GetAllProjects(teams.Select(t => t.Id).ToList(), monitors),
             Monitor = new AppMonitorDto()
-        };
-        var errorPorts = _masaConfiguration.GetTraceErrorStatus(_masaStackConfig);
+        };        
         var appids = string.Join(",", query.Result.Projects.Select(p => string.Join(",", p.Apps.Select(app => app.Identity)))).Split(',').Where(s => s.Length > 0).ToArray();
-        var env = _masaStackConfig.GetServiceEnvironmentName(_environment, appids, _multiEnvironment.CurrentEnvironment);
+        var env = GetServiceEnvironmentName(appids);
 
-        var (errors, warnings) = await GetProjectErrorAndWarnAsync(appids, errorPorts, env, query.StartTime, query.EndTime);
+        var (errors, warnings) = await GetProjectErrorAndWarnAsync(appids, ConfigConst.TraceErrorStatus, env, query.StartTime, query.EndTime);
 
         SetProjectErrorOrWarn(query, errors, true);
         SetProjectErrorOrWarn(query, warnings, false);
@@ -155,7 +145,7 @@ public class QueryHandler
         query.Result.Monitor.Normal = query.Result.Projects.Count(m => m.Status == MonitorStatuses.Normal);
         query.Result.Monitor.NormalAppTotal = query.Result.Projects.Sum(m => m.Apps.Count(a => !a.HasError && !a.HasWarning));
 
-        var (errorCount, warnCount) = await GetErrorAndWarnCountAsync(appids, errorPorts, env, query.StartTime, query.EndTime);
+        var (errorCount, warnCount) = await GetErrorAndWarnCountAsync(appids, ConfigConst.TraceErrorStatus, env, query.StartTime, query.EndTime);
         query.Result.Monitor.ErrorCount = errorCount;
         query.Result.Monitor.WarnCount = warnCount;
     }
@@ -163,9 +153,8 @@ public class QueryHandler
     [EventHandler]
     public async Task GetAppErrorCountAsync(AppErrorCountQuery query)
     {
-        var errorPorts = _masaConfiguration.GetTraceErrorStatus(_masaStackConfig);
-        var env = _masaStackConfig.GetServiceEnvironmentName(_environment, query.AppId, _multiEnvironment.CurrentEnvironment);
-        query.Result = await GetErrorOrWarnCountAsync(new string[] { query.AppId }, errorPorts, env, query.Start, query.End);
+        var env = GetServiceEnvironmentName(query.AppId);
+        query.Result = await GetErrorOrWarnCountAsync(new string[] { query.AppId }, ConfigConst.TraceErrorStatus, env, query.Start, query.End);
     }
 
     private async Task<(List<string> errorAppids, List<string> warningAppids)> GetProjectErrorAndWarnAsync(IEnumerable<string> appids, int[] errorPorts, string env, DateTime start, DateTime end)

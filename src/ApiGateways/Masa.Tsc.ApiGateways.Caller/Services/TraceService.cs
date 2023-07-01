@@ -12,6 +12,11 @@ public class TraceService : BaseService
         return await Caller.GetAsync<IEnumerable<TraceResponseDto>>($"{RootPath}/{traceId}") ?? Array.Empty<TraceResponseDto>();
     }
 
+    public async Task<IEnumerable<TraceResponseDto>> GetNextAsync(RequestNextPrevTraceDetailDto data)
+    {
+        return await Caller.GetAsync<IEnumerable<TraceResponseDto>>($"{RootPath}/next", data) ?? Array.Empty<TraceResponseDto>();
+    }
+
     public async Task<PaginatedListBase<TraceResponseDto>> GetListAsync(RequestTraceListDto model, CancellationToken? token = null)
     {
         return await Caller.GetAsync<PaginatedListBase<TraceResponseDto>>($"{RootPath}/list", model, token ?? default) ?? new PaginatedListBase<TraceResponseDto>();

@@ -1,0 +1,25 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Panel.Log
+@inherits TscComponentBase
+
+<MCard>
+    <SDataTable Headers="headers" Items="Columns" TItem=LogErrorDto Page="pageIndex" ItemsPerPage="pageSize">
+        <ItemColContent>
+            <div onclick="@(async ()=>await OpenLogAsync(context.Item))" style="cursor:pointer">
+                @switch (context.Header.Value)
+                {
+                    case (nameof(LogErrorDto.Message)):
+                        <TooltipCopy Value="@context.Item.Message" />
+                        break;
+                    case nameof(LogErrorDto.Count):
+                        @context.Item.Count
+                        break;
+                }
+            </div>
+        </ItemColContent>
+    </SDataTable>
+</MCard>
+<MCard>
+    <MCardText>
+        <SPagination @bind-Page="pageIndex" @bind-PageSize=pageSize Total=Columns.Count />
+    </MCardText>
+</MCard>

@@ -1,14 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using BlazorComponent;
-using Masa.Blazor;
-using Nest;
-using Newtonsoft.Json.Linq;
-using OneOf.Types;
-using System.Collections.Generic;
-using System;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceDetail
@@ -19,16 +11,15 @@ public partial class TscTraceDetail
     private List<TraceResponseTree> _treeData = new();
     private List<string>? _actives;
     private TraceResponseTree? _activeTreeItem;
-    private TraceResponseTree? _rootTreeItem;
     private int _count;
     private readonly List<List<TraceResponseTimeline>> _timelineView = new();
     private List<LogModel> _logs = new();
     private bool _loadLogs = false;
     private string? _lastQuerySpanId;
     private SSheetDialog.MProgressInfo _loading = new();
-    private MVirtualScroll<TraceResponseTree> _vs;
     private int? _logsCount;
-    
+    double _totalDuration = 0;
+
     internal async Task OpenAsync(string traceId)
     {
         _tabValue = 0;
@@ -60,7 +51,6 @@ public partial class TscTraceDetail
         if (!val)
         {
             _activeTreeItem = null;
-            _rootTreeItem = null;
             _logsCount = null;
             _treeData.Clear();
             _timelineView.Clear();
@@ -94,20 +84,19 @@ public partial class TscTraceDetail
         data = data.DistinctBy(span => span.SpanId).ToList();
         _count = data.Count();
 
-        _treeData = ToTree(data.OrderBy(item => item.Timestamp), null);
+        _treeData = GetRoots2(data);
         _timelineView.Clear();
         if (_treeData.Any())
         {
-            _rootTreeItem = _treeData.First();
             _activeTreeItem = _treeData.First();
             _actives = new List<string>() { _activeTreeItem.SpanId };
 
-            CalcTraceTimeConsuming(_treeData, _rootTreeItem.Timestamp, _rootTreeItem.EndTimestamp);
+            CalcTraceTimeConsuming(_treeData, _treeData.First().Timestamp, _treeData.Last().EndTimestamp);
             CalculateOverlapDisplayDlank();
             _timelineView.Reverse();
         }
     }
-    
+
     /*Serial is on one line, while parallel requires multiple lines*/
     /*Prioritize finding serial, not within a time range*/
     private void CalcTraceTimeConsuming(List<TraceResponseTree> treeData, DateTime rootTimestamp, DateTime rootEndTimestamp)
@@ -216,25 +205,13 @@ public partial class TscTraceDetail
         _activeTreeItem = items.First();
     }
 
-    private List<TraceResponseTree> ToTree(IEnumerable<TraceResponseDto>? items, TraceResponseTree? parent, TraceResponseTree? root = null,
-        double parentLeft = 0)
+    private List<TraceResponseTree>? ToTree(IEnumerable<TraceResponseDto>? items, TraceResponseTree parent, TraceResponseTree root, double parentLeft = 0)
     {
-        int parentLevel = parent?.Level ?? 0;
-        string? parentSpanId = parent?.SpanId;
+        if (items == null || !items.Any())
+            return default;
 
-        if (parent == null && items != null && items.Any())
-        {
-            var first = GetRoots(items).FirstOrDefault();
-            parentSpanId = first.ParentSpanId;
-            root = new TraceResponseTree(new TraceResponseDto
-            {
-                SpanId = parentSpanId,
-                TraceId = first.TraceId,
-                Timestamp = first.Timestamp,
-                EndTimestamp = items.Last().EndTimestamp
-            }, 0);
-        }
-
+        int parentLevel = parent.Level;
+        string? parentSpanId = parent.SpanId;
         var currentLevel = parentLevel + 1;
         var found = items.Where(item => item.ParentSpanId == parentSpanId);
         var nodes = found.Select(item => new TraceResponseTree(item, currentLevel)).ToList();
@@ -242,63 +219,15 @@ public partial class TscTraceDetail
 
         foreach (var node in nodes)
         {
-            node.Children ??= new();
-
             double internalParentLeft = parentLeft;
-            if (parent is not null)
-            {
-                internalParentLeft += (node.Timestamp - parent.Timestamp).TotalMilliseconds;
-            }
-
-            root ??= node;
+            internalParentLeft += (node.Timestamp - parent.Timestamp).TotalMilliseconds;
+            var marginLeft = internalParentLeft / root.DoubleDuration;
+            var durationPercent = Math.Round(node.DoubleDuration / root.DoubleDuration, 4, MidpointRounding.ToPositiveInfinity);
+            node.Timelines.Add(new TraceResponseTimeline(true, durationPercent, marginLeft));
 
             if (restItems.Any())
             {
-                var children = ToTree(restItems, node, root, internalParentLeft).OrderBy(u => u.Timestamp).ToList();
-
-                node.Children.AddRange(children);
-
-                var lastTimestamp = node.Timestamp;
-                foreach (var (child, index) in children.Select((child, index) => (child, index)))
-                {
-                    var duration = (child.Timestamp - lastTimestamp).TotalMilliseconds;
-                    var percent = Math.Round(duration / root.DoubleDuration, 4, MidpointRounding.ToPositiveInfinity);
-                    if (percent - 1 > 0)
-                        percent = 0;
-
-                    if (index == 0 && internalParentLeft > 0)
-                    {
-                        var marginLeft = internalParentLeft / root.DoubleDuration;
-                        node.Timelines.Add(new TraceResponseTimeline(true, percent, marginLeft));
-                    }
-                    else
-                    {
-                        node.Timelines.Add(new TraceResponseTimeline(true, percent));
-                    }
-
-                    var childDuration = child.DoubleDuration;
-                    node.Timelines.Add(new TraceResponseTimeline(false, percent));
-
-                    lastTimestamp = child.EndTimestamp;
-                }
-
-                if (lastTimestamp < node.EndTimestamp)
-                {
-                    var duration = (node.EndTimestamp - lastTimestamp).TotalMilliseconds;
-                    var percent = Math.Round(duration / root.DoubleDuration, 4, MidpointRounding.ToPositiveInfinity);
-                    node.Timelines.Add(new TraceResponseTimeline(true, percent));
-                }
-            }
-            else if (parent is not null)
-            {
-                var marginLeft = internalParentLeft / root.DoubleDuration;
-
-                var durationPercent = Math.Round(node.DoubleDuration / root.DoubleDuration, 4, MidpointRounding.ToPositiveInfinity);
-                node.Timelines.Add(new TraceResponseTimeline(true, durationPercent, marginLeft));
-            }
-            else
-            {
-                node.Timelines.Add(new TraceResponseTimeline(true, 1));
+                node.Children = ToTree(restItems, node, root, internalParentLeft)?.OrderBy(u => u.Timestamp)?.ToList();
             }
         }
 
@@ -311,8 +240,8 @@ public partial class TscTraceDetail
         if (roots.Any())
             return roots.ToList();
 
-        var spanIds = roots.Select(item => item.SpanId).Distinct().ToList();
-        var parentIds = roots.Select(item => item.ParentSpanId).Distinct().ToList();
+        var spanIds = items.Select(item => item.SpanId).Distinct().ToList();
+        var parentIds = items.Select(item => item.ParentSpanId).Distinct().ToList();
 
         spanIds.Sort();
         parentIds.Sort();
@@ -320,10 +249,29 @@ public partial class TscTraceDetail
         parentIds.RemoveAll(spanId => spanIds.Contains(spanId));
         if (!parentIds.Any())
         {
-            //没有root
+            //no root, everyone is root
             return items;
         }
-        return items.Where(item => parentIds.Contains(item.ParentSpanId)).ToList();
+        return items.Where(item => parentIds.Contains(item.ParentSpanId)).OrderBy(item => item.Timestamp).ToList();
+    }
+
+    private List<TraceResponseTree> GetRoots2(IEnumerable<TraceResponseDto> items)
+    {
+        var roots = GetRoots(items);
+        DateTime start = roots.First().Timestamp, end = roots.Last().EndTimestamp;
+        _totalDuration = (end - start).TotalMilliseconds;
+        double left = 0;
+        var list = new List<TraceResponseTree>();
+        foreach (var root in roots)
+        {
+            var rootNode = new TraceResponseTree(root, 0);
+            var durationPercent = Math.Round(rootNode.DoubleDuration / _totalDuration, 4, MidpointRounding.ToPositiveInfinity);
+            rootNode.Timelines.Add(new TraceResponseTimeline(true, durationPercent, left));
+            rootNode.Children = ToTree(items, rootNode, rootNode, left);
+            left += durationPercent;
+            list.Add(rootNode);
+        }
+        return list;
     }
 
     private async Task LoadSpanLogsAsync(string? spanId)
@@ -374,5 +322,74 @@ public partial class TscTraceDetail
         }
 
         return $"{(ms / 60000d):F}m";
+    }
+
+    private async Task NextAsync(bool isNext = true)
+    {
+        _activeTreeItem.Attributes.TryGetValue(TraceKeyConst.Attributes.Target, out var url);
+        _activeTreeItem.Resource.TryGetValue(TraceKeyConst.Resource.ServiceName, out var serviceName);
+        if (url == null || serviceName == null)
+        {
+            await PopupService.EnqueueSnackbarAsync(I18n.Trace("serviceName and url must not empty"));
+            return;
+        }
+        _loading.Loading = true;
+        StateHasChanged();
+        var query = new Contracts.Admin.Traces.RequestNextPrevTraceDetailDto
+        {
+            Service = serviceName?.ToString()!,
+            Time = isNext ? _activeTreeItem.EndTimestamp : _activeTreeItem.Timestamp,
+            Url = url?.ToString()!,
+            IsNext = isNext,
+            TraceId = _activeTreeItem.TraceId
+        };
+        var data = await ApiCaller.TraceService.GetNextAsync(query);
+        if (data == null || !data.Any())
+        {
+            await PopupService.EnqueueSnackbarAsync(I18n.Trace("no more data"));
+            _loading.Loading = false;
+            StateHasChanged();
+            return;
+        }
+
+        data = data.DistinctBy(span => span.SpanId).ToList();
+        _count = data.Count();
+        _logsCount = null;
+        _treeData = GetRoots2(data);
+        _timelineView.Clear();
+        if (_treeData.Any())
+        {
+            _actives = new List<string>() { _activeTreeItem.SpanId };
+
+            CalcTraceTimeConsuming(_treeData, _treeData[0].Timestamp, _treeData.Last().EndTimestamp);
+            CalculateOverlapDisplayDlank();
+            _timelineView.Reverse();
+        }
+        var selected = FindSelected(_treeData, query.Service, query.Url);
+        if (selected == null)
+            selected = _treeData[0];
+        _activeTreeItem = selected;
+        _actives = new() { _activeTreeItem!.SpanId };
+        _loading.Loading = false;
+        StateHasChanged();
+    }
+
+    private TraceResponseTree? FindSelected(IEnumerable<TraceResponseTree> data, string service, string url)
+    {
+        if (data == null || !data.Any())
+            return default;
+
+        var selected = data.FirstOrDefault(item => item.Attributes.TryGetValue(TraceKeyConst.Attributes.Target, out var url1) && url1 != null
+        && item.Resource.TryGetValue(TraceKeyConst.Resource.ServiceName, out var serviceName1) && serviceName1 != null
+        && url1.ToString() == url && serviceName1.ToString() == service);
+        if (selected != null)
+            return selected;
+        foreach (var item in data)
+        {
+            selected = FindSelected(item.Children!, service, url);
+            if (selected != null)
+                return selected;
+        }
+        return default;
     }
 }

@@ -34,4 +34,9 @@ public class LogService : BaseService
     {
         return await Caller.GetAsync<PaginatedListBase<LogDto>>($"{RootPath}/list", param) ?? default!;
     }
+
+    public async Task<List<LogErrorDto>> GetErrorTypesAsync(string service,DateTime start,DateTime end)
+    {
+        return await Caller.GetAsync<List<LogErrorDto>>($"{RootPath}/errorTypes", new {service,start,end }) ?? default!;
+    }
 }

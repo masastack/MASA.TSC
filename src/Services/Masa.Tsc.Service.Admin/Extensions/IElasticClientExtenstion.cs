@@ -78,13 +78,13 @@ internal static class IElasticClientExtenstion
 
     public static async Task<string> GetByMetricAsync(this IElasticClient client, string service, string url, DateTime start, DateTime end, string env)
     {
-        ISearchResponse<object> searchResponse = await client.SearchAsync<object>(searchDescriptor => searchDescriptor.Index(AppSettings.Get("Masa:Elastic:TraceIndex"))
+        ISearchResponse<object> searchResponse = await client.SearchAsync<object>(searchDescriptor => searchDescriptor.Index(ConfigConst.TraceIndex)
                 .Query(q => q.Bool(
                     b => b.Must(
                             q1 => q1.Term(f => f.Field($"{ElasticConstant.ServiceName}.keyword").Value(service)),
-                            q2 => q2.DateRange(f => f.Name(ElasticConstant.Trace.Timestamp).LessThanOrEquals(end).GreaterThanOrEquals(start)),
+                            q2 => q2.DateRange(f => f.Field(ElasticConstant.Trace.Timestamp).LessThanOrEquals(end).GreaterThanOrEquals(start)),
                             q4 => q4.Term(f => f.Field($"{ElasticSearchConst.Environment}.keyword").Value(env)),
-                            q3 => url.Contains('*') ? q3.QueryString(f => f.Name($"{ElasticSearchConst.URL}").Query(url)) : q3.Term(f => f.Field($"{ElasticSearchConst.URL}.keyword").Value(url))
+                            q3 => url.Contains('*') ? q3.QueryString(f => f.Fields($"{ElasticSearchConst.URL}").Query(url)) : q3.Term(f => f.Field($"{ElasticSearchConst.URL}.keyword").Value(url))
                             )
                 ))
                 .Sort(sort => sort.Script(script => script.Order(SortOrder.Descending).Script(s => s.Source("doc['EndTimestamp'].value.toEpochSecond()-doc['@timestamp'].value.toEpochSecond()")).Type("number")))
@@ -97,9 +97,36 @@ internal static class IElasticClientExtenstion
         foreach (var item in obj)
         {
             if (item.Key == ElasticConstant.TraceId)
-                return item.Value.ToString();
+                return item.Value.ToString()!;
         }
 
         return default!;
+    }
+
+    public static async Task<List<LogErrorDto>> GetLogErrorTypesAsync(this IElasticClient client, string service, DateTime start, DateTime end, string env)
+    {
+        ISearchResponse<object> searchResponse = await client.SearchAsync<object>(searchDescriptor => searchDescriptor.Index(ConfigConst.LogIndex)
+                    .Query(q => q.Bool(
+                            b => b.Must(
+                                    q1 => q1.Term(f => f.Field($"{ElasticConstant.ServiceName}.keyword").Value(service)),
+                                    q2 => q2.DateRange(f => f.Field(ElasticConstant.Log.Timestamp).LessThanOrEquals(end).GreaterThanOrEquals(start)),
+                                    q3 => q3.Term(f => f.Field($"{ElasticSearchConst.Environment}.keyword").Value(env))
+                                )
+                        )).Size(0)
+                        .Aggregations(agg => agg.Terms("error", term => term.Field($"{ElasticSearchConst.ExceptionMessage}.keyword").Size(9999)))
+                    );
+        if (!searchResponse.IsValid || !searchResponse.Aggregations.Any())
+            return default!;
+
+        var result = new List<LogErrorDto>();
+
+        var key = searchResponse.Aggregations.Keys.First();
+        var buckets = (BucketAggregate)searchResponse.Aggregations[key];
+
+        foreach (KeyedBucket<object> item in buckets.Items)
+        {
+            result.Add(new LogErrorDto { Message = item.Key.ToString()!, Count = (int)item.DocCount! });
+        }
+        return result.OrderByDescending(item => item.Count).ToList();
     }
 }

@@ -3,7 +3,7 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
-await builder.Services.AddMasaStackConfigAsync();
+await builder.Services.AddMasaStackConfigAsync(MasaStackProject.TSC, MasaStackApp.WEB);
 var masaStackConfig = builder.Services.GetMasaStackConfig();
 
 builder.Services.AddRazorPages();
@@ -34,7 +34,7 @@ builder.Services.AddObservable(builder.Logging, new MasaObservableOptions
 {
     ServiceNameSpace = builder.Environment.EnvironmentName,
     ServiceVersion = masaStackConfig.Version,
-    ServiceName = masaStackConfig.GetWebId(MasaStackConstant.TSC),
+    ServiceName = masaStackConfig.GetWebId(MasaStackProject.TSC),
     Layer = masaStackConfig.Namespace,
     ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
 }, masaStackConfig.OtlpUrl, true);
@@ -42,7 +42,7 @@ builder.Services.AddObservable(builder.Logging, new MasaObservableOptions
 MasaOpenIdConnectOptions masaOpenIdConnectOptions = new()
 {
     Authority = masaStackConfig.GetSsoDomain(),
-    ClientId = masaStackConfig.GetWebId(MasaStackConstant.TSC),
+    ClientId = masaStackConfig.GetWebId(MasaStackProject.TSC),
     Scopes = new List<string> { "offline_access" }
 };
 
@@ -63,10 +63,10 @@ var redisOption = new RedisConfigurationOptions
 };
 
 #if DEBUG
-builder.AddMasaStackComponentsForServer(authHost: "https://auth-service-dev.masastack.com", mcHost: "https://mc-service-dev.masastack.com", pmHost: "https://pm-service-dev.masastack.com");
+await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC, authHost: "https://auth-service-dev.masastack.com", mcHost: "https://mc-service-dev.masastack.com", pmHost: "https://pm-service-dev.masastack.com");
 builder.Services.AddTscHttpApiCaller("http://localhost:18010").AddDccClient(redisOption);
 #else
-    builder.AddMasaStackComponentsForServer();
+    await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC);
     builder.Services.AddTscHttpApiCaller(masaStackConfig.GetTscServiceDomain()).AddDccClient(redisOption);
 #endif
 
@@ -74,15 +74,14 @@ builder.Services.AddRcl().AddScoped<TokenProvider>();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 
-if (builder.Environment.IsDevelopment())
+#if DEBUG
+builder.Services.AddDaprStarter(opt =>
 {
-    builder.Services.AddDaprStarter(opt =>
-    {
-        opt.AppId = masaStackConfig.GetWebId(MasaStackConstant.TSC);
-        opt.DaprHttpPort = 3602;
-        opt.DaprGrpcPort = 3603;
-    });
-}
+    opt.AppId = masaStackConfig.GetWebId(MasaStackProject.TSC);
+    opt.DaprHttpPort = 3602;
+    opt.DaprGrpcPort = 3603;
+});
+#endif
 builder.Services.AddDaprClient();
 
 builder.Services.AddHttpContextAccessor();

@@ -23,7 +23,7 @@ public static class SchedulerJobServiceCollectionExtensions
         var schedulerClient = serviceProvider.GetRequiredService<ISchedulerClient>();
         await schedulerClient.SchedulerJobService.AddAsync(new UpsertSchedulerJobRequest()
         {
-            ProjectIdentity = MasaStackConstant.TSC,
+            ProjectIdentity = MasaStackProject.TSC.Name,
             JobIdentity = "masa-tsc-topology",
             Name = "CaculateTopologyRelation",
             IsAlertException = false,

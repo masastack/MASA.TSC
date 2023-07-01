@@ -38,9 +38,14 @@
                     <LogPanel ConfigurationRecord="ConfigurationRecord" />
                     break;
                 case PanelTypes.Select:
+                    if (context.Title == "ServiceError")
+                    {
+                        <LogError ConfigurationRecord="ConfigurationRecord" />
+                        break;
+                    }
                     <PanelSelect Panel="context" OnSelect="ReplacePanel" />
                     break;
-                default:
+                default:                   
                     break;
             }
         </div>
