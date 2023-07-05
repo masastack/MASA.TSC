@@ -69,7 +69,7 @@ builder.Services.AddDaprStarter(opt =>
 });
 #else
     redis = redisOption;
-    pmServiceUrl=masaStackConfig.GetAuthServiceDomain();
+    pmServiceUrl=masaStackConfig.GetPmServiceDomain();
     authServiceUrl= masaStackConfig.GetAuthServiceDomain();
 #endif
 
