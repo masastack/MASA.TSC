@@ -6,6 +6,37 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Project.Charts;
 public partial class TscEChartBase : TscComponentBase
 {
     protected bool _isLoading;
+    private string lastKey = default!;
+    protected string MetricEnv { get; private set; }
+
+    [Inject]
+    public IHttpContextAccessor HttpContext { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (UserContext != null && UserContext.IsAuthenticated)
+        {
+            var env = HttpContext.HttpContext!.User.Claims.FirstOrDefault(item => item.Type == "environment")?.Value!;
+            if (string.IsNullOrEmpty(env))
+            {
+                MetricEnv = string.Empty;
+            }
+            else
+            {
+                MetricEnv = $"{MetricConstants.Environment}=\"{env}\"";
+            }
+        }
+    }
+
+    protected virtual bool CheckKeyChanged(ProjectAppSearchModel query)
+    {
+        var key = $"{query.AppId}_{query.Start}_{query.End}";
+        if (key == lastKey)
+            return false;
+        lastKey = key;
+        return true;
+    }
 
     internal async Task OnLoadAsync(ProjectAppSearchModel query)
     {

@@ -115,16 +115,15 @@ public class QueryHandler : EnvQueryHandler
             return;
 
         teams = teams.Where(team => team.Id == query.TeamId).ToList();
-
-        var monitors = await GetAllMonitServicesAsync(query.StartTime, query.EndTime);
+        var env = GetServiceEnvironmentName(string.Empty);
+        var monitors = await GetAllMonitServicesAsync(env, query.StartTime, query.EndTime);
 
         query.Result = new TeamMonitorDto
         {
             Projects = await GetAllProjects(teams.Select(t => t.Id).ToList(), monitors),
             Monitor = new AppMonitorDto()
-        };        
+        };
         var appids = string.Join(",", query.Result.Projects.Select(p => string.Join(",", p.Apps.Select(app => app.Identity)))).Split(',').Where(s => s.Length > 0).ToArray();
-        var env = GetServiceEnvironmentName(appids);
 
         var (errors, warnings) = await GetProjectErrorAndWarnAsync(appids, ConfigConst.TraceErrorStatus, env, query.StartTime, query.EndTime);
 
@@ -263,29 +262,26 @@ public class QueryHandler : EnvQueryHandler
         return result;
     }
 
-    private async Task<List<string>> GetAllMonitServicesAsync(DateTime? start = default, DateTime? end = default)
+    private async Task<List<string>> GetAllMonitServicesAsync(string env, DateTime? start = default, DateTime? end = default)
     {
         if (start == null)
             start = DateTime.MinValue;
         if (end == null)
             end = DateTime.MaxValue;
+
+        var query = new SimpleAggregateRequestDto
+        {
+            Name = ElasticConstant.ServiceName,
+            Start = start.Value,
+            End = end.Value,
+            Type = AggregateTypes.GroupBy,
+            MaxCount = 999
+        };
+        query.SetEnv(env);
+
         var tasks = new Task<object>[] {
-            _logService.AggregateAsync(new SimpleAggregateRequestDto
-            {
-                Name = ElasticConstant.ServiceName,
-                Start = start.Value,
-                End = end.Value,
-                Type = AggregateTypes.GroupBy,
-                MaxCount = 999
-            }),
-                _traceService.AggregateAsync(new SimpleAggregateRequestDto
-            {
-                Name = ElasticConstant.ServiceName,
-                Start = start ?? DateTime.MinValue,
-                End = end ?? DateTime.MinValue,
-                Type = AggregateTypes.GroupBy,
-                MaxCount = 999
-            })
+            _logService.AggregateAsync(query),
+            _traceService.AggregateAsync(query)
         };
         var queryResult = await Task.WhenAll(tasks);
 
@@ -297,9 +293,10 @@ public class QueryHandler : EnvQueryHandler
 
         var metricServices = await _prometheusClient.QueryRangeAsync(new QueryRangeRequest
         {
-            Query = "group by(service_name) (http_server_duration_sum)",
+            Query = $"group by(service_name) (http_server_duration_sum{{{MetricConstants.Environment}=\"{env}\"}})",
             Start = start!.Value.ToUnixTimestamp().ToString(),
-            End = end!.Value.ToUnixTimestamp().ToString()
+            End = end!.Value.ToUnixTimestamp().ToString(),
+            Step = (end!.Value - start!.Value).TotalSeconds.ToString(),
         });
         if (metricServices.Status == ResultStatuses.Success && metricServices.Data!.Result != null && metricServices.Data.Result.Any() && metricServices.Data.ResultType == ResultTypes.Vector)
         {

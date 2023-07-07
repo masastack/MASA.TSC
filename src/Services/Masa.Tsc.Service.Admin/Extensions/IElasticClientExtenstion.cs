@@ -123,9 +123,10 @@ internal static class IElasticClientExtenstion
         var key = searchResponse.Aggregations.Keys.First();
         var buckets = (BucketAggregate)searchResponse.Aggregations[key];
 
-        foreach (KeyedBucket<object> item in buckets.Items)
+        foreach (var item in buckets.Items)
         {
-            result.Add(new LogErrorDto { Message = item.Key.ToString()!, Count = (int)item.DocCount! });
+            var itemKey = (KeyedBucket<object>)item!;
+            result.Add(new LogErrorDto { Message = itemKey.Key.ToString()!, Count = (int)itemKey.DocCount! });
         }
         return result.OrderByDescending(item => item.Count).ToList();
     }

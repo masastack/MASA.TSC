@@ -28,9 +28,9 @@
     [Parameter]
     public string Keyword { get; set; }
 
-    DateTime ToDateTime(string str)
+    DateTime ToDateTime(string? str)
     {
-        if (DateTime.TryParse(str, out var time))
+        if (!string.IsNullOrEmpty(str) && DateTime.TryParse(str, out var time))
             return time;
         return DateTime.MinValue;
     }

@@ -217,10 +217,10 @@
         if (item.Attributes.TryGetValue(TraceKeyConst.Attributes.HttpStatusCode, out object? statusCodeObj))
         {
             var statusCode = statusCodeObj?.ToString();
-            if (statusCode != null && statusCode.StartsWith("5"))
+            if (int.TryParse(statusCode, out var code) && _errorStatus.Contains(code))
             {
                 labelDictionary.TryAdd("ERROR", "#FFDBDC");
-            }
+            }           
         }
 
         foreach (var dic in labelDictionary)

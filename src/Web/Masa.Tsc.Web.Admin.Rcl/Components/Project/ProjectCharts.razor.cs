@@ -14,6 +14,7 @@ public partial class ProjectCharts
     private UpsertChartPanelDto? _slowEndpoint;
     string? _oldConfigRecordKey;
     TscTraceDetail _tscTraceDetail = default!;
+    private static bool isNew = false;
 
     [Parameter]
     public ConfigurationRecord ConfigurationRecord { get; set; }
@@ -31,6 +32,7 @@ public partial class ProjectCharts
 
     internal async Task OnLoadDataAsync(ProjectAppSearchModel? query = null)
     {
+        isNew = true;
         query = new()
         {
             AppId = ConfigurationRecord.Service!,
@@ -39,18 +41,28 @@ public partial class ProjectCharts
         };
         UpSetMetrics();
         var tasks = new List<Task>();
-        if (_errorWarnChart != null)
-            tasks.Add(_errorWarnChart.OnLoadAsync(query));
-        if (_traceLogChart != null)
-            tasks.Add(_traceLogChart.OnLoadAsync(query));
-        if (_serviceResponseTimePercentile != null)
-            tasks.Add(_serviceResponseTimePercentile.OnLoadAsync(query));
-        if (_serviceResponseAvgTime != null)
-            tasks.Add(_serviceResponseAvgTime.OnLoadAsync(query));
-        if (_apdexChart != null)
-            tasks.Add(_apdexChart.OnLoadAsync(query));
+        do
+        {
+            if (_errorWarnChart != null)
+                tasks.Add(_errorWarnChart.OnLoadAsync(query));
+            if (_traceLogChart != null)
+                tasks.Add(_traceLogChart.OnLoadAsync(query));
+            if (_serviceResponseAvgTime != null)
+                tasks.Add(_serviceResponseAvgTime.OnLoadAsync(query));
+            if (_apdexChart != null)
+                tasks.Add(_apdexChart.OnLoadAsync(query));
+            if (_serviceResponseTimePercentile != null)
+                tasks.Add(_serviceResponseTimePercentile.OnLoadAsync(query));
 
-        if (_oldConfigRecordKey != ConfigurationRecord.Key && tasks.Count - 5 == 0)
+            if (tasks.Count - 5 == 0 || isNew)
+                break;
+
+            tasks.Clear();
+            await Task.Delay(50);
+        }
+        while (true);
+        isNew = false;
+        if (!isNew && _oldConfigRecordKey != ConfigurationRecord.Key)
         {
             _oldConfigRecordKey = ConfigurationRecord.Key;
             await Task.WhenAll(tasks);

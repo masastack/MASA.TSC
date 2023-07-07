@@ -3,13 +3,18 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Metrics;
 
-public class QueryHandler
+public class QueryHandler : EnvQueryHandler
 {
     private readonly IMasaPrometheusClient _prometheusClient;
     private readonly IMultilevelCacheClient _multilevelCacheClient;
     private readonly ILogger _logger;
 
-    public QueryHandler(IMasaStackConfig masaStackConfig, IMasaPrometheusClient masaPrometheusClient, IMultilevelCacheClientFactory multilevelCacheClientFactory, ILogger<QueryHandler> logger)
+    public QueryHandler(IMasaStackConfig masaStackConfig,
+        IMasaPrometheusClient masaPrometheusClient,
+        IMultilevelCacheClientFactory multilevelCacheClientFactory,
+        ILogger<QueryHandler> logger,
+        IWebHostEnvironment environment,
+        IMultiEnvironmentContext multiEnvironment) : base(masaStackConfig, environment, multiEnvironment)
     {
         _prometheusClient = masaPrometheusClient;
         _multilevelCacheClient = multilevelCacheClientFactory.Create(masaStackConfig.GetServiceId(MasaStackProject.TSC));
@@ -189,13 +194,13 @@ public class QueryHandler
     {
         var metric = "";
         if (query.Type == MetricValueTypes.Service)
-            metric = $"group by (service_name) (http_client_duration_bucket)";
+            metric = $"group by (service_name) (http_client_duration_bucket{{{GetEnvCondition()}}})";
         else if (query.Type == MetricValueTypes.Instance)
-            metric = $"group by (service_instance_id) (http_client_duration_bucket)";
+            metric = $"group by (service_instance_id) (http_client_duration_bucket{{{GetEnvCondition()}}})";
         else if (query.Type == MetricValueTypes.Endpoint)
-            metric = $"group by (http_target) (http_response_bucket)";
+            metric = $"group by (http_target) (http_response_bucket{{{GetEnvCondition()}}})";
         else if (query.Type == MetricValueTypes.Layer)
-            metric = $"group by (service_layer) (http_client_duration_bucket)";
+            metric = $"group by (service_layer) (http_client_duration_bucket{{{GetEnvCondition()}}})";
 
         metric = await ReplaceCondition(metric, query.Layer, query.Service, query.Instance, query.Endpint);
 
@@ -286,14 +291,14 @@ public class QueryHandler
         }
         if (template.Contains(MetricConstants.APPEND_TEMPLATE))
         {
-            return template.Replace(MetricConstants.APPEND_TEMPLATE, CombineCondition(layer, service, instance, endpoint));
+            return template.Replace(MetricConstants.APPEND_TEMPLATE, CombineCondition($"{GetEnvCondition()},", layer, service, instance, endpoint));
         }
         return template;
     }
 
-    private static string CombineCondition(string layer, string service, string instance, string endpoint)
+    private static string CombineCondition(string env, string layer, string service, string instance, string endpoint)
     {
-        StringBuilder text = new();
+        StringBuilder text = new(env);
         if (!string.IsNullOrEmpty(service))
             text.Append($"service_name=\"{service}\",");
         if (!string.IsNullOrEmpty(instance))
@@ -374,4 +379,6 @@ public class QueryHandler
         result = text.ToString();
         return true;
     }
+
+    private string GetEnvCondition() => $"{MetricConstants.Environment}=\"{GetServiceEnvironmentName(string.Empty)}\"";
 }

@@ -93,6 +93,9 @@ public partial class ServiceCallChart
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
+        if (!CheckKeyChanged(query))
+            return;
+
         if (query == null)
             return;
         if (query.Start.HasValue)
@@ -104,7 +107,7 @@ public partial class ServiceCallChart
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
-                $"round(sum by(service_name)(increase(http_server_duration_count[{MetricConstants.TIME_PERIOD}])),0.01)"
+                $"round(sum by(service_name)(increase(http_server_duration_count{{{MetricEnv}}}[{MetricConstants.TIME_PERIOD}])),0.01)"
             },
             Service = query.AppId,
             Start = StartTime,
