@@ -80,7 +80,7 @@ public partial class TeamProjectDialog
 
     async Task OpenTraceAsync()
     {
-        var url = $"/trace/{ConfigurationRecord.Service}/{StartTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/{EndTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}/Error";
+        var url = $"/trace?service={ConfigurationRecord.Service}&startTime={StartTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}&endTime={EndTime?.UtcDateTime:yyyy-MM-dd HH:mm:ss}&type=Error";
         await JSRuntime.InvokeVoidAsync("open", url, "_blank");
     }
 

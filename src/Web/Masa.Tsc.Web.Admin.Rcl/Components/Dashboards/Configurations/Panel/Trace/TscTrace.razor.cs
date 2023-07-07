@@ -176,7 +176,7 @@ public partial class TscTrace
         _chartData = values;
     }
 
-    private bool IsTraceId(string value)
+    private bool IsTraceId(string? value)
     {
         if (!string.IsNullOrEmpty(value) && value.Length - 32 == 0)
         {
@@ -189,19 +189,11 @@ public partial class TscTrace
     {
         if (IsTraceId(Keyword))
         {
-            var list = new List<FieldConditionDto>();
-            var traceId = Keyword;
-            list.Add(new FieldConditionDto
-            {
-                Name = ElasticSearchConst.TraceId,
-                Type = ConditionTypes.Equal,
-                Value = traceId
-            });
-            query.Conditions = list;
+            query.TraceId = Keyword!;
         }
         else
         {
-            query.RawQuery = Keyword;
+            query.Keyword = Keyword!;
         }
     }
 

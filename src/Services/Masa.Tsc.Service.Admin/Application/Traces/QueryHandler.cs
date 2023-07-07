@@ -83,7 +83,7 @@ public class QueryHandler : EnvQueryHandler
 
         queryDto.Conditions = list;
 
-        if (!query.IsError && !isRawQuery)
+        if (string.IsNullOrEmpty(query.TraceId) && !query.IsError && !isRawQuery)
             queryDto.SetEnv(GetServiceEnvironmentName(query.Service));
 
         query.Result = await _traceService.ListAsync(queryDto);
@@ -105,46 +105,20 @@ public class QueryHandler : EnvQueryHandler
         if (string.IsNullOrEmpty(query.Data.Service))
         {
             query.Data.Name = ElasticConstant.ServiceName;
-            if (!string.IsNullOrEmpty(query.Data.Keyword))
-            {
-                list.Add(new FieldConditionDto
-                {
-                    Name = ElasticConstant.ServiceName,
-                    Type = ConditionTypes.Regex,
-                    Value = $"*{query.Data.Keyword}*"
-                });
-            }
         }
         else if (query.Data.Instance == null)
         {
             query.Data.Name = ElasticConstant.ServiceInstance;
-            if (!string.IsNullOrEmpty(query.Data.Keyword))
-            {
-                list.Add(new FieldConditionDto
-                {
-                    Name = ElasticConstant.ServiceInstance,
-                    Type = ConditionTypes.Regex,
-                    Value = $"*{query.Data.Keyword}*"
-                });
-            }
         }
         else
         {
             query.Data.Name = "Attributes.http.target";
-            if (!string.IsNullOrEmpty(query.Data.Keyword))
-            {
-                list.Add(new FieldConditionDto
-                {
-                    Name = ElasticConstant.Endpoint,
-                    Type = ConditionTypes.Regex,
-                    Value = $"*{query.Data.Keyword}*"
-                });
-            }
         }
         query.Data.Conditions = list;
         query.Data.Keyword = default!;
-
+        
         query.Data.SetEnv(GetServiceEnvironmentName(query.Data.Service));
+
         query.Result = (IEnumerable<string>)await _traceService.AggregateAsync(query.Data);
         if (query.Result == null)
             query.Result = Array.Empty<string>();
@@ -223,6 +197,6 @@ public class QueryHandler : EnvQueryHandler
     [EventHandler]
     public void GetErrorStatus(TraceErrorStatusQuery query)
     {
-         query.Result = ConfigConst.TraceErrorStatus;
+        query.Result = ConfigConst.TraceErrorStatus;
     }
 }

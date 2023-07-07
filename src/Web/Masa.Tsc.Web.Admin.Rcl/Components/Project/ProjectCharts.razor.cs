@@ -40,30 +40,29 @@ public partial class ProjectCharts
             End = ConfigurationRecord.EndTime.UtcDateTime,
         };
         UpSetMetrics();
-        var tasks = new List<Task>();
+        isNew = false;
         do
         {
-            if (_errorWarnChart != null)
-                tasks.Add(_errorWarnChart.OnLoadAsync(query));
-            if (_traceLogChart != null)
-                tasks.Add(_traceLogChart.OnLoadAsync(query));
-            if (_serviceResponseAvgTime != null)
-                tasks.Add(_serviceResponseAvgTime.OnLoadAsync(query));
-            if (_apdexChart != null)
-                tasks.Add(_apdexChart.OnLoadAsync(query));
-            if (_serviceResponseTimePercentile != null)
-                tasks.Add(_serviceResponseTimePercentile.OnLoadAsync(query));
-
-            if (tasks.Count - 5 == 0 || isNew)
+            if (isNew)
+                break;
+            else if (_errorWarnChart == null || _traceLogChart == null || _serviceResponseAvgTime == null || _apdexChart == null || _serviceResponseTimePercentile == null)
+                await Task.Delay(50);
+            else
                 break;
 
-            tasks.Clear();
-            await Task.Delay(50);
-        }
-        while (true);
-        isNew = false;
+        } while (true);
+
         if (!isNew && _oldConfigRecordKey != ConfigurationRecord.Key)
         {
+            var tasks = new Task[]
+            {
+                _errorWarnChart!.OnLoadAsync(query),
+                _traceLogChart!.OnLoadAsync(query),
+                _serviceResponseAvgTime!.OnLoadAsync(query),
+                _apdexChart!.OnLoadAsync(query),
+                _serviceResponseTimePercentile!.OnLoadAsync(query)
+            };
+
             _oldConfigRecordKey = ConfigurationRecord.Key;
             await Task.WhenAll(tasks);
         }

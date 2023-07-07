@@ -34,7 +34,7 @@ public partial class LogError
 
     private async Task OpenLogAsync(LogErrorDto item)
     {
-        var url = $"/log/{ConfigurationRecord.Service}/{ConfigurationRecord.StartTime.UtcDateTime:yyyy-MM-dd HH:mm:ss}/{ConfigurationRecord.EndTime.UtcDateTime:yyyy-MM-dd HH:mm:ss}/{item.Message.Replace('.','。')}";
+        var url = $"/log?service={ConfigurationRecord.Service}&startTime={ConfigurationRecord.StartTime.UtcDateTime:yyyy-MM-dd HH:mm:ss}&endTime={ConfigurationRecord.EndTime.UtcDateTime:yyyy-MM-dd HH:mm:ss}&keyword={item.Message}";
         await JSRuntime.InvokeVoidAsync("open", url, "_blank");
     }
 }
