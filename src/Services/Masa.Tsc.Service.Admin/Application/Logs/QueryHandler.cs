@@ -24,22 +24,19 @@ public class QueryHandler : EnvQueryHandler
     [EventHandler]
     public async Task GetLatestDataAsync(LatestLogQuery queryData)
     {
-        var data = await _logService.ListAsync(new BaseRequestDto
+        var query = new BaseRequestDto
         {
             Start = queryData.Start,
             End = queryData.End,
             Keyword = queryData.Query,
             Page = 1,
             PageSize = 1,
-            Conditions = new FieldConditionDto[] {
-                new FieldConditionDto{
-                    Name= ElasticSearchConst.Environment,
-                    Type= ConditionTypes.Equal,
-                    Value=_multiEnvironment.CurrentEnvironment
-                }
-            },
             Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = !queryData.IsDesc }
-        });
+        };
+
+        var env = GetServiceEnvironmentName(string.Empty!);
+        query.SetEnv(env);
+        var data = await _logService.ListAsync(query);
 
         queryData.Result = data?.Result?.FirstOrDefault()!;
     }
@@ -55,7 +52,7 @@ public class QueryHandler : EnvQueryHandler
     [EventHandler]
     public async Task GetPageListAsync(LogsQuery queryData)
     {
-        bool isMasaStack = false;
+        bool isSkipEnv = false;
         var conditions = new List<FieldConditionDto>();
         if (!string.IsNullOrEmpty(queryData.JobTaskId))
         {
@@ -65,7 +62,7 @@ public class QueryHandler : EnvQueryHandler
                 Type = ConditionTypes.Equal,
                 Value = queryData.JobTaskId
             });
-            isMasaStack = true;
+            isSkipEnv = true;
         }
 
         if (!string.IsNullOrEmpty(queryData.SpanId))
@@ -101,21 +98,12 @@ public class QueryHandler : EnvQueryHandler
             Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = queryData.IsDesc },
             Conditions = conditions
         };
-        if (isMasaStack)
-        {
-            conditions.Add(new FieldConditionDto
-            {
-                Name = ElasticSearchConst.Environment,
-                Type = ConditionTypes.Equal,
-                Value = _environment.EnvironmentName
-            });
-        }
-        else
+        if (!isSkipEnv && !isRawQuery)
         {
             var env = GetServiceEnvironmentName(queryData.Service!);
             query.SetEnv(env);
         }
-       
+
         var data = await _logService.ListAsync(query);
         data ??= new PaginatedListBase<LogResponseDto>();
         queryData.Result = data;

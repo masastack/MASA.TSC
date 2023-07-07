@@ -113,6 +113,10 @@ public partial class TscTraceSearch
             {
                 await SearchEndpoints();
             }
+            else
+            {
+                await SearchServices();
+            }
 
             await OnQueryUpdate.InvokeAsync((Service, _instance, _endpoint, Keyword));
             StateHasChanged();

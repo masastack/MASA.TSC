@@ -1,6 +1,5 @@
 ﻿@page "/log"
 @page "/log/{TaskId}"
-@page "/log/{Service}/{StartTime}/{EndTime}/{Keyword}"
 @inject I18n I18n
 @inject NavigationManager NavigationManager
 
@@ -17,28 +16,35 @@
     public string TaskId { get; set; }
 
     [Parameter]
+    [SupplyParameterFromQuery]
     public string StartTime { get; set; }
 
     [Parameter]
+    [SupplyParameterFromQuery]
     public string EndTime { get; set; }
 
     [Parameter]
+    [SupplyParameterFromQuery]
     public string Service { get; set; }
 
     [Parameter]
+    [SupplyParameterFromQuery]
     public string Keyword { get; set; }
 
-    DateTime ToDateTime(string str)
+    DateTime ToDateTime(string? str)
     {
-        if (DateTime.TryParse(str, out var time))
+        if (!string.IsNullOrEmpty(str) && DateTime.TryParse(str, out var time))
             return time;
         return DateTime.MinValue;
     }
 
-    protected override void OnInitialized()
+    protected override void OnAfterRender(bool firstRender)
     {
-        if (!string.IsNullOrEmpty(Keyword))
-            Keyword = Keyword.Replace('。', '.');
-        base.OnInitialized();
+        if (!firstRender)
+        {
+            NavigationManager.NavigateTo("/log", true);
+            return;
+        }
+        base.OnAfterRender(firstRender);
     }
 }

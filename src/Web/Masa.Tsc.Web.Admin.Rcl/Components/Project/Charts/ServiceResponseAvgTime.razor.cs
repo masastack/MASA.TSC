@@ -4,7 +4,7 @@
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class ServiceResponseAvgTime : TscEChartBase
-{
+{   
     [Parameter]
     public StringNumber Width { get; set; } = "100%";
 
@@ -33,8 +33,11 @@ public partial class ServiceResponseAvgTime : TscEChartBase
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
+        if (!CheckKeyChanged(query))
+            return;
+
         var step = (long)Math.Floor((query.End!.Value - query.Start!.Value).TotalSeconds);
-        var metric = $"round(sum by(service_name) (increase(http_server_duration_sum{{service_name=\"{query.AppId}\"}}[{MetricConstants.TIME_PERIOD}]))/sum by(service_name) (increase(http_server_duration_count{{service_name=\"{query.AppId}\"}}[{MetricConstants.TIME_PERIOD}])),1)";
+        var metric = $"round(sum by(service_name) (increase(http_server_duration_sum{{service_name=\"{query.AppId}\",{MetricEnv}}}[{MetricConstants.TIME_PERIOD}]))/sum by(service_name) (increase(http_server_duration_count{{service_name=\"{query.AppId}\",{MetricEnv}}}[{MetricConstants.TIME_PERIOD}])),1)";
         Total = 0;
         var result = await ApiCaller.MetricService.GetQueryRangeAsync(new RequestMetricAggDto
         {

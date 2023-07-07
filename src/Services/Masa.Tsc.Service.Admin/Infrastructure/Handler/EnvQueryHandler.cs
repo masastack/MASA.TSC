@@ -14,7 +14,7 @@ public abstract class EnvQueryHandler
         _masaStackConfig = masaStackConfig;
         _environment = environment;
         _multiEnvironment = multiEnvironment;
-    }
+    }    
 
     protected string GetServiceEnvironmentName(string service) => _masaStackConfig.GetServiceEnvironmentName(_environment, service, _multiEnvironment.CurrentEnvironment);
 

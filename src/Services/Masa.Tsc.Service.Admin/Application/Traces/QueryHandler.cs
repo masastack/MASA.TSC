@@ -45,7 +45,7 @@ public class QueryHandler : EnvQueryHandler
             TraceId = query.TraceId,
             Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = query.IsDesc }
         };
-        queryDto.SetEnv(GetServiceEnvironmentName(query.Service));
+
         var list = queryDto.Conditions?.ToList() ?? new();
         if (!string.IsNullOrEmpty(query.Endpoint))
         {
@@ -57,12 +57,18 @@ public class QueryHandler : EnvQueryHandler
             };
             list.Add(endpointCondition);
         }
+        bool isRawQuery = false;
         if (!string.IsNullOrEmpty(query.Keyword))
         {
             if (query.Keyword.IndexOf('}') >= 0)
+            {
+                isRawQuery = true;
                 queryDto.RawQuery = query.Keyword;
+            }
             else
+            {
                 queryDto.Keyword = query.Keyword;
+            }
         }
 
         if (query.IsError)
@@ -74,11 +80,14 @@ public class QueryHandler : EnvQueryHandler
                 Value = ConfigConst.TraceErrorStatus.Select(num => (object)num)
             });
         }
+
         queryDto.Conditions = list;
 
+        if (string.IsNullOrEmpty(query.TraceId) && !query.IsError && !isRawQuery)
+            queryDto.SetEnv(GetServiceEnvironmentName(query.Service));
+
         query.Result = await _traceService.ListAsync(queryDto);
-        if (query.Result == null)
-            query.Result = new PaginatedListBase<TraceResponseDto>();
+        query.Result ??= new PaginatedListBase<TraceResponseDto>();
     }
 
     [EventHandler]
@@ -96,46 +105,20 @@ public class QueryHandler : EnvQueryHandler
         if (string.IsNullOrEmpty(query.Data.Service))
         {
             query.Data.Name = ElasticConstant.ServiceName;
-            if (!string.IsNullOrEmpty(query.Data.Keyword))
-            {
-                list.Add(new FieldConditionDto
-                {
-                    Name = ElasticConstant.ServiceName,
-                    Type = ConditionTypes.Regex,
-                    Value = $"*{query.Data.Keyword}*"
-                });
-            }
         }
         else if (query.Data.Instance == null)
         {
             query.Data.Name = ElasticConstant.ServiceInstance;
-            if (!string.IsNullOrEmpty(query.Data.Keyword))
-            {
-                list.Add(new FieldConditionDto
-                {
-                    Name = ElasticConstant.ServiceInstance,
-                    Type = ConditionTypes.Regex,
-                    Value = $"*{query.Data.Keyword}*"
-                });
-            }
         }
         else
         {
             query.Data.Name = "Attributes.http.target";
-            if (!string.IsNullOrEmpty(query.Data.Keyword))
-            {
-                list.Add(new FieldConditionDto
-                {
-                    Name = ElasticConstant.Endpoint,
-                    Type = ConditionTypes.Regex,
-                    Value = $"*{query.Data.Keyword}*"
-                });
-            }
         }
         query.Data.Conditions = list;
         query.Data.Keyword = default!;
-
+        
         query.Data.SetEnv(GetServiceEnvironmentName(query.Data.Service));
+
         query.Result = (IEnumerable<string>)await _traceService.AggregateAsync(query.Data);
         if (query.Result == null)
             query.Result = Array.Empty<string>();
@@ -209,5 +192,11 @@ public class QueryHandler : EnvQueryHandler
         var detailQuery = new TraceDetailQuery(traceId);
         await GetDetailAsync(detailQuery);
         query.Result = detailQuery.Result;
+    }
+
+    [EventHandler]
+    public void GetErrorStatus(TraceErrorStatusQuery query)
+    {
+        query.Result = ConfigConst.TraceErrorStatus;
     }
 }

@@ -39,4 +39,9 @@ public class TraceService : BaseService
     {
         return (await Caller.GetAsync<string>($"{RootPath}/getTraceIdByMetric", new { service, url, start, end }))!;
     }
+
+    public async Task<int[]> GetErrorStatusAsync()
+    {
+        return (await Caller.GetAsync<int[]>($"{RootPath}/errorStatus"))!;
+    }
 }

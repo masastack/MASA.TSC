@@ -10,6 +10,8 @@ public static class IMasaStackConfigExtenstion
 
     public static string GetServiceEnvironmentName(this IMasaStackConfig masaStackConfig, IWebHostEnvironment environment, string serviceName, string environmentName)
     {
+        return string.IsNullOrEmpty(environmentName) ? environment.EnvironmentName : environmentName;
+
         if (string.IsNullOrEmpty(serviceName))
             return environmentName;
         var services = GetServiceIds(masaStackConfig);
@@ -20,6 +22,8 @@ public static class IMasaStackConfigExtenstion
 
     public static string GetServiceEnvironmentName(this IMasaStackConfig masaStackConfig, IWebHostEnvironment environment, IEnumerable<string> serviceNames, string environmentName)
     {
+        return GetServiceEnvironmentName(masaStackConfig, environment, serviceNames?.FirstOrDefault()!, environmentName);
+
         if (serviceNames == null || !serviceNames.Any())
             return environmentName;
         var masaServices = GetServiceIds(masaStackConfig);

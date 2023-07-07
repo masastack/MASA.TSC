@@ -44,19 +44,21 @@ public partial class ErrorWarnChart
 
     internal override async Task LoadAsync(ProjectAppSearchModel query)
     {
-        _hasData = false;
+        if (!CheckKeyChanged(query))
+            return;
 
+        _hasData = false;
         if (query == null)
             return;
         if (query.End == null)
             query.End = DateTime.UtcNow;
         if (query.Start == null)
             query.Start = query.End.Value.AddDays(-1);
-
+        string env = MetricEnv;
         _data = await ApiCaller.MetricService.GetMultiRangeAsync(new RequestMultiQueryRangeDto
         {
             MetricNames = new List<string> {
-                $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\"}}[{MetricConstants.TIME_PERIOD}]))/sum by(service_name) (increase(http_server_duration_count[{MetricConstants.TIME_PERIOD}]))*100,0.01)"
+                $"round(sum by(service_name) (increase(http_server_duration_count{{http_status_code!~\"5..\",{env}}}[{MetricConstants.TIME_PERIOD}]))/sum by(service_name) (increase(http_server_duration_count{{{env}}}[{MetricConstants.TIME_PERIOD}]))*100,0.01)"
            },
             Service = query.AppId,
             Start = query.Start.Value,

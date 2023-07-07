@@ -24,7 +24,7 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
     public TscCaller ApiCaller { get; set; }
 
     [Inject]
-    public I18n I18n { get; set; }
+    public I18n I18n { get; set; }   
 
     public Guid CurrentUserId { get; private set; }
 

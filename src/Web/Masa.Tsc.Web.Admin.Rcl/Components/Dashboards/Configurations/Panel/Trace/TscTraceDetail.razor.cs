@@ -19,15 +19,22 @@ public partial class TscTraceDetail
     private SSheetDialog.MProgressInfo _loading = new();
     private int? _logsCount;
     double _totalDuration = 0;
+    private int[] _errorStatus;
 
-    internal async Task OpenAsync(string traceId)
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        _errorStatus = await ApiCaller.TraceService.GetErrorStatusAsync();
+    }
+
+    internal async Task OpenAsync(string traceId, string spanId)
     {
         _tabValue = 0;
         _dialogValue = true;
         _loading.Loading = true;
         _logsCount = null;
         StateHasChanged();
-        await QueryTraceDetailAndToTree(traceId);
+        await QueryTraceDetailAndToTree(traceId, spanId: spanId);
         _loading.Loading = false;
         StateHasChanged();
     }
@@ -40,7 +47,7 @@ public partial class TscTraceDetail
         _logsCount = null;
         StateHasChanged();
         var traceId = await ApiCaller.TraceService.GetTraceIdByMetricAsync(configurationRecord.Service!, url, configurationRecord.StartTime.UtcDateTime, configurationRecord.EndTime.UtcDateTime);
-        await QueryTraceDetailAndToTree(traceId);
+        await QueryTraceDetailAndToTree(traceId, service: configurationRecord.Service, url: url);
         _loading.Loading = false;
         StateHasChanged();
     }
@@ -78,17 +85,27 @@ public partial class TscTraceDetail
         return sections;
     }
 
-    private async Task QueryTraceDetailAndToTree(string traceId)
+    private async Task QueryTraceDetailAndToTree(string traceId, string? spanId = default, string? service = default, string? url = default)
     {
         var data = await ApiCaller.TraceService.GetAsync(traceId);
         data = data.DistinctBy(span => span.SpanId).ToList();
         _count = data.Count();
 
-        _treeData = GetRoots2(data);
+        _treeData = ConvertRoots(data);
         _timelineView.Clear();
         if (_treeData.Any())
         {
-            _activeTreeItem = _treeData.First();
+            if (!string.IsNullOrEmpty(spanId))
+            {
+                _activeTreeItem = GetSelectedBySpanId(_treeData, spanId);
+            }
+            else if (!string.IsNullOrEmpty(url))
+            {
+                _activeTreeItem = GetSelectedByUrl(_treeData, service!, url);
+            }
+            if (_activeTreeItem == null)
+                _activeTreeItem = _treeData.First();
+
             _actives = new List<string>() { _activeTreeItem.SpanId };
 
             CalcTraceTimeConsuming(_treeData, _treeData.First().Timestamp, _treeData.Last().EndTimestamp);
@@ -255,7 +272,7 @@ public partial class TscTraceDetail
         return items.Where(item => parentIds.Contains(item.ParentSpanId)).OrderBy(item => item.Timestamp).ToList();
     }
 
-    private List<TraceResponseTree> GetRoots2(IEnumerable<TraceResponseDto> items)
+    private List<TraceResponseTree> ConvertRoots(IEnumerable<TraceResponseDto> items)
     {
         var roots = GetRoots(items);
         DateTime start = roots.First().Timestamp, end = roots.Last().EndTimestamp;
@@ -355,7 +372,7 @@ public partial class TscTraceDetail
         data = data.DistinctBy(span => span.SpanId).ToList();
         _count = data.Count();
         _logsCount = null;
-        _treeData = GetRoots2(data);
+        _treeData = ConvertRoots(data);
         _timelineView.Clear();
         if (_treeData.Any())
         {
@@ -365,7 +382,7 @@ public partial class TscTraceDetail
             CalculateOverlapDisplayDlank();
             _timelineView.Reverse();
         }
-        var selected = FindSelected(_treeData, query.Service, query.Url);
+        var selected = GetSelectedByUrl(_treeData, query.Service, query.Url);
         if (selected == null)
             selected = _treeData[0];
         _activeTreeItem = selected;
@@ -374,7 +391,7 @@ public partial class TscTraceDetail
         StateHasChanged();
     }
 
-    private TraceResponseTree? FindSelected(IEnumerable<TraceResponseTree> data, string service, string url)
+    private TraceResponseTree? GetSelectedByUrl(IEnumerable<TraceResponseTree> data, string service, string url)
     {
         if (data == null || !data.Any())
             return default;
@@ -386,7 +403,24 @@ public partial class TscTraceDetail
             return selected;
         foreach (var item in data)
         {
-            selected = FindSelected(item.Children!, service, url);
+            selected = GetSelectedByUrl(item.Children!, service, url);
+            if (selected != null)
+                return selected;
+        }
+        return default;
+    }
+
+    private TraceResponseTree? GetSelectedBySpanId(IEnumerable<TraceResponseTree> data, string spanId)
+    {
+        if (data == null || !data.Any())
+            return default;
+
+        var selected = data.FirstOrDefault(item => item.SpanId == spanId);
+        if (selected != null)
+            return selected;
+        foreach (var item in data)
+        {
+            selected = GetSelectedBySpanId(item.Children!, spanId);
             if (selected != null)
                 return selected;
         }

@@ -55,4 +55,11 @@ public class TraceService : ServiceBase
         await eventBus.PublishAsync(query);
         return query.Result;
     }
+
+    public async Task<int[]> GetErrorStatusAsync([FromServices] IEventBus eventBus)
+    {
+        var query = new TraceErrorStatusQuery();
+        await eventBus.PublishAsync(query);
+        return query.Result;
+    }
 }

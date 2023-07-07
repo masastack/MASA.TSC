@@ -18,4 +18,8 @@ public sealed class MetricConstants
     public const string METRIC_TEMPLATE_PREF = "metic_template_{0}";
 
     public const string APPEND_TEMPLATE = "{template_condition}";
+
+    public const string Environment = "service_namespace";
+
+    public const string BlazorEnvironment = "$BLAZORENV";
 }

@@ -37,7 +37,7 @@ builder.Services.AddTraceLog(elasticsearchUrls)
         };
     });
 
-builder.Services.AddIsolation(services => services.UseMultiEnvironment(parserProviders: new List<Masa.Contrib.Isolation.Parser.IParserProvider> { new CurrentUserEnvironmentParseProvider() }));
+builder.Services.AddIsolation(services => services.UseMultiEnvironment());
 
 builder.Services.AddDaprClient();
 var redisOption = new RedisConfigurationOptions
