@@ -106,7 +106,7 @@
 
         @if (_activeTreeItem is not null)
         {
-            var detail = _activeTreeItem.ToDictionary(nameof(TraceResponseTree.Children), nameof(TraceResponseTree.Attributes), nameof(TraceResponseTree.Resource), nameof(TraceResponseTree.Timelines), nameof(TraceResponseTree.Level), nameof(TraceResponseTree.DoubleDuration));
+            var detail = _activeTreeItem.ToDictionary(nameof(TraceResponseTree.Children), nameof(TraceResponseTree.Attributes), nameof(TraceResponseTree.Resource), nameof(TraceResponseTree.Timelines), nameof(TraceResponseTree.Level), nameof(TraceResponseTree.Duration));
             <div class="pa-12">
                 <MList Flat Class="mb-4 rounded tracedetail" style="width:334px">
                     <MListItem>
@@ -237,6 +237,10 @@
             if (item.Value is DateTime dateTime)
             {
                 value = dateTime.ToString("yyyy/MM/dd HH:mm:ss.fff");
+            }
+            else if (item.Value is double doubleValue)
+            {
+                value = doubleValue.ToString("0.##");
             }
             else
             {
