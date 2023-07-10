@@ -81,7 +81,10 @@ VALUES
 ,(N'8369e976-c3a7-430e-bbff-ed0c283a91ee', N'a9828362-b63f-4a58-1d8c-08daef8970bf', N'CLR Heap Memory(MB)', N'', 3, N'2', N'4', N'8', N'0', 0, N'3ca99720-4dbe-4586-85d5-896b60b263e3', N'{{"ChartType":"Line","YAxis":{{"show":true,"showLine":true,"showTick":true,"showLabel":true}},"XAxis":{{"show":true,"showLine":true,"showTick":true,"showLabel":true}},"Toolbox":{{"show":true,"orient":"horizontal","xPositon":"right","yPositon":"top","feature":[]}},"Legend":{{"show":true,"orient":"horizontal","xPositon":"center","yPositon":"top","type":"scroll"}},"Tooltip":{{"show":true,"renderModel":"html","className":null,"trigger":"axis"}},"ListType":2}}')
 ,(N'ef12abc8-237a-4e53-9346-ee83c709b9ec', N'445bb938-8e42-455e-1d88-08daef8970bf', N'Trace', N'', 4, N'4', N'12', N'0', N'0', 0, N'8ac3b1d9-5373-429e-a0ff-1addf3ff5a6e', NULL)
 ,(N'35eaedea-320e-4e45-996c-f260a4cd3017', N'a9828362-b63f-4a58-1d8c-08daef8970bf', N'Trace', N'', 4, N'5', N'12', N'0', N'0', 0, N'52266ac1-283c-4c91-9ec1-0ca7e9c554ef', NULL)
-,(N'a57f685d-29f0-4b51-90e7-faabf0bad313', N'445bb938-8e42-455e-1d88-08daef8970bf', N'Log', N'', 5, N'4', N'12', N'0', N'0', 0, N'dba595c3-9ccd-4dbc-b6af-16d17d34be6d', NULL);
+,(N'a57f685d-29f0-4b51-90e7-faabf0bad313', N'445bb938-8e42-455e-1d88-08daef8970bf', N'Log', N'', 5, N'4', N'12', N'0', N'0', 0, N'dba595c3-9ccd-4dbc-b6af-16d17d34be6d', NULL)
+,(N'99C67E6D-BAE8-4184-A7AF-1151FF6243CD',N'303D6055-AF4D-453E-BA41-34021A8C36F0',N'ServiceError',N'',0,5,N'12',N'0',N'0',N'0',N'CAF808B5-4758-422B-8EDA-A2BF00461399',N'{{}}')
+,(N'CAF808B5-4758-422B-8EDA-A2BF00461399',N'303D6055-AF4D-453E-BA41-34021A8C36F0',N'ServiceError',N'',7,2,N'4',N'0',N'0',N'4',	N'36BA7549-CD08-46D8-9863-2C23B4F38267',N'{{}}')
+;
 
 INSERT [tsc].[PanelMetric] ([Id], [PanelId], [Name], [Caculate], [Color], [Unit], [Sort], [DisplayName], [Icon]) 
 VALUES 
