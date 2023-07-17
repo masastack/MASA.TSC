@@ -200,7 +200,9 @@
     "Resource": "资源",
     "Detail": "详情",
     "serviceName and url must not empty": "服务名称和Ur不能为空",
-    "no more data": "没有更多的数据了"
+    "no more data": "没有更多的数据了",
+    "Prev": "上一条",
+    "Next": "下一条"
   },
   "Log": {
     "Log": "日志",
