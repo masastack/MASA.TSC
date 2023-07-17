@@ -108,7 +108,7 @@
         {
             var detail = _activeTreeItem.ToDictionary(nameof(TraceResponseTree.Children), nameof(TraceResponseTree.Attributes), nameof(TraceResponseTree.Resource), nameof(TraceResponseTree.Timelines), nameof(TraceResponseTree.Level), nameof(TraceResponseTree.Duration));
             <div class="pa-12">
-                <MList Flat Class="mb-4 rounded tracedetail" style="width:334px">
+                <MList Flat Class="mb-4 rounded tracedetail" style="width:382px">
                     <MListItem>
                         <MListItemContent>
                             <MListItemTitle>
@@ -141,9 +141,9 @@
                                     </div>
                                     @if (!string.Equals(target, "- -"))
                                     {
-                                        <div class="d-flex flex-row col-6 justify-end">
-                                            <span class="flex-column my-2" style="cursor:pointer" @onclick="async ()=>await NextAsync(false)"> 上一条</span>
-                                            <span class="flex-column my-2 ml-4" style="cursor:pointer" @onclick="async ()=>await NextAsync()">下一条</span>
+                                        <div class="d-flex flex-row col-6 justify-space-between">
+                                            <MButton Class="flex-column pa-0" MinWidth="32"> <SIcon @onclick="async ()=>await NextAsync(false)" Size="32" Tooltip="@I18n.Trace("Prev")">mdi-chevron-left</SIcon></MButton>
+                                            <MButton Class="flex-column pa-0 ml-4" MinWidth="32"><SIcon @onclick="async ()=>await NextAsync()" Size="32" Tooltip="@I18n.Trace("Next")">mdi-chevron-right</SIcon></MButton>
                                         </div>
                                     }
                                 </div>
@@ -220,7 +220,7 @@
             if (int.TryParse(statusCode, out var code) && _errorStatus.Contains(code))
             {
                 labelDictionary.TryAdd("ERROR", "#FFDBDC");
-            }           
+            }
         }
 
         foreach (var dic in labelDictionary)

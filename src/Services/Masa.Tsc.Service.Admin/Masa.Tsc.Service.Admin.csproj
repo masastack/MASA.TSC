@@ -22,6 +22,7 @@
 		<PackageReference Include="Masa.Utils.Data.Prometheus" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Tsc" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.Elasticsearch" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.OpenTelemetry" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.Dapr" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.ReadWriteSplitting.Cqrs" Version="$(MasaFrameworkPackageVersion)" />

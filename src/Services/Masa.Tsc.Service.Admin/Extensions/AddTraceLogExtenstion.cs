@@ -18,7 +18,10 @@ public static class AddTraceLogExtenstion
             var config = client.GetAsync<AppSettingConfiguration>(ConfigConst.ConfigRoot, ValueChanged).ConfigureAwait(false).GetAwaiter().GetResult();
             ConfigConst.SetConfiguration(config);
         }
-        catch { }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
         return services.AddElasticClientLogAndTrace(elasticsearchUrls, ConfigConst.LogIndex, ConfigConst.TraceIndex);
     }
 

@@ -29,15 +29,6 @@ builder.WebHost.UseKestrel(option =>
         options.CheckCertificateRevocation = false;
     });
 });
-
-builder.Services.AddObservable(builder.Logging, new MasaObservableOptions
-{
-    ServiceNameSpace = builder.Environment.EnvironmentName,
-    ServiceVersion = masaStackConfig.Version,
-    ServiceName = masaStackConfig.GetWebId(MasaStackProject.TSC),
-    Layer = masaStackConfig.Namespace,
-    ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
-}, masaStackConfig.OtlpUrl, true);
 MasaOpenIdConnectOptions masaOpenIdConnectOptions = new()
 {
     Authority = masaStackConfig.GetSsoDomain(),
