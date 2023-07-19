@@ -120,7 +120,7 @@ public class QueryHandler : EnvQueryHandler
 
         query.Result = new TeamMonitorDto
         {
-            Projects = await GetAllProjects(teams.Select(t => t.Id).ToList(), monitors),
+            Projects = await GetAllProjects(teams.First().Id, monitors),
             Monitor = new AppMonitorDto()
         };
         var appids = string.Join(",", query.Result.Projects.Select(p => string.Join(",", p.Apps.Select(app => app.Identity)))).Split(',').Where(s => s.Length > 0).ToArray();
@@ -212,7 +212,7 @@ public class QueryHandler : EnvQueryHandler
         }
     }
 
-    private async Task<List<ProjectOverviewDto>> GetAllProjects(List<Guid> teamids, List<string> appids)
+    private async Task<List<ProjectOverviewDto>> GetAllProjects(Guid teamId, List<string> appids)
     {
         var result = new List<ProjectOverviewDto>();
         if (appids == null || !appids.Any())
@@ -220,7 +220,7 @@ public class QueryHandler : EnvQueryHandler
 
         var list = new List<int>();
 
-        var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(teamids);
+        var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(new List<Guid> { teamId });
         if (projects == null || !projects.Any())
             return result;
         var apps = await _pmClient.AppService.GetListByProjectIdsAsync(projects.Select(p => p.Id).ToList());
@@ -238,7 +238,7 @@ public class QueryHandler : EnvQueryHandler
                 LabelName = project.LabelName,
                 LabelCode = project.LabelCode,
                 Name = project.Name,
-                TeamId = project.TeamId,
+                TeamId = teamId,
                 Status = MonitorStatuses.Normal
             };
 
