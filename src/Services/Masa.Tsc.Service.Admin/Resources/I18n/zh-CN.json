@@ -1,4 +1,9 @@
 {
   "NotAllowEdit": "该记录禁止更新",
-  "ContainsNotAllowEdit": "包含不可删除的数据"
+  "ContainsNotAllowEdit": "包含不可删除的数据",
+  "Directory name {0} is exists": "目录名称 {0} 已存在",
+  "Directory {0} is not exists": "目录 {0} 不存在",
+  "Deleted directory {directory.Name} contains instruments": "要删除的目录 {0} 内有仪表盘，请先删除仪表盘",
+  "Instrument {command.Data.Id} is not exists": "仪表盘 {0} 不存在",
+  "Instrument {0} is exists": "仪表盘名称 {0} 已存在"
 }

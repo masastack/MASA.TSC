@@ -39,7 +39,7 @@ public class InstrumentCommandHandler
     {
         var entry = await _instrumentRepository.GetAsync(command.Data.Id, command.UserId);
         if (entry == null)
-            throw new UserFriendlyException($"instrument {command.Data.Id} is not exists");
+            throw new UserFriendlyException("Instrument {0} is not exists", command.Data.Id);
         if (!entry.EnableEdit)
             throw new UserFriendlyException(errorCode: ErrorCodes.NOT_ALLOW_EDIT);
         await ValidateAsync(command.Data.Folder, command.Data.Name, entry.Id);
@@ -52,7 +52,7 @@ public class InstrumentCommandHandler
     {
         var instrument = await _instrumentRepository.GetAsync(command.Id, command.UserId);
         if (instrument == null)
-            throw new UserFriendlyException($"instrument {command.Id} is not exists");
+            throw new UserFriendlyException("Instrument {0} is not exists", command.Id);
 
         instrument.SetRoot(command.IsRoot);
         await _instrumentRepository.UpdateAsync(instrument);
@@ -65,7 +65,7 @@ public class InstrumentCommandHandler
     {
         var entry = await _instrumentRepository.GetDetailAsync(command.InstumentId, command.UserId);
         if (entry == null)
-            throw new UserFriendlyException($"instrument {command.InstumentId} is not exists");
+            throw new UserFriendlyException("Instrument {0} is not exists", command.InstumentId);
 
         if (!entry.EnableEdit)
             throw new UserFriendlyException(errorCode: ErrorCodes.NOT_ALLOW_EDIT);
@@ -84,7 +84,7 @@ public class InstrumentCommandHandler
         if (list == null || !list.Any())
             return;
 
-        if (list.Any(item => !item.EnableEdit))
+        if (list.Exists(item => !item.EnableEdit))
             throw new UserFriendlyException(errorCode: ErrorCodes.CONTAINS_NOT_ALLOW_EDIT);
 
         await _instrumentRepository.RemoveRangeAsync(list);
@@ -96,7 +96,7 @@ public class InstrumentCommandHandler
         var instrument = await _instrumentRepository.FindAsync(e => e.DirectoryId == parentId && e.Name == name && (id == Guid.Empty || e.Id != id));
         if (instrument != null)
         {
-            throw new UserFriendlyException($"instrument {name} is exists");
+            throw new UserFriendlyException("Instrument {0} is exists", name);
         }
     }
 }

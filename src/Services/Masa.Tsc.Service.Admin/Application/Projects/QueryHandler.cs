@@ -7,11 +7,13 @@ public class QueryHandler
 {
     private readonly IPmClient _pmClient;
     private readonly IAuthClient _authClient;
+    private readonly IMultiEnvironmentContext _multiEnvironmentContext;
 
-    public QueryHandler(IPmClient pmClient, IAuthClient authClient)
+    public QueryHandler(IPmClient pmClient, IAuthClient authClient, IMultiEnvironmentContext multiEnvironmentContext)
     {
         _pmClient = pmClient;
         _authClient = authClient;
+        _multiEnvironmentContext = multiEnvironmentContext;
     }
 
     [EventHandler]
@@ -64,7 +66,7 @@ public class QueryHandler
         var result = new List<ProjectDto>();
         var list = new List<int>();
 
-        var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(teamIds);
+        var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(teamIds, _multiEnvironmentContext.CurrentEnvironment);
         if (projects == null || !projects.Any())
             return result;
         foreach (var project in projects)

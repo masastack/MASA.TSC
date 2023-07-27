@@ -38,10 +38,8 @@ public partial class TscTraceList : TscComponentBase
     private int _pageSize = 10;
     private bool _isDesc = true;
     private TraceResponseDto? CurrentTrace;
-    private List<string> _sortBy = new List<string> {
-        "Timestamp"
-    };
-    private List<bool> _sortDesc = new List<bool> { true, false };
+    private List<string> _sortBy = new() { "Timestamp" };
+    private List<bool> _sortDesc = new() { true, false };
 
     private List<DataTableHeader<TraceResponseDto>> _headers => new()
     {
@@ -99,7 +97,7 @@ public partial class TscTraceList : TscComponentBase
     private async Task OnOptionsUpdate(DataOptions options)
     {
         _isDesc = options.SortDesc.FirstOrDefault();
-        await OnPaginationUpdate.InvokeAsync((1, _pageSize, _isDesc));
+        //await OnPaginationUpdate.InvokeAsync((1, _pageSize, _isDesc));
     }
 
     protected override bool IsSubscribeTimeZoneChange => true;

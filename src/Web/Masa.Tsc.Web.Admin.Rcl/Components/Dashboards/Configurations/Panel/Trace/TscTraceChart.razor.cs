@@ -46,6 +46,7 @@ public partial class TscTraceChart
 
         var _chartFormat = Start.Format(End);
         var subText = $"{Start.UtcFormatLocal(CurrentTimeZone)}～{End.UtcFormatLocal(CurrentTimeZone)}";
+        var names = new string[] { I18n.Trace("Span Count"), I18n.Trace("Duration") + "("+ I18n.T("ms") + ")" };
 
         return new
         {
@@ -66,7 +67,7 @@ public partial class TscTraceChart
             },
             legend = new
             {
-                data = new[] { "Span Count", "Duration(ms)" },
+                data = names,
                 bottom = true
             },
             xAxis = new[]
@@ -98,7 +99,7 @@ public partial class TscTraceChart
             {
                 new
                 {
-                    name = "Span Count" ,
+                    name =names[0] ,
                     type = "bar",
                     yAxisIndex = 0,
                     data = Data.Select(item=>item.Item2),
@@ -115,7 +116,7 @@ public partial class TscTraceChart
                 },
                 new
                 {
-                    name = "Duration(ms)",
+                    name =names[1],
                     type = "line",
                     yAxisIndex = 1,
                     data = Data.Select(item=>item.Item3),

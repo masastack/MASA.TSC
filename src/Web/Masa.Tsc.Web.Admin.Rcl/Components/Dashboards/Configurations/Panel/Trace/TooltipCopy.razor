@@ -6,7 +6,7 @@
             <SIcon Tooltip="@I18n.T("Copy value")"
                    Color="@(_copyClicked ? "success" : "gray")"
                    Class="@(hContext.Hover ? IconHoverClass : IconClass)">
-                   @(_copyClicked ? _checkSvg : _copySvg)
+                @(_copyClicked ? _checkSvg : _copySvg)
             </SIcon>
         </div>
         <MTooltip Top ContentStyle="@TooltipContentStyle" ContentClass="@TooltipContentClass">
@@ -31,10 +31,10 @@
     public string IconHoverClass { get; set; } = "icon_hover";
 
     [Parameter]
-    public string? TooltipContentStyle { get; set; } = "max-width:400px";
+    public string? TooltipContentStyle { get; set; } = "max-width:400px;word-break:break-word";
 
     [Parameter]
-    public string? TooltipContentClass { get; set; } = "tooltip_content";
+    public string? TooltipContentClass { get; set; } = "tooltip_content px-2";
 
     [Parameter]
     public string? TextClass { get; set; }
