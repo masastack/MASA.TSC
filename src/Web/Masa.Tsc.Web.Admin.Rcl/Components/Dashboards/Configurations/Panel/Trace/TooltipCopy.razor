@@ -1,6 +1,6 @@
 ﻿@inherits TscComponentBase
 
-<MHover Context="hContext" Style="max-width:100%">
+<MHover Context="hContext">
     <div @attributes="hContext.Attrs" class="hover-pointer d-flex align-left tooltip">
         <div @onclick="() => Copy(ValueFunc(Value))" @onclick:stopPropagation>
             <SIcon Tooltip="@I18n.T("Copy value")"
