@@ -15,7 +15,7 @@ public class TopologyService : ServiceBase
         if (excuteTime == null)
             excuteTime = new DateTimeOffset(DateTime.UtcNow);
         var end = excuteTime.Value.ToUniversalTime().DateTime;
-        var start = DateTime.MinValue;
+        var start = end.AddDays(-7);
         var command = new StartCommand(start, end);
         await eventBus.PublishAsync(command);
     }

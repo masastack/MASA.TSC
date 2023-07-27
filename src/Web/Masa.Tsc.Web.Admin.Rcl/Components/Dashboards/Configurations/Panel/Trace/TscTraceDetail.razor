@@ -27,7 +27,7 @@
                 }
             </div>
 
-            <div class="mb-6">
+            <div class="overflow-y" style="max-height:300px">
                 @foreach (var timelineView in _timelineView)
                 {
                     double sumLeft = 0;
@@ -59,27 +59,26 @@
                             </div>
                         }
                     </div>
-                }
-
-                @if (_treeData.Any())
-                {
-                    var sections = NumberSplit(_totalDuration);
-                    var avgPercentage = 100.0 / (sections.Count + 1);
-
-                    <div class="trace-timelines-view">
-                        <div class="trace-timelines-view__line">
-                            <div class="trace-timelines-view__line-item body2" style="left: 0;">0</div>
-                            @for (var i = 0; i < sections.Count; i++)
-                            {
-                                var left = avgPercentage * (i + 1);
-                                <div class="trace-timelines-view__line-item body2" style="left: @(left)%;">@(FormatDuration(sections[i]))</div>
-                            }
-                            <div class="trace-timelines-view__line-item body2" style="right: 0;">@FormatDuration(_totalDuration)</div>
-                        </div>
-                    </div>
-                }
+                }                
             </div>
 
+            @if (_treeData.Any())
+            {
+                var sections = NumberSplit(_totalDuration);
+                var avgPercentage = 100.0 / (sections.Count + 1);
+
+                <div class="trace-timelines-view mb-6">
+                    <div class="trace-timelines-view__line">
+                        <div class="trace-timelines-view__line-item body2" style="left: 0;">0</div>
+                        @for (var i = 0; i < sections.Count; i++)
+                        {
+                            var left = avgPercentage * (i + 1);
+                            <div class="trace-timelines-view__line-item body2" style="left: @(left)%;">@(FormatDuration(sections[i]))</div>
+                        }
+                        <div class="trace-timelines-view__line-item body2" style="right: 0;">@FormatDuration(_totalDuration)</div>
+                    </div>
+                </div>
+            }
             <MTreeview Items="@_treeData"
                        ItemChildren="item => item.Children?.Any() ?? false ? item.Children : default!"
                        ItemText="item => item.Name"
@@ -91,7 +90,7 @@
                        @bind-Active="_actives"
                        OnActiveUpdate="OnActiveUpdate"
                        Class="flex-fill overflow-y-auto"
-                       Style='@($"height: calc(100vh - {_timelineView.Count * 20 + 254}px)")'
+                       Style='@($"height: calc(100vh - {(_timelineView.Count-15>0? 300:_timelineView.Count*20) + 254}px)")'
                        @key="@_treeData">
                 <LabelContent>
                     @context.Item.Name
@@ -142,8 +141,8 @@
                                     @if (!string.Equals(target, "- -"))
                                     {
                                         <div class="d-flex flex-row col-6 justify-space-between">
-                                            <MButton Class="flex-column pa-0" MinWidth="32"> <SIcon @onclick="async ()=>await NextAsync(false)" Size="32" Tooltip="@I18n.Trace("Prev")">mdi-chevron-left</SIcon></MButton>
-                                            <MButton Class="flex-column pa-0 ml-4" MinWidth="32"><SIcon @onclick="async ()=>await NextAsync()" Size="32" Tooltip="@I18n.Trace("Next")">mdi-chevron-right</SIcon></MButton>
+                                            <MButton Icon Text Class="flex-column pa-0" MinWidth="32"> <SIcon @onclick="async ()=>await NextAsync(false)" Size="32" Tooltip="@I18n.Trace("Prev")">mdi-chevron-left</SIcon></MButton>
+                                            <MButton Icon Text Class="flex-column pa-0 ml-4" MinWidth="32"><SIcon @onclick="async ()=>await NextAsync()" Size="32" Tooltip="@I18n.Trace("Next")">mdi-chevron-right</SIcon></MButton>
                                         </div>
                                     }
                                 </div>

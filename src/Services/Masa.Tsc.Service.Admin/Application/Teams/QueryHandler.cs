@@ -48,7 +48,7 @@ public class QueryHandler : EnvQueryHandler
 
     private async Task SetProjectAsync(TeamDetailQuery query)
     {
-        var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(new List<Guid> { query.TeamId });
+        var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(new List<Guid> { query.TeamId }, _multiEnvironment.CurrentEnvironment);
         if (projects != null && projects.Any())
         {
             query.Result.ProjectTotal = projects.Count;
@@ -218,18 +218,13 @@ public class QueryHandler : EnvQueryHandler
         if (appids == null || !appids.Any())
             return result;
 
-        var list = new List<int>();
-
-        var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(new List<Guid> { teamId });
+        var projects = await _pmClient.ProjectService.GetListByTeamIdsAsync(new List<Guid> { teamId }, _multiEnvironment.CurrentEnvironment);
         if (projects == null || !projects.Any())
             return result;
         var apps = await _pmClient.AppService.GetListByProjectIdsAsync(projects.Select(p => p.Id).ToList());
 
         foreach (var project in projects)
         {
-            if (list.Contains(project.Id))
-                continue;
-
             var model = new ProjectOverviewDto
             {
                 Id = project.Id.ToString(),
@@ -245,7 +240,7 @@ public class QueryHandler : EnvQueryHandler
             var projectAppIds = apps.Where(a => a.ProjectId == project.Id).Select(app => app.Identity).ToList();
             if (!projectAppIds.Any())
                 continue;
-            if (appids.Any(id => projectAppIds.Contains(id)))
+            if (appids.Exists(id => projectAppIds.Contains(id)))
                 model.Apps = apps.Where(a => a.ProjectId == project.Id).Select(a => new AppDto
                 {
                     Id = a.Id.ToString(),

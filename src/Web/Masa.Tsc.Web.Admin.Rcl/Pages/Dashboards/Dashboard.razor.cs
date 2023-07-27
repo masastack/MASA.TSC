@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using BlazorComponent;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Dashboards;
 
 public partial class Dashboard
@@ -42,14 +44,7 @@ public partial class Dashboard
         }
     }
 
-    bool ExpandAll
-    {
-        get => Folders.Where(forder => forder.Dashboards.Any()).Any(folder => folder.IsActive);
-        set
-        {
-            Folders.Where(forder => forder.Dashboards.Any()).ForEach(folder => folder.IsActive = value);
-        }
-    }
+    bool ExpandAll { get; set; } = true;
 
     long Total { get; set; }
 
@@ -176,8 +171,17 @@ public partial class Dashboard
     async Task OnSearchAsync()
     {
         _page = 1;
-         ExpandAll = true;
+        ExpandAll = true;
 
         await GetFoldersAsync();
+    }
+
+    void ExpandOrCloseAll(bool expand = true)
+    {
+        ExpandAll = !expand;
+        Folders.ForEach(folder =>
+        {
+            folder.IsActive = ExpandAll;
+        });
     }
 }

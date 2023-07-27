@@ -16,7 +16,7 @@
             </SLabeledRadioGroup>
             @if (Mode is ModeTypes.Folder)
             {
-                <SButton BorderRadiusClass="" Color="" Depressed Text Outlined Class="mr-6 my-auto regular--text body2 white" OnClick="() => ExpandAll = !ExpandAll">
+                <SButton BorderRadiusClass="" Color="" Depressed Text Outlined Class="mr-6 my-auto regular--text body2 white" OnClick="() => ExpandOrCloseAll(ExpandAll)">
                     @I18n.Dashboard( ExpandAll ? "Close all" : "Expend all")
                 </SButton>
             }
@@ -31,10 +31,10 @@
             @if (Mode is ModeTypes.Table)
             {
                 <SDataTable Items="Dashboards"
-                            TItem="DashboardDto"
-                            ItemsPerPage="PageSize"
-                            Headers="GetHeaders()"
-                            Height="@("calc(100vh - 289px)")">
+                        TItem="DashboardDto"
+                        ItemsPerPage="PageSize"
+                        Headers="GetHeaders()"
+                        Height="@("calc(100vh - 289px)")">
                     <HeaderColContent Context="header">
                         <span>@header.Text</span>
                     </HeaderColContent>
@@ -70,17 +70,17 @@
                     {
                         <MHover>
                             <MListGroup PrependIcon="@(IconConstants.Folder)"
-                                        NoAction
-                                        Disabled=!folder.Dashboards.Any()
-                                        @attributes="@context.Attrs"
-                                        @bind-Value=folder.IsActive>
+                                NoAction
+                                Disabled=!folder.Dashboards.Any()
+                                @attributes="@context.Attrs"
+                                @bind-Value=folder.IsActive>
                                 <ActivatorContent>
                                     <MListItemContent>
                                         <MListItemTitle Class="h8">@folder.Name</MListItemTitle>
                                     </MListItemContent>
                                 </ActivatorContent>
                                 <AppendIconContent>
-                                    @if(context.Hover)
+                                    @if (context.Hover)
                                     {
                                         <SButton Icon OnClick="() => OpenUpdateFolderDialog(folder)" Class="mr-4" OnClickStopPropagation><SIcon Tooltip="@I18n.T("Edit")" Style="transform: none !important">@IconConstants.Update</SIcon></SButton>
                                         <SButton Icon Color="red" Class="mr-10" OnClick="async () => await OpenRemoveFolderDialogAsync(folder)" OnClickStopPropagation><SIcon Tooltip="@I18n.T("Remove")" Color="red" Style="transform: none !important">@IconConstants.Remove</SIcon></SButton>
@@ -101,7 +101,7 @@
                                                     </MListItemTitle>
                                                 </MListItemContent>
                                                 <MListItemAction>
-                                            <SButton OnClickStopPropagation Icon Class="mr-4" Style="@(childContext.Hover?"":"visibility: hidden")" OnClick="() => OpenUpdateDashboardDialog(dashboard)"><SIcon Tooltip="@I18n.T("Edit")">@IconConstants.Update</SIcon></SButton>
+                                                    <SButton OnClickStopPropagation Icon Class="mr-4" Style="@(childContext.Hover?"":"visibility: hidden")" OnClick="() => OpenUpdateDashboardDialog(dashboard)"><SIcon Tooltip="@I18n.T("Edit")">@IconConstants.Update</SIcon></SButton>
                                                     <SButton OnClickStopPropagation Icon Color="red" Style="@(childContext.Hover?"":"visibility: hidden")" OnClick="async () => await OpenRemoveDashboardDialogAsync(dashboard)"><SIcon Tooltip="@I18n.T("Remove")" Color="red">@IconConstants.Remove</SIcon></SButton>
                                                 </MListItemAction>
                                             </MListItem>

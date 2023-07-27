@@ -15,8 +15,8 @@ public class DirectoryCommandHandler
     [EventHandler]
     public async Task AddAsync(AddDirectoryCommand command)
     {
-        if (await _directoryRepository.GetCountAsync(t => (t.UserId == Guid.Empty || t.UserId == command.UserId) && t.Name == command.Name) > 0)
-            throw new UserFriendlyException($"Directory name \"{command.Name}\" is exists");
+        if (await _directoryRepository.GetCountAsync(t => t.Name == command.Name) > 0)
+            throw new UserFriendlyException("Directory name {0} is exists", command.Name);
 
         await _directoryRepository.AddAsync(new Domain.Aggregates.Directory
         {
@@ -31,13 +31,10 @@ public class DirectoryCommandHandler
     {
         var directory = await _directoryRepository.FindAsync(t => t.Id == command.Id);
         if (directory == null)
-            throw new UserFriendlyException($"Directory \"{command.Id}\" is not exists");
+            throw new UserFriendlyException("Directory {0} is not exists", command.Id);
 
-        if (directory.UserId == Guid.Empty || directory.UserId != command.UserId)
-            throw new UserFriendlyException($"No permission");
-
-        if (await _directoryRepository.GetCountAsync(t => (t.UserId == Guid.Empty || t.UserId == command.UserId) && t.Id != directory.Id && t.Name == command.Name) > 0)
-            throw new UserFriendlyException($"Directory name \"{command.Name}\" is exists");
+        if (await _directoryRepository.GetCountAsync(t => t.Id != directory.Id && t.Name == command.Name) > 0)
+            throw new UserFriendlyException("Directory name {0} is exists", command.Name);
 
         directory.Update(command.Name);
         await _directoryRepository.UpdateAsync(directory);
@@ -50,10 +47,7 @@ public class DirectoryCommandHandler
         if (directory == null)
             return;
         if (directory.Instruments != null && directory.Instruments.Any())
-            throw new UserFriendlyException($"directory {directory.Name} contains instruments");
-
-        if (directory.UserId == Guid.Empty || directory.UserId != command.UserId)
-            throw new UserFriendlyException($"No permission");
+            throw new UserFriendlyException($"Deleted directory {0} contains instruments", directory.Name);       
 
         await _directoryRepository.RemoveAsync(directory);
     }

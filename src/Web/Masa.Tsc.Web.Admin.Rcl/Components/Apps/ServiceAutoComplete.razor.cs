@@ -7,7 +7,7 @@ public partial class ServiceAutoComplete
 {
     bool _firstValueChanged;
     bool _isLoading;
-    Guid _key = default;
+    Guid _key = Guid.Empty;
 
     [Inject]
     public IPmClient PmClient { get; set; }
@@ -34,7 +34,7 @@ public partial class ServiceAutoComplete
     public bool Readonly { get; set; }
 
     [Parameter]
-    public string? Label { get; set; }   
+    public string? Label { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,7 +64,15 @@ public partial class ServiceAutoComplete
     {
         var result = new List<AppDetailModel>();
         if (metricServices == null || !metricServices.Any())
+        {
+            if (pmServices != null && pmServices.Any())
+                return pmServices.Select(pm => new AppDetailModel { Identity = pm.Identity, Name = pm.Name }).ToList();
+            else if (!string.IsNullOrEmpty(Value))
+                return new List<AppDetailModel> { new AppDetailModel { Name = Value, Identity = Value } };
+
             return result;
+        }
+
         foreach (var name in metricServices)
         {
             var pmService = pmServices?.FirstOrDefault(p => p.Identity == name);
@@ -85,17 +93,17 @@ public partial class ServiceAutoComplete
         if (_firstValueChanged is false && string.IsNullOrEmpty(Value) && Services?.Any() is true)
         {
             _firstValueChanged = true;
-            var value = Services.First().Identity;
+            var value = Services[0].Identity;
             await ValueChanged.InvokeAsync(value);
         }
     }
 
     public async Task OnBlurAsync(FocusEventArgs focusEventArgs)
     {
-        if (Value.IsNullOrEmpty())
+        if (Value.IsNullOrEmpty() && Services != null && Services.Any())
         {
             _key = Guid.NewGuid();
-            var value = Services.First().Identity;
+            var value = Services[0].Identity;
             await ValueChanged.InvokeAsync(value);
         }
     }

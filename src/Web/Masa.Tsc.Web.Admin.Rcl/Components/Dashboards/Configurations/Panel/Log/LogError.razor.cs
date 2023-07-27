@@ -17,8 +17,8 @@ public partial class LogError
     private int pageSize = 10;
 
     private readonly List<DataTableHeader<LogErrorDto>> headers = new() {
-        new (){ Text="Message",Value=nameof(LogErrorDto.Message)},
-        new (){ Text="Count",Value=nameof(LogErrorDto.Count)}
+        new (){ Text="Message",Value=nameof(LogErrorDto.Message),Width="85%"},
+        new (){ Text="Count",Value=nameof(LogErrorDto.Count),Width="15%"}
     };
 
     protected override async Task OnParametersSetAsync()

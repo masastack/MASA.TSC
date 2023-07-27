@@ -21,6 +21,7 @@ public partial class TscTraceDetail
     double _totalDuration = 0;
     private int[] _errorStatus;
 
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
