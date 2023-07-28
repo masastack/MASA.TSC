@@ -17,6 +17,7 @@ internal static class IElasticClientExtenstion
          .BackOffRetries(3)
          .BackOffTime(TimeSpan.FromSeconds(10))
          .RefreshOnCompleted()
+         .ContinueAfterDroppedDocuments()
          .BufferToBulk((r, buffer) => r.IndexMany(buffer)));
 
         var name = typeof(T).Name;
@@ -46,6 +47,8 @@ internal static class IElasticClientExtenstion
         info?.Throw();
         await Task.CompletedTask;
     }
+
+    
 
     public static async Task<IEnumerable<T>> ScrollAllAsync<T>(this IElasticClient client, string indexName, string scroll) where T : class
     {
