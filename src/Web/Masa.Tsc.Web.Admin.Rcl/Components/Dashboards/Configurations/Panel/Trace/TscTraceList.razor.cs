@@ -1,6 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Nest;
+using System.Runtime.CompilerServices;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components;
 
 public partial class TscTraceList : TscComponentBase
@@ -106,5 +109,28 @@ public partial class TscTraceList : TscComponentBase
     {
         await base.OnTimeZoneInfoChanged(timeZoneInfo);
         StateHasChanged();
+    }
+
+    private string GetDisplayName(TraceResponseDto dto)
+    {
+        if (dto.Attributes.ContainsKey("db.system"))
+        {
+            DefaultInterpolatedStringHandler defaultInterpolatedStringHandler = new DefaultInterpolatedStringHandler(0, 3);
+            defaultInterpolatedStringHandler.AppendFormatted<object>(dto.Attributes.ContainsKey("peer.service") ? dto.Attributes["peer.service"] : "");
+            defaultInterpolatedStringHandler.AppendFormatted(dto.Attributes["db.system"]);
+            defaultInterpolatedStringHandler.AppendFormatted(dto.Attributes["db.name"]);
+            return defaultInterpolatedStringHandler.ToStringAndClear();
+        }
+        else if (dto.Attributes.ContainsKey("http.method"))
+        {
+            if (dto.Kind == "SPAN_KIND_CLIENT")
+            {
+                return dto.Attributes["http.url"].ToString();
+            }
+            else
+                return dto.Attributes["http.target"].ToString();
+        }
+
+        return dto.Name;
     }
 }

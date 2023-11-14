@@ -1,6 +1,10 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Google.Api;
+using Masa.Contrib.StackSdks.Pm;
+using System;
+
 namespace Masa.Tsc.Service.Admin.Application.Traces;
 
 public class QueryHandler : EnvQueryHandler
@@ -27,7 +31,19 @@ public class QueryHandler : EnvQueryHandler
         ArgumentNullException.ThrowIfNull(query.Service);
         ArgumentNullException.ThrowIfNull(query.Url);
         var env = GetServiceEnvironmentName(query.Service);
-        var traceId = await _traceService.GetElasticClient().GetByMetricAsync(query.Service, query.Url, query.Start, query.End, env);
+        var dto = new BaseRequestDto
+        {
+            Service = query.Service,
+            Start = query.Start,
+            End = query.End,
+            Conditions = new List<FieldConditionDto> { new FieldConditionDto {
+             Name=ElasticSearchConst.URL,
+             Type= ConditionTypes.Equal,
+                Value=query.Url
+            } }
+        };
+        dto.SetEnv(env);
+        var traceId = await _traceService.GetMaxDelayTraceIdAsync(dto);
         query.Result = traceId ?? string.Empty;
     }
 
@@ -57,10 +73,10 @@ public class QueryHandler : EnvQueryHandler
             };
             list.Add(endpointCondition);
         }
-        bool isRawQuery = false;
+        bool isRawQuery = query.Keyword.IsRawQuery();
         if (!string.IsNullOrEmpty(query.Keyword))
         {
-            if (query.Keyword.IndexOf('}') >= 0)
+            if (isRawQuery)
             {
                 isRawQuery = true;
                 queryDto.RawQuery = query.Keyword;
@@ -116,7 +132,7 @@ public class QueryHandler : EnvQueryHandler
         }
         query.Data.Conditions = list;
         query.Data.Keyword = default!;
-        
+
         query.Data.SetEnv(GetServiceEnvironmentName(query.Data.Service));
 
         query.Result = (IEnumerable<string>)await _traceService.AggregateAsync(query.Data);

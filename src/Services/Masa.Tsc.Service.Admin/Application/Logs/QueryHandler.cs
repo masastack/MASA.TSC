@@ -1,6 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Google.Api;
+using Masa.Contrib.StackSdks.Pm;
+
 namespace Masa.Tsc.Service.Admin.Application.Logs;
 
 public class QueryHandler : EnvQueryHandler
@@ -58,7 +61,7 @@ public class QueryHandler : EnvQueryHandler
         {
             conditions.Add(new FieldConditionDto
             {
-                Name = "Attributes.TaskId.keyword",
+                Name = "Attributes.TaskId",
                 Type = ConditionTypes.Equal,
                 Value = queryData.JobTaskId
             });
@@ -69,7 +72,7 @@ public class QueryHandler : EnvQueryHandler
         {
             conditions.Add(new FieldConditionDto
             {
-                Name = "SpanId.keyword",
+                Name = "SpanId",
                 Type = ConditionTypes.Equal,
                 Value = queryData.SpanId
             });
@@ -85,7 +88,7 @@ public class QueryHandler : EnvQueryHandler
             });
         }
 
-        bool isRawQuery = (queryData.Query?.IndexOfAny(new char[] { '{', '}' }) ?? -1) >= 0;
+        bool isRawQuery = queryData.Query.IsRawQuery();// (queryData.Query?.IndexOfAny(new char[] { '{', '}' }) ?? -1) >= 0;
         var query = new BaseRequestDto
         {
             Service = queryData.Service!,
@@ -112,6 +115,27 @@ public class QueryHandler : EnvQueryHandler
     [EventHandler]
     public async Task GetErrorTypesAsync(LogErrorTypesQuery query)
     {
-        query.Result = await _logService.GetElasticClient().GetLogErrorTypesAsync(query.Service, query.Start, query.End, GetServiceEnvironmentName(query.Service));
+        var queryDto = new SimpleAggregateRequestDto
+        {
+            Service = query.Service,
+            Start = query.Start,
+            End = query.End,
+            Name = ElasticSearchConst.ExceptionMessage,
+            Type = AggregateTypes.GroupBy,
+            MaxCount = 999,
+            AllValue = true
+        };
+        queryDto.SetEnv(GetServiceEnvironmentName(query.Service));
+
+        var data = (IEnumerable<KeyValuePair<string, long>>)(await _logService.AggregateAsync(queryDto));
+        var result = new List<LogErrorDto>();
+        if (data != null && data.Any())
+        {
+            foreach (var item in data)
+            {
+                result.Add(new LogErrorDto { Message = item.Key, Count = (int)item.Value });
+            }
+        }
+        query.Result = result;
     }
 }

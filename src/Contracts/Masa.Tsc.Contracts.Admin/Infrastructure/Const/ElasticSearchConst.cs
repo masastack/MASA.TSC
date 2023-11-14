@@ -19,9 +19,40 @@ public sealed class ElasticSearchConst
 
     public const string HttpPort = "Attributes.http.status_code";
 
-    public static string TraceId { get; private set; } = "TraceId";    
+    public static string TraceId { get; private set; } = "TraceId";
 
-    public static string Environment => "Resource.service.namespace";
+    public const string Environment = "Resource.service.namespace";
 
-    public const string ExceptionMessage = "Attributes.exception.message";    
+    public const string ExceptionMessage = "Attributes.exception.message";
+
+    public const string TaskId = "Attributes.TaskId";
+
+    public static bool IsElasticSeach { get; private set; }
+}
+
+public sealed class ClickHouseConst
+{
+    private ClickHouseConst() { }
+
+    public static bool IsClickhouse { get; private set; } = true;
+
+    public const string LogLevelText = $"SeverityText";
+
+    public const string LogErrorText = "Error";
+
+    public const string LogWarningText = "Warning";
+
+    public const string ServiceName = "ServiceName";
+
+    public const string URL = $"Attributes.http.target";
+
+    public const string HttpPort = $"Attributes.http.status_code";
+
+    public static string TraceId { get; private set; } = "TraceId";
+
+    public const string Environment = $"Resource.service.namespace";
+
+    public const string ExceptionMessage = $"Attributes.exception.message";
+
+    public const string TaskId = $"Attributes.taskId";
 }

@@ -76,7 +76,10 @@ public partial class LogPanel
 
         if (!string.IsNullOrWhiteSpace(TaskId))
         {
-            Search = $"{{\"term\":{{\"Attributes.TaskId.keyword\":\"{TaskId}\"}}}}";
+            if (ClickHouseConst.IsClickhouse)
+                Search = $"{ClickHouseConst.TaskId}='{TaskId}'";
+            else if (ElasticSearchConst.IsElasticSeach)
+                Search = $"{{\"term\":{{\"{ElasticSearchConst.TaskId}.keyword\":\"{TaskId}\"}}}}";
         }
     }
 
@@ -167,12 +170,12 @@ public partial class LogPanel
             start = DateTime.MinValue;
             conditions.Add(new FieldConditionDto
             {
-                Name = "Attributes.TaskId.keyword",
+                Name = "Attributes.TaskId",
                 Type = ConditionTypes.Equal,
                 Value = TaskId
             });
         }
-        bool isRawQuery = (_search?.IndexOfAny(new char[] { '{', '}' }) ?? -1) >= 0;
+        bool isRawQuery = _search.IsRawQuery();
         var result = await ApiCaller.LogService.AggregateAsync<List<KeyValuePair<long, long>>>(new SimpleAggregateRequestDto
         {
             Start = start,
@@ -193,11 +196,17 @@ public partial class LogPanel
         {
             if (string.Equals("error", Keyword, StringComparison.InvariantCultureIgnoreCase))
             {
-                Search = $"{{\"term\":{{\"{ElasticSearchConst.ServiceName}.keyword\":\"{Service}\"}}}},{{\"term\":{{\"{ElasticSearchConst.LogLevelText}.keyword\": \"{Keyword}\"}}}}";
+                if (ClickHouseConst.IsClickhouse)
+                    Search = $"{ClickHouseConst.ServiceName}='{Service}' and {ClickHouseConst.LogLevelText}='{Keyword}'";
+                else if (ElasticSearchConst.IsElasticSeach)
+                    Search = $"{{\"term\":{{\"{ElasticSearchConst.ServiceName}.keyword\":\"{Service.Replace("'","''")}\"}}}},{{\"term\":{{\"{ElasticSearchConst.LogLevelText}.keyword\": \"{Keyword.Replace("'", "''")}\"}}}}";
             }
             else
             {
-                Search = $"{{\"term\":{{\"{ElasticSearchConst.ServiceName}.keyword\":\"{Service}\"}}}},{{\"term\":{{\"{ElasticSearchConst.ExceptionMessage}.keyword\": \"{Keyword}\"}}}}";
+                if (ClickHouseConst.IsClickhouse)
+                    Search = $"{ClickHouseConst.ServiceName}='{Service}' and {ClickHouseConst.ExceptionMessage}='{Keyword.Replace("'", "''")}'";
+                else if (ElasticSearchConst.IsElasticSeach)
+                    Search = $"{{\"term\":{{\"{ElasticSearchConst.ServiceName}.keyword\":\"{Service}\"}}}},{{\"term\":{{\"{ElasticSearchConst.ExceptionMessage}.keyword\": \"{Keyword}\"}}}}";
             }
         }
         base.OnInitialized();
