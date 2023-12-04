@@ -21,16 +21,16 @@ internal static class BaseRequestDtoExtensions
 
     public static void SetEnv(this BaseRequestDto dto, string envName)
     {
-        //if (string.IsNullOrEmpty(dto.Service))
-        //    return;
+        if (string.IsNullOrEmpty(dto.Service))
+            return;
 
         var list = dto.Conditions?.ToList() ?? new();
 
-        if (!list.Any() || !list.Any(item => item.Name == ElasticSearchConst.Environment))
+        if (!list.Any() || !list.Exists(item => item.Name == StorageConst.Environment))
         {
             list.Add(new FieldConditionDto
             {
-                Name = ElasticSearchConst.Environment,
+                Name = StorageConst.Environment,
                 Type = ConditionTypes.Equal,
                 Value = envName
             });

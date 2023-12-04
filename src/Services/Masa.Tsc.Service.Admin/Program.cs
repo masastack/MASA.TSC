@@ -6,7 +6,7 @@ await builder.Services.AddMasaStackConfigAsync(MasaStackProject.TSC, MasaStackAp
 var masaStackConfig = builder.Services.GetMasaStackConfig();
 var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus");
 var appid = masaStackConfig.GetServiceId(MasaStackProject.TSC);
-builder.Services.AddTraceLog(builder.Configuration)
+builder.Services.AddTraceLog()
     .AddObservable(builder.Logging, new MasaObservableOptions
     {
         ServiceNameSpace = builder.Environment.EnvironmentName,
@@ -35,8 +35,16 @@ builder.Services.AddTraceLog(builder.Configuration)
     });
 
 builder.Services.AddIsolation(services => services.UseMultiEnvironment());
-
 builder.Services.AddDaprClient();
+builder.Services.AddHttpLogging(options => {
+    options.RequestBodyLogLimit = 4096;
+    options.ResponseBodyLogLimit = 4096;
+    options.RequestHeaders.Add("userAgent");
+    options.RequestHeaders.Add("authorization");
+    options.MediaTypeOptions.AddText("application/json");
+});
+//开启response stream读取
+//builder.Services.Configure<KestrelServerOptions>(x =>x.AllowSynchronousIO = true);
 var redisOption = new RedisConfigurationOptions
 {
     Servers = new List<RedisServerOptions> {
@@ -65,9 +73,9 @@ builder.Services.AddDaprStarter(opt =>
     opt.DaprGrpcPort = 3607;
 });
 #else
-    redis = redisOption;
-    pmServiceUrl=masaStackConfig.GetPmServiceDomain();
-    authServiceUrl= masaStackConfig.GetAuthServiceDomain();
+redis = redisOption;
+pmServiceUrl = masaStackConfig.GetPmServiceDomain();
+authServiceUrl = masaStackConfig.GetAuthServiceDomain();
 #endif
 
 builder.Services.AddMasaIdentity(options =>
@@ -142,9 +150,10 @@ app.UseSwagger();
 app.UseSwaggerUI();
 #endif
 app.UseRouting();
-
+//app.UseMiddleware<HttpResponseMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseHttpLogging();
 
 app.UseI18n();
 app.UseIsolation();

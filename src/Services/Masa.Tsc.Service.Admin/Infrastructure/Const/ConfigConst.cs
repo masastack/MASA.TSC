@@ -22,4 +22,42 @@ internal class ConfigConst
 
     public static int[] TraceErrorStatus => Configuration?.Trace?.ErrorStatus ?? DefaultErrorStatus;
 
+    public static bool IsElasticsearch => Configuration.IsElasticsearch;
+
+    public static bool IsClickhouse => Configuration.IsClickHouse;
+
+    public static string ClikhouseConnection => Configuration.Clickhouse?.Connection!;
+
+    public static string ClickHouseLogSourceTable => Configuration.Clickhouse?.LogSource!;
+
+    public static string ClickHouseTaceSourceTable => Configuration.Clickhouse?.TraceSource!;
+
+    internal sealed class StorageConst
+    {
+        public static bool IsElasticSearch { get; private set; }
+
+        public static bool IsClickhouse { get; private set; }
+
+        public static bool HasInit => IsClickhouse || IsElasticSearch;
+
+        public static void Reset()
+        {
+            IsClickhouse = false;
+            IsElasticSearch = false;
+        }
+
+        public static void SetElasticSearch()
+        {
+            if (!IsClickhouse && !IsElasticSearch)
+                IsElasticSearch = true;
+        }
+
+        public static void SetClickhouse()
+        {
+            if (!IsClickhouse && !IsElasticSearch)
+                IsClickhouse = true;
+        }
+
+        private StorageConst() { }
+    }
 }

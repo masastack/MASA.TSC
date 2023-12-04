@@ -10,9 +10,24 @@ public class AppSettingConfiguration
     public string TraceIndex { get; set; }
 
     public AppSettingTraceConfiguration Trace { get; set; }
+
+    public ClickhouseConfiguration Clickhouse { get; set; }
+
+    public bool IsClickHouse { get; set; }
+
+    public bool IsElasticsearch { get; set; } = true;
 }
 
 public class AppSettingTraceConfiguration
 {
     public int[] ErrorStatus { get; set; }
+}
+
+public class ClickhouseConfiguration
+{
+    public string Connection { get; set; }
+
+    public string LogSource { get; set; }
+
+    public string TraceSource { get; set; }
 }

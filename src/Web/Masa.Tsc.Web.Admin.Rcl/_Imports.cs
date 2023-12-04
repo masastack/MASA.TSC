@@ -28,6 +28,7 @@ global using Masa.Tsc.Contracts.Admin.Infrastructure.Const;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Utils;
 global using Masa.Tsc.Contracts.Admin.Logs;
 global using Masa.Tsc.Contracts.Admin.Metrics;
+global using Masa.Tsc.Contracts.Admin.Setting;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Antvg6;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Apps;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Models;

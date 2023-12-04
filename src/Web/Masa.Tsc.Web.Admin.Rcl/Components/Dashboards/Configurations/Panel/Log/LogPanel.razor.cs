@@ -69,17 +69,20 @@ public partial class LogPanel
 
     protected override bool IsSubscribeTimeZoneChange => true;
 
+    private SettingDto _storageSetting;
+
     protected override async Task OnInitializedAsync()
     {
+        _storageSetting = await ApiCaller.SettingService.GetStorage();
         if (StartTime.HasValue && StartTime.Value > DateTime.MinValue)
             await GetPageLogsAsync();
 
         if (!string.IsNullOrWhiteSpace(TaskId))
         {
-            if (ClickHouseConst.IsClickhouse)
-                Search = $"{ClickHouseConst.TaskId}='{TaskId}'";
-            else if (ElasticSearchConst.IsElasticSeach)
-                Search = $"{{\"term\":{{\"{ElasticSearchConst.TaskId}.keyword\":\"{TaskId}\"}}}}";
+            if (_storageSetting.IsClickhouse)
+                Search = $"{StorageConst.TaskId}='{TaskId}'";
+            else if (_storageSetting.IsElasticsearch)
+                Search = $"{{\"term\":{{\"{StorageConst.TaskId}.keyword\":\"{TaskId}\"}}}}";
         }
     }
 
@@ -175,7 +178,7 @@ public partial class LogPanel
                 Value = TaskId
             });
         }
-        bool isRawQuery = _search.IsRawQuery();
+        bool isRawQuery = _search.IsRawQuery(_storageSetting.IsElasticsearch, _storageSetting.IsClickhouse);
         var result = await ApiCaller.LogService.AggregateAsync<List<KeyValuePair<long, long>>>(new SimpleAggregateRequestDto
         {
             Start = start,
@@ -196,17 +199,17 @@ public partial class LogPanel
         {
             if (string.Equals("error", Keyword, StringComparison.InvariantCultureIgnoreCase))
             {
-                if (ClickHouseConst.IsClickhouse)
-                    Search = $"{ClickHouseConst.ServiceName}='{Service}' and {ClickHouseConst.LogLevelText}='{Keyword}'";
-                else if (ElasticSearchConst.IsElasticSeach)
-                    Search = $"{{\"term\":{{\"{ElasticSearchConst.ServiceName}.keyword\":\"{Service.Replace("'","''")}\"}}}},{{\"term\":{{\"{ElasticSearchConst.LogLevelText}.keyword\": \"{Keyword.Replace("'", "''")}\"}}}}";
+                if (_storageSetting.IsClickhouse)
+                    Search = $"{StorageConst.ServiceName}='{Service}' and {StorageConst.LogLevelText}='{Keyword}'";
+                else if (_storageSetting.IsElasticsearch)
+                    Search = $"{{\"term\":{{\"{StorageConst.ServiceName}.keyword\":\"{Service.Replace("'", "''")}\"}}}},{{\"term\":{{\"{StorageConst.LogLevelText}.keyword\": \"{Keyword.Replace("'", "''")}\"}}}}";
             }
             else
             {
-                if (ClickHouseConst.IsClickhouse)
-                    Search = $"{ClickHouseConst.ServiceName}='{Service}' and {ClickHouseConst.ExceptionMessage}='{Keyword.Replace("'", "''")}'";
-                else if (ElasticSearchConst.IsElasticSeach)
-                    Search = $"{{\"term\":{{\"{ElasticSearchConst.ServiceName}.keyword\":\"{Service}\"}}}},{{\"term\":{{\"{ElasticSearchConst.ExceptionMessage}.keyword\": \"{Keyword}\"}}}}";
+                if (_storageSetting.IsClickhouse)
+                    Search = $"{StorageConst.ServiceName}='{Service}' and {StorageConst.ExceptionMessage}='{Keyword.Replace("'", "''")}'";
+                else if (_storageSetting.IsElasticsearch)
+                    Search = $"{{\"term\":{{\"{StorageConst.ServiceName}.keyword\":\"{Service}\"}}}},{{\"term\":{{\"{StorageConst.ExceptionMessage}.keyword\": \"{Keyword}\"}}}}";
             }
         }
         base.OnInitialized();

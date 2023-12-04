@@ -37,7 +37,7 @@ public class QueryHandler : EnvQueryHandler
             Start = query.Start,
             End = query.End,
             Conditions = new List<FieldConditionDto> { new FieldConditionDto {
-             Name=ElasticSearchConst.URL,
+             Name=StorageConst.URL,
              Type= ConditionTypes.Equal,
                 Value=query.Url
             } }
@@ -67,13 +67,13 @@ public class QueryHandler : EnvQueryHandler
         {
             var endpointCondition = new FieldConditionDto
             {
-                Name = ElasticSearchConst.URL,
+                Name = StorageConst.URL,
                 Type = ConditionTypes.Equal,
                 Value = query.Endpoint
             };
             list.Add(endpointCondition);
         }
-        bool isRawQuery = query.Keyword.IsRawQuery();
+        bool isRawQuery = query.Keyword.IsRawQuery(ConfigConst.StorageConst.IsElasticSearch, ConfigConst.StorageConst.IsClickhouse);
         if (!string.IsNullOrEmpty(query.Keyword))
         {
             if (isRawQuery)
@@ -91,7 +91,7 @@ public class QueryHandler : EnvQueryHandler
         {
             list.Add(new FieldConditionDto
             {
-                Name = ElasticSearchConst.HttpPort,
+                Name = StorageConst.HttpPort,
                 Type = ConditionTypes.In,
                 Value = ConfigConst.TraceErrorStatus.Select(num => (object)num)
             });
@@ -120,11 +120,11 @@ public class QueryHandler : EnvQueryHandler
 
         if (string.IsNullOrEmpty(query.Data.Service))
         {
-            query.Data.Name = ElasticConstant.ServiceName;
+            query.Data.Name = StorageConst.ServiceName;
         }
         else if (query.Data.Instance == null)
         {
-            query.Data.Name = ElasticConstant.ServiceInstance;
+            query.Data.Name = StorageConst.ServiceInstance;
         }
         else
         {
@@ -156,7 +156,7 @@ public class QueryHandler : EnvQueryHandler
             Service = query.Service,
             Sort = new FieldOrderDto
             {
-                Name = ElasticConstant.Trace.Timestamp,
+                Name = StorageConst.Timestimap(ConfigConst.StorageConst.IsElasticSearch, ConfigConst.StorageConst.IsClickhouse),
                 IsDesc = !query.IsNext
             },
             Page = 1,
@@ -165,12 +165,12 @@ public class QueryHandler : EnvQueryHandler
 
         var list = new List<FieldConditionDto>() {
             new FieldConditionDto{
-                Name=ElasticSearchConst.URL,
+                Name=StorageConst.URL,
                 Type =ConditionTypes.Equal,
                 Value=query.Url
             },
             new FieldConditionDto{
-                Name=ElasticConstant.TraceId,
+                Name=StorageConst.TraceId,
                 Type =ConditionTypes.NotEqual,
                 Value=query.TraceId
             }
@@ -180,7 +180,7 @@ public class QueryHandler : EnvQueryHandler
         {
             list.Add(new FieldConditionDto
             {
-                Name = ElasticConstant.Trace.Timestamp,
+                Name = StorageConst.Timestimap(ConfigConst.StorageConst.IsElasticSearch, ConfigConst.StorageConst.IsClickhouse),
                 Type = ConditionTypes.Great,
                 Value = query.Time
             });
@@ -189,7 +189,7 @@ public class QueryHandler : EnvQueryHandler
         {
             list.Add(new FieldConditionDto
             {
-                Name = ElasticConstant.Trace.Timestamp,
+                Name = StorageConst.Timestimap(ConfigConst.StorageConst.IsElasticSearch, ConfigConst.StorageConst.IsClickhouse),
                 Type = ConditionTypes.Less,
                 Value = query.Time
             });
@@ -204,7 +204,7 @@ public class QueryHandler : EnvQueryHandler
             return;
         }
 
-        var traceId = data.Result.First().TraceId;
+        var traceId = data.Result[0].TraceId;
         var detailQuery = new TraceDetailQuery(traceId);
         await GetDetailAsync(detailQuery);
         query.Result = detailQuery.Result;

@@ -8,6 +8,7 @@ public class TscCaller
     internal TscCaller(IServiceProvider serviceProvider, ICaller caller)
     {
         AppService = new AppService(caller);
+        SettingService = new SettingService(caller);
         ProjectService = new ProjectService(caller, serviceProvider.GetRequiredService<IDccClient>());
         TeamService = new TeamService(caller);
         LogService = new LogService(caller);
@@ -35,4 +36,6 @@ public class TscCaller
     public MetricService MetricService { get; private init; }
 
     public TopologyService TopologyService { get; private init; }
+
+    public SettingService SettingService { get; private init; }
 }

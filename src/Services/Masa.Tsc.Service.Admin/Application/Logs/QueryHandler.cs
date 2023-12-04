@@ -1,9 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Google.Api;
-using Masa.Contrib.StackSdks.Pm;
-
 namespace Masa.Tsc.Service.Admin.Application.Logs;
 
 public class QueryHandler : EnvQueryHandler
@@ -88,7 +85,7 @@ public class QueryHandler : EnvQueryHandler
             });
         }
 
-        bool isRawQuery = queryData.Query.IsRawQuery();// (queryData.Query?.IndexOfAny(new char[] { '{', '}' }) ?? -1) >= 0;
+        bool isRawQuery = queryData.Query.IsRawQuery(ConfigConst.StorageConst.IsElasticSearch, ConfigConst.StorageConst.IsClickhouse);// (queryData.Query?.IndexOfAny(new char[] { '{', '}' }) ?? -1) >= 0;
         var query = new BaseRequestDto
         {
             Service = queryData.Service!,
@@ -120,7 +117,7 @@ public class QueryHandler : EnvQueryHandler
             Service = query.Service,
             Start = query.Start,
             End = query.End,
-            Name = ElasticSearchConst.ExceptionMessage,
+            Name = StorageConst.ExceptionMessage,
             Type = AggregateTypes.GroupBy,
             MaxCount = 999,
             AllValue = true
