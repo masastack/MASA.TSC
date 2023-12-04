@@ -5,29 +5,40 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class AddTraceLogExtenstion
 {
-    private static IServiceCollection? _services;
-    private static string[] _elasticsearchUrls;
+    private static IServiceCollection _services;
 
-    public static IServiceCollection AddTraceLog(this IServiceCollection services, string[] elasticsearchUrls)
+    public static IServiceCollection AddTraceLog(this IServiceCollection services)
     {
         _services = services;
-        _elasticsearchUrls = elasticsearchUrls;
-        var client = services.BuildServiceProvider().GetRequiredService<IConfigurationApiClient>();
-        try
-        {
-            var config = client.GetAsync<AppSettingConfiguration>(ConfigConst.ConfigRoot, ValueChanged).ConfigureAwait(false).GetAwaiter().GetResult();
-            ConfigConst.SetConfiguration(config);
-        }
-        catch(Exception ex)
-        {
-            Console.WriteLine(ex);
-        }
-        return services.AddElasticClientLogAndTrace(elasticsearchUrls, ConfigConst.LogIndex, ConfigConst.TraceIndex);
+        var client = _services.BuildServiceProvider().GetRequiredService<IConfigurationApiClient>();
+        var config = client.GetAsync<AppSettingConfiguration>(ConfigConst.ConfigRoot, ValueChanged).ConfigureAwait(false).GetAwaiter().GetResult();
+        ConfigConst.SetConfiguration(config);
+        AddClickHouse();
+        AddElasticSearch();
+        return _services;
+    }
+
+    private static void AddClickHouse()
+    {
+        if (ConfigConst.StorageConst.HasInit || !ConfigConst.IsClickhouse) return;
+        if (string.IsNullOrEmpty(ConfigConst.ClikhouseConnection)) return;
+        _services.AddMASAStackClickhouse(ConfigConst.ClikhouseConnection, ConfigConst.LogIndex, ConfigConst.TraceIndex, ConfigConst.ClickHouseLogSourceTable, ConfigConst.ClickHouseTaceSourceTable);
+        ConfigConst.StorageConst.SetClickhouse();
+    }
+
+    private static void AddElasticSearch()
+    {
+        if (ConfigConst.StorageConst.HasInit || !ConfigConst.IsElasticsearch) return;
+        string[] elasticsearchUrls = _services.GetMasaStackConfig().ElasticModel.Nodes?.ToArray() ?? Array.Empty<string>();
+        _services.AddElasticClientLogAndTrace(elasticsearchUrls, ConfigConst.LogIndex, ConfigConst.TraceIndex);
+        ConfigConst.StorageConst.SetElasticSearch();
     }
 
     private static void ValueChanged(AppSettingConfiguration config)
     {
         ConfigConst.SetConfiguration(config);
-        _services?.AddElasticClientLogAndTrace(_elasticsearchUrls, ConfigConst.LogIndex, ConfigConst.TraceIndex);
+        ConfigConst.StorageConst.Reset();
+        AddClickHouse();
+        AddElasticSearch();
     }
 }

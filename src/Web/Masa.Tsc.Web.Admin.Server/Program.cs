@@ -38,7 +38,6 @@ MasaOpenIdConnectOptions masaOpenIdConnectOptions = new()
 
 IdentityModelEventSource.ShowPII = true;
 builder.Services.AddMasaOpenIdConnect(masaOpenIdConnectOptions);
-
 var redisOption = new RedisConfigurationOptions
 {
     Servers = new List<RedisServerOptions> {
@@ -51,7 +50,6 @@ var redisOption = new RedisConfigurationOptions
     DefaultDatabase = masaStackConfig.RedisModel.RedisDb,
     Password = masaStackConfig.RedisModel.RedisPassword
 };
-
 #if DEBUG
 await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC, authHost: "https://auth-service-dev.masastack.com", mcHost: "https://mc-service-dev.masastack.com", pmHost: "https://pm-service-dev.masastack.com");
 builder.Services.AddTscHttpApiCaller("http://localhost:18010").AddDccClient(redisOption);
@@ -64,14 +62,14 @@ builder.Services.AddRcl().AddScoped<TokenProvider>();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 
-#if DEBUG
-builder.Services.AddDaprStarter(opt =>
-{
-    opt.AppId = masaStackConfig.GetWebId(MasaStackProject.TSC);
-    opt.DaprHttpPort = 3602;
-    opt.DaprGrpcPort = 3603;
-});
-#endif
+//#if DEBUG
+//builder.Services.AddDaprStarter(opt =>
+//{
+//    opt.AppId = masaStackConfig.GetWebId(MasaStackProject.TSC);
+//    opt.DaprHttpPort = 3602;
+//    opt.DaprGrpcPort = 3603;
+//});
+//#endif
 builder.Services.AddDaprClient();
 
 builder.Services.AddHttpContextAccessor();

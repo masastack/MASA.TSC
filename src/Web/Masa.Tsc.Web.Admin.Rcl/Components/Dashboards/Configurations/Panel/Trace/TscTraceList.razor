@@ -29,7 +29,7 @@
             else if (context.Header.Value == "Endpoint")
             {
                 <div style="max-width:400px">
-                    <TooltipCopy Value="@context.Item.GetDispalyName()" TooltipContentStyle="max-width:400px" />
+                    <TooltipCopy Value="@GetDisplayName(context.Item)" TooltipContentStyle="max-width:400px" />
                 </div>
             }
             else if (context.Header.Value == nameof(TraceResponseDto.Duration))
