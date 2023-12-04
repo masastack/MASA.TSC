@@ -36,15 +36,8 @@ builder.Services.AddTraceLog()
 
 builder.Services.AddIsolation(services => services.UseMultiEnvironment());
 builder.Services.AddDaprClient();
-builder.Services.AddHttpLogging(options => {
-    options.RequestBodyLogLimit = 4096;
-    options.ResponseBodyLogLimit = 4096;
-    options.RequestHeaders.Add("userAgent");
-    options.RequestHeaders.Add("authorization");
-    options.MediaTypeOptions.AddText("application/json");
-});
 //开启response stream读取
-//builder.Services.Configure<KestrelServerOptions>(x =>x.AllowSynchronousIO = true);
+builder.Services.Configure<KestrelServerOptions>(x =>x.AllowSynchronousIO = true);
 var redisOption = new RedisConfigurationOptions
 {
     Servers = new List<RedisServerOptions> {
@@ -150,10 +143,9 @@ app.UseSwagger();
 app.UseSwaggerUI();
 #endif
 app.UseRouting();
-//app.UseMiddleware<HttpResponseMiddleware>();
+//app.UseMASAHttpReponseLog();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHttpLogging();
 
 app.UseI18n();
 app.UseIsolation();
