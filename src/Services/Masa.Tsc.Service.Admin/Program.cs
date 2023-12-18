@@ -57,8 +57,8 @@ string pmServiceUrl, authServiceUrl;
 
 #if DEBUG
 redis = AppSettings.GetModel<RedisConfigurationOptions>("LocalRedisOptions");
-pmServiceUrl = "https://pm-service-dev.masastack.com";
-authServiceUrl = "https://auth-service-dev.masastack.com";
+pmServiceUrl = "https://pm-serviceiotdev.lonsid.cn";
+authServiceUrl = "https://auth-serviceiotdev.lonsid.cn";
 builder.Services.AddDaprStarter(opt =>
 {
     opt.AppId = appid;

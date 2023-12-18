@@ -63,7 +63,7 @@ public partial class TscTraceSearch
         _services = (await QueryServices.Invoke())?.ToList()!;
         if (!string.IsNullOrEmpty(Service) && _services != null && _services.Contains(Service))
         {
-            await SearchEndpoints();
+            await SearchInstances();
             await SearchEndpoints();
         }
         else
@@ -93,34 +93,31 @@ public partial class TscTraceSearch
         _endpointSearching = false;
     }
 
-    private void OnEnter()
+    private Task OnEnter()
     {
-        Query();
+        return Query();
     }
 
-    private void Query(bool isService = false, bool isInstance = false)
+    private async Task Query(bool isService = false, bool isInstance = false, bool isEndpoint = false)
     {
-        NextTick(async () =>
+        if (!(isService || isInstance || isEndpoint))
         {
-            if (isService)
-            {
-                _instance = default;
-                _endpoint = default;
-                await SearchInstances();
-                await SearchEndpoints();
-            }
-            else if (isInstance)
-            {
-                await SearchEndpoints();
-            }
-            else
-            {
-                await SearchServices();
-            }
+            await SearchServices();
+        }
+        else if (isService)
+        {
+            _instance = default;
+            _endpoint = default;
+            await SearchInstances();
+            await SearchEndpoints();
+        }
+        else if (isInstance)
+        {
+            await SearchEndpoints();
+        }
 
-            await OnQueryUpdate.InvokeAsync((Service, _instance, _endpoint, Keyword));
-            StateHasChanged();
-        });
+        await OnQueryUpdate.InvokeAsync((Service, _instance, _endpoint, Keyword));
+        StateHasChanged();
     }
 
     private async Task OnDateTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) range)

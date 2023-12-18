@@ -46,7 +46,7 @@ public class MetricService : BaseService
         return ConvertResult(result);
     }
 
-    public async Task<List<QueryResultDataResponse>> GetMultiRangeAsync(RequestMultiQueryRangeDto param)
+    public async Task<List<QueryResultDataResponse>> GetMultiRangeAsync(RequestMultiQueryRangeDto param, CancellationToken? token=null)
     {
         var result = (await Caller.GetByBodyAsync<List<QueryResultDataResponse>>($"{RootPath}/multi-range", param))!;
         if (result != null && result.Any())

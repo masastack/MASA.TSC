@@ -21,7 +21,7 @@
                    Loading="_serviceSearching"
                    Class="mr-4 rounded-2 m-input--h-40"
                    Style="max-width: 280px"
-                   OnSelectedItemUpdate="()=>Query(isService:true)"
+                   OnSelect="()=>Query(isService:true)"
                    OnClearClick="()=>Query(isService:true)" />
 
     <SAutoComplete Placeholder="@I18n.T("Instance")" Label="@I18n.T("Instance")"
@@ -44,7 +44,7 @@
                    Class="mr-4 rounded-2 m-input--h-40"
                    Style="max-width: 280px"
                    Disabled="@(string.IsNullOrWhiteSpace(Service))"
-                   OnSelectedItemUpdate="()=>Query(isInstance:true)"
+                   OnSelect="()=>Query(isInstance:true)"
                    OnClearClick="()=>Query(isInstance:true)" />
 
     <SAutoComplete Placeholder="@I18n.T("Endpoint")" Label="@I18n.T("Endpoint")"
@@ -68,8 +68,8 @@
                    Disabled="@(string.IsNullOrWhiteSpace(Service))"
                    Class="mr-4 rounded-2 m-input--h-40"
                    Style="max-width: 280px;"
-                   OnSelectedItemUpdate="()=>Query()"
-                   OnClearClick="()=>Query()" />
+                   OnSelect="()=>Query(isEndpoint:true)"
+                   OnClearClick="()=>Query(isEndpoint:true)" />
     @if (!PageMode)
     {
         <MSpacer />

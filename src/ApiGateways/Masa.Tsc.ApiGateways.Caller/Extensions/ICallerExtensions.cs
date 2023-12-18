@@ -5,13 +5,13 @@ namespace Masa.Contrib.Service.Caller;
 
 internal static class ICallerExtensions
 {
-    public static async Task<TResult> GetByBodyAsync<TResult>(this ICaller caller, string url, object body) where TResult : class
+    public static async Task<TResult> GetByBodyAsync<TResult>(this ICaller caller, string url, object body, CancellationToken? token = null) where TResult : class
     {
 
         if (caller is DaprCaller daprCaller)
         {
             var request = daprCaller.CreateRequest(HttpMethod.Get, url, body);
-            return (await daprCaller.SendAsync<TResult>(request, default)) ?? default!;
+            return (await daprCaller.SendAsync<TResult>(request, token ?? default)) ?? default!;
         }
         else
         {
@@ -20,7 +20,7 @@ internal static class ICallerExtensions
             {
                 request.Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
             }
-            return (await caller.SendAsync<TResult>(request, default)) ?? default!;
+            return (await caller.SendAsync<TResult>(request, token ?? default)) ?? default!;
         }
     }
 }
