@@ -37,8 +37,10 @@ public static class AddTraceLogExtenstion
     private static void ValueChanged(AppSettingConfiguration config)
     {
         ConfigConst.SetConfiguration(config);
-        ConfigConst.StorageConst.Reset();
-        AddClickHouse();
-        AddElasticSearch();
+        var logger = _services.BuildServiceProvider().GetRequiredService<ILoggerFactory>().CreateLogger("Masa.Tsc.Service.Admin");
+        logger.LogInformation("ValueChanged config value is:{config}", JsonSerializer.Serialize(config));
+        //ConfigConst.StorageConst.Reset();
+        //AddClickHouse();
+        //AddElasticSearch();
     }
 }
