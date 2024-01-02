@@ -70,7 +70,7 @@ public class QueryHandler : EnvQueryHandler
             return;
         }
 
-        _logger.LogError("request failed {data.ErrorType} {data.Error}", data);
+        _logger.LogError("request failed {data.ErrorType} {data.Error}", data.ErrorType,data.Error);
     }
 
     [EventHandler]
@@ -85,7 +85,7 @@ public class QueryHandler : EnvQueryHandler
         });
 
         if (data.Status == ResultStatuses.Error)
-            _logger.LogError("request failed {data.ErrorType} {data.Error}", data);
+            _logger.LogError("request failed {data.ErrorType} {data.Error}", data.ErrorType, data.Error);
 
         query.Result = data.Data!;
     }
@@ -101,7 +101,7 @@ public class QueryHandler : EnvQueryHandler
         query.Result = data.Data!;
         if (data.Status != ResultStatuses.Success)
         {
-            _logger.LogError("request failed {data.ErrorType} {data.Error}", data);
+            _logger.LogError("request failed {data.ErrorType} {data.Error}", data.ErrorType, data.Error);
         }
     }
 
@@ -122,7 +122,7 @@ public class QueryHandler : EnvQueryHandler
             return;
         }
 
-        _logger.LogError("request failed {data.ErrorType} {data.Error}", data);
+        _logger.LogError("request failed {data.ErrorType} {data.Error}", data.ErrorType, data.Error);
     }
 
     [EventHandler]
@@ -144,7 +144,7 @@ public class QueryHandler : EnvQueryHandler
             return;
         }
 
-        _logger.LogError("request failed {data.ErrorType} {data.Error}", data);
+        _logger.LogError("request failed {data.ErrorType} {data.Error}", data.ErrorType, data.Error);
     }
 
     [EventHandler]
