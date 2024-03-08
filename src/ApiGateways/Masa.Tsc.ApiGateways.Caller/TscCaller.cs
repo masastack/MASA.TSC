@@ -17,9 +17,12 @@ public class TscCaller
         InstrumentService = new InstrumentService(caller);
         MetricService = new MetricService(caller);
         TopologyService = new TopologyService(caller);
+        ApmService=new ApmService(caller);
     }
 
     public AppService AppService { get; private init; }
+
+    public ApmService ApmService { get; private init; }
 
     public ProjectService ProjectService { get; private init; }
 

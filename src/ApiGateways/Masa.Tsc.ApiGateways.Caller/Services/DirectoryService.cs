@@ -3,9 +3,9 @@
 
 namespace Masa.Tsc.ApiGateways.Caller.Services;
 
-public class DirectoryService : BaseService
+public sealed class DirectoryService : BaseService
 {
-    public DirectoryService(ICaller caller) : base(caller, "/api/Instrument/directory") { }
+    internal DirectoryService(ICaller caller) : base(caller, "/api/Instrument/directory") { }
 
     public async Task<IEnumerable<DirectoryTreeDto>> GetTreeAsync(bool isContainsInstrument = true) => (await Caller.GetAsync<IEnumerable<DirectoryTreeDto>>($"{RootPath}/tree/{isContainsInstrument}"))!;
 

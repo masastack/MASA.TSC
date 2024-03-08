@@ -3,9 +3,9 @@
 
 namespace Masa.Tsc.ApiGateways.Caller.Services;
 
-public class TopologyService : BaseService
+public sealed class TopologyService : BaseService
 {
-    public TopologyService(ICaller caller) : base(caller, "/api/topology") { }
+    internal TopologyService(ICaller caller) : base(caller, "/api/topology") { }
 
     public async Task<TopologyResultDto> GetAsync(string? serviceName, int level, DateTime start, DateTime end) => (await Caller.GetAsync<TopologyResultDto>($"{RootPath}", new { serviceName, level, start, end }))!;
 }

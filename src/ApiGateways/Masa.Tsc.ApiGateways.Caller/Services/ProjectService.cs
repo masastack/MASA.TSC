@@ -3,11 +3,11 @@
 
 namespace Masa.Tsc.ApiGateways.Caller.Services;
 
-public class ProjectService : BaseService
+public sealed class ProjectService : BaseService
 {
     private readonly IDccClient _dccClient;
 
-    public ProjectService(ICaller caller, IDccClient dccClient) : base(caller, "/api/project")
+    internal ProjectService(ICaller caller, IDccClient dccClient) : base(caller, "/api/project")
     {
         _dccClient = dccClient;
     }

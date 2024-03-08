@@ -36,9 +36,13 @@ public sealed class StorageConst
 
     public static string TraceId { get; private set; } = "TraceId";
 
+    public static string SpanId { get; private set; } = "SpanId";
+
     public const string Environment = "Resource.service.namespace";
 
     public const string ExceptionMessage = "Attributes.exception.message";
+
+    public const string ExceptionType = "Attributes.exception.type";
 
     public const string TaskId = "Attributes.TaskId";
 }

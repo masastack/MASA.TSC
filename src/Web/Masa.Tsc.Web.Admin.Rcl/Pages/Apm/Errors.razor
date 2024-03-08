@@ -1,0 +1,60 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm
+@inherits ApmComponentBase
+@page "/apm/errors"
+<PageTitle>@I18n.Apm("Apm.Errors")</PageTitle>
+
+<ApmSearchComponent ShowButton
+                    ShowEnv
+                    ShowText
+                    ShowTime
+                    ShowService
+                    Value="Search"
+                    ValueChanged="LoadASync" />
+<SDataTable Headers="headers"
+            Stripe
+            FixedHeader
+            ServerItemsLength="total"
+            ItemsPerPage="defaultSize"
+            Items="data"
+            TItem="ErrorMessageDto"
+            Loading="@isTableLoading"
+            OnOptionsUpdate="OnTableOptionsChanged">
+    <ItemColContent>
+        @if (context.Header.Value == nameof(ErrorMessageDto.Type))
+        {
+            <a target="_blank"
+               style="text-decoration:none"
+               title="@context.Item.Type"
+               href="/apm/error@(GetUrlParam(service:Search.Service,env: GetSearchEnv(Search.Enviroment), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,exType:context.Item.Type,search:Search.Text))">
+                @context.Item.Type
+            </a>
+        }
+        else if (context.Header.Value == nameof(ErrorMessageDto.Message))
+        {
+            <div style="width:400px;overflow:hidden" class="text-truncate">
+                @* <a target="_blank"
+                   style="text-decoration:none"
+                   href="@($"/apm/error?service={Search.Service}&env={Search.Enviroment}&start={Search.Start.ToString("yyyy-MM-dd HH:mm:ss")}&end={Search.End.ToString("yyyy-MM-dd HH:mm:ss")}&ex_type={context.Item.Type.ToUrlSafe()}&ex_msg={context.Item.Message.ToUrlSafe()}")"
+                   title="@context.Item.Message"> *@
+                    @context.Item.Message
+                @* </a> *@
+            </div>
+        }
+        else if (context.Header.Value == nameof(ErrorMessageDto.LastTime))
+        {
+            @context.Item.LastTime.UtcFormatLocal(CurrentTimeZone)
+        }
+        else
+        {
+            @context.Item.Total
+        }
+    </ItemColContent>
+</SDataTable>
+<style>
+    .m-data-table .m-data-table__wrapper {
+        height: calc(100vh - 290px)
+    }
+</style>
+<MCard Rounded=true Class="px-6 py-2" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
+    <SPagination Class="mt-2" @bind-Page="page" @bind-PageSize=defaultSize Total=total OnChange="OnPageChange" />
+</MCard>

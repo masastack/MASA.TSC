@@ -1,10 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Google.Api;
-using Masa.Contrib.StackSdks.Pm;
-using System;
-
 namespace Masa.Tsc.Service.Admin.Application.Traces;
 
 public class QueryHandler : EnvQueryHandler
@@ -87,6 +83,16 @@ public class QueryHandler : EnvQueryHandler
             }
         }
 
+        if (!string.IsNullOrEmpty(query.SpanId))
+        {
+            list.Add(new FieldConditionDto
+            {
+                Name = StorageConst.SpanId,
+                Type = ConditionTypes.Equal,
+                Value = query.SpanId
+            });
+        }
+
         if (query.IsError)
         {
             list.Add(new FieldConditionDto
@@ -97,10 +103,46 @@ public class QueryHandler : EnvQueryHandler
             });
         }
 
-        queryDto.Conditions = list;
 
-        if (string.IsNullOrEmpty(query.TraceId) && !query.IsError && !isRawQuery)
-            queryDto.SetEnv(GetServiceEnvironmentName(query.Service));
+        var conditions = new List<FieldConditionDto>();
+        if (!string.IsNullOrEmpty(query.Env))
+        {
+            conditions.Add(new FieldConditionDto
+            {
+                Name = "Resource.service.namespace",
+                Type = ConditionTypes.Equal,
+                Value = query.Env
+            });
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(query.TraceId) && !query.IsError && !isRawQuery)
+                queryDto.SetEnv(GetServiceEnvironmentName(query.Service));
+        }
+
+        if (query.LatMin.HasValue && query.LatMin.Value >= 0)
+        {
+            conditions.Add(new FieldConditionDto
+            {
+                Name = "Duration",
+                Type = ConditionTypes.GreatEqual,
+                Value = query.LatMin.Value,
+            });
+        }
+
+        if (query.LatMax.HasValue && query.LatMax.Value >= 0 && (
+            !query.LatMin.HasValue
+            || query.LatMin.HasValue && query.LatMax - query.LatMin.Value > 0))
+            conditions.Add(new FieldConditionDto
+            {
+                Name = "Duration",
+                Type = ConditionTypes.LessEqual,
+                Value = query.LatMax.Value,
+            });
+        if (conditions.Any())
+            queryDto.Conditions = conditions;
+
+        queryDto.Conditions = list;
 
         query.Result = await _traceService.ListAsync(queryDto);
         query.Result ??= new PaginatedListBase<TraceResponseDto>();

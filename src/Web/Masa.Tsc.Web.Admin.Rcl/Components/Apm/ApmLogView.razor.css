@@ -1,0 +1,26 @@
+﻿.slide_in {
+    transform: translateX(-100%);
+    margin-right: 16px;
+}
+
+.slide_out {
+    transform: translateX(0%);
+    transition: transform 0.5s ease-out;
+    display: none;
+}
+
+.slide {
+    position: fixed;
+    z-index: 10;
+    top: 154px;
+    right: -994px;
+    width: 1000px;
+    height: calc(100vh - 154px);
+    border: solid 1px #ccc;
+    background-color: white
+}
+
+.text-wrap {
+    white-space: pre-line;
+    line-height: 1.5rem;
+}

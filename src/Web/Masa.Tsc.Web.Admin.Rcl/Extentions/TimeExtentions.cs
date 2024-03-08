@@ -70,4 +70,10 @@ internal static class TimeExtentions
             timeZoneInfo = TimeZoneInfo.Utc;
         return new DateTimeOffset(ticks: time.Value.Ticks + timeZoneInfo.BaseUtcOffset.Ticks, offset: timeZoneInfo.BaseUtcOffset);
     }
+
+    public static DateTimeOffset ToDateTimeOffset(this DateTime time, TimeZoneInfo? timeZoneInfo)
+    {
+        timeZoneInfo ??= TimeZoneInfo.Utc;
+        return new DateTimeOffset(ticks: time.Ticks + timeZoneInfo.BaseUtcOffset.Ticks, offset: timeZoneInfo.BaseUtcOffset);
+    }
 }

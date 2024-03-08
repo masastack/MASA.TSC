@@ -1,0 +1,40 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm
+@inherits ApmComponentBase
+@page "/apm/service"
+<PageTitle>@I18n.Apm("ServiceDetail")</PageTitle>
+
+<ApmSearchComponent ShowService
+                    ShowButton                   
+                    @bind-Value="Search"
+                    ShowComparison
+                    ShowEnv
+                    ShowTime />
+
+<MTabs FixedTabs @bind-Value="index" Class="rounded-t-xl">
+    <MTab Value="1">@I18n.Apm("Overview")</MTab>
+    <MTab Value="2">@I18n.Apm("Endpoints")</MTab>
+    <MTab Value="3">@I18n.Apm("Errors")</MTab>
+    <MTab Value="4">@I18n.Apm("Logs")</MTab>
+    @* <MTab Value="5">@I18n.Apm("Dependencies")</MTab> *@
+</MTabs>
+<CascadingValue Value="Search">
+<div style="height:calc(100vh - 224px)" class="overflow-y-scroll">
+    <MTabsItems @bind-Value="index" Class="rounded-b-xl">
+        <MTabItem Value="1">
+            <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.OverView />
+        </MTabItem>
+        <MTabItem Value="2">
+            <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceEndpoints />
+        </MTabItem>
+        <MTabItem Value="3">
+            <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceErrors />
+        </MTabItem>
+        <MTabItem Value="4">
+            <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceLogs />
+        </MTabItem>
+        @* <MTabItem Value="5">
+        <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.Dependencies />
+        </MTabItem> *@
+    </MTabsItems>
+</div>
+</CascadingValue>

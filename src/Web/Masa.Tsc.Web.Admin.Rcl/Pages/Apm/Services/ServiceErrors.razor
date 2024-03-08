@@ -1,0 +1,53 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services
+@inherits ApmComponentBase
+
+<div class="mx-4">
+    <MCard Class="rounded-lg mt-4" Style="border:solid #ccc 1px">
+        <MCardSubtitle Class="font-weight-black h6 py-2">
+            Error Count
+        </MCardSubtitle>
+        <MCardText>
+            @if (!chart.ChartLoading && chart.HasChart)
+            {
+                <MECharts Option="@(chart.Data)" Height="200" Style="@("width:100%")" />
+            }
+        </MCardText>
+    </MCard>
+
+    <div class="col-12 rounded-lg mt-4" style="border:solid #ccc 1px">
+        <SDataTable Headers="headers"
+                    Stripe
+                    Height="300"
+                    FixedHeader
+                    ServerItemsLength="total"
+                    ItemsPerPage="defaultSize"
+                    Items="data"
+                    TItem="ErrorMessageDto"
+                    Loading="@isTableLoading"
+                    Class="rounded-t-xl overflow-x-hidden"
+                    OnOptionsUpdate="OnTableOptionsChanged">
+            <ItemColContent>
+                @if (context.Header.Value == nameof(ErrorMessageDto.Type))
+                {
+                    <a target="_blank"
+                       style="text-decoration:none"
+                       title="@context.Item.Type"
+                       href="/apm/error@(GetUrlParam(service:SearchData.Service,env: GetSearchEnv(SearchData.Enviroment), comparisonType: SearchData.ComparisonType, start: SearchData.Start, end: SearchData.End,exType:context.Item.Type))">
+                        @context.Item.Type
+                    </a>
+                }
+                @if (context.Header.Value == nameof(ErrorMessageDto.LastTime))
+                {
+                    @context.Item.LastTime.UtcFormatLocal(CurrentTimeZone)
+                }
+                @if (context.Header.Value == nameof(ErrorMessageDto.Total))
+                {
+                    @context.Item.Total
+                }
+            </ItemColContent>
+        </SDataTable>
+        <MCard Rounded=true Class="px-6" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
+            <SPagination Class="mt-2" Page="page" PageChanged="OnPageChange" @bind-PageSize=defaultSize Total=total PageSizeSelect="@(new List<int>{defaultSize})" />
+        </MCard>
+    </div>
+</div>

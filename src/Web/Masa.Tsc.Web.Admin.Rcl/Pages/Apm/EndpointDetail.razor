@@ -1,0 +1,29 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm
+@inherits ApmComponentBase
+@page "/apm/endpoint"
+<PageTitle>@I18n.Apm("Apm.Endpoint")</PageTitle>
+
+<ApmSearchComponent ShowService
+                    ShowButton
+                    @bind-Value="Search"
+                    ShowComparison
+                    ShowText
+                    ShowEnv
+                    ShowTime />
+
+<MTabs FixedTabs @bind-Value="index" Class="rounded-t-xl">
+    <MTab Value="1">@I18n.Apm("Overview")</MTab>
+    <MTab Value="2">@I18n.Apm("Errors")</MTab>
+</MTabs>
+<CascadingValue Value="Search">
+    <div style="height:calc(100vh - 224px)" class="overflow-y-scroll">
+        <MTabsItems @bind-Value="index" Class="rounded-b-xl">
+            <MTabItem Value="1">
+                <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints.OverView />
+            </MTabItem>
+            <MTabItem Value="2">
+                <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceErrors />
+            </MTabItem>
+        </MTabsItems>
+    </div>
+</CascadingValue>

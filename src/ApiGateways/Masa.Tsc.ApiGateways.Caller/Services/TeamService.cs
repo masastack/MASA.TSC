@@ -3,9 +3,9 @@
 
 namespace Masa.Tsc.ApiGateways.Caller.Services;
 
-public class TeamService : BaseService
+public sealed class TeamService : BaseService
 {
-    public TeamService(ICaller caller) : base(caller, "/api/team") { }
+    internal TeamService(ICaller caller) : base(caller, "/api/team") { }
 
     public async Task<TeamDto> GetTeamAsync(Guid teamId, string projectId) => (await Caller.GetAsync<TeamDto>($"{RootPath}/{teamId}/{projectId}"))!;
 }

@@ -1,0 +1,95 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm
+@inherits ApmComponentBase
+@page "/apm/services"
+<PageTitle>@I18n.Apm("Service")</PageTitle>
+
+<ApmSearchComponent ShowComparison
+                    ShowButton
+                    ShowEnv
+                    ShowText
+                    ShowTime
+                    ShowService
+                    Value="Search"
+                    ValueChanged="LoadASync" />
+<SDataTable Headers="headers"
+            Stripe
+            FixedHeader
+            ServerItemsLength="total"
+            ItemsPerPage="defaultSize"
+            Items="data"
+            TItem="ListChartData"
+            Loading="@isTableLoading"
+            OnOptionsUpdate="OnTableOptionsChanged">
+    <ItemColContent>
+        @if (context.Header.Value == nameof(ListChartData.Name))
+        {
+            <a href="/apm/service@(GetUrlParam(service: context.Item.Name, env: GetSearchEnv(Search.Enviroment, context.Item.Envs?.Split(',')), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,search:Search.Text))">@context.Item.Name</a>
+        }
+        else if (context.Header.Value == nameof(ListChartData.Envs))
+        {
+            @string.Join(',', context.Item.Envs)
+        }
+        else if (context.Header.Value == nameof(ListChartData.Latency))
+        {
+            <div class="d-flex justify-start">
+                <div>
+                    @($"{context.Item.Latency} ms")
+                </div>
+                <div>
+                    @if (context.Item.LatencyChartData != null && context.Item.LatencyChartData.HasChart)
+                    {
+                        <MECharts Option="context.Item.LatencyChartData.Data" Width="80" Height="24" />
+                    }
+                    else
+                    {
+                        <MIcon>mdi-chart</MIcon>
+                    }
+                </div>
+            </div>
+        }
+        else if (context.Header.Value == nameof(ListChartData.Throughput))
+        {
+            <div class="d-flex justify-start">
+                <div>
+                    @($"{context.Item.Throughput} tpm")
+                </div>
+                <div>
+                    @if (context.Item.ThroughputChartData != null && context.Item.ThroughputChartData.HasChart)
+                    {
+                        <MECharts Option="context.Item.ThroughputChartData.Data" Width="80" Height="24" />
+                    }
+                    else
+                    {
+                        <MIcon>mdi-chart</MIcon>
+                    }
+                </div>
+            </div>
+        }
+        else if (context.Header.Value == nameof(ListChartData.Failed))
+        {
+            <div class="d-flex justify-start">
+                <div>
+                    @($"{context.Item.Failed} %")
+                </div>
+                <div class="ml-2">
+                    @if (context.Item.FailedChartData != null && context.Item.FailedChartData.HasChart)
+                    {
+                        <MECharts Option="context.Item.FailedChartData.Data" Width="80" Height="24" />
+                    }
+                    else
+                    {
+                        <MIcon>mdi-chart</MIcon>
+                    }
+                </div>
+            </div>
+        }
+    </ItemColContent>
+</SDataTable>
+<style>
+    .m-data-table .m-data-table__wrapper {
+        height: calc(100vh - 290px)
+    }
+</style>
+<MCard Rounded=true Class="px-6 py-2" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
+    <SPagination Class="mt-2" @bind-Page="page" @bind-PageSize=defaultSize Total=total OnChange="OnPageChange" />
+</MCard>

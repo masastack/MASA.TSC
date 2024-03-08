@@ -20,6 +20,11 @@ internal static class I18nExtensions
         return i18n?.T("Trace", key)!;
     }
 
+    public static string Apm(this I18n? i18n, string key)
+    {
+        return i18n?.T("Apm", key)!;
+    }
+
     public static string Dashboard(this I18n? i18n, string key)
     {
         return i18n?.T("Dashboard", key)!;

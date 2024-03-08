@@ -1,0 +1,59 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services
+@inherits ApmComponentBase
+
+<div class="mx-4">
+    <MCard Class="rounded-lg mt-4" Style="border:solid #ccc 1px">
+        <MCardSubtitle Class="font-weight-black h6 py-2">
+            Log Count
+        </MCardSubtitle>
+        <MCardText>
+            @if (!chart.ChartLoading && chart.HasChart)
+            {
+                <MECharts Option="@(chart.Data)" Height="200" Style="@("width:100%")" />
+            }
+        </MCardText>
+    </MCard>
+
+    <div class="col-12 rounded-lg mt-4" style="border:solid #ccc 1px">
+        <SDataTable Headers="headers"
+                    Stripe
+                    Height="300"
+                    FixedHeader
+                    ServerItemsLength="total"
+                    ItemsPerPage="defaultSize"
+                    Items="data"
+                    TItem="LogResponseDto"
+                    Loading="@isTableLoading"
+                    Class="rounded-t-xl overflow-x-hidden"
+                    OnOptionsUpdate="OnTableOptionsChanged">
+            <ItemColContent>
+                @if (context.Header.Value == nameof(LogResponseDto.Timestamp))
+                {
+                    <div class="d-flex justify-space-between">
+                        <SIcon OnClick="@(() => OpenAsync(context.Item))" Class="pr-2" Size="18" Tooltip="@I18n.T("Detail")">mdi-arrow-top-right-bottom-left</SIcon>
+                        @context.Item.Timestamp.UtcFormatLocal(CurrentTimeZone)
+                    </div>
+                }
+                else if (context.Header.Value == nameof(LogResponseDto.SeverityText))
+                {
+                    @context.Item.SeverityText
+                }
+                else if (context.Header.Value == nameof(LogResponseDto.TraceId))
+                {
+                    @context.Item.TraceId
+                }
+                else if (context.Header.Value == nameof(LogResponseDto.Body))
+                {
+                    <div style="width:200px;overflow:hidden" class="text-truncate">
+                        @context.Item.Body
+                    </div>
+                }
+            </ItemColContent>
+        </SDataTable>
+        <MCard Rounded=true Class="px-6" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
+            <SPagination Class="mt-2" @bind-Page="page" @bind-PageSize=defaultSize Total=total PageSizeSelect="@(new List<int>{defaultSize})" />
+        </MCard>
+    </div>
+</div>
+
+<ApmLogView Value="current" @bind-Show="dialogShow" />
