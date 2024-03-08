@@ -1,6 +1,12 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.Service.Caller;
+using Masa.Contrib.StackSdks.Tsc.Apm.Clickhouse;
+using Masa.Contrib.StackSdks.Tsc.Apm.Clickhouse.Models;
+using Masa.Contrib.StackSdks.Tsc.Apm.Clickhouse.Models.Request;
+using Masa.Contrib.StackSdks.Tsc.Apm.Clickhouse.Models.Response;
+
 namespace Masa.Tsc.Service.Admin.Services;
 
 public class ApmService : ServiceBase

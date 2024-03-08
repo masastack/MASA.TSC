@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Utils.Security.Cryptography;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services;
 
 public partial class ServiceLogs
@@ -13,10 +15,10 @@ public partial class ServiceLogs
 
     private List<DataTableHeader<LogResponseDto>> headers => new()
     {
-        new() { Text = I18n.Apm("Log.List.Timestamp"), Value = nameof(LogResponseDto.Timestamp)},
-        new() { Text = I18n.Apm("Log.List.TraceId"), Value = nameof(LogResponseDto.TraceId)},
-        new() { Text = I18n.Apm("Log.List.SeverityText"), Value = nameof(LogResponseDto.SeverityText)},
-        new() { Text = I18n.Apm("Log.List.Body"), Value = nameof(LogResponseDto.Body) }
+        new() { Text = I18n.Apm(nameof(LogResponseDto.Timestamp)), Value = nameof(LogResponseDto.Timestamp)},
+        new() { Text = I18n.Apm(nameof(LogResponseDto.TraceId)), Value = nameof(LogResponseDto.TraceId)},
+        new() { Text = I18n.Apm(nameof(LogResponseDto.SeverityText)), Value = nameof(LogResponseDto.SeverityText)},
+        new() { Text = I18n.Apm(nameof(LogResponseDto.Body)), Value = nameof(LogResponseDto.Body) }
     };
 
     private int defaultSize = 5;
@@ -88,8 +90,8 @@ public partial class ServiceLogs
             Env = SearchData.Enviroment,
             IsDesc = sortBy
         };
-        var result = await ApiCaller.ApmService.GetLogChartAsync(query);
-        chart.Data = ConvertLatencyChartData(result, lineName: "log count").Json;
+        var result = await ApiCaller.ApmService.GetLogChartAsync(query);       
+        chart.Data = ConvertLatencyChartData(result, lineName: "log count").Json;        
         chart.ChartLoading = false;
     }
 

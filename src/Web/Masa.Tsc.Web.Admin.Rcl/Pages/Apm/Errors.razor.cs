@@ -9,10 +9,10 @@ public partial class Errors
 
     private List<DataTableHeader<ErrorMessageDto>> headers => new()
     {
-        new() { Text = I18n.Apm("Error.List.LastTime"), Value = nameof(ErrorMessageDto.LastTime) },
-        new() { Text = I18n.Apm("Error.List.Type"), Value = nameof(ErrorMessageDto.Type)},
-        new() { Text = I18n.Apm("Error.List.Message"), Value =nameof(ErrorMessageDto.Message)},
-        new() { Text = I18n.Apm("Error.List.Total"), Value = nameof(ErrorMessageDto.Total)}
+        new() { Text = I18n.Apm(nameof(ErrorMessageDto.LastTime)), Value = nameof(ErrorMessageDto.LastTime) },
+        new() { Text = I18n.Apm(nameof(ErrorMessageDto.Type)), Value = nameof(ErrorMessageDto.Type)},
+        new() { Text = I18n.Apm(nameof(ErrorMessageDto.Message)), Value =nameof(ErrorMessageDto.Message)},        
+        new() { Text = I18n.Apm(nameof(ErrorMessageDto.Total)), Value = nameof(ErrorMessageDto.Total)}
     };
 
     private int defaultSize = 50;
@@ -35,7 +35,7 @@ public partial class Errors
             sortBy = default;
         await LoadASync();
     }
-
+    
     private async Task OnPageChange((int page, int pageSize) pageData)
     {
         page = pageData.page;
@@ -68,7 +68,7 @@ public partial class Errors
             Env = Search.Enviroment,
             IsDesc = sortBy,
             Service = Search.Service,
-            Queries = Search.Text
+            Queries=Search.Text
         };
         var result = await ApiCaller.ApmService.GetErrorsPageAsync(query);
         data.Clear();

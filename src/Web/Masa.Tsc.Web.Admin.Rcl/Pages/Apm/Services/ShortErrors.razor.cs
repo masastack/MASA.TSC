@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Utils.Security.Cryptography;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services;
 
 public partial class ShortErrors
@@ -16,9 +18,9 @@ public partial class ShortErrors
 
     private List<DataTableHeader<ErrorMessageDto>> headers => new()
     {
-        new() { Text = I18n.Apm("Error.List.Type"), Value = nameof(ErrorMessageDto.Type)},
-        new() { Text = I18n.Apm("Error.List.LastTime"), Value = nameof(ErrorMessageDto.LastTime) },
-        new() { Text = I18n.Apm("Error.List.Total"), Value = nameof(ErrorMessageDto.Total)}
+        new() { Text = I18n.Apm(nameof(ErrorMessageDto.Type)), Value = nameof(ListChartData.Name)},
+        new() { Text = I18n.Apm(nameof(ErrorMessageDto.LastTime)), Value = nameof(ListChartData.Latency) },
+        new() { Text = I18n.Apm(nameof(ErrorMessageDto.Total)), Value = nameof(ListChartData.Throughput)}
     };
 
     private int defaultSize = 5;

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using System.Text;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Shared.Apm;
 
 public partial class ApmComponentBase : BDomComponentBase, IAsyncDisposable

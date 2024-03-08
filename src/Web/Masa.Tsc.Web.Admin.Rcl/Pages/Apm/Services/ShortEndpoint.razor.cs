@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Utils.Security.Cryptography;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services;
 
 public partial class ShortEndpoint
@@ -13,10 +15,10 @@ public partial class ShortEndpoint
 
     private List<DataTableHeader<ListChartData>> headers => new()
     {
-        new() { Text = I18n.Apm("Endpoint.List.Name"), Value = nameof(ListChartData.Name)},
-        new() { Text = I18n.Apm("Endpoint.List.Latency"), Value = nameof(ListChartData.Latency) },
-        new() { Text = I18n.Apm("Endpoint.List.Throughput"), Value = nameof(ListChartData.Throughput)},
-        new() { Text = I18n.Apm("Endpoint.List.Failed"), Value = nameof(ListChartData.Failed)}
+        new() { Text = I18n.Apm(nameof(ListChartData.Name)), Value = nameof(ListChartData.Name)},
+        new() { Text = I18n.Apm(nameof(ListChartData.Latency)), Value = nameof(ListChartData.Latency) },
+        new() { Text = I18n.Apm(nameof(ListChartData.Throughput)), Value = nameof(ListChartData.Throughput)},
+        new() { Text = I18n.Apm(nameof(ListChartData.Failed)), Value = nameof(ListChartData.Failed)}
     };
 
     private int defaultSize = 5;

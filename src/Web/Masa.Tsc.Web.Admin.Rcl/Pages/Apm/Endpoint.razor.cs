@@ -8,11 +8,11 @@ public partial class Endpoint
     protected override bool IsPage => true;
     private List<DataTableHeader<ListChartData>> headers => new()
     {
-        new() { Text = I18n.Apm("Endpoint.List.Name"), Value = nameof(ListChartData.Name) },
-        new() { Text = I18n.Apm("Endpoint.List.Service"), Value =nameof(ListChartData.Service)},
-        new() { Text = I18n.Apm("Endpoint.List.Latency"), Value = nameof(ListChartData.Latency)},
-        new() { Text = I18n.Apm("Endpoint.List.Throughput"), Value = nameof(ListChartData.Throughput)},
-        new() { Text = I18n.Apm("Endpoint.List.Failed"), Value = nameof(ListChartData.Failed)}
+        new() { Text = I18n.Apm(nameof(ListChartData.Name)), Value = nameof(ListChartData.Name) },
+        new() { Text = I18n.Apm(nameof(ListChartData.Service)), Value =nameof(ListChartData.Service)},
+        new() { Text = I18n.Apm(nameof(ListChartData.Latency)), Value = nameof(ListChartData.Latency)},
+        new() { Text = I18n.Apm(nameof(ListChartData.Throughput)), Value = nameof(ListChartData.Throughput)},
+        new() { Text = I18n.Apm(nameof(ListChartData.Failed)), Value = nameof(ListChartData.Failed)}
     };
 
     private int defaultSize = 50;
