@@ -12,7 +12,7 @@
     <div class="d-flex mb-4">
         @if (ShowEnv)
         {
-            <SAutoComplete Label="@I18n.T("Search.Enviroment")"
+            <SAutoComplete Label="@I18n.Apm("Search.Enviroment")"
                            Clearable
                            Items="enviroments"
                            TItem="string"
@@ -44,7 +44,7 @@
                            Disabled="isServiceLoading"
                            Small
                            HideSelected=false
-                           Label="@I18n.T("Service")"
+                           Label="@I18n.Apm("Search.Service")"
                            BackgroundColor="white"
                            Loading="isServiceLoading"
                            Clearable
@@ -55,7 +55,7 @@
         @if (ShowComparison)
         {
             <SAutoComplete Placeholder="@I18n.Apm("Comparison")"
-                           Label="@I18n.T("Comparison")"
+                           Label="@I18n.Apm("Search.Comparison")"
                            Clearable
                            BackgroundColor="white"
                            Items="listComparisons"
@@ -84,7 +84,7 @@
         }
         @if (ShowButton)
         {
-            <SButton OnClick="OnValueChanged" Color="white my-auto ml-auto rounded-2"><SIcon Small Class="pr-2">mdi-refresh</SIcon>@I18n.Apm("Refresh")</SButton>
+            <SButton OnClick="OnValueChanged" Color="white my-auto ml-auto rounded-2"><SIcon Small Class="pr-2">mdi-refresh</SIcon>@I18n.Apm("Search.Refresh")</SButton>
         }
     </div>
 }

@@ -11,20 +11,20 @@
                 <SSearch BackgroundColor="white" @bind-Value="search" Class="rounded-2" Style="border:solid 1px;width:100%" />
                 @if (!string.IsNullOrEmpty(LinkUrl))
                 {
-                    <div class="blue rouned-lg blue rounded-lg pt-2 px-2 my-1 mx-4"> <a href="@LinkUrl" class="white--text" style="text-decoration:none" target="_blank">Span logs</a></div>
+                    <div class="blue rouned-lg blue rounded-lg pt-2 px-2 my-1 mx-4"> <a href="@LinkUrl" class="white--text" style="text-decoration:none" target="_blank">@I18n.Apm("Trace.Detail.SpanLog")</a></div>
                 }
             </div>
             <MSimpleTable Style="width:100%" Height="610" FixedHeader>
                 <thead>
                     <tr>
                         <th class="text-left">
-                            Actions
+                            @I18n.Apm("Log.Dialog.Actions")
                         </th>
                         <th class="text-left">
-                            Field
+                            @I18n.Apm("Log.Dialog.Field")
                         </th>
                         <th class="text-left">
-                            Value
+                            @I18n.Apm("Log.Dialog.Value")
                         </th>
                     </tr>
                 </thead>

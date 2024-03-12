@@ -4,7 +4,7 @@
 <MCard Class="rounded-lg mt-4" Style="border:solid #ccc 1px;min-height:600px;">
     <MCardSubtitle>
         <div class="d-flex justify-start">
-            <div class="font-weight-black pr-4">Trace sample</div>
+            <div class="font-weight-black pr-4">@I18n.Apm("Trace.Detail.Sample")</div>
             <ApmSamplePage Current="Page" Total="Total" CurrentChanged="LoadPageAsync" />
         </div>
         <div class="d-flex justify-space-between">
@@ -24,7 +24,7 @@
             <div class="d-flex">
                 @if (!string.IsNullOrEmpty(traceLinkUrl))
                 {
-                    <div class="blue rounded-lg py-2 px-2 my-0 mx-4"> <a href="@traceLinkUrl" class="white--text" style="text-decoration:none" target="_blank">Trace logs</a></div>
+                    <div class="blue rounded-lg py-2 px-2 my-0 mx-4"> <a href="@traceLinkUrl" class="white--text" style="text-decoration:none" target="_blank">@I18n.Apm("Trace.Detail.TraceLog")</a></div>
                 }
             </div>
         </div>
