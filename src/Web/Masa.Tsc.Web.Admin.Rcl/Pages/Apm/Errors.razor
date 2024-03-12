@@ -1,7 +1,7 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm
 @inherits ApmComponentBase
 @page "/apm/errors"
-<PageTitle>@I18n.Apm("Apm.Errors")</PageTitle>
+<PageTitle>@I18n.Apm("PageTitles.Error")</PageTitle>
 
 <ApmSearchComponent ShowButton
                     ShowEnv
@@ -32,12 +32,7 @@
         else if (context.Header.Value == nameof(ErrorMessageDto.Message))
         {
             <div style="width:400px;overflow:hidden" class="text-truncate">
-                @* <a target="_blank"
-                   style="text-decoration:none"
-                   href="@($"/apm/error?service={Search.Service}&env={Search.Enviroment}&start={Search.Start.ToString("yyyy-MM-dd HH:mm:ss")}&end={Search.End.ToString("yyyy-MM-dd HH:mm:ss")}&ex_type={context.Item.Type.ToUrlSafe()}&ex_msg={context.Item.Message.ToUrlSafe()}")"
-                   title="@context.Item.Message"> *@
-                    @context.Item.Message
-                @* </a> *@
+                @context.Item.Message
             </div>
         }
         else if (context.Header.Value == nameof(ErrorMessageDto.LastTime))

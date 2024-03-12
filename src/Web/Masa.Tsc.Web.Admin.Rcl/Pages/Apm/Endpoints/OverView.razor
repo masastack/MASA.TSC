@@ -4,9 +4,9 @@
 <div class="mx-4">
     <MCard Class="rounded-lg mt-4" Height="256" Style="border:solid #ccc 1px">
         <MCardSubtitle Class="d-flex">
-            <div class="font-weight-black h6 ml-4 mt-2">Latency</div>
+            <div class="font-weight-black h6 ml-4 mt-2">@I18n.Apm("Chart.Latency")</div>
             <div class="ml-4">
-                <SSelect Placeholder="@I18n.T("Search.Enviroment")"
+                <SSelect Placeholder="@I18n.Apm("Search.Enviroment")"
                          Items="metricTypes"
                          TItem="(MetricTypes,string)"
                          TValue="MetricTypes"
@@ -31,7 +31,7 @@
         <div class="col-4 rounded-lg" style="border:solid #ccc 1px;height:354px">
             <MCard>
                 <MCardSubtitle Class="font-weight-black h6">
-                    Thought
+                    @I18n.Apm("Chart.Thought")
                 </MCardSubtitle>
                 <MCardText>
                     @if (!throughput.ChartLoading && throughput.HasChart)
@@ -45,7 +45,7 @@
             <div style="border:solid #ccc 1px;height:354px" class="rounded-lg ml-4">
                 <MCard>
                     <MCardSubtitle Class="font-weight-black h6">
-                        Failed
+                        @I18n.Apm("Chart.Failed")
                     </MCardSubtitle>
                     <MCardText>
                         @if (!failed.ChartLoading && failed.HasChart)
@@ -60,7 +60,7 @@
             <div style="border:solid #ccc 1px;height:354px" class="rounded-lg ml-4">
                 <MCard>
                     <MCardSubtitle Class="font-weight-black h6">
-                        Time spent spans
+                        @I18n.Apm("Chart.SpanKinds")
                     </MCardSubtitle>
                     <MCardText>
                         @if (!throughput.ChartLoading && throughput.HasChart)
@@ -74,7 +74,7 @@
     </div>
     <MCard Class="rounded-lg mt-4" Style="border:solid #ccc 1px">
         <MCardSubtitle Class="d-flex">
-            <div class="font-weight-black h6">Latency distribution</div>
+            <div class="font-weight-black h6">@I18n.Apm("Chart.LatencyDistribution")</div>
         </MCardSubtitle>
         <MCardText>
             @if (!timeTypeCount.ChartLoading && timeTypeCount.HasChart)

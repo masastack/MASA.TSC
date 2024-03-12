@@ -4,9 +4,9 @@
 <div class="mx-4">
     <MCard Class="rounded-lg mt-4" Height="256" Style="border:solid #ccc 1px">
         <MCardSubtitle Class="d-flex">
-            <div class="font-weight-black h6 ml-4 mt-2">Latency</div>
+            <div class="font-weight-black h6 ml-4 mt-2">@I18n.Apm("Chart.Latency")</div>
             <div class="ml-4">
-                <SSelect Placeholder="@I18n.T("Search.Enviroment")"
+                <SSelect Placeholder="@I18n.T("Service.Detail.MetricTypes")"
                          Items="metricTypes"
                          TItem="(MetricTypes,string)"
                          TValue="MetricTypes"
@@ -35,7 +35,7 @@
         <div class="col-4 rounded-lg pa-0" style="border:solid #ccc 1px;height:354px">
             <MCard>
                 <MCardSubtitle Class="font-weight-black h6 py-2">
-                    Thought
+                    @I18n.Apm("Chart.Thought")
                 </MCardSubtitle>
                 <MCardText>
                     @if (!throughput.ChartLoading && throughput.HasChart)
@@ -49,7 +49,7 @@
             <div style="border:solid #ccc 1px;height:354px" class="rounded-lg ml-4 ma-0">
                 <MCard>
                     <MCardSubtitle Class="font-weight-black h6 py-2">
-                        Failed
+                        @I18n.Apm("Chart.Failed")
                     </MCardSubtitle>
                     <MCardText>
                         @if (!throughput.ChartLoading && throughput.HasChart)
@@ -64,7 +64,7 @@
             <div style="border:solid #ccc 1px;height:354px" class="rounded-lg ml-4 ma-0">
                 <MCard>
                     <MCardSubtitle Class="font-weight-black h6 copy_text py-2">
-                        Time spent spans
+                        @I18n.Apm("Chart.SpanKinds")
                     </MCardSubtitle>
                     <MCardText>
                         @if (!throughput.ChartLoading && throughput.HasChart)

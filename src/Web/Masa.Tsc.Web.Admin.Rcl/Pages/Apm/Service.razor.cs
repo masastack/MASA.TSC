@@ -9,11 +9,11 @@ public partial class Service
 
     private List<DataTableHeader<ListChartData>> headers => new()
     {
-        new() { Text = I18n.Apm(nameof(ListChartData.Name)), Value = nameof(ListChartData.Name)},
-        new() { Text = I18n.Apm(nameof(ListChartData.Envs)), Value =nameof(ListChartData.Envs)},
-        new() { Text = I18n.Apm(nameof(ListChartData.Latency)), Value = nameof(ListChartData.Latency) },
-        new() { Text = I18n.Apm(nameof(ListChartData.Throughput)), Value = nameof(ListChartData.Throughput)},
-        new() { Text = I18n.Apm(nameof(ListChartData.Failed)), Value = nameof(ListChartData.Failed)}
+        new() { Text = I18n.Apm("Service.List.Name"), Value = nameof(ListChartData.Name)},
+        new() { Text = I18n.Apm("Service.List.Envs"), Value =nameof(ListChartData.Envs)},
+        new() { Text = I18n.Apm("Service.List.Latency"), Value = nameof(ListChartData.Latency) },
+        new() { Text = I18n.Apm("Service.List.Throughput"), Value = nameof(ListChartData.Throughput)},
+        new() { Text = I18n.Apm("Service.List.Failed"), Value = nameof(ListChartData.Failed)}
     };
 
     private int defaultSize = 50;

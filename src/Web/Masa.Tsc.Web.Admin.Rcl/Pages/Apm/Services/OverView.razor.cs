@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Utils.Security.Cryptography;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services;
 
 public partial class OverView
@@ -49,11 +47,11 @@ public partial class OverView
         };
         if (SearchData.ComparisonType == ApmComparisonTypes.Day)
         {
-            query.ComparisonType = Contrib.StackSdks.Tsc.Apm.Clickhouse.Models.ComparisonTypes.DayBefore;
+            query.ComparisonType = ComparisonTypes.DayBefore;
         }
         else if (SearchData.ComparisonType == ApmComparisonTypes.Week)
         {
-            query.ComparisonType = Contrib.StackSdks.Tsc.Apm.Clickhouse.Models.ComparisonTypes.WeekBefore;
+            query.ComparisonType = ComparisonTypes.WeekBefore;
         }
         var data = await ApiCaller.ApmService.GetChartsAsync(query);
         if (data != null && data.Any())
@@ -66,9 +64,9 @@ public partial class OverView
                 throughput = new();
                 failed = new();
 
-                metricTypeChartData.Avg.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime().ToString("yyyy/MM/dd HH:mm:ss"), item => item.Latency, unit: "ms", lineName: "Average").Json;
-                metricTypeChartData.P95.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime().ToString("yyyy/MM/dd HH:mm:ss"), item => item.P95, unit: "ms", lineName: "95th percentile").Json;
-                metricTypeChartData.P99.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime().ToString("yyyy/MM/dd HH:mm:ss"), item => item.P99, unit: "ms", lineName: "99th percentile").Json;
+                metricTypeChartData.Avg.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime().ToString("yyyy/MM/dd HH:mm:ss"), item => item.Latency, unit: "ms", lineName: I18n.Apm("Chart.Average")).Json;
+                metricTypeChartData.P95.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime().ToString("yyyy/MM/dd HH:mm:ss"), item => item.P95, unit: "ms", lineName: I18n.Apm("Chart.p95")).Json;
+                metricTypeChartData.P99.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime().ToString("yyyy/MM/dd HH:mm:ss"), item => item.P99, unit: "ms", lineName: I18n.Apm("Chart.p99")).Json;
                 throughput.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime().ToString("yyyy/MM/dd HH:mm:ss"), item => item.Throughput, unit: "tpm").Json;
                 failed.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime().ToString("yyyy/MM/dd HH:mm:ss"), item => item.Failed, unit: "%").Json;
 

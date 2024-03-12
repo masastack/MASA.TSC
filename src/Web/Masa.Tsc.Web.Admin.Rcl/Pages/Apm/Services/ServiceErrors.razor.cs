@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Utils.Security.Cryptography;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services;
 
 public partial class ServiceErrors
@@ -15,9 +13,9 @@ public partial class ServiceErrors
 
     private List<DataTableHeader<ErrorMessageDto>> headers => new()
     {
-        new() { Text = I18n.Apm(nameof(ErrorMessageDto.Type)), Value = nameof(ErrorMessageDto.Type)},
-        new() { Text = I18n.Apm(nameof(ErrorMessageDto.LastTime)), Value = nameof(ErrorMessageDto.LastTime) },
-        new() { Text = I18n.Apm(nameof(ErrorMessageDto.Total)), Value = nameof(ErrorMessageDto.Total)}
+        new() { Text = I18n.Apm("Error.List.Type"), Value = nameof(ErrorMessageDto.Type)},
+        new() { Text = I18n.Apm("Error.List.LastTime"), Value = nameof(ErrorMessageDto.LastTime) },
+        new() { Text = I18n.Apm("Error.List.Total"), Value = nameof(ErrorMessageDto.Total)}
     };
 
     private int defaultSize = 5;
@@ -43,11 +41,7 @@ public partial class ServiceErrors
         await LoadASync();
         StateHasChanged();
     }
-
-    private void OpenAsync(ErrorMessageDto item)
-    {
-    }
-
+  
     protected override async Task OnParametersSetAsync()
     {
         var key = MD5Utils.Encrypt(JsonSerializer.Serialize(SearchData));
@@ -90,7 +84,7 @@ public partial class ServiceErrors
             IsDesc = sortBy
         };
         var result = await ApiCaller.ApmService.GetErrorChartAsync(query);
-        chart.Data = ConvertLatencyChartData(result, lineName: "error count").Json;
+        chart.Data = ConvertLatencyChartData(result, lineName: I18n.Apm("Chart.ErrorCount")).Json;
         chart.ChartLoading = false;
     }
 
