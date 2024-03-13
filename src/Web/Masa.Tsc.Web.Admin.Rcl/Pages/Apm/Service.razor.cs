@@ -46,9 +46,6 @@ public partial class Service
 
     private async Task LoadASync(SearchData data = null!)
     {
-        var d = 1.7343;
-        var t = (int)d;
-
         isTableLoading = true;
         if (data != null)
             Search = data;

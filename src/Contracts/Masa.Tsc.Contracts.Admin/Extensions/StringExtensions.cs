@@ -22,4 +22,9 @@ public static class StringExtensions
 
         return false;
     }
+
+    public static DateTime ParseTime(this string str)
+    {
+        return DateTime.TryParse(str, out var time) ? time : DateTime.MinValue;
+    }
 }

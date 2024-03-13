@@ -21,9 +21,9 @@ public class TraceService : ServiceBase
         return query.Result;
     }
 
-    private async Task<string> GetTraceIdByMetricAsync([FromServices] IEventBus eventBus, string service, string url, DateTime start, DateTime end)
+    private async Task<string> GetTraceIdByMetricAsync([FromServices] IEventBus eventBus, string service, string url, string start, string end)
     {
-        var query = new TraceIdByMetricQuery(service, url, start, end);
+        var query = new TraceIdByMetricQuery(service, url, start.ParseTime(), end.ParseTime());
         await eventBus.PublishAsync(query);
         return query.Result;
     }
@@ -49,9 +49,9 @@ public class TraceService : ServiceBase
         return query.Result!;
     }
 
-    public async Task<IEnumerable<TraceResponseDto>> GetNextAsync([FromServices] IEventBus eventBus, string service, string traceId, DateTime time, string url, bool isNext)
+    public async Task<IEnumerable<TraceResponseDto>> GetNextAsync([FromServices] IEventBus eventBus, string service, string traceId, string time, string url, bool isNext)
     {
-        var query = new TraceDetailNextQuery(service, traceId, time, url, isNext);
+        var query = new TraceDetailNextQuery(service, traceId, time.ParseTime(), url, isNext);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
