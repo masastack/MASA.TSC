@@ -1,0 +1,75 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm
+@inherits ApmComponentBase
+@page "/apm/logs"
+<PageTitle>@I18n.Apm("PageTitles.Log")</PageTitle>
+
+<ApmSearchComponent ShowButton
+                    ShowEnv
+                    ShowText
+                    ShowTime
+                    ShowService
+                    Value="Search"
+                    ValueChanged="LoadASync" />
+<SDataTable Headers="headers"
+            Stripe
+            Width="@("120%")"
+            FixedHeader
+            ServerItemsLength="total"
+            ItemsPerPage="defaultSize"
+            Items="data"
+            TItem="LogResponseDto"
+            Loading="@isTableLoading"
+            OnOptionsUpdate="OnTableOptionsChanged">
+    <ItemColContent>
+        @if (context.Header.Value == nameof(LogResponseDto.Timestamp))
+        {
+            <div class="d-flex justify-space-between">
+                <SIcon OnClick="@(() => OpenAsync(context.Item))" Class="pr-2" Size="18" Tooltip="@I18n.T("Detail")">mdi-arrow-top-right-bottom-left</SIcon>
+                @context.Item.Timestamp.UtcFormatLocal(CurrentTimeZone)
+            </div>
+        }
+        else if (context.Header.Value == nameof(LogResponseDto.Body))
+        {
+            <div style="width:400px;overflow:hidden" class="text-truncate">
+                @context.Item.Body
+            </div>
+        }
+        else if (context.Header.Value == "Resource.service.namespace")
+        {
+            @context.Item.Resource["service.namespace"]
+        }
+        else if (context.Header.Value == "Resource.service.name")
+        {
+            @context.Item.Resource["service.name"]
+        }
+        else if (context.Header.Value == nameof(LogResponseDto.SeverityText))
+        {
+            @context.Item.SeverityText
+        }
+        else if (context.Header.Value == nameof(LogResponseDto.TraceId))
+        {
+            @context.Item.TraceId
+        }
+        else if (context.Header.Value == nameof(LogResponseDto.SpanId))
+        {
+            @context.Item.SpanId
+        }
+        else if (context.Header.Value == "Attributes.exception.type" && context.Item.Attributes.ContainsKey("exception.type"))
+        {
+            @context.Item.Attributes["exception.type"]
+        }
+    </ItemColContent>
+</SDataTable>
+
+<MCard Rounded=true Class="px-6 py-2" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
+    <SPagination Class="mt-2" @bind-Page="page" @bind-PageSize=defaultSize Total=total OnChange="OnPageChange" />
+</MCard>
+
+<style>
+    .m-data-table .m-data-table__wrapper {
+        height: calc(100vh - 290px)
+    }
+</style>
+
+
+<ApmLogView Value="current" @bind-Show="dialogShow" />

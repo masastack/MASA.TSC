@@ -1,0 +1,70 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm
+@inherits ApmComponentBase
+
+<div class="@($"slide {(Show ? "slide_in" : "slide_out")}")">
+    <MCard>
+        <MCardSubtitle Class="d-flex justify-end">
+            <SIcon OnClick="CloseAsync" Small Tooltip="@I18n.T("Close")">mdi-close</SIcon>
+        </MCardSubtitle>
+        <MCardText>
+            <div class="d-flex">
+                <SSearch BackgroundColor="white" @bind-Value="search" Class="rounded-2" Style="border:solid 1px;width:100%" />                
+            </div>
+            <MSimpleTable Height="610" FixedHeader Width="@("100%")">
+                <thead>
+                    <tr>
+                        <th class="text-left" style="width:5%">
+                            @I18n.Apm("Log.Dialog.Actions")
+                        </th>
+                        <th class="text-left" style="width:15%">
+                            @I18n.Apm("Log.Dialog.Field")
+                        </th>
+                        <th class="text-left">
+                            @I18n.Apm("Log.Dialog.Value")
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @((RenderFragment)(dictRender => RenderTable(dictRender, _dic!)))
+                </tbody>
+            </MSimpleTable>
+        </MCardText>
+    </MCard>
+</div>
+
+@code {
+
+    private void RenderTable(RenderTreeBuilder __builder, IDictionary<string, object> dic, string? parent = null)
+    {
+        if (dic == null || !dic.Any())
+            return;
+        foreach (var key in dic.Keys)
+        {
+            var currentName = string.IsNullOrEmpty(parent) ? key : $"{parent}.{key}";
+
+            var isShow = string.IsNullOrEmpty(search) || currentName.Contains(search, StringComparison.CurrentCultureIgnoreCase);
+
+            var value = dic[key];
+            if (IsFundamental(value.GetType()) || value.GetType().Equals(typeof(JsonElement)))
+            {
+                if (!isShow) continue;
+                if (value is DateTime time)
+                    value = time.UtcFormatLocal(CurrentTimeZone, "yyyy-MM-dd HH:mm:ss fff");
+                <tr>
+                    <td></td>
+                    <td>@currentName</td>
+                    <td><div class="text-wrap">@value</div></td>
+                </tr>
+            }
+            else if (value is IDictionary<string, object> dicValue)
+            {
+                RenderTable(__builder, dicValue, currentName);
+            }
+        }
+    }
+
+    private static bool IsFundamental(Type type)
+    {
+        return type.IsPrimitive || type.IsEnum || type.Equals(typeof(string)) || type.Equals(typeof(DateTime));
+    }
+}

@@ -31,13 +31,12 @@ public class QueryHandler : EnvQueryHandler
             Keyword = queryData.Query,
             Page = 1,
             PageSize = 1,
-            Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = !queryData.IsDesc }
+            Sort = new FieldOrderDto { Name = StorageConst.Timestimap(ConfigConst.IsElasticsearch, ConfigConst.IsClickhouse), IsDesc = !queryData.IsDesc }
         };
 
         var env = GetServiceEnvironmentName(string.Empty!);
         query.SetEnv(env);
         var data = await _logService.ListAsync(query);
-
         queryData.Result = data?.Result?.FirstOrDefault()!;
     }
 
@@ -45,8 +44,7 @@ public class QueryHandler : EnvQueryHandler
     public async Task GetMappingAsync(LogFieldQuery query)
     {
         query.Result = await _logService.GetMappingAsync();
-        if (query.Result == null)
-            query.Result = Array.Empty<MappingResponseDto>();
+        query.Result ??= Array.Empty<MappingResponseDto>();
     }
 
     [EventHandler]
@@ -95,13 +93,14 @@ public class QueryHandler : EnvQueryHandler
             RawQuery = isRawQuery ? queryData.Query! : string.Empty,
             Page = queryData.Page,
             PageSize = queryData.Size,
-            Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = queryData.IsDesc },
+            Sort = new FieldOrderDto { Name = string.IsNullOrEmpty(queryData.SortField) ? StorageConst.Timestimap(ConfigConst.IsElasticsearch, ConfigConst.IsClickhouse) : queryData.SortField, IsDesc = queryData.IsDesc },
             Conditions = conditions
         };
-        if (!isSkipEnv && !isRawQuery)
+        if (!isSkipEnv)
         {
-            var env = GetServiceEnvironmentName(queryData.Service!);
-            query.SetEnv(env);
+            var env = queryData.Env == null ? GetServiceEnvironmentName(queryData.Service!) : queryData.Env;
+            if (!string.IsNullOrEmpty(env))
+                query.SetEnv(env,true);
         }
 
         var data = await _logService.ListAsync(query);

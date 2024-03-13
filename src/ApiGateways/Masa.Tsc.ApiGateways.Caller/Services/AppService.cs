@@ -3,9 +3,9 @@
 
 namespace Masa.Tsc.ApiGateways.Caller.Services;
 
-public class AppService : BaseService
+public sealed class AppService : BaseService
 {
-    public AppService(ICaller caller) : base(caller, "/api/app") { }
+    internal AppService(ICaller caller) : base(caller, "/api/app") { }
 
     public async Task<List<AppDto>> GetAppsAsync(string projectId) => await Caller.GetAsync<List<AppDto>>($"{RootPath}?projectId={projectId}") ?? default!;
 

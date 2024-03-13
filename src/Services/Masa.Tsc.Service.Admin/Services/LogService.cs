@@ -36,14 +36,14 @@ public class LogService : ServiceBase
 
     private async Task<PaginatedListBase<LogResponseDto>> GetPageAsync([FromServices] IEventBus eventBus, LogPageQueryDto param)
     {
-        var query = new LogsQuery(param.Query, param.Start, param.End, param.Page, param.PageSize, param.IsDesc, JobTaskId: param.TaskId, SpanId: param.SpanId, Service: param.Service, LogLevel: param.LogLevel);
+        var query = new LogsQuery(param.Query, param.Start, param.End, param.Page, param.PageSize, param.IsDesc, param.SortField, JobTaskId: param.TaskId, SpanId: param.SpanId, Service: param.Service, LogLevel: param.LogLevel, Env: param.Env);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
     public async Task<List<LogErrorDto>> GetErrorTypesAsync([FromServices] IEventBus eventBus, string service, DateTime start, DateTime end)
     {
-        var query = new LogErrorTypesQuery(service,start,end);
+        var query = new LogErrorTypesQuery(service, start, end);
         await eventBus.PublishAsync(query);
         return query.Result;
     }

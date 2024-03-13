@@ -22,4 +22,12 @@ public class RequestTraceListDto : Pagination<RequestTraceListDto>
     public bool IsDesc { get; set; } = true;
 
     public bool IsError { get; set; }
+
+    public string Env { get; set; }
+
+    public int? LatMin { get; set; }
+
+    public int? LatMax { get; set; }
+
+    public string SpanId { get; set; }
 }

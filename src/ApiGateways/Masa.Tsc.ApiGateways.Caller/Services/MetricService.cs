@@ -3,11 +3,11 @@
 
 namespace Masa.Tsc.ApiGateways.Caller.Services;
 
-public class MetricService : BaseService
+public sealed class MetricService : BaseService
 {
     static JsonSerializerOptions options;
 
-    public MetricService(ICaller caller) : base(caller, "/api/metric")
+    internal MetricService(ICaller caller) : base(caller, "/api/metric")
     {
         if (options == null)
         {

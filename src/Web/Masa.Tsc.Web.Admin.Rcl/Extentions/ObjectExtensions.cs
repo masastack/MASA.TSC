@@ -31,6 +31,7 @@ public static class ObjectExtensions
 
         return dictionary;
     }
+
     public static T Random<T>(this IEnumerable<T> source)
     {
         return source.ToArray()[System.Random.Shared.Next(source.Count())];
@@ -44,5 +45,78 @@ public static class ObjectExtensions
     private static void ThrowExceptionWhenSourceArgumentIsNull()
     {
         throw new UserFriendlyException("Unable to convert anonymous object to a dictionary. The source anonymous object is null.");
+    }
+
+    public static string FormatTime(this double millionSeconds)
+    {
+        if (millionSeconds <= 1)
+            return "<1ms";
+        if (millionSeconds - 1000 < 0)
+            return $"{millionSeconds:0.##}ms";
+        if (millionSeconds - 60_000 < 0)
+            return $"{millionSeconds / 1000:0.##} s";
+        var minis = (long)millionSeconds / 60_000;
+        var seconds = ((long)millionSeconds % 60_000) / 1000;
+        return $"{minis} min{(seconds > 0 ? $"{seconds} s" : "")}";
+    }
+
+    public static string FormatHistory(this DateTime time)
+    {
+        var now = DateTime.UtcNow;
+        var timeSpan = now - time;
+        var days = (int)Math.Floor(timeSpan.TotalDays);
+        var housrs = timeSpan.Hours;
+        var minutes = timeSpan.Minutes;
+
+        int num = 0;
+        string unit = "";
+        if (days > 0)
+        {
+            if (days - 7 <= 0)
+            {
+                num = days;
+                unit = "day";
+            }
+            else if (days - 25 <= 0)
+            {
+                num = (days / 7) + (days % 7 > 0 ? 1 : 0);
+                unit = "week";
+            }
+            else if (days - 360 < 0)
+            {
+                num = (days / 30) + (days % 30 > 0 ? 1 : 0);
+                unit = "month";
+            }
+            else
+            {
+                num = (days / 365) + (days % 365 > 0 ? 1 : 0);
+                unit = "year";
+            }
+        }
+        else
+        {
+            if (housrs > 0)
+            {
+                num = housrs;
+                unit = "hour";
+            }
+            else if (minutes > 0)
+            {
+                num = minutes;
+                unit = "minute";
+            }
+            else
+            {
+                num = time.Second;
+                unit = "second";
+            }
+        }
+
+        return $"{num} {unit}{(num == 1 ? "" : "s")} ago";
+    }
+
+    public static string ToUrlSafe(this string s)
+    {
+        return s;
     }
 }

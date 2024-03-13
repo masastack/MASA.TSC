@@ -13,9 +13,13 @@ public class LogPageQueryDto : Pagination<LogPageQueryDto>
 
     public bool IsDesc { get; set; } = true;
 
+    public string SortField { get; set; }
+
     public string Duration { get; set; }
 
     public string SpanId { get; set; }
+
+    public string Env { get; set; }
 
     /// <summary>
     ///  scheduler job taskid

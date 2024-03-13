@@ -38,5 +38,31 @@
     "ThisMonthSoFar": "This month so far",
     "ThisYear": "This year",
     "ThisYearSoFar": "This year so far"
+  },
+  "Apm": {
+    "Tabs": {
+      "Stacktrace": "Exception stack trace"
+    },
+    "Error": {
+      "Detail": {
+        "Sample": "Error sample",
+        "Type": "Exception type",
+        "Message": "Exception message"
+      }
+    },
+    "Trace": {
+      "Detail": {
+        "Sample": "Trace sample"
+      }
+    },
+    "Chart": {
+      "SpanKinds": "Time span kinds",
+      "ErrorCount": "Error count",
+      "LogCount": "Log count",
+      "ErrorOccurrences": "Error occurrences",
+      "LatencyDistribution": "Latency distribution",
+      "p95": "95th percentile",
+      "p99": "99th percentile"
+    }
   }
 }

@@ -17,7 +17,7 @@ public class QueryHandler : EnvQueryHandler
         IMultiEnvironmentContext multiEnvironment) : base(masaStackConfig, environment, multiEnvironment)
     {
         _prometheusClient = masaPrometheusClient;
-        _multilevelCacheClient = multilevelCacheClientFactory.Create(masaStackConfig.GetServiceId(MasaStackProject.TSC));
+        _multilevelCacheClient = multilevelCacheClientFactory.Create($"{masaStackConfig.GetServiceId(MasaStackProject.TSC)}_{masaStackConfig.Environment}");
         _logger = logger;
     }
 
@@ -70,7 +70,7 @@ public class QueryHandler : EnvQueryHandler
             return;
         }
 
-        _logger.LogError("request failed {data.ErrorType} {data.Error}", data.ErrorType,data.Error);
+        _logger.LogError("request failed {data.ErrorType} {data.Error}", data.ErrorType, data.Error);
     }
 
     [EventHandler]

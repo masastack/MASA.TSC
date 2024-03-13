@@ -3,9 +3,9 @@
 
 namespace Masa.Tsc.ApiGateways.Caller.Services;
 
-public class LogService : BaseService
+public sealed class LogService : BaseService
 {
-    public LogService(ICaller caller) : base(caller, "/api/log") { }
+    internal LogService(ICaller caller) : base(caller, "/api/log") { }
 
     public async Task<TResult> AggregateAsync<TResult>(SimpleAggregateRequestDto model)
     {

@@ -6,6 +6,7 @@ await builder.Services.AddMasaStackConfigAsync(MasaStackProject.TSC, MasaStackAp
 var masaStackConfig = builder.Services.GetMasaStackConfig();
 var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus");
 var appid = masaStackConfig.GetServiceId(MasaStackProject.TSC);
+var envAppid = $"{appid}_{masaStackConfig.Environment}";
 builder.Services.AddTraceLog()
     .AddObservable(builder.Logging, new MasaObservableOptions
     {
@@ -37,7 +38,7 @@ builder.Services.AddTraceLog()
 builder.Services.AddIsolation(services => services.UseMultiEnvironment());
 builder.Services.AddDaprClient();
 //开启response stream读取
-builder.Services.Configure<KestrelServerOptions>(x =>x.AllowSynchronousIO = true);
+builder.Services.Configure<KestrelServerOptions>(x => x.AllowSynchronousIO = true);
 var redisOption = new RedisConfigurationOptions
 {
     Servers = new List<RedisServerOptions> {
@@ -57,8 +58,8 @@ string pmServiceUrl, authServiceUrl;
 
 #if DEBUG
 redis = AppSettings.GetModel<RedisConfigurationOptions>("LocalRedisOptions");
-pmServiceUrl = "https://pm-serviceiotdev.lonsid.cn";
-authServiceUrl = "https://auth-serviceiotdev.lonsid.cn";
+pmServiceUrl = "https://pm-service-iotdev.lonsid.cn";
+authServiceUrl = "https://auth-service-iotdev.lonsid.cn";
 builder.Services.AddDaprStarter(opt =>
 {
     opt.AppId = appid;
@@ -82,7 +83,7 @@ builder.Services.AddMasaIdentity(options =>
 }).AddAuthenticationCore()
     .AddAuthClient(authServiceUrl, redisOption)
     .AddPmClient(pmServiceUrl)
-    .AddMultilevelCache(appid,
+    .AddMultilevelCache(envAppid,
         distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
         multilevelCacheOptions =>
         {
