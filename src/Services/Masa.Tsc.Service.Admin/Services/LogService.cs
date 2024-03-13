@@ -41,9 +41,9 @@ public class LogService : ServiceBase
         return query.Result;
     }
 
-    public async Task<List<LogErrorDto>> GetErrorTypesAsync([FromServices] IEventBus eventBus, string service, DateTime start, DateTime end)
+    public async Task<List<LogErrorDto>> GetErrorTypesAsync([FromServices] IEventBus eventBus, string service, string start, string end)
     {
-        var query = new LogErrorTypesQuery(service, start, end);
+        var query = new LogErrorTypesQuery(service, start.ParseTime(), end.ParseTime());
         await eventBus.PublishAsync(query);
         return query.Result;
     }

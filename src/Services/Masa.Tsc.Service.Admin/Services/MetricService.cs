@@ -36,9 +36,9 @@ public class MetricService : ServiceBase
         return query.Result ?? string.Empty;
     }
 
-    public async Task<QueryResultDataResponse> GetQueryAsync([FromServices] IEventBus eventBus, [FromQuery] string query, [FromQuery] DateTime time)
+    public async Task<QueryResultDataResponse> GetQueryAsync([FromServices] IEventBus eventBus, [FromQuery] string query, [FromQuery] string time)
     {
-        var result = new InstantQuery(query, time);
+        var result = new InstantQuery(query, time.ParseTime());
         await eventBus.PublishAsync(result);
         return result.Result;
     }
