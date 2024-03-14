@@ -5,13 +5,11 @@ namespace Masa.Tsc.Service.Admin.Services;
 
 public class ApmService : ServiceBase
 {
-    private readonly IApmService apmService;
-    public ApmService(IApmService apmService) : base("/api/apm")
+    public ApmService() : base("/api/apm")
     {
-        this.apmService = apmService;
-    }   
+    }
 
-    public async Task<PaginatedListBase<ServiceListDto>> GetServices(int page, int pageSize, string start, string end, string? env, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
+    public async Task<PaginatedListBase<ServiceListDto>> GetServices([FromServices] IApmService apmService, int page, int pageSize, string start, string end, string? env, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
         => await apmService.ServicePageAsync(new BaseApmRequestDto
         {
             Start = start.ParseTime(),
@@ -26,7 +24,7 @@ public class ApmService : ServiceBase
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
         });
 
-    public async Task<PaginatedListBase<EndpointListDto>> GetEndpoints(int page, int pageSize, string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
+    public async Task<PaginatedListBase<EndpointListDto>> GetEndpoints([FromServices] IApmService apmService, int page, int pageSize, string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
         => await apmService.EndpointPageAsync(new BaseApmRequestDto
         {
             Start = start.ParseTime(),
@@ -42,7 +40,7 @@ public class ApmService : ServiceBase
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
         });
 
-    public async Task<IEnumerable<ChartLineDto>> GetCharts(string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries)
+    public async Task<IEnumerable<ChartLineDto>> GetCharts([FromServices] IApmService apmService, string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries)
         => await apmService.ChartDataAsync(new BaseApmRequestDto
         {
             Start = start.ParseTime(),
@@ -54,7 +52,7 @@ public class ApmService : ServiceBase
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
         });
 
-    public async Task<EndpointLatencyDistributionDto> GetLatencyDistributions(string start, string end, string? env, string? service, string endpoint)
+    public async Task<EndpointLatencyDistributionDto> GetLatencyDistributions([FromServices] IApmService apmService, string start, string end, string? env, string? service, string endpoint)
         => await apmService.EndpointLatencyDistributionAsync(new ApmEndpointRequestDto
         {
             Start = start.ParseTime(),
@@ -65,7 +63,7 @@ public class ApmService : ServiceBase
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
         });
 
-    public async Task<PaginatedListBase<ErrorMessageDto>> GetErrors(int page, int pageSize, string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
+    public async Task<PaginatedListBase<ErrorMessageDto>> GetErrors([FromServices] IApmService apmService, int page, int pageSize, string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
         => await apmService.ErrorMessagePageAsync(new ApmEndpointRequestDto
         {
             Start = start.ParseTime(),
@@ -79,7 +77,7 @@ public class ApmService : ServiceBase
             Service = service
         });
 
-    public Task<IEnumerable<ChartPointDto>> GetSpanErrors(int page, int pageSize, string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
+    public Task<IEnumerable<ChartPointDto>> GetSpanErrors([FromServices] IApmService apmService, int page, int pageSize, string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
         => apmService.GetTraceErrorsAsync(new ApmEndpointRequestDto
         {
             Start = start.ParseTime(),
@@ -93,7 +91,7 @@ public class ApmService : ServiceBase
             Service = service
         });
 
-    public async Task<PaginatedListBase<TraceResponseDto>> GetTraceDetail(int page, string start, string end, string? env, string? service, string endpoint, long? latMin, long? latMax)
+    public async Task<PaginatedListBase<TraceResponseDto>> GetTraceDetail([FromServices] IApmService apmService, int page, string start, string end, string? env, string? service, string endpoint, long? latMin, long? latMax)
         => await apmService.TraceLatencyDetailAsync(new ApmTraceLatencyRequestDto
         {
             Start = start.ParseTime(),
@@ -106,7 +104,7 @@ public class ApmService : ServiceBase
             LatMin = latMin
         });
 
-    public async Task<IEnumerable<ChartLineCountDto>> GetErrorChart(string start, string end, string? env, string? service, string? endpoint, ComparisonTypes? comparisonType, string? queries)
+    public async Task<IEnumerable<ChartLineCountDto>> GetErrorChart([FromServices] IApmService apmService, string start, string end, string? env, string? service, string? endpoint, ComparisonTypes? comparisonType, string? queries)
          => await apmService.GetErrorChartAsync(new ApmEndpointRequestDto
          {
              Start = start.ParseTime(),
@@ -119,7 +117,7 @@ public class ApmService : ServiceBase
              StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
          });
 
-    public async Task<IEnumerable<ChartLineCountDto>> GetLogChart(string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries)
+    public async Task<IEnumerable<ChartLineCountDto>> GetLogChart([FromServices] IApmService apmService, string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries)
         => await apmService.GetLogChartAsync(new ApmEndpointRequestDto
         {
             Start = start.ParseTime(),
