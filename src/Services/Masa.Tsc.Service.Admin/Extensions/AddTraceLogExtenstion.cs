@@ -22,8 +22,7 @@ public static class AddTraceLogExtenstion
     {
         if (ConfigConst.StorageConst.HasInit || !ConfigConst.IsClickhouse) return;
         if (string.IsNullOrEmpty(ConfigConst.ClikhouseConnection)) return;
-        //_services.AddMASAStackClickhouse(ConfigConst.ClikhouseConnection, ConfigConst.LogIndex, ConfigConst.TraceIndex, ConfigConst.ClickHouseLogSourceTable, ConfigConst.ClickHouseTaceSourceTable);
-        _services.AddMASAStackApmClickhouse("Compress=False;Compressor=lz4;CheckCompressedHash=False;SocketTimeout=10000;Host=10.130.0.19;Port=3806;User=apptest;Password=Apptest@123;Database=otel_test", ConfigConst.LogIndex, ConfigConst.TraceIndex, ConfigConst.ClickHouseLogSourceTable, ConfigConst.ClickHouseTaceSourceTable);
+        _services.AddMASAStackClickhouse(ConfigConst.ClikhouseConnection, ConfigConst.LogIndex, ConfigConst.TraceIndex, ConfigConst.ClickHouseLogSourceTable, ConfigConst.ClickHouseTaceSourceTable);        
         ConfigConst.StorageConst.SetClickhouse();
     }
 
