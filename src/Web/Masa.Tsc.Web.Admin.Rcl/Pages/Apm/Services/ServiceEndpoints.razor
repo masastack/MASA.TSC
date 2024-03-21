@@ -42,7 +42,7 @@
                 @if (context.Header.Value == nameof(ListChartData.Name))
                 {
                     <div style="width:400px;overflow:hidden" class="text-truncate">
-                        <a href="/apm/endpoint@(GetUrlParam(service: context.Item.Service, env: GetSearchEnv(SearchData.Enviroment, context.Item.Envs?.Split(',')),endpoint:context.Item.Endpoint, comparisonType: SearchData.ComparisonType, start: SearchData.Start, end: SearchData.End))"
+                        <a href="/apm/endpoints/@(HttpUtility.UrlEncode(context.Item.Name)+GetUrlParam(service: context.Item.Service, env: GetSearchEnv(SearchData.Enviroment, context.Item.Envs?.Split(',')),endpoint:context.Item.Endpoint, comparisonType: SearchData.ComparisonType, start: SearchData.Start, end: SearchData.End))"
                            title="@context.Item.Name">@context.Item.Name</a>
                     </div>
                 }

@@ -21,7 +21,7 @@ public partial class ApmComponentBase : BDomComponentBase, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        base.Dispose(true);
+        //base.Dispose(true);
         await Task.CompletedTask;
     }
 

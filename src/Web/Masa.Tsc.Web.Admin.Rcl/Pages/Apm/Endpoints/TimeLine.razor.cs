@@ -126,7 +126,6 @@ public partial class TimeLine
                 Children = GetChildren(item.SpanId, traces)
             };
             timeLine.SetValue(item, start, end, totalDuration, errorStatus);
-            timeLine.SetChildren();
             var spanError = Errors?.FirstOrDefault(t => t.X == item.SpanId);
             if (spanError != null)
             {
@@ -157,7 +156,6 @@ public partial class TimeLine
                 Children = GetChildren(item.SpanId, traces)
             };
             timeLine.SetValue(item, start, end, totalDuration, errorStatus);
-            timeLine.SetChildren();
             result.Add(timeLine);
         }
         return result;
@@ -255,7 +253,7 @@ public partial class TimeLine
         lastDuration = totalDuration;
     }
 
-    private string GetUrl(TreeLineDto current, bool isSpan = false,string baseUrl= "/apm/logs")
+    private string GetUrl(TreeLineDto current, bool isSpan = false, string baseUrl = "/apm/logs")
     {
         if (current == null)
             return string.Empty;
@@ -267,6 +265,21 @@ public partial class TimeLine
     {
         var url = GetUrl(item, true, "/apm/errors");
         await JSRuntime.InvokeVoidAsync("open", url, "_blank");
+    }
+
+    private static string GetClassStyle(TreeLineDto timeLine)
+    {
+        var left = timeLine.Left + timeLine.Process;
+        if (left - 65 <= 0)
+        {
+            if (timeLine.Left - 35 <= 0)
+                return "class=\"d-flex\"";
+            return $"class=\"d-flex\" style=\"padding-left:{timeLine.Left}\"";
+        }
+        else
+        {
+            return $"class=\"d-flex justify-end\" style=\"padding-right:{timeLine.Right}\"";
+        }        
     }
 
     private StringNumber index = 1;
@@ -325,11 +338,11 @@ public class TreeLineDto
 
     public TraceResponseDto Trace { get; set; }
 
-    public double Left { get; set; }
+    public int Left { get; set; }
 
-    public double Right { get; set; }
+    public int Right { get; set; }
 
-    public double Process { get; set; }
+    public int Process { get; set; }
 
     public bool Show { get; set; } = true;
 
@@ -386,25 +399,21 @@ public class TreeLineDto
             Faild = true;
         }
 
-        Left = Math.Round(Math.Floor((trace.Timestamp - start).TotalMilliseconds) * 100 / total, 2);
-        Process = Math.Round(Math.Floor((trace.EndTimestamp - trace.Timestamp).TotalMilliseconds) * 100 / total, 2);
-        //if (Process - 10 < 0) Process = 10;
-        Right = 100 - Left - Process;
-    }
-
-    public void SetChildren()
-    {
-        if (Children == null || !Children.Any())
-            return;
-
-        double right = 100;
-
-        foreach (var item in Children)
+        Left = (int)Math.Floor(Math.Floor((trace.Timestamp - start).TotalMilliseconds) * 100 / total);
+        Process = (int)Math.Floor(Math.Floor((trace.EndTimestamp - trace.Timestamp).TotalMilliseconds) * 100 / total);
+        if (Process - 1 < 0) Process = 1;
+        if (Process + Left - 100 > 0)
         {
-            item.Left = Left + Process - item.Process;
-            right -= (item.Left + item.Process);
+            Left = 100 - Process;
         }
-        var lastChild = Children[Children.Count - 1];
-        lastChild.Right = right;
+        else
+        {
+            Right = 100 - Left - Process;
+            if (Right < 0)
+            {
+                Right = 0;
+                Left = 100 - Process;
+            }
+        }
     }
 }
