@@ -1,6 +1,6 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm
 @inherits ApmComponentBase
-@page "/apm/endpoint"
+@page "/apm/endpoints/{name}"
 <PageTitle>@I18n.Apm("PageTitles.EndpointDetail")</PageTitle>
 
 <ApmSearchComponent ShowService
@@ -16,7 +16,7 @@
     <MTab Value="2">@I18n.Apm("Tabs.Errors")</MTab>
 </MTabs>
 <CascadingValue Value="Search">
-    <div style="height:calc(100vh - 224px)" class="overflow-y-scroll">
+    <div style="height:calc(100vh - 280px)" class="overflow-y-scroll">
         <MTabsItems @bind-Value="index" Class="rounded-b-xl">
             <MTabItem Value="1">
                 <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints.OverView />

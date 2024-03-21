@@ -400,3 +400,7 @@ div[style*="visibility: hidden; opacity: 0;"] {
 .edit .m-slide-group__content {
     cursor: move;
 }
+
+.m-breadcrumbs__item {
+    max-width: 600px !important
+}

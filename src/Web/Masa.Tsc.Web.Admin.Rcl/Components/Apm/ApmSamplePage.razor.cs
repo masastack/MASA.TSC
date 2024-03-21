@@ -26,7 +26,7 @@ public partial class ApmSamplePage
 
     private async Task OnPreAsync()
     {
-        if (Current - 1 < 0)
+        if (Current - 1 <= 0)
             return;
 
         Current -= 1;
