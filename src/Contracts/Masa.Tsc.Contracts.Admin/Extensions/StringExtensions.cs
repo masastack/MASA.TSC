@@ -23,8 +23,12 @@ public static class StringExtensions
         return false;
     }
 
-    public static DateTime ParseTime(this string str)
+    public static DateTime ParseUTCTime(this string str)
     {
-        return DateTime.TryParse(str, out var time) ? time : DateTime.MinValue;
+        if (DateTime.TryParse(str, out var time))
+        {
+            return new DateTimeOffset(time, TimeSpan.Zero).DateTime;
+        }
+        return DateTime.MinValue;
     }
 }

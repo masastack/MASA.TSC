@@ -20,15 +20,18 @@ public partial class ErrorDetail
 
     string search = string.Empty;
     IDictionary<string, object> _dic = null;
+    bool loading = true;
 
     string exceptionType;
     string exceptionMessage;
 
     private async Task OnLoadAsync(SearchData data)
     {
+        loading = true;
         Search = data;
         await LoadChartDataAsync();
         await ChangeRecordAsync();
+        loading = false;
     }
 
     protected override void OnInitialized()
@@ -67,7 +70,8 @@ public partial class ErrorDetail
             Page = currentPage,
             Query = Search.Text,
             Start = Search.Start,
-            End = Search.End
+            End = Search.End,
+            IsLimitEnv = false
         });
         total = (int)result.Total;
         currentLog = result.Result[0];
@@ -95,8 +99,10 @@ public partial class ErrorDetail
 
     private async Task ChangePageAsync(int page)
     {
+        loading = true;
         currentPage = page;
         await ChangeRecordAsync();
+        loading = false;
     }
 
     private async Task ChangeRecordAsync()
@@ -121,7 +127,7 @@ public partial class ErrorDetail
         errorChart.ChartLoading = false;
     }
 
-    private static EChartType ConvertLatencyChartData(List<ChartLineCountDto> data, string lineColor = null, string areaLineColor = null, string? unit = null, string? lineName = null)
+    private EChartType ConvertLatencyChartData(List<ChartLineCountDto> data, string lineColor = null, string areaLineColor = null, string? unit = null, string? lineName = null)
     {
         var chart = EChartConst.Line;
         chart.SetValue("tooltip", new { trigger = "axis" });
@@ -137,7 +143,7 @@ public partial class ErrorDetail
         //if (data != null && data.Any())
         {
             chart.SetValue("xAxis", new object[] {
-                new { type="category",boundaryGap=false,data=data?.Select(item=>item.Name)}
+                new { type="category",boundaryGap=false,data=data?.Select(item=>item.Currents.First().Time.ToDateTime(CurrentTimeZone).Format()) }
             });
             chart.SetValue($"series[0]", new { name = $"{lineName}", type = "line", smooth = true, areaStyle = new { }, lineStyle = new { width = 1 }, symbol = "none", data = data?.Select(item => item.Currents.First().Value) });
         }

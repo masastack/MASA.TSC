@@ -10,7 +10,9 @@ public record LogsQuery(string Query, DateTime Start, DateTime End, int Page = 1
     string? SpanId = null,
     string? Service = null,
     string? Env = null,
-    string? LogLevel = null) : Query<PaginatedListBase<LogResponseDto>>
+    string? LogLevel = null,
+    bool IsLimitEnv = false
+    ) : Query<PaginatedListBase<LogResponseDto>>
 {
     public override PaginatedListBase<LogResponseDto> Result { get; set; }
 }

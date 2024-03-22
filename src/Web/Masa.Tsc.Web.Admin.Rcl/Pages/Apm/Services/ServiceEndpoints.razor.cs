@@ -113,12 +113,13 @@ public partial class ServiceEndpoints
     {
         if (data.Count == 0)
             return;
-        var query = new BaseApmRequestDto
+        var query = new ApmEndpointRequestDto
         {
             Page = page,
             PageSize = defaultSize,
             Start = SearchData.Start,
             End = SearchData.End,
+            Endpoint = "",
             Service = SearchData.Service,
             Env = SearchData.Enviroment
         };
@@ -130,7 +131,7 @@ public partial class ServiceEndpoints
 
         foreach (var service in data)
         {
-            var chartData = result.FirstOrDefault(s => s.Name == service.Name);
+            var chartData = result.FirstOrDefault(s => s.Name == service.Endpoint);
             service.LatencyChartData = new();
             service.ThroughputChartData = new();
             service.FailedChartData = new();

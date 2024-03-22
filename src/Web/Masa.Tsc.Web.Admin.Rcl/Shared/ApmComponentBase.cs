@@ -117,7 +117,7 @@ public partial class ApmComponentBase : BDomComponentBase, IAsyncDisposable
          string? search = default)
     {
         StringBuilder text = new StringBuilder();
-        if (!string.IsNullOrEmpty(service))
+        if (!string.IsNullOrEmpty(env))
             text.AppendFormat("&env={0}", HttpUtility.UrlEncode(env));
         if (!string.IsNullOrEmpty(service))
             text.AppendFormat("&service={0}", HttpUtility.UrlEncode(service));
@@ -133,7 +133,7 @@ public partial class ApmComponentBase : BDomComponentBase, IAsyncDisposable
             text.AppendFormat("&ex_type={0}", HttpUtility.UrlEncode(exType));
         if (!string.IsNullOrEmpty(traceId))
             text.AppendFormat("&traceId={0}", HttpUtility.UrlEncode(traceId));
-        if (!string.IsNullOrEmpty(traceId))
+        if (!string.IsNullOrEmpty(spanId))
             text.AppendFormat("&spanId={0}", HttpUtility.UrlEncode(spanId));
         if (!string.IsNullOrEmpty(search))
             text.AppendFormat("&search={0}", HttpUtility.UrlEncode(search));

@@ -23,7 +23,7 @@
     <ItemColContent>
         @if (context.Header.Value == nameof(LogResponseDto.Timestamp))
         {
-            <div class="d-flex justify-space-between">
+            <div class="d-flex justify-start">
                 <SIcon OnClick="@(() => OpenAsync(context.Item))" Class="pr-2" Size="18" Tooltip="@I18n.T("Detail")">mdi-arrow-top-right-bottom-left</SIcon>
                 @context.Item.Timestamp.UtcFormatLocal(CurrentTimeZone)
             </div>

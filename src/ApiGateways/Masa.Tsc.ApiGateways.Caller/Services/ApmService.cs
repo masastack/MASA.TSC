@@ -17,7 +17,7 @@ public sealed class ApmService : BaseService
 
     public Task<PaginatedListBase<TraceResponseDto>> GetTraceDetailAsync(ApmTraceLatencyRequestDto query) => Caller.GetAsync<PaginatedListBase<TraceResponseDto>>($"{RootPath}/traceDetail", data: query)!;
 
-    public Task<List<ChartLineDto>> GetChartsAsync(BaseApmRequestDto query) => Caller.GetAsync<List<ChartLineDto>>($"{RootPath}/charts", data: query)!;
+    public Task<List<ChartLineDto>> GetChartsAsync(ApmEndpointRequestDto query) => Caller.GetAsync<List<ChartLineDto>>($"{RootPath}/charts", data: query)!;
 
     public Task<List<ChartLineCountDto>> GetErrorChartAsync(ApmEndpointRequestDto query) => Caller.GetAsync<List<ChartLineCountDto>>($"{RootPath}/errorChart", data: query)!;
 
