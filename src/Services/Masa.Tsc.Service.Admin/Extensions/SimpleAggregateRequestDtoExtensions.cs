@@ -19,9 +19,9 @@ internal static class BaseRequestDtoExtensions
         }
     }
 
-    public static void SetEnv(this BaseRequestDto dto, string envName, bool isMust = false)
+    public static void SetEnv(this BaseRequestDto dto, string envName, bool isMustService = true)
     {
-        if (!isMust || string.IsNullOrEmpty(dto.Service))
+        if (isMustService && string.IsNullOrEmpty(dto.Service))
             return;
 
         var list = dto.Conditions?.ToList() ?? new();

@@ -115,7 +115,7 @@ public partial class ShortEndpoint
     {
         if (data.Count == 0)
             return;
-        var query = new BaseApmRequestDto
+        var query = new ApmEndpointRequestDto
         {
             Page = page,
             PageSize = defaultSize,

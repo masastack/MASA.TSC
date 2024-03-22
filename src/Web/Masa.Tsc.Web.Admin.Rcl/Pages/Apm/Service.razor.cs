@@ -92,7 +92,7 @@ public partial class Service
     {
         if (data.Count == 0)
             return;
-        var query = new BaseApmRequestDto
+        var query = new ApmEndpointRequestDto
         {
             Page = page,
             PageSize = defaultSize,

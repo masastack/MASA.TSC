@@ -27,7 +27,7 @@ public partial class TimeLine
     public EventCallback<int> PageChanged { get; set; }
 
     private string? lastKey = default;
-    private bool loading = false;
+    private bool loading = true;
     private int totalDuration = 0;
     private int stepDuration = 0;
     private int lastDuration = 0;
@@ -57,8 +57,10 @@ public partial class TimeLine
         var key = MD5Utils.Encrypt(str);
         if (lastKey != key)
         {
+            loading = true;
             lastKey = key;
-            LoadData();
+            CaculateTimelines(Data);
+            loading = false;
         }
         base.OnParametersSet();
     }
@@ -67,14 +69,6 @@ public partial class TimeLine
     {
         errorStatus = await ApiCaller.TraceService.GetErrorStatusAsync();
         await base.OnInitializedAsync();
-    }
-
-    private void LoadData()
-    {
-        if (loading) return;
-        loading = true;
-        CaculateTimelines(Data);
-        loading = false;
     }
 
     private void CaculateTimelines(List<TraceResponseDto>? traces)
@@ -164,6 +158,7 @@ public partial class TimeLine
     private async Task LoadPageAsync(int page)
     {
         Page = page;
+        loading = true;
         if (PageChanged.HasDelegate)
             await PageChanged.InvokeAsync(Page);
     }
@@ -267,19 +262,9 @@ public partial class TimeLine
         await JSRuntime.InvokeVoidAsync("open", url, "_blank");
     }
 
-    private static string GetClassStyle(TreeLineDto timeLine)
+    private async Task OpenTraceLogAsync()
     {
-        var left = timeLine.Left + timeLine.Process;
-        if (left - 65 <= 0)
-        {
-            if (timeLine.Left - 35 <= 0)
-                return "class=\"d-flex\"";
-            return $"class=\"d-flex\" style=\"padding-left:{timeLine.Left}\"";
-        }
-        else
-        {
-            return $"class=\"d-flex justify-end\" style=\"padding-right:{timeLine.Right}\"";
-        }        
+        await JSRuntime.InvokeVoidAsync("open", traceLinkUrl, "_blank");
     }
 
     private StringNumber index = 1;

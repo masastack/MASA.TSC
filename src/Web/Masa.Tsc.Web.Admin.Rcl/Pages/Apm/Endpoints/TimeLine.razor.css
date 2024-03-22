@@ -12,7 +12,7 @@
         }
 
     time_line .left, time_line .right, .time_line .process {
-        height: 20px;
+        height: 16px;
     }
 
     .time_line .process {

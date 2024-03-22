@@ -29,4 +29,6 @@ public class LogPageQueryDto : Pagination<LogPageQueryDto>
     public string Service { get; set; }
 
     public string LogLevel { get; set; }
+
+    public bool IsLimitEnv { get; set; } = true;
 }

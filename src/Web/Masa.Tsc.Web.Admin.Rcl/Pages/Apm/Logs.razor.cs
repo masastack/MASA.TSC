@@ -96,7 +96,8 @@ public partial class Logs
             PageSize = defaultSize,
             IsDesc = sortBy ?? false,
             SortField = sortFiled!,
-            Query = Search.Text
+            Query = Search.Text,
+            IsLimitEnv=false
         };
         var result = await ApiCaller.LogService.GetPageAsync(query);
         data.Clear();

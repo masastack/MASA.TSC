@@ -41,7 +41,7 @@ public partial class ServiceErrors
         await LoadASync();
         StateHasChanged();
     }
-  
+
     protected override async Task OnParametersSetAsync()
     {
         var key = MD5Utils.Encrypt(JsonSerializer.Serialize(SearchData));
@@ -110,7 +110,7 @@ public partial class ServiceErrors
         isTableLoading = false;
     }
 
-    private static EChartType ConvertLatencyChartData(List<ChartLineCountDto> data, string lineColor = null, string areaLineColor = null, string? unit = null, string? lineName = null)
+    private EChartType ConvertLatencyChartData(List<ChartLineCountDto> data, string lineColor = null, string areaLineColor = null, string? unit = null, string? lineName = null)
     {
         var chart = EChartConst.Line;
         chart.SetValue("tooltip", new { trigger = "axis" });
@@ -126,7 +126,7 @@ public partial class ServiceErrors
         //if (data != null && data.Any())
         {
             chart.SetValue("xAxis", new object[] {
-                new { type="category",boundaryGap=false,data=data?.Select(item=>item.Name)}
+                new { type="category",boundaryGap=false,data=data?.Select(item=>item.Currents.First().Time.ToDateTime(CurrentTimeZone).Format()) }
             });
             chart.SetValue($"series[0]", new { name = $"{lineName}", type = "line", smooth = true, areaStyle = new { }, lineStyle = new { width = 1 }, symbol = "none", data = data?.Select(item => item.Currents.First().Value) });
         }

@@ -1,7 +1,7 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints
 @inherits ApmComponentBase
 
-<MCard Class="rounded-lg mt-4" Style="border:solid #ccc 1px;min-height:600px;">
+<MCard Class="rounded-lg mt-4" Style="border:solid #ccc 1px;min-height:600px;" Loading="loading">
     <MCardSubtitle>
         <div class="d-flex justify-start">
             <div class="font-weight-black pr-4">@I18n.Apm("Trace.Detail.Sample")</div>
@@ -24,7 +24,10 @@
             <div class="d-flex">
                 @if (!string.IsNullOrEmpty(traceLinkUrl))
                 {
-                    <div class="blue rounded-lg py-2 px-2 my-0 mx-4"> <a href="@traceLinkUrl" class="white--text" style="text-decoration:none" target="_blank">@I18n.Apm("Trace.Detail.TraceLog")</a></div>
+                    <SButton Class="white--text blue darken-1"
+                             Style="text-transform: none"
+                             BorderRadiusClass="rounded-lg"
+                             OnClick="OpenTraceLogAsync">@I18n.Apm("Trace.Detail.TraceLog")</SButton>
                 }
             </div>
         </div>
@@ -67,15 +70,14 @@
         {
             var left = timeLine.Left + timeLine.Process;
             string className = "d-flex", style = null;
-            if (timeLine.Left - 35 > 0)
+            if (timeLine.Left - 65 < 0)
             {
-                if (timeLine.Right -35> 0)
-                    style = $"padding-left:{timeLine.Left}%";
-                else
-                {
-                    className = "d-flex justify-end";
-                    style = $"padding-right:{timeLine.Right}%";
-                }
+                style = $"padding-left:{timeLine.Left}%";
+            }
+            else if (35 - timeLine.Process - timeLine.Right >= 0)
+            {
+                className = "d-flex justify-end";
+                style = $"padding-right:{timeLine.Right}%";
             }
 
             <div class="time_line d-flex justify-space-between">
@@ -86,7 +88,7 @@
                     }
                 </div>
                 <div style="width:calc(100% - 100px)">
-                    <div class="d-flex my-2">
+                    <div class="d-flex mt-2">
                         <div class="left" style="width:@timeLine.Left%"></div>
                         <div @onclick="(()=>ShowTraceDetail(timeLine))" class="process" title="@timeLine.Label" style="width:@timeLine.Process%"></div>
                         <div class="right" style="width:@timeLine.Right%"></div>

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using System;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm;
 
 public partial class ApmSearchComponent
@@ -60,11 +62,14 @@ public partial class ApmSearchComponent
 
     protected override void OnInitialized()
     {
-        Search.ComparisonType = ApmComparisonTypes.Day;
         base.OnInitialized();
-        if (string.IsNullOrEmpty(Search.Enviroment) && string.IsNullOrEmpty(Search.Service) && !string.IsNullOrEmpty(UserContext.Environment))
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (string.IsNullOrEmpty(uri.Query))
         {
-            Search.Enviroment = UserContext.Environment;
+            if (string.IsNullOrEmpty(Search.Enviroment) && string.IsNullOrEmpty(Search.Service) && !string.IsNullOrEmpty(UserContext.Environment))
+                Search.Enviroment = UserContext.Environment;
+            if (Search.ComparisonType == ApmComparisonTypes.None)
+                Search.ComparisonType = ApmComparisonTypes.Day;
         }
     }
 

@@ -24,7 +24,7 @@
             }
         </MCardText>
     </MCard>
-    <MCard Class="rounded-lg mt-4 pt-4" Style="border:solid #ccc 1px">
+    <MCard Class="rounded-lg mt-4 pt-4" Style="border:solid #ccc 1px" Loading="loading">
         <MCardSubtitle>
             <div class="d-flex justify-start">
                 <div class="font-weight-black pr-4">@I18n.Apm("Error.Detail.Sample")</div>
@@ -51,11 +51,11 @@
             </div>
         </MCardSubtitle>
         <MCardText>
-            <MTabs FixedTabs @bind-Value="index" Class="rounded-t-xl">
+            <MTabs @bind-Value="index" Class="rounded-t-xl">
                 <MTab Value="1">@I18n.Apm("Tabs.Stacktrace")</MTab>
                 <MTab Value="2">@I18n.Apm("Tabs.Metadata")</MTab>
             </MTabs>
-            <MTabsItems @bind-Value="index">
+            <MTabsItems Value="index">
                 <MTabItem Value="1">
                     <div class="ex_content_stacktrace subtitle-1 pl-8 py-4">@currentLog?.Attributes["exception.stacktrace"]</div>
                 </MTabItem>
@@ -65,7 +65,7 @@
                             <div class="d-flex">
                                 <SSearch BackgroundColor="white" @bind-Value="search" Class="rounded-2" Style="border:solid 1px;width:100%" />
                             </div>
-                            <MSimpleTable Height="560" FixedHeader Width="@("100%")" Dense >
+                            <MSimpleTable Height="560" FixedHeader Width="@("100%")" Dense>
                                 <thead>
                                     <tr>
                                         <th class="text-left">

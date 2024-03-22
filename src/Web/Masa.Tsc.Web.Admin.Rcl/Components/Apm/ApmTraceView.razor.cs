@@ -5,6 +5,9 @@ namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm;
 
 public partial class ApmTraceView
 {
+    [Inject]
+    IJSRuntime JSRuntime { get; set; }
+
     [Parameter]
     public object Value { get; set; }
 
@@ -50,5 +53,10 @@ public partial class ApmTraceView
     private void OnSeach(string value)
     {
         search = value;
+    }
+
+    private async Task OpenLogAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("open", LinkUrl, "_blank");
     }
 }

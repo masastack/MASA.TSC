@@ -104,7 +104,8 @@ public partial class ServiceLogs
             Service = SearchData.Service!,
             Page = page,
             Env = SearchData.Enviroment!,
-            PageSize = defaultSize
+            PageSize = defaultSize,
+            IsLimitEnv = false
         };
         var result = await ApiCaller.LogService.GetPageAsync(query);
         data.Clear();
@@ -115,7 +116,7 @@ public partial class ServiceLogs
         total = (int)result.Total;
     }
 
-    private static EChartType ConvertLatencyChartData(List<ChartLineCountDto> data, string lineColor = null, string areaLineColor = null, string? unit = null, string? lineName = null)
+    private EChartType ConvertLatencyChartData(List<ChartLineCountDto> data, string lineColor = null, string areaLineColor = null, string? unit = null, string? lineName = null)
     {
         var chart = EChartConst.Line;
         chart.SetValue("tooltip", new { trigger = "axis" });
@@ -124,7 +125,7 @@ public partial class ServiceLogs
             chart.SetValue("legend", new { data = new string[] { $"{lineName}" }, bottom = "2%" });
         }
         chart.SetValue("xAxis", new object[] {
-            new { type="category",boundaryGap=false,data=data?.Select(item=>item.Name)}
+            new { type="category",boundaryGap=false,data=data?.Select(item=>item.Currents.First().Time.ToDateTime(CurrentTimeZone).Format()) }
         });
         chart.SetValue("yAxis", new object[] {
             new {type="value",axisLabel=new{formatter=$"{{value}} {unit}" } }

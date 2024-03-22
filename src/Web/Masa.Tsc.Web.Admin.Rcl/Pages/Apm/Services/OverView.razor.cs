@@ -37,7 +37,7 @@ public partial class OverView
 
     private async Task LoadDataAsync()
     {
-        var query = new BaseApmRequestDto
+        var query = new ApmEndpointRequestDto
         {
             Start = SearchData.Start,
             End = SearchData.End,
@@ -64,11 +64,11 @@ public partial class OverView
                 throughput = new();
                 failed = new();
 
-                metricTypeChartData.Avg.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime().ToString("yyyy/MM/dd HH:mm:ss"), item => item.Latency, unit: "ms", lineName: I18n.Apm("Chart.Average")).Json;
-                metricTypeChartData.P95.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime().ToString("yyyy/MM/dd HH:mm:ss"), item => item.P95, unit: "ms", lineName: I18n.Apm("Chart.p95")).Json;
-                metricTypeChartData.P99.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime().ToString("yyyy/MM/dd HH:mm:ss"), item => item.P99, unit: "ms", lineName: I18n.Apm("Chart.p99")).Json;
-                throughput.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime().ToString("yyyy/MM/dd HH:mm:ss"), item => item.Throughput, unit: "tpm").Json;
-                failed.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime().ToString("yyyy/MM/dd HH:mm:ss"), item => item.Failed, unit: "%").Json;
+                metricTypeChartData.Avg.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Latency, unit: "ms", lineName: I18n.Apm("Chart.Average")).Json;
+                metricTypeChartData.P95.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.P95, unit: "ms", lineName: I18n.Apm("Chart.p95")).Json;
+                metricTypeChartData.P99.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.P99, unit: "ms", lineName: I18n.Apm("Chart.p99")).Json;
+                throughput.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Throughput, unit: "tpm").Json;
+                failed.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Failed, unit: "%").Json;
 
                 metricTypeChartData.Avg.ChartLoading = false;
                 metricTypeChartData.P95.ChartLoading = false;

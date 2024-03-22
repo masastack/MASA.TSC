@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Model;
+
 namespace Masa.Tsc.Service.Admin.Application.Logs;
 
 public class QueryHandler : EnvQueryHandler
@@ -98,9 +100,13 @@ public class QueryHandler : EnvQueryHandler
         };
         if (!isSkipEnv)
         {
-            var env = queryData.Env == null ? GetServiceEnvironmentName(queryData.Service!) : queryData.Env;
+            var env = queryData.Env;
+            if (queryData.IsLimitEnv)
+            {
+                env = GetServiceEnvironmentName(queryData.Service!);
+            }            
             if (!string.IsNullOrEmpty(env))
-                query.SetEnv(env,true);
+                query.SetEnv(env, queryData.IsLimitEnv);
         }
 
         var data = await _logService.ListAsync(query);

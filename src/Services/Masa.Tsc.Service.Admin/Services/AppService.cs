@@ -19,7 +19,7 @@ public class AppService : ServiceBase
 
     public async Task<long> GetErrorCountAsync([FromServices] IEventBus eventBus, string appid, string start, string end)
     {
-        var query = new AppErrorCountQuery(appid, start.ParseTime(), end.ParseTime());
+        var query = new AppErrorCountQuery(appid, start.ParseUTCTime(), end.ParseUTCTime());
         await eventBus.PublishAsync(query);
         return query.Result;
     }

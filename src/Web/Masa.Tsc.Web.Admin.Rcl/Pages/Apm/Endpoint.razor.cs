@@ -91,12 +91,13 @@ public partial class Endpoint
     {
         if (data.Count == 0)
             return;
-        var query = new BaseApmRequestDto
+        var query = new ApmEndpointRequestDto
         {
             Page = page,
             PageSize = defaultSize,
             Start = Search.Start,
             End = Search.End,
+            Endpoint=Search.Endpoint!,
             Service = Search.Service,
             Env = Search.Enviroment
         };
