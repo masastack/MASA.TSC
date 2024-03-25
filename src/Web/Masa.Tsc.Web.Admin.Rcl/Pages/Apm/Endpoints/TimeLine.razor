@@ -57,6 +57,7 @@
         @((RenderFragment)(dictRender => RenderRootTimeLine(dictRender, timeLines)))
     </MCardText>
 </MCard>
+
 <ApmTraceView Value="currentTimeLine?.Trace" @bind-Show="showTraceDetail" LinkUrl="@spanLinkUrl" />
 
 @code {

@@ -1,26 +1,50 @@
 ﻿.slide_in {
-    transform: translateX(-100%);
-    margin-right: 16px;
+    animation-name: fadein;
 }
 
 .slide_out {
-    transform: translateX(0%);
-    transition: transform 0.5s ease-out;
-    display: none;
+    animation-name: fadeout;
+    transform: translateX(1100px);
 }
 
 .slide {
     position: fixed;
-    z-index: 10;
-    top: 154px;
-    right: -994px;
+    z-index: 99999;
+    top: 96px;
+    right: 0px;
     width: 1000px;
-    height: calc(100vh - 154px);
+    height: calc(100vh - 96px);
     border: solid 1px #ccc;
-    background-color: white
+    background-color: white;
+    animation-duration: 800ms;
 }
 
 .text-wrap {
     white-space: pre-line;
     line-height: 1.5rem;
+}
+
+
+@keyframes fadein {
+    0% {
+        opacity: 0;
+        transform: translateX(1100px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0px);
+    }
+}
+
+@keyframes fadeout {
+    0% {
+        opacity: 1;
+        transform: translateX(0px);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(1100px);
+    }
 }

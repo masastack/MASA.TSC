@@ -8,9 +8,9 @@
         </MCardSubtitle>
         <MCardText>
             <div class="d-flex">
-                <SSearch BackgroundColor="white" @bind-Value="search" Class="rounded-2" Style="border:solid 1px;width:100%" />                
+                <SSearch BackgroundColor="white" @bind-Value="search" Class="rounded-2" Style="border:solid 1px;width:100%" />
             </div>
-            <MSimpleTable Height="610" FixedHeader Width="@("100%")">
+            <MSimpleTable Height="@("calc(100vh - 200px)")" FixedHeader Width="@("100%")">
                 <thead>
                     <tr>
                         <th class="text-left" style="width:15%">
