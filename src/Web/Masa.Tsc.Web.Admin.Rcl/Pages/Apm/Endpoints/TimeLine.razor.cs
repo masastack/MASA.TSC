@@ -383,21 +383,27 @@ public class TreeLineDto
         {
             Faild = true;
         }
-
-        Left = (int)Math.Floor(Math.Floor((trace.Timestamp - start).TotalMilliseconds) * 100 / total);
-        Process = (int)Math.Floor(Math.Floor((trace.EndTimestamp - trace.Timestamp).TotalMilliseconds) * 100 / total);
-        if (Process - 1 < 0) Process = 1;
-        if (Process + Left - 100 > 0)
+        if (total == 0)
         {
-            Left = 100 - Process;
+            Process = 100;
         }
         else
         {
-            Right = 100 - Left - Process;
-            if (Right < 0)
+            Left = (int)Math.Floor(Math.Floor((trace.Timestamp - start).TotalMilliseconds) * 100 / total);
+            Process = (int)Math.Floor(Math.Floor((trace.EndTimestamp - trace.Timestamp).TotalMilliseconds) * 100 / total);
+            if (Process - 1 < 0) Process = 1;
+            if (Process + Left - 100 > 0)
             {
-                Right = 0;
                 Left = 100 - Process;
+            }
+            else
+            {
+                Right = 100 - Left - Process;
+                if (Right < 0)
+                {
+                    Right = 0;
+                    Left = 100 - Process;
+                }
             }
         }
     }
