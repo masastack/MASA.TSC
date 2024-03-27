@@ -42,7 +42,7 @@ public partial class ApmSearchComponent
         new (ApmComparisonTypes.Week, "Week before"),
     };
     private List<string> services = new();
-    private List<string> enviroments = new();
+    private List<string> environments = new();
     private bool isServiceLoading = true, isEnvLoading = true;
 
     private bool isCallQuery = false;
@@ -53,7 +53,7 @@ public partial class ApmSearchComponent
         await base.OnInitializedAsync();
         if (!isCallQuery && Search.Start > DateTime.MinValue)
         {
-            await LoadEnviromentAsync();
+            await LoadEnvironmentAsync();
             await LoadServiceAsync();
             await OnValueChanged();
             isCallQuery = true;
@@ -66,8 +66,8 @@ public partial class ApmSearchComponent
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         if (string.IsNullOrEmpty(uri.Query))
         {
-            if (string.IsNullOrEmpty(Search.Enviroment) && string.IsNullOrEmpty(Search.Service) && !string.IsNullOrEmpty(UserContext.Environment))
-                Search.Enviroment = UserContext.Environment;
+            if (string.IsNullOrEmpty(Search.Environment) && string.IsNullOrEmpty(Search.Service) && !string.IsNullOrEmpty(UserContext.Environment))
+                Search.Environment = UserContext.Environment;
             if (Search.ComparisonType == ApmComparisonTypes.None)
                 Search.ComparisonType = ApmComparisonTypes.Day;
         }
@@ -84,13 +84,13 @@ public partial class ApmSearchComponent
             Name = StorageConst.ServiceName,
             Type = AggregateTypes.GroupBy
         };
-        if (!string.IsNullOrEmpty(Search.Enviroment) && Search.Enviroment != "All")
+        if (!string.IsNullOrEmpty(Search.Environment) && Search.Environment != "All")
         {
             query.Conditions = new List<FieldConditionDto> {
                 new FieldConditionDto{
                     Name=StorageConst.Environment,
                     Type= ConditionTypes.Equal,
-                    Value=Search.Enviroment
+                    Value=Search.Environment
                 }
             };
         }
@@ -101,7 +101,7 @@ public partial class ApmSearchComponent
         isServiceLoading = false;
     }
 
-    private async Task LoadEnviromentAsync()
+    private async Task LoadEnvironmentAsync()
     {
         if (!ShowEnv) return;
         isEnvLoading = true;
@@ -113,9 +113,9 @@ public partial class ApmSearchComponent
             Type = AggregateTypes.GroupBy
         };
         var result = await ApiCaller.TraceService.AggregateAsync<IEnumerable<string>>(query);
-        enviroments = result?.ToList() ?? new List<string>();
-        if (!string.IsNullOrEmpty(Search.Enviroment) && !enviroments.Contains(Search.Enviroment))
-            Search.Enviroment = default!;
+        environments = result?.ToList() ?? new List<string>();
+        if (!string.IsNullOrEmpty(Search.Environment) && !environments.Contains(Search.Environment))
+            Search.Environment = default!;
         isEnvLoading = false;
     }
 
@@ -129,14 +129,14 @@ public partial class ApmSearchComponent
     {
         Search.Start = times.start!.Value.UtcDateTime;
         Search.End = times.end!.Value.UtcDateTime;
-        await LoadEnviromentAsync();
+        await LoadEnvironmentAsync();
         await LoadServiceAsync();
         await OnValueChanged();
     }
 
-    private async Task OnEnviromentChanged(string env)
+    private async Task OnEnvironmentChanged(string env)
     {
-        Search.Enviroment = env;
+        Search.Environment = env;
         await LoadServiceAsync();
         await OnValueChanged();
         StateHasChanged();

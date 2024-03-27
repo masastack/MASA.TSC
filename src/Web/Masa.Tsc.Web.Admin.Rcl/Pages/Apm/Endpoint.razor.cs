@@ -65,7 +65,7 @@ public partial class Endpoint
             Start = Search.Start,
             End = Search.End,
             OrderField = sortFiled,
-            Env = Search.Enviroment,
+            Env = Search.Environment,
             IsDesc = sortBy,
             Service = Search.Service,
             Queries=Search.Text
@@ -99,7 +99,7 @@ public partial class Endpoint
             End = Search.End,
             Endpoint=Search.Endpoint!,
             Service = Search.Service,
-            Env = Search.Enviroment
+            Env = Search.Environment
         };
         var result = await ApiCaller.ApmService.GetChartsAsync(query);
         if (result == null || !result.Any())

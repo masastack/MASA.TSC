@@ -63,7 +63,7 @@ public partial class ApmComponentBase : BDomComponentBase, IAsyncDisposable
             }
             var service = values.Get("service");
             var env = values.Get("env");
-            Search.Enviroment = env;
+            Search.Environment = env;
             Search.Service = service;
 
             var endpoint = values.Get("endpoint");

@@ -17,7 +17,7 @@
                          Class="my-auto mr-1"
                          Small
                          BackgroundColor="white"
-                         ValueChanged="OnMetricTypeChanged" />
+                         @bind-Value="metricTypeChartData.MetricType" />
             </div>
         </MCardSubtitle>
         <MCardText>
@@ -35,7 +35,7 @@
         <div class="col-4 rounded-lg pa-0" style="border:solid #ccc 1px;height:354px">
             <MCard>
                 <MCardSubtitle Class="font-weight-black h6 py-2">
-                    @I18n.Apm("Chart.Thought")
+                    @I18n.Apm("Chart.Throughput")
                 </MCardSubtitle>
                 <MCardText>
                     @if (!throughput.ChartLoading && throughput.HasChart)

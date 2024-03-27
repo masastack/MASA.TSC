@@ -228,7 +228,7 @@
       "Metadata": "详细信息"
     },
     "Search": {
-      "Enviroment": "环境",
+      "Environment": "环境",
       "Service": "服务",
       "Comparison": "Comparison",
       "Refresh": "刷新"
@@ -236,7 +236,7 @@
     "Service": {
       "List": {
         "Name": "服务",
-        "Envs": "环境",
+        "Environment": "环境",
         "Latency": "延迟",
         "Throughput": "吞吐量",
         "Failed": "失败率"
@@ -280,7 +280,7 @@
     "Log": {
       "List": {
         "Timestamp": "时间",
-        "Enviroment": "环境",
+        "Environment": "环境",
         "ServiceName": "服务",
         "SeverityText": "级别",
         "TraceId": "TraceId",
@@ -296,7 +296,7 @@
     },
     "Chart": {
       "Latency": "加载延迟",
-      "Thought": "吞吐量",
+      "Throughput": "吞吐量",
       "Failed": "失败率",
       "SpanKinds": "Span分类",
       "ErrorCount": "错误次数",

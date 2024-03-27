@@ -10,7 +10,7 @@ public partial class Logs
     private List<DataTableHeader<LogResponseDto>> headers => new()
     {
         new() { Text = I18n.Apm("Log.List.Timestamp"), Value = nameof(LogResponseDto.Timestamp),Fixed = DataTableFixed.Left},
-        new() { Text = I18n.Apm("Log.List.Enviroment"), Value ="Resource.service.namespace",Fixed = DataTableFixed.Left},
+        new() { Text = I18n.Apm("Log.List.Environment"), Value ="Resource.service.namespace",Fixed = DataTableFixed.Left},
         new() { Text = I18n.Apm("Log.List.ServiceName"), Value ="Resource.service.name",Fixed = DataTableFixed.Left },
         new() { Text = I18n.Apm("Log.List.SeverityText"), Value = nameof(LogResponseDto.SeverityText),Fixed = DataTableFixed.Left},
         new() { Text = I18n.Apm("Log.List.TraceId"), Value = nameof(LogResponseDto.TraceId)},
@@ -92,7 +92,7 @@ public partial class Logs
             End = Search.End,
             Service = Search.Service!,
             Page = page,
-            Env = Search.Enviroment!,
+            Env = Search.Environment!,
             PageSize = defaultSize,
             IsDesc = sortBy ?? false,
             SortField = sortFiled!,

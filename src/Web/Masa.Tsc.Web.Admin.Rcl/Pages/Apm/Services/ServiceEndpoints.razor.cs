@@ -89,7 +89,7 @@ public partial class ServiceEndpoints
             End = SearchData.End,
             OrderField = sortFiled,
             Service = SearchData.Service,
-            Env = SearchData.Enviroment,
+            Env = SearchData.Environment,
             IsDesc = sortBy
         };
         var result = await ApiCaller.ApmService.GetEndpointPageAsync(query);
@@ -121,7 +121,7 @@ public partial class ServiceEndpoints
             End = SearchData.End,
             Endpoint = "",
             Service = SearchData.Service,
-            Env = SearchData.Enviroment
+            Env = SearchData.Environment
         };
         var result = await ApiCaller.ApmService.GetChartsAsync(query);
         if (result == null || !result.Any())

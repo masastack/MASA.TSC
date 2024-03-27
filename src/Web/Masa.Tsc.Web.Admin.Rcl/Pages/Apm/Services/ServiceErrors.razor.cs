@@ -14,6 +14,7 @@ public partial class ServiceErrors
     private List<DataTableHeader<ErrorMessageDto>> headers => new()
     {
         new() { Text = I18n.Apm("Error.List.Type"), Value = nameof(ErrorMessageDto.Type)},
+        new() { Text = I18n.Apm("Error.List.Message"), Value = nameof(ErrorMessageDto.Message) },
         new() { Text = I18n.Apm("Error.List.LastTime"), Value = nameof(ErrorMessageDto.LastTime) },
         new() { Text = I18n.Apm("Error.List.Total"), Value = nameof(ErrorMessageDto.Total)}
     };
@@ -80,7 +81,7 @@ public partial class ServiceErrors
             OrderField = sortFiled,
             Service = SearchData.Service,
             Endpoint = SearchData.Endpoint!,
-            Env = SearchData.Enviroment,
+            Env = SearchData.Environment,
             IsDesc = sortBy
         };
         var result = await ApiCaller.ApmService.GetErrorChartAsync(query);
@@ -100,7 +101,7 @@ public partial class ServiceErrors
             End = SearchData.End,
             OrderField = sortFiled,
             Service = SearchData.Service,
-            Env = SearchData.Enviroment,
+            Env = SearchData.Environment,
             IsDesc = sortBy,
             Endpoint = SearchData.Endpoint!
         };

@@ -65,7 +65,7 @@ public partial class ErrorDetail
         var result = await ApiCaller.LogService.GetPageAsync(new LogPageQueryDto
         {
             Service = Search.Service!,
-            Env = Search.Enviroment!,
+            Env = Search.Environment!,
             PageSize = 1,
             Page = currentPage,
             Query = Search.Text,
@@ -120,7 +120,7 @@ public partial class ErrorDetail
             //Queries = Search.Text,
             Service = Search.Service,
             Endpoint = Search.Endpoint!,
-            Env = Search.Enviroment,
+            Env = Search.Environment,
         };
         var result = await ApiCaller.ApmService.GetErrorChartAsync(query);
         errorChart.Data = ConvertLatencyChartData(result, lineName: "error count").Json;

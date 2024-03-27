@@ -80,7 +80,7 @@ public partial class ShortErrors
             End = SearchData.End,
             OrderField = sortFiled,
             Service = SearchData.Service,
-            Env = SearchData.Enviroment,
+            Env = SearchData.Environment,
             IsDesc = sortBy
         };
         var result = await ApiCaller.ApmService.GetErrorsPageAsync(query);

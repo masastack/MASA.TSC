@@ -12,9 +12,9 @@
     <div class="d-flex mb-4">
         @if (ShowEnv)
         {
-            <SAutoComplete Label="@I18n.Apm("Search.Enviroment")"
+            <SAutoComplete Label="@I18n.Apm("Search.Environment")"
                            Clearable
-                           Items="enviroments"
+                           Items="environments"
                            TItem="string"
                            TValue="string"
                            TItemValue="string"
@@ -27,8 +27,8 @@
                            Small
                            HideSelected=false
                            BackgroundColor="white"
-                           Value=Search.Enviroment
-                           ValueChanged="OnEnviromentChanged" />
+                           Value=Search.Environment
+                           ValueChanged="OnEnvironmentChanged" />
         }
 
         @if (ShowService)
@@ -80,7 +80,9 @@
                                    OnAutoUpdate="OnTimeUpdate"
                                    ShowQuickChange
                                    ShowTimeZoneSelector
-                                   DefaultQuickRange="QuickRangeKey.Last15Minutes" />
+                                   DefaultQuickRange="QuickRangeKey.Last15Minutes"
+                                   ShowInterval                                   
+                                   />
         }
         @if (ShowButton)
         {

@@ -32,9 +32,15 @@
                     <a target="_blank"
                        style="text-decoration:none"
                        title="@context.Item.Type"
-                       href="/apm/errors/@(HttpUtility.UrlEncode(context.Item.Type)+GetUrlParam(service:SearchData.Service,env: GetSearchEnv(SearchData.Enviroment), comparisonType: SearchData.ComparisonType, start: SearchData.Start, end: SearchData.End,exType:context.Item.Type))">
+                       href="/apm/errors/@(HttpUtility.UrlEncode(context.Item.Type)+GetUrlParam(service:SearchData.Service,env: GetSearchEnv(SearchData.Environment), comparisonType: SearchData.ComparisonType, start: SearchData.Start, end: SearchData.End,exType:context.Item.Type))">
                         @context.Item.Type
                     </a>
+                }
+                else if (context.Header.Value == nameof(ErrorMessageDto.Message))
+                {
+                    <div style="width:400px" class="text-truncate">
+                        @context.Item.Message
+                    </div>
                 }
                 @if (context.Header.Value == nameof(ErrorMessageDto.LastTime))
                 {

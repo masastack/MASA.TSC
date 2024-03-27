@@ -91,7 +91,7 @@ public partial class ShortEndpoint
             End = SearchData.End,
             OrderField = sortFiled,
             Service = SearchData.Service,
-            Env = SearchData.Enviroment,
+            Env = SearchData.Environment,
             IsDesc = sortBy
         };
         var result = await ApiCaller.ApmService.GetEndpointPageAsync(query);
@@ -122,7 +122,7 @@ public partial class ShortEndpoint
             Start = SearchData.Start,
             End = SearchData.End,
             Service = SearchData.Service,
-            Env = SearchData.Enviroment
+            Env = SearchData.Environment
         };
         var result = await ApiCaller.ApmService.GetChartsAsync(query);
         if (result == null || !result.Any())

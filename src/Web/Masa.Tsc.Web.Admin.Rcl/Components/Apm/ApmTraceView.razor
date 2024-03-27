@@ -2,7 +2,7 @@
 @inherits ApmComponentBase
 
 
-<MDialog @bind-Value=Show>
+<MDialog Value=Show ValueChanged="CloseAsync">
     <ChildContent>
         <div class="@($"slide {(Show ? "slide_in" : "slide_out")}")">
             <MCard Class="slide slide_in">
@@ -52,16 +52,17 @@
             return;
         foreach (var key in dic.Keys)
         {
-            var currentName = string.IsNullOrEmpty(parent) ? key : $"{parent}.{key}";
-
-            var isShow = string.IsNullOrEmpty(search) || currentName.Contains(search, StringComparison.CurrentCultureIgnoreCase);
+            var currentName = string.IsNullOrEmpty(parent) ? key : $"{parent}.{key}";           
 
             var value = dic[key];
             if (IsFundamental(value.GetType()) || value.GetType().Equals(typeof(JsonElement)))
-            {
-                if (!isShow) continue;
+            {               
                 if (value is DateTime time)
                     value = time.UtcFormatLocal(CurrentTimeZone, "yyyy-MM-dd HH:mm:ss fff");
+
+                var isShow = string.IsNullOrEmpty(search) || currentName.Contains(search, StringComparison.CurrentCultureIgnoreCase) || value.ToString()!.Contains(search);
+                if (!isShow) continue;
+                
                 <tr>
                     <td></td>
                     <td>@currentName</td>

@@ -18,12 +18,7 @@ public partial class OverView
     int page = 1, total = 1;
     Dictionary<double, int> latencies = new();
     double percentile = 0;
-    //string? traceId = default;
-
-    private void OnMetricTypeChanged(MetricTypes type)
-    {
-        metricTypeChartData.MetricType = type;
-    }
+    //string? traceId = default;    
 
     protected override async Task OnParametersSetAsync()
     {
@@ -58,7 +53,7 @@ public partial class OverView
             End = SearchData.End,
             Endpoint = SearchData.Endpoint!,
             Service = SearchData.Service!,
-            Env = SearchData.Enviroment!,
+            Env = SearchData.Environment!,
             Page = this.page,
             PageSize = 1,
             Keyword = SearchData.Text
@@ -85,7 +80,7 @@ public partial class OverView
         {
             Start = SearchData.Start,
             End = SearchData.End,
-            Env = SearchData.Enviroment,
+            Env = SearchData.Environment,
             Queries = $"TraceId='{traceId}'",
             Page = 1,
             PageSize = 100
@@ -121,7 +116,7 @@ public partial class OverView
             Start = SearchData.Start,
             End = SearchData.End,
             Service = SearchData.Service,
-            Env = SearchData.Enviroment,
+            Env = SearchData.Environment,
             Endpoint = SearchData.Endpoint!,
             Queries = SearchData.Text,
             ComparisonType = SearchData.ComparisonType.ToComparisonType()
@@ -197,7 +192,7 @@ public partial class OverView
             Start = SearchData.Start,
             End = SearchData.End,
             Service = SearchData.Service,
-            Env = SearchData.Enviroment,
+            Env = SearchData.Environment,
             Endpoint = SearchData.Endpoint!,
             Queries = SearchData.Text,
             ComparisonType = SearchData.ComparisonType.ToComparisonType()

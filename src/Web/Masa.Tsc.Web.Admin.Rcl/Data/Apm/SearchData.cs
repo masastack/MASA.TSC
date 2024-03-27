@@ -11,7 +11,7 @@ public class SearchData
 
     public DateTime End { get; set; }
 
-    public string? Enviroment { get; set; }
+    public string? Environment { get; set; }
 
     public string? Service { get; set; }
 

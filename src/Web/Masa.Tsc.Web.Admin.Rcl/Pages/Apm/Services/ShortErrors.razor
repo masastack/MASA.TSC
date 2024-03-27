@@ -18,7 +18,7 @@
             <a target="_blank"
                style="text-decoration:none"
                title="@context.Item.Type"
-               href="/apm/errors/@(HttpUtility.UrlEncode(context.Item.Type)+GetUrlParam(service:SearchData.Service,env: GetSearchEnv(SearchData.Enviroment), comparisonType: SearchData.ComparisonType, start: SearchData.Start, end: SearchData.End,exType:context.Item.Type,search:SearchData.Text))">
+               href="/apm/errors/@(HttpUtility.UrlEncode(context.Item.Type)+GetUrlParam(service:SearchData.Service,env: GetSearchEnv(SearchData.Environment), comparisonType: SearchData.ComparisonType, start: SearchData.Start, end: SearchData.End,exType:context.Item.Type,search:SearchData.Text))">
                 @context.Item.Type
             </a>
         }

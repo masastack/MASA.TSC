@@ -85,7 +85,7 @@ public partial class ServiceLogs
             OrderField = sortFiled,
             Service = SearchData.Service,
             Endpoint = SearchData.Endpoint!,
-            Env = SearchData.Enviroment,
+            Env = SearchData.Environment,
             IsDesc = sortBy
         };
         var result = await ApiCaller.ApmService.GetLogChartAsync(query);
@@ -103,7 +103,7 @@ public partial class ServiceLogs
             End = SearchData.End,
             Service = SearchData.Service!,
             Page = page,
-            Env = SearchData.Enviroment!,
+            Env = SearchData.Environment!,
             PageSize = defaultSize,
             IsLimitEnv = false
         };

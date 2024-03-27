@@ -25,13 +25,13 @@
             <a target="_blank"
                style="text-decoration:none"
                title="@context.Item.Type"
-               href="/apm/errors/@(HttpUtility.UrlEncode(context.Item.Type)+GetUrlParam(service:Search.Service,env: GetSearchEnv(Search.Enviroment), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,exType:context.Item.Type,search:Search.Text))">
+               href="/apm/errors/@(HttpUtility.UrlEncode(context.Item.Type)+GetUrlParam(service:Search.Service,env: GetSearchEnv(Search.Environment), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,exType:context.Item.Type,search:Search.Text))">
                 @context.Item.Type
             </a>
         }
         else if (context.Header.Value == nameof(ErrorMessageDto.Message))
         {
-            <div style="width:400px;overflow:hidden" class="text-truncate">
+            <div style="width:400px" class="text-truncate">
                 @context.Item.Message
             </div>
         }

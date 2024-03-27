@@ -10,7 +10,7 @@ public partial class Service
     private List<DataTableHeader<ListChartData>> headers => new()
     {
         new() { Text = I18n.Apm("Service.List.Name"), Value = nameof(ListChartData.Name)},
-        new() { Text = I18n.Apm("Service.List.Envs"), Value =nameof(ListChartData.Envs)},
+        new() { Text = I18n.Apm("Service.List.Environment"), Value =nameof(ListChartData.Envs)},
         new() { Text = I18n.Apm("Service.List.Latency"), Value = nameof(ListChartData.Latency) },
         new() { Text = I18n.Apm("Service.List.Throughput"), Value = nameof(ListChartData.Throughput)},
         new() { Text = I18n.Apm("Service.List.Failed"), Value = nameof(ListChartData.Failed)}
@@ -66,7 +66,7 @@ public partial class Service
             Start = Search.Start,
             End = Search.End,
             Service = Search.Service,
-            Env = Search.Enviroment,
+            Env = Search.Environment,
             OrderField = sortFiled,
             IsDesc = sortBy,
             ComparisonType = Search.ComparisonType.ToComparisonType(),
@@ -99,7 +99,7 @@ public partial class Service
             Start = Search.Start,
             End = Search.End,
             Service = Search.Service,
-            Env = Search.Enviroment,
+            Env = Search.Environment,
             Queries = Search.Text,
             ComparisonType = Search.ComparisonType.ToComparisonType()
         };

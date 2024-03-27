@@ -65,7 +65,7 @@ public partial class Errors
             Start = Search.Start,
             End = Search.End,
             OrderField = sortFiled,
-            Env = Search.Enviroment,
+            Env = Search.Environment,
             IsDesc = sortBy,
             Service = Search.Service,
             Queries = Search.Text

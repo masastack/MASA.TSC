@@ -56,7 +56,7 @@
       }
     },
     "Chart": {
-      "SpanKinds": "Time span kinds",
+      "SpanKinds": "Time spent by span type",
       "ErrorCount": "Error count",
       "LogCount": "Log count",
       "ErrorOccurrences": "Error occurrences",

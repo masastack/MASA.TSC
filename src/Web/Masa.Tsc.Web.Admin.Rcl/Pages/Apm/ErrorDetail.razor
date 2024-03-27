@@ -96,15 +96,14 @@
         foreach (var key in dic.Keys)
         {
             var currentName = string.IsNullOrEmpty(parent) ? key : $"{parent}.{key}";
-
-            var isShow = string.IsNullOrEmpty(search) || currentName.Contains(search, StringComparison.CurrentCultureIgnoreCase);
-
             var value = dic[key];
             if (IsFundamental(value.GetType()) || value.GetType().Equals(typeof(JsonElement)))
             {
-                if (!isShow) continue;
                 if (value is DateTime time)
                     value = time.UtcFormatLocal(CurrentTimeZone, "yyyy-MM-dd HH:mm:ss fff");
+                var isShow = string.IsNullOrEmpty(search) || currentName.Contains(search, StringComparison.CurrentCultureIgnoreCase) || value.ToString()!.Contains(search);
+                if (!isShow) continue;
+
                 <tr>
                     <td>@currentName</td>
                     <td><div class="right-error-text">@value</div></td>

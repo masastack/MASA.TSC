@@ -5,6 +5,7 @@
 .slide_out {
     animation-name: fadeout;
     transform: translateX(1100px);
+    display: none;
 }
 
 .slide {
@@ -23,7 +24,6 @@
     white-space: pre-line;
     line-height: 1.5rem;
 }
-
 
 @keyframes fadein {
     0% {

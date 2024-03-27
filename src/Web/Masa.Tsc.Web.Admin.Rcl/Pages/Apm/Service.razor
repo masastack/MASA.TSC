@@ -23,7 +23,7 @@
     <ItemColContent>
         @if (context.Header.Value == nameof(ListChartData.Name))
         {
-            <a href="/apm/services/@(context.Item.Name+GetUrlParam(service: context.Item.Name, env: GetSearchEnv(Search.Enviroment, context.Item.Envs?.Split(',')), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,search:Search.Text))">@context.Item.Name</a>
+            <a href="/apm/services/@(context.Item.Name+GetUrlParam(service: context.Item.Name, env: GetSearchEnv(Search.Environment, context.Item.Envs?.Split(',')), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,search:Search.Text))">@context.Item.Name</a>
         }
         else if (context.Header.Value == nameof(ListChartData.Envs))
         {

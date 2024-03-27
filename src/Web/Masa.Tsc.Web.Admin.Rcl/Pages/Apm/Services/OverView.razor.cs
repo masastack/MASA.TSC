@@ -13,11 +13,6 @@ public partial class OverView
     private ChartData throughput = new(), failed = new();
     string lastKey = null;
 
-    private void OnMetricTypeChanged(MetricTypes type)
-    {
-        metricTypeChartData.MetricType = type;
-    }
-
     protected override async Task OnParametersSetAsync()
     {
         var key = MD5Utils.Encrypt(JsonSerializer.Serialize(SearchData));
@@ -42,7 +37,7 @@ public partial class OverView
             Start = SearchData.Start,
             End = SearchData.End,
             Service = SearchData.Service,
-            Env = SearchData.Enviroment,
+            Env = SearchData.Environment,
             ComparisonType = SearchData.ComparisonType.ToComparisonType()
         };
         if (SearchData.ComparisonType == ApmComparisonTypes.Day)
