@@ -79,12 +79,13 @@ public class ApmService : ServiceBase
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
         });
 
-    public async Task<PaginatedListBase<ErrorMessageDto>> GetErrors([FromServices] IApmService apmService, int page, int pageSize, string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
+    public async Task<PaginatedListBase<ErrorMessageDto>> GetErrors([FromServices] IApmService apmService, int page, int pageSize, string start, string end, string? env, string? service, string? endpoint, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
         => await apmService.ErrorMessagePageAsync(new ApmEndpointRequestDto
         {
             Start = start.ParseUTCTime(),
             End = end.ParseUTCTime(),
             Env = GetEnv(env),
+            //Endpoint = endpoint!,
             Queries = queries,
             OrderField = orderField,
             IsDesc = isDesc,

@@ -6,8 +6,7 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.Apm.Clickhouse" Version="1.0.0-local" />
+	<ItemGroup>		
 		<PackageReference Include="Masa.Contrib.Service.Caller.DaprClient" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Config" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.BuildingBlocks.Data.Contracts" Version="$(MasaFrameworkPackageVersion)" />
@@ -19,5 +18,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Masa.Contrib.StackSdks.Tsc.Apm.Clickhouse\Masa.Contrib.StackSdks.Tsc.Apm.Clickhouse.csproj" />
 	</ItemGroup>
 </Project>

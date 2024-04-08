@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using System;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm;
 
 public partial class ApmSearchComponent
@@ -34,7 +32,6 @@ public partial class ApmSearchComponent
     [Inject]
     public IMultiEnvironmentUserContext UserContext { get; set; }
 
-    private List<(string, string)> _values = new List<(string, string)> { new("All", "All") };
     private static List<(ApmComparisonTypes value, string text)> listComparisons = new()
     {
         new (ApmComparisonTypes.None, "None"),
@@ -46,17 +43,69 @@ public partial class ApmSearchComponent
     private bool isServiceLoading = true, isEnvLoading = true;
 
     private bool isCallQuery = false;
-
+    private QuickRangeKey quickRangeKey = QuickRangeKey.Last15Minutes;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        if (Search.Start > DateTime.MinValue && Search.End > Search.Start)
+        {
+            SetQuickRangeKey(Search.End - Search.Start);
+        }
+
         if (!isCallQuery && Search.Start > DateTime.MinValue)
         {
             await LoadEnvironmentAsync();
             await LoadServiceAsync();
             await OnValueChanged();
             isCallQuery = true;
+        }
+    }
+
+    private void SetQuickRangeKey(TimeSpan timeSpan)
+    {
+        var minutes = (int)timeSpan.TotalMinutes;
+
+        if (minutes - 1440 >= 0)
+        {
+            var days = minutes / 1440;
+            switch (days)
+            {
+                case 1:
+                    quickRangeKey = QuickRangeKey.Last24Hours;
+                    return;
+                case 2:
+                    quickRangeKey = QuickRangeKey.Last2Days;
+                    return;
+                case 7:
+                    quickRangeKey = QuickRangeKey.Last7Days;
+                    return;
+                case 30:
+                    quickRangeKey = QuickRangeKey.Last30Days;
+                    return;
+            }
+        }
+
+        switch (minutes)
+        {
+            case 15:
+                quickRangeKey = QuickRangeKey.Last15Minutes;
+                return;
+            case 30:
+                quickRangeKey = QuickRangeKey.Last30Minutes;
+                return;
+            case 60:
+                quickRangeKey = QuickRangeKey.Last1Hour;
+                return;
+            case 180:
+                quickRangeKey = QuickRangeKey.Last3Hours;
+                return;
+            case 360:
+                quickRangeKey = QuickRangeKey.Last6Hours;
+                return;
+            case 720:
+                quickRangeKey = QuickRangeKey.Last12Hours;
+                return;
         }
     }
 

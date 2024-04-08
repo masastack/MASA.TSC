@@ -19,6 +19,7 @@
             Items="data"
             TItem="ListChartData"
             Loading="@isTableLoading"
+            MustSort
             OnOptionsUpdate="OnTableOptionsChanged">
     <ItemColContent>
         @if (context.Header.Value == nameof(ListChartData.Name))
