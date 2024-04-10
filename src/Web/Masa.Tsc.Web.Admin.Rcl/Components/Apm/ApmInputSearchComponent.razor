@@ -1,4 +1,72 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm
 @inherits ApmComponentBase
 
-<SSearch BackgroundColor="white" @bind-Value="@Value" OnEnter="OnValueChange" Class="rounded-2" Style="width:100%" />
+@* <SSearch BackgroundColor="white" @bind-Value="@Value" OnEnter="OnValueChange" Class="rounded-2" Style="width:100%" /> *@
+
+<SAutoComplete BackgroundColor="white"
+               Items="items"
+               TItem="KeyValuePair<int,string>"
+               TValue="string"
+               TItemValue="string"
+               ItemText="item=>item.Value"
+               ItemValue="item=>item.Value"
+               Value="Value"
+               OnSearchInputUpdate="InputChanged"
+               Filter="Filter"
+               OnEnter="OnValueChange" Class="rounded-2" Style="width:100%">
+
+</SAutoComplete>
+
+@code {
+    Dictionary<int, string> list = new Dictionary<int, string>()
+    {
+        {0,"" },
+    {1,"ServiceName" },
+    {2,"Endpoint" }
+
+    };
+
+    List<KeyValuePair<int, string>> items = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        list[0] = Value;
+        items = list.ToList();
+    }
+
+    Regex reg = new Regex(@"^\S+$|(?<=(and|or)\s*)\S+");
+
+    string lastMatch = string.Empty;
+
+
+    private void InputChanged(string search)
+    {
+        if (reg.IsMatch(search))
+        {
+            var str = reg.Matches(search).Last().Value;
+            //str.StartsWith(lastMatch)
+            lastMatch = str;
+            list[0] = search;
+        }
+
+    }
+
+
+    private bool Filter(KeyValuePair<int, string> _, string a, string b)
+    {
+        if (!string.IsNullOrEmpty(b) && reg.IsMatch(a))
+        {
+            var value = reg.Matches(b).Last().Value;
+
+            return b.StartsWith(value, StringComparison.CurrentCultureIgnoreCase);
+        }
+        return false;
+    }
+
+
+
+
+
+
+}

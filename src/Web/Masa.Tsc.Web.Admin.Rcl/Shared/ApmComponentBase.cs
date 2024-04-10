@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Shared.Apm;
 
-public partial class ApmComponentBase : BDomComponentBase, IAsyncDisposable
+public partial class ApmComponentBase : BDomComponentBase
 {
     [Inject]
     public I18n I18n { get; set; }
@@ -17,13 +17,8 @@ public partial class ApmComponentBase : BDomComponentBase, IAsyncDisposable
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
-    protected virtual SearchData Search { get; set; }
-
-    public async ValueTask DisposeAsync()
-    {
-        //base.Dispose(true);
-        await Task.CompletedTask;
-    }
+    [Inject]
+    public SearchData Search { get; set; }
 
     public TimeZoneInfo CurrentTimeZone { get; private set; }
 
@@ -41,12 +36,8 @@ public partial class ApmComponentBase : BDomComponentBase, IAsyncDisposable
 
     public ApmComponentBase()
     {
-        if (IsPage)
-        {
-            Search = new();
-        }
-    }
 
+    }
 
     protected override void OnInitialized()
     {
@@ -56,15 +47,17 @@ public partial class ApmComponentBase : BDomComponentBase, IAsyncDisposable
             var values = HttpUtility.ParseQueryString(uri.Query);
             var start = values.Get("start");
             var end = values.Get("end");
-            if (DateTime.TryParse(start, out var startTime) && DateTime.TryParse(end, out var endTime) && endTime > startTime)
+            if (DateTime.TryParse(start, out DateTime startTime) && DateTime.TryParse(end, out DateTime endTime) && endTime > startTime)
             {
                 Search.Start = startTime;
                 Search.End = endTime;
             }
             var service = values.Get("service");
             var env = values.Get("env");
-            Search.Environment = env;
-            Search.Service = service;
+            if (!string.IsNullOrEmpty(env))
+                Search.Environment = env;
+            if (!string.IsNullOrEmpty(service))
+                Search.Service = service;
 
             var endpoint = values.Get("endpoint");
             if (!string.IsNullOrEmpty(endpoint))
@@ -99,7 +92,7 @@ public partial class ApmComponentBase : BDomComponentBase, IAsyncDisposable
 
             if (!string.IsNullOrEmpty(Search.Text) && Search.Text.Trim().StartsWith("and "))
             {
-                Search.Text = Search.Text.Trim().Substring(4);
+                Search.Text = Search.Text.Trim()[4..];
             }
         }
         base.OnInitialized();

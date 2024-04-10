@@ -98,9 +98,9 @@ public partial class ServiceEndpoints
         {
             data.AddRange(result.Result.Select(item => new ListChartData
             {
-                Name = $"{item.Method} {item.Name}",
+                Name = $"{item.Method} {item.Endpoint}",
                 Service = item.Service,
-                Endpoint = item.Name,
+                Endpoint = item.Endpoint,
                 Failed = item.Failed,
                 Throughput = item.Throughput,
                 Latency = item.Latency
@@ -131,7 +131,7 @@ public partial class ServiceEndpoints
 
         foreach (var service in data)
         {
-            var chartData = result.FirstOrDefault(s => s.Name == service.Endpoint);
+            var chartData = result.Find(s => s.Name == service.Endpoint);
             service.LatencyChartData = new();
             service.ThroughputChartData = new();
             service.FailedChartData = new();

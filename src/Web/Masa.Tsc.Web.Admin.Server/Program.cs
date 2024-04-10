@@ -8,6 +8,7 @@ var masaStackConfig = builder.Services.GetMasaStackConfig();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddRcl().AddScoped<TokenProvider>();
 
 builder.Services.Configure<JsonOptions>(option =>
 {
@@ -57,8 +58,6 @@ builder.Services.AddTscHttpApiCaller("http://localhost:18010").AddDccClient(redi
     await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC);
     builder.Services.AddTscHttpApiCaller(masaStackConfig.GetTscServiceDomain()).AddDccClient(redisOption);
 #endif
-
-builder.Services.AddRcl().AddScoped<TokenProvider>();
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 

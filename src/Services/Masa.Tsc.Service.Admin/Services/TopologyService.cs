@@ -12,17 +12,12 @@ public class TopologyService : ServiceBase
 
     public async Task StartAsync([FromServices] IEventBus eventBus, [FromQuery] DateTimeOffset? excuteTime)
     {
-        if (excuteTime == null)
-            excuteTime = new DateTimeOffset(DateTime.UtcNow);
-        var end = excuteTime.Value.ToUniversalTime().DateTime;
-        var start = end.AddDays(-7);
-        var command = new StartCommand(start, end);
-        await eventBus.PublishAsync(command);
+        await Task.CompletedTask;
     }
 
-    public async Task<TopologyResultDto> GetAsync([FromServices] IEventBus eventBus, string serviceName, int level, DateTime start, DateTime end)
+    public async Task<TopologyResultDto> GetAsync([FromServices] IEventBus eventBus, string serviceName, int level, string start, string end)
     {
-        var query = new TopologyQuery(new TopologyRequestDto { ServiceName = serviceName, Level = level, Start = start, End = end });
+        var query = new TopologyQuery(new TopologyRequestDto { ServiceName = serviceName, Level = level, Start = start.ParseUTCTime(), End = end.ParseUTCTime() });
         await eventBus.PublishAsync(query);
         return query.Result;
     }

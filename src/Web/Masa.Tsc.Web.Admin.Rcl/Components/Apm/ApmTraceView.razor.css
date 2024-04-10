@@ -16,7 +16,6 @@
     height: calc(100vh - 96px);
     border: solid 1px #ccc;
     background-color: white;
-    animation-duration: 800ms;
 }
 
 .text-wrap {

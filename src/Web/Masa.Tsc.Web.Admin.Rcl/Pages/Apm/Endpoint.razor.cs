@@ -68,7 +68,7 @@ public partial class Endpoint
             Env = Search.Environment,
             IsDesc = sortBy,
             Service = Search.Service,
-            Queries=Search.Text
+            Queries = Search.Text
         };
         var result = await ApiCaller.ApmService.GetEndpointPageAsync(query);
         data.Clear();
@@ -76,8 +76,8 @@ public partial class Endpoint
         {
             data.AddRange(result.Result.Select(item => new ListChartData
             {
-                Name = $"{item.Method} {item.Name}",
-                Endpoint = item.Name,
+                Name = $"{item.Method} {item.Endpoint}",
+                Endpoint = item.Endpoint,
                 Service = item.Service,
                 Failed = item.Failed,
                 Throughput = item.Throughput,
@@ -97,7 +97,7 @@ public partial class Endpoint
             PageSize = defaultSize,
             Start = Search.Start,
             End = Search.End,
-            Endpoint=Search.Endpoint!,
+            Endpoint = Search.Endpoint!,
             Service = Search.Service,
             Env = Search.Environment
         };

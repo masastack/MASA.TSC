@@ -78,7 +78,7 @@ public partial class Service
         {
             data.AddRange(result.Result.Select(item => new ListChartData
             {
-                Name = item.Name,
+                Name = item.Service,
                 Envs = string.Join(",", item.Envs),
                 Failed = item.Failed,
                 Throughput = item.Throughput,

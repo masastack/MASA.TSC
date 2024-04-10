@@ -7,9 +7,7 @@
 		<UserSecretsId>f6cdf028-3564-47a5-a4fb-662685680853</UserSecretsId>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.Apm.Clickhouse" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="TimeZoneConverter" Version="6.1.0" />
+	<ItemGroup>		
 		<PackageReference Include="Masa.BuildingBlocks.Dispatcher.Events" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Config" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Scheduler" Version="$(MasaFrameworkPackageVersion)" />
@@ -19,12 +17,8 @@
 		<PackageReference Include="Masa.BuildingBlocks.Ddd.Domain" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Ddd.Domain" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Exceptions" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.Clickhouse" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Utils.Data.Elasticsearch" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Utils.Data.Prometheus" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Tsc" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.Elasticsearch" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="$(MasaFrameworkPackageVersion)" />		
+		<PackageReference Include="Masa.Contrib.StackSdks.Tsc" Version="$(MasaFrameworkPackageVersion)" />		
 		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.OpenTelemetry" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.Dapr" Version="$(MasaFrameworkPackageVersion)" />
@@ -38,8 +32,7 @@
 		<PackageReference Include="Masa.Contrib.Development.DaprStarter.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="MASA.Utils.Configuration.Json" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Utils.Extensions.Enums" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.Globalization.I18n.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />		
-		<PackageReference Include="NEST" Version="7.17.5" />
+		<PackageReference Include="Masa.Contrib.Globalization.I18n.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.6" />
@@ -55,9 +48,12 @@
 		<PackageReference Include="Dapr.AspNetCore" Version="1.10.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<!--<ProjectReference Include="..\..\..\..\MASA.Framework\src\Contrib\StackSdks\Masa.Contrib.StackSdks.Tsc\Masa.Contrib.StackSdks.Tsc.csproj" />-->
-		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
+	<ItemGroup>		
+		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />		
+		<ProjectReference Include="..\..\Infrastructure\Masa.Contrib.StackSdks.Tsc.Apm.Clickhouse\Masa.Contrib.StackSdks.Tsc.Apm.Clickhouse.csproj" />		
+		<ProjectReference Include="..\..\Infrastructure\Masa.Contrib.StackSdks.Tsc.Clickhouse\Masa.Contrib.StackSdks.Tsc.Clickhouse.csproj" />		
+		<ProjectReference Include="..\..\Infrastructure\Masa.Contrib.StackSdks.Tsc.Elasticsearch\Masa.Contrib.StackSdks.Tsc.Elasticsearch.csproj" />		
+		<ProjectReference Include="..\..\Infrastructure\Masa.Utils.Data.Prometheus\Masa.Utils.Data.Prometheus.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

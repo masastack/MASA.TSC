@@ -36,7 +36,7 @@ public partial class ApmSamplePage
 
     private async Task OnPageAsync(int value)
     {
-        if (value < 1 || value - Total > 0)
+        if (value < 1 || value - Total > 0 || value - Current == 0)
             return;
 
         Current = value;
