@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Model;
-
 namespace Masa.Tsc.Service.Admin.Application.Logs;
 
 public class QueryHandler : EnvQueryHandler
@@ -30,7 +28,7 @@ public class QueryHandler : EnvQueryHandler
         {
             Start = queryData.Start,
             End = queryData.End,
-            Keyword = queryData.Query,
+            RawQuery = queryData.Query,
             Page = 1,
             PageSize = 1,
             Sort = new FieldOrderDto { Name = StorageConst.Timestimap(ConfigConst.IsElasticsearch, ConfigConst.IsClickhouse), IsDesc = !queryData.IsDesc }
