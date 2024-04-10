@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Nest;
+
 namespace Masa.Tsc.Service.Admin.Infrastructure.Const;
 
 internal class ConfigConst
@@ -25,6 +27,8 @@ internal class ConfigConst
     public static bool IsElasticsearch => Configuration.IsElasticsearch;
 
     public static bool IsClickhouse => Configuration.IsClickHouse;
+
+    public static string ClickhouseTableSuffix => Configuration.Clickhouse?.Suffix!;
 
     public static string ClikhouseConnection => Configuration.Clickhouse?.Connection!;
 

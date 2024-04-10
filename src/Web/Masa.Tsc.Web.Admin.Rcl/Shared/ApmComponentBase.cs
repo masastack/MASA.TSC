@@ -39,14 +39,8 @@ public partial class ApmComponentBase : BDomComponentBase
 
     }
 
-
     protected override void OnInitialized()
     {
-        if (IsPage)
-        {
-            Search ??= new();
-        }
-
         if (IsPage)
         {
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);

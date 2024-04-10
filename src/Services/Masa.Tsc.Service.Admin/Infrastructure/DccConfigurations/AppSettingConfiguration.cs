@@ -30,4 +30,6 @@ public class ClickhouseConfiguration
     public string LogSource { get; set; }
 
     public string TraceSource { get; set; }
+
+    public string Suffix { get; set; }
 }
