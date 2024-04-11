@@ -111,29 +111,119 @@ from(
             ) t
         {groupby}
         ) {orderBy} @limit";
-        }
-
-        PaginatedListBase<T> result = new() { Total = Convert.ToInt64(Scalar(countSql, parameters)) };
-        SetData(sql, parameters, result, query, reader => ToServiceList<T>(reader));
+        SetData(sql, parameters, result, query, reader =>
+        {
+            var result = new T()
+            {
+                Service = reader[0].ToString()!,
+                Envs = reader[1]?.ToString()?.Split(',') ?? Array.Empty<string>(),
+                Latency = (long)Math.Floor(Convert.ToDouble(reader[2])),
+                Throughput = Math.Round(Convert.ToDouble(reader[3]), 2),
+                Failed = Math.Round(Convert.ToDouble(reader[4]), 2),
+            };
+            if (result is EndpointListDto endpointListDto)
+            {
+                endpointListDto.Endpoint = reader[5].ToString()!;
+                endpointListDto.Method = reader[6].ToString()!;
+            }
+            return result;
+        });
         return Task.FromResult(result);
     }
 
-    private static T ToServiceList<T>(IDataReader reader) where T : ServiceListDto, new()
+//    private Task<PaginatedListBase<T>> InstrumentListAsync<T>(BaseApmRequestDto query, bool isEndpoint) where T : ServiceListDto, new()
+//    {
+//        query.IsServer = true;        
+//        var (where, parameters) = AppendWhere(query);
+//        var period = GetPeriod(query);
+//        string groupAppend = isEndpoint ? ",`Attributes.http.target`,`Attributes.http.method`" : string.Empty;
+//        var groupby = $"group by ServiceName{groupAppend}";
+//        var tableName = Constants.GetAggregateTable(period);
+//        var countSql = $"select count(1) from(select count(1) from {tableName} where {where} {groupby})";
+//        PaginatedListBase<T> result = new() { Total = Convert.ToInt64(Scalar(countSql, parameters)) };
+
+
+//        //query.IsServer = true;
+//        //var (where, parameters) = AppendWhere(query);
+//        //var groupby = "group by ServiceName";
+//        var countSql = $"select count(1) from(select count(1) from {MasaStackClickhouseConnection.TraceTable} where {where} {groupby})";
+//        PaginatedListBase<T> result = new() { Total = Convert.ToInt64(Scalar(countSql, parameters)) };
+//        var orderBy = GetOrderBy(query, serviceOrders, defaultSort: SERVICE_NAME);
+//        var sql = $@"select * from(
+//select
+//ServiceName,
+//arrayStringConcat(groupUniqArray(`Resource.service.namespace`)) env,
+//floor(AVG(Duration/{MILLSECOND})) latency,
+//round(count(1)*1.0/DATEDIFF(MINUTE ,toDateTime(@startTime),toDateTime (@endTime)),2) throughput,
+//round(sum(has(['{string.Join("','", query.GetErrorStatusCodes())}'],`Attributes.http.status_code`))*100.0/count(1),2) failed
+//from {Constants.TraceTableFull} where {where} {groupby} {orderBy} @limit)";
+//        SetData(sql, parameters, result, query, reader => new ServiceListDto()
+//        {
+//            Name = reader[0].ToString()!,
+//            Envs = reader[1]?.ToString()?.Split(',') ?? Array.Empty<string>(),
+//            Latency = (long)Math.Floor(Convert.ToDouble(reader[2])),
+//            Throughput = Math.Round(Convert.ToDouble(reader[3]), 2),
+//            Failed = Math.Round(Convert.ToDouble(reader[4]), 2),
+//        });
+//        return Task.FromResult(result);
+
+
+
+
+
+
+//        var orderBy = GetOrderBy(query, serviceOrders, defaultSort: SERVICE_NAME);
+//        var sql = $@"select 
+//    ServiceName,`Resource.service.namespace1` as `Resource.service.namespace`,Latency1 as Latency,
+//Throughput1 as Throughput,Failed1 as Failed {groupAppend}
+//from(
+//        select
+//        ServiceName,
+//        arrayStringConcat(groupUniqArray(`Resource.service.namespace`)) AS `Resource.service.namespace1`,
+//        floor(sum(Latency*Throughput)/sum(Throughput)/{MILLSECOND}) as Latency1,
+//        sum(Throughput) as Throughput1,
+//        round(sum(Failed)*100/sum(Throughput),2) as Failed1 {groupAppend}
+//        from(
+//            select
+//                    ServiceName,Resource.service.namespace,
+//                    avgMerge(Latency) as Latency,
+//                    countMerge(Throughput) as Throughput,
+//                    SumMerge(Failed) as Failed {groupAppend}
+//            from {tableName}
+//            where {where}
+//            group by ServiceName,`Resource.service.namespace`{groupAppend},Timestamp
+//            ) t
+//        {groupby}
+//        ) {orderBy} @limit";
+//        SetData(sql, parameters, result, query, reader =>
+//        {
+//            var result = new T()
+//            {
+//                Service = reader[0].ToString()!,
+//                Envs = reader[1]?.ToString()?.Split(',') ?? Array.Empty<string>(),
+//                Latency = (long)Math.Floor(Convert.ToDouble(reader[2])),
+//                Throughput = Math.Round(Convert.ToDouble(reader[3]), 2),
+//                Failed = Math.Round(Convert.ToDouble(reader[4]), 2),
+//            };
+//            if (result is EndpointListDto endpointListDto)
+//            {
+//                endpointListDto.Endpoint = reader[5].ToString()!;
+//                endpointListDto.Method = reader[6].ToString()!;
+//            }
+//            return result;
+//        });
+//        return Task.FromResult(result);
+//    }
+
+    private Task<PaginatedListBase<EndpointListDto>> GetEndpointAsync(BaseApmRequestDto query, string groupBy, string selectField, Func<IDataReader, EndpointListDto> parseFn)
     {
-        var result = new T()
-        {
-            Service = reader[0].ToString()!,
-            Envs = reader[1]?.ToString()?.Split(',') ?? Array.Empty<string>(),
-            Latency = (long)Math.Floor(Convert.ToDouble(reader[2])),
-            Throughput = Math.Round(Convert.ToDouble(reader[3]), 2),
-            Failed = Math.Round(Convert.ToDouble(reader[4]), 2),
-        };
-        if (result is EndpointListDto endpointListDto)
-        {
-            endpointListDto.Endpoint = reader[5].ToString()!;
-            endpointListDto.Method = reader[6].ToString()!;
-        }
-        return result;
+        var (where, parameters) = AppendWhere(query);
+        var countSql = $"select count(1) from(select count(1) from {MasaStackClickhouseConnection.TraceTable} where {where} {groupBy})";
+        PaginatedListBase<EndpointListDto> result = new() { Total = Convert.ToInt64(Scalar(countSql, parameters)) };
+        var orderBy = GetOrderBy(query, endpointOrders);
+        var sql = $@"select * from( select {selectField} from {MasaStackClickhouseConnection.TraceTable} where {where} {groupBy} {orderBy} @limit)";
+        SetData(sql, parameters, result, query, parseFn);
+        return Task.FromResult(result);
     }
 
     public Task<IEnumerable<ChartLineDto>> ChartDataAsync(BaseApmRequestDto query)
