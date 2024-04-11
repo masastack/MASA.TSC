@@ -50,10 +50,9 @@
 
 	<ItemGroup>		
 		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />		
-		<ProjectReference Include="..\..\Infrastructure\Masa.Contrib.StackSdks.Tsc.Apm.Clickhouse\Masa.Contrib.StackSdks.Tsc.Apm.Clickhouse.csproj" />		
-		<ProjectReference Include="..\..\Infrastructure\Masa.Contrib.StackSdks.Tsc.Clickhouse\Masa.Contrib.StackSdks.Tsc.Clickhouse.csproj" />		
-		<ProjectReference Include="..\..\Infrastructure\Masa.Contrib.StackSdks.Tsc.Elasticsearch\Masa.Contrib.StackSdks.Tsc.Elasticsearch.csproj" />		
-		<ProjectReference Include="..\..\Infrastructure\Masa.Utils.Data.Prometheus\Masa.Utils.Data.Prometheus.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Clickhouse.Apm\Masa.Tsc.Storage.Clickhouse.Apm.csproj" />		
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Elasticsearch\Masa.Tsc.Storage.Elasticsearch.csproj" />		
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Prometheus\Masa.Tsc.Storage.Prometheus.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
