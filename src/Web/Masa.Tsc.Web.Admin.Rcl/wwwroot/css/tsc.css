@@ -344,10 +344,10 @@ div[style*="visibility: hidden; opacity: 0;"] {
     background-color: #E4E8F3 !important;
 }
 
-.m-label.m-label--active {
+/*.m-label.m-label--active {
     z-index: 9999
 }
-
+*/
 .m-window {
     height: 100%;
     min-height: 100% !important;

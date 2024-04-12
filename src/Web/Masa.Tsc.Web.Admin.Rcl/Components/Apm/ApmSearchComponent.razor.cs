@@ -88,6 +88,9 @@ public partial class ApmSearchComponent
 
         switch (minutes)
         {
+            case 5:
+                quickRangeKey = QuickRangeKey.Last5Minutes;
+                return;
             case 15:
                 quickRangeKey = QuickRangeKey.Last15Minutes;
                 return;
