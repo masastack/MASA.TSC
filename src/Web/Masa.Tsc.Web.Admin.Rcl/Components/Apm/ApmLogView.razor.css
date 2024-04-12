@@ -10,7 +10,7 @@
 
 .slide {
     position: fixed;
-    z-index: 99999;
+    z-index: 9;
     top: 96px;
     right: 0px;
     width: 1000px;
