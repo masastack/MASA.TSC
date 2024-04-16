@@ -198,32 +198,44 @@ public partial class OverView
             ComparisonType = SearchData.ComparisonType.ToComparisonType()
         };
         var data = await ApiCaller.ApmService.GetLatencyDistributionAsync(query);
+        await LoadTraceDetailAsync();
+        var currentSpan = traceDetails?.Find(item => item.Attributes.TryGetValue("http.target", out var value) && value.ToString().Equals(SearchData.Endpoint, StringComparison.OrdinalIgnoreCase));
         if (data != null)
         {
-            int index = 0, p95Index = 0;
-            double min = data.P95.Value;
-            foreach (var item in data.Latencies)
-            {
-                var timeKey = Convert.ToDouble(item.X);
-                if (latencies.ContainsKey(timeKey))
-                    latencies[timeKey] += Convert.ToInt32(item.Y);
-                else
-                    latencies.Add(timeKey, Convert.ToInt32(item.Y));
-                var value = Convert.ToDouble(item.X);
-                var lastMin = Math.Abs(value - data.P95.Value);
-                if (lastMin - min < 0)
-                {
-                    p95Index = index;
-                }
-                index++;
-            }
+            int p95Index = GetIndex(data.P95 ?? 0, data.Latencies),
+                currentIndex = GetIndex(currentSpan?.Duration ?? 0, data.Latencies);
 
-            var list = data.Latencies.Select(item => Convert.ToDouble(item.X)).Select(item => Math.Abs(item - data.P95.Value)).ToList();
+            var list = data.Latencies?.Select(item => Convert.ToDouble(item.X)).Select(item => Math.Abs(item - data.P95.Value)).ToList();
 
-            timeTypeCount.Data = ConvertDistributionChartData(data.Latencies, 0, p95Index).Json;
+            timeTypeCount.Data = ConvertDistributionChartData(data.Latencies, currentIndex, p95Index).Json;
         }
         timeTypeCount.ChartLoading = false;
-        await LoadTraceDetailAsync();
+    }
+
+    private int GetIndex(long current, IEnumerable<ChartPointDto> data)
+    {
+        if (data == null || !data.Any())
+            return 0;
+
+        int index = 0, findIndex = 0;
+        double min = current;
+        foreach (var item in data)
+        {
+            var timeKey = Convert.ToDouble(item.X);
+            if (latencies.ContainsKey(timeKey))
+                latencies[timeKey] += Convert.ToInt32(item.Y);
+            else
+                latencies.Add(timeKey, Convert.ToInt32(item.Y));
+            var value = Convert.ToDouble(item.X);
+            var lastMin = Math.Abs(value - current);
+            if (lastMin - min < 0)
+            {
+                findIndex = index;
+                min = lastMin;
+            }
+            index++;
+        }
+        return findIndex;
     }
 
     private static EChartType ConvertDistributionChartData(IEnumerable<ChartPointDto> data, int current, int p95)

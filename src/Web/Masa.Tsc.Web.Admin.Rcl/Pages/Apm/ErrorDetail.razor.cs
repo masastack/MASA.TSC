@@ -51,7 +51,7 @@ public partial class ErrorDetail
         }
         if (!string.IsNullOrEmpty(exceptionMessage))
         {
-            append.AppendFormat(" and `Body` like '%{0}%'", exceptionMessage.Replace("x2E", ".").Replace("'", "''"));
+            append.AppendFormat(" and `Body` like '{0}%'", exceptionMessage.Replace("x2E", ".").Replace("'", "''"));
         }
         if (string.IsNullOrEmpty(Search.Text) && append.Length > 0)
             append.Remove(0, 5);
