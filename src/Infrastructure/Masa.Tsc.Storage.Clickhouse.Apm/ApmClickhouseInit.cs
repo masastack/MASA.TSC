@@ -24,13 +24,16 @@ internal static class ApmClickhouseInit
     `ServiceName` String CODEC(ZSTD(1)),
     `Resource.service.namespace` String CODEC(ZSTD(1)),
     `Attributes.http.target` String CODEC(ZSTD(1)),
-    INDEX idx_log_id TraceId TYPE bloom_filter(0.001) GRANULARITY 1,
-    INDEX idx_log_spanid SpanId TYPE bloom_filter(0.001) GRANULARITY 1,
-    INDEX idx_log_environment `Resource.service.namespace` TYPE bloom_filter(0.001) GRANULARITY 1,
-    INDEX idx_log_servicename ServiceName TYPE bloom_filter(0.001) GRANULARITY 1,
-    INDEX idx_log_type `Attributes.exception.type` TYPE bloom_filter(0.001) GRANULARITY 1,
-    INDEX idx_log_endpoint `Attributes.http.target` TYPE bloom_filter(0.001) GRANULARITY 1,
-    INDEX idx_string_message `Attributes.exception.message` TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1
+    `MsgGroupKey` String CODEC(ZSTD(1)),
+
+    INDEX idx_error_id TraceId TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_error_spanid SpanId TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_error_environment `Resource.service.namespace` TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_error_servicename ServiceName TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_error_type `Attributes.exception.type` TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_error_endpoint `Attributes.http.target` TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_error_message `Attributes.exception.message` TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1,
+    INDEX idx_error_msggroupkey MsgGroupKey TYPE bloom_filter(0.001) GRANULARITY 1
 )
 ENGINE = MergeTree
 PARTITION BY toDate(Timestamp)
@@ -38,6 +41,7 @@ ORDER BY (Timestamp,
  ServiceName,
  `Resource.service.namespace`,
  `Attributes.exception.type`,
+ `MsgGroupKey`,
 `Attributes.http.target`)
 TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
@@ -46,8 +50,11 @@ SETTINGS index_granularity = 8192,
 $@"CREATE MATERIALIZED VIEW {Constants.ErrorTable.Replace(".",".v_")} TO {Constants.ErrorTable}
 AS
 SELECT
-Timestamp,TraceId,SpanId, Body AS `Attributes.exception.message`,LogAttributes['exception.type'] AS `Attributes.exception.type`,
-    ServiceName,ResourceAttributes['service.namespace'] AS `Resource.service.namespace`, LogAttributes['RequestPath'] AS `Attributes.http.target`
+    Timestamp,TraceId,SpanId, if(position(Body, '\n') > 0,extract(Body, '[^\n\r]+'),Body) `Attributes.exception.message`,LogAttributes['exception.type'] AS `Attributes.exception.type`,
+    ServiceName,ResourceAttributes['service.namespace'] AS `Resource.service.namespace`, LogAttributes['RequestPath'] AS `Attributes.http.target`,
+multiIf(
+  length(`Attributes.exception.message`)-150<=0,`Attributes.exception.message`,  
+  extract(`Attributes.exception.message`, '[^,:\\.£º£¬\{{\[]+')) AS MsgGroupKey
 FROM {MasaStackClickhouseConnection.LogSourceTable}
 WHERE mapContains(LogAttributes, 'exception.type')
 "};

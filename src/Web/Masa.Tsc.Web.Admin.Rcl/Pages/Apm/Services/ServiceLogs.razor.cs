@@ -70,8 +70,7 @@ public partial class ServiceLogs
         {
             return;
         }
-        await LoadPageDataAsync();
-        isTableLoading = false;
+        await LoadPageDataAsync();       
     }
 
     private async Task LoadChartDataAsync()
@@ -114,6 +113,14 @@ public partial class ServiceLogs
             data.AddRange(result.Result);
         }
         total = (int)result.Total;
+        isTableLoading = false;
+    }
+
+    private async Task OnPageChange((int page, int pageSize) pageData)
+    {
+        page = pageData.page;
+        defaultSize = pageData.pageSize;
+        await LoadPageDataAsync();
     }
 
     private EChartType ConvertLatencyChartData(List<ChartLineCountDto> data, string lineColor = null, string areaLineColor = null, string? unit = null, string? lineName = null)
