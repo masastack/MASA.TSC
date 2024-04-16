@@ -29,8 +29,8 @@ internal partial class ClickhouseApmService : IApmService
     private static readonly Dictionary<string, string> errorOrders = new() {
         {nameof(ErrorMessageDto.Type),"Type"},
         {nameof(ErrorMessageDto.Message),"Message"},
-        {nameof(ErrorMessageDto.LastTime),"`time`"},
-        {nameof(ErrorMessageDto.Total),"`total`"}
+        {nameof(ErrorMessageDto.LastTime),"time"},
+        {nameof(ErrorMessageDto.Total),"total"}
     };
     const double MILLSECOND = 1e6;
     const string SERVICE_NAME = "ServiceName";
@@ -320,10 +320,10 @@ from(
         query.IsServer = default;
         var (where, parameters) = AppendWhere(query);
         var groupby = $"group by Type,Message{(string.IsNullOrEmpty(query.Endpoint) ? "" : ",Endpoint")}";
-        var countSql = $"select count(1) from (select Attributes.exception.type as Type,Attributes.exception.message as Message,max(Timestamp) time,count(1) from {Constants.ErrorTable} where {where} {groupby})";
+        var countSql = $"select count(1) from (select `Attributes.exception.type` as Type,MsgGroupKey as Message,max(Timestamp) time,count(1) from {Constants.ErrorTable} where {where} {groupby})";
         PaginatedListBase<ErrorMessageDto> result = new() { Total = Convert.ToInt64(Scalar(countSql, parameters)) };
         var orderBy = GetOrderBy(query, errorOrders);
-        var sql = $@"select * from( select Attributes.exception.type as Type,Attributes.exception.message as Message,max(Timestamp) time,count(1) total from {Constants.ErrorTable} where {where} {groupby} {orderBy} @limit)";
+        var sql = $@"select * from( select `Attributes.exception.type` as Type,MsgGroupKey as Message,max(Timestamp) time,count(1) total from {Constants.ErrorTable} where {where} {groupby} {orderBy} @limit)";
         SetData(sql, parameters, result, query, reader => new ErrorMessageDto()
         {
             Type = reader[0]?.ToString()!,

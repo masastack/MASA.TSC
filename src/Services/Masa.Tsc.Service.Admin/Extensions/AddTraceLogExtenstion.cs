@@ -23,11 +23,6 @@ public static class AddTraceLogExtenstion
         if (ConfigConst.StorageConst.HasInit || !ConfigConst.IsClickhouse) return;
         if (string.IsNullOrEmpty(ConfigConst.ClikhouseConnection)) return;
         _services.AddMASAStackApmClickhouse(ConfigConst.ClikhouseConnection, ConfigConst.ClickhouseTableSuffix, ConfigConst.ClickHouseLogSourceTable, ConfigConst.ClickHouseTaceSourceTable);
-        //_services.AddMASAStackApmClickhouse(
-        //    "Compress=True;CheckCompressedHash=False;Compressor=lz4;SocketTimeout=10000;Host=10.130.0.106;Port=4229;User=ss;Password=Ckapp@2023;Database=lonsid_fusion", 
-        //    "masav1", 
-        //    "otel_logs_masa",
-        //    "otel_traces_masa");
         ConfigConst.StorageConst.SetClickhouse();
     }
 

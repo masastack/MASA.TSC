@@ -71,8 +71,7 @@ public partial class ServiceEndpoints
             return;
         }
         StateHasChanged();
-        await LoadPageDataAsync();
-        isTableLoading = false;
+        await LoadPageDataAsync();        
         StateHasChanged();
         await LoadChartDataAsync();
     }
@@ -107,6 +106,14 @@ public partial class ServiceEndpoints
             }));
         }
         total = (int)result.Total;
+        isTableLoading = false;
+    }
+
+    private async Task OnPageChange((int page, int pageSize) pageData)
+    {
+        page = pageData.page;
+        defaultSize = pageData.pageSize;
+        await LoadPageDataAsync();
     }
 
     private async Task LoadChartDataAsync()

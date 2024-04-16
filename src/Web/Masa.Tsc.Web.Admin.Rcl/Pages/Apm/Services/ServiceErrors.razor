@@ -39,7 +39,14 @@
                 else if (context.Header.Value == nameof(ErrorMessageDto.Message))
                 {
                     <div style="width:400px" class="text-truncate">
-                        @context.Item.Message
+                        <div style="width:400px" class="text-truncate">
+                            <a target="_blank"
+                               style="text-decoration:none"
+                               title="@context.Item.Message"
+                               href="/apm/errors/@(HttpUtility.UrlEncode(context.Item.Message).Replace(".","x2E")+GetUrlParam(service:Search.Service,env: GetSearchEnv(Search.Environment), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,exType:context.Item.Type,exMsg:context.Item.Message,search:Search.Text))">
+                                @context.Item.Message
+                            </a>
+                        </div>
                     </div>
                 }
                 @if (context.Header.Value == nameof(ErrorMessageDto.LastTime))
@@ -53,7 +60,7 @@
             </ItemColContent>
         </SDataTable>
         <MCard Rounded=true Class="px-6" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
-            <SPagination Class="mt-2" Page="page" PageChanged="OnPageChange" @bind-PageSize=defaultSize Total=total PageSizeSelect="@(new List<int>{defaultSize})" />
+            <SPagination Class="mt-2" Page="page" OnChange="OnPageChange" @bind-PageSize=defaultSize Total=total />
         </MCard>
     </div>
 </div>

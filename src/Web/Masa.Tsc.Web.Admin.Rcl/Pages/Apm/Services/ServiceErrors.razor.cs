@@ -19,7 +19,7 @@ public partial class ServiceErrors
         new() { Text = I18n.Apm("Error.List.Total"), Value = nameof(ErrorMessageDto.Total)}
     };
 
-    private int defaultSize = 5;
+    private int defaultSize = 20;
     private int total = 0;
     private int page = 1;
     private List<ErrorMessageDto> data = new();
@@ -55,9 +55,10 @@ public partial class ServiceErrors
         await base.OnParametersSetAsync();
     }
 
-    private async Task OnPageChange(int page)
+    private async Task OnPageChange((int page, int pageSize) pageData)
     {
-        this.page = page;
+        page = pageData.page;
+        defaultSize = pageData.pageSize;
         await LoadPageDataAsync();
     }
 

@@ -105,6 +105,7 @@ public partial class ApmComponentBase : BDomComponentBase
          DateTime? end = default,
          ApmComparisonTypes? comparisonType = default,
          string? exType = default,
+         string? exMsg = default,
          string? traceId = default,
          string? spanId = default,
          string? search = default)
@@ -124,6 +125,8 @@ public partial class ApmComponentBase : BDomComponentBase
             text.AppendFormat("&end={0}", HttpUtility.UrlEncode(end.Value.ToString("yyyy-MM-dd HH:mm:ss")));
         if (!string.IsNullOrEmpty(exType))
             text.AppendFormat("&ex_type={0}", HttpUtility.UrlEncode(exType));
+        if (!string.IsNullOrEmpty(exMsg))
+            text.AppendFormat("&ex_msg={0}", HttpUtility.UrlEncode(exMsg).Replace(".", "x2E"));
         if (!string.IsNullOrEmpty(traceId))
             text.AppendFormat("&traceId={0}", HttpUtility.UrlEncode(traceId));
         if (!string.IsNullOrEmpty(spanId))

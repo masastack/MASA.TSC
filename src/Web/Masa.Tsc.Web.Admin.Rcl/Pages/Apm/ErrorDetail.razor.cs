@@ -47,14 +47,13 @@ public partial class ErrorDetail
 
         if (!string.IsNullOrEmpty(exceptionType))
         {
-            //append.AppendFormat(" and exception.type='{0}'", exceptionType);
-            append.AppendFormat(" and LogAttributesValues[indexOf(LogAttributesKeys,'exception.type')]='{0}'", exceptionType);
+            append.AppendFormat(" and `Attributes.exception.type`='{0}'", exceptionType);
         }
-        //if (!string.IsNullOrEmpty(exceptionMessage))
-        //{
-        //    append.AppendFormat(" and LogAttributesValues[indexOf(LogAttributesKeys,'exception.message')]='{0}'", exceptionMessage);
-        //}
-        if (string.IsNullOrEmpty(Search.Text))
+        if (!string.IsNullOrEmpty(exceptionMessage))
+        {
+            append.AppendFormat(" and `Body` like '%{0}%'", exceptionMessage.Replace("x2E", ".").Replace("'", "''"));
+        }
+        if (string.IsNullOrEmpty(Search.Text) && append.Length > 0)
             append.Remove(0, 5);
         Search.Text = append.ToString();
     }
