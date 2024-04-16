@@ -19,7 +19,7 @@ public partial class ServiceLogs
         new() { Text = I18n.Apm("Log.List.Body"), Value = nameof(LogResponseDto.Body) }
     };
 
-    private int defaultSize = 5;
+    private int defaultSize = 10;
     private int total = 0;
     private int page = 1;
     private List<LogResponseDto> data = new();

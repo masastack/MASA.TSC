@@ -60,7 +60,7 @@
             </ItemColContent>
         </SDataTable>
         <MCard Rounded=true Class="px-6" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
-            <SPagination Class="mt-2" Page="page" PageChanged="OnPageChange" @bind-PageSize=defaultSize Total=total PageSizeSelect="@(new List<int>{defaultSize})" />
+            <SPagination Class="mt-2" Page="page" OnChange="OnPageChange" @bind-PageSize=defaultSize Total=total />
         </MCard>
     </div>
 </div>

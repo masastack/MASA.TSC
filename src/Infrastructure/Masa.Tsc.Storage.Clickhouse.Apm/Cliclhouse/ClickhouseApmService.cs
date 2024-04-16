@@ -29,8 +29,8 @@ internal partial class ClickhouseApmService : IApmService
     private static readonly Dictionary<string, string> errorOrders = new() {
         {nameof(ErrorMessageDto.Type),"Type"},
         {nameof(ErrorMessageDto.Message),"Message"},
-        {nameof(ErrorMessageDto.LastTime),"`time`"},
-        {nameof(ErrorMessageDto.Total),"`total`"}
+        {nameof(ErrorMessageDto.LastTime),"time"},
+        {nameof(ErrorMessageDto.Total),"total"}
     };
     const double MILLSECOND = 1e6;
     const string SERVICE_NAME = "ServiceName";
