@@ -465,7 +465,7 @@ internal static class IElasticClientExtenstion
         if (type == AggregateTypes.GroupBy)
         {
             if (isAll)
-                return value.Items.Select(it => KeyValuePair.Create(((KeyedBucket<object>)it).Key.ToString(), ((KeyedBucket<object>)it).DocCount)).ToList();
+                return value.Items.Select(it => KeyValuePair.Create(((KeyedBucket<object>)it).Key.ToString(), ((KeyedBucket<object>)it).DocCount ?? 0)).ToList();
             else
                 return value.Items.Select(it => ((KeyedBucket<object>)it).Key.ToString()).ToList();
         }
