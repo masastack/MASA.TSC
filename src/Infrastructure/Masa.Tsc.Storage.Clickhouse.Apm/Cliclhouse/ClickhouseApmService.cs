@@ -142,7 +142,7 @@ from(
         bool isInstrument = !string.IsNullOrEmpty(query.Queries);
         query.IsMetric = !isInstrument;
         var (where, parameters) = AppendWhere(query);
-        bool isEndpoint = query is ApmEndpointRequestDto apmEndpointDto && string.IsNullOrEmpty(apmEndpointDto.Endpoint);
+        bool isEndpoint = query is ApmEndpointRequestDto;
         string groupAppend = isEndpoint ? ",`Attributes.http.target`,`Attributes.http.method`" : string.Empty;
         string sql;
         var period = GetPeriod(query);
@@ -254,7 +254,7 @@ from(
             }
             else
             {
-                name = $"{reader[7]} {reader[6]}";
+                name = $"{reader[8]} {reader[7]}";
             }
             var time = new DateTimeOffset(Convert.ToDateTime(reader[0])).ToUnixTimeSeconds();
             if (current == null || current.Name != name)

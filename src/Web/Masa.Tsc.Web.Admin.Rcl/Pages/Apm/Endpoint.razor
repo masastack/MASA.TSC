@@ -24,10 +24,17 @@
     <ItemColContent>
         @if (context.Header.Value == nameof(ListChartData.Name))
         {
-            <div style="width:400px;overflow:hidden" class="text-truncate">
-                <a href="/apm/endpoints/@(HttpUtility.UrlEncode(context.Item.Name)+GetUrlParam(service: context.Item.Service, env: GetSearchEnv(Search.Environment, context.Item.Envs?.Split(',')),endpoint:context.Item.Endpoint, comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,search:Search.Text))"
-                   title="@context.Item.Name">@context.Item.Name</a>
-            </div>
+            <MTooltip Top Context="tooltipContent">
+                <ActivatorContent>
+                    <div @attributes="@tooltipContent.Attrs" style="width:400px;overflow:hidden" class="text-truncate">
+                        <a href="/apm/endpoints/@(HttpUtility.UrlEncode(context.Item.Name)+GetUrlParam(service: context.Item.Service, env: GetSearchEnv(Search.Environment, context.Item.Envs?.Split(',')),endpoint:context.Item.Endpoint, comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,search:Search.Text))"
+                           title="@context.Item.Name">@context.Item.Name</a>
+                    </div>
+                </ActivatorContent>
+                <ChildContent>
+                    <span>@context.Item.Name</span>
+                </ChildContent>
+            </MTooltip>
         }
         else if (context.Header.Value == nameof(ListChartData.Service))
         {

@@ -45,7 +45,7 @@ public class ApmService : ServiceBase
     {
         BaseApmRequestDto queryDto;
 
-        if (endpoint == null)
+        if (endpoint == null || string.IsNullOrEmpty(service))
         {
             queryDto = new BaseApmRequestDto();
         }
@@ -53,7 +53,7 @@ public class ApmService : ServiceBase
         {
             queryDto = new ApmEndpointRequestDto()
             {
-                Endpoint = endpoint!
+                Endpoint = endpoint.Equals("@all", StringComparison.InvariantCultureIgnoreCase) ? "" : endpoint!
             };
         }
         queryDto.Start = start.ParseUTCTime();

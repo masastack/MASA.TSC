@@ -44,9 +44,16 @@
                 }
                 else if (context.Header.Value == nameof(LogResponseDto.Body))
                 {
-                    <div style="width:200px;overflow:hidden" class="text-truncate">
-                        @context.Item.Body
-                    </div>
+                    <MTooltip Top Context="tooltipContent">
+                        <ActivatorContent>
+                            <div @attributes="@tooltipContent.Attrs" style="width:400px" class="text-truncate">
+                                @context.Item.Body
+                            </div>
+                        </ActivatorContent>
+                        <ChildContent>
+                            <span>@context.Item.Body</span>
+                        </ChildContent>
+                    </MTooltip>
                 }
             </ItemColContent>
         </SDataTable>

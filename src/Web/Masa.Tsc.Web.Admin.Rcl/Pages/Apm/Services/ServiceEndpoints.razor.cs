@@ -71,7 +71,7 @@ public partial class ServiceEndpoints
             return;
         }
         StateHasChanged();
-        await LoadPageDataAsync();        
+        await LoadPageDataAsync();
         StateHasChanged();
         await LoadChartDataAsync();
     }
@@ -126,7 +126,7 @@ public partial class ServiceEndpoints
             PageSize = defaultSize,
             Start = SearchData.Start,
             End = SearchData.End,
-            Endpoint = "",
+            Endpoint = "@all",
             Service = SearchData.Service,
             Env = SearchData.Environment
         };
@@ -138,7 +138,7 @@ public partial class ServiceEndpoints
 
         foreach (var service in data)
         {
-            var chartData = result.Find(s => s.Name == service.Endpoint);
+            var chartData = result.Find(s => s.Name == service.Name);
             service.LatencyChartData = new();
             service.ThroughputChartData = new();
             service.FailedChartData = new();
