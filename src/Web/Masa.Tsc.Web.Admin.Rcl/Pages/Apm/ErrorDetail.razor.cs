@@ -73,8 +73,16 @@ public partial class ErrorDetail
             IsLimitEnv = false
         });
         total = (int)result.Total;
-        currentLog = result.Result[0];
-        _dic = currentLog.ToDictionary();
+        if (total == 0)
+        {
+            currentLog = null;
+            _dic = new Dictionary<string, object>();
+        }
+        else
+        {
+            currentLog = result.Result[0];
+            _dic = currentLog.ToDictionary();
+        }
     }
 
     private async Task LoadTraceAsync()

@@ -24,4 +24,6 @@ public sealed class ApmService : BaseService
     public Task<List<ChartLineCountDto>> GetLogChartAsync(ApmEndpointRequestDto query) => Caller.GetAsync<List<ChartLineCountDto>>($"{RootPath}/logChart", data: query)!;
 
     public Task<EndpointLatencyDistributionDto> GetLatencyDistributionAsync(ApmEndpointRequestDto query) => Caller.GetAsync<EndpointLatencyDistributionDto>($"{RootPath}/latencyDistributions", data: query)!;
+
+    public Task<Dictionary<string,List<string>>> GetEnviromentServiceAsync(BaseApmRequestDto query) => Caller.GetAsync<Dictionary<string, List<string>>>($"{RootPath}/enviromentService", data: query)!;
 }

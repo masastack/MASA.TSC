@@ -59,4 +59,6 @@ public interface IApmService : IDisposable
     Task<IEnumerable<ChartLineCountDto>> GetEndpointChartAsync(ApmEndpointRequestDto query);
 
     Task<IEnumerable<ChartLineCountDto>> GetLogChartAsync(ApmEndpointRequestDto query);
+
+    Dictionary<string, List<string>> GetEnviromentServices(BaseApmRequestDto query);
 }

@@ -143,5 +143,12 @@ public class ApmService : ServiceBase
             Service = service
         });
 
+    public Dictionary<string, List<string>> GetEnviromentService([FromServices] IApmService apmService, string start, string end)
+        => apmService.GetEnviromentServices(new BaseApmRequestDto
+        {
+            Start = start.ParseUTCTime(),
+            End = end.ParseUTCTime()
+        });
+
     private static string? GetEnv(string? env) => string.Equals("all", env, StringComparison.CurrentCultureIgnoreCase) ? default : env;
 }

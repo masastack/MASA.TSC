@@ -200,7 +200,7 @@ public partial class OverView
         var data = await ApiCaller.ApmService.GetLatencyDistributionAsync(query);
         await LoadTraceDetailAsync();
         var currentSpan = traceDetails?.Find(item => item.Attributes.TryGetValue("http.target", out var value) && value.ToString().Equals(SearchData.Endpoint, StringComparison.OrdinalIgnoreCase));
-        if (data != null)
+        if (data != null && data.Latencies.Any())
         {
             int p95Index = GetIndex(data.P95 ?? 0, data.Latencies),
                 currentIndex = GetIndex(currentSpan?.Duration ?? 0, data.Latencies);

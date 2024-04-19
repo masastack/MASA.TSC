@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Contrib.StackSdks.Pm.Service;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm;
 
 public partial class ApmSearchComponent
@@ -40,6 +42,7 @@ public partial class ApmSearchComponent
     };
     private List<string> services = new();
     private List<string> environments = new();
+    private Dictionary<string, List<string>> enviromentServices = new();
     private bool isServiceLoading = true, isEnvLoading = true;
 
     private bool isCallQuery = false;
@@ -128,26 +131,20 @@ public partial class ApmSearchComponent
     private async Task LoadServiceAsync()
     {
         if (!ShowService) return;
-        isServiceLoading = true;
-        var query = new SimpleAggregateRequestDto
+        isServiceLoading = true;        
+        if (!string.IsNullOrEmpty(Search.Environment))
         {
-            Start = Search.Start,
-            End = Search.End,
-            Name = StorageConst.ServiceName,
-            Type = AggregateTypes.GroupBy
-        };
-        if (!string.IsNullOrEmpty(Search.Environment) && Search.Environment != "All")
-        {
-            query.Conditions = new List<FieldConditionDto> {
-                new FieldConditionDto{
-                    Name=StorageConst.Environment,
-                    Type= ConditionTypes.Equal,
-                    Value=Search.Environment
-                }
-            };
+            if (!enviromentServices.TryGetValue(Search.Environment!, out services))
+                services = new();
         }
-        var result = await ApiCaller.TraceService.GetAttrValuesAsync(query);
-        services = result?.ToList() ?? new List<string>();
+        else
+        {
+            foreach (var item in enviromentServices)
+            {
+                services.AddRange(item.Value);
+            }
+            services = services.Distinct().ToList();
+        }
         if (!string.IsNullOrEmpty(Search.Service) && !services.Contains(Search.Service))
             Search.Service = default!;
         isServiceLoading = false;
@@ -157,15 +154,14 @@ public partial class ApmSearchComponent
     {
         if (!ShowEnv) return;
         isEnvLoading = true;
-        var query = new SimpleAggregateRequestDto
+        var query = new BaseApmRequestDto
         {
             Start = Search.Start,
-            End = Search.End,
-            Name = StorageConst.Environment,
-            Type = AggregateTypes.GroupBy
+            End = Search.End            
         };
-        var result = await ApiCaller.TraceService.AggregateAsync<IEnumerable<string>>(query);
-        environments = result?.ToList() ?? new List<string>();
+        var result = await ApiCaller.ApmService.GetEnviromentServiceAsync(query);
+        enviromentServices = result;
+        environments = result.Keys.ToList();
         if (!string.IsNullOrEmpty(Search.Environment) && !environments.Contains(Search.Environment))
             Search.Environment = default!;
         isEnvLoading = false;

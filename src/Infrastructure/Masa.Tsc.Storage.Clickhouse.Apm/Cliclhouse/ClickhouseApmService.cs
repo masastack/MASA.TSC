@@ -706,4 +706,45 @@ from {Constants.ErrorTable} where {where} {groupby}";
         }
         return Task.FromResult(list.AsEnumerable());
     }
+
+    public Dictionary<string, List<string>> GetEnviromentServices(BaseApmRequestDto query)
+    {
+        query.IsServer = true;
+        query.IsMetric = true;
+        var period = GetPeriod(query);
+        var result = new Dictionary<string, List<string>>();
+        var tableName = Constants.GetAggregateTable(period);
+        var sql = $@"select        
+        ServiceName,`Resource.service.namespace`
+            from {tableName}
+            where Timestamp between @start and @end
+            group by `Resource.service.namespace`,ServiceName
+            order by `Resource.service.namespace`,ServiceName";
+        lock (lockObj)
+        {
+            using var reader = Query(sql, new ClickHouseParameter[] {
+                new (){ ParameterName="start",DbType= DbType.DateTime,Value=MasaStackClickhouseConnection.ToTimeZone(query.Start)},
+                new (){ ParameterName="end",DbType= DbType.DateTime,Value=MasaStackClickhouseConnection.ToTimeZone(query.End)},
+            });
+            if (reader != null && !reader.NextResult())
+                return result;
+            string env = null, currentEnv = null;
+            while (reader.Read())
+            {
+                env = reader[1].ToString()!;
+                var service = reader[0].ToString()!;
+                if (currentEnv == null || currentEnv != env)
+                {
+                    result.Add(env, new List<string> { service });
+                    currentEnv = env;
+                }
+                else
+                {
+                    result[env].Add(service);
+                }
+            }
+
+            return result;
+        }
+    }
 }

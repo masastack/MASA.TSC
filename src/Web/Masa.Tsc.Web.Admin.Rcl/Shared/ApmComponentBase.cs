@@ -36,13 +36,13 @@ public partial class ApmComponentBase : BDomComponentBase
 
     public ApmComponentBase()
     {
-
     }
 
     protected override void OnInitialized()
     {
         if (IsPage)
         {
+            Search.Text = default!;
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
             var values = HttpUtility.ParseQueryString(uri.Query);
             var start = values.Get("start");
@@ -110,7 +110,7 @@ public partial class ApmComponentBase : BDomComponentBase
          string? spanId = default,
          string? search = default)
     {
-        StringBuilder text = new StringBuilder();
+        var text = new StringBuilder();
         if (!string.IsNullOrEmpty(env))
             text.AppendFormat("&env={0}", HttpUtility.UrlEncode(env));
         if (!string.IsNullOrEmpty(service))
