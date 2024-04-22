@@ -60,12 +60,12 @@ internal static class IDbConnectionExtensitions
     public static List<MappingResponseDto> GetMapping(this IDbConnection dbConnection, bool isLog)
     {
         var type = isLog ? "log" : "trace";
-        var result = dbConnection.Query($"select DISTINCT Name from otel_mapping Array join Name where `Type`='{type}_basic' order by Name", default, ConvertToMapping);
+        var result = dbConnection.Query($"select DISTINCT Name from {MasaStackClickhouseConnection.MappingTable} Array join Name where `Type`='{type}_basic' order by Name", default, ConvertToMapping);
         if (result == null || result.Count == 0)
             return default!;
 
-        var attributes = dbConnection.Query($"select DISTINCT concat('{ATTRIBUTE_KEY}',Name)  from otel_mapping Array join Name where `Type`='{type}_attributes' order by Name", default, ConvertToMapping);
-        var resources = dbConnection.Query($"select DISTINCT concat('{RESOURCE_KEY}',Name)  from otel_mapping Array join Name where `Type`='resource' order by Name", default, ConvertToMapping);
+        var attributes = dbConnection.Query($"select DISTINCT concat('{ATTRIBUTE_KEY}',Name)  from {MasaStackClickhouseConnection.MappingTable} Array join Name where `Type`='{type}_attributes' order by Name", default, ConvertToMapping);
+        var resources = dbConnection.Query($"select DISTINCT concat('{RESOURCE_KEY}',Name)  from {MasaStackClickhouseConnection.MappingTable} Array join Name where `Type`='resource' order by Name", default, ConvertToMapping);
         if (attributes != null && attributes.Count > 0) result.AddRange(attributes);
         if (resources != null && resources.Count > 0) result.AddRange(resources);
 
