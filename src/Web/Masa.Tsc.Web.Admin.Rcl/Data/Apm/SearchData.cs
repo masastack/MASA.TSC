@@ -19,7 +19,7 @@ public class SearchData
 
     public ApmComparisonTypes ComparisonType { get; set; }
 
-    public long Timestamp { get; set; }
+    //public long Timestamp { get; set; }
 
     public string ExceptionType { get; set; }
 

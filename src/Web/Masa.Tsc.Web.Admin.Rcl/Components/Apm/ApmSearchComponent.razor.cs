@@ -207,7 +207,7 @@ public partial class ApmSearchComponent
     private async Task OnValueChanged()
     {
         isCallQuery = true;
-        Search.Timestamp = DateTime.Now.ToUnixTimestamp();
+        //Search.Timestamp = DateTime.Now.ToUnixTimestamp();
         await ValueChanged.InvokeAsync(Search);
         StateHasChanged();
     }

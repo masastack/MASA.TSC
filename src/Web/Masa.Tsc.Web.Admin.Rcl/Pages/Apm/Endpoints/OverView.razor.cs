@@ -8,21 +8,23 @@ public partial class OverView
     [CascadingParameter]
     public SearchData SearchData { get; set; }
 
-    private static List<(MetricTypes, string)> metricTypes = new() { (MetricTypes.Avg, "avg"), (MetricTypes.P95, "p95"), (MetricTypes.P99, "p99") };
-    private LatencyTypeChartData metricTypeChartData = new();
-    private ChartData throughput = new(), failed = new(), timeTypeCount = new();
+    private static readonly List<(MetricTypes, string)> metricTypes = new() { (MetricTypes.Avg, "avg"), (MetricTypes.P95, "p95"), (MetricTypes.P99, "p99") };
+    private readonly LatencyTypeChartData metricTypeChartData = new();
+    private ChartData throughput = new();
+    private ChartData failed = new();
+    private readonly ChartData timeTypeCount = new();
     private string? lastKey = null;
-    private ApmTraceLatencyRequestDto query = new();
+    private readonly ApmTraceLatencyRequestDto query = new();
     private List<TraceResponseDto>? traceDetails = null;
     private List<ChartPointDto>? errors = null;
     int page = 1, total = 1;
-    Dictionary<double, int> latencies = new();
+    readonly Dictionary<double, int> latencies = new();
     double percentile = 0;
-    //string? traceId = default;    
 
     protected override async Task OnParametersSetAsync()
     {
-        var key = MD5Utils.Encrypt(JsonSerializer.Serialize(SearchData));
+        var text = JsonSerializer.Serialize(SearchData);
+        var key = MD5Utils.Encrypt(text);
         if (lastKey != key)
         {
             lastKey = key;
@@ -69,6 +71,7 @@ public partial class OverView
         if (!string.IsNullOrEmpty(traceId))
         {
             traceDetails = (await ApiCaller.TraceService.GetAsync(traceId))?.ToList()!;
+
             await LoadTraceErrorsAsync(traceId);
             CaculatePercentil();
         }
