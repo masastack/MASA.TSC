@@ -12,6 +12,10 @@ public sealed class MasaStackClickhouseConnection : ClickHouseConnection
 
     public static string TraceTable { get; private set; }
 
+    public static string TraceSpanTable { get; private set; }
+
+    public static string TraceClientTable { get; private set; }
+
     public static string MappingTable { get; private set; }
 
     public static TimeZoneInfo TimeZone { get; set; }
@@ -39,5 +43,7 @@ public sealed class MasaStackClickhouseConnection : ClickHouseConnection
         TraceSourceTable = $"{database}{traceSourceTable}";
         LogSourceTable = $"{database}{logSourceTable}";
         MappingTable = $"{database}otel_mapping_{suffix}";
+        TraceSpanTable = $"{database}{traceSourceTable}_spans_{suffix}";
+        TraceClientTable = $"{database}{traceSourceTable}_clients_{suffix}";
     }
 }

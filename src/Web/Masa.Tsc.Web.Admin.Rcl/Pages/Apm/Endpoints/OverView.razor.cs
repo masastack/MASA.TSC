@@ -150,11 +150,11 @@ public partial class OverView
         }
         else
         {
-            metricTypeChartData.Avg.EmptyChart = true;
-            metricTypeChartData.P95.EmptyChart = true;
-            metricTypeChartData.P99.EmptyChart = true;
-            throughput.EmptyChart = true;
-            failed.EmptyChart = true;
+            metricTypeChartData.Avg.HasChart = false;
+            metricTypeChartData.P95.HasChart = false;
+            metricTypeChartData.P99.HasChart = false;
+            throughput.HasChart = false;
+            failed.HasChart = false;
         }
     }
 
@@ -211,6 +211,11 @@ public partial class OverView
             var list = data.Latencies?.Select(item => Convert.ToDouble(item.X)).Select(item => Math.Abs(item - data.P95.Value)).ToList();
 
             timeTypeCount.Data = ConvertDistributionChartData(data.Latencies, currentIndex, p95Index).Json;
+            timeTypeCount.HasChart = true;
+        }
+        else
+        {
+            timeTypeCount.HasChart = false;
         }
         timeTypeCount.ChartLoading = false;
     }

@@ -70,7 +70,7 @@ internal partial class ClickhouseApmService : IApmService
         var orderBy = GetOrderBy(query, isEndpoint ? endpointOrders : serviceOrders, defaultSort: isEndpoint ? endpointOrders["Name"] : serviceOrders["Name"]);
         if (isInstrument)
         {
-            countSql = $"select count(1) from(select count(1) from {MasaStackClickhouseConnection.TraceTable} where {where} {groupby})";
+            countSql = $"select count(1) from(select count(1) from {MasaStackClickhouseConnection.TraceSpanTable} where {where} {groupby})";
             var minites = (long)(query.End - query.Start).TotalMinutes;
             if (minites == 0) minites = 1;
             sql = $@"select * from(
@@ -81,7 +81,7 @@ floor(AVG(Duration/{MILLSECOND})) Latency,
 round(count(1)*1.0/{minites},2) Throughput,
 round(sum(has(['{string.Join("','", query.GetErrorStatusCodes())}'],`Attributes.http.status_code`))*100.0/if(count(1)=0,1,count(1)),2) Failed
 {groupAppend}
-from {MasaStackClickhouseConnection.TraceTable} where {where} {groupby} {orderBy} @limit)";
+from {MasaStackClickhouseConnection.TraceSpanTable} where {where} {groupby} {orderBy} @limit)";
         }
         else
         {
@@ -168,7 +168,7 @@ from(
                 floor(quantile(0.99)(Duration/{MILLSECOND})) `P99`,
                 floor(quantile(0.95)(Duration/{MILLSECOND})) `P95`,
                 ServiceName{groupAppend}
-                from {MasaStackClickhouseConnection.TraceTable} where {where} 
+                from {MasaStackClickhouseConnection.TraceSpanTable} where {where} 
                 group by ServiceName{groupAppend},`time`
                 order by ServiceName{groupAppend},`time`
                 ) t
@@ -292,10 +292,10 @@ from(
     {
         var (where, parameters) = AppendWhere(query);
         var result = new EndpointLatencyDistributionDto();
-        var p95 = Convert.ToDouble(Scalar($"select floor(quantile(0.95)(Duration/{MILLSECOND})) p95 from {MasaStackClickhouseConnection.TraceTable} where {where}", parameters));
+        var p95 = Convert.ToDouble(Scalar($"select floor(quantile(0.95)(Duration/{MILLSECOND})) p95 from {MasaStackClickhouseConnection.TraceSpanTable} where {where}", parameters));
         if (p95 is not double.NaN)
             result.P95 = (long)Math.Floor(p95);
-        var sql = $@"select Duration/{MILLSECOND},count(1) total from {MasaStackClickhouseConnection.TraceTable} where {where} group by Duration order by Duration";
+        var sql = $@"select Duration/{MILLSECOND},count(1) total from {MasaStackClickhouseConnection.TraceSpanTable} where {where} group by Duration order by Duration";
         var list = new List<ChartPointDto>();
         lock (lockObj)
         {
@@ -611,7 +611,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} and SeverityText='Er
         var sql = $@"select 
 toStartOfInterval(`Timestamp` , INTERVAL  {GetPeriod(query)} ) as `time`,
 count(1) `total`
-from {MasaStackClickhouseConnection.TraceTable} where {where} {groupby}";
+from {MasaStackClickhouseConnection.TraceSpanTable} where {where} {groupby}";
 
         return Task.FromResult(GetChartCountData(sql, parameters, query.ComparisonType).AsEnumerable());
     }

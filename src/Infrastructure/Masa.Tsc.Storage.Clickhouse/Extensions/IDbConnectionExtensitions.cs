@@ -13,13 +13,13 @@ internal static class IDbConnectionExtensitions
     {
         var (where, parameters, ors) = AppendWhere(query);
         var orderBy = AppendOrderBy(query, false);
-        var countSql = CombineOrs($"select count() as `total` from {MasaStackClickhouseConnection.TraceTable} where {where}", ors);
+        var countSql = CombineOrs($"select count() as `total` from {MasaStackClickhouseConnection.TraceSpanTable} where {where}", ors);
         var total = Convert.ToInt64(ExecuteScalar(connection, $"select sum(`total`) from {countSql}", parameters?.ToArray()));
         var start = (query.Page - 1) * query.PageSize;
         var result = new PaginatedListBase<TraceResponseDto>() { Total = total, Result = new() };
         if (total > 0 && start - total < 0)
         {
-            var querySql = CombineOrs($"select ServiceName,{TIMSTAMP_KEY},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceTable} where {where}", ors, orderBy);
+            var querySql = CombineOrs($"select ServiceName,{TIMSTAMP_KEY},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceSpanTable} where {where}", ors, orderBy);
             result.Result = Query(connection, $"select * from {querySql} as t limit {start},{query.PageSize}", parameters?.ToArray(), ConvertTraceDto);
         }
         return result;
@@ -75,7 +75,14 @@ internal static class IDbConnectionExtensitions
     public static List<TraceResponseDto> GetTraceByTraceId(this IDbConnection connection, string traceId)
     {
         string where = $"TraceId=@TraceId";
-        return Query(connection, $"select * from (select {TIMSTAMP_KEY},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceTable} where {where}) as t limit 1000", new IDataParameter[] { new ClickHouseParameter { ParameterName = "TraceId", Value = traceId } }, ConvertTraceDto);
+        return Query(connection,
+            $@"select * from (
+                    select {TIMSTAMP_KEY},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceSpanTable} where {where}
+                    union all
+                    select {TIMSTAMP_KEY},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceClientTable} where {where}
+                ) as t 
+            order by {TIMSTAMP_KEY}
+            limit 1000", new IDataParameter[] { new ClickHouseParameter { ParameterName = "TraceId", Value = traceId } }, ConvertTraceDto);
     }
 
     public static string AppendOrderBy(BaseRequestDto query, bool isLog)
@@ -376,7 +383,7 @@ internal static class IDbConnectionExtensitions
         var appendWhere = new StringBuilder();
         var name = GetName(requestDto.Name, isLog);
         AppendAggtype(requestDto, sql, append, name, out var isScalar);
-        sql.AppendFormat(" from {0} ", isLog ? MasaStackClickhouseConnection.LogTable : MasaStackClickhouseConnection.TraceTable);
+        sql.AppendFormat(" from {0} ", isLog ? MasaStackClickhouseConnection.LogTable : MasaStackClickhouseConnection.TraceSpanTable);
         var (where, @paremeters, _) = AppendWhere(requestDto, !isLog);
         sql.Append($" where {appendWhere} {where}");
         sql.Append(append);
@@ -537,7 +544,7 @@ internal static class IDbConnectionExtensitions
     public static string GetMaxDelayTraceId(this IDbConnection dbConnection, BaseRequestDto requestDto)
     {
         var (where, parameters, _) = AppendWhere(requestDto);
-        var text = $"select * from( TraceId from {MasaStackClickhouseConnection.TraceTable} where {where} order by Duration desc) as t limit 1";
+        var text = $"select * from( TraceId from {MasaStackClickhouseConnection.TraceSpanTable} where {where} order by Duration desc) as t limit 1";
         return dbConnection.ExecuteScalar(text, parameters?.ToArray())?.ToString()!;
     }
 }

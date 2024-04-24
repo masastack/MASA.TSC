@@ -22,7 +22,9 @@ public static class ClickhouseInit
             if (!ExistsTable(Connection, MasaStackClickhouseConnection.LogSourceTable))
                 throw new ArgumentNullException(nameof(MasaStackClickhouseConnection.LogSourceTable));
             InitLog();
-            InitTrace();
+            //InitTrace(MasaStackClickhouseConnection.TraceTable);
+            InitTrace(MasaStackClickhouseConnection.TraceSpanTable, "where SpanKind =='SPAN_KIND_SERVER'");
+            InitTrace(MasaStackClickhouseConnection.TraceClientTable, "where SpanKind =='SPAN_KIND_CLIENT'");
             InitMappingTable();
             var timezoneStr = GetTimezone(Connection);
             MasaStackClickhouseConnection.TimeZone = TZConvert.GetTimeZoneInfo(timezoneStr);
@@ -108,10 +110,11 @@ FROM {MasaStackClickhouseConnection.LogSourceTable}
         InitTable(MasaStackClickhouseConnection.LogTable, sql);
     }
 
-    private static void InitTrace()
+    private static void InitTrace(string table, string? where = null)
     {
+
         string[] sql = new string[] {
-            @$"CREATE TABLE {MasaStackClickhouseConnection.TraceTable}
+            @$"CREATE TABLE {table}
 (
     `Timestamp` DateTime64(9) CODEC(Delta(8), ZSTD(1)),
     `TraceId` String CODEC(ZSTD(1)),
@@ -175,7 +178,7 @@ TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
 ",
-            $@"CREATE MATERIALIZED VIEW {MasaStackClickhouseConnection.TraceTable.Replace(".",".v_")} TO {MasaStackClickhouseConnection.TraceTable}
+            $@"CREATE MATERIALIZED VIEW {table.Replace(".",".v_")} TO {table}
 AS
 SELECT
     Timestamp,TraceId,SpanId,ParentSpanId,TraceState,SpanName,SpanKind,ServiceName,toJSONString(ResourceAttributes) AS Resources,
@@ -199,8 +202,9 @@ SELECT
     mapKeys(SpanAttributes) AS SpanAttributesKeys,
     mapValues(SpanAttributes) AS SpanAttributesValues
 FROM {MasaStackClickhouseConnection.TraceSourceTable}
+{where}
 " };
-        InitTable(MasaStackClickhouseConnection.TraceTable, sql);
+        InitTable(table, sql);
     }
 
     private static void InitMappingTable()
