@@ -180,7 +180,7 @@ public partial class TscTrace
     {
         if (!string.IsNullOrEmpty(value) && value.Length - 32 == 0)
         {
-            return Regex.IsMatch("[a-zA-Z0-9]{32}", value);
+            return Regex.IsMatch(value, "[a-zA-Z0-9]{32}");
         }
         return false;
     }

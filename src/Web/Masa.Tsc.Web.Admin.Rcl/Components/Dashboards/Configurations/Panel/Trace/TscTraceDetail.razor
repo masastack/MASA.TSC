@@ -59,7 +59,7 @@
                             </div>
                         }
                     </div>
-                }                
+                }
             </div>
 
             @if (_treeData.Any())
@@ -93,8 +93,17 @@
                        Style='@($"height: calc(100vh - {(_timelineView.Count-15>0? 300:_timelineView.Count*20) + 254}px)")'
                        @key="@_treeData">
                 <LabelContent>
-                    @context.Item.Name
-                    @((RenderFragment)(labelBuilder => RenderItemLabel(labelBuilder, context.Item)))
+                    <MTooltip Left Top Context="tooltipContent">
+                        <ActivatorContent>
+                            <div style="max-width:1000px;white-space:nowrap" class="d-flex justify-start">
+                                <div @attributes="@tooltipContent.Attrs" class="text-truncate pt-1">@context.Item.Name</div>
+                                @((RenderFragment)(labelBuilder => RenderItemLabel(labelBuilder, context.Item)))
+                            </div>
+                        </ActivatorContent>
+                        <ChildContent>
+                            <span>@context.Item.Name</span>
+                        </ChildContent>
+                    </MTooltip>
                 </LabelContent>
                 <AppendContent>
                 </AppendContent>
@@ -119,8 +128,8 @@
                                     serviceName = "- -";
                                 }
                                 <TooltipCopy Value="@serviceName" TextClass="text-lg-h6 copy_text"
-                                         IconClass="icon_large"
-                                         IconHoverClass="icon_large_hover"></TooltipCopy>
+                                             IconClass="icon_large"
+                                             IconHoverClass="icon_large_hover"></TooltipCopy>
                             </MListItemSubtitle>
                         </MListItemContent>
                     </MListItem>
@@ -135,8 +144,8 @@
                                             target = "- -";
                                         }
                                         <TooltipCopy Value="@target" TextClass="text-lg-h6 copy_text"
-                                                 IconClass="icon_large"
-                                                 IconHoverClass="icon_large_hover"></TooltipCopy>
+                                                     IconClass="icon_large"
+                                                     IconHoverClass="icon_large_hover"></TooltipCopy>
                                     </div>
                                     @if (!string.Equals(target, "- -"))
                                     {
@@ -153,13 +162,13 @@
                 <div class="trace_detail" style="width:382px">
                     <MTabs Value="_tabValue" ValueChanged="OnTabValueChange" ShowArrows="false">
                         <MTab>@($"{I18n.Trace("Attribute")}({_activeTreeItem.Attributes.Count})")</MTab>
-                            <MTab>@($"{I18n.Trace("Resource")}({_activeTreeItem.Resource.Count})")</MTab>
-                            <MTab>@($"{I18n.Trace("Detail")}({detail.Count})")</MTab>
-                            <MTab>@($"{I18n.Log("Log")}{(_logsCount == null ? "" : "(" + _logsCount + ")")}")</MTab>
-                        </MTabs>
-                        <MTabsItems @bind-Value="_tabValue">
-                            <MTabItem>
-                                @((RenderFragment)(dictRender => RenderDictionary(dictRender, _activeTreeItem.Attributes)))
+                        <MTab>@($"{I18n.Trace("Resource")}({_activeTreeItem.Resource.Count})")</MTab>
+                        <MTab>@($"{I18n.Trace("Detail")}({detail.Count})")</MTab>
+                        <MTab>@($"{I18n.Log("Log")}{(_logsCount == null ? "" : "(" + _logsCount + ")")}")</MTab>
+                    </MTabs>
+                    <MTabsItems @bind-Value="_tabValue">
+                        <MTabItem>
+                            @((RenderFragment)(dictRender => RenderDictionary(dictRender, _activeTreeItem.Attributes)))
                         </MTabItem>
                         <MTabItem>
                             @((RenderFragment)(dictRender => RenderDictionary(dictRender, _activeTreeItem.Resource)))
@@ -252,7 +261,7 @@
                 </MListItemContent>
                 <MListItemAction Style="max-width: 38%">
                     <MListItemActionText Class="text-truncate text-right masa body-2"
-                             Style="width: 100%; cursor: auto;">
+                                         Style="width: 100%; cursor: auto;">
                         <TooltipCopy Value="@value" TextClass="copy_text"></TooltipCopy>
                     </MListItemActionText>
                 </MListItemAction>

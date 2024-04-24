@@ -118,6 +118,12 @@ internal static class IDbConnectionExtensitions
             sql.Append($" and `{ATTRIBUTE_KEY}http.target`=@HttpTarget");
             @paramerters.Add(new ClickHouseParameter() { ParameterName = "HttpTarget", Value = query.Endpoint });
         }
+        if (!string.IsNullOrEmpty(query.TraceId))
+        {
+            sql.Append($" and TraceId=@TraceId");
+            @paramerters.Add(new ClickHouseParameter() { ParameterName = "TraceId", Value = query.TraceId });
+        }
+
         var ors = AppendKeyword(query.Keyword, paramerters, isTrace);
         AppendConditions(query.Conditions, paramerters, sql, isTrace);
 
