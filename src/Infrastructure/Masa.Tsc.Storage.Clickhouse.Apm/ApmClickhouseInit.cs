@@ -13,6 +13,7 @@ internal static class ApmClickhouseInit
 
     private static void InitErrorTable(MasaStackClickhouseConnection connection)
     {
+        var viewTable = Constants.ErrorTable.Replace(".", ".v_");
         var sql = new string[]{
         @$"CREATE TABLE {Constants.ErrorTable}
 (
@@ -47,7 +48,7 @@ TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
 ",
-$@"CREATE MATERIALIZED VIEW {Constants.ErrorTable.Replace(".",".v_")} TO {Constants.ErrorTable}
+$@"CREATE MATERIALIZED VIEW {viewTable} TO {Constants.ErrorTable}
 AS
 SELECT
     Timestamp,TraceId,SpanId, if(position(Body, '\n') > 0,extract(Body, '[^\n\r]+'),Body) `Attributes.exception.message`,LogAttributes['exception.type'] AS `Attributes.exception.type`,
@@ -58,7 +59,8 @@ multiIf(
 FROM {MasaStackClickhouseConnection.LogSourceTable}
 WHERE mapContains(LogAttributes, 'exception.type')
 "};
-        ClickhouseInit.InitTable(connection, Constants.ErrorTable, sql);
+        ClickhouseInit.InitTable(connection, Constants.ErrorTable, sql[0]);
+        ClickhouseInit.InitTable(connection, viewTable, sql[1]);
     }
 
     private static void InitAggregateTable(MasaStackClickhouseConnection connection)
@@ -71,6 +73,7 @@ WHERE mapContains(LogAttributes, 'exception.type')
 
     private static void InitAggregateTable(MasaStackClickhouseConnection connection, string interval, string tableName)
     {
+        var viewTable = tableName.Replace(".", ".v_");
         var sql = new string[] {
         $@"CREATE TABLE {tableName}
 (
@@ -95,7 +98,7 @@ ORDER BY (
  )
  TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192",
-$@"CREATE MATERIALIZED VIEW {tableName.Replace(".",".v_")} TO {tableName}
+$@"CREATE MATERIALIZED VIEW {viewTable} TO {tableName}
 (
     `ServiceName` String,
     `Resource.service.namespace` String,
@@ -110,16 +113,16 @@ $@"CREATE MATERIALIZED VIEW {tableName.Replace(".",".v_")} TO {tableName}
 ) AS
 SELECT
     ServiceName,
-    `Resource.service.namespace`,
-    `Attributes.http.target`,
-    `Attributes.http.method`,
+    ResourceAttributes['service.namespace'] `Resource.service.namespace`,
+    SpanAttributes['http.target'] `Attributes.http.target`,
+    SpanAttributes['http.method'] `Attributes.http.method`,
     toStartOfInterval(Timestamp,INTERVAL {interval}) AS Timestamp,
     avgState(Duration) AS Latency,
     countState(1) AS Throughput,
-    sumState(has(['400','500','501','502','503'],`Attributes.http.status_code`)) as Failed,
+    sumState(has(['400','500','501','502','503'],SpanAttributes['http.status_code'])) as Failed,
     quantileState(0.99)(Duration) as P99,
     quantileState(0.95)(Duration) as P95 
-FROM {MasaStackClickhouseConnection.TraceTable}
+FROM {MasaStackClickhouseConnection.TraceSourceTable}
 WHERE
 SpanKind='SPAN_KIND_SERVER'
 GROUP BY
@@ -129,6 +132,8 @@ GROUP BY
     `Attributes.http.method`,
     Timestamp"
         };
-        ClickhouseInit.InitTable(connection, tableName, sql);
+
+        ClickhouseInit.InitTable(connection, tableName, sql[0]);
+        ClickhouseInit.InitTable(connection, viewTable, sql[1]);
     }
 }

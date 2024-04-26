@@ -37,6 +37,7 @@ public static class ClickhouseInit
 
     private static void InitLog()
     {
+        var viewTable = MasaStackClickhouseConnection.LogTable.Replace(".", ".v_");
         string[] sql = new string[] {
             @$"CREATE TABLE {MasaStackClickhouseConnection.LogTable}
 (
@@ -91,7 +92,7 @@ TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
 ",
-            $@"CREATE MATERIALIZED VIEW {MasaStackClickhouseConnection.LogTable.Replace(".",".v_")} TO {MasaStackClickhouseConnection.LogTable}
+            $@"CREATE MATERIALIZED VIEW {viewTable} TO {MasaStackClickhouseConnection.LogTable}
 AS
 SELECT
 Timestamp,TraceId,SpanId,TraceFlags,SeverityText,SeverityNumber,ServiceName,Body,ResourceSchemaUrl,toJSONString(ResourceAttributes) as Resources,
@@ -107,12 +108,13 @@ mapKeys(LogAttributes) as LogAttributesKeys,mapValues(LogAttributes) as LogAttri
 FROM {MasaStackClickhouseConnection.LogSourceTable}
 ",
         };
-        InitTable(MasaStackClickhouseConnection.LogTable, sql);
+        InitTable(MasaStackClickhouseConnection.LogTable, sql[0]);
+        InitTable(viewTable, sql[1]);
     }
 
     private static void InitTrace(string table, string? where = null)
     {
-
+        var viewTable = table.Replace(".", ".v_");
         string[] sql = new string[] {
             @$"CREATE TABLE {table}
 (
@@ -178,7 +180,7 @@ TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
 ",
-            $@"CREATE MATERIALIZED VIEW {table.Replace(".",".v_")} TO {table}
+            $@"CREATE MATERIALIZED VIEW {viewTable} TO {table}
 AS
 SELECT
     Timestamp,TraceId,SpanId,ParentSpanId,TraceState,SpanName,SpanKind,ServiceName,toJSONString(ResourceAttributes) AS Resources,
@@ -204,7 +206,8 @@ SELECT
 FROM {MasaStackClickhouseConnection.TraceSourceTable}
 {where}
 " };
-        InitTable(table, sql);
+        InitTable(table, sql[0]);
+        InitTable(viewTable, sql[1]);
     }
 
     private static void InitMappingTable()

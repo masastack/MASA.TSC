@@ -24,8 +24,8 @@ public partial class Logs
     private int page = 1;
     private List<LogResponseDto> data = new();
     private bool isTableLoading = false;
-    private string? sortFiled;
-    private bool? sortBy;
+    private string? sortFiled = nameof(LogResponseDto.Timestamp);
+    private bool? sortBy = true;
     private bool dialogShow = false;
     private LogResponseDto current = null;
 
@@ -97,7 +97,7 @@ public partial class Logs
             IsDesc = sortBy ?? false,
             SortField = sortFiled!,
             Query = Search.Text,
-            IsLimitEnv=false
+            IsLimitEnv = false
         };
         var result = await ApiCaller.LogService.GetPageAsync(query);
         data.Clear();

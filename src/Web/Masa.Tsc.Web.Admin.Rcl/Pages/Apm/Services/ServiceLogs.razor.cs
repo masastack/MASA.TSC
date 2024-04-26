@@ -22,12 +22,12 @@ public partial class ServiceLogs
     private int defaultSize = 20;
     private int total = 0;
     private int page = 1;
-    private List<LogResponseDto> data = new();
+    private readonly List<LogResponseDto> data = new();
     private bool isTableLoading = false;
-    private string? sortFiled;
-    private bool? sortBy;
+    private string? sortFiled = nameof(LogResponseDto.Timestamp);
+    private bool? sortBy = true;
     private string lastKey = string.Empty;
-    private ChartData chart = new();
+    private readonly ChartData chart = new();
     private bool dialogShow = false;
     private LogResponseDto current = null;
 
@@ -70,7 +70,7 @@ public partial class ServiceLogs
         {
             return;
         }
-        await LoadPageDataAsync();       
+        await LoadPageDataAsync();
     }
 
     private async Task LoadChartDataAsync()

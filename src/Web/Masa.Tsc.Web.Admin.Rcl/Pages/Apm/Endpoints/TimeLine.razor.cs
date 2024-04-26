@@ -76,6 +76,7 @@ public partial class TimeLine
         traceLinkUrl = default;
         spanLinkUrl = default;
         timeLines.Clear();
+        services.Clear();
         if (traces == null || !traces.Any())
             return;
 
@@ -99,6 +100,24 @@ public partial class TimeLine
             limit = 100;
         }
 
+        start = traces.Min(item => item.Timestamp);
+        end = traces.Max(item => item.EndTimestamp);
+        CaculateTotalTime(start, end);
+
+        do
+        {
+            SetRootTimeLine(traces);
+        }
+        while (traces.Count > 0);
+
+        timeLines = timeLines.OrderBy(item => item.Trace.Timestamp).ToList();
+        services = services.Distinct().ToList();
+        traceLinkUrl = GetUrl(timeLines[0]);
+    }
+
+
+    private void SetRootTimeLine(List<TraceResponseDto> traces)
+    {
         var roots = GetEmptyParentNodes(traces!);
         if (!roots.Any())
         {
@@ -106,12 +125,11 @@ public partial class TimeLine
             if (!roots.Any())
                 roots = traces.OrderBy(t => t.Timestamp).ToList();
         }
-        services = traces.Select(item => item.Resource["service.name"].ToString()).Distinct().ToList()!;
-        start = traces.Min(item => item.Timestamp);
-        end = traces.Max(item => item.EndTimestamp);
-        CaculateTotalTime(start, end);
+        services.AddRange(traces.Select(item => item.Resource["service.name"].ToString())!);
+
         foreach (var item in roots)
         {
+            traces.Remove(item);
             var timeLine = new TreeLineDto
             {
                 ParentSpanId = item.ParentSpanId,
@@ -131,8 +149,6 @@ public partial class TimeLine
             }
             timeLines.Add(timeLine);
         }
-
-        traceLinkUrl = GetUrl(timeLines[0]);
     }
 
     private List<TreeLineDto> GetChildren(string spanId, List<TraceResponseDto> traces)
@@ -142,6 +158,7 @@ public partial class TimeLine
         var result = new List<TreeLineDto>();
         foreach (var item in children)
         {
+            traces.Remove(item);
             var timeLine = new TreeLineDto
             {
                 ParentSpanId = item.ParentSpanId,
@@ -364,6 +381,10 @@ public class TreeLineDto
 
                     if (matches.Count > 0)
                         table = matches[0].Value;
+                }
+                else
+                {
+                    table = database.System;
                 }
 
                 Type = $"{action} {table}";
