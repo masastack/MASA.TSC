@@ -16,6 +16,10 @@ public class QueryHandler : EnvQueryHandler
     [EventHandler]
     public async Task AggregateAsync(LogAggQuery query)
     {
+        if (query.Data.End < query.Data.Start)
+        {
+            (query.Data.End, query.Data.Start) = (query.Data.Start, query.Data.End);
+        }
         query.Data.SetValues();
         query.Data.SetEnv(GetServiceEnvironmentName(query.Data.Service));
         query.Result = await _logService.AggregateAsync(query.Data);
@@ -33,6 +37,10 @@ public class QueryHandler : EnvQueryHandler
             PageSize = 1,
             Sort = new FieldOrderDto { Name = StorageConst.Timestimap(ConfigConst.IsElasticsearch, ConfigConst.IsClickhouse), IsDesc = !queryData.IsDesc }
         };
+        if (query.End < query.Start)
+        {
+            (query.End, query.Start) = (query.Start, query.End);
+        }
 
         var env = GetServiceEnvironmentName(string.Empty!);
         query.SetEnv(env);
@@ -102,7 +110,7 @@ public class QueryHandler : EnvQueryHandler
             if (queryData.IsLimitEnv)
             {
                 env = GetServiceEnvironmentName(queryData.Service!);
-            }            
+            }
             if (!string.IsNullOrEmpty(env))
                 query.SetEnv(env, queryData.IsLimitEnv);
         }

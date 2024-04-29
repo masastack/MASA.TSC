@@ -49,8 +49,8 @@ public partial class ApmComponentBase : BDomComponentBase
             var end = values.Get("end");
             if (DateTime.TryParse(start, out DateTime startTime) && DateTime.TryParse(end, out DateTime endTime) && endTime > startTime)
             {
-                Search.Start = startTime;
-                Search.End = endTime;
+                Search.Start = startTime.ToDateTimeOffset(default).UtcDateTime;
+                Search.End = endTime.ToDateTimeOffset(default).UtcDateTime;
             }
             var service = values.Get("service");
             var env = values.Get("env");
@@ -98,7 +98,7 @@ public partial class ApmComponentBase : BDomComponentBase
         base.OnInitialized();
     }
 
-    public static string GetUrlParam(string? service = default,
+    public string GetUrlParam(string? service = default,
          string? env = default,
          string? endpoint = default,
          DateTime? start = default,
@@ -120,7 +120,7 @@ public partial class ApmComponentBase : BDomComponentBase
         if (comparisonType.HasValue)
             text.AppendFormat("&comparison={0}", (int)comparisonType);
         if (start.HasValue && start.Value > DateTime.MinValue)
-            text.AppendFormat("&start={0:yyyy-MM-dd HH:mm:ss}", HttpUtility.UrlEncode(start.Value.ToString("yyyy-MM-dd HH:mm:ss")));
+            text.AppendFormat("&start={0}", HttpUtility.UrlEncode(start.Value.ToString("yyyy-MM-dd HH:mm:ss")));
         if (end.HasValue && end.Value > DateTime.MinValue)
             text.AppendFormat("&end={0}", HttpUtility.UrlEncode(end.Value.ToString("yyyy-MM-dd HH:mm:ss")));
         if (!string.IsNullOrEmpty(exType))
