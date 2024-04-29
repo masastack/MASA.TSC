@@ -80,6 +80,10 @@
     "1d": "1天",
     "Current Selected TimeZone": "当前时区"
   },
+  "apmlogs": "日志",
+  "apmservices": "服务",
+  "apmendpoints": "接口",
+  "apmerrors": "错误",
   "Team": {
     "ProjectTeam": "项目团队",
     "Project name": "项目名称",
