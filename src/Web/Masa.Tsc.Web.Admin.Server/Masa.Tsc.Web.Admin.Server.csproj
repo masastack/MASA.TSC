@@ -4,6 +4,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>f6cdf028-3564-47a5-a4fb-662685680853</UserSecretsId>
+		<ServerGarbageCollection>false</ServerGarbageCollection>
+		<ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="IdentityModel" Version="6.1.0-preview.1" />
