@@ -43,7 +43,7 @@
                             <div @attributes="@tooltipContent.Attrs" style="width:400px" class="text-truncate">
                                 <a target="_blank"
                                    style="text-decoration:none"
-                                   href="/apm/errors/@(HttpUtility.UrlEncode(context.Item.Message).Replace(".","x2E")+GetUrlParam(service:Search.Service,env: GetSearchEnv(Search.Environment), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,exType:context.Item.Type,exMsg:context.Item.Message,search:Search.Text))">
+                                   href="/apm/errors/@(HttpUtility.UrlEncode(context.Item.Message).Replace(".","x2E")+GetUrlParam(service:Search.Service,env: GetSearchEnv(Search.Environment), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,exType:context.Item.Type,exMsg:context.Item.Message))">
                                     @context.Item.Message
                                 </a>
                             </div>
