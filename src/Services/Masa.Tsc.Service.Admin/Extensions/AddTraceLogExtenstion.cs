@@ -22,7 +22,7 @@ public static class AddTraceLogExtenstion
     {
         if (ConfigConst.StorageConst.HasInit || !ConfigConst.IsClickhouse) return;
         if (string.IsNullOrEmpty(ConfigConst.ClikhouseConnection)) return;
-        _services.AddMASAStackApmClickhouse(ConfigConst.ClikhouseConnection, ConfigConst.ClickhouseTableSuffix, ConfigConst.ClickHouseLogSourceTable, ConfigConst.ClickHouseTaceSourceTable);
+        _services.AddMASAStackApmClickhouse(ConfigConst.ClikhouseConnection, ConfigConst.ClickhouseTableSuffix, ConfigConst.ClickHouseLogSourceTable, ConfigConst.ClickHouseTaceSourceTable);        
         ConfigConst.StorageConst.SetClickhouse();
     }
 

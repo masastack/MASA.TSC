@@ -176,7 +176,7 @@ ORDER BY (
  Resource.service.namespace,
  ServiceName
  )
-TTL toDateTime(Timestamp) + toIntervalDay(30)
+--TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
 ",
@@ -213,35 +213,77 @@ FROM {MasaStackClickhouseConnection.TraceSourceTable}
     private static void InitMappingTable()
     {
         var mappingTable = "otel_mapping_";
+        var now= DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         var sql = new string[]{
 $@"
 CREATE TABLE {MasaStackClickhouseConnection.MappingTable}
 (
-    `Name` Array(String),
-    `Type` String
+    Timestamp DateTime64(9) CODEC(Delta(8), ZSTD(1)),
+    `Name` String CODEC(ZSTD(1)),
+    `Type` String CODEC(ZSTD(1))
 )
-ENGINE = MergeTree
-ORDER BY Name
+ENGINE = ReplacingMergeTree(Timestamp)
+PRIMARY KEY (Timestamp,`Type`,`Name`)
+ORDER BY (Timestamp,`Type`,`Name`)
+--TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192;",
 @$"CREATE MATERIALIZED VIEW {MasaStackClickhouseConnection.MappingTable.Replace(mappingTable,"v_otel_traces_attribute_mapping")} to {MasaStackClickhouseConnection.MappingTable}
 as
-select DISTINCT arraySort(mapKeys(SpanAttributes)) as Name, 'trace_attributes' as Type
-from {MasaStackClickhouseConnection.TraceSourceTable}",
+select 
+ DISTINCT now() as Timestamp, Names as `Name`,'trace_attributes' AS `Type` 
+ from
+(
+SELECT arraySort(mapKeys(SpanAttributes)) AS Names    
+FROM {MasaStackClickhouseConnection.TraceSourceTable}
+) t
+Array join Names",
 $@"CREATE MATERIALIZED VIEW  {MasaStackClickhouseConnection.MappingTable.Replace(mappingTable,"v_otel_traces_resource_mapping")} to {MasaStackClickhouseConnection.MappingTable}
 as
-select DISTINCT arraySort(mapKeys(ResourceAttributes)) as Name, 'trace_resource' as Type
-from {MasaStackClickhouseConnection.TraceSourceTable}",
+select 
+ DISTINCT now() as Timestamp, Names as `Name`,'trace_resource' AS `Type` 
+ from
+(
+SELECT arraySort(mapKeys(ResourceAttributes)) AS Names    
+FROM {MasaStackClickhouseConnection.TraceSourceTable}
+) t
+Array join Names",
 $@"CREATE MATERIALIZED VIEW {MasaStackClickhouseConnection.MappingTable.Replace(mappingTable,"v_otel_logs_attribute_mapping")} to {MasaStackClickhouseConnection.MappingTable}
 as
-select DISTINCT arraySort(mapKeys(LogAttributes)) as Name, 'log_attributes' as Type
-from {MasaStackClickhouseConnection.LogSourceTable}",
+select 
+ DISTINCT now() as Timestamp, Names as `Name`,'log_attributes' AS `Type` 
+ from
+(
+SELECT arraySort(mapKeys(LogAttributes)) AS Names    
+FROM {MasaStackClickhouseConnection.LogSourceTable}
+) t
+Array join Names",
 $@"CREATE MATERIALIZED VIEW {MasaStackClickhouseConnection.MappingTable.Replace(mappingTable,"v_otel_logs_resource_mapping")} to {MasaStackClickhouseConnection.MappingTable}
 as
-select DISTINCT arraySort(mapKeys(ResourceAttributes)) as Name, 'log_resource' as Type
-from {MasaStackClickhouseConnection.LogSourceTable}",
+select 
+ DISTINCT now() as Timestamp, Names as `Name`,'log_resource' AS `Type` 
+ from
+(
+SELECT arraySort(mapKeys(ResourceAttributes)) AS Names    
+FROM {MasaStackClickhouseConnection.LogSourceTable}
+) t
+Array join Names",
 $@"insert into {MasaStackClickhouseConnection.MappingTable}
-values (['Timestamp','TraceId','SpanId','TraceFlag','SeverityText','SeverityNumber','Body'],'log_basic'),
-(['Timestamp','TraceId','SpanId','ParentSpanId','TraceState','SpanKind','Duration'],'trace_basic');
+values 
+('{now}','Timestamp','log_basic'),
+('{now}','TraceId','log_basic'),
+('{now}','SpanId','log_basic'),
+('{now}','TraceFlag','log_basic'),
+('{now}','SeverityText','log_basic'),
+('{now}','SeverityNumber','log_basic'),
+('{now}','Body','log_basic'),
+
+('{now}','Timestamp','trace_basic'),
+('{now}','TraceId','trace_basic'),
+('{now}','SpanId','trace_basic'),
+('{now}','ParentSpanId','trace_basic'),
+('{now}','TraceState','trace_basic'),
+('{now}','SpanKind','trace_basic'),
+('{now}','Duration','trace_basic');
 " };
         InitTable(MasaStackClickhouseConnection.MappingTable, sql);
     }
