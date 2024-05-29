@@ -213,24 +213,22 @@ FROM {MasaStackClickhouseConnection.TraceSourceTable}
     private static void InitMappingTable()
     {
         var mappingTable = "otel_mapping_";
-        var now= DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         var sql = new string[]{
 $@"
 CREATE TABLE {MasaStackClickhouseConnection.MappingTable}
 (
-    Timestamp DateTime64(9) CODEC(Delta(8), ZSTD(1)),
+    Id UInt64(64),
     `Name` String CODEC(ZSTD(1)),
     `Type` String CODEC(ZSTD(1))
 )
-ENGINE = ReplacingMergeTree(Timestamp)
-PRIMARY KEY (Timestamp,`Type`,`Name`)
-ORDER BY (Timestamp,`Type`,`Name`)
---TTL toDateTime(Timestamp) + toIntervalDay(30)
+ENGINE = ReplacingMergeTree(Id)
+PRIMARY KEY (`Id`)
+ORDER BY (`Id`,`Type`,`Name`)
 SETTINGS index_granularity = 8192;",
 @$"CREATE MATERIALIZED VIEW {MasaStackClickhouseConnection.MappingTable.Replace(mappingTable,"v_otel_traces_attribute_mapping")} to {MasaStackClickhouseConnection.MappingTable}
 as
 select 
- DISTINCT now() as Timestamp, Names as `Name`,'trace_attributes' AS `Type` 
+ DISTINCT sipHash64(concat(Names,'trace_attributes')) as Id, Names as `Name`,'trace_attributes' AS `Type` 
  from
 (
 SELECT arraySort(mapKeys(SpanAttributes)) AS Names    
@@ -240,7 +238,7 @@ Array join Names",
 $@"CREATE MATERIALIZED VIEW  {MasaStackClickhouseConnection.MappingTable.Replace(mappingTable,"v_otel_traces_resource_mapping")} to {MasaStackClickhouseConnection.MappingTable}
 as
 select 
- DISTINCT now() as Timestamp, Names as `Name`,'trace_resource' AS `Type` 
+ DISTINCT sipHash64(concat(Names,'trace_resource')) as Id, Names as `Name`,'trace_resource' AS `Type` 
  from
 (
 SELECT arraySort(mapKeys(ResourceAttributes)) AS Names    
@@ -250,7 +248,7 @@ Array join Names",
 $@"CREATE MATERIALIZED VIEW {MasaStackClickhouseConnection.MappingTable.Replace(mappingTable,"v_otel_logs_attribute_mapping")} to {MasaStackClickhouseConnection.MappingTable}
 as
 select 
- DISTINCT now() as Timestamp, Names as `Name`,'log_attributes' AS `Type` 
+ DISTINCT sipHash64(concat(Names,'log_attributes')) as Id, Names as `Name`,'log_attributes' AS `Type` 
  from
 (
 SELECT arraySort(mapKeys(LogAttributes)) AS Names    
@@ -260,7 +258,7 @@ Array join Names",
 $@"CREATE MATERIALIZED VIEW {MasaStackClickhouseConnection.MappingTable.Replace(mappingTable,"v_otel_logs_resource_mapping")} to {MasaStackClickhouseConnection.MappingTable}
 as
 select 
- DISTINCT now() as Timestamp, Names as `Name`,'log_resource' AS `Type` 
+ DISTINCT sipHash64(concat(Names,'log_resource')) as Id, Names as `Name`,'log_resource' AS `Type` 
  from
 (
 SELECT arraySort(mapKeys(ResourceAttributes)) AS Names    
@@ -269,21 +267,21 @@ FROM {MasaStackClickhouseConnection.LogSourceTable}
 Array join Names",
 $@"insert into {MasaStackClickhouseConnection.MappingTable}
 values 
-('{now}','Timestamp','log_basic'),
-('{now}','TraceId','log_basic'),
-('{now}','SpanId','log_basic'),
-('{now}','TraceFlag','log_basic'),
-('{now}','SeverityText','log_basic'),
-('{now}','SeverityNumber','log_basic'),
-('{now}','Body','log_basic'),
+(sipHash64('Timestamplog_basic'),'Timestamp','log_basic'),
+(sipHash64('TraceIdplog_basic'),'TraceId','log_basic'),
+(sipHash64('SpanIdlog_basic'),'SpanId','log_basic'),
+(sipHash64('TraceFlaglog_basic'),'TraceFlag','log_basic'),
+(sipHash64('SeverityTextlog_basic'),'SeverityText','log_basic'),
+(sipHash64('SeverityNumberlog_basic'),'SeverityNumber','log_basic'),
+(sipHash64('Bodylog_basic'),'Body','log_basic'),
 
-('{now}','Timestamp','trace_basic'),
-('{now}','TraceId','trace_basic'),
-('{now}','SpanId','trace_basic'),
-('{now}','ParentSpanId','trace_basic'),
-('{now}','TraceState','trace_basic'),
-('{now}','SpanKind','trace_basic'),
-('{now}','Duration','trace_basic');
+(sipHash64('Timestamptrace_basic'),'Timestamp','trace_basic'),
+(sipHash64('TraceIdtrace_basic'),'TraceId','trace_basic'),
+(sipHash64('SpanIdtrace_basic'),'SpanId','trace_basic'),
+(sipHash64('ParentSpanIdtrace_basic'),'ParentSpanId','trace_basic'),
+(sipHash64('TraceStatetrace_basic'),'TraceState','trace_basic'),
+(sipHash64('SpanKindtrace_basic'),'SpanKind','trace_basic'),
+(sipHash64('Durationtrace_basic'),'Duration','trace_basic');
 " };
         InitTable(MasaStackClickhouseConnection.MappingTable, sql);
     }
