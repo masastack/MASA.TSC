@@ -20,7 +20,7 @@ public partial class ApmComponentBase : BDomComponentBase
     [Inject]
     public SearchData Search { get; set; }
 
-    public TimeZoneInfo CurrentTimeZone { get; private set; }
+    public static TimeZoneInfo CurrentTimeZone { get; private set; }
 
     protected override void OnAfterRender(bool firstRender)
     {

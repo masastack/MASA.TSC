@@ -45,4 +45,6 @@ public sealed class StorageConst
     public const string ExceptionType = "Attributes.exception.type";
 
     public const string TaskId = "Attributes.TaskId";
+
+    public const string UserId = "Attributes.enduser.id";
 }

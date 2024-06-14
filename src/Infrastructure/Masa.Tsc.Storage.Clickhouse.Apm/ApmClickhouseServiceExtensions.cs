@@ -5,15 +5,17 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ApmClickhouseServiceExtensions
 {
-    internal static ILogger Logger { get; private set; }
+    internal static ILogger Logger { get; }
 
-    public static IServiceCollection AddMASAStackApmClickhouse(this IServiceCollection services, string connectionStr, string suffix = "masastack", string? logSourceTable = null, string? traceSourceTable = null)
+    public static IServiceCollection AddMASAStackApmClickhouse(this IServiceCollection services, string connectionStr, string suffix = "masastack",
+        string? logSourceTable = null, string? traceSourceTable = null,
+        string? appLogSourceTable = null, string? AppTraceSourceTable = null)
     {
         services.AddMASAStackClickhouse(connectionStr, suffix, logSourceTable, traceSourceTable, con =>
          {
              var clickhouseConnection = (MasaStackClickhouseConnection)con;
              Constants.Init(clickhouseConnection.ConnectionSettings.Database, suffix);
-             ApmClickhouseInit.Init(clickhouseConnection);
+             ApmClickhouseInit.Init(clickhouseConnection, suffix, appLogSourceTable, AppTraceSourceTable);
          });
         services.AddScoped<IApmService, ClickhouseApmService>();
         return services;

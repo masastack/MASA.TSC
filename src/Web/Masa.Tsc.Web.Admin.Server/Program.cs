@@ -53,10 +53,10 @@ var redisOption = new RedisConfigurationOptions
 };
 #if DEBUG
 await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC, authHost: "https://auth-service-dev.masastack.com", mcHost: "https://mc-service-dev.masastack.com", pmHost: "https://pm-service-dev.masastack.com");
-builder.Services.AddTscHttpApiCaller("http://localhost:18010").AddDccClient(redisOption);
+builder.Services.AddTscHttpApiCaller("http://localhost:18010",authApiUrl: "https://auth-service-dev.masastack.com").AddDccClient(redisOption);
 #else
     await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC);
-    builder.Services.AddTscHttpApiCaller(masaStackConfig.GetTscServiceDomain()).AddDccClient(redisOption);
+    builder.Services.AddTscHttpApiCaller(masaStackConfig.GetTscServiceDomain(),masaStackConfig.GetAuthServiceDomain()).AddDccClient(redisOption);
 #endif
 
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);

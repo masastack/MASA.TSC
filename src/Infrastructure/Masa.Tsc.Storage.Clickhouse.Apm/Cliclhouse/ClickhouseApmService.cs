@@ -377,9 +377,34 @@ from(
 
         if (!string.IsNullOrEmpty(query.Queries) && query.Queries.Trim().Length > 0)
         {
-            if (!query.Queries.Trim().StartsWith("and ", StringComparison.CurrentCultureIgnoreCase))
-                sql.Append(" and ");
-            sql.AppendLine(query.Queries);
+            //traceid,userId,url,body
+            if (Guid.TryParse(query.Queries, out var _))
+            {
+                if (query.IsLog.HasValue && query.IsLog.Value)
+                {
+                    //sql.AppendLine()
+                }
+                else if (query.IsTrace.HasValue && query.IsTrace.Value)
+                {
+
+                }
+            }
+            //status_code, body
+            else if (long.TryParse(query.Queries, out var _))
+            {
+
+            }
+            //sql
+            else if (query.Queries.Contains(" and ") || query.Queries.Contains(" or ") || query.Queries.Contains("='") || query.Queries.Contains(" in ") || query.Queries.Contains(" not in ") || query.Queries.Contains(" like ") || query.Queries.Contains(" not like  "))
+            {
+                if (!query.Queries.Trim().StartsWith("and ", StringComparison.CurrentCultureIgnoreCase))
+                    sql.Append(" and ");
+                sql.AppendLine(query.Queries);
+            }
+            else
+            {
+
+            }
         }
 
         return (sql.ToString(), parameters);
@@ -746,5 +771,35 @@ from {Constants.ErrorTable} where {where} {groupby}";
 
             return result;
         }
+    }
+
+    public Task<PhoneModelDto> GetDeviceModelAsync(string brand, string model)
+    {
+        var sql = $"select * from {Constants.ModelsTable} where Brand=@brand and Model=@model limit 1";
+        PhoneModelDto result = default!;
+        lock (lockObj)
+        {
+            using var reader = Query(sql, new ClickHouseParameter[] {
+                new ClickHouseParameter{ ParameterName="brand",Value=brand.ToLower() },
+                new ClickHouseParameter{ ParameterName="model",Value=model.ToUpper() }
+            });
+            while (reader.NextResult())
+                while (reader.Read())
+                {
+                    result = new PhoneModelDto()
+                    {
+                        Model = reader[0].ToString()!,
+                        Type = reader[1].ToString()!,
+                        Brand = reader[2]?.ToString()!,
+                        BrandName = reader[3]?.ToString()!,
+                        Code = reader[4]?.ToString()!,
+                        CodeAlis = reader[5]?.ToString()!,
+                        ModeName = reader[6]?.ToString()!,
+                        VerName = reader[7]?.ToString()!,
+                    };
+                }
+        }
+
+        return Task.FromResult(result)!;
     }
 }

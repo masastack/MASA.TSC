@@ -5,17 +5,17 @@ namespace Masa.Tsc.Storage.Clickhouse.Apm;
 
 internal static class ApmClickhouseInit
 {
-    public static void Init(MasaStackClickhouseConnection connection)
+    public static void Init(MasaStackClickhouseConnection connection, string suffix, string? logTable = null, string? traceTable = null)
     {
-        InitErrorTable(connection);
+        InitModelTable(connection);
+        InitErrorTable(connection, suffix, logTable);
+        InitAppTable(connection, suffix, logTable, traceTable);
         InitAggregateTable(connection);
     }
 
-    private static void InitErrorTable(MasaStackClickhouseConnection connection)
+    private static void InitErrorTable(MasaStackClickhouseConnection connection, string? suffix = null, string? appLogTable = null)
     {
-        var viewTable = Constants.ErrorTable.Replace(".", ".v_");
-        var sql = new string[]{
-        @$"CREATE TABLE {Constants.ErrorTable}
+        var sql = @$"CREATE TABLE {Constants.ErrorTable}
 (
     `Timestamp` DateTime64(9) CODEC(Delta(8), ZSTD(1)),
     `TraceId` String CODEC(ZSTD(1)),
@@ -47,8 +47,20 @@ ORDER BY (Timestamp,
 TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
-",
-$@"CREATE MATERIALIZED VIEW {viewTable} TO {Constants.ErrorTable}
+";
+        ClickhouseInit.InitTable(connection, Constants.ErrorTable, sql);
+        InitErrorView(connection, Constants.ErrorTable.Replace(".", ".v_"), MasaStackClickhouseConnection.LogSourceTable);
+        if (!string.IsNullOrEmpty(appLogTable))
+        {
+            string database = string.IsNullOrEmpty(connection.ConnectionSettings.Database) ? default! : $"{connection.ConnectionSettings.Database}.";
+            InitErrorView(connection, $"{database}v_{appLogTable}_errors", appLogTable);
+        }
+    }
+
+    private static void InitErrorView(MasaStackClickhouseConnection connection, string table, string source)
+    {
+        var sql =
+$@"CREATE MATERIALIZED VIEW {table} TO {Constants.ErrorTable}
 AS
 SELECT
     Timestamp,TraceId,SpanId, if(position(Body, '\n') > 0,extract(Body, '[^\n\r]+'),Body) `Attributes.exception.message`,LogAttributes['exception.type'] AS `Attributes.exception.type`,
@@ -56,11 +68,25 @@ SELECT
 multiIf(
   length(`Attributes.exception.message`)-150<=0,`Attributes.exception.message`,  
   extract(`Attributes.exception.message`, '[^,:\\.£º£¬\{{\[]+')) AS MsgGroupKey
-FROM {MasaStackClickhouseConnection.LogSourceTable}
+FROM {source}
 WHERE mapContains(LogAttributes, 'exception.type')
-"};
-        ClickhouseInit.InitTable(connection, Constants.ErrorTable, sql[0]);
-        ClickhouseInit.InitTable(connection, viewTable, sql[1]);
+";
+        ClickhouseInit.InitTable(connection, table, sql);
+    }
+
+    private static void InitAppTable(MasaStackClickhouseConnection connection, string suffix, string? logTable, string? traceTable)
+    {
+        string database = string.IsNullOrEmpty(connection.ConnectionSettings.Database) ? default! : $"{connection.ConnectionSettings.Database}.";
+
+        if (!string.IsNullOrEmpty(logTable))
+        {
+            ClickhouseInit.InitLogView($"{database}v_{logTable}_{suffix}", logTable);
+        }
+        if (!string.IsNullOrEmpty(traceTable))
+        {
+            ClickhouseInit.InitTraceView($"{database}v_{traceTable}_spans_{suffix}", MasaStackClickhouseConnection.TraceSpanTable, traceTable, "where SpanKind =='SPAN_KIND_SERVER'");
+            ClickhouseInit.InitTraceView($"{database}v_{traceTable}_clients_{suffix}", MasaStackClickhouseConnection.TraceClientTable, traceTable, "where SpanKind =='SPAN_KIND_CLIENT'");
+        }
     }
 
     private static void InitAggregateTable(MasaStackClickhouseConnection connection)
@@ -135,5 +161,23 @@ GROUP BY
 
         ClickhouseInit.InitTable(connection, tableName, sql[0]);
         ClickhouseInit.InitTable(connection, viewTable, sql[1]);
+    }
+
+    private static void InitModelTable(MasaStackClickhouseConnection connection)
+    {
+        var sql = $@"create table {Constants.ModelsTable}(
+`Model` String CODEC(ZSTD(1)),
+`Dtype` String CODEC(ZSTD(1)),
+`Brand` String CODEC(ZSTD(1)),
+`BrandName` String CODEC(ZSTD(1)),
+`Code` String CODEC(ZSTD(1)),
+`CodeAlis` String CODEC(ZSTD(1)),
+`ModeName` String CODEC(ZSTD(1)),
+`VerName` String CODEC(ZSTD(1))
+)
+engine = MergeTree
+Order by (`Brand`,`Model`)
+SETTINGS index_granularity = 8192";
+        ClickhouseInit.InitTable(connection, Constants.ModelsTable, sql);
     }
 }

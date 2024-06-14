@@ -1,5 +1,7 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
+using System.Text.Json.Nodes;
+
 [assembly: InternalsVisibleTo("Masa.Contrib.StackSdks.Tsc.Apm.Clickhouse")]
 namespace System.Data.Common;
 
@@ -264,7 +266,19 @@ internal static class IDbConnectionExtensitions
 
     private static void ParseWhere(StringBuilder sql, object value, List<IDataParameter> @paramerters, string fieldName, string paramName, string compare)
     {
-        DbType dbType = value is DateTime ? DbType.DateTime2 : DbType.AnsiString;
+        var dbType = value is DateTime ? DbType.DateTime2 : DbType.AnsiString;
+        if (value is JsonElement json && json.ValueKind == JsonValueKind.Array)
+        {
+            var values = Array.CreateInstance(typeof(JsonElement), json.GetArrayLength());
+            var position = values.Length - 1;
+            do
+            {
+                values.SetValue(json[position], position--);
+            }
+            while (position >= 0);
+            value = values;
+        }
+
         if (value is IEnumerable)
             sql.Append($" and {fieldName} {compare} (@{paramName})");
         else

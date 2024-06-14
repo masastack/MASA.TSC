@@ -32,6 +32,10 @@ internal class ConfigConst
 
     public static string ClickHouseLogSourceTable => Configuration.Clickhouse?.LogSource!;
 
+    public static string ClickHouseAppLogSourceTable => Configuration.Clickhouse?.AppLogTable!;
+
+    public static string ClickHouseAppTraceSourceTable => Configuration.Clickhouse?.AppTraceTable!;
+
     public static string ClickHouseTaceSourceTable => Configuration.Clickhouse?.TraceSource!;
 
     internal sealed class StorageConst

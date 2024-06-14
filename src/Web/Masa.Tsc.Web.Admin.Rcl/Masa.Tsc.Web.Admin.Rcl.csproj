@@ -5,19 +5,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
-
-	<ItemGroup>
-	  <None Remove="Components\Apm\ApmLogView.razor.css" />
-	  <None Remove="Components\Apm\ApmTraceView.razor.css" />
-	  <None Remove="Pages\Apm\ErrorDetail.razor.css" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Content Include="Components\Apm\ApmTraceView.razor.css" />
-	  <Content Include="Components\Apm\ApmLogView.razor.css" />
-	  <Content Include="Pages\Apm\ErrorDetail.razor.css" />
-	</ItemGroup>
-
+	
 	<ItemGroup>
 		<SupportedPlatform Include="browser" />
 	</ItemGroup>

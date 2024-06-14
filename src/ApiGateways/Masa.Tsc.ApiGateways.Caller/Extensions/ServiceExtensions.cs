@@ -6,8 +6,9 @@ namespace Masa.Tsc.ApiGateways.Caller;
 public static class ServiceExtensions
 {
     internal const string DEFAULT_CLIENT_NAME = "masa.tsc.apigateways.caller";
+    internal const string AUTH_CLIENT_NAME = "masa.tsc.auth.apigateways.caller";
 
-    public static IServiceCollection AddTscApiCaller(this IServiceCollection services, string appid)
+    public static IServiceCollection AddTscApiCaller(this IServiceCollection services, string appid, string authAppid)
     {
         try
         {
@@ -22,13 +23,17 @@ public static class ServiceExtensions
             {
                 builder.UseDapr(options => options.AppId = appid,
                     builder => builder.UseDaprApiToken(serviceProviderCopy.GetRequiredService<TokenProvider>()?.AccessToken));
+            }).AddCaller(AUTH_CLIENT_NAME, builder =>
+            {
+                builder.UseDapr(options => options.AppId = authAppid,
+                    builder => builder.UseDaprApiToken(serviceProviderCopy.GetRequiredService<TokenProvider>()?.AccessToken));
             });
 
             services.AddScoped(serviceProvider =>
             {
                 serviceProviderCopy = serviceProvider;
-                var caller = serviceProvider.GetRequiredService<ICallerFactory>().Create(DEFAULT_CLIENT_NAME);
-                var client = new TscCaller(serviceProvider, caller);
+                var callerFactory = serviceProvider.GetRequiredService<ICallerFactory>();
+                var client = new TscCaller(serviceProvider.GetRequiredService<IDccClient>(), callerFactory);
                 return client;
             });
         }
@@ -36,7 +41,7 @@ public static class ServiceExtensions
         return services;
     }
 
-    public static IServiceCollection AddTscHttpApiCaller(this IServiceCollection services, string tscApiUrl)
+    public static IServiceCollection AddTscHttpApiCaller(this IServiceCollection services, string tscApiUrl, string authApiUrl)
     {
         try
         {
@@ -62,12 +67,29 @@ public static class ServiceExtensions
                             http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                     };
                 });
-            });
+            })
+            .AddCaller(AUTH_CLIENT_NAME, builder =>
+                {
+                    builder.UseHttpClient(options =>
+                    {
+                        options.BaseAddress = authApiUrl;
+                        options.Configure = (http) =>
+                        {
+                            var httpContext = serviceProviderCopy.GetRequiredService<IHttpContextAccessor>();
+                            if (httpContext.HttpContext == null)
+                                return;
+                            var token = httpContext.HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken).ConfigureAwait(false).GetAwaiter().GetResult();
+                            if (!string.IsNullOrEmpty(token))
+                                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                        };
+                    });
+                });
 
             services.AddScoped(serviceProvider =>
             {
-                var caller = serviceProvider.GetRequiredService<ICallerFactory>().Create(DEFAULT_CLIENT_NAME);
-                var client = new TscCaller(serviceProvider, caller);
+                serviceProviderCopy = serviceProvider;
+                var callerFactory = serviceProvider.GetRequiredService<ICallerFactory>();
+                var client = new TscCaller(serviceProvider.GetRequiredService<IDccClient>(), callerFactory);
                 return client;
             });
         }

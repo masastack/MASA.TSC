@@ -1,0 +1,170 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.App
+@inherits ApmComponentBase
+@page "/apm/app"
+
+<div class="d-flex flex-row">
+    <div class="d-flex col-2">
+        <SUserAutoComplete Small FillBackground=false Value="_userId" ValueChanged="UserChange" Class="@("user-auto-complete pr-4")" Placeholder="姓名/手机号码/Id" Label="姓名/手机号码/Id" Clearable />
+    </div>
+    <div class="d-flex col-2">
+        <SAutoComplete Small Items="services" Value="@serviceName" ValueChanged="ServiceChange"
+                       TItem="string"
+                       TValue="string"
+                       TItemValue="string"
+                       ItemText="str=>str"
+                       ItemValue="str=>str"
+                       BackgroundColor="white"
+                       Class="@("user-auto-complete pr-4")"
+                       
+                       Placeholder="应用" Label="应用" Clearable />
+    </div>
+    <div class="d-flex col-3">
+        <STextField Small Clearable Value="_searchText" ValueChanged="SearchValueChange" TValue="string" BackgroundColor="white" OnEnter="OnErrorChanged" Label="报错关键信息" Placeholder="报错关键信息" Class="rounded-2" />
+    </div>
+    <div class="d-flex col-5">
+        <SDateTimeRangeToolbar Class="my-auto"
+                               StartDateTime="@start.ToDateTimeOffset(CurrentTimeZone)"
+                               EndDateTime="@end.ToDateTimeOffset(CurrentTimeZone)"
+                               OnUpdate="OnTimeUpdate"
+                               OnAutoUpdate="OnAutoTimeUpdate"
+                               ShowQuickChange=false
+                               ShowTimeZoneSelector=false
+                               DefaultQuickRange="quickRangeKey"
+                               ShowInterval />
+    </div>
+</div>
+<div class="d-flex justify-space-between py-2">
+    <div class="my-2">APP版本号：@firstTrace?.Resource["service.version"]</div>
+    <div class="my-2 pl-4">终端类型：@ClientType()</div>
+    <div class="my-2 pl-4">手机型号：@PhoneModel()</div>
+    <div class="my-2 pl-4">操作系统：@ClientOs()</div>
+    <div class="my-2 pl-4">
+        <MTooltip Top>
+            <ActivatorContent>
+                <div @attributes="@context.Attrs" class="text-truncate" style="max-width:500px">
+                    角色名称：@RolesNames()
+                </div>
+            </ActivatorContent>
+            <ChildContent>
+                @RolesNames()
+            </ChildContent>
+        </MTooltip>
+    </div>
+    <div class="pl-4"><MButton OnClick="@(()=>claimShow=true)">查看用户申明数据</MButton></div>
+</div>
+
+<div class="d-flex flex-row">
+    <!--left-->
+    <div class="col-3 white rounded-lg py-0">
+        <div class="py-4">
+            <SButton OnClick="Top" BorderRadiusClass="rounded-lg" Class="px-10">顶部</SButton>
+            <SButton OnClick="Pre" BorderRadiusClass="rounded-lg" Class="pl-4 px-10"> 前一分钟</SButton>
+        </div>
+        <MVirtualScroll Height="@("calc(100vh - 378px)")" Items="data"
+                        Id="infinite-scroll-virtual">
+            <ItemContent>
+                @((RenderFragment)(render => RenderTraces(render, context)))
+            </ItemContent>
+        </MVirtualScroll>
+        <div class="py-4">
+            <SButton OnClick="Bottom" BorderRadiusClass="rounded-lg px-10">尾部</SButton>
+            <SButton OnClick="Next" BorderRadiusClass="rounded-lg px-10" Class="pl-4"> 后一分钟</SButton>
+        </div>
+    </div>
+    <!--end left-->
+    <!--right-->
+    <div class="col-9 py-0">
+        <div class="d-flex justify-space-between white rounded-t-xl">
+            <div>
+                <MTabs Value="index" Class="rounded-t-xl" ValueChanged="OnTabIndexChange">
+                    <MTab Value="1">@I18n.Apm("Tabs.Metadata")</MTab>
+                    <MTab Value="2">@I18n.Apm("Tabs.Trace")</MTab>
+                    <MTab Value="3">@I18n.Apm("Tabs.Errors")</MTab>
+                    <MTab Value="4">@I18n.Apm("Tabs.Logs")</MTab>
+                </MTabs>
+            </div>
+            <div><SIcon Class="pr-4 pt-2" Tooltip="分享" OnClick="Share">mdi-share</SIcon></div>
+        </div>
+        <CascadingValue Value="Search">
+            <div style="height:calc(100vh - 288px)" class="overflow-y-scroll">
+                <MTabsItems Value="index" Class="rounded-b-xl">
+                    <MTabItem Value="1">
+                        <ApmTraceView Value="@(currentLog!=null?currentLog.Data:currentTrace?.Data)" Dialog=false Height="@("calc(100vh - 400px)")" />
+                    </MTabItem>
+                    <MTabItem Value="2">
+                        <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints.TimeLine Data="traceLines" />
+                    </MTabItem>
+                    <MTabItem Value="3">
+                        <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceErrors />
+                    </MTabItem>
+                    <MTabItem Value="4">
+                        <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceLogs />
+                    </MTabItem>
+                </MTabsItems>
+            </div>
+        </CascadingValue>
+    </div>
+    <!--end right-->
+</div>
+
+<ApmTraceView Value="@claims" @bind-Show="claimShow" />
+@code {
+    private OperationLineTraceModel? currentTrace;
+    private OperationLineLogModel? currentLog;
+
+    private readonly List<OperationLineTraceModel> data = new();
+
+    public void UpdateData(List<TraceResponseDto> traces, List<LogResponseDto> logs)
+    {
+
+    }
+
+    private async Task ChangeCurrent(OperationLineTraceModel trace, OperationLineLogModel? log = null)
+    {
+        currentTrace = trace;
+        currentLog = log;
+        await LoadTraceTimeLines();
+        StateHasChanged();
+    }
+
+    private void RenderTraces(RenderTreeBuilder __builder, OperationLineTraceModel item)
+    {
+        bool isSelected = currentLog == null && currentTrace != null && item == currentTrace;
+        bool isSearchMatched = IsSearchKeyword(item);
+        var color = item.IsError ? "red" : isSelected ? "yellow lighten-2" : isSearchMatched ? "orange lighten-2" : "light-green lighten-2";
+        <div class="d-flex mt-1 text-caption" @onclick="()=>ChangeCurrent(item)">
+            <div class="pl-2 py-1 @color">@item.Time.UtcFormatLocal(CurrentTimeZone)</div>
+            <div class="pl-4 pr-4 py-1 @color rounded-r-sm flex-grow-1">
+                <MTooltip Top>
+                    <ActivatorContent>
+                        <div @attributes="@context.Attrs" class="text-truncate" style="width:210px">
+                            @item.Text
+                        </div>
+                    </ActivatorContent>
+                    <ChildContent>
+                        @item.Text
+                    </ChildContent>
+                </MTooltip>
+            </div>
+        </div>
+        @((RenderFragment)(render => RenderLogs(render, item)))
+    }
+
+    private void RenderLogs(RenderTreeBuilder __builder, OperationLineTraceModel trace)
+    {
+        if (trace.Children == null || trace.Children.Count == 0)
+            return;
+
+        foreach (var item in trace.Children)
+        {
+            bool isSelected = currentLog != null && item == currentLog;
+            bool isSearchMatched = IsSearchKeyword(item);
+            var color = item.IsError ? "red" : isSelected ? "yellow lighten-2" : isSearchMatched ? "orange lighten-2" : "light-green lighten-2";
+            <div class="d-flex mt-1 text-caption" @onclick="()=>ChangeCurrent(trace,item)">
+                <div class="pl-2 py-1 @color">@item.Time.UtcFormatLocal(CurrentTimeZone)</div>
+                <div class="pl-6 py-1 pr-2 @color rounded-r-sm">点击</div>
+                <div class="pr-4 py-1 @color rounded-r-sm flex-grow-1">@item.Text</div>
+            </div>
+        }
+    }
+}

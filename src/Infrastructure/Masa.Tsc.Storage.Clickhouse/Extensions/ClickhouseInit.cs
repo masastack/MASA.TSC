@@ -38,8 +38,7 @@ public static class ClickhouseInit
     private static void InitLog()
     {
         var viewTable = MasaStackClickhouseConnection.LogTable.Replace(".", ".v_");
-        string[] sql = new string[] {
-            @$"CREATE TABLE {MasaStackClickhouseConnection.LogTable}
+        string sql = @$"CREATE TABLE {MasaStackClickhouseConnection.LogTable}
 (
     `Timestamp` DateTime64(9) CODEC(Delta(8), ZSTD(1)),
     `TraceId` String CODEC(ZSTD(1)),
@@ -91,8 +90,14 @@ ORDER BY (
 TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
-",
-            $@"CREATE MATERIALIZED VIEW {viewTable} TO {MasaStackClickhouseConnection.LogTable}
+";
+        InitTable(MasaStackClickhouseConnection.LogTable, sql);
+        InitLogView(viewTable, MasaStackClickhouseConnection.LogTable);
+    }
+
+    public static void InitLogView(string name, string sourceName)
+    {
+        var sql = $@"CREATE MATERIALIZED VIEW {name} TO {MasaStackClickhouseConnection.LogTable}
 AS
 SELECT
 Timestamp,TraceId,SpanId,TraceFlags,SeverityText,SeverityNumber,ServiceName,Body,ResourceSchemaUrl,toJSONString(ResourceAttributes) as Resources,
@@ -105,17 +110,15 @@ LogAttributes['exception.message'] as `Attributes.exception.message`,
 LogAttributes['RequestPath'] as `Attributes.http.target`,
 mapKeys(ResourceAttributes) as ResourceAttributesKeys,mapValues(ResourceAttributes) as ResourceAttributesValues,
 mapKeys(LogAttributes) as LogAttributesKeys,mapValues(LogAttributes) as LogAttributesValues
-FROM {MasaStackClickhouseConnection.LogSourceTable}
-",
-        };
-        InitTable(MasaStackClickhouseConnection.LogTable, sql[0]);
-        InitTable(viewTable, sql[1]);
+FROM {sourceName}
+";
+        InitTable(name, sql);
     }
 
     private static void InitTrace(string table, string? where = null)
     {
         var viewTable = table.Replace(".", ".v_");
-        string[] sql = new string[] {
+        string sql =
             @$"CREATE TABLE {table}
 (
     `Timestamp` DateTime64(9) CODEC(Delta(8), ZSTD(1)),
@@ -179,8 +182,14 @@ ORDER BY (
 --TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
-",
-            $@"CREATE MATERIALIZED VIEW {viewTable} TO {table}
+";
+        InitTable(table, sql);
+        InitTraceView(viewTable, table, MasaStackClickhouseConnection.TraceSourceTable, where);
+    }
+
+    public static void InitTraceView(string viewTable, string table, string sourceTable, string? where = null)
+    {
+        var sql = $@"CREATE MATERIALIZED VIEW {viewTable} TO {table}
 AS
 SELECT
     Timestamp,TraceId,SpanId,ParentSpanId,TraceState,SpanName,SpanKind,ServiceName,toJSONString(ResourceAttributes) AS Resources,
@@ -203,11 +212,10 @@ SELECT
     mapValues(ResourceAttributes) AS ResourceAttributesValues,
     mapKeys(SpanAttributes) AS SpanAttributesKeys,
     mapValues(SpanAttributes) AS SpanAttributesValues
-FROM {MasaStackClickhouseConnection.TraceSourceTable}
+FROM {sourceTable}
 {where}
-" };
-        InitTable(table, sql[0]);
-        InitTable(viewTable, sql[1]);
+";
+        InitTable(viewTable, sql);
     }
 
     private static void InitMappingTable()

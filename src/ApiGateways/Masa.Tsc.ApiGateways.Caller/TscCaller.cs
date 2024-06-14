@@ -5,11 +5,12 @@ namespace Masa.Tsc.ApiGateways.Caller;
 
 public class TscCaller
 {
-    internal TscCaller(IServiceProvider serviceProvider, ICaller caller)
+    internal TscCaller(IDccClient dccClient, ICallerFactory callerFactory)
     {
+        var caller = callerFactory.Create(ServiceExtensions.DEFAULT_CLIENT_NAME);
         AppService = new AppService(caller);
         SettingService = new SettingService(caller);
-        ProjectService = new ProjectService(caller, serviceProvider.GetRequiredService<IDccClient>());
+        ProjectService = new ProjectService(caller, dccClient);
         TeamService = new TeamService(caller);
         LogService = new LogService(caller);
         TraceService = new TraceService(caller);
@@ -17,7 +18,8 @@ public class TscCaller
         InstrumentService = new InstrumentService(caller);
         MetricService = new MetricService(caller);
         TopologyService = new TopologyService(caller);
-        ApmService=new ApmService(caller);
+        ApmService = new ApmService(caller);
+        UserService = new UserService(callerFactory.Create(ServiceExtensions.AUTH_CLIENT_NAME));
     }
 
     public AppService AppService { get; private init; }
@@ -41,4 +43,6 @@ public class TscCaller
     public TopologyService TopologyService { get; private init; }
 
     public SettingService SettingService { get; private init; }
+
+    public UserService UserService { get; private init; }
 }

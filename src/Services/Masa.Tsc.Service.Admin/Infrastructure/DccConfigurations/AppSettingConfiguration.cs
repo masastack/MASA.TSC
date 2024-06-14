@@ -31,5 +31,9 @@ public class ClickhouseConfiguration
 
     public string TraceSource { get; set; }
 
+    public string AppLogTable { get; set; }
+
+    public string AppTraceTable { get; set; }
+
     public string Suffix { get; set; }
 }

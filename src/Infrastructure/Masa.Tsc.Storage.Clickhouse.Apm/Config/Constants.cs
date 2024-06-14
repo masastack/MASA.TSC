@@ -9,6 +9,8 @@ internal static class Constants
 
     private const string AggregateTable = "otel_trace_metrics@interval";
 
+    public static string ModelsTable { get; private set; }
+
     private static string GetAggregateTable(string interval, string suffix)
     {
         if (string.IsNullOrEmpty(interval))
@@ -32,6 +34,7 @@ internal static class Constants
         if (!string.IsNullOrEmpty(database))
             database = $"{database}.";
         ErrorTable = $"{database}otel_errors_{suffix}";
+        ModelsTable = $"{database}tsc_phone_models_{suffix}";
         foreach (var key in INTERVALS)
         {
             DicAggregateTable.Add(key, database + GetAggregateTable(key, suffix));

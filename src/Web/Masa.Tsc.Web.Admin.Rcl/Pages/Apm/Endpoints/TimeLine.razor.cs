@@ -53,16 +53,17 @@ public partial class TimeLine
 
     protected override void OnParametersSet()
     {
+        base.OnParametersSet();
+
         var str = $"{JsonSerializer.Serialize(Data)}";
         var key = MD5Utils.Encrypt(str);
         if (lastKey != key)
         {
             loading = true;
             lastKey = key;
-            CaculateTimelines(Data);
+            CaculateTimelines(Data.ToList());
             loading = false;
         }
-        base.OnParametersSet();
     }
 
     protected override async Task OnInitializedAsync()

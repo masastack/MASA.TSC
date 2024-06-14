@@ -15,6 +15,9 @@ public partial class ApmTraceView
     public bool Show { get; set; }
 
     [Parameter]
+    public bool Dialog { get; set; } = true;
+
+    [Parameter]
     public string LinkUrl { get; set; }
 
     [Parameter]
@@ -23,7 +26,8 @@ public partial class ApmTraceView
     [Parameter]
     public EventCallback<bool> LoadingCompelete { get; set; }
 
-    private string className = "slide";
+    [Parameter]
+    public StringNumber? Height { get; set; }
 
     private async Task CloseAsync()
     {
@@ -35,12 +39,15 @@ public partial class ApmTraceView
 
     protected override void OnParametersSet()
     {
-        if (Show)
+        if ((!Dialog || Show) && Value != null)
         {
             var newKey = JsonSerializer.Serialize(Value);
             if (!string.Equals(md5Key, newKey))
             {
-                _dic = Value.ToDictionary();
+                if (Value is Dictionary<string, object> dic)
+                    _dic = dic;
+                else
+                    _dic = Value.ToDictionary();
                 md5Key = newKey;
             }
         }

@@ -143,6 +143,16 @@ public class ApmService : ServiceBase
             Service = service
         });
 
+
+    public async Task<PaginatedListBase<TraceResponseDto>> GetTraceList([FromServices] ITraceService traceService, [FromBody] BaseRequestDto query)
+        => await traceService.ListAsync(query);
+
+    public async Task<PaginatedListBase<LogResponseDto>> GetLogList([FromServices] ILogService logService, [FromBody] BaseRequestDto query)
+        => await logService.ListAsync(query);
+
+    public async Task<PhoneModelDto> GetModel([FromServices] IApmService apmService, string brand, string model)
+        => await apmService.GetDeviceModelAsync(brand, model);
+
     public Dictionary<string, List<string>> GetEnviromentService([FromServices] IApmService apmService, string start, string end)
         => apmService.GetEnviromentServices(new BaseApmRequestDto
         {
