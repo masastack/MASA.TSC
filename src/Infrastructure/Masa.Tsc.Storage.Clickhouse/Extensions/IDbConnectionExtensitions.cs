@@ -151,20 +151,27 @@ internal static class IDbConnectionExtensitions
             return sqls;
 
         //status_code
-        if (int.TryParse(keyword, out var num) && num != 0 && num - 1000 < 0 && isTrace)
-        {
-            sqls.Add($" and `{ATTRIBUTE_KEY}http.status_code`=@HttpStatusCode");
-            sqls.Add($" and `{ATTRIBUTE_KEY}http.request_content_body` like @Keyword");
-            paramerters.Add(new ClickHouseParameter() { ParameterName = "HttpStatusCode", Value = num });
-            paramerters.Add(new ClickHouseParameter() { ParameterName = "Keyword", Value = $"%{keyword}%" });
-            return sqls;
-        }
-
         if (isTrace)
         {
-            sqls.Add($" and `{ATTRIBUTE_KEY}http.request_content_body` like @Keyword");
-            sqls.Add($" and `{ATTRIBUTE_KEY}http.response_content_body` like @Keyword");
-            sqls.Add($" and `{ATTRIBUTE_KEY}exception.message` like @Keyword");
+            if (int.TryParse(keyword, out var _))
+            {
+                sqls.Add($" and `{ATTRIBUTE_KEY}http.status_code`=@HttpStatusCode");
+                paramerters.Add(new ClickHouseParameter() { ParameterName = "HttpStatusCode", Value = keyword });
+                return sqls;
+            }
+            if (Guid.TryParse(keyword, out var _))
+            {
+                sqls.Add($" and TraceId=@TraceUserId");
+                sqls.Add($" and {GetAttributeName("attributes.enduser.id", false)}=@TraceUserId");
+                paramerters.Add(new ClickHouseParameter() { ParameterName = "TraceUserId", Value = keyword });
+                return sqls;
+            }
+            else
+            {
+                sqls.Add($" and `{ATTRIBUTE_KEY}http.request_content_body` like @Keyword");
+                sqls.Add($" and `{ATTRIBUTE_KEY}http.response_content_body` like @Keyword");
+                sqls.Add($" and `{ATTRIBUTE_KEY}http.target` like @Keyword");
+            }
         }
         else
         {
@@ -173,6 +180,7 @@ internal static class IDbConnectionExtensitions
             sqls.Add(" and Body like @Keyword");
             sqls.Add($" and `{ATTRIBUTE_KEY}exception.message` like @Keyword");
         }
+
         paramerters.Add(new ClickHouseParameter() { ParameterName = "Keyword", Value = $"%{keyword}%" });
         return sqls;
     }

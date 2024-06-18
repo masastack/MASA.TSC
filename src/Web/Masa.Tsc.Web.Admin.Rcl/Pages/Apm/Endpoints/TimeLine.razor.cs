@@ -61,7 +61,7 @@ public partial class TimeLine
         {
             loading = true;
             lastKey = key;
-            CaculateTimelines(Data.ToList());
+            CaculateTimelines(Data?.ToList());
             loading = false;
         }
     }

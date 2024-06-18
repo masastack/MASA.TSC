@@ -34,4 +34,6 @@ public class BaseApmRequestDto : RequestPageBase
     internal bool? IsTrace { get; set; }
 
     internal bool? IsLog { get; set; }
+
+    internal bool? IsError { get; set; }
 }

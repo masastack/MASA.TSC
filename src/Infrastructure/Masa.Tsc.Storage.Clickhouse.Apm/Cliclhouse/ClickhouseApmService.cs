@@ -60,6 +60,7 @@ internal partial class ClickhouseApmService : IApmService
     private Task<PaginatedListBase<T>> MetricListAsync<T>(BaseApmRequestDto query, bool isEndpoint) where T : ServiceListDto, new()
     {
         query.IsServer = true;
+        query.IsTrace = true;
         bool isInstrument = !string.IsNullOrEmpty(query.Queries);
         query.IsMetric = !isInstrument;
         var (where, parameters) = AppendWhere(query);
@@ -139,6 +140,7 @@ from(
     public Task<IEnumerable<ChartLineDto>> ChartDataAsync(BaseApmRequestDto query)
     {
         query.IsServer = true;
+        query.IsTrace = true;
         bool isInstrument = !string.IsNullOrEmpty(query.Queries);
         query.IsMetric = !isInstrument;
         var (where, parameters) = AppendWhere(query);
@@ -290,6 +292,7 @@ from(
 
     public Task<EndpointLatencyDistributionDto> EndpointLatencyDistributionAsync(ApmEndpointRequestDto query)
     {
+        query.IsTrace = true;
         var (where, parameters) = AppendWhere(query);
         var result = new EndpointLatencyDistributionDto();
         var p95 = Convert.ToDouble(Scalar($"select floor(quantile(0.95)(Duration/{MILLSECOND})) p95 from {MasaStackClickhouseConnection.TraceSpanTable} where {where}", parameters));
@@ -318,6 +321,7 @@ from(
     public Task<PaginatedListBase<ErrorMessageDto>> ErrorMessagePageAsync(ApmEndpointRequestDto query)
     {
         query.IsServer = default;
+        query.IsError = true;
         var (where, parameters) = AppendWhere(query);
         var groupby = $"group by Type,Message{(string.IsNullOrEmpty(query.Endpoint) ? "" : ",Endpoint")}";
         var countSql = $"select count(1) from (select `Attributes.exception.type` as Type,MsgGroupKey as Message,max(Timestamp) time,count(1) from {Constants.ErrorTable} where {where} {groupby})";
@@ -374,40 +378,63 @@ from(
         }
         AppendEndpoint(query as ApmEndpointRequestDto, sql, parameters);
         AppendDuration(query as ApmTraceLatencyRequestDto, sql, parameters);
+        AppendRawQuery(query, sql, parameters);
+        return (sql.ToString(), parameters);
+    }
 
-        if (!string.IsNullOrEmpty(query.Queries) && query.Queries.Trim().Length > 0)
+    private static void AppendRawQuery<TQuery>(TQuery query, StringBuilder sql, List<ClickHouseParameter> parameters) where TQuery : BaseApmRequestDto
+    {
+        if (string.IsNullOrEmpty(query.Queries) || query.Queries.Trim().Length == 0)
+            return;
+        //sql
+        if (query.Queries.Contains(" and ") || query.Queries.Contains(" or ") || query.Queries.Contains("='") || query.Queries.Contains(" in ") || query.Queries.Contains(" not in ") || query.Queries.Contains(" like ") || query.Queries.Contains(" not like  "))
         {
-            //traceid,userId,url,body
-            if (Guid.TryParse(query.Queries, out var _))
-            {
-                if (query.IsLog.HasValue && query.IsLog.Value)
-                {
-                    //sql.AppendLine()
-                }
-                else if (query.IsTrace.HasValue && query.IsTrace.Value)
-                {
+            if (!query.Queries.Trim().StartsWith("and ", StringComparison.CurrentCultureIgnoreCase))
+                sql.Append(" and ");
+            sql.AppendLine(query.Queries);
+            return;
+        }
 
-                }
-            }
-            //status_code, body
-            else if (long.TryParse(query.Queries, out var _))
+        bool isTrace = query.IsTrace ?? default, isLog = query.IsLog ?? default, isError = query.IsError ?? default;
+        if (!(isTrace || isLog || isError))
+            return;
+        //guid
+        if (Guid.TryParse(query.Queries, out var _))
+        {
+            if (isError || isLog)
             {
-
-            }
-            //sql
-            else if (query.Queries.Contains(" and ") || query.Queries.Contains(" or ") || query.Queries.Contains("='") || query.Queries.Contains(" in ") || query.Queries.Contains(" not in ") || query.Queries.Contains(" like ") || query.Queries.Contains(" not like  "))
-            {
-                if (!query.Queries.Trim().StartsWith("and ", StringComparison.CurrentCultureIgnoreCase))
-                    sql.Append(" and ");
-                sql.AppendLine(query.Queries);
+                sql.AppendLine($" and TraceId='{query.Queries}'");
             }
             else
             {
+                sql.AppendLine($" and (TraceId='{query.Queries}' or SpanAttributesValues[indexOf(SpanAttributesKeys,'enduser.id')]='{query.Queries}')");
+            }
+            return;
+        }
 
+        //status_code
+        if (long.TryParse(query.Queries, out var _))
+        {
+            if (isTrace)
+            {
+                sql.AppendLine($" and `Attributes.http.status_code`='{query.Queries}'");
+                return;
             }
         }
 
-        return (sql.ToString(), parameters);
+        if (isLog)
+        {
+            sql.AppendLine(" and Body like @p1");
+        }
+        else if (isError)
+        {
+            sql.AppendLine(" and (`Attributes.exception.type` like @p1 or `Attributes.exception.message` like @p1)");
+        }
+        else
+        {
+            sql.AppendLine("and (`Attributes.http.target` like @p1 or `Attributes.http.request_content_body` like @p1)");
+        }
+        parameters.Add(new ClickHouseParameter { ParameterName = "p1", Value = $"%{query.Queries}%" });
     }
 
     private static void AppendEndpoint(ApmEndpointRequestDto? traceQuery, StringBuilder sql, List<ClickHouseParameter> parameters)
@@ -707,7 +734,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
     public Task<IEnumerable<ChartPointDto>> GetTraceErrorsAsync(ApmEndpointRequestDto query)
     {
         query.IsServer = default;
-        query.IsLog = true;
+        query.IsError = true;
         var (where, parameters) = AppendWhere(query);
         var groupby = "group by `SpanId` order by `SpanId`";
         var sql = $@"select 

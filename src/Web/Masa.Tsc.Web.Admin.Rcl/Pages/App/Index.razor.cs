@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
 using Masa.Tsc.Contracts.Admin.User;
+using System.Collections.Specialized;
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.App;
 
@@ -28,6 +29,7 @@ public partial class Index
     private string? spanId;
     private DateTime? logTime;
     private bool firstLoaded = false;
+    private NameValueCollection? values;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -38,29 +40,23 @@ public partial class Index
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await base.OnInitializedAsync();
+        base.OnInitialized();
         services = new();
         traceLines = new();
-        await LoadService();
-
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri.ToNomalBlazorUrl());
-        var values = HttpUtility.ParseQueryString(uri.Query);
-
+        values = HttpUtility.ParseQueryString(uri.Query);
         string
             start = values.Get("start"), end = values.Get("end"),
             userId = values.Get("userId"),
-             service = values.Get("service"),
             logTime = values.Get("logTime"),
             tabIndex = values.Get("index");
-        if (DateTime.TryParse(start, out DateTime startTime) && DateTime.TryParse(end, out DateTime endTime) && endTime > startTime)
+        serviceName = values.Get("service");
+        if (DateTime.TryParse(start, default, default, out DateTime startTime) && DateTime.TryParse(end, default, default, out DateTime endTime) && endTime > startTime)
         {
             (this.start, this.end) = (startTime.ToDateTimeOffset(default).UtcDateTime, endTime.ToDateTimeOffset(default).UtcDateTime);
         }
-        if (services.Contains(service))
-            serviceName = service;
-
         if (userId != null && Guid.TryParse(userId, out var guid))
             _userId = guid;
         spanId = values.Get("spanId");
@@ -69,19 +65,27 @@ public partial class Index
         {
             index = num;
         }
-        if (DateTime.TryParse(logTime, out var time))
+        if (DateTime.TryParse(logTime, default, default, out var time))
             this.logTime = time;
+        if (values.Count == 0)
+        {
+            this.end = DateTime.UtcNow;
+            this.start = this.end.AddMinutes(-1);
+            index = 1;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadService();
+        if (!string.IsNullOrEmpty(serviceName) && !services.Contains(serviceName))
+            serviceName = default!;
         if (values != null && values.Count > 0)
         {
             await LoadTrace();
             await LoadTraceTimeLines();
             StateHasChanged();
-        }
-        else
-        {
-            this.end = DateTime.UtcNow;
-            this.start = this.end.AddMinutes(-1);
-            this.index = 1;
         }
     }
 
@@ -155,7 +159,6 @@ public partial class Index
 
     private async Task UserChange(Guid userId)
     {
-        //_userId = Guid.Parse("c6595066-de16-4f67-2f98-08db5c04d8d9");
         _userId = userId;
         roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
         claims = await ApiCaller.UserService.GetUserClaimAsync(userId);
@@ -348,8 +351,8 @@ public partial class Index
 
     private async Task Share()
     {
-        var str = $"{NavigationManager.BaseUri}apm/app?userId={_userId}&service={serviceName}&start={end}&end={start}&search={_searchText}&spanId={currentTrace?.Data?.SpanId}&logTime={currentLog?.Time}&tab={index}".ToSafeBlazorUrl();
-        await Js.InvokeVoidAsync(JsInteropConstants.Copy, str);
+        var str = $"apm/app?userId={_userId}&service={serviceName}&start={end}&end={start}&search={_searchText}&spanId={currentTrace?.Data?.SpanId}&logTime={currentLog?.Time}&tab={index}".ToSafeBlazorUrl();
+        await Js.InvokeVoidAsync(JsInteropConstants.Copy, $"{NavigationManager.BaseUri}{str}");
         await Task.Delay(500);
     }
 
