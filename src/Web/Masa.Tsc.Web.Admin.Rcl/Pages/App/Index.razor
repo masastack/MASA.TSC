@@ -32,7 +32,7 @@
     </div>
 </div>
 <div class="d-flex justify-space-between py-2">
-    <div class="my-2">APP版本号：@firstTrace?.Resource["service.version"]</div>
+    <div class="my-2 pl-1">APP版本号：@firstTrace?.Resource["service.version"]</div>
     <div class="my-2 pl-4">终端类型：@ClientType()</div>
     <div class="my-2 pl-4">手机型号：@PhoneModel()</div>
     <div class="my-2 pl-4">操作系统：@ClientOs()</div>
@@ -157,9 +157,9 @@
             bool isSelected = currentLog != null && item == currentLog;
             bool isSearchMatched = IsSearchKeyword(item);
             var color = item.IsError ? "red" : isSelected ? "yellow lighten-2" : isSearchMatched ? "orange lighten-2" : "light-green lighten-2";
-            <div class="d-flex mt-1 text-caption" @onclick="()=>ChangeCurrent(trace,item)">
+            <div class="d-flex mt-1 text-caption @(isSelected?"grey pl-1":"")" @onclick="()=>ChangeCurrent(trace,item)">
                 <div class="pl-2 py-1 @color">@item.Time.UtcFormatLocal(CurrentTimeZone)</div>
-                <div class="pl-6 py-1 pr-2 @color rounded-r-sm">点击</div>
+                <div class="pl-5 py-1 pr-2 @color rounded-r-sm">点击</div>
                 <div class="pr-4 py-1 @color rounded-r-sm flex-grow-1">@item.Text</div>
             </div>
         }
