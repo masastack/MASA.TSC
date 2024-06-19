@@ -803,13 +803,13 @@ from {Constants.ErrorTable} where {where} {groupby}";
     public Task<PhoneModelDto> GetDeviceModelAsync(string brand, string model)
     {
         var isCodeAlis = brand.ToLower().Equals("apple") && model.Contains(',');
-        var sql = $"select * from {Constants.ModelsTable} where Brand=@brand and  {(isCodeAlis ? "CodeAlis=@model" : "Model=@model")} limit 1";
+        var sql = $"select * from {Constants.ModelsTable} where lower(Brand)=@brand and  {(isCodeAlis ? "lower(CodeAlis)=@model" : "Model=@model")} limit 1";
         PhoneModelDto result = default!;
         lock (lockObj)
         {
             using var reader = Query(sql, new ClickHouseParameter[] {
                 new ClickHouseParameter{ ParameterName="brand",Value=brand.ToLower() },
-                new ClickHouseParameter{ ParameterName="model",Value=model.ToUpper() }
+                new ClickHouseParameter{ ParameterName="model",Value=model.ToLower() }
             });
             while (reader.NextResult())
                 while (reader.Read())
