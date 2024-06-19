@@ -211,7 +211,6 @@ public partial class Index
             currentLog = default;
             return;
         }
-        _userId = Guid.Parse("4bec9903-36d2-4d6a-ca75-08dbebef4650");
 
         dataLoading = true;
         StateHasChanged();
