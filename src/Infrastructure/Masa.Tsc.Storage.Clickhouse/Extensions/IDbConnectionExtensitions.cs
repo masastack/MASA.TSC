@@ -176,7 +176,16 @@ internal static class IDbConnectionExtensitions
         else
         {
             if (keyword.Equals("error", StringComparison.CurrentCultureIgnoreCase))
+            {
                 sqls.Add(" and SeverityText='Error'");
+                return sqls;
+            }
+            if (Guid.TryParse(keyword, out var _))
+            {
+                sqls.Add($" and TraceId=@TraceUserId");
+                paramerters.Add(new ClickHouseParameter() { ParameterName = "TraceUserId", Value = keyword });
+                return sqls;
+            }
             sqls.Add(" and Body like @Keyword");
             sqls.Add($" and `{ATTRIBUTE_KEY}exception.message` like @Keyword");
         }

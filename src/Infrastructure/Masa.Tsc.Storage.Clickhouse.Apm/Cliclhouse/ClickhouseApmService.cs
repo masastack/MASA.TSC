@@ -802,7 +802,8 @@ from {Constants.ErrorTable} where {where} {groupby}";
 
     public Task<PhoneModelDto> GetDeviceModelAsync(string brand, string model)
     {
-        var sql = $"select * from {Constants.ModelsTable} where Brand=@brand and Model=@model limit 1";
+        var isCodeAlis = brand.ToLower().Equals("apple") && model.Contains(',');
+        var sql = $"select * from {Constants.ModelsTable} where Brand=@brand and  {(isCodeAlis ? "CodeAlis=@model" : "Model=@model")} limit 1";
         PhoneModelDto result = default!;
         lock (lockObj)
         {

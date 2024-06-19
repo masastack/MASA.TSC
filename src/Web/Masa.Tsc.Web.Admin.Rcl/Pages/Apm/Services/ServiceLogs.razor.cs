@@ -9,6 +9,9 @@ public partial class ServiceLogs
     public SearchData SearchData { get; set; }
 
     [Parameter]
+    public bool ShowChart { get; set; } = true;
+
+    [Parameter]
     public MetricTypes MetricType { get; set; }
 
     private List<DataTableHeader<LogResponseDto>> headers => new()
@@ -50,6 +53,11 @@ public partial class ServiceLogs
         dialogShow = true;
     }
 
+    private StringNumber GetHeight()
+    {
+        return ShowChart ? 300 : 500;
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
@@ -75,19 +83,23 @@ public partial class ServiceLogs
 
     private async Task LoadChartDataAsync()
     {
-        var query = new ApmEndpointRequestDto
+        List<ChartLineCountDto> result = null;
+        if (!string.IsNullOrEmpty(SearchData.Service))
         {
-            Page = page,
-            PageSize = defaultSize,
-            Start = SearchData.Start,
-            End = SearchData.End,
-            OrderField = sortFiled,
-            Service = SearchData.Service,
-            Endpoint = SearchData.Endpoint!,
-            Env = SearchData.Environment,
-            IsDesc = sortBy
-        };
-        var result = await ApiCaller.ApmService.GetLogChartAsync(query);
+            var query = new ApmEndpointRequestDto
+            {
+                Page = page,
+                PageSize = defaultSize,
+                Start = SearchData.Start,
+                End = SearchData.End,
+                OrderField = sortFiled,
+                Service = SearchData.Service,
+                Endpoint = SearchData.Endpoint!,
+                Env = SearchData.Environment,
+                IsDesc = sortBy
+            };
+            result = await ApiCaller.ApmService.GetLogChartAsync(query);
+        }
         chart.Data = ConvertLatencyChartData(result, lineName: "log count").Json;
         chart.ChartLoading = false;
     }
@@ -96,23 +108,32 @@ public partial class ServiceLogs
     {
         if (isTableLoading) return;
         isTableLoading = true;
-        var query = new LogPageQueryDto()
+        if (string.IsNullOrEmpty(SearchData.Service))
         {
-            Start = SearchData.Start,
-            End = SearchData.End,
-            Service = SearchData.Service!,
-            Page = page,
-            Env = SearchData.Environment!,
-            PageSize = defaultSize,
-            IsLimitEnv = false
-        };
-        var result = await ApiCaller.LogService.GetPageAsync(query);
-        data.Clear();
-        if (result.Result != null && result.Result.Any())
-        {
-            data.AddRange(result.Result);
+            data.Clear();
+            total = 0;
         }
-        total = (int)result.Total;
+        else
+        {
+            var query = new LogPageQueryDto()
+            {
+                Start = SearchData.Start,
+                End = SearchData.End,
+                Service = SearchData.Service!,
+                Page = page,
+                Env = SearchData.Environment!,
+                Query = Search.Text,
+                PageSize = defaultSize,
+                IsLimitEnv = false
+            };
+            var result = await ApiCaller.LogService.GetPageAsync(query);
+            data.Clear();
+            if (result.Result != null && result.Result.Any())
+            {
+                data.AddRange(result.Result);
+            }
+            total = (int)result.Total;
+        }
         isTableLoading = false;
     }
 

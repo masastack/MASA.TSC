@@ -1,4 +1,4 @@
-﻿<MCard Class="@($"d-flex full-height full-width {Class}")">
+﻿<MCard Class="@($"{(DefaultClass?"d-flex full-height full-width":"")} {Class}")" Style="@Style">
     <div class="ma-auto">@I18n?.T("Loading data")</div>
 </MCard>
 
@@ -8,4 +8,10 @@
 
     [Parameter]
     public string? Class { get; set; }
+
+    [Parameter]
+    public bool DefaultClass { get; set; } = true;
+
+    [Parameter]
+    public string? Style { get; set; }
 }

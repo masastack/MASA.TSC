@@ -30,6 +30,7 @@ public partial class Index
     private DateTime? logTime;
     private bool firstLoaded = false;
     private NameValueCollection? values;
+    private bool dataLoading = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -100,7 +101,7 @@ public partial class Index
         if (firstTrace == null) return default;
         if (phoneModel != null)
         {
-            return $"{phoneModel.ModeName}({phoneModel.Model})";
+            return $"{(phoneModel.ModeName.Contains(phoneModel.BrandName) ? "" : phoneModel.BrandName)} {phoneModel.ModeName}";
         }
 
         if (firstTrace.Resource.TryGetValue("device.manufacturer", out var brand) && firstTrace.Resource.TryGetValue("device.model", out var model))
@@ -161,7 +162,23 @@ public partial class Index
     {
         _userId = userId;
         roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
-        claims = await ApiCaller.UserService.GetUserClaimAsync(userId);
+        var claims = await ApiCaller.UserService.GetUserClaimAsync(userId);
+        var claimTypes = await ApiCaller.UserService.GetClaimsAsync();
+        if (claims != null && claims.Count > 0 && claimTypes != null && claimTypes.Count > 0)
+        {
+            var keys = claims.Keys.ToList();
+
+            foreach (var key in keys)
+            {
+                var declare = claimTypes.Find(item => item.Name == key);
+                if (string.IsNullOrEmpty(declare.Description) || declare.Description == key)
+                    continue;
+                var value = claims[key];
+                claims.Remove(key);
+                claims.Add($"{key}({declare.Description})", value);
+            }
+        }
+        this.claims = claims;
         data.Clear();
         await LoadTrace();
     }
@@ -194,7 +211,10 @@ public partial class Index
             currentLog = default;
             return;
         }
+        _userId = Guid.Parse("4bec9903-36d2-4d6a-ca75-08dbebef4650");
 
+        dataLoading = true;
+        StateHasChanged();
         var query = new BaseRequestDto
         {
             Start = start,
@@ -216,15 +236,18 @@ public partial class Index
             }
         };
         var traces = await ApiCaller.ApmService.GetTraceListAsync(query);
-        if (traces == null || traces.Result == null || traces.Result.Count == 0)
-            return;
-        await SetDeviceModel(traces.Result[0]);
-        var spanIds = traces.Result.Select(item => item.SpanId).Distinct().ToList();
-        SetTraceData(traces.Result);
-        await LoadLog(spanIds);
+        await SetDeviceModel(traces.Result?.FirstOrDefault());
+        SetTraceData(traces.Result!);
+        await LoadLog(traces.Result?.Select(item => item.SpanId).Distinct().ToList()!);
         if (currentTrace == null && data.Count > 0)
             currentTrace = data[0];
+        else if (data.Count == 0)
+        {
+            currentTrace = default;
+            currentLog = default;
+        }
         UpdateSearch();
+        dataLoading = false;
         StateHasChanged();
     }
 
@@ -249,11 +272,11 @@ public partial class Index
             services.AddRange(data);
     }
 
-    private async Task SetDeviceModel(TraceResponseDto trace)
+    private async Task SetDeviceModel(TraceResponseDto? trace)
     {
         firstTrace = trace;
         phoneModel = null;
-        if (trace.Resource.TryGetValue("device.manufacturer", out var brand) && trace.Resource.TryGetValue("device.model", out var model))
+        if (trace != null && trace.Resource.TryGetValue("device.manufacturer", out var brand) && trace.Resource.TryGetValue("device.model", out var model))
         {
             phoneModel = await ApiCaller.ApmService.GetDeviceModelAsync(brand.ToString()!, model.ToString()!);
         }
@@ -261,6 +284,7 @@ public partial class Index
 
     private void SetTraceData(IEnumerable<TraceResponseDto> traces)
     {
+        if (traces == null || !traces.Any()) return;
         foreach (var trace in traces)
         {
             if (data.Exists(item => item.Data.TraceId == trace.TraceId))
@@ -272,6 +296,8 @@ public partial class Index
 
     private async Task LoadLog(List<string> spanIds)
     {
+        if (spanIds == null || !spanIds.Any())
+            return;
         var query = new BaseRequestDto
         {
             Start = start,
@@ -414,6 +440,7 @@ public partial class Index
     {
         Search.Start = start;
         Search.End = end;
+        Search.Service = serviceName;
         if (currentTrace != null)
         {
             if (currentTrace.Data.Resource.TryGetValue("service.namespace", out var env))

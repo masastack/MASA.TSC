@@ -134,7 +134,11 @@ var app = builder.Services
                 .UseEventLog<TscDbContext>()
                 .UseEventBus();
             })
-            .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name)).UseFilter())
+            .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name), options =>
+            {
+                options.CommandTimeout(1);
+                options.EnableRetryOnFailure(2);
+            }).UseFilter())
             .UseRepository<TscDbContext>();
     })
     .AddServices(builder);

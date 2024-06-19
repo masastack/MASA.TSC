@@ -20,13 +20,22 @@ public class OperationLineTraceModel
             {
                 return value.ToString()!;
             }
-            if (Data.Attributes.TryGetValue("client.path.route", out var url) && !string.IsNullOrEmpty(url?.ToString()))
-            {
-                return url.ToString()!;
-            }
+            return Url;
+        }
+    }
+
+    public string Url
+    {
+        get
+        {
             if (Data.Attributes.TryGetValue("client.path", out var path) && !string.IsNullOrEmpty(path?.ToString()))
             {
                 return path.ToString()!;
+            }
+
+            if (Data.Attributes.TryGetValue("client.path.route", out var url) && !string.IsNullOrEmpty(url?.ToString()))
+            {
+                return url.ToString()!;
             }
             return "未匹配到路由";
         }

@@ -9,6 +9,9 @@ public partial class ServiceErrors
     public SearchData SearchData { get; set; }
 
     [Parameter]
+    public bool ShowChart { get; set; } = true;
+
+    [Parameter]
     public MetricTypes MetricType { get; set; }
 
     private List<DataTableHeader<ErrorMessageDto>> headers => new()
@@ -28,6 +31,7 @@ public partial class ServiceErrors
     private bool? sortBy;
     private string lastKey = string.Empty;
     private ChartData chart = new();
+
 
     private async Task OnTableOptionsChanged(DataOptions sort)
     {
@@ -55,6 +59,11 @@ public partial class ServiceErrors
         await base.OnParametersSetAsync();
     }
 
+    private StringNumber GetHeight()
+    {
+        return ShowChart ? 300 : 500;
+    }
+
     private async Task OnPageChange((int page, int pageSize) pageData)
     {
         page = pageData.page;
@@ -73,19 +82,25 @@ public partial class ServiceErrors
 
     private async Task LoadChartDataAsync()
     {
-        var query = new ApmEndpointRequestDto
+        if (!ShowChart)
+            return;
+        List<ChartLineCountDto> result = null;
+        if (!string.IsNullOrEmpty(SearchData.Service))
         {
-            Page = page,
-            PageSize = defaultSize,
-            Start = SearchData.Start,
-            End = SearchData.End,
-            OrderField = sortFiled,
-            Service = SearchData.Service,
-            Endpoint = SearchData.Endpoint!,
-            Env = SearchData.Environment,
-            IsDesc = sortBy
-        };
-        var result = await ApiCaller.ApmService.GetErrorChartAsync(query);
+            var query = new ApmEndpointRequestDto
+            {
+                Page = page,
+                PageSize = defaultSize,
+                Start = SearchData.Start,
+                End = SearchData.End,
+                OrderField = sortFiled,
+                Service = SearchData.Service,
+                Endpoint = SearchData.Endpoint!,
+                Env = SearchData.Environment,
+                IsDesc = sortBy
+            };
+            result = await ApiCaller.ApmService.GetErrorChartAsync(query);
+        }
         chart.Data = ConvertLatencyChartData(result, lineName: I18n.Apm("Chart.ErrorCount")).Json;
         chart.ChartLoading = false;
     }
@@ -94,21 +109,30 @@ public partial class ServiceErrors
     {
         if (isTableLoading) return;
         isTableLoading = true;
-        var query = new ApmEndpointRequestDto
+        if (string.IsNullOrEmpty(SearchData.Service))
         {
-            Page = page,
-            PageSize = defaultSize,
-            Start = SearchData.Start,
-            End = SearchData.End,
-            OrderField = sortFiled,
-            Service = SearchData.Service,
-            Env = SearchData.Environment,
-            IsDesc = sortBy,
-            Endpoint = SearchData.Endpoint!
-        };
-        var result = await ApiCaller.ApmService.GetErrorsPageAsync(query);
-        data = result.Result?.ToList() ?? new();
-        total = (int)result.Total;
+            total = 0;
+            data = new();
+        }
+        else
+        {
+            var query = new ApmEndpointRequestDto
+            {
+                Page = page,
+                PageSize = defaultSize,
+                Start = SearchData.Start,
+                End = SearchData.End,
+                OrderField = sortFiled,
+                Queries = Search.Text,
+                Service = SearchData.Service,
+                Env = SearchData.Environment,
+                IsDesc = sortBy,
+                Endpoint = SearchData.Endpoint!
+            };
+            var result = await ApiCaller.ApmService.GetErrorsPageAsync(query);
+            data = result.Result?.ToList() ?? new();
+            total = (int)result.Total;
+        }
         isTableLoading = false;
     }
 

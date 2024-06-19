@@ -16,4 +16,9 @@ public class UserService : BaseService
     {
         return await Caller.GetAsync<Dictionary<string, object>>($"{RootPath}/user/claim-values/{userId}");
     }
+
+    public async Task<List<UserClaimDto>> GetClaimsAsync()
+    {
+        return (await Caller.GetAsync<PaginatedListBase<UserClaimDto>>($"{RootPath}/sso/userClaim/getlist?page=1&pageSize=100")).Result;
+    }
 }
