@@ -178,7 +178,7 @@ public partial class Index
             foreach (var key in keys)
             {
                 var declare = claimTypes.Find(item => item.Name == key);
-                if (string.IsNullOrEmpty(declare.Description) || declare.Description == key)
+                if (declare == null || string.IsNullOrEmpty(declare.Description) || declare.Description == key)
                     continue;
                 var value = claims[key];
                 claims.Remove(key);
@@ -189,7 +189,7 @@ public partial class Index
         foreach (var key in claims.Keys)
         {
             this.claims.Add(key, claims[key]);
-        }        
+        }
         await LoadTrace();
     }
 
@@ -308,6 +308,7 @@ public partial class Index
         phoneModel = null;
         claims.Clear();
         data.Clear();
+        StateHasChanged();
     }
 
     private void SetTraceData(IEnumerable<TraceResponseDto> traces)

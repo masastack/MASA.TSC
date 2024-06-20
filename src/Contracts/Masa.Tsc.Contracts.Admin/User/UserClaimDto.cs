@@ -7,7 +7,7 @@ public class UserClaimPageDto
 {
     public int Total { get; set; }
 
-    public List<UserClaimDto> Items { get; }
+    public List<UserClaimDto> Items { get; set; }
 }
 
 public class UserClaimDto
