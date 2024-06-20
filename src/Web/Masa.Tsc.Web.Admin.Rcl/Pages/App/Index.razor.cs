@@ -162,10 +162,15 @@ public partial class Index
 
     private async Task UserChange(Guid userId)
     {
+        if (_userId == userId)
+            return;
+        currentLog = default;
+        currentTrace = default;
         _userId = userId;
         if (roles == null)
             roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
         user = await ApiCaller.UserService.GetUserDetailAsync(userId);
+
         var claims = await ApiCaller.UserService.GetUserClaimAsync(userId);
         var claimTypes = await ApiCaller.UserService.GetClaimsAsync();
         if (claims != null && claims.Count > 0 && claimTypes != null && claimTypes.Count > 0)

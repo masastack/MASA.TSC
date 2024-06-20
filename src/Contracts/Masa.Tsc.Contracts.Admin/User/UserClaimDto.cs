@@ -3,6 +3,13 @@
 
 namespace Masa.Tsc.Contracts.Admin.User;
 
+public class UserClaimPageDto
+{
+    public int Total { get; set; }
+
+    public List<UserClaimDto> Items { get; }
+}
+
 public class UserClaimDto
 {
     public Guid Id { get; set; }

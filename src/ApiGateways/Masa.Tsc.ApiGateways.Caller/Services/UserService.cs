@@ -33,6 +33,6 @@ public class UserService : BaseService
 
     public async Task<List<UserClaimDto>> GetClaimsAsync()
     {
-        return (await Caller.GetAsync<PaginatedListBase<UserClaimDto>>($"{RootPath}/sso/userClaim/getlist?page=1&pageSize=100")).Result;
+        return (await Caller.GetAsync<UserClaimPageDto>($"{RootPath}/sso/userClaim/getlist?page=1&pageSize=100")).Items;
     }
 }
