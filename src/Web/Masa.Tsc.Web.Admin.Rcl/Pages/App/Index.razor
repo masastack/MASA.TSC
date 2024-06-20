@@ -159,7 +159,8 @@
             var color = item.IsError ? "red" : isSelected ? "yellow lighten-2" : isSearchMatched ? "orange lighten-2" : "light-green lighten-2";
             <div class="d-flex mt-1 text-caption @(isSelected?"grey pl-1":"")" @onclick="()=>ChangeCurrent(trace,item)">
                 <div class="pl-2 py-1 @color">@item.Time.UtcFormatLocal(CurrentTimeZone)</div>
-                <div class="pl-5 py-1 pr-2 @color rounded-r-sm">点击</div>
+                <div class="pl-5 py-1 @color"><MIcon Class="fa-solid fa-right-long" Small></MIcon></div>
+                <div class="pl-2 py-1 pr-2 @color rounded-r-sm">点击</div>
                 <div class="pr-4 py-1 @color rounded-r-sm flex-grow-1">@item.Text</div>
             </div>
         }

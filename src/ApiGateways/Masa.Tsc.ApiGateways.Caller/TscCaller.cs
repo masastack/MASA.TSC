@@ -1,16 +1,19 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.StackSdks.Auth;
+
 namespace Masa.Tsc.ApiGateways.Caller;
 
 public class TscCaller
 {
-    internal TscCaller(IDccClient dccClient, ICallerFactory callerFactory)
+    internal TscCaller(IServiceProvider serviceProvider, ICallerFactory callerFactory)
     {
+        serviceProvider.GetRequiredService<IDccClient>();
         var caller = callerFactory.Create(ServiceExtensions.DEFAULT_CLIENT_NAME);
         AppService = new AppService(caller);
         SettingService = new SettingService(caller);
-        ProjectService = new ProjectService(caller, dccClient);
+        ProjectService = new ProjectService(caller, serviceProvider.GetRequiredService<IDccClient>());
         TeamService = new TeamService(caller);
         LogService = new LogService(caller);
         TraceService = new TraceService(caller);
@@ -19,7 +22,7 @@ public class TscCaller
         MetricService = new MetricService(caller);
         TopologyService = new TopologyService(caller);
         ApmService = new ApmService(caller);
-        UserService = new UserService(callerFactory.Create(ServiceExtensions.AUTH_CLIENT_NAME));
+        UserService = new UserService(callerFactory.Create(ServiceExtensions.AUTH_CLIENT_NAME), serviceProvider.GetRequiredService<IAuthClient>());
     }
 
     public AppService AppService { get; private init; }

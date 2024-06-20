@@ -33,7 +33,7 @@ public static class ServiceExtensions
             {
                 serviceProviderCopy = serviceProvider;
                 var callerFactory = serviceProvider.GetRequiredService<ICallerFactory>();
-                var client = new TscCaller(serviceProvider.GetRequiredService<IDccClient>(), callerFactory);
+                var client = new TscCaller(serviceProviderCopy, callerFactory);
                 return client;
             });
         }
@@ -89,7 +89,7 @@ public static class ServiceExtensions
             {
                 serviceProviderCopy = serviceProvider;
                 var callerFactory = serviceProvider.GetRequiredService<ICallerFactory>();
-                var client = new TscCaller(serviceProvider.GetRequiredService<IDccClient>(), callerFactory);
+                var client = new TscCaller(serviceProviderCopy, callerFactory);
                 return client;
             });
         }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Model;
 using Masa.Tsc.Contracts.Admin.User;
 using System.Collections.Specialized;
 
@@ -14,9 +15,10 @@ public partial class Index
     private string _searchText;
     private bool isSearchEnd = false;
     private List<UserRoleDto>? roles = default;
+    private UserModel? user = default;
     private TraceResponseDto? firstTrace;
     private PhoneModelDto? phoneModel;
-    private Dictionary<string, object>? claims = default;
+    private Dictionary<string, object> claims = new();
     private DateTime end, start;
     private QuickRangeKey quickRangeKey = QuickRangeKey.Last5Minutes;
     private StringNumber index;
@@ -120,9 +122,9 @@ public partial class Index
     //auth获取
     private string RolesNames()
     {
-        if (roles == null || !roles.Any())
+        if (roles == null || !roles.Any() || user == null || user.Roles == null || !user.Roles.Any())
             return default;
-        return string.Join(", ", roles.Select(role => role.Name));
+        return string.Join(", ", roles.Where(role => user.Roles.Exists(r => r.Id == role.Id)).Select(role => role.Name));
     }
 
     private void SearchValueChange(string value)
@@ -161,7 +163,9 @@ public partial class Index
     private async Task UserChange(Guid userId)
     {
         _userId = userId;
-        roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
+        if (roles == null)
+            roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
+        user = await ApiCaller.UserService.GetUserDetailAsync(userId);
         var claims = await ApiCaller.UserService.GetUserClaimAsync(userId);
         var claimTypes = await ApiCaller.UserService.GetClaimsAsync();
         if (claims != null && claims.Count > 0 && claimTypes != null && claimTypes.Count > 0)
@@ -178,7 +182,11 @@ public partial class Index
                 claims.Add($"{key}({declare.Description})", value);
             }
         }
-        this.claims = claims;
+        this.claims.Clear();
+        foreach (var key in claims.Keys)
+        {
+            this.claims.Add(key, claims[key]);
+        }
         data.Clear();
         await LoadTrace();
     }
@@ -198,11 +206,12 @@ public partial class Index
 
     private async Task OnAutoTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) time)
     {
+        var seconds = Convert.ToInt32(Math.Floor((time.start!.Value.UtcDateTime - start).TotalSeconds));
         (start, end) = (time.start!.Value.UtcDateTime, time.end!.Value.UtcDateTime);
-        await LoadTrace();
+        await LoadTrace(isNext: true, seconds: seconds);
     }
 
-    private async Task LoadTrace()
+    private async Task LoadTrace(bool isPre = false, bool isNext = false, int seconds = 0)
     {
         if (_userId == Guid.Empty || string.IsNullOrEmpty(serviceName))
         {
@@ -234,6 +243,12 @@ public partial class Index
                 IsDesc = false
             }
         };
+
+        if (isPre)
+            query.End = query.Start.AddMinutes(seconds);
+        else if (isNext)
+            query.Start = query.End.AddMinutes(-seconds);
+
         var traces = await ApiCaller.ApmService.GetTraceListAsync(query);
         await SetDeviceModel(traces.Result?.FirstOrDefault());
         SetTraceData(traces.Result!);
@@ -286,11 +301,32 @@ public partial class Index
         if (traces == null || !traces.Any()) return;
         foreach (var trace in traces)
         {
-            if (data.Exists(item => item.Data.TraceId == trace.TraceId))
+            if (data.Exists(item => item.Data.SpanId == trace.SpanId))
                 continue;
             var @new = new OperationLineTraceModel(trace);
-            data.Add(@new);
+            (bool isAppend, int index) = GetPosition(@new.Time);
+            if (isAppend)
+                data.Add(@new);
+            else
+                data.Insert(index, @new);
         }
+    }
+
+    private (bool append, int index) GetPosition(DateTime time)
+    {
+        if (data.Count == 0)
+            return (true, 0);
+        int index = 0, max = data.Count - 1;
+        do
+        {
+            if (data[index].Time > time)
+            {
+                return (false, index);
+            }
+            index++;
+        }
+        while (max - index >= 0);
+        return (true, 0);
     }
 
     private async Task LoadLog(List<string> spanIds)
@@ -394,17 +430,13 @@ public partial class Index
     private async Task Pre()
     {
         start = start.AddMinutes(-1);
-        end = end.AddMinutes(-1);
-        data.Clear();
-        await LoadTrace();
+        await LoadTrace(isPre: true, seconds: 60);
     }
 
     private async Task Next()
     {
-        start = start.AddMinutes(1);
         end = end.AddMinutes(1);
-        data.Clear();
-        await LoadTrace();
+        await LoadTrace(isNext: true, seconds: 60);
     }
 
     protected override ValueTask DisposeAsyncCore()
@@ -439,9 +471,9 @@ public partial class Index
     {
         Search.Start = start;
         Search.End = end;
-        Search.Service = serviceName;
         if (currentTrace != null)
         {
+            Search.Service = serviceName;
             if (currentTrace.Data.Resource.TryGetValue("service.namespace", out var env))
             {
                 Search.Environment = env.ToString();
@@ -450,6 +482,7 @@ public partial class Index
         }
         else
         {
+            Search.Service = default!;
             Search.Environment = default!;
         }
     }
