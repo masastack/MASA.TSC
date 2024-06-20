@@ -30,7 +30,6 @@ public partial class Index
 
     private string? spanId;
     private DateTime? logTime;
-    private bool firstLoaded = false;
     private NameValueCollection? values;
     private bool dataLoading = false;
 
@@ -164,8 +163,7 @@ public partial class Index
     {
         if (_userId == userId)
             return;
-        currentLog = default;
-        currentTrace = default;
+        ClearData();
         _userId = userId;
         if (roles == null)
             roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
@@ -191,8 +189,7 @@ public partial class Index
         foreach (var key in claims.Keys)
         {
             this.claims.Add(key, claims[key]);
-        }
-        data.Clear();
+        }        
         await LoadTrace();
     }
 
@@ -299,6 +296,18 @@ public partial class Index
         {
             phoneModel = await ApiCaller.ApmService.GetDeviceModelAsync(brand.ToString()!, model.ToString()!);
         }
+    }
+
+    private void ClearData()
+    {
+        user = null;
+        currentLog = null;
+        currentTrace = null;
+        traceLines.Clear();
+        firstTrace = null;
+        phoneModel = null;
+        claims.Clear();
+        data.Clear();
     }
 
     private void SetTraceData(IEnumerable<TraceResponseDto> traces)
