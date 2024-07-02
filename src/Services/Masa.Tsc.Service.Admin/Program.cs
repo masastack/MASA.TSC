@@ -37,6 +37,7 @@ builder.Services.AddTraceLog()
 
 builder.Services.AddIsolation(services => services.UseMultiEnvironment());
 builder.Services.AddDaprClient();
+
 //开启response stream读取
 builder.Services.Configure<KestrelServerOptions>(x => x.AllowSynchronousIO = true);
 var redisOption = new RedisConfigurationOptions
