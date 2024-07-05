@@ -7,9 +7,9 @@ public sealed class TraceService : BaseService
 {
     internal TraceService(ICaller caller) : base(caller, "/api/trace") { }
 
-    public async Task<IEnumerable<TraceResponseDto>> GetAsync(string traceId)
+    public async Task<IEnumerable<TraceResponseDto>> GetAsync(string traceId, DateTime start, DateTime end)
     {
-        return await Caller.GetAsync<IEnumerable<TraceResponseDto>>($"{RootPath}/{traceId}") ?? Array.Empty<TraceResponseDto>();
+        return await Caller.GetAsync<IEnumerable<TraceResponseDto>>($"{RootPath}/{traceId}?start={start}&end={end}") ?? Array.Empty<TraceResponseDto>();
     }
 
     public async Task<IEnumerable<TraceResponseDto>> GetNextAsync(RequestNextPrevTraceDetailDto data)

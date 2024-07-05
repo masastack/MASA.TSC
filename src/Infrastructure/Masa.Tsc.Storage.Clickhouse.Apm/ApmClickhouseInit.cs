@@ -37,13 +37,15 @@ internal static class ApmClickhouseInit
     INDEX idx_error_msggroupkey MsgGroupKey TYPE bloom_filter(0.001) GRANULARITY 1
 )
 ENGINE = MergeTree
-PARTITION BY toDate(Timestamp)
+//PARTITION BY toDate(Timestamp)
 ORDER BY (Timestamp,
- ServiceName,
- `Resource.service.namespace`,
+ ServiceName, 
  `Attributes.exception.type`,
  `MsgGroupKey`,
-`Attributes.http.target`)
+`Attributes.http.target`,
+`Attributes.exception.message`,
+`Resource.service.namespace`
+)
 TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
@@ -84,8 +86,14 @@ WHERE mapContains(LogAttributes, 'exception.type')
         }
         if (!string.IsNullOrEmpty(traceTable))
         {
-            ClickhouseInit.InitTraceView($"{database}v_{traceTable}_spans_{suffix}", MasaStackClickhouseConnection.TraceSpanTable, traceTable, "where SpanKind =='SPAN_KIND_SERVER'");
-            ClickhouseInit.InitTraceView($"{database}v_{traceTable}_clients_{suffix}", MasaStackClickhouseConnection.TraceClientTable, traceTable, "where SpanKind =='SPAN_KIND_CLIENT'");
+
+            //InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, "where SpanKind =='SPAN_KIND_SERVER' and mapContains(SpanAttributes,'http.url')", "Attributes.http.target");
+            //InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, "where SpanKind =='SPAN_KIND_CLIENT' and mapContains(SpanAttributes,'http.url')");
+            //InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, "where not (SpanKind =='SPAN_KIND_SERVER' and mapContains(SpanAttributes,'host.name')) and not (SpanKind =='SPAN_KIND_CL
+
+            ClickhouseInit.InitTraceView($"{database}v_{traceTable}_spans_{suffix}", MasaStackClickhouseConnection.TraceHttpServerTable, traceTable, "where SpanKind =='SPAN_KIND_SERVER' and mapContains(SpanAttributes,'http.url')");
+            ClickhouseInit.InitTraceView($"{database}v_{traceTable}_clients_{suffix}", MasaStackClickhouseConnection.TraceHttpClientTable, traceTable, "where SpanKind =='SPAN_KIND_CLIENT' and mapContains(SpanAttributes,'http.url')");
+            ClickhouseInit.InitTraceView($"{database}v_{traceTable}_others_{suffix}", MasaStackClickhouseConnection.TraceOtherClientTable, traceTable, "where not (SpanKind =='SPAN_KIND_SERVER' and mapContains(SpanAttributes,'host.name')) and not (SpanKind =='SPAN_KIND_CLIENT' and mapContains(SpanAttributes,'http.url'))");
         }
     }
 

@@ -78,4 +78,15 @@ public partial class Errors
         }
         total = (int)result.Total;
     }
+
+    string? type = default, message = default;
+    bool showDetail = false;
+
+    private void Show(string? type = default, string? message = default)
+    {
+        this.type = type;
+        this.message = message;
+        showDetail = true;
+        StateHasChanged();
+    }
 }

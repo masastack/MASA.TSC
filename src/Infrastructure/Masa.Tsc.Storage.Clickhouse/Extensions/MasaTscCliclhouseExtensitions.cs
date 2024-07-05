@@ -9,6 +9,7 @@ public static class MasaTscCliclhouseExtensitions
 
     public static IServiceCollection AddMASAStackClickhouse(this IServiceCollection services, string connectionStr, string suffix = "masastack", string? logSourceTable = null, string? traceSourceTable = null, Action<IDbConnection>? configer = null)
     {
+        _ = new ClickhouseStorageConst();
         services.AddScoped(services => new MasaStackClickhouseConnection(connectionStr, suffix, logSourceTable, traceSourceTable))
             .AddScoped<ILogService, LogService>()
             .AddScoped<ITraceService, TraceService>();

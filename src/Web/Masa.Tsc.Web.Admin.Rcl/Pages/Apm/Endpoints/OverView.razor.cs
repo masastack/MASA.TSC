@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Storage.Contracts;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints;
 
 public partial class OverView
@@ -20,6 +22,8 @@ public partial class OverView
     int page = 1, total = 1;
     readonly Dictionary<double, int> latencies = new();
     double percentile = 0;
+    private List<SimpleTraceListDto> traceIds = new();
+    private List<SimpleTraceListDto> traceTails = new();
 
     protected override async Task OnParametersSetAsync()
     {
@@ -45,7 +49,7 @@ public partial class OverView
         base.OnInitialized();
     }
 
-    private async Task LoadTraceDetailAsync(int page = 1)
+    private async Task LoadTraceDetailAsyncaaaaa(int page = 1)
     {
         this.page = page;
         string traceId = null;
@@ -70,9 +74,76 @@ public partial class OverView
 
         if (!string.IsNullOrEmpty(traceId))
         {
-            traceDetails = (await ApiCaller.TraceService.GetAsync(traceId))?.ToList()!;
+            traceDetails = (await ApiCaller.TraceService.GetAsync(traceId, result.Result[0].Timestamp.AddHours(-6), result.Result[0].EndTimestamp.AddHours(6)))?.ToList()!;
 
             await LoadTraceErrorsAsync(traceId);
+            CaculatePercentil();
+        }
+    }
+
+
+    private async Task LoadTraceDetailAsync(int page = 1)
+    {
+        this.page = page;
+        SimpleTraceListDto trace = null;
+        traceDetails = null;
+        errors = null;
+        percentile = 0;
+        //首次
+        if (total == 0 && page == 1)
+        {
+            var result1 = await ApiCaller.ApmService.GetSimpleTraceListAsync(new ApmEndpointRequestDto
+            {
+                Start = SearchData.Start,
+                End = SearchData.End,
+                Endpoint = SearchData.Endpoint!,
+                Service = SearchData.Service!,
+                Env = SearchData.Environment!,
+                Page = 1,
+                PageSize = 100,
+                Queries = SearchData.Text,
+                OrderField = "Timestamp",
+                IsDesc = true
+            });
+            if (result1 != null && result1.Result != null)
+            {
+                traceIds.AddRange(result1.Result);
+                total = (int)result1.Total;
+            }
+        }
+        //加载最后一页
+        else if (total - page >= 0 && traceIds.Count - page <= 0 && traceTails.Count == 0)
+        {
+            var result1 = await ApiCaller.ApmService.GetSimpleTraceListAsync(new ApmEndpointRequestDto
+            {
+                Start = SearchData.Start,
+                End = SearchData.End,
+                Endpoint = SearchData.Endpoint!,
+                Service = SearchData.Service!,
+                Env = SearchData.Environment!,
+                Page = 1,
+                PageSize = 100,
+                Queries = SearchData.Text,
+                OrderField = "Timestamp",
+                IsDesc = false
+            });
+
+            if (result1 != null && result1.Result != null)
+            {
+                traceTails.AddRange(result1.Result.OrderByDescending(item => item.Timestamp));
+            }
+        }
+
+        if (traceIds.Count - page >= 0)
+            trace = traceIds[page - 1];
+        else
+            trace = traceTails[page - 1 - (total - traceTails.Count)];
+
+        if (trace != null)
+        {
+            traceDetails = (await ApiCaller.TraceService.GetAsync(trace.TraceId, trace.Timestamp.AddHours(-6), trace.EndTimestamp.AddHours(6)))?.ToList()!;
+
+            await LoadTraceErrorsAsync(trace.TraceId);
             CaculatePercentil();
         }
     }
@@ -84,7 +155,7 @@ public partial class OverView
             Start = SearchData.Start,
             End = SearchData.End,
             Env = SearchData.Environment,
-            Queries = $"TraceId='{traceId}'",
+            Queries = $"and TraceId='{traceId}'",
             Page = 1,
             PageSize = 100
         };
@@ -189,6 +260,9 @@ public partial class OverView
     private async Task LoadDistributionDataAsync()
     {
         latencies.Clear();
+        traceIds.Clear();
+        traceTails.Clear();
+        total = 0;
         timeTypeCount.ChartLoading = true;
         var query = new ApmEndpointRequestDto
         {

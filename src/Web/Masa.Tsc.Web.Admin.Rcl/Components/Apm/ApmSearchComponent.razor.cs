@@ -129,7 +129,7 @@ public partial class ApmSearchComponent
     private async Task LoadServiceAsync()
     {
         if (!ShowService) return;
-        isServiceLoading = true;        
+        isServiceLoading = true;
         if (!string.IsNullOrEmpty(Search.Environment))
         {
             if (!enviromentServices.TryGetValue(Search.Environment!, out services))
@@ -155,7 +155,7 @@ public partial class ApmSearchComponent
         var query = new BaseApmRequestDto
         {
             Start = Search.Start,
-            End = Search.End            
+            End = Search.End
         };
         var result = await ApiCaller.ApmService.GetEnviromentServiceAsync(query);
         enviromentServices = result;
@@ -168,6 +168,14 @@ public partial class ApmSearchComponent
     private async Task OnTextChanged(string text)
     {
         Search.Text = text;
+        if (!string.IsNullOrEmpty(Search.TraceId) && !Search.Text.Contains($"TraceId='{Search.TraceId}'"))
+        {
+            Search.TraceId = string.Empty;
+        }
+        if (!string.IsNullOrEmpty(Search.SpanId) && !Search.Text.Contains($"SpanId='{Search.TraceId}'"))
+        {
+            Search.SpanId = string.Empty;
+        }
         await OnValueChanged();
     }
 

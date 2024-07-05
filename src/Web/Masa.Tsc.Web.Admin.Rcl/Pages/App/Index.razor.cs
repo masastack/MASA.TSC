@@ -49,6 +49,11 @@ public partial class Index
         traceLines = new();
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri.ToNomalBlazorUrl());
         values = HttpUtility.ParseQueryString(uri.Query);
+        Search.Service = string.Empty;
+        Search.Endpoint = string.Empty;
+        Search.Environment = string.Empty;
+        Search.Text = string.Empty;
+        Search.TraceId = string.Empty;
         string
             start = values.Get("start"), end = values.Get("end"),
             userId = values.Get("userId"),
@@ -254,7 +259,7 @@ public partial class Index
         var traces = await ApiCaller.ApmService.GetTraceListAsync(query);
         await SetDeviceModel(traces.Result?.FirstOrDefault());
         SetTraceData(traces.Result!);
-        await LoadLog(traces.Result?.Select(item => item.SpanId).Distinct().ToList()!);
+        await LoadLog(traces.Result?.Select(item => item.TraceId).Distinct().ToList()!);
         if (currentTrace == null && data.Count > 0)
             currentTrace = data[0];
         else if (data.Count == 0)
@@ -344,27 +349,21 @@ public partial class Index
         return (true, 0);
     }
 
-    private async Task LoadLog(List<string> spanIds)
+    private async Task LoadLog(List<string> traceIds)
     {
-        if (spanIds == null || !spanIds.Any())
+        if (traceIds == null || !traceIds.Any())
             return;
         var query = new BaseRequestDto
         {
             Start = start,
             End = end,
-            Service = serviceName,
             Page = 1,
             PageSize = 200,
             Conditions = new List<FieldConditionDto> {
-                //new FieldConditionDto{
-                //    Name =StorageConst.TraceId,
-                //     Type= ConditionTypes.In,
-                //      Value =traceIds
-                //},
                 new FieldConditionDto{
-                    Name=StorageConst.SpanId,
+                    Name=StorageConst.TraceId,
                     Type = ConditionTypes.In,
-                    Value = spanIds
+                    Value = traceIds.Distinct()
                 }
             },
             Sort = new FieldOrderDto
@@ -386,7 +385,7 @@ public partial class Index
         do
         {
             var first = logs[0];
-            var trace = data.Find(trace => trace.Data.SpanId == first.SpanId);
+            var trace = data.Find(trace => trace.Data.TraceId == first.TraceId);
             if (trace == null)
             {
                 //该页面报错了,先不处理
@@ -394,7 +393,7 @@ public partial class Index
             }
             else
             {
-                var childLogs = logs.Where(log => log.SpanId == first.SpanId).ToList();
+                var childLogs = logs.Where(log => log.TraceId == first.TraceId).ToList();
                 SetChild(trace, childLogs);
                 logs.RemoveAll(childLogs);
             }
@@ -472,7 +471,7 @@ public partial class Index
         {
             if (traceLines.Count == 0 || traceLines[0].TraceId != currentTrace.Data.TraceId)
             {
-                var traces = await ApiCaller.TraceService.GetAsync(currentTrace.Data.TraceId);
+                var traces = await ApiCaller.TraceService.GetAsync(currentTrace.Data.TraceId, currentTrace.Data.Timestamp.AddHours(-6), currentTrace.Data.EndTimestamp.AddHours(6));
                 if (traces != null)
                     traceLines = traces.ToList();
                 else
@@ -486,19 +485,10 @@ public partial class Index
     {
         Search.Start = start;
         Search.End = end;
-        if (currentTrace != null)
-        {
-            Search.Service = serviceName;
-            if (currentTrace.Data.Resource.TryGetValue("service.namespace", out var env))
-            {
-                Search.Environment = env.ToString();
-                Search.Text = $"TraceId='{currentTrace.Data.TraceId}'";
-            }
-        }
-        else
-        {
-            Search.Service = default!;
-            Search.Environment = default!;
-        }
+        Search.Service = default;
+        Search.Environment = default!;
+        Search.Endpoint = default!;
+        Search.TraceId = currentTrace?.Data.TraceId!;
+        Search.Text = currentTrace != null ? $"TraceId='{currentTrace.Data.TraceId}'" : string.Empty;
     }
 }

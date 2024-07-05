@@ -67,7 +67,7 @@ public partial class TscTraceList : TscComponentBase
         {
             CurrentTrace = item;
         }
-        await _tscTraceDetail!.OpenAsync(item.TraceId, item.SpanId);
+        await _tscTraceDetail!.OpenAsync(item.TraceId, item.SpanId, item.Timestamp.AddHours(-6), item.EndTimestamp.AddHours(6));
     }
 
     private static string FormatDuration(double duration)

@@ -1,6 +1,11 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+//using System.Security.Cryptography;
+//var token = "11111111";
+//var md5 = HashAlgorithm.Create("md5");
+//var tt = string.Join("", md5.ComputeHash(Encoding.UTF8.GetBytes(token)).Select(a => a.ToString("X2"))).ToLower();
+
 var builder = WebApplication.CreateBuilder(args);
 await builder.Services.AddMasaStackConfigAsync(MasaStackProject.TSC, MasaStackApp.Service);
 var masaStackConfig = builder.Services.GetMasaStackConfig();

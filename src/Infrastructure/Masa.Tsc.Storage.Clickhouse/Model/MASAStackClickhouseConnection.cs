@@ -12,9 +12,13 @@ public sealed class MasaStackClickhouseConnection : ClickHouseConnection
 
     public static string TraceTable { get; private set; }
 
-    public static string TraceSpanTable { get; private set; }
+    public static string TraceHttpServerTable { get; private set; }
 
-    public static string TraceClientTable { get; private set; }
+    public static string TraceHttpClientTable { get; private set; }
+
+    public static string TraceOtherClientTable { get; private set; }
+
+    public static string MasaKeyword => "MasaKeyword";
 
     public static string MappingTable { get; private set; }
 
@@ -43,7 +47,8 @@ public sealed class MasaStackClickhouseConnection : ClickHouseConnection
         TraceSourceTable = $"{database}{traceSourceTable}";
         LogSourceTable = $"{database}{logSourceTable}";
         MappingTable = $"{database}otel_mapping_{suffix}";
-        TraceSpanTable = $"{database}{traceSourceTable}_spans_{suffix}";
-        TraceClientTable = $"{database}{traceSourceTable}_clients_{suffix}";
+        TraceHttpServerTable = $"{database}{traceSourceTable}_spans_{suffix}";
+        TraceHttpClientTable = $"{database}{traceSourceTable}_clients_{suffix}";
+        TraceOtherClientTable = $"{database}{traceSourceTable}_others_{suffix}";
     }
 }

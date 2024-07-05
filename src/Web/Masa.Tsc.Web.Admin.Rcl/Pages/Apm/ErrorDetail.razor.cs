@@ -5,7 +5,14 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm;
 
 public partial class ErrorDetail
 {
-    protected override bool IsPage => true;
+    [Parameter]
+    public string Type { get; set; }
+
+    [Parameter]
+    public string Message { get; set; }
+
+    [Parameter]
+    public bool Show { get; set; }
 
     ChartData errorChart = new();
 
@@ -13,49 +20,78 @@ public partial class ErrorDetail
 
     TraceResponseDto currentTrace = null;
 
+    [Inject]
+    IJSRuntime JSRuntime { get; set; }
+
+    IJSObjectReference module = null;
+
+    MSimpleTable table = null;
+
     int currentPage = 1;
     int total = 1;
 
     StringNumber index = 1;
 
+    [Parameter]
+    public SearchData SearchData { get => base.Search; set => base.Search = value; }
+
     string search = string.Empty;
     IDictionary<string, object> _dic = null;
     bool loading = true;
+    string? lastKey = default, lastType = default, lastMessage = default;
 
-    string exceptionType;
-    string exceptionMessage;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/_content/Masa.Tsc.Web.Admin.Rcl/Pages/Apm/ErrorDetail.razor.js");
+        }
+        else if (table != null)
+        {
+            await module.InvokeVoidAsync("setTableId", table.Id);
+        }
+    }
 
-    private async Task OnLoadAsync(SearchData data)
+    private async Task OnLoadAsync(SearchData data = null)
     {
         loading = true;
-        Search = data;
+        if (data != null)
+            Search = data;
         await LoadChartDataAsync();
         await ChangeRecordAsync();
         loading = false;
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnParametersSetAsync()
     {
-        base.OnInitialized();
-
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        var query = HttpUtility.ParseQueryString(uri.Query);
-        exceptionType = query.Get("ex_type")!;
-        exceptionMessage = query.Get("ex_msg")!;
-
-        var append = new StringBuilder(Search.Text);
-
-        if (!string.IsNullOrEmpty(exceptionType))
+        await base.OnParametersSetAsync();
+        if (!Show)
+            return;
+        var key = MD5Utils.Encrypt(JsonSerializer.Serialize(Search));
+        if (lastKey != key || lastType != Type || lastMessage != Message)
         {
-            append.AppendFormat(" and `Attributes.exception.type`='{0}'", exceptionType);
+            lastKey = key;
+            lastType = Type;
+            lastMessage = Message;
+            await OnLoadAsync();
         }
-        if (!string.IsNullOrEmpty(exceptionMessage))
+    }
+
+    private string GetText
+    {
+        get
         {
-            append.AppendFormat(" and `Body` like '{0}%'", exceptionMessage.Replace("x2E", ".").Replace("'", "''"));
-        }
-        if (string.IsNullOrEmpty(Search.Text) && append.Length > 0)
+            var append = new StringBuilder();
+            if (!string.IsNullOrEmpty(SearchData.TraceId))
+                append.AppendFormat(" and `TraceId`='{0}'", SearchData.TraceId);
+            if (!string.IsNullOrEmpty(Type))
+                append.AppendFormat(" and `Attributes.exception.type`='{0}'", Type);
+            if (!string.IsNullOrEmpty(Message))
+                append.AppendFormat(" and `Body` like '{0}%'", Message.Replace("x2E", ".").Replace("'", "''").Split(':')[0]);
             append.Remove(0, 5);
-        Search.Text = append.ToString();
+            return append.ToString();
+        }
     }
 
     private async Task LoadLogAysnc()
@@ -67,7 +103,7 @@ public partial class ErrorDetail
             Env = Search.Environment!,
             PageSize = 1,
             Page = currentPage,
-            Query = Search.Text,
+            Query = GetText,
             Start = Search.Start,
             End = Search.End,
             IsLimitEnv = false
@@ -156,5 +192,11 @@ public partial class ErrorDetail
         }
 
         return chart;
+    }
+
+    protected override async ValueTask DisposeAsyncCore()
+    {
+        await base.DisposeAsyncCore();
+        await module.DisposeAsync();
     }
 }

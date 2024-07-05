@@ -17,9 +17,9 @@ internal class TraceService : ITraceService
         return Task.FromResult(_dbConnection.AggregationQuery(query, false));
     }
 
-    public Task<IEnumerable<TraceResponseDto>> GetAsync(string traceId)
+    public Task<IEnumerable<TraceResponseDto>> GetAsync(BaseRequestDto query)
     {
-        return Task.FromResult(_dbConnection.GetTraceByTraceId(traceId).AsEnumerable());
+        return Task.FromResult(_dbConnection.GetTraceByTraceId(query).AsEnumerable());
     }
 
     public Task<string> GetMaxDelayTraceIdAsync(BaseRequestDto query)

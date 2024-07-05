@@ -5,21 +5,17 @@ namespace System.Data.Common;
 
 internal static class IDbConnectionExtensitions
 {
-    const string ATTRIBUTE_KEY = "Attributes.";
-    const string RESOURCE_KEY = "Resource.";
-    const string TIMSTAMP_KEY = "Timestamp";
-
     public static PaginatedListBase<TraceResponseDto> QueryTrace(this IDbConnection connection, BaseRequestDto query)
     {
         var (where, parameters, ors) = AppendWhere(query);
         var orderBy = AppendOrderBy(query, false);
-        var countSql = CombineOrs($"select count() as `total` from {MasaStackClickhouseConnection.TraceSpanTable} where {where}", ors);
-        var total = Convert.ToInt64(ExecuteScalar(connection, $"select sum(`total`) from {countSql}", parameters?.ToArray()));
+        var countSql = CombineOrs($"select count() as `total` from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors);
+        var total = Convert.ToInt64(ExecuteScalar(connection, $"select sum(`total`) from ({countSql})", parameters?.ToArray()));
         var start = (query.Page - 1) * query.PageSize;
         var result = new PaginatedListBase<TraceResponseDto>() { Total = total, Result = new() };
         if (total > 0 && start - total < 0)
         {
-            var querySql = CombineOrs($"select ServiceName,{TIMSTAMP_KEY},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceSpanTable} where {where}", ors, orderBy);
+            var querySql = CombineOrs($"select ServiceName,{ClickhouseHelper.GetName("timestamp", false)},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors, orderBy);
             result.Result = Query(connection, $"select * from {querySql} as t limit {start},{query.PageSize}", parameters?.ToArray(), ConvertTraceDto);
         }
         return result;
@@ -34,10 +30,9 @@ internal static class IDbConnectionExtensitions
         var start = (query.Page - 1) * query.PageSize;
         var result = new PaginatedListBase<LogResponseDto>() { Total = total, Result = new() };
 
-
         if (total > 0 && start - total < 0)
         {
-            var querySql = CombineOrs($"select {TIMSTAMP_KEY},TraceId,SpanId,TraceFlags,SeverityText,SeverityNumber,ServiceName,Body,Resources,Logs from {MasaStackClickhouseConnection.LogTable} where {where}", ors, orderBy);
+            var querySql = CombineOrs($"select {ClickhouseHelper.GetName("timestamp", true)},TraceId,SpanId,TraceFlags,SeverityText,SeverityNumber,ServiceName,Body,Resources,Logs from {MasaStackClickhouseConnection.LogTable} where {where}", ors, orderBy);
             result.Result = Query(connection, $"select * from {querySql} as t limit {start},{query.PageSize}", parameters?.ToArray(), ConvertLogDto);
         }
         return result;
@@ -51,7 +46,7 @@ internal static class IDbConnectionExtensitions
         var text = new StringBuilder();
         foreach (var or in ors)
         {
-            text.AppendLine($" union all {sql}{or} {orderBy}");
+            text.AppendLine($" union all {sql} {or} {orderBy}");
         }
         text.Remove(0, 11).Insert(0, '(').Append(')');
         return text.ToString();
@@ -64,34 +59,39 @@ internal static class IDbConnectionExtensitions
         if (result == null || result.Count == 0)
             return default!;
 
-        var attributes = dbConnection.Query($"select DISTINCT concat('{ATTRIBUTE_KEY}',Name)  from {MasaStackClickhouseConnection.MappingTable} where `Type`='{type}_attributes' order by Name", default, ConvertToMapping);
-        var resources = dbConnection.Query($"select DISTINCT concat('{RESOURCE_KEY}',Name)  from {MasaStackClickhouseConnection.MappingTable} where `Type`='{type}_resource' order by Name", default, ConvertToMapping);
+        var attributes = dbConnection.Query($"select DISTINCT concat('{ClickhouseHelper.ATTRIBUTE_KEY}',Name)  from {MasaStackClickhouseConnection.MappingTable} where `Type`='{type}_attributes' order by Name", default, ConvertToMapping);
+        var resources = dbConnection.Query($"select DISTINCT concat('{ClickhouseHelper.RESOURCE_KEY}',Name)  from {MasaStackClickhouseConnection.MappingTable} where `Type`='{type}_resource' order by Name", default, ConvertToMapping);
         if (attributes != null && attributes.Count > 0) result.AddRange(attributes);
         if (resources != null && resources.Count > 0) result.AddRange(resources);
 
         return result;
     }
 
-    public static List<TraceResponseDto> GetTraceByTraceId(this IDbConnection connection, string traceId)
+    public static List<TraceResponseDto> GetTraceByTraceId(this IDbConnection connection, BaseRequestDto query)
     {
-        string where = $"TraceId=@TraceId";
+        query.Start = default;
+        query.End = default;
+        var (where, parameters, _) = AppendWhere(query);
+        var timeField = StorageConstaaa.Current.Timestimap;
         return Query(connection,
             $@"select * from (
-                    select {TIMSTAMP_KEY},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceSpanTable} where {where}
+                    select {timeField},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}
                     union all
-                    select {TIMSTAMP_KEY},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceClientTable} where {where}
+                    select {timeField},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceHttpClientTable} where {where}
+                    union all
+                    select {timeField},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceOtherClientTable} where {where}
                 ) as t 
-            order by {TIMSTAMP_KEY}
-            limit 1000", new IDataParameter[] { new ClickHouseParameter { ParameterName = "TraceId", Value = traceId } }, ConvertTraceDto);
+            order by {timeField}
+            limit 1000", parameters.ToArray(), ConvertTraceDto);
     }
 
     public static string AppendOrderBy(BaseRequestDto query, bool isLog)
     {
-        var field = TIMSTAMP_KEY;
+        var field = StorageConstaaa.Current.Timestimap;
         var isDesc = query.Sort?.IsDesc ?? true;
         if (isLog && query.Sort != null && !string.IsNullOrEmpty(query.Sort.Name))
         {
-            field = GetName(query.Sort.Name, isLog);
+            field = ClickhouseHelper.GetName(query.Sort.Name, isLog);
             isDesc = query.Sort?.IsDesc ?? false;
         }
         return $" order by {field}{(isDesc ? " desc" : "")}";
@@ -106,32 +106,32 @@ internal static class IDbConnectionExtensitions
             && query.End > DateTime.MinValue && query.End < DateTime.MaxValue
             && query.End > query.Start)
         {
-            sql.Append($" and {TIMSTAMP_KEY} BETWEEN @Start and @End");
+            sql.Append($" and {StorageConstaaa.Current.Timestimap} BETWEEN @Start and @End");
             @paramerters.Add(new ClickHouseParameter() { ParameterName = "Start", Value = MasaStackClickhouseConnection.ToTimeZone(query.Start), DbType = DbType.DateTime2 });
             @paramerters.Add(new ClickHouseParameter() { ParameterName = "End", Value = MasaStackClickhouseConnection.ToTimeZone(query.End), DbType = DbType.DateTime2 });
         }
         if (!string.IsNullOrEmpty(query.Service))
         {
-            sql.Append(" and ServiceName=@ServiceName");
-            @paramerters.Add(new ClickHouseParameter() { ParameterName = "ServiceName", Value = query.Service });
+            sql.Append($" and {ClickhouseHelper.GetName(StorageConstaaa.Current.ServiceName, !isTrace)} = @serviceName");
+            @paramerters.Add(new ClickHouseParameter() { ParameterName = "serviceName", Value = query.Service });
         }
         if (!string.IsNullOrEmpty(query.Instance))
         {
-            sql.Append($" and `{RESOURCE_KEY}service.instance.id`=@ServiceInstanceId");
-            @paramerters.Add(new ClickHouseParameter() { ParameterName = "ServiceInstanceId", Value = query.Instance });
+            sql.Append($" and {ClickhouseHelper.GetName(StorageConstaaa.Current.ServiceInstance, !isTrace)} = @serviceInstanceId");
+            @paramerters.Add(new ClickHouseParameter() { ParameterName = "serviceInstanceId", Value = query.Instance });
         }
         if (isTrace && !string.IsNullOrEmpty(query.Endpoint))
         {
-            sql.Append($" and `{ATTRIBUTE_KEY}http.target`=@HttpTarget");
-            @paramerters.Add(new ClickHouseParameter() { ParameterName = "HttpTarget", Value = query.Endpoint });
+            sql.Append($" and {ClickhouseHelper.GetName(StorageConstaaa.Current.Trace.URL, !isTrace)} = @httpTarget");
+            @paramerters.Add(new ClickHouseParameter() { ParameterName = "httpTarget", Value = query.Endpoint });
         }
         if (!string.IsNullOrEmpty(query.TraceId))
         {
-            sql.Append($" and TraceId=@TraceId");
+            sql.Append($" and {StorageConstaaa.Current.TraceId} = @TraceId");
             @paramerters.Add(new ClickHouseParameter() { ParameterName = "TraceId", Value = query.TraceId });
         }
 
-        var ors = AppendKeyword(query.Keyword, paramerters, isTrace);
+        var ors = AppendKeyword(query.Keyword?.Trim(), paramerters, isTrace);
         AppendConditions(query.Conditions, paramerters, sql, isTrace);
 
         if (!string.IsNullOrEmpty(query.RawQuery))
@@ -148,47 +148,63 @@ internal static class IDbConnectionExtensitions
         if (string.IsNullOrEmpty(keyword))
             return sqls;
 
+        if (keyword.Contains(" and ")
+            || keyword.Contains(" or ")
+            || keyword.Contains("='")
+            || keyword.Contains(" in ")
+            || keyword.Contains(" not in ")
+            || keyword.Contains(" like ")
+            || keyword.Contains(" not like  "))
+        {
+            sqls.Add(!keyword.StartsWith("and ", StringComparison.CurrentCultureIgnoreCase) ? $" and {keyword}" : keyword);
+            return sqls;
+        }
+
         //status_code
         if (isTrace)
         {
-            if (int.TryParse(keyword, out var _))
+            if (int.TryParse(keyword, out var num) && num - -1 > 0 && num - 600 < 0)
             {
-                sqls.Add($" and `{ATTRIBUTE_KEY}http.status_code`=@HttpStatusCode");
+                sqls.Add($" and {ClickhouseHelper.GetName(StorageConstaaa.Current.Trace.HttpStatusCode, !isTrace)}=@HttpStatusCode");
                 paramerters.Add(new ClickHouseParameter() { ParameterName = "HttpStatusCode", Value = keyword });
                 return sqls;
             }
-            if (Guid.TryParse(keyword, out var _))
+            if (Guid.TryParse(keyword, out var _) && keyword.Length - 32 == 0)
             {
-                sqls.Add($" and TraceId=@TraceUserId");
-                sqls.Add($" and {GetAttributeName("attributes.enduser.id", false)}=@TraceUserId");
+                sqls.Add($" and {StorageConstaaa.Current.TraceId}=@TraceUserId");
                 paramerters.Add(new ClickHouseParameter() { ParameterName = "TraceUserId", Value = keyword });
                 return sqls;
             }
             else
             {
-                sqls.Add($" and `{ATTRIBUTE_KEY}http.request_content_body` like @Keyword");
-                sqls.Add($" and `{ATTRIBUTE_KEY}http.response_content_body` like @Keyword");
-                sqls.Add($" and `{ATTRIBUTE_KEY}http.target` like @Keyword");
+                sqls.Add(ClickhouseHelper.AppendLike(ClickhouseHelper.GetName(StorageConstaaa.Current.Trace.HttpRequestBody, false), "Keyword", keyword));
+                sqls.Add(ClickhouseHelper.AppendLike(ClickhouseHelper.GetName(StorageConstaaa.Current.Trace.URLFull, false), "Keyword", keyword));
             }
         }
         else
         {
             if (keyword.Equals("error", StringComparison.CurrentCultureIgnoreCase))
             {
-                sqls.Add(" and SeverityText='Error'");
+                sqls.Add($" and {StorageConstaaa.Current.Log.LogLevelText}='Error'");
                 return sqls;
             }
+            if (keyword.EndsWith("exception", StringComparison.CurrentCultureIgnoreCase) && Regex.IsMatch(keyword, @"[\da-zA-Z]+"))
+            {
+                sqls.Add($" and {StorageConstaaa.Current.ExceptionType} = '{keyword}'");
+                return sqls;
+            }
+
             if (Guid.TryParse(keyword, out var _))
             {
-                sqls.Add($" and TraceId=@TraceUserId");
+                sqls.Add($" and {StorageConstaaa.Current.TraceId}=@TraceUserId");
                 paramerters.Add(new ClickHouseParameter() { ParameterName = "TraceUserId", Value = keyword });
                 return sqls;
             }
-            sqls.Add(" and Body like @Keyword");
-            sqls.Add($" and `{ATTRIBUTE_KEY}exception.message` like @Keyword");
+            sqls.Add(ClickhouseHelper.AppendLike(StorageConstaaa.Current.Log.Body, "Keyword", keyword));
+            sqls.Add(ClickhouseHelper.AppendLike(ClickhouseHelper.GetName(StorageConstaaa.Current.ExceptionMessage, !isTrace), "Keyword", keyword));
         }
 
-        paramerters.Add(new ClickHouseParameter() { ParameterName = "Keyword", Value = $"%{keyword}%" });
+        paramerters.Add(ClickhouseHelper.GetLikeParameter("Keyword", keyword));
         return sqls;
     }
 
@@ -199,31 +215,27 @@ internal static class IDbConnectionExtensitions
 
         foreach (var item in conditions)
         {
-            var name = GetName(item.Name, !isTrace);
+            var name = ClickhouseHelper.GetName(item.Name, !isTrace);
 
             if (item.Value is DateTime time)
             {
                 item.Value = MasaStackClickhouseConnection.ToTimeZone(time);
             }
-            if (item.Name.StartsWith(RESOURCE_KEY, StringComparison.CurrentCultureIgnoreCase))
+            else if (string.Equals(name, StorageConstaaa.Current.ServiceName, StringComparison.CurrentCultureIgnoreCase))
             {
-                var filed = item.Name[RESOURCE_KEY.Length..];
-                if (string.Equals(filed, "service.name"))
-                {
-                    AppendField(item, @paramerters, sql, name, "ServiceName");
-                }
-                else if (string.Equals(filed, "service.instance.id"))
-                {
-                    AppendField(item, @paramerters, sql, name, "ServiceInstanceId");
-                }
-                else if (string.Equals(filed, "service.namespace"))
-                {
-                    AppendField(item, @paramerters, sql, name, "ServiceNameSpace");
-                }
+                AppendField(item, @paramerters, sql, name, "serviceName");
             }
-            else if (item.Name.StartsWith(ATTRIBUTE_KEY, StringComparison.CurrentCultureIgnoreCase))
+            else if (string.Equals(name, StorageConstaaa.Current.ServiceInstance, StringComparison.CurrentCultureIgnoreCase))
             {
-                var filed = item.Name[ATTRIBUTE_KEY.Length..];
+                AppendField(item, @paramerters, sql, name, "serviceInstanceId");
+            }
+            else if (string.Equals(name, StorageConstaaa.Current.Environment, StringComparison.CurrentCultureIgnoreCase))
+            {
+                AppendField(item, @paramerters, sql, name, "serviceNameSpace");
+            }
+            else if (item.Name.StartsWith(ClickhouseHelper.ATTRIBUTE_KEY, StringComparison.CurrentCultureIgnoreCase))
+            {
+                var filed = item.Name[ClickhouseHelper.ATTRIBUTE_KEY.Length..];
                 AppendField(item, @paramerters, sql, name, filed.Replace('.', '_'));
             }
             else
@@ -365,13 +377,14 @@ internal static class IDbConnectionExtensitions
 
     public static TraceResponseDto ConvertTraceDto(IDataReader reader)
     {
-        var startTime = Convert.ToDateTime(reader[TIMSTAMP_KEY]);
+        var startTime = Convert.ToDateTime(reader[StorageConstaaa.Current.Timestimap]);
         long ns = Convert.ToInt64(reader["Duration"]);
         string resource = reader["Resources"].ToString()!, spans = reader["Spans"].ToString()!;
         var result = new TraceResponseDto
         {
             TraceId = reader["TraceId"].ToString()!,
             EndTimestamp = startTime.AddMilliseconds(ns / 1e6),
+
             Kind = reader["SpanKind"].ToString()!,
             Name = reader["SpanName"].ToString()!,
             ParentSpanId = reader["ParentSpanId"].ToString()!,
@@ -396,7 +409,7 @@ internal static class IDbConnectionExtensitions
             SeverityText = reader["SeverityText"].ToString()!,
             TraceFlags = Convert.ToInt32(reader["TraceFlags"]),
             SpanId = reader["SpanId"].ToString()!,
-            Timestamp = Convert.ToDateTime(reader[TIMSTAMP_KEY]),
+            Timestamp = Convert.ToDateTime(reader[StorageConstaaa.Current.Timestimap]),
         };
         if (!string.IsNullOrEmpty(resource))
             result.Resource = JsonSerializer.Deserialize<Dictionary<string, object>>(resource)!;
@@ -410,9 +423,9 @@ internal static class IDbConnectionExtensitions
         var sql = new StringBuilder("select ");
         var append = new StringBuilder();
         var appendWhere = new StringBuilder();
-        var name = GetName(requestDto.Name, isLog);
+        var name = ClickhouseHelper.GetName(requestDto.Name, isLog);
         AppendAggtype(requestDto, sql, append, name, out var isScalar);
-        sql.AppendFormat(" from {0} ", isLog ? MasaStackClickhouseConnection.LogTable : MasaStackClickhouseConnection.TraceSpanTable);
+        sql.AppendFormat(" from {0} ", isLog ? MasaStackClickhouseConnection.LogTable : MasaStackClickhouseConnection.TraceHttpServerTable);
         var (where, @paremeters, _) = AppendWhere(requestDto, !isLog);
         sql.Append($" where {appendWhere} {where}");
         sql.Append(append);
@@ -488,56 +501,6 @@ internal static class IDbConnectionExtensitions
         }
     }
 
-    private static string GetName(string name, bool isLog)
-    {
-        if (name.Equals("@timestamp", StringComparison.CurrentCultureIgnoreCase))
-            return TIMSTAMP_KEY;
-
-        if (!isLog && name.Equals("duration", StringComparison.CurrentCultureIgnoreCase))
-            return "Duration";
-
-        if (!isLog && name.Equals("kind", StringComparison.InvariantCultureIgnoreCase))
-            return "SpanKind";
-
-        if (name.StartsWith(RESOURCE_KEY, StringComparison.CurrentCultureIgnoreCase))
-            return GetResourceName(name);
-
-        if (name.StartsWith(ATTRIBUTE_KEY, StringComparison.CurrentCultureIgnoreCase))
-            return GetAttributeName(name, isLog);
-
-        return name;
-    }
-
-    private static string GetResourceName(string name)
-    {
-        var field = name[(RESOURCE_KEY.Length)..];
-        if (field.Equals("service.name", StringComparison.CurrentCultureIgnoreCase))
-            return "ServiceName";
-
-        if (field.Equals("service.namespace", StringComparison.CurrentCultureIgnoreCase) || field.Equals("service.instance.id", StringComparison.CurrentCultureIgnoreCase))
-            return $"{RESOURCE_KEY}{field}";
-
-        return $"ResourceAttributesValues[indexOf(ResourceAttributesKeys,'{field}')]";
-    }
-
-    private static string GetAttributeName(string name, bool isLog)
-    {
-        var pre = isLog ? "Log" : "Span";
-        var field = name[(ATTRIBUTE_KEY.Length)..];
-        if (isLog && (field.Equals("exception.message", StringComparison.CurrentCultureIgnoreCase)))
-            return $"{ATTRIBUTE_KEY}{field}";
-
-        if (!isLog && (field.Equals("http.status_code", StringComparison.CurrentCultureIgnoreCase)
-            || field.Equals("http.request_content_body", StringComparison.CurrentCultureIgnoreCase)
-            || field.Equals("http.response_content_body", StringComparison.CurrentCultureIgnoreCase)
-            || field.Equals("exception.message", StringComparison.CurrentCultureIgnoreCase)
-            || field.Equals("http.target", StringComparison.CurrentCultureIgnoreCase))
-            )
-            return $"{ATTRIBUTE_KEY}{field}";
-
-        return $"{pre}AttributesValues[indexOf({pre}AttributesKeys,'{field}')]";
-    }
-
     public static int ConvertInterval(string s)
     {
         var unit = Regex.Replace(s, @"\d+", "", RegexOptions.IgnoreCase, TimeSpan.FromSeconds(5));
@@ -573,7 +536,7 @@ internal static class IDbConnectionExtensitions
     public static string GetMaxDelayTraceId(this IDbConnection dbConnection, BaseRequestDto requestDto)
     {
         var (where, parameters, _) = AppendWhere(requestDto);
-        var text = $"select * from( TraceId from {MasaStackClickhouseConnection.TraceSpanTable} where {where} order by Duration desc) as t limit 1";
+        var text = $"select * from( {StorageConstaaa.Current.TraceId} from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where} order by {StorageConstaaa.Current.Trace.Duration} desc) as t limit 1";
         return dbConnection.ExecuteScalar(text, parameters?.ToArray())?.ToString()!;
     }
 }

@@ -28,14 +28,14 @@ public partial class TscTraceDetail
         _errorStatus = await ApiCaller.TraceService.GetErrorStatusAsync();
     }
 
-    internal async Task OpenAsync(string traceId, string spanId)
+    internal async Task OpenAsync(string traceId, string spanId, DateTime start, DateTime end)
     {
         _tabValue = 0;
         _dialogValue = true;
         _loading.Loading = true;
         _logsCount = null;
         StateHasChanged();
-        await QueryTraceDetailAndToTree(traceId, spanId: spanId);
+        await QueryTraceDetailAndToTree(traceId, spanId: spanId, start: start, end: end);
         _loading.Loading = false;
         StateHasChanged();
     }
@@ -48,7 +48,7 @@ public partial class TscTraceDetail
         _logsCount = null;
         StateHasChanged();
         var traceId = await ApiCaller.TraceService.GetTraceIdByMetricAsync(configurationRecord.Service!, url, configurationRecord.StartTime.UtcDateTime, configurationRecord.EndTime.UtcDateTime);
-        await QueryTraceDetailAndToTree(traceId, service: configurationRecord.Service, url: url);
+        await QueryTraceDetailAndToTree(traceId, service: configurationRecord.Service, url: url, start: configurationRecord.StartTime.UtcDateTime.AddHours(-6), end: configurationRecord.EndTime.UtcDateTime.AddHours(6));
         _loading.Loading = false;
         StateHasChanged();
     }
@@ -86,9 +86,9 @@ public partial class TscTraceDetail
         return sections;
     }
 
-    private async Task QueryTraceDetailAndToTree(string traceId, string? spanId = default, string? service = default, string? url = default)
+    private async Task QueryTraceDetailAndToTree(string traceId, string? spanId = default, string? service = default, string? url = default, DateTime? start = null, DateTime? end = null)
     {
-        var data = await ApiCaller.TraceService.GetAsync(traceId);
+        var data = await ApiCaller.TraceService.GetAsync(traceId, start!.Value, end!.Value);
         data = data.DistinctBy(span => span.SpanId).ToList();
         _count = data.Count();
 

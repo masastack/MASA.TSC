@@ -16,7 +16,12 @@ public class QueryHandler : EnvQueryHandler
     [EventHandler]
     public async Task GetDetailAsync(TraceDetailQuery query)
     {
-        query.Result = await _traceService.GetAsync(query.TraceId);
+        query.Result = await _traceService.GetAsync(new BaseRequestDto
+        {
+            Start = DateTime.Parse(query.Start),
+            End = DateTime.Parse(query.End),
+            TraceId = query.TraceId,
+        });
         if (query.Result == null)
             query.Result = Array.Empty<TraceResponseDto>();
     }
@@ -247,7 +252,9 @@ public class QueryHandler : EnvQueryHandler
         }
 
         var traceId = data.Result[0].TraceId;
-        var detailQuery = new TraceDetailQuery(traceId);
+        var startTime = data.Result[0].Timestamp.AddDays(-1).ToString();
+        var endTime = data.Result[0].EndTimestamp.AddDays(1).ToString();
+        var detailQuery = new TraceDetailQuery(traceId, startTime, endTime);
         await GetDetailAsync(detailQuery);
         query.Result = detailQuery.Result;
     }

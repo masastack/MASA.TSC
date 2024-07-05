@@ -24,6 +24,10 @@ public class SearchData
     public string ExceptionType { get; set; }
 
     public string ExceptionMsg { get; set; }
+
+    public string TraceId { get; set; }
+
+    public string SpanId { get; set; }    
 }
 
 public enum ApmComparisonTypes

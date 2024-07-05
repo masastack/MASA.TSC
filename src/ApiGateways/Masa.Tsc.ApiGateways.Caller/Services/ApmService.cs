@@ -32,4 +32,6 @@ public sealed class ApmService : BaseService
     public Task<PaginatedListBase<LogResponseDto>> GetLogListAsync(BaseRequestDto query) => Caller.GetByBodyAsync<PaginatedListBase<LogResponseDto>>($"{RootPath}/logList", body: query)!;
 
     public Task<PhoneModelDto> GetDeviceModelAsync(string brand,string model) => Caller.GetAsync<PhoneModelDto>($"{RootPath}/model?brand={brand}&model={model}")!;
+
+    public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmEndpointRequestDto query)=> Caller.GetByBodyAsync<PaginatedListBase<SimpleTraceListDto>>($"{RootPath}/simpleTraceList", body: query)!;
 }

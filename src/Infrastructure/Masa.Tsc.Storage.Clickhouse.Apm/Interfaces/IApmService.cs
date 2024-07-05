@@ -63,4 +63,11 @@ public interface IApmService : IDisposable
     Dictionary<string, List<string>> GetEnviromentServices(BaseApmRequestDto query);
 
     Task<PhoneModelDto> GetDeviceModelAsync(string brand, string model);
+
+    /// <summary>
+    /// 获取单个接口的tracelist
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmEndpointRequestDto query);
 }

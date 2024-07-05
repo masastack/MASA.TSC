@@ -18,7 +18,7 @@ public partial class ApmComponentBase : BDomComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public SearchData Search { get; set; }
+    public virtual SearchData Search { get; set; }
 
     public static TimeZoneInfo CurrentTimeZone { get; private set; }
 
@@ -70,25 +70,27 @@ public partial class ApmComponentBase : BDomComponentBase
             var search = values.Get("search");
             if (!string.IsNullOrEmpty(search))
                 Search.Text = search;
-            var traceId = values.Get("traceId");
-            if (!string.IsNullOrEmpty(traceId))
+            Search.TraceId = values.Get("traceId")!;
+            Search.SpanId = values.Get("spanId")!;
+
+            if (!string.IsNullOrEmpty(Search.TraceId))
             {
-                var text = $"TraceId='{traceId}'";
+                var text = $"TraceId='{Search.TraceId}'";
                 if (string.IsNullOrEmpty(Search.Text) || !Search.Text.Contains(text))
                 {
                     Search.Text = $"{Search.Text} and {text}";
                 }
             }
 
-            var spanId = values.Get("spanId");
-            if (!string.IsNullOrEmpty(spanId))
+            if (!string.IsNullOrEmpty(Search.SpanId))
             {
-                var text = $"SpanId='{spanId}'";
+                var text = $"SpanId='{Search.SpanId}'";
                 if (string.IsNullOrEmpty(Search.Text) || !Search.Text.Contains(text))
                 {
                     Search.Text = $"{Search.Text} and {text}";
                 }
             }
+
 
             if (!string.IsNullOrEmpty(Search.Text) && Search.Text.Trim().StartsWith("and "))
             {

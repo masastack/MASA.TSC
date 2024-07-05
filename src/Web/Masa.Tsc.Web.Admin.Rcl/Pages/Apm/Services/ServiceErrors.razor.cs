@@ -109,7 +109,7 @@ public partial class ServiceErrors
     {
         if (isTableLoading) return;
         isTableLoading = true;
-        if (string.IsNullOrEmpty(SearchData.Service))
+        if (string.IsNullOrEmpty(SearchData.Service) && string.IsNullOrEmpty(SearchData.Text))
         {
             total = 0;
             data = new();
@@ -123,7 +123,7 @@ public partial class ServiceErrors
                 Start = SearchData.Start,
                 End = SearchData.End,
                 OrderField = sortFiled,
-                Queries = Search.Text,
+                Queries = Search.Text,                
                 Service = SearchData.Service,
                 Env = SearchData.Environment,
                 IsDesc = sortBy,
@@ -158,5 +158,16 @@ public partial class ServiceErrors
         }
 
         return chart;
+    }
+
+    string? type = default, message = default;
+    bool showDetail = false;
+
+    private void Show(string? type = default, string? message = default)
+    {
+        this.type = type;
+        this.message = message;
+        showDetail = true;
+        StateHasChanged();
     }
 }

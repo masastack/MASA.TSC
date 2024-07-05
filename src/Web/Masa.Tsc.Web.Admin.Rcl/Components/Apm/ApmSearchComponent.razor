@@ -9,7 +9,7 @@
             <ApmInputSearchComponent Value="@Search.Text" ValueChanged="OnTextChanged" />
         </div>
     }
-    <div class="d-flex mb-4">
+    <div class="d-flex mb-4 @(ShowText?"":"pt-2")">
         @if (ShowEnv)
         {
             <SAutoComplete Label="@I18n.Apm("Search.Environment")"
@@ -34,7 +34,7 @@
         @if (ShowService)
         {
             <SAutoComplete Value=Search.Service
-                           ValueChanged="OnServiceChanged"                           
+                           ValueChanged="OnServiceChanged"
                            Items="services"
                            TItem="string"
                            TValue="string"
@@ -81,12 +81,11 @@
                                    ShowQuickChange
                                    ShowTimeZoneSelector
                                    DefaultQuickRange="quickRangeKey"
-                                   ShowInterval                                   
-                                   />
+                                   ShowInterval />
         }
         @* @if (ShowButton)
-        {
-            <SButton OnClick="OnValueChanged" Color="white my-auto ml-auto rounded-2"><SIcon Small Class="pr-2">mdi-refresh</SIcon>@I18n.Apm("Search.Refresh")</SButton>
-        } *@
+    {
+    <SButton OnClick="OnValueChanged" Color="white my-auto ml-auto rounded-2"><SIcon Small Class="pr-2">mdi-refresh</SIcon>@I18n.Apm("Search.Refresh")</SButton>
+    } *@
     </div>
 }

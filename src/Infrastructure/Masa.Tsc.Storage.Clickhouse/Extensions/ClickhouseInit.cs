@@ -22,9 +22,9 @@ public static class ClickhouseInit
             if (!ExistsTable(Connection, MasaStackClickhouseConnection.LogSourceTable))
                 throw new ArgumentNullException(nameof(MasaStackClickhouseConnection.LogSourceTable));
             InitLog();
-            //InitTrace(MasaStackClickhouseConnection.TraceTable);
-            InitTrace(MasaStackClickhouseConnection.TraceSpanTable, "where SpanKind =='SPAN_KIND_SERVER'");
-            InitTrace(MasaStackClickhouseConnection.TraceClientTable, "where SpanKind =='SPAN_KIND_CLIENT'");
+            InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, "where SpanKind =='SPAN_KIND_SERVER' and mapContains(SpanAttributes,'http.url')", "Attributes.http.target");
+            InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, "where SpanKind =='SPAN_KIND_CLIENT' and mapContains(SpanAttributes,'http.url')");
+            InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, "where not (SpanKind =='SPAN_KIND_SERVER' and mapContains(SpanAttributes,'host.name')) and not (SpanKind =='SPAN_KIND_CLIENT' and mapContains(SpanAttributes,'http.url'))");
             InitMappingTable();
             var timezoneStr = GetTimezone(Connection);
             MasaStackClickhouseConnection.TimeZone = TZConvert.GetTimeZoneInfo(timezoneStr);
@@ -78,21 +78,27 @@ public static class ClickhouseInit
     INDEX idx_log_exceptiontype `Attributes.exception.type` TYPE bloom_filter(0.001) GRANULARITY 1,
 
 	INDEX idx_string_body Body TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1,
-	INDEX idx_string_exceptionmessage Attributes.exception.message TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1
+	INDEX idx_string_exceptionmessage Attributes.exception.message TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1    
 )
 ENGINE = MergeTree
-PARTITION BY toDate(Timestamp)
+//PARTITION BY toDate(Timestamp)
 ORDER BY (
- Timestamp,
- `Resource.service.namespace`,
- ServiceName
+ Timestamp, 
+ ServiceName,
+ TraceId,
+ Attributes.exception.type, 
+ Body,
+ Attributes.TaskId,
+Attributes.http.target,
+Attributes.exception.message,
+`Resource.service.namespace`
  )
-TTL toDateTime(Timestamp) + toIntervalDay(30)
+TTL toDateTime(Timestamp) + toIntervalDay(15)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
 ";
         InitTable(MasaStackClickhouseConnection.LogTable, sql);
-        InitLogView(viewTable, MasaStackClickhouseConnection.LogTable);
+        InitLogView(viewTable, MasaStackClickhouseConnection.LogSourceTable);
     }
 
     public static void InitLogView(string name, string sourceName)
@@ -115,9 +121,15 @@ FROM {sourceName}
         InitTable(name, sql);
     }
 
-    private static void InitTrace(string table, string? where = null)
+    private static void InitTrace(string table, string where, params string[] orders)
     {
         var viewTable = table.Replace(".", ".v_");
+
+        string orderBy = null;
+        if (orders != null && orders.Any())
+        {
+            orderBy = $",{string.Join(',', orders)}";
+        }
         string sql =
             @$"CREATE TABLE {table}
 (
@@ -143,23 +155,25 @@ FROM {sourceName}
     `Links.SpanId` Array(String) CODEC(ZSTD(1)),
     `Links.TraceState` Array(String) CODEC(ZSTD(1)),
     `Links.Attributes` Array(Map(LowCardinality(String), String)) CODEC(ZSTD(1)),
-	
+
 	`Resource.service.namespace` String CODEC(ZSTD(1)),	
 	`Resource.service.version` String CODEC(ZSTD(1)),	
 	`Resource.service.instance.id` String CODEC(ZSTD(1)),
-	
+
 	`Attributes.http.status_code` String CODEC(ZSTD(1)),
 	`Attributes.http.response_content_body` String CODEC(ZSTD(1)),
 	`Attributes.http.request_content_body` String CODEC(ZSTD(1)),
 	`Attributes.http.target` String CODEC(ZSTD(1)),
+    `Attributes.http.url` String CODEC(ZSTD(1)),
     `Attributes.http.method` String CODEC(ZSTD(1)),
+    `Attributes.enduser.id` String CODEC( ZSTD(1)),
     `Attributes.exception.type` String CODEC(ZSTD(1)),
-	`Attributes.exception.message` String CODEC(ZSTD(1)),
+	`Attributes.exception.message` String CODEC(ZSTD(1)),    
 
     `ResourceAttributesKeys` Array(String) CODEC(ZSTD(1)),
     `ResourceAttributesValues` Array(String) CODEC(ZSTD(1)),
     `SpanAttributesKeys` Array(String) CODEC(ZSTD(1)),
-    `SpanAttributesValues` Array(String) CODEC(ZSTD(1)),
+    `SpanAttributesValues` Array(String) CODEC(ZSTD(1)),    
 
     INDEX idx_trace_id TraceId TYPE bloom_filter(0.001) GRANULARITY 1,
 	INDEX idx_trace_servicename ServiceName TYPE bloom_filter(0.001) GRANULARITY 1,
@@ -167,19 +181,32 @@ FROM {sourceName}
 	INDEX idx_trace_serviceinstanceid Resource.service.instance.id TYPE bloom_filter(0.001) GRANULARITY 1,
 	INDEX idx_trace_statuscode Attributes.http.status_code TYPE bloom_filter(0.001) GRANULARITY 1,
     INDEX idx_trace_exceptiontype Attributes.exception.type TYPE bloom_filter(0.001) GRANULARITY 1,	
+    INDEX idx_string_target Attributes.http.target TYPE bloom_filter(0.001) GRANULARITY 1,	
+    INDEX idx_string_url Attributes.http.url TYPE bloom_filter(0.001) GRANULARITY 1,	
+    INDEX idx_string_method Attributes.http.method TYPE bloom_filter(0.001) GRANULARITY 1,	
+    INDEX idx_string_userid Attributes.enduser.id TYPE bloom_filter(0.001) GRANULARITY 1,	
 	
 	INDEX idx_string_requestbody Attributes.http.request_content_body TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1,
 	INDEX idx_string_responsebody Attributes.http.response_content_body TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1,
 	INDEX idx_string_exceptionmessage Attributes.exception.message TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1
 )
 ENGINE = MergeTree
-PARTITION BY toDate(Timestamp)
+//PARTITION BY toDate(Timestamp)
 ORDER BY (
- Timestamp,
- Resource.service.namespace,
- ServiceName
+ Timestamp, 
+ ServiceName,
+ TraceId, 
+ Attributes.http.target,
+ Attributes.enduser.id,
+ Attributes.http.url,
+ Attributes.exception.type,
+ Attributes.exception.message, 
+Resource.service.namespace,
+SpanKind,
+Attributes.http.status_code,
+Attributes.http.method
  )
---TTL toDateTime(Timestamp) + toIntervalDay(30)
+--TTL toDateTime(Timestamp) + toIntervalDay(15)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
 ";
@@ -203,10 +230,13 @@ SELECT
     SpanAttributes['http.status_code'] as `Attributes.http.status_code`,
     SpanAttributes['http.response_content_body'] as `Attributes.http.response_content_body`,
     SpanAttributes['http.request_content_body'] as `Attributes.http.request_content_body`,
-    SpanAttributes['http.target'] as `Attributes.http.target`,
+    SpanAttributes['http.target'] as `Attributes.http.target`,    
+    SpanAttributes['http.url'] as `Attributes.http.url`,
     SpanAttributes['http.method'] as `Attributes.http.method`,
+    SpanAttributes['enduser.id'] as `Attributes.enduser.id`,
     SpanAttributes['exception.type'] as `Attributes.exception.type`,   
-    SpanAttributes['exception.message'] as `Attributes.exception.message`,   
+    SpanAttributes['exception.message'] as `Attributes.exception.message`, 
+    //concat(SpanAttributes['http.url'],' ',SpanAttributes['http.request.content_body'],' ',SpanAttributes['http.request_content_body'],' ',SpanAttributes['enduser.id'],' ',SpanAttributes['exception.type'],' ',SpanAttributes['exception.message']) as MasaKeyword, 
 
     mapKeys(ResourceAttributes) AS ResourceAttributesKeys,
     mapValues(ResourceAttributes) AS ResourceAttributesValues,

@@ -5,7 +5,7 @@ namespace Masa.Tsc.Storage.Contracts;
 
 public interface ITraceService
 {
-    Task<IEnumerable<TraceResponseDto>> GetAsync(string traceId);
+    Task<IEnumerable<TraceResponseDto>> GetAsync(BaseRequestDto query);
 
     Task<PaginatedListBase<TraceResponseDto>> ListAsync(BaseRequestDto query);
 

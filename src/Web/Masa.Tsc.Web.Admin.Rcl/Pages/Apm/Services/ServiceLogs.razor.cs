@@ -14,6 +14,9 @@ public partial class ServiceLogs
     [Parameter]
     public MetricTypes MetricType { get; set; }
 
+    [Parameter]
+    public bool ShowAppEvent { get; set; } = true;
+
     private List<DataTableHeader<LogResponseDto>> headers => new()
     {
         new() { Text = I18n.Apm("Log.List.Timestamp"), Value = nameof(LogResponseDto.Timestamp)},
@@ -108,7 +111,7 @@ public partial class ServiceLogs
     {
         if (isTableLoading) return;
         isTableLoading = true;
-        if (string.IsNullOrEmpty(SearchData.Service))
+        if (string.IsNullOrEmpty(SearchData.Service) && string.IsNullOrEmpty(SearchData.Text))
         {
             data.Clear();
             total = 0;
@@ -122,7 +125,7 @@ public partial class ServiceLogs
                 Service = SearchData.Service!,
                 Page = page,
                 Env = SearchData.Environment!,
-                Query = Search.Text,
+                Query = GetSearchText,
                 PageSize = defaultSize,
                 IsLimitEnv = false
             };
@@ -135,6 +138,16 @@ public partial class ServiceLogs
             total = (int)result.Total;
         }
         isTableLoading = false;
+    }
+
+    string GetSearchText
+    {
+        get
+        {
+            if (ShowAppEvent) return Search.Text;
+            //if(!string.IsNullOrEmpty(Search.Text))
+            return $"{Search.Text} and Body not like 'Event %'";
+        }
     }
 
     private async Task OnPageChange((int page, int pageSize) pageData)

@@ -1,19 +1,7 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm
 @inherits ApmComponentBase
-@page "/apm/errors/{name}"
 
-<PageTitle>@I18n.Apm("PageTitles.ErrorDetail")</PageTitle>
-
-<ApmSearchComponent ShowButton
-                    Value="Search"
-                    ValueChanged="OnLoadAsync"
-                    ShowText
-                    ShowComparison
-                    ShowService
-                    ShowEnv
-                    ShowTime />
-
-<div class="ma-0 pa-0 pb-4 container scroll-y">
+<div class="pa-4 container overflow-y-auto" style="height:840px">
     <MCard Class="rounded-lg mt-4" Height="256" Style="border:solid #ccc 1px">
         <MCardSubtitle Class="d-flex">
             <div class="font-weight-black h6 ml-4 mt-2">@I18n.Apm("Chart.ErrorOccurrences")</div>
@@ -66,7 +54,7 @@
                             <div class="d-flex">
                                 <SSearch BackgroundColor="white" @bind-Value="search" Class="rounded-2" Style="border:solid 1px;width:100%" />
                             </div>
-                            <MSimpleTable Height="560" FixedHeader Width="@("100%")" Dense>
+                            <MSimpleTable Height="560" FixedHeader Width="@("100%")" @ref="table" Dense>
                                 <thead>
                                     <tr>
                                         <th class="text-left">
@@ -121,4 +109,4 @@
     {
         return type.IsPrimitive || type.IsEnum || type.Equals(typeof(string)) || type.Equals(typeof(DateTime));
     }
-}
+    }

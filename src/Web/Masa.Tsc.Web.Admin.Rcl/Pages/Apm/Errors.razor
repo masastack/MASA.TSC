@@ -23,23 +23,14 @@
     <ItemColContent>
         @if (context.Header.Value == nameof(ErrorMessageDto.Type))
         {
-            <a target="_blank"
-               style="text-decoration:none"
-               title="@context.Item.Type"
-               href="/apm/errors/@(HttpUtility.UrlEncode(context.Item.Type)+GetUrlParam(service:Search.Service,env: GetSearchEnv(Search.Environment), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,exType:context.Item.Type,search:Search.Text))">
-                @context.Item.Type
-            </a>
+            <a style="text-decoration:none" onclick="@(()=>Show(context.Item.Type))">@context.Item.Type</a>
         }
         else if (context.Header.Value == nameof(ErrorMessageDto.Message))
         {
             <MTooltip Top Context="tooltipContent">
                 <ActivatorContent>
-                    <div @attributes="@tooltipContent.Attrs" style="width:400px" class="text-truncate">
-                        <a target="_blank"
-                           style="text-decoration:none"
-                           href="/apm/errors/@(HttpUtility.UrlEncode(context.Item.Message).Replace(".","x2E")+GetUrlParam(service:Search.Service,env: GetSearchEnv(Search.Environment), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,exType:context.Item.Type,exMsg:context.Item.Message,search:Search.Text))">
-                            @context.Item.Message
-                        </a>
+                    <div @attributes="@tooltipContent.Attrs" style="width:400px;cursor:pointer" class="text-truncate" @onclick="@(()=>Show(context.Item.Type,context.Item.Message))">
+                        <a style="text-decoration:none" onclick="javascript:;">@context.Item.Message</a>
                     </div>
                 </ActivatorContent>
                 <ChildContent>
@@ -65,3 +56,7 @@
 <MCard Rounded=true Class="px-6 py-2" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
     <SPagination Class="mt-2" @bind-Page="page" @bind-PageSize=defaultSize Total=total OnChange="OnPageChange" />
 </MCard>
+
+<SSheetDialog @bind-Value="showDetail" Title="@(message??type)">
+    <ErrorDetail Type="@type" Message="@message" SearchData="@Search" Show="showDetail" />
+</SSheetDialog>

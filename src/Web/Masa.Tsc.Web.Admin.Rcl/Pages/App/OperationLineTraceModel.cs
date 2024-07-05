@@ -55,7 +55,7 @@ public class OperationLineTraceModel
     /// </summary>
     public List<LogResponseDto> Logs { get; set; } = new();
 
-    public bool IsError => Logs.Exists(log => log.Attributes.ContainsKey("exception.type"));
+    public bool IsError => Logs.Exists(log => log.Attributes.ContainsKey("exception.type") || log.Attributes.ContainsKey("exception.message"));
 }
 
 public class OperationLineLogModel

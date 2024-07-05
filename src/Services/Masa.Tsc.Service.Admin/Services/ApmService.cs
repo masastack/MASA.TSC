@@ -143,7 +143,6 @@ public class ApmService : ServiceBase
             Service = service
         });
 
-
     public async Task<PaginatedListBase<TraceResponseDto>> GetTraceList([FromServices] ITraceService traceService, [FromBody] BaseRequestDto query)
         => await traceService.ListAsync(query);
 
@@ -159,6 +158,9 @@ public class ApmService : ServiceBase
             Start = start.ParseUTCTime(),
             End = end.ParseUTCTime()
         });
+
+    public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceList([FromServices] IApmService apmService, [FromBody] ApmEndpointRequestDto query)
+        => apmService.GetSimpleTraceListAsync(query);
 
     private static string? GetEnv(string? env) => string.Equals("all", env, StringComparison.CurrentCultureIgnoreCase) ? default : env;
 }
