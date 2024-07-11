@@ -69,8 +69,8 @@ internal static class IDbConnectionExtensitions
 
     public static List<TraceResponseDto> GetTraceByTraceId(this IDbConnection connection, BaseRequestDto query)
     {
-        query.Start = default;
-        query.End = default;
+        //query.Start = default;
+        //query.End = default;
         var (where, parameters, _) = AppendWhere(query);
         var timeField = StorageConstaaa.Current.Timestimap;
         return Query(connection,
