@@ -5,7 +5,7 @@ namespace Masa.Tsc.Storage.Clickhouse.Extensions;
 
 public static class ClickhouseInit
 {
-    private static ILogger Logger { get; set; }
+    internal static ILogger Logger { get; set; }
 
     internal static MasaStackClickhouseConnection Connection { get; private set; }
 

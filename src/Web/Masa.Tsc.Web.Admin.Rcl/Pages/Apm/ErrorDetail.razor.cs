@@ -74,6 +74,10 @@ public partial class ErrorDetail
             lastKey = key;
             lastType = Type;
             lastMessage = Message;
+            currentPage = 1;
+            currentLog = default;
+            _dic?.Clear();
+            total = 1;
             await OnLoadAsync();
         }
     }
@@ -108,8 +112,12 @@ public partial class ErrorDetail
             End = Search.End,
             IsLimitEnv = false
         });
-        total = (int)result.Total;
-        if (total == 0)
+        if (currentPage == 1)
+        {
+            total = (int)result.Total;
+        }
+
+        if (result.Result == null || !result.Result.Any())
         {
             currentLog = null;
             _dic = new Dictionary<string, object>();
@@ -134,8 +142,9 @@ public partial class ErrorDetail
             Start = Search.Start,
             End = Search.End,
             Service = Search.Service!,
+            HasPage = false
         });
-        if (result == null || result.Total == 0)
+        if (result == null || result.Result == null || !result.Result.Any())
             return;
         currentTrace = result.Result[0];
     }
@@ -160,7 +169,7 @@ public partial class ErrorDetail
         {
             Start = Search.Start,
             End = Search.End,
-            //Queries = Search.Text,
+            Queries = GetText,
             Service = Search.Service,
             Endpoint = Search.Endpoint!,
             Env = Search.Environment,

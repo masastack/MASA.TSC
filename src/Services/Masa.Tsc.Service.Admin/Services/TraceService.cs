@@ -30,7 +30,7 @@ public class TraceService : ServiceBase
 
     private async Task<PaginatedListBase<TraceResponseDto>> GetListAsync([FromServices] IEventBus eventBus, RequestTraceListDto model)
     {
-        var query = new TraceListQuery(model.Service, model.Instance, model.Endpoint, model.TraceId, model.Start, model.End, model.Page, model.PageSize, model.IsDesc, model.Keyword, model.IsError, model.Env, model.LatMin, model.LatMax, model.SpanId);
+        var query = new TraceListQuery(model.Service, model.Instance, model.Endpoint, model.TraceId, model.Start, model.End, model.Page, model.PageSize, model.IsDesc, model.Keyword, model.IsError, model.Env, model.LatMin, model.LatMax, model.SpanId, model.HasPage);
         await eventBus.PublishAsync(query);
         return query.Result;
     }

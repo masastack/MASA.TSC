@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Storage.Contracts;
+
 namespace Masa.Tsc.Service.Admin.Application.Traces;
 
 public class QueryHandler : EnvQueryHandler
@@ -62,6 +64,7 @@ public class QueryHandler : EnvQueryHandler
             TraceId = query.TraceId,
             Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = query.IsDesc }
         };
+        queryDto.SetHasPage(query.HasPage);
 
         var list = queryDto.Conditions?.ToList() ?? new();
         if (!string.IsNullOrEmpty(query.Endpoint))

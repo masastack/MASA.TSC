@@ -60,10 +60,14 @@ internal partial class ClickhouseApmService : IApmService
     {
         query.IsTrace = true;
         var (where, ors, parameters) = AppendWhere(query);
+        var period = GetPeriod(query);
+        var tableName = Constants.GetAggregateTable(period);
         var result = new EndpointLatencyDistributionDto();
-        var p95 = Convert.ToDouble(Scalar($"select floor(quantile(0.95)(Duration/{MILLSECOND})) p95 from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", parameters));
+
+        var p95 = Convert.ToDouble(Scalar($"select floor(quantileMerge(P95)/{MILLSECOND}) p95 from {tableName} where {where}", parameters));
         if (p95 is not double.NaN)
             result.P95 = (long)Math.Floor(p95);
+
         var sql = $@"select Duration/{MILLSECOND},count(1) total from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where} group by Duration order by Duration";
         var list = new List<ChartPointDto>();
         lock (lockObj)
@@ -290,14 +294,25 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
 
     public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmEndpointRequestDto query)
     {
-        query.IsServer = default;
-        query.IsTrace = true;
+        //query.IsServer = default;
+        //query.IsTrace = true;
         var (where, ors, parameters) = AppendWhere(query);
         var orderBy = GetOrderBy(query, new());
+        //
+        PaginatedListBase<SimpleTraceListDto> result = new() { };
+        if (query.HasPage)
+        {
+            var sql1 = CombineOrs($@"select TraceId from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors);
+            var countSql = $"select count(1) from(select TraceId from {sql1} group by TraceId)";
+            //var sql1 = CombineOrs($@"select countMerge(Total) as Total from {Constants.DurationCountTable1} where {where}", ors);
+            //var countSql = $"select sum(Total) from({sql1})";
+            result.Total = Convert.ToInt64(Scalar(countSql, parameters));
+        }
+        //Constants.DurationTable
+
         var sql = CombineOrs($@"select TraceId,Duration,Timestamp from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors);
-        var countSql = $"select count(1) from (select DISTINCT TraceId from {sql})";
-        sql = $"select DISTINCT TraceId,Duration,Timestamp from {sql} {orderBy} @limit";
-        PaginatedListBase<SimpleTraceListDto> result = new() { Total = Convert.ToInt64(Scalar(countSql, parameters)) };
+        sql = $"select TraceId,Duration,Timestamp from {sql} group by TraceId,Duration,Timestamp  {orderBy} @limit";
+
         SetData(sql, parameters, result, query, ToSampleTraceListDto);
         return Task.FromResult(result);
     }
@@ -308,7 +323,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         long ns = Convert.ToInt64(reader["Duration"]);
         var result = new SimpleTraceListDto
         {
-            TraceId = reader[StorageConstaaa.Current.TraceId].ToString(),
+            TraceId = reader[StorageConstaaa.Current.TraceId].ToString()!,
             Timestamp = startTime,
             EndTimestamp = startTime.AddMilliseconds(ns / 1e6),
         };
@@ -485,42 +500,34 @@ from(
         query.IsTrace = true;
         bool isInstrument = !string.IsNullOrEmpty(query.Queries);
         query.IsMetric = !isInstrument;
+        var period = GetPeriod(query);
+        var tableName = Constants.GetAggregateTable(period);
         var (where, ors, parameters) = AppendWhere(query);
         bool isEndpoint = query is ApmEndpointRequestDto;
         string groupAppend = isEndpoint ? ",`Attributes.http.target`,`Attributes.http.method`" : string.Empty;
         string sql;
-        var period = GetPeriod(query);
+
         var result = new List<ChartLineDto>();
         if (isInstrument)
         {
-            var minites = (long)(query.End - query.Start).TotalMinutes;
-            if (minites == 0) minites = 1;
-            sql = $@"select 
-        `time` as Timestamp,
-        Latency,
-        Throughput,
-        Failed,
-        P99,
-        P95,
-        ServiceName{groupAppend}
-        from
-                (select
-                toStartOfInterval(`Timestamp` , INTERVAL {period} ) as `time`,
-                floor(avg(Duration/{MILLSECOND})) `Latency`,
-                round(count(1)*1.0/{minites},2) `Throughput`,
-                round(sum(has(['{string.Join("','", query.GetErrorStatusCodes())}'],`Attributes.http.status_code`))*100.0/if(count(1)=0,1,count(1)),2) `Failed`,
-                floor(quantile(0.99)(Duration/{MILLSECOND})) `P99`,
-                floor(quantile(0.95)(Duration/{MILLSECOND})) `P95`,
-                ServiceName{groupAppend}
-                from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where} 
-                group by ServiceName{groupAppend},`time`
-                order by ServiceName{groupAppend},`time`
-                ) t
-        ";
+            var sql2 = CombineOrs($"select DISTINCT  ServiceName{groupAppend} from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors);
+            sql = @$"select a.* from(select  
+                    Timestamp,
+                    avgMerge(Latency) as Latency,
+                    countMerge(Throughput) as Throughput,
+                    SumMerge(Failed) as Failed,
+                     floor(quantileMerge(P99)/{MILLSECOND}) as P99,
+                    floor(quantileMerge(P95)/{MILLSECOND}) as P95,
+                    ServiceName
+                    {groupAppend}
+            from {tableName}
+            where {where}
+            group by ServiceName{groupAppend},Timestamp) a,
+            (select DISTINCT ServiceName{groupAppend} from ({sql2})) b where a.ServiceName=b.ServiceName{(isEndpoint ? " and a.Attributes.http.target=b.Attributes.http.target and a.Attributes.http.method=b.Attributes.http.method" : "")}
+            order by ServiceName{groupAppend},Timestamp";
         }
         else
         {
-            var tableName = Constants.GetAggregateTable(period);
             sql = $@"select        
         Timestamp,
         floor(Latency1/{MILLSECOND}) as Latency,
@@ -707,6 +714,7 @@ from(
 
     private IDataReader Query(string sql, IEnumerable<ClickHouseParameter> parameters)
     {
+        var start = DateTime.Now;
         try
         {
             command.CommandText = sql;
@@ -718,6 +726,13 @@ from(
             _logger.LogError(ex, "execute sql error:{Sqlraw}", sql);
             throw;
         }
+        finally
+        {
+            var end = DateTime.Now;
+            var duration = (end - start).TotalSeconds;
+            if (duration - 3 > 0)
+                _logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
+        }
     }
 
     private object Scalar(string sql, IEnumerable<ClickHouseParameter> parameters)
@@ -726,7 +741,18 @@ from(
         {
             command.CommandText = sql;
             SetParameters(parameters);
-            return command.ExecuteScalar()!;
+            var start = DateTime.Now;
+            try
+            {
+                return command.ExecuteScalar()!;
+            }
+            finally
+            {
+                var end = DateTime.Now;
+                var duration = (end - start).TotalSeconds;
+                if (duration - 3 > 0)
+                    _logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
+            }
         }
     }
 

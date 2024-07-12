@@ -29,5 +29,7 @@ public class RequestTraceListDto : Pagination<RequestTraceListDto>
 
     public int? LatMax { get; set; }
 
+    public bool HasPage { get; set; } = true;
+
     public string SpanId { get; set; }
 }

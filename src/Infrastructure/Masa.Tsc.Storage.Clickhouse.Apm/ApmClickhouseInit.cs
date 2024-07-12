@@ -11,6 +11,9 @@ internal static class ApmClickhouseInit
         InitErrorTable(connection, suffix, logTable);
         InitAppTable(connection, suffix, logTable, traceTable);
         InitAggregateTable(connection);
+        //InitDurationTable(connection);
+        //InitDurationCountTable(connection);
+        //InitDurationCountTable(connection);
     }
 
     private static void InitErrorTable(MasaStackClickhouseConnection connection, string? suffix = null, string? appLogTable = null)
@@ -187,5 +190,143 @@ engine = MergeTree
 Order by (`Brand`,`Model`)
 SETTINGS index_granularity = 8192";
         ClickhouseInit.InitTable(connection, Constants.ModelsTable, sql);
+    }
+
+    private static void InitDurationTable(MasaStackClickhouseConnection connection)
+    {
+        var table = Constants.DurationTable;
+        var sql = $@"create table {Constants.DurationTable}(
+Timestamp DateTime64(9) CODEC(Delta(8), ZSTD(1)),
+ServiceName String CODEC(ZSTD(1)),
+`Resource.service.namespace` String CODEC(ZSTD(1)),
+`Attributes.http.method` String CODEC(ZSTD(1)),
+`Attributes.http.status_code` String CODEC(ZSTD(1)),
+`Attributes.http.target` String CODEC(ZSTD(1)),
+TraceId String CODEC(ZSTD(1)),
+Duration Int64 CODEC(ZSTD(1))
+)
+ENGINE = MergeTree
+ORDER BY (
+ Timestamp,
+ ServiceName,
+ TraceId,
+ Attributes.http.target, 
+ Attributes.http.status_code,
+ Attributes.http.method,
+ Resource.service.namespace)
+TTL toDateTime(Timestamp) + toIntervalDay(30)
+SETTINGS index_granularity = 8192,
+ ttl_only_drop_parts = 1;";
+        var sqlView =
+ $@"CREATE MATERIALIZED VIEW {table.Replace(".", ".v_")} TO {table}
+AS
+select Timestamp,ServiceName,Resource.service.namespace,Attributes.http.method,Attributes.http.status_code,Attributes.http.target,TraceId,Duration
+from 
+{MasaStackClickhouseConnection.TraceHttpServerTable}
+";
+        ClickhouseInit.InitTable(connection, table, sql);
+        ClickhouseInit.InitTable(connection, table.Replace(".", ".v_"), sqlView);
+    }
+
+    private static void InitDurationCountTable(MasaStackClickhouseConnection connection)
+    {
+        var table = Constants.DurationCountTable1;
+        var sql = $@"create table {Constants.DurationCountTable1}(
+Timestamp DateTime64(9) CODEC(Delta(8), ZSTD(1)),
+ServiceName String CODEC(ZSTD(1)),
+`Resource.service.namespace` String CODEC(ZSTD(1)),
+`Attributes.http.method` String CODEC(ZSTD(1)),
+`Attributes.http.target` String CODEC(ZSTD(1)),
+Duration Int64 CODEC(ZSTD(1)),
+Total AggregateFunction(count,UInt8),
+)
+ENGINE = AggregatingMergeTree
+--PARTITION BY toYYYYMM(Timestamp)
+ORDER BY (
+ Timestamp,
+ ServiceName,
+ Attributes.http.target, 
+ Attributes.http.method,
+ Resource.service.namespace)
+TTL toDateTime(Timestamp) + toIntervalDay(30)
+SETTINGS index_granularity = 8192";
+        var sqlView =
+ $@"CREATE MATERIALIZED VIEW {table.Replace(".", ".v_")} TO {table}
+AS
+SELECT
+    toStartOfInterval(Timestamp,toIntervalMinute(1)) AS Timestamp,
+    ServiceName,
+    `Resource.service.namespace`,    
+    `Attributes.http.method`, 
+    `Attributes.http.target`,
+    floor(Duration/1000000) as Duration,
+    countState(1) AS Total
+FROM {Constants.DurationTable}
+GROUP BY
+    ServiceName,
+    `Resource.service.namespace`,
+    `Attributes.http.target`,
+    `Attributes.http.method`,
+    Timestamp,
+    Duration";
+        ClickhouseInit.InitTable(connection, table, sql);
+        ClickhouseInit.InitTable(connection, table.Replace(".", ".v_"), sqlView);
+    }
+
+    private static void InitDurationCountTable1(MasaStackClickhouseConnection connection)
+    {
+        foreach (var item in Constants.DicDurationCountTable)
+        {
+            InitDurationCountTable(connection, item.Key, item.Value);
+        }
+    }
+
+    private static void InitDurationCountTable(MasaStackClickhouseConnection connection, string interval, string tableName)
+    {
+        var viewTable = tableName.Replace(".", ".v_");
+        var sql = new string[] {
+        $@"CREATE TABLE {tableName}
+(
+    Timestamp DateTime64(9) CODEC(Delta(8), ZSTD(1)),
+ServiceName String CODEC(ZSTD(1)),
+`Resource.service.namespace` String CODEC(ZSTD(1)),
+`Attributes.http.method` String CODEC(ZSTD(1)),
+`Attributes.http.target` String CODEC(ZSTD(1)),
+Duration Int64 CODEC(ZSTD(1)),
+Total AggregateFunction(count,UInt8),
+)
+ENGINE = AggregatingMergeTree
+--PARTITION BY toYYYYMM(Timestamp)
+ORDER BY (
+ Timestamp,
+ ServiceName,
+ Attributes.http.target, 
+ Attributes.http.method,
+ Resource.service.namespace)
+TTL toDateTime(Timestamp) + toIntervalDay(30)
+SETTINGS index_granularity = 8192;",
+$@"CREATE MATERIALIZED VIEW {viewTable} TO {tableName}
+AS
+SELECT
+    toStartOfInterval(Timestamp,INTERVAL {interval}) AS Timestamp,
+    ServiceName,
+    ResourceAttributes['service.namespace'] AS `Resource.service.namespace`,    
+    SpanAttributes['http.method'] AS `Attributes.http.method`, 
+    SpanAttributes['http.target'] AS `Attributes.http.target`,
+    floor(Duration/1000000) as Duration,
+    count(1) AS Throughput
+FROM {MasaStackClickhouseConnection.TraceSourceTable}
+WHERE SpanKind = 'SPAN_KIND_SERVER'
+GROUP BY
+    ServiceName,
+    `Resource.service.namespace`,
+    `Attributes.http.target`,
+    `Attributes.http.method`,
+    Timestamp,
+    Duration"
+        };
+
+        ClickhouseInit.InitTable(connection, tableName, sql[0]);
+        ClickhouseInit.InitTable(connection, viewTable, sql[1]);
     }
 }

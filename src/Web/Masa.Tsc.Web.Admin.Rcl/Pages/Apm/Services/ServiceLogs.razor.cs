@@ -31,7 +31,7 @@ public partial class ServiceLogs
     private readonly List<LogResponseDto> data = new();
     private bool isTableLoading = false;
     private string? sortFiled = nameof(LogResponseDto.Timestamp);
-    private bool? sortBy = true;
+    private bool sortBy = true;
     private string lastKey = string.Empty;
     private readonly ChartData chart = new();
     private bool dialogShow = false;
@@ -48,6 +48,7 @@ public partial class ServiceLogs
         else
             sortBy = default;
         await LoadAsync();
+        StateHasChanged();
     }
 
     private void OpenAsync(LogResponseDto item)
@@ -123,6 +124,8 @@ public partial class ServiceLogs
                 Start = SearchData.Start,
                 End = SearchData.End,
                 Service = SearchData.Service!,
+                SortField = sortFiled,
+                IsDesc = sortBy,
                 Page = page,
                 Env = SearchData.Environment!,
                 Query = GetSearchText,

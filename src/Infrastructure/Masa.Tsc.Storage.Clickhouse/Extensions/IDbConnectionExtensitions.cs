@@ -9,15 +9,20 @@ internal static class IDbConnectionExtensitions
     {
         var (where, parameters, ors) = AppendWhere(query);
         var orderBy = AppendOrderBy(query, false);
-        var countSql = CombineOrs($"select count() as `total` from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors);
-        var total = Convert.ToInt64(ExecuteScalar(connection, $"select sum(`total`) from ({countSql})", parameters?.ToArray()));
+        var result = new PaginatedListBase<TraceResponseDto>() { Result = new() };
         var start = (query.Page - 1) * query.PageSize;
-        var result = new PaginatedListBase<TraceResponseDto>() { Total = total, Result = new() };
-        if (total > 0 && start - total < 0)
+        if (query.HasPage())
         {
-            var querySql = CombineOrs($"select ServiceName,{ClickhouseHelper.GetName("timestamp", false)},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors, orderBy);
-            result.Result = Query(connection, $"select * from {querySql} as t limit {start},{query.PageSize}", parameters?.ToArray(), ConvertTraceDto);
+            var countSql = CombineOrs($"select count() as `total` from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors);
+            var total = Convert.ToInt64(ExecuteScalar(connection, $"select sum(`total`) from ({countSql})", parameters?.ToArray()));
+            result.Total = total;
+            if (total <= 0 || start - total >= 0)
+                return result;
         }
+
+        var querySql = CombineOrs($"select ServiceName,{ClickhouseHelper.GetName("timestamp", false)},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors, orderBy);
+        result.Result = Query(connection, $"select * from {querySql} as t limit {start},{query.PageSize}", parameters?.ToArray(), ConvertTraceDto);
+
         return result;
     }
 
@@ -25,16 +30,20 @@ internal static class IDbConnectionExtensitions
     {
         var (where, parameters, ors) = AppendWhere(query, false);
         var orderBy = AppendOrderBy(query, true);
-        var countSql = CombineOrs($"select count() as `total` from {MasaStackClickhouseConnection.LogTable} where {where}", ors);
-        var total = Convert.ToInt64(ExecuteScalar(connection, $"select sum(`total`) from {countSql}", parameters?.ToArray()));
         var start = (query.Page - 1) * query.PageSize;
-        var result = new PaginatedListBase<LogResponseDto>() { Total = total, Result = new() };
-
-        if (total > 0 && start - total < 0)
+        var result = new PaginatedListBase<LogResponseDto>() { Result = new() };
+        if (query.HasPage())
         {
-            var querySql = CombineOrs($"select {ClickhouseHelper.GetName("timestamp", true)},TraceId,SpanId,TraceFlags,SeverityText,SeverityNumber,ServiceName,Body,Resources,Logs from {MasaStackClickhouseConnection.LogTable} where {where}", ors, orderBy);
-            result.Result = Query(connection, $"select * from {querySql} as t limit {start},{query.PageSize}", parameters?.ToArray(), ConvertLogDto);
+            var countSql = CombineOrs($"select count() as `total` from {MasaStackClickhouseConnection.LogTable} where {where}", ors);
+            var total = Convert.ToInt64(ExecuteScalar(connection, $"select sum(`total`) from {countSql}", parameters?.ToArray()));
+            result.Total = total;
+            if (total <= 0 || start - total >= 0)
+                return result;
         }
+
+        var querySql = CombineOrs($"select {ClickhouseHelper.GetName("timestamp", true)},TraceId,SpanId,TraceFlags,SeverityText,SeverityNumber,ServiceName,Body,Resources,Logs from {MasaStackClickhouseConnection.LogTable} where {where}", ors, orderBy);
+        result.Result = Query(connection, $"select * from {querySql} as t limit {start},{query.PageSize}", parameters?.ToArray(), ConvertLogDto);
+
         return result;
     }
 
@@ -82,7 +91,7 @@ internal static class IDbConnectionExtensitions
                     select {timeField},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceOtherClientTable} where {where}
                 ) as t 
             order by {timeField}
-            limit 1000", parameters.ToArray(), ConvertTraceDto);
+            limit 300", parameters.ToArray(), ConvertTraceDto);
     }
 
     public static string AppendOrderBy(BaseRequestDto query, bool isLog)
@@ -315,6 +324,7 @@ internal static class IDbConnectionExtensitions
 
     public static object? ExecuteScalar(this IDbConnection dbConnection, string sql, IDataParameter[]? @parameters = null)
     {
+        var start = DateTime.Now;
         using var cmd = dbConnection.CreateCommand();
         cmd.CommandText = sql;
         if (@parameters != null && @parameters.Length > 0)
@@ -329,6 +339,13 @@ internal static class IDbConnectionExtensitions
         {
             MasaTscCliclhouseExtensitions.Logger?.LogError(ex, "execute sql error:{RawSql}, paramters:{Parameters}", sql, parameters);
             throw;
+        }
+        finally
+        {
+            var end = DateTime.Now;
+            var duration = (end - start).TotalSeconds;
+            if (duration - 3 > 0)
+                ClickhouseInit.Logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
         }
     }
 
@@ -346,6 +363,7 @@ internal static class IDbConnectionExtensitions
             foreach (var p in @parameters)
                 cmd.Parameters.Add(p);
         OpenConnection(dbConnection);
+        var start = DateTime.Now;
         try
         {
             using var reader = cmd.ExecuteReader();
@@ -363,6 +381,13 @@ internal static class IDbConnectionExtensitions
         {
             MasaTscCliclhouseExtensitions.Logger?.LogError(ex, "query sql error:{RawSql}, paramters:{Parameters}", sql, parameters);
             throw;
+        }
+        finally
+        {
+            var end = DateTime.Now;
+            var duration = (end - start).TotalSeconds;
+            if (duration - 3 > 0)
+                ClickhouseInit.Logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
         }
     }
 

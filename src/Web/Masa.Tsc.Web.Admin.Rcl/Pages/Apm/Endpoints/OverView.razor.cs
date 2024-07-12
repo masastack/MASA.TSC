@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Storage.Contracts;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints;
 
 public partial class OverView
@@ -27,6 +25,7 @@ public partial class OverView
 
     protected override async Task OnParametersSetAsync()
     {
+        await base.OnParametersSetAsync();
         var text = JsonSerializer.Serialize(SearchData);
         var key = MD5Utils.Encrypt(text);
         if (lastKey != key)
@@ -35,7 +34,6 @@ public partial class OverView
             await LoadDataAsync();
             await LoadDistributionDataAsync();
         }
-        await base.OnParametersSetAsync();
     }
 
     protected override void OnInitialized()
@@ -48,39 +46,6 @@ public partial class OverView
         //traceId = queries.Get("traceId");
         base.OnInitialized();
     }
-
-    private async Task LoadTraceDetailAsyncaaaaa(int page = 1)
-    {
-        this.page = page;
-        string traceId = null;
-        var queryDto = new RequestTraceListDto
-        {
-            Start = SearchData.Start,
-            End = SearchData.End,
-            Endpoint = SearchData.Endpoint!,
-            Service = SearchData.Service!,
-            Env = SearchData.Environment!,
-            Page = this.page,
-            PageSize = 1,
-            Keyword = SearchData.Text
-        };
-        var result = await ApiCaller.TraceService.GetListAsync(queryDto);
-        total = (int)result.Total;
-        traceDetails = null;
-        errors = null;
-        percentile = 0;
-        if (result.Result != null && result.Result.Any())
-            traceId = result.Result[0].TraceId;
-
-        if (!string.IsNullOrEmpty(traceId))
-        {
-            traceDetails = (await ApiCaller.TraceService.GetAsync(traceId, result.Result[0].Timestamp.AddHours(-6), result.Result[0].EndTimestamp.AddHours(6)))?.ToList()!;
-
-            await LoadTraceErrorsAsync(traceId);
-            CaculatePercentil();
-        }
-    }
-
 
     private async Task LoadTraceDetailAsync(int page = 1)
     {
@@ -125,7 +90,8 @@ public partial class OverView
                 PageSize = 100,
                 Queries = SearchData.Text,
                 OrderField = "Timestamp",
-                IsDesc = false
+                IsDesc = false,
+                HasPage = true
             });
 
             if (result1 != null && result1.Result != null)
@@ -136,21 +102,22 @@ public partial class OverView
 
         if (traceIds.Count - page >= 0)
             trace = traceIds[page - 1];
-        else
+        else if (traceTails.Count > 0)
             trace = traceTails[page - 1 - (total - traceTails.Count)];
 
         if (trace != null)
         {
             traceDetails = (await ApiCaller.TraceService.GetAsync(trace.TraceId, trace.Timestamp.AddHours(-6), trace.EndTimestamp.AddHours(6)))?.ToList()!;
-
-            await LoadTraceErrorsAsync(trace.TraceId);
             CaculatePercentil();
+            StateHasChanged();
+            await LoadTraceErrorsAsync(trace.TraceId);
+            StateHasChanged();
         }
     }
 
     private async Task LoadTraceErrorsAsync(string traceId)
     {
-        var query = new ApmEndpointRequestDto
+        var queryError = new ApmEndpointRequestDto
         {
             Start = SearchData.Start,
             End = SearchData.End,
@@ -159,7 +126,7 @@ public partial class OverView
             Page = 1,
             PageSize = 100
         };
-        errors = await ApiCaller.ApmService.GetSpanErrorsAsync(query);
+        errors = await ApiCaller.ApmService.GetSpanErrorsAsync(queryError);
     }
 
     private void CaculatePercentil()
@@ -227,6 +194,7 @@ public partial class OverView
             throughput.HasChart = false;
             failed.HasChart = false;
         }
+        StateHasChanged();
     }
 
     private static EChartType ConvertLatencyChartData(ChartLineDto data, Func<ChartLineItemDto, object> fnXProperty, Func<ChartLineItemDto, object> fnProperty, string lineColor = null, string areaLineColor = null, string? unit = null, string? lineName = null)
@@ -274,8 +242,9 @@ public partial class OverView
             Queries = SearchData.Text,
             ComparisonType = SearchData.ComparisonType.ToComparisonType()
         };
-        var data = await ApiCaller.ApmService.GetLatencyDistributionAsync(query);
         await LoadTraceDetailAsync();
+        StateHasChanged();
+        var data = await ApiCaller.ApmService.GetLatencyDistributionAsync(query);
         var currentSpan = traceDetails?.Find(item => item.Attributes.TryGetValue("http.target", out var value) && value.ToString().Equals(SearchData.Endpoint, StringComparison.OrdinalIgnoreCase));
         if (data != null && data.Latencies.Any())
         {
