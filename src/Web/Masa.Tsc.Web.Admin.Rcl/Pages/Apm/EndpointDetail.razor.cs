@@ -8,6 +8,9 @@ public partial class EndpointDetail
     private StringNumber index = 1;
     protected override bool IsPage => true;
 
+    [Parameter]
+    public string Name { get; set; }
+
     private void OnSearchValueChanged(SearchData data)
     {
         Search = data;

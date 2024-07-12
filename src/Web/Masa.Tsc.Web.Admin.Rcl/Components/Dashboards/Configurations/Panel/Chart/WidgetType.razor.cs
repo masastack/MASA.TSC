@@ -24,7 +24,7 @@ public partial class WidgetType
     private async Task OnSelected(EChartPanelTypeModel item)
     {
         Value = item.Type;
-        Items.Where(x => x.Selected).ForEach(x => x.Selected = false);
+        Items.Where(x => x.Selected).ToList().ForEach(x => x.Selected = false);
         item.Selected = true;
         if (ValueChanged.HasDelegate)
             await ValueChanged.InvokeAsync(Value);

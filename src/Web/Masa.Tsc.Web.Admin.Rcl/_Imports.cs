@@ -1,14 +1,11 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-global using BlazorComponent;
-global using BlazorComponent.I18n;
 global using Force.DeepCloner;
 global using Masa.Blazor;
 global using Masa.BuildingBlocks.Authentication.Identity;
 global using Masa.BuildingBlocks.StackSdks.Auth.Contracts;
 global using Masa.BuildingBlocks.StackSdks.Config;
-global using Masa.BuildingBlocks.StackSdks.Pm;
 global using Masa.BuildingBlocks.StackSdks.Pm.Model;
 global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Log;
 global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Model;
@@ -59,7 +56,6 @@ global using Microsoft.AspNetCore.Components.Web;
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
-global using Microsoft.Extensions.Logging;
 global using Microsoft.JSInterop;
 global using System;
 global using System.ComponentModel;

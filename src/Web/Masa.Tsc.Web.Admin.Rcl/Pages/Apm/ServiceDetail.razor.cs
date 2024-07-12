@@ -8,4 +8,12 @@ public partial class ServiceDetail
     protected override bool IsPage => true;
     private StringNumber index = 1;
 
+    [Parameter]
+    public string Name { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Search.Endpoint = default!;
+    }
 }

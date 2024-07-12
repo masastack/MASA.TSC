@@ -304,7 +304,8 @@ public partial class TscTraceDetail
             _loadLogs = false;
             return;
         }
-        await InvokeStateHasChangedAsync();
+        //await base.StateHasChanged InvokeStateHasChangedAsync();
+        StateHasChanged();
         var query = new LogPageQueryDto
         {
             PageSize = pageSize,
@@ -319,7 +320,8 @@ public partial class TscTraceDetail
             .ToList();
         _logsCount = _logs.Count;
         _loadLogs = false;
-        await InvokeStateHasChangedAsync();
+        StateHasChanged();
+        //await InvokeStateHasChangedAsync();
     }
 
     private static string FormatDuration(double duration)

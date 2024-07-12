@@ -427,7 +427,7 @@ public partial class Index
     private async Task Share()
     {
         var str = $"apm/app?userId={_userId}&service={serviceName}&start={end}&end={start}&search={_searchText}&spanId={currentTrace?.Data?.SpanId}&logTime={currentLog?.Time}&tab={index}".ToSafeBlazorUrl();
-        await Js.InvokeVoidAsync(JsInteropConstants.Copy, $"{NavigationManager.BaseUri}{str}");
+        await JSRuntime.InvokeVoidAsync(JsInteropConstants.Copy, $"{NavigationManager.BaseUri}{str}");
         await Task.Delay(500);
     }
 

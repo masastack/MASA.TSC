@@ -140,7 +140,7 @@ internal static class IDbConnectionExtensitions
             @paramerters.Add(new ClickHouseParameter() { ParameterName = "TraceId", Value = query.TraceId });
         }
 
-        var ors = AppendKeyword(query.Keyword?.Trim(), paramerters, isTrace);
+        var ors = AppendKeyword(query.Keyword?.Trim()!, paramerters, isTrace);
         AppendConditions(query.Conditions, paramerters, sql, isTrace);
 
         if (!string.IsNullOrEmpty(query.RawQuery))

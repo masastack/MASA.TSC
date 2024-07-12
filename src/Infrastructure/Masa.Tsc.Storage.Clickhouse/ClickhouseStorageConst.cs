@@ -45,6 +45,8 @@ public class ClickhouseStorageLog : StorageLog
     public override string LogErrorText => "Error";
 
     public override string LogWarningText => "Warning";
+
+    public override string Url => "Attributes.RequestPath";
 }
 
 public class ClickhouseStorageTrace : StorageTrace

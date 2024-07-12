@@ -1,4 +1,5 @@
 ﻿@inherits TscComponentBase
+@inject IJSRuntime JSRuntime
 
 <MHover Context="hContext">
     <div @attributes="hContext.Attrs" class="hover-pointer d-flex align-left tooltip">
@@ -21,6 +22,7 @@
 </MHover>
 
 @code {
+
     [Parameter]
     public object Value { get; set; }
 
@@ -57,7 +59,7 @@
     {
         _copyClicked = true;
 
-        await Js.InvokeVoidAsync(JsInteropConstants.Copy, value);
+        await JSRuntime.InvokeVoidAsync(JsInteropConstants.Copy, value);
 
         await Task.Delay(500);
 

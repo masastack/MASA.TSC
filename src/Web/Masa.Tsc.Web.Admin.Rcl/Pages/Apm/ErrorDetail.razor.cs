@@ -25,8 +25,6 @@ public partial class ErrorDetail
 
     IJSObjectReference module = null;
 
-    MSimpleTable table = null;
-
     int currentPage = 1;
     int total = 1;
 
@@ -47,9 +45,9 @@ public partial class ErrorDetail
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/_content/Masa.Tsc.Web.Admin.Rcl/Pages/Apm/ErrorDetail.razor.js");
         }
-        else if (table != null)
+        else
         {
-            await module.InvokeVoidAsync("setTableId", table.Id);
+            await module.InvokeVoidAsync("autoHeight");
         }
     }
 

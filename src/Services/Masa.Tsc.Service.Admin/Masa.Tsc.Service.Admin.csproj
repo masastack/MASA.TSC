@@ -7,20 +7,14 @@
 		<UserSecretsId>f6cdf028-3564-47a5-a4fb-662685680853</UserSecretsId>
 	</PropertyGroup>
 
-	<ItemGroup>		
+	<ItemGroup>
 		<PackageReference Include="Masa.BuildingBlocks.Dispatcher.Events" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Config" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Scheduler" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Middleware" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Configuration" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.BuildingBlocks.Ddd.Domain" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Ddd.Domain" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Exceptions" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="$(MasaFrameworkPackageVersion)" />		
-		<PackageReference Include="Masa.Contrib.StackSdks.Tsc" Version="$(MasaFrameworkPackageVersion)" />		
-		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.OpenTelemetry" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaFrameworkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.Dapr" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.ReadWriteSplitting.Cqrs" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Ddd.Domain.Repository.EFCore" Version="$(MasaFrameworkPackageVersion)" />
@@ -33,6 +27,14 @@
 		<PackageReference Include="MASA.Utils.Configuration.Json" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Utils.Extensions.Enums" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Globalization.I18n.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
+
+		<PackageReference Include="Masa.Contrib.StackSdks.Config" Version="$(MasaSdkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Scheduler" Version="$(MasaSdkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Middleware" Version="$(MasaSdkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Tsc" Version="$(MasaSdkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.OpenTelemetry" Version="$(MasaSdkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaSdkPackageVersion)" />
+
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.6" />
@@ -48,10 +50,10 @@
 		<PackageReference Include="Dapr.AspNetCore" Version="1.10.0" />
 	</ItemGroup>
 
-	<ItemGroup>		
-		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />		
-		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Clickhouse.Apm\Masa.Tsc.Storage.Clickhouse.Apm.csproj" />		
-		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Elasticsearch\Masa.Tsc.Storage.Elasticsearch.csproj" />		
+	<ItemGroup>
+		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Clickhouse.Apm\Masa.Tsc.Storage.Clickhouse.Apm.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Elasticsearch\Masa.Tsc.Storage.Elasticsearch.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Prometheus\Masa.Tsc.Storage.Prometheus.csproj" />
 	</ItemGroup>
 

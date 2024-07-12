@@ -401,6 +401,10 @@ div[style*="visibility: hidden; opacity: 0;"] {
     cursor: move;
 }
 
+.m-breadcrumbs li {
+    max-width: 600px !important
+}
+
 .m-breadcrumbs__item {
     max-width: 600px !important
 }

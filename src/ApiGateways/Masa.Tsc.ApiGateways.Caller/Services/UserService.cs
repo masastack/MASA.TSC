@@ -14,25 +14,25 @@ public class UserService : BaseService
         _authClient = authClient;
     }
 
-    public async Task<UserModel> GetUserDetailAsync(Guid userId)
+    public Task<UserModel> GetUserDetailAsync(Guid userId)
     {
-        return await _authClient.UserService.GetByIdAsync(userId);
+        return _authClient.UserService.GetByIdAsync(userId)!;
     }
 
-    public async Task<List<UserRoleDto>> GetUserRolesAsync(Guid userId)
+    public Task<List<UserRoleDto>> GetUserRolesAsync(Guid userId)
     {
-        return await Caller.GetAsync<List<UserRoleDto>>($"{RootPath}/role/getSelectForUser?userId={userId}");
+        return Caller.GetAsync<List<UserRoleDto>>($"{RootPath}/role/getSelectForUser?userId={userId}")!;
     }
 
-    public async Task<Dictionary<string, string>> GetUserClaimAsync(Guid userId)
+    public Task<Dictionary<string, string>> GetUserClaimAsync(Guid userId)
     {
-        return await _authClient.UserService.GetClaimValuesAsync(userId);
+        return _authClient.UserService.GetClaimValuesAsync(userId);
 
         //return await Caller.GetAsync<Dictionary<string, object>>($"{RootPath}/user/claim-values/{userId}");
     }
 
     public async Task<List<UserClaimDto>> GetClaimsAsync()
     {
-        return (await Caller.GetAsync<UserClaimPageDto>($"{RootPath}/sso/userClaim/getlist?page=1&pageSize=100")).Items;
+        return (await Caller.GetAsync<UserClaimPageDto>($"{RootPath}/sso/userClaim/getlist?page=1&pageSize=100"))!.Items;
     }
 }

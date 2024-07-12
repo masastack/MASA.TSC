@@ -83,7 +83,7 @@ public class ApmService : ServiceBase
             Start = start.ParseUTCTime(),
             End = end.ParseUTCTime(),
             Env = GetEnv(env),
-            //Endpoint = endpoint!,
+            Endpoint = endpoint!,
             Queries = queries,
             OrderField = orderField,
             IsDesc = isDesc,

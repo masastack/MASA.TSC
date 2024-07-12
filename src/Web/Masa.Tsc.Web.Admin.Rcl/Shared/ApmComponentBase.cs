@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Shared.Apm;
 
-public partial class ApmComponentBase : BDomComponentBase
+public partial class ApmComponentBase : MasaComponentBase
 {
     [Inject]
     public I18n I18n { get; set; }

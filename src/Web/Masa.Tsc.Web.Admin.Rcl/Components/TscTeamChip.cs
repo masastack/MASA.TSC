@@ -8,13 +8,13 @@ public class TscTeamChip : MChip
     [Parameter]
     public string ContentClass { get; set; } = default!;
 
-    protected override void SetComponentClass()
-    {
-        base.SetComponentClass();
-        base.CssProvider.Merge("content", delegate (CssBuilder cssBuilder)
-        {
-            cssBuilder.Add($"{ContentClass}");
-        });
-    }
+    //protected override void SetComponentClass()
+    //{
+    //    base.SetComponentClass();
+    //    base.CssProvider.Merge("content", delegate (CssBuilder cssBuilder)
+    //    {
+    //        cssBuilder.Add($"{ContentClass}");
+    //    });
+    //}
 
 }

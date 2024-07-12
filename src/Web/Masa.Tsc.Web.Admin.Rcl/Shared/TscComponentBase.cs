@@ -3,10 +3,10 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Shared;
 
-public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
+public partial class TscComponentBase : MasaComponentBase, IAsyncDisposable
 {
-    [CascadingParameter(Name = "Culture")]
-    private string Culture { get; set; } = null!;
+    //[CascadingParameter(Name = "Culture")]
+    //private string Culture { get; set; } = null!;
 
     [Inject]
     public IUserContext UserContext { get; set; }
@@ -24,7 +24,7 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
     public TscCaller ApiCaller { get; set; }
 
     [Inject]
-    public I18n I18n { get; set; }   
+    public I18n I18n { get; set; }
 
     public Guid CurrentUserId { get; private set; }
 
@@ -69,7 +69,7 @@ public partial class TscComponentBase : BDomComponentBase, IAsyncDisposable
     public async Task<bool> OpenConfirmDialog(string title, string content, AlertTypes type)
     {
         return await PopupService.SimpleConfirmAsync(title, content, type);
-    }   
+    }
 
     public void OpenSuccessMessage(string message)
     {

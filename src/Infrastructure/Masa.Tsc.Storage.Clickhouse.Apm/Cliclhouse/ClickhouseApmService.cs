@@ -93,8 +93,9 @@ internal partial class ClickhouseApmService : IApmService
         query.IsServer = default;
         query.IsError = true;
         var (where, ors, parameters) = AppendWhere(query);
-        var groupby = $"group by Type,Message{(string.IsNullOrEmpty(query.Endpoint) ? "" : ",Endpoint")}";
-        var combineSql = CombineOrs($"select Attributes.exception.type,MsgGroupKey,Timestamp from {Constants.ErrorTable} where {where} ", ors);
+        var groupby = $"group by Type,Message{(string.IsNullOrEmpty(query.Endpoint) ? "" : ",Attributes.http.target")}";
+        var append = string.IsNullOrEmpty(query.Endpoint) ? "" : ",Attributes.http.target";
+        var combineSql = CombineOrs($"select Attributes.exception.type,MsgGroupKey,Timestamp{append} from {Constants.ErrorTable} where {where} ", ors);
         var countSql = $"select count(1) from (select `Attributes.exception.type` as Type,MsgGroupKey as Message,max(Timestamp) time,count(1) from {combineSql} {groupby})";
         PaginatedListBase<ErrorMessageDto> result = new() { Total = Convert.ToInt64(Scalar(countSql, parameters)) };
         var orderBy = GetOrderBy(query, errorOrders);
@@ -196,8 +197,8 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
             });
             if (reader != null && !reader.NextResult())
                 return result;
-            string env = null, currentEnv = null;
-            while (reader.Read())
+            string env = default!, currentEnv = default!;
+            while (reader!.Read())
             {
                 env = reader[1].ToString()!;
                 var service = reader[0].ToString()!;
@@ -687,7 +688,7 @@ from(
         var name = "endpoint";
         if (traceQuery.IsLog.HasValue && traceQuery.IsLog.Value)
         {
-            sql.AppendLine($" and {ClickhouseHelper.GetName(StorageConstaaa.Current.Trace.URL, true)} like @{name}");
+            sql.AppendLine($" and {ClickhouseHelper.GetName(StorageConstaaa.Current.Log.Url, true)} like @{name}");
             parameters.Add(new ClickHouseParameter { ParameterName = name, Value = $"{traceQuery.Endpoint}%" });
         }
         else

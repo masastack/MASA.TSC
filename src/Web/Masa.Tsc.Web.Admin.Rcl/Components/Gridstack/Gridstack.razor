@@ -73,7 +73,7 @@
 
     async Task OnItemChangeAsync(IEnumerable<GridstackChangeEventArgs> args)
     {
-        args.ForEach(arg =>
+        args.ToList().ForEach(arg =>
         {
             var item = Items.FirstOrDefault(e => e.Id == arg.Id);
             if (item is not null)
@@ -106,7 +106,7 @@
             _prevReadonly = Readonly;
             if (Id is null)
             {
-                await GridstackJSModule.InitAllAsync(Options);               
+                await GridstackJSModule.InitAllAsync(Options);
             }
             else
             {

@@ -54,6 +54,8 @@ public class StorageLog
     public virtual string LogErrorText => "Error";
 
     public virtual string LogWarningText => "Warning";
+
+    public virtual string Url => "RequestPath";
 }
 
 public class StorageTrace

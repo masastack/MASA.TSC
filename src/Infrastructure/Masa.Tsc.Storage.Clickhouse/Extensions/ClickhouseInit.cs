@@ -125,7 +125,7 @@ FROM {sourceName}
     {
         var viewTable = table.Replace(".", ".v_");
 
-        string orderBy = null;
+        string orderBy = default!;
         if (orders != null && orders.Any())
         {
             orderBy = $",{string.Join(',', orders)}";

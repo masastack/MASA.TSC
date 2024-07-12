@@ -7,10 +7,7 @@ public partial class ServiceAutoComplete
 {
     bool _firstValueChanged;
     bool _isLoading;
-    Guid _key = Guid.Empty;
-
-    [Inject]
-    public IPmClient PmClient { get; set; }
+    Guid _key = Guid.Empty;   
 
     [Parameter]
     public string? Value { get; set; }

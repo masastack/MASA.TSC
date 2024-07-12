@@ -1,7 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace BlazorComponent.I18n;
+//namespace Masa.Blazor.I18n;
 
 internal static class I18nExtensions
 {
