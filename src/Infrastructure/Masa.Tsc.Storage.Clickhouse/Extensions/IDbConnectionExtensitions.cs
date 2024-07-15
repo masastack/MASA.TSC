@@ -344,7 +344,7 @@ internal static class IDbConnectionExtensitions
         {
             var end = DateTime.Now;
             var duration = (end - start).TotalSeconds;
-            if (duration - 3 > 0)
+            //if (duration - 1 > 0)
                 ClickhouseInit.Logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
         }
     }
@@ -386,7 +386,7 @@ internal static class IDbConnectionExtensitions
         {
             var end = DateTime.Now;
             var duration = (end - start).TotalSeconds;
-            if (duration - 3 > 0)
+            //if (duration - 1 > 0)
                 ClickhouseInit.Logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
         }
     }

@@ -8,7 +8,7 @@ internal static class Constants
     public static string ErrorTable { get; private set; }
 
     private const string AggregateTable = "otel_trace_metrics@interval";
-    private const string DurationCountTable = "otel_traces_spans_duration@intervalcount_aaaaaaaaaaaaaa";
+    private const string DurationCountTable = "otel_traces_spans_duration@intervalcount";
 
     public static string DurationTable { get; private set; }
 
@@ -53,8 +53,8 @@ internal static class Constants
             database = $"{database}.";
         ErrorTable = $"{database}otel_errors_{suffix}";
         DurationTable = $"{database}otel_traces_spans_duration_{suffix}";
-        DurationCountTable1 = $"{database}otel_traces_spans_duration_count_{suffix}_aaaaaaaaaaaaaa";
-        ModelsTable = $"{database}tsc_phone_models_{suffix}_aaaaaaaaaaaaaa";
+        DurationCountTable1 = $"{database}otel_traces_spans_duration_count_{suffix}";
+        ModelsTable = $"{database}tsc_phone_models_{suffix}";
         foreach (var key in INTERVALS)
         {
             DicAggregateTable.Add(key, database + GetAggregateTable(key, suffix));

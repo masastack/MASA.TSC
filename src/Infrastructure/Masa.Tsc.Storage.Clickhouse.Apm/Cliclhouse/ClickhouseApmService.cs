@@ -68,7 +68,7 @@ internal partial class ClickhouseApmService : IApmService
         if (p95 is not double.NaN)
             result.P95 = (long)Math.Floor(p95);
 
-        var sql = $@"select Duration/{MILLSECOND},count(1) total from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where} group by Duration order by Duration";
+        var sql = $@"select Duration/{MILLSECOND},count(1) total from {Constants.DurationCountTable1} where {where} group by Duration order by Duration";
         var list = new List<ChartPointDto>();
         lock (lockObj)
         {
@@ -731,7 +731,7 @@ from(
         {
             var end = DateTime.Now;
             var duration = (end - start).TotalSeconds;
-            if (duration - 3 > 0)
+            //if (duration - 1 > 0)
                 _logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
         }
     }
@@ -751,7 +751,7 @@ from(
             {
                 var end = DateTime.Now;
                 var duration = (end - start).TotalSeconds;
-                if (duration - 3 > 0)
+                //if (duration - 1 > 0)
                     _logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
             }
         }
