@@ -47,7 +47,10 @@ public partial class Errors
     {
         isTableLoading = true;
         if (data != null)
+        {
+            page = 1;
             Search = data;
+        }
         StateHasChanged();
         await LoadPageDataAsync();
         isTableLoading = false;

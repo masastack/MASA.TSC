@@ -54,6 +54,7 @@ public partial class ServiceErrors
         {
             lastKey = key;
             await LoadASync();
+            StateHasChanged();
             await LoadChartDataAsync();
         }
         await base.OnParametersSetAsync();
@@ -123,7 +124,7 @@ public partial class ServiceErrors
                 Start = SearchData.Start,
                 End = SearchData.End,
                 OrderField = sortFiled,
-                Queries = Search.Text,                
+                Queries = Search.Text,
                 Service = SearchData.Service,
                 Env = SearchData.Environment,
                 IsDesc = sortBy,

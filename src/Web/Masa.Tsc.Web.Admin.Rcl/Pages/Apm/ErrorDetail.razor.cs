@@ -204,6 +204,7 @@ public partial class ErrorDetail
     protected override async ValueTask DisposeAsyncCore()
     {
         await base.DisposeAsyncCore();
-        await module.DisposeAsync();
+        if (module != null)
+            await module.DisposeAsync();
     }
 }

@@ -70,7 +70,7 @@ internal partial class ClickhouseApmService : IApmService
 
         var sql = $@"select Duration/{MILLSECOND},count(1) total from {Constants.DurationCountTable1} where {where} group by Duration order by Duration";
         var list = new List<ChartPointDto>();
-        lock (lockObj)
+        //lock (lockObj)
         {
             using var reader = Query(sql, parameters);
             while (reader.NextResult())
@@ -159,7 +159,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         var sql = CombineOrs($@"select SpanId from {Constants.ErrorTable} where {where}", ors);
         sql = $"select SpanId,count(1) `total` from ({sql}) {groupby}";
         var list = new List<ChartPointDto>();
-        lock (lockObj)
+        //lock (lockObj)
         {
             using var reader = Query(sql, parameters);
             while (reader.NextResult())
@@ -189,7 +189,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
             where Timestamp between @start and @end
             group by `Resource.service.namespace`,ServiceName
             order by `Resource.service.namespace`,ServiceName";
-        lock (lockObj)
+        //lock (lockObj)
         {
             using var reader = Query(sql, new ClickHouseParameter[] {
                 new (){ ParameterName="start",DbType= DbType.DateTime,Value=MasaStackClickhouseConnection.ToTimeZone(query.Start)},
@@ -222,7 +222,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         var isCodeAlis = brand.ToLower().Equals("apple") && model.Contains(',');
         var sql = $"select * from {Constants.ModelsTable} where lower(Brand)=@brand and  {(isCodeAlis ? "lower(CodeAlis)=@model" : "lower(Model)=@model")} limit 1";
         PhoneModelDto result = default!;
-        lock (lockObj)
+        //lock (lockObj)
         {
             using var reader = Query(sql, new ClickHouseParameter[] {
                 new (){ ParameterName="brand",Value=brand.ToLower() },
@@ -299,20 +299,20 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         //query.IsTrace = true;
         var (where, ors, parameters) = AppendWhere(query);
         var orderBy = GetOrderBy(query, new());
-        //
+
         PaginatedListBase<SimpleTraceListDto> result = new() { };
         if (query.HasPage)
         {
-            var sql1 = CombineOrs($@"select TraceId from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors);
-            var countSql = $"select count(1) from(select TraceId from {sql1} group by TraceId)";
-            //var sql1 = CombineOrs($@"select countMerge(Total) as Total from {Constants.DurationCountTable1} where {where}", ors);
-            //var countSql = $"select sum(Total) from({sql1})";
+            //var sql1 = CombineOrs($@"select TraceId from {Constants.DurationTable} where {where}", ors);
+            //var countSql = $"select count(1) from {sql1}";
+            var sql1 = CombineOrs($@"select countMerge(Total) as Total from {Constants.DurationCountTable1} where {where}", ors);
+            var countSql = $"select sum(Total) from({sql1})";
             result.Total = Convert.ToInt64(Scalar(countSql, parameters));
         }
         //Constants.DurationTable
 
-        var sql = CombineOrs($@"select TraceId,Duration,Timestamp from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors);
-        sql = $"select TraceId,Duration,Timestamp from {sql} group by TraceId,Duration,Timestamp  {orderBy} @limit";
+        var sql = CombineOrs($@"select TraceId,Duration,Timestamp from {Constants.DurationTable} where {where}", ors);
+        sql = $"select TraceId,Duration,Timestamp from {sql} {orderBy} @limit";
 
         SetData(sql, parameters, result, query, ToSampleTraceListDto);
         return Task.FromResult(result);
@@ -440,7 +440,7 @@ from(
         var paramEndTime = parameters.First(p => p.ParameterName == "endTime");
         paramEndTime.Value = ((DateTime)paramEndTime.Value!).AddDays(day);
 
-        lock (lockObj)
+        //lock (lockObj)
         {
             using var readerPrevious = Query(sql, parameters);
             SetChartData(result, readerPrevious, isPrevious: true);
@@ -552,7 +552,7 @@ from(
             order by ServiceName{groupAppend},Timestamp
             ) t";
         }
-        lock (lockObj)
+        //lock (lockObj)
         {
             using var reader = Query(sql, parameters);
             SetChartData(result, reader);
@@ -566,7 +566,7 @@ from(
         var start = (query.Page - 1) * query.PageSize;
         if (result.Total - start > 0)
         {
-            lock (lockObj)
+            //lock (lockObj)
             {
                 using var reader = Query(sql.Replace("@limit", $"limit {start},{query.PageSize}"), parameters);
                 result.Result = new();
@@ -731,14 +731,14 @@ from(
         {
             var end = DateTime.Now;
             var duration = (end - start).TotalSeconds;
-            //if (duration - 1 > 0)
+            if (duration - 1 > 0)
                 _logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
         }
     }
 
     private object Scalar(string sql, IEnumerable<ClickHouseParameter> parameters)
     {
-        lock (lockObj)
+        //lock (lockObj)
         {
             command.CommandText = sql;
             SetParameters(parameters);
@@ -751,7 +751,7 @@ from(
             {
                 var end = DateTime.Now;
                 var duration = (end - start).TotalSeconds;
-                //if (duration - 1 > 0)
+                if (duration - 1 > 0)
                     _logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
             }
         }
@@ -798,10 +798,15 @@ from(
     private List<ChartLineCountDto> GetChartCountData(string sql, IEnumerable<ClickHouseParameter> parameters, ComparisonTypes? comparisonTypes = null)
     {
         var result = new List<ChartLineCountDto>();
-        lock (lockObj)
+        //lock (lockObj)
         {
+            var t1 = DateTime.Now;
             using var currentReader = Query(sql, parameters);
+            var t2 = DateTime.Now;
+            var ta = (t2 - t1).TotalSeconds;
             SetChartCountData(result, currentReader);
+            var t3 = DateTime.Now;
+            var tb = (t3 - t2).TotalSeconds;
         }
 
         if (comparisonTypes.HasValue && (comparisonTypes.Value == ComparisonTypes.DayBefore || comparisonTypes.Value == ComparisonTypes.WeekBefore))
@@ -813,25 +818,31 @@ from(
             var paramEndTime = parameters.First(p => p.ParameterName == "endTime");
             paramEndTime.Value = ((DateTime)paramEndTime.Value!).AddDays(day);
 
-            lock (lockObj)
+            //lock (lockObj)
             {
+                var t1 = DateTime.Now;
                 using var previousReader = Query(sql, parameters);
+                var t2 = DateTime.Now;
+                var ta = (t2 - t1).TotalSeconds;
                 SetChartCountData(result, previousReader, true);
+                var t3 = DateTime.Now;
+                var tb = (t3 - t2).TotalSeconds;
             }
         }
 
         return result;
     }
 
-    private static void SetChartCountData(List<ChartLineCountDto> result, IDataReader reader, bool isPrevious = false)
+    private void SetChartCountData(List<ChartLineCountDto> result, IDataReader reader, bool isPrevious = false)
     {
+        var t1 = DateTime.Now;
         if (!reader.NextResult())
             return;
         ChartLineCountDto? current = null;
         while (reader.Read())
         {
-            var name = reader[0].ToString()!;
-            var time = new DateTimeOffset(Convert.ToDateTime(reader[0])).ToUnixTimeSeconds();
+            var name = reader.GetValue(0).ToString()!;
+            var time = new DateTimeOffset(Convert.ToDateTime(reader.GetValue(0))).ToUnixTimeSeconds();
             if (current == null || current.Name != name)
             {
                 if (isPrevious && result.Exists(item => item.Name == name))
@@ -853,10 +864,12 @@ from(
             ((List<ChartLineCountItemDto>)(isPrevious ? current.Previous : current.Currents)).Add(
                 new()
                 {
-                    Value = reader[1],
+                    Value = reader.GetValue(1),
                     Time = time
                 });
         }
+        var t2 = DateTime.Now;
+        var tb = (t2 - t1).TotalSeconds;
     }
 
     private static string GetPeriod(BaseApmRequestDto query)

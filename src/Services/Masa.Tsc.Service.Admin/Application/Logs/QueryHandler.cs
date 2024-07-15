@@ -102,8 +102,10 @@ public class QueryHandler : EnvQueryHandler
             Page = queryData.Page,
             PageSize = queryData.Size,
             Sort = new FieldOrderDto { Name = string.IsNullOrEmpty(queryData.SortField) ? StorageConst.Timestimap(ConfigConst.IsElasticsearch, ConfigConst.IsClickhouse) : queryData.SortField, IsDesc = queryData.IsDesc },
-            Conditions = conditions
+            Conditions = conditions,
         };
+        if (query.Page - 1 > 0)
+            query.SetHasPage(false);
         if (!isSkipEnv)
         {
             var env = queryData.Env;

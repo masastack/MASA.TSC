@@ -11,8 +11,8 @@ internal static class ApmClickhouseInit
         InitErrorTable(connection, suffix, logTable);
         InitAppTable(connection, suffix, logTable, traceTable);
         InitAggregateTable(connection);
-        //InitDurationTable(connection);
-        //InitDurationCountTable(connection);
+        InitDurationTable(connection);
+        InitDurationCountTable(connection);
         //InitDurationCountTable(connection);
     }
 

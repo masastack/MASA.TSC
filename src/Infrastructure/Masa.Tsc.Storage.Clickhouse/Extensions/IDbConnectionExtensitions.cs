@@ -34,7 +34,7 @@ internal static class IDbConnectionExtensitions
         var result = new PaginatedListBase<LogResponseDto>() { Result = new() };
         if (query.HasPage())
         {
-            var countSql = CombineOrs($"select count() as `total` from {MasaStackClickhouseConnection.LogTable} where {where}", ors);
+            var countSql = CombineOrs($"select count(1) as `total` from {MasaStackClickhouseConnection.LogTable} where {where}", ors);
             var total = Convert.ToInt64(ExecuteScalar(connection, $"select sum(`total`) from {countSql}", parameters?.ToArray()));
             result.Total = total;
             if (total <= 0 || start - total >= 0)
@@ -344,7 +344,7 @@ internal static class IDbConnectionExtensitions
         {
             var end = DateTime.Now;
             var duration = (end - start).TotalSeconds;
-            //if (duration - 1 > 0)
+            if (duration - 1 > 0)
                 ClickhouseInit.Logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
         }
     }
@@ -386,7 +386,7 @@ internal static class IDbConnectionExtensitions
         {
             var end = DateTime.Now;
             var duration = (end - start).TotalSeconds;
-            //if (duration - 1 > 0)
+            if (duration - 1 > 0)
                 ClickhouseInit.Logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
         }
     }

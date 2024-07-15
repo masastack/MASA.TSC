@@ -66,6 +66,7 @@ public partial class Logs
         current = item;
         dialogShow = true;
     }
+
     private async Task OnPageChange((int page, int pageSize) pageData)
     {
         page = pageData.page;
@@ -77,7 +78,11 @@ public partial class Logs
     {
         isTableLoading = true;
         if (data != null)
+        {
+            total = 0;
+            page = 1;
             Search = data;
+        }
         StateHasChanged();
         await LoadPageDataAsync();
         isTableLoading = false;
@@ -97,7 +102,7 @@ public partial class Logs
             IsDesc = sortBy ?? false,
             SortField = sortFiled!,
             Query = Search.Text,
-            IsLimitEnv = false
+            IsLimitEnv = false,
         };
         var result = await ApiCaller.LogService.GetPageAsync(query);
         data.Clear();
@@ -105,6 +110,7 @@ public partial class Logs
         {
             data.AddRange(result.Result);
         }
-        total = (int)result.Total;
+        if (total == 0)
+            total = (int)result.Total;
     }
 }
