@@ -95,7 +95,7 @@ ORDER BY (
  Attributes.exception.message,
  SpanId
  )
-TTL toDateTime(Timestamp) + toIntervalDay(15)
+TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
 ";
