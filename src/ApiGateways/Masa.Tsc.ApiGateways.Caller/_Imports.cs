@@ -24,7 +24,7 @@ global using Masa.Tsc.Contracts.Admin.Traces;
 global using Masa.Tsc.Contracts.Admin.User;
 global using Masa.Tsc.Storage.Clickhouse.Apm.Models.Request;
 global using Masa.Tsc.Storage.Clickhouse.Apm.Models.Response;
-global using Masa.Utils.Data.Prometheus.Model;
+global using Masa.Tsc.Storage.Prometheus.Model;
 global using Masa.Utils.Models;
 global using Microsoft.AspNetCore.Authentication;
 global using Microsoft.AspNetCore.Http;
