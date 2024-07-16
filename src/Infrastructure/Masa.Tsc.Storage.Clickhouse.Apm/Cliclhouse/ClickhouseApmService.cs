@@ -76,7 +76,7 @@ internal partial class ClickhouseApmService : IApmService
         if (p95 is not double.NaN)
             result.P95 = (long)Math.Floor(p95);
 
-        var sql = $@"select Duration,count(1) total from {Constants.DurationCountTable1} where {where} group by Duration order by Duration";
+        var sql = $@"select Duration,count(1) total from {Constants.DurationCountTable} where {where} group by Duration order by Duration";
         var list = new List<ChartPointDto>();
 
         using var reader = await Query(sql, parameters);
@@ -326,7 +326,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         {
             //var sql1 = CombineOrs($@"select TraceId from {Constants.DurationTable} where {where}", ors);
             //var countSql = $"select count(1) from {sql1}";
-            var sql1 = CombineOrs($@"select countMerge(Total) as Total from {Constants.DurationCountTable1} where {where}", ors);
+            var sql1 = CombineOrs($@"select countMerge(Total) as Total from {Constants.DurationCountTable} where {where}", ors);
             var countSql = $"select sum(Total) from({sql1})";
             result.Total = Convert.ToInt64(await Scalar(countSql, parameters));
         }
@@ -378,13 +378,13 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
             from {tableName}
             where {where}
             group by ServiceName,`Resource.service.namespace`{groupAppend},Timestamp) a,
-            (select DISTINCT ServiceName{groupAppend} from ({sql2})) b where a.ServiceName=b.ServiceName{(isEndpoint ? " and a.Attributes.http.target=b.Attributes.http.target and a.Attributes.http.method=b.Attributes.http.method" : "")}";
+            (select DISTINCT ServiceName{groupAppend} from ({sql2})) b where a.ServiceName=b.ServiceName{(isEndpoint ? " and a.`Attributes.http.target`=b.`Attributes.http.target` and a.`Attributes.http.method`=b.`Attributes.http.method`" : "")}";
             countSql = @$"select a.* from(select
                     ServiceName{groupAppend}
             from {tableName}
             where {where}
             group by ServiceName{groupAppend}) a,
-            (select DISTINCT ServiceName{groupAppend} from ({sql2})) b where a.ServiceName=b.ServiceName{(isEndpoint ? " and a.Attributes.http.target=b.Attributes.http.target and a.Attributes.http.method=b.Attributes.http.method" : "")}";
+            (select DISTINCT ServiceName{groupAppend} from ({sql2})) b where a.ServiceName=b.ServiceName{(isEndpoint ? " and a.`Attributes.http.target`=b.`Attributes.http.target` and a.`Attributes.http.method`=b.`Attributes.http.method`" : "")}";
         }
         else
         {
@@ -548,7 +548,7 @@ from(
             from {tableName}
             where {where}
             group by ServiceName{groupAppend},Timestamp) a,
-            (select DISTINCT ServiceName{groupAppend} from ({sql2})) b where a.ServiceName=b.ServiceName{(isEndpoint ? " and a.Attributes.http.target=b.Attributes.http.target and a.Attributes.http.method=b.Attributes.http.method" : "")}
+            (select DISTINCT ServiceName{groupAppend} from ({sql2})) b where a.ServiceName=b.ServiceName{(isEndpoint ? " and a.`Attributes.http.target`=b.`Attributes.http.target` and a.`Attributes.http.method`=b.`Attributes.http.method`" : "")}
             order by ServiceName{groupAppend},Timestamp";
         }
         else

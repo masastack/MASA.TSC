@@ -18,9 +18,9 @@ public static class ClickhouseInit
         {
             Connection = serviceProvider.GetRequiredService<MasaStackClickhouseConnection>();
             if (!ExistsTable(Connection, MasaStackClickhouseConnection.TraceSourceTable))
-                throw new ArgumentNullException(nameof(MasaStackClickhouseConnection.TraceSourceTable));
+                throw new ArgumentNullException(MasaStackClickhouseConnection.TraceSourceTable);
             if (!ExistsTable(Connection, MasaStackClickhouseConnection.LogSourceTable))
-                throw new ArgumentNullException(nameof(MasaStackClickhouseConnection.LogSourceTable));
+                throw new ArgumentNullException(MasaStackClickhouseConnection.LogSourceTable);
             InitLog();
             InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, "where SpanKind =='SPAN_KIND_SERVER' and mapContains(SpanAttributes,'http.url')", "Attributes.http.target");
             InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, "where SpanKind =='SPAN_KIND_CLIENT' and mapContains(SpanAttributes,'http.url')");
@@ -89,9 +89,11 @@ ORDER BY (
  Attributes.exception.type, 
  Body,
  Attributes.TaskId,
-Attributes.http.target,
-Attributes.exception.message,
-`Resource.service.namespace`
+ Attributes.http.target,
+ SeverityText,
+ `Resource.service.namespace`,
+ Attributes.exception.message,
+ SpanId
  )
 TTL toDateTime(Timestamp) + toIntervalDay(15)
 SETTINGS index_granularity = 8192,
@@ -124,12 +126,6 @@ FROM {sourceName}
     private static void InitTrace(string table, string where, params string[] orders)
     {
         var viewTable = table.Replace(".", ".v_");
-
-        string orderBy = default!;
-        if (orders != null && orders.Any())
-        {
-            orderBy = $",{string.Join(',', orders)}";
-        }
         string sql =
             @$"CREATE TABLE {table}
 (
@@ -197,16 +193,17 @@ ORDER BY (
  ServiceName,
  TraceId, 
  Attributes.http.target,
- Attributes.enduser.id,
  Attributes.http.url,
- Attributes.exception.type,
+ Attributes.exception.type, 
+ Attributes.http.status_code,
+ Attributes.http.method,
+ `Attributes.enduser.id`,
  Attributes.exception.message, 
-Resource.service.namespace,
-SpanKind,
-Attributes.http.status_code,
-Attributes.http.method
+ Resource.service.namespace,
+ SpanKind,
+ SpanId
  )
---TTL toDateTime(Timestamp) + toIntervalDay(15)
+TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
 ";
