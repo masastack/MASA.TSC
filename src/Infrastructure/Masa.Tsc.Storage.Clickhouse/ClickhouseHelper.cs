@@ -46,7 +46,7 @@ public sealed class ClickhouseHelper
     {
         var pre = isLog ? "Log" : "Span";
         var field = name[(ATTRIBUTE_KEY.Length)..];
-        if (isLog && (field.Equals("exception.message", StringComparison.CurrentCultureIgnoreCase)))
+        if (isLog && (field.Equals("exception.message", StringComparison.CurrentCultureIgnoreCase) || field.Equals("http.target", StringComparison.CurrentCultureIgnoreCase)))
             return $"{ATTRIBUTE_KEY}{field}";
 
         if (!isLog && (

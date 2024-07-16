@@ -65,7 +65,11 @@ public partial class ServiceEndpoints
     private async Task LoadASync(SearchData data = null)
     {
         if (data != null)
+        {
+            page = 1;
+            total = 0;
             SearchData = data;
+        }
         if (isTableLoading)
         {
             return;

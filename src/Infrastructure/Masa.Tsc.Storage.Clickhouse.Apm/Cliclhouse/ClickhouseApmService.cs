@@ -1,6 +1,8 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using System.Data.Common;
+
 namespace Masa.Tsc.Storage.Clickhouse.Apm;
 
 internal partial class ClickhouseApmService : IApmService
@@ -8,7 +10,6 @@ internal partial class ClickhouseApmService : IApmService
     private readonly MasaStackClickhouseConnection _dbConnection;
     private readonly ClickHouseCommand command;
     private readonly ITraceService _traceService;
-    private readonly static object lockObj = new();
     private static readonly Dictionary<string, string> serviceOrders = new() {
         {nameof(ServiceListDto.Name),"ServiceName"},
         {nameof(ServiceListDto.Envs),"Resource.service.namespace"},
@@ -36,6 +37,13 @@ internal partial class ClickhouseApmService : IApmService
 
     private readonly ILogger _logger;
 
+    private void Log(DateTime start, DateTime end, string sql, IEnumerable<ClickHouseParameter> parameters, bool isReader = false)
+    {
+        var duration = (end - start).TotalSeconds;
+        if (duration - 1 > 0)
+            _logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}, isReader:{isReader}", duration, sql, parameters, isReader);
+    }
+
     public ClickhouseApmService(MasaStackClickhouseConnection dbConnection, ITraceService traceService, ILogger<ClickhouseApmService> logger)
     {
         _traceService = traceService;
@@ -56,7 +64,7 @@ internal partial class ClickhouseApmService : IApmService
         return MetricListAsync<EndpointListDto>(query, true);
     }
 
-    public Task<EndpointLatencyDistributionDto> EndpointLatencyDistributionAsync(ApmEndpointRequestDto query)
+    public async Task<EndpointLatencyDistributionDto> EndpointLatencyDistributionAsync(ApmEndpointRequestDto query)
     {
         query.IsTrace = true;
         var (where, ors, parameters) = AppendWhere(query);
@@ -64,31 +72,33 @@ internal partial class ClickhouseApmService : IApmService
         var tableName = Constants.GetAggregateTable(period);
         var result = new EndpointLatencyDistributionDto();
 
-        var p95 = Convert.ToDouble(Scalar($"select floor(quantileMerge(P95)/{MILLSECOND}) p95 from {tableName} where {where}", parameters));
+        var p95 = Convert.ToDouble(await Scalar($"select floor(quantileMerge(P95)/{MILLSECOND}) p95 from {tableName} where {where}", parameters));
         if (p95 is not double.NaN)
             result.P95 = (long)Math.Floor(p95);
 
-        var sql = $@"select Duration/{MILLSECOND},count(1) total from {Constants.DurationCountTable1} where {where} group by Duration order by Duration";
+        var sql = $@"select Duration,count(1) total from {Constants.DurationCountTable1} where {where} group by Duration order by Duration";
         var list = new List<ChartPointDto>();
-        //lock (lockObj)
-        {
-            using var reader = Query(sql, parameters);
-            while (reader.NextResult())
-                while (reader.Read())
+
+        using var reader = await Query(sql, parameters);
+        var start = DateTime.Now;
+        while (await reader.NextResultAsync())
+            while (await reader.ReadAsync())
+            {
+                var item = new ChartPointDto()
                 {
-                    var item = new ChartPointDto()
-                    {
-                        X = reader[0].ToString()!,
-                        Y = reader[1]?.ToString()!
-                    };
-                    list.Add(item);
-                }
-        }
+                    X = reader[0].ToString()!,
+                    Y = reader[1]?.ToString()!
+                };
+                list.Add(item);
+            }
+        var end = DateTime.Now;
+        Log(start, end, sql, parameters, true);
+
         result.Latencies = list;
-        return Task.FromResult(result);
+        return result;
     }
 
-    public Task<PaginatedListBase<ErrorMessageDto>> ErrorMessagePageAsync(ApmEndpointRequestDto query)
+    public async Task<PaginatedListBase<ErrorMessageDto>> ErrorMessagePageAsync(ApmEndpointRequestDto query)
     {
         query.IsServer = default;
         query.IsError = true;
@@ -97,20 +107,20 @@ internal partial class ClickhouseApmService : IApmService
         var append = string.IsNullOrEmpty(query.Endpoint) ? "" : ",Attributes.http.target";
         var combineSql = CombineOrs($"select Attributes.exception.type,MsgGroupKey,Timestamp{append} from {Constants.ErrorTable} where {where} ", ors);
         var countSql = $"select count(1) from (select `Attributes.exception.type` as Type,MsgGroupKey as Message,max(Timestamp) time,count(1) from {combineSql} {groupby})";
-        PaginatedListBase<ErrorMessageDto> result = new() { Total = Convert.ToInt64(Scalar(countSql, parameters)) };
+        PaginatedListBase<ErrorMessageDto> result = new() { Total = Convert.ToInt64(await Scalar(countSql, parameters)) };
         var orderBy = GetOrderBy(query, errorOrders);
         var sql = $@"select * from( select `Attributes.exception.type` as Type,MsgGroupKey as Message,max(Timestamp) time,count(1) total from {combineSql} {groupby} {orderBy} @limit)";
-        SetData(sql, parameters, result, query, reader => new ErrorMessageDto()
+        await SetData(sql, parameters, result, query, reader => new ErrorMessageDto()
         {
             Type = reader[0]?.ToString()!,
             Message = reader[1]?.ToString()!,
             LastTime = Convert.ToDateTime(reader[2])!,
             Total = Convert.ToInt32(reader[3]),
         });
-        return Task.FromResult(result);
+        return result;
     }
 
-    public Task<IEnumerable<ChartLineCountDto>> GetErrorChartAsync(ApmEndpointRequestDto query)
+    public async Task<IEnumerable<ChartLineCountDto>> GetErrorChartAsync(ApmEndpointRequestDto query)
     {
         query.IsServer = default;
         query.IsLog = true;
@@ -121,10 +131,10 @@ toStartOfInterval(`Timestamp` , INTERVAL  {GetPeriod(query)} ) as `time`,
 count(1) `total`
 from {MasaStackClickhouseConnection.LogTable} where {where} and SeverityText='Error' and `Attributes.exception.message`!='' {groupby}";
 
-        return Task.FromResult(GetChartCountData(sql, parameters, query.ComparisonType).AsEnumerable());
+        return await GetChartCountData(sql, parameters, query.ComparisonType);
     }
 
-    public Task<IEnumerable<ChartLineCountDto>> GetEndpointChartAsync(ApmEndpointRequestDto query)
+    public async Task<IEnumerable<ChartLineCountDto>> GetEndpointChartAsync(ApmEndpointRequestDto query)
     {
         query.IsServer = false;
         var (where, ors, parameters) = AppendWhere(query);
@@ -134,10 +144,10 @@ toStartOfInterval(`Timestamp` , INTERVAL  {GetPeriod(query)} ) as `time`,
 count(1) `total`
 from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where} {groupby}";
 
-        return Task.FromResult(GetChartCountData(sql, parameters, query.ComparisonType).AsEnumerable());
+        return await GetChartCountData(sql, parameters, query.ComparisonType);
     }
 
-    public Task<IEnumerable<ChartLineCountDto>> GetLogChartAsync(ApmEndpointRequestDto query)
+    public async Task<IEnumerable<ChartLineCountDto>> GetLogChartAsync(ApmEndpointRequestDto query)
     {
         query.IsServer = default;
         query.IsLog = true;
@@ -147,10 +157,10 @@ from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where} {groupby
 toStartOfInterval(`Timestamp` , INTERVAL  {GetPeriod(query)} ) as `time`,
 count(1) `total`
 from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
-        return Task.FromResult(GetChartCountData(sql, parameters, query.ComparisonType).AsEnumerable());
+        return await GetChartCountData(sql, parameters, query.ComparisonType);
     }
 
-    public Task<IEnumerable<ChartPointDto>> GetTraceErrorsAsync(ApmEndpointRequestDto query)
+    public async Task<IEnumerable<ChartPointDto>> GetTraceErrorsAsync(ApmEndpointRequestDto query)
     {
         query.IsServer = default;
         query.IsError = true;
@@ -159,24 +169,26 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         var sql = CombineOrs($@"select SpanId from {Constants.ErrorTable} where {where}", ors);
         sql = $"select SpanId,count(1) `total` from ({sql}) {groupby}";
         var list = new List<ChartPointDto>();
-        //lock (lockObj)
-        {
-            using var reader = Query(sql, parameters);
-            while (reader.NextResult())
-                while (reader.Read())
+
+        using var reader = await Query(sql, parameters);
+        var start = DateTime.Now;
+        while (await reader.NextResultAsync())
+            while (await reader.ReadAsync())
+            {
+                var item = new ChartPointDto()
                 {
-                    var item = new ChartPointDto()
-                    {
-                        X = reader[0].ToString()!,
-                        Y = reader[1]?.ToString()!
-                    };
-                    list.Add(item);
-                }
-        }
-        return Task.FromResult(list.AsEnumerable());
+                    X = reader[0].ToString()!,
+                    Y = reader[1]?.ToString()!
+                };
+                list.Add(item);
+            }
+        var end = DateTime.Now;
+        Log(start, end, sql, parameters, true);
+
+        return list;
     }
 
-    public Dictionary<string, List<string>> GetEnviromentServices(BaseApmRequestDto query)
+    public async Task<Dictionary<string, List<string>>> GetEnviromentServices(BaseApmRequestDto query)
     {
         query.IsServer = true;
         query.IsMetric = true;
@@ -191,45 +203,52 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
             order by `Resource.service.namespace`,ServiceName";
         //lock (lockObj)
         {
-            using var reader = Query(sql, new ClickHouseParameter[] {
+            var parameters = new ClickHouseParameter[] {
                 new (){ ParameterName="start",DbType= DbType.DateTime,Value=MasaStackClickhouseConnection.ToTimeZone(query.Start)},
                 new (){ ParameterName="end",DbType= DbType.DateTime,Value=MasaStackClickhouseConnection.ToTimeZone(query.End)},
-            });
-            if (reader != null && !reader.NextResult())
+            };
+            using var reader = await Query(sql, parameters);
+            var start = DateTime.Now;
+            if (reader == null)
                 return result;
             string env = default!, currentEnv = default!;
-            while (reader!.Read())
-            {
-                env = reader[1].ToString()!;
-                var service = reader[0].ToString()!;
-                if (currentEnv == null || currentEnv != env)
+            while (await reader.NextResultAsync())
+                while (await reader.ReadAsync())
                 {
-                    result.Add(env, new List<string> { service });
-                    currentEnv = env;
+                    env = reader[1].ToString()!;
+                    var service = reader[0].ToString()!;
+                    if (currentEnv == null || currentEnv != env)
+                    {
+                        result.Add(env, new List<string> { service });
+                        currentEnv = env;
+                    }
+                    else
+                    {
+                        result[env].Add(service);
+                    }
                 }
-                else
-                {
-                    result[env].Add(service);
-                }
-            }
+            var end = DateTime.Now;
+            Log(start, end, sql, parameters, true);
 
             return result;
         }
     }
 
-    public Task<PhoneModelDto> GetDeviceModelAsync(string brand, string model)
+    public async Task<PhoneModelDto> GetDeviceModelAsync(string brand, string model)
     {
         var isCodeAlis = brand.ToLower().Equals("apple") && model.Contains(',');
         var sql = $"select * from {Constants.ModelsTable} where lower(Brand)=@brand and  {(isCodeAlis ? "lower(CodeAlis)=@model" : "lower(Model)=@model")} limit 1";
         PhoneModelDto result = default!;
         //lock (lockObj)
         {
-            using var reader = Query(sql, new ClickHouseParameter[] {
+            var parameters = new ClickHouseParameter[] {
                 new (){ ParameterName="brand",Value=brand.ToLower() },
                 new (){ ParameterName="model",Value=model.ToLower() }
-            });
-            while (reader.NextResult())
-                while (reader.Read())
+            };
+            using var reader = await Query(sql, parameters);
+            var start = DateTime.Now;
+            while (await reader.NextResultAsync())
+                while (await reader.ReadAsync())
                 {
                     result = new PhoneModelDto()
                     {
@@ -243,9 +262,11 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
                         VerName = reader[7]?.ToString()!,
                     };
                 }
+            var end = DateTime.Now;
+            Log(start, end, sql, parameters, true);
         }
 
-        return Task.FromResult(result)!;
+        return result!;
     }
 
     public async Task<PaginatedListBase<TraceResponseDto>> TraceLatencyDetailAsync(ApmTraceLatencyRequestDto query)
@@ -293,7 +314,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         return await _traceService.ListAsync(queryDto);
     }
 
-    public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmEndpointRequestDto query)
+    public async Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmEndpointRequestDto query)
     {
         //query.IsServer = default;
         //query.IsTrace = true;
@@ -307,15 +328,15 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
             //var countSql = $"select count(1) from {sql1}";
             var sql1 = CombineOrs($@"select countMerge(Total) as Total from {Constants.DurationCountTable1} where {where}", ors);
             var countSql = $"select sum(Total) from({sql1})";
-            result.Total = Convert.ToInt64(Scalar(countSql, parameters));
+            result.Total = Convert.ToInt64(await Scalar(countSql, parameters));
         }
         //Constants.DurationTable
 
         var sql = CombineOrs($@"select TraceId,Duration,Timestamp from {Constants.DurationTable} where {where}", ors);
         sql = $"select TraceId,Duration,Timestamp from {sql} {orderBy} @limit";
 
-        SetData(sql, parameters, result, query, ToSampleTraceListDto);
-        return Task.FromResult(result);
+        await SetData(sql, parameters, result, query, ToSampleTraceListDto);
+        return result;
     }
 
     private static SimpleTraceListDto ToSampleTraceListDto(IDataReader reader)
@@ -331,7 +352,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         return result;
     }
 
-    private Task<PaginatedListBase<T>> MetricListAsync<T>(BaseApmRequestDto query, bool isEndpoint) where T : ServiceListDto, new()
+    private async Task<PaginatedListBase<T>> MetricListAsync<T>(BaseApmRequestDto query, bool isEndpoint) where T : ServiceListDto, new()
     {
         query.IsServer = true;
         query.IsTrace = true;
@@ -393,9 +414,9 @@ from(
         from({sql}) t
         {groupby}
         ) {orderBy} @limit ";
-        PaginatedListBase<T> result = new() { Total = Convert.ToInt64(Scalar(countSql, parameters)) };
-        SetData(sql, parameters, result, query, reader => ToServiceList<T>(reader));
-        return Task.FromResult(result);
+        PaginatedListBase<T> result = new() { Total = Convert.ToInt64(await Scalar(countSql, parameters)) };
+        await SetData(sql, parameters, result, query, reader => ToServiceList<T>(reader));
+        return result;
     }
 
     private static T ToServiceList<T>(IDataReader reader) where T : ServiceListDto, new()
@@ -416,7 +437,7 @@ from(
         return result;
     }
 
-    private void GetPreviousChartData(BaseApmRequestDto query, string sql, List<ClickHouseParameter> parameters, List<ChartLineDto> result)
+    private async Task GetPreviousChartData(BaseApmRequestDto query, string sql, List<ClickHouseParameter> parameters, List<ChartLineDto> result)
     {
         if (!query.ComparisonType.HasValue)
             return;
@@ -442,45 +463,46 @@ from(
 
         //lock (lockObj)
         {
-            using var readerPrevious = Query(sql, parameters);
-            SetChartData(result, readerPrevious, isPrevious: true);
+            var readerPrevious = await Query(sql, parameters);
+            await SetChartData(result, readerPrevious, isPrevious: true);
+            await readerPrevious.DisposeAsync();
         }
     }
 
-    private static void SetChartData(List<ChartLineDto> result, IDataReader reader, bool isPrevious = false)
+    private async Task SetChartData(List<ChartLineDto> result, DbDataReader reader, bool isPrevious = false)
     {
-        if (!reader.NextResult())
-            return;
         ChartLineDto? current = null;
-        while (reader.Read())
-        {
-            string name;
-            if (reader.FieldCount - 7 == 0)//service
+        var start = DateTime.Now;
+        while (reader != null && await reader.NextResultAsync())
+            while (reader != null && await reader.ReadAsync())
             {
-                name = reader[6].ToString()!;
-            }
-            else
-            {
-                name = $"{reader[8]} {reader[7]}";
-            }
-            var time = new DateTimeOffset(Convert.ToDateTime(reader[0])).ToUnixTimeSeconds();
-            if (current == null || current.Name != name)
-            {
-                if (isPrevious && result.Exists(item => item.Name == name))
+                string name;
+                if (reader.FieldCount - 7 == 0)//service
                 {
-                    current = result.First(item => item.Name == name);
+                    name = reader[6].ToString()!;
                 }
                 else
                 {
-                    current = new ChartLineDto
-                    {
-                        Name = name,
-                        Previous = new List<ChartLineItemDto>(),
-                        Currents = new List<ChartLineItemDto>()
-                    };
-                    result.Add(current);
+                    name = $"{reader[8]} {reader[7]}";
                 }
-            }
+                var time = new DateTimeOffset(Convert.ToDateTime(reader[0])).ToUnixTimeSeconds();
+                if (current == null || current.Name != name)
+                {
+                    if (isPrevious && result.Exists(item => item.Name == name))
+                    {
+                        current = result.First(item => item.Name == name);
+                    }
+                    else
+                    {
+                        current = new ChartLineDto
+                        {
+                            Name = name,
+                            Previous = new List<ChartLineItemDto>(),
+                            Currents = new List<ChartLineItemDto>()
+                        };
+                        result.Add(current);
+                    }
+                }
 
             ((List<ChartLineItemDto>)(isPrevious ? current.Previous : current.Currents)).Add(
                 new()
@@ -492,10 +514,12 @@ from(
                     P95 = Math.Round(Convert.ToDouble(reader[5]), 2, MidpointRounding.ToZero),
                     Time = time
                 });
-        }
+            }
+        var end = DateTime.Now;
+        Log(start, end, default, default, true);
     }
 
-    public Task<IEnumerable<ChartLineDto>> ChartDataAsync(BaseApmRequestDto query)
+    public async Task<IEnumerable<ChartLineDto>> ChartDataAsync(BaseApmRequestDto query)
     {
         query.IsServer = true;
         query.IsTrace = true;
@@ -554,25 +578,29 @@ from(
         }
         //lock (lockObj)
         {
-            using var reader = Query(sql, parameters);
-            SetChartData(result, reader);
+            using (var reader = await Query(sql, parameters))
+                await SetChartData(result, reader);
         }
-        GetPreviousChartData(query, sql, parameters, result);
-        return Task.FromResult(result.AsEnumerable());
+        await GetPreviousChartData(query, sql, parameters, result);
+        return result;
     }
 
-    private void SetData<TResult>(string sql, List<ClickHouseParameter> parameters, PaginatedListBase<TResult> result, BaseApmRequestDto query, Func<IDataReader, TResult> parseFn) where TResult : class
+    private async Task SetData<TResult>(string sql, List<ClickHouseParameter> parameters, PaginatedListBase<TResult> result, BaseApmRequestDto query, Func<IDataReader, TResult> parseFn) where TResult : class
     {
         var start = (query.Page - 1) * query.PageSize;
         if (result.Total - start > 0)
         {
             //lock (lockObj)
-            {
-                using var reader = Query(sql.Replace("@limit", $"limit {start},{query.PageSize}"), parameters);
-                result.Result = new();
-                while (reader.NextResult())
-                    while (reader.Read())
-                        result.Result.Add(parseFn(reader));
+            
+                using (var reader = await Query(sql.Replace("@limit", $"limit {start},{query.PageSize}"), parameters))
+                {
+                    result.Result = new();
+                    var _start = DateTime.Now;
+                    while (await reader.NextResultAsync())
+                        while (await reader.ReadAsync())
+                            result.Result.Add(parseFn(reader));
+                var end = DateTime.Now;
+                Log(_start, end, sql, parameters, true);
             }
         }
     }
@@ -713,14 +741,14 @@ from(
         }
     }
 
-    private IDataReader Query(string sql, IEnumerable<ClickHouseParameter> parameters)
+    private Task<DbDataReader> Query(string sql, IEnumerable<ClickHouseParameter> parameters)
     {
         var start = DateTime.Now;
         try
         {
             command.CommandText = sql;
             SetParameters(parameters);
-            return command.ExecuteReader();
+            return command.ExecuteReaderAsync();
         }
         catch (Exception ex)
         {
@@ -730,13 +758,11 @@ from(
         finally
         {
             var end = DateTime.Now;
-            var duration = (end - start).TotalSeconds;
-            if (duration - 1 > 0)
-                _logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
+            Log(start, end, sql, parameters);
         }
     }
 
-    private object Scalar(string sql, IEnumerable<ClickHouseParameter> parameters)
+    private Task<object?> Scalar(string sql, IEnumerable<ClickHouseParameter> parameters)
     {
         //lock (lockObj)
         {
@@ -745,14 +771,12 @@ from(
             var start = DateTime.Now;
             try
             {
-                return command.ExecuteScalar()!;
+                return command.ExecuteScalarAsync();
             }
             finally
             {
                 var end = DateTime.Now;
-                var duration = (end - start).TotalSeconds;
-                if (duration - 1 > 0)
-                    _logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}", duration, sql, parameters);
+                Log(start, end, sql, parameters);
             }
         }
     }
@@ -795,18 +819,14 @@ from(
         }
     }
 
-    private List<ChartLineCountDto> GetChartCountData(string sql, IEnumerable<ClickHouseParameter> parameters, ComparisonTypes? comparisonTypes = null)
+    private async Task<List<ChartLineCountDto>> GetChartCountData(string sql, IEnumerable<ClickHouseParameter> parameters, ComparisonTypes? comparisonTypes = null)
     {
         var result = new List<ChartLineCountDto>();
         //lock (lockObj)
         {
-            var t1 = DateTime.Now;
-            using var currentReader = Query(sql, parameters);
-            var t2 = DateTime.Now;
-            var ta = (t2 - t1).TotalSeconds;
-            SetChartCountData(result, currentReader);
-            var t3 = DateTime.Now;
-            var tb = (t3 - t2).TotalSeconds;
+
+            using var currentReader = await Query(sql, parameters);
+            await SetChartCountData(result, currentReader);
         }
 
         if (comparisonTypes.HasValue && (comparisonTypes.Value == ComparisonTypes.DayBefore || comparisonTypes.Value == ComparisonTypes.WeekBefore))
@@ -820,46 +840,43 @@ from(
 
             //lock (lockObj)
             {
-                var t1 = DateTime.Now;
-                using var previousReader = Query(sql, parameters);
-                var t2 = DateTime.Now;
-                var ta = (t2 - t1).TotalSeconds;
-                SetChartCountData(result, previousReader, true);
-                var t3 = DateTime.Now;
-                var tb = (t3 - t2).TotalSeconds;
+                using var previousReader = await Query(sql, parameters);
+                await SetChartCountData(result, previousReader, true);
+
             }
         }
 
         return result;
     }
 
-    private void SetChartCountData(List<ChartLineCountDto> result, IDataReader reader, bool isPrevious = false)
+    private async Task SetChartCountData(List<ChartLineCountDto> result, DbDataReader reader, bool isPrevious = false)
     {
-        var t1 = DateTime.Now;
-        if (!reader.NextResult())
-            return;
+        var start = DateTime.Now;
         ChartLineCountDto? current = null;
-        while (reader.Read())
-        {
-            var name = reader.GetValue(0).ToString()!;
-            var time = new DateTimeOffset(Convert.ToDateTime(reader.GetValue(0))).ToUnixTimeSeconds();
-            if (current == null || current.Name != name)
+        var list = new List<DateTime>();
+        while (await reader.NextResultAsync())
+            while (await reader.ReadAsync())
             {
-                if (isPrevious && result.Exists(item => item.Name == name))
+                list.Add(DateTime.Now);
+                var name = reader.GetValue(0).ToString()!;
+                var time = new DateTimeOffset(Convert.ToDateTime(reader.GetValue(0))).ToUnixTimeSeconds();
+                if (current == null || current.Name != name)
                 {
-                    current = result.First(item => item.Name == name);
-                }
-                else
-                {
-                    current = new ChartLineCountDto
+                    if (isPrevious && result.Exists(item => item.Name == name))
                     {
-                        Name = name,
-                        Previous = new List<ChartLineCountItemDto>(),
-                        Currents = new List<ChartLineCountItemDto>()
-                    };
-                    result.Add(current);
+                        current = result.First(item => item.Name == name);
+                    }
+                    else
+                    {
+                        current = new ChartLineCountDto
+                        {
+                            Name = name,
+                            Previous = new List<ChartLineCountItemDto>(),
+                            Currents = new List<ChartLineCountItemDto>()
+                        };
+                        result.Add(current);
+                    }
                 }
-            }
 
             ((List<ChartLineCountItemDto>)(isPrevious ? current.Previous : current.Currents)).Add(
                 new()
@@ -867,9 +884,10 @@ from(
                     Value = reader.GetValue(1),
                     Time = time
                 });
-        }
-        var t2 = DateTime.Now;
-        var tb = (t2 - t1).TotalSeconds;
+                list.Add(DateTime.Now);
+            }
+        var end = DateTime.Now;
+        Log(start, end, default, default, true);
     }
 
     private static string GetPeriod(BaseApmRequestDto query)

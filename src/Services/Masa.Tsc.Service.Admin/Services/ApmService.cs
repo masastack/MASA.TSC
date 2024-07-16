@@ -152,8 +152,8 @@ public class ApmService : ServiceBase
     public async Task<PhoneModelDto> GetModel([FromServices] IApmService apmService, string brand, string model)
         => await apmService.GetDeviceModelAsync(brand, model);
 
-    public Dictionary<string, List<string>> GetEnviromentService([FromServices] IApmService apmService, string start, string end)
-        => apmService.GetEnviromentServices(new BaseApmRequestDto
+    public async Task<Dictionary<string, List<string>>> GetEnviromentService([FromServices] IApmService apmService, string start, string end)
+        => await apmService.GetEnviromentServices(new BaseApmRequestDto
         {
             Start = start.ParseUTCTime(),
             End = end.ParseUTCTime()

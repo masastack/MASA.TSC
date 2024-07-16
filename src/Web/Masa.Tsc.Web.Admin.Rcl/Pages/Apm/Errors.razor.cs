@@ -49,6 +49,7 @@ public partial class Errors
         if (data != null)
         {
             page = 1;
+            total = 0;
             Search = data;
         }
         StateHasChanged();

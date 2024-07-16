@@ -60,7 +60,7 @@ public interface IApmService : IDisposable
 
     Task<IEnumerable<ChartLineCountDto>> GetLogChartAsync(ApmEndpointRequestDto query);
 
-    Dictionary<string, List<string>> GetEnviromentServices(BaseApmRequestDto query);
+    Task<Dictionary<string, List<string>>> GetEnviromentServices(BaseApmRequestDto query);
 
     Task<PhoneModelDto> GetDeviceModelAsync(string brand, string model);
 
