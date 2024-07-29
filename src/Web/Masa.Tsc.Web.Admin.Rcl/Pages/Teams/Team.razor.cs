@@ -142,16 +142,16 @@ public partial class Team
             Type = AggregateTypes.Count,
             Start = ConfigurationRecord.StartTime.UtcDateTime,
             End = ConfigurationRecord.EndTime.UtcDateTime,
-            Name = StorageConst.ServiceName,
+            Name = StorageConst.Current.ServiceName,
             Conditions = new List<FieldConditionDto> {
                 new FieldConditionDto{
-                Name=StorageConst.LogLevelText,
+                Name=StorageConst.Current.Log.LogLevelText,
                 Type= ConditionTypes.Equal,
-                Value=isError?StorageConst.LogErrorText:StorageConst.LogWarningText
+                Value=isError?StorageConst.Current.Log.LogErrorText:StorageConst.Current.Log.LogWarningText
                 },
                 new FieldConditionDto
                 {
-                    Name=StorageConst.ServiceName,
+                    Name=StorageConst.Current.ServiceName,
                     Type= ConditionTypes.In,
                     Value=appids
                 }

@@ -3,11 +3,11 @@
 
 namespace Masa.Tsc.Storage.Contracts;
 
-public class StorageConstaaa
+public class StorageConst
 {
-    public static StorageConstaaa Current { get; protected set; }
+    public static StorageConst Current { get; protected set; }
 
-    protected StorageConstaaa()
+    protected StorageConst()
     {
         if (Current == null)
         {
@@ -17,7 +17,7 @@ public class StorageConstaaa
         }
     }
 
-    public static void Init(StorageConstaaa current) => Current ??= current;
+    public static void Init(StorageConst current) => Current ??= current;
 
     public virtual string Timestimap => "Timestamp";
 
@@ -58,6 +58,8 @@ public class StorageLog
     public virtual string LogWarningText => "Warning";
 
     public virtual string Url => "RequestPath";
+
+    public virtual string TaskId => "Attributes.TaskId";
 }
 
 public class StorageTrace

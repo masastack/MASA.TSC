@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Storage.Contracts;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Shared.Apm;
 
 public partial class ApmComponentBase : MasaComponentBase
@@ -36,14 +34,14 @@ public partial class ApmComponentBase : MasaComponentBase
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        if (StorageConstaaa.Current != null) return;
+        if (StorageConst.Current != null) return;
         var setting = await ApiCaller.SettingService.GetStorage();
         if (setting == null)
             throw new Exception("Storage setting is null");
         if (setting.IsClickhouse)
-            StorageConstaaa.Init(new ClickhouseStorageConst());
+            StorageConst.Init(new ClickhouseStorageConst());
         else if (setting.IsElasticsearch)
-            ;//
+            StorageConst.Init(new ElasticsearchStorageConst());
     }
     protected override void OnInitialized()
     {

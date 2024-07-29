@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Storage.Contracts;
-
 namespace Masa.Tsc.Service.Admin.Application.Traces;
 
 public class QueryHandler : EnvQueryHandler
@@ -40,7 +38,7 @@ public class QueryHandler : EnvQueryHandler
             Start = query.Start,
             End = query.End,
             Conditions = new List<FieldConditionDto> { new FieldConditionDto {
-             Name=StorageConst.URL,
+             Name=StorageConst.Current.Trace.URL,
              Type= ConditionTypes.Equal,
                 Value=query.Url
             } }
@@ -62,7 +60,7 @@ public class QueryHandler : EnvQueryHandler
             PageSize = query.Size,
             Start = query.Start,
             TraceId = query.TraceId,
-            Sort = new FieldOrderDto { Name = "@timestamp", IsDesc = query.IsDesc }
+            Sort = new FieldOrderDto { Name = StorageConst.Current.Timestimap, IsDesc = query.IsDesc }
         };
         queryDto.SetHasPage(query.HasPage);
 
@@ -71,13 +69,13 @@ public class QueryHandler : EnvQueryHandler
         {
             var endpointCondition = new FieldConditionDto
             {
-                Name = StorageConst.URL,
+                Name = StorageConst.Current.Trace.URL,
                 Type = ConditionTypes.Equal,
                 Value = query.Endpoint
             };
             list.Add(endpointCondition);
         }
-        bool isRawQuery = query.Keyword.IsRawQuery(ConfigConst.StorageConst.IsElasticSearch, ConfigConst.StorageConst.IsClickhouse);
+        bool isRawQuery = query.Keyword.IsRawQuery(ConfigConst.StorageSetting.IsElasticSearch, ConfigConst.StorageSetting.IsClickhouse);
         if (!string.IsNullOrEmpty(query.Keyword))
         {
             if (isRawQuery)
@@ -95,7 +93,7 @@ public class QueryHandler : EnvQueryHandler
         {
             list.Add(new FieldConditionDto
             {
-                Name = StorageConst.SpanId,
+                Name = StorageConst.Current.SpanId,
                 Type = ConditionTypes.Equal,
                 Value = query.SpanId
             });
@@ -105,7 +103,7 @@ public class QueryHandler : EnvQueryHandler
         {
             list.Add(new FieldConditionDto
             {
-                Name = StorageConst.HttpPort,
+                Name = StorageConst.Current.Trace.HttpStatusCode,
                 Type = ConditionTypes.In,
                 Value = ConfigConst.TraceErrorStatus.Select(num => (object)num)
             });
@@ -117,7 +115,7 @@ public class QueryHandler : EnvQueryHandler
         {
             conditions.Add(new FieldConditionDto
             {
-                Name = "Resource.service.namespace",
+                Name = StorageConst.Current.Environment,
                 Type = ConditionTypes.Equal,
                 Value = query.Env
             });
@@ -132,7 +130,7 @@ public class QueryHandler : EnvQueryHandler
         {
             conditions.Add(new FieldConditionDto
             {
-                Name = "Duration",
+                Name = StorageConst.Current.Trace.Duration,
                 Type = ConditionTypes.GreatEqual,
                 Value = query.LatMin.Value,
             });
@@ -143,7 +141,7 @@ public class QueryHandler : EnvQueryHandler
             || query.LatMin.HasValue && query.LatMax - query.LatMin.Value > 0))
             conditions.Add(new FieldConditionDto
             {
-                Name = "Duration",
+                Name = StorageConst.Current.Trace.Duration,
                 Type = ConditionTypes.LessEqual,
                 Value = query.LatMax.Value,
             });
@@ -163,22 +161,22 @@ public class QueryHandler : EnvQueryHandler
 
         list.Add(new FieldConditionDto
         {
-            Name = "Kind",
+            Name = StorageConst.Current.Trace.SpanKind,
             Type = ConditionTypes.Equal,
             Value = "SPAN_KIND_SERVER"
         });
 
         if (string.IsNullOrEmpty(query.Data.Service))
         {
-            query.Data.Name = StorageConst.ServiceName;
+            query.Data.Name = StorageConst.Current.ServiceName;
         }
         else if (query.Data.Instance == null)
         {
-            query.Data.Name = StorageConst.ServiceInstance;
+            query.Data.Name = StorageConst.Current.ServiceInstance;
         }
         else
         {
-            query.Data.Name = "Attributes.http.target";
+            query.Data.Name = StorageConst.Current.Trace.URL;
         }
         query.Data.Conditions = list;
         query.Data.Keyword = default!;
@@ -206,7 +204,7 @@ public class QueryHandler : EnvQueryHandler
             Service = query.Service,
             Sort = new FieldOrderDto
             {
-                Name = StorageConst.Timestimap(ConfigConst.StorageConst.IsElasticSearch, ConfigConst.StorageConst.IsClickhouse),
+                Name = StorageConst.Current.Timestimap,
                 IsDesc = !query.IsNext
             },
             Page = 1,
@@ -215,12 +213,12 @@ public class QueryHandler : EnvQueryHandler
 
         var list = new List<FieldConditionDto>() {
             new FieldConditionDto{
-                Name=StorageConst.URL,
+                Name=StorageConst.Current.Trace.URL,
                 Type =ConditionTypes.Equal,
                 Value=query.Url
             },
             new FieldConditionDto{
-                Name=StorageConst.TraceId,
+                Name= StorageConst.Current.TraceId,
                 Type =ConditionTypes.NotEqual,
                 Value=query.TraceId
             }
@@ -230,7 +228,7 @@ public class QueryHandler : EnvQueryHandler
         {
             list.Add(new FieldConditionDto
             {
-                Name = StorageConst.Timestimap(ConfigConst.StorageConst.IsElasticSearch, ConfigConst.StorageConst.IsClickhouse),
+                Name = StorageConst.Current.Timestimap,
                 Type = ConditionTypes.Great,
                 Value = query.Time
             });
@@ -239,7 +237,7 @@ public class QueryHandler : EnvQueryHandler
         {
             list.Add(new FieldConditionDto
             {
-                Name = StorageConst.Timestimap(ConfigConst.StorageConst.IsElasticSearch, ConfigConst.StorageConst.IsClickhouse),
+                Name = StorageConst.Current.Timestimap,
                 Type = ConditionTypes.Less,
                 Value = query.Time
             });

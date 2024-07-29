@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Storage.Contracts;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm;
 
 public partial class ApmSearchComponent
@@ -117,22 +115,22 @@ public partial class ApmSearchComponent
     {
         base.OnInitialized();
         textFileds = new List<string> {
-                StorageConstaaa.Current.TraceId,
-                StorageConstaaa.Current.SpanId
+                StorageConst.Current.TraceId,
+                StorageConst.Current.SpanId
         };
         if (IsEndpoint)
         {
             textFileds.AddRange(new string[] {
-                StorageConstaaa.Current.Trace.URLFull,
-                StorageConstaaa.Current.Trace.UserId,
-                StorageConstaaa.Current.Trace.HttpRequestBody
+                StorageConst.Current.Trace.URLFull,
+                StorageConst.Current.Trace.UserId,
+                StorageConst.Current.Trace.HttpRequestBody
             });
         }
         else if (!IsService)
         {
-            textFileds.Add(StorageConstaaa.Current.ExceptionMessage);
+            textFileds.Add(StorageConst.Current.ExceptionMessage);
             if (IsLog)
-                textFileds.Add(StorageConstaaa.Current.Log.Body);
+                textFileds.Add(StorageConst.Current.Log.Body);
         }
         Value.TextField = textFileds[0];
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
@@ -146,12 +144,12 @@ public partial class ApmSearchComponent
 
         if (!string.IsNullOrEmpty(Search.SpanId))
         {
-            Search.TextField = StorageConstaaa.Current.SpanId;
+            Search.TextField = StorageConst.Current.SpanId;
             Search.TextValue = Search.SpanId;
         }
         else if (!string.IsNullOrEmpty(Search.TraceId))
         {
-            Search.TextField = StorageConstaaa.Current.TraceId;
+            Search.TextField = StorageConst.Current.TraceId;
             Search.TextValue = Search.TraceId;
         }
     }

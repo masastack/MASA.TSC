@@ -167,7 +167,7 @@ public partial class Index
     private async Task UserChange(Guid userId)
     {
         if (_userId == userId)
-            return;       
+            return;
         ClearData();
         _userId = userId;
         if (roles == null)
@@ -239,7 +239,7 @@ public partial class Index
             PageSize = 200,
             Conditions = new List<FieldConditionDto> {
                 new FieldConditionDto{
-                    Name =StorageConst.UserId,
+                    Name =StorageConst.Current.Trace.UserId,
                      Type= ConditionTypes.Equal,
                       Value =_userId.ToString().ToLower()
                 }
@@ -286,7 +286,7 @@ public partial class Index
                     Value="MAUI"
                 }
             },
-            Name = StorageConst.ServiceName,
+            Name = StorageConst.Current.ServiceName,
             Type = AggregateTypes.GroupBy
         });
         if (data != null)
@@ -361,14 +361,14 @@ public partial class Index
             PageSize = 200,
             Conditions = new List<FieldConditionDto> {
                 new FieldConditionDto{
-                    Name=StorageConst.TraceId,
+                    Name=StorageConst.Current.TraceId,
                     Type = ConditionTypes.In,
                     Value = traceIds.Distinct()
                 }
             },
             Sort = new FieldOrderDto
             {
-                Name = "@timestamp",
+                Name = StorageConst.Current.Timestimap,
                 IsDesc = false
             }
         };

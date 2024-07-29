@@ -35,7 +35,7 @@ public class QueryHandler : EnvQueryHandler
             RawQuery = queryData.Query,
             Page = 1,
             PageSize = 1,
-            Sort = new FieldOrderDto { Name = StorageConst.Timestimap(ConfigConst.IsElasticsearch, ConfigConst.IsClickhouse), IsDesc = !queryData.IsDesc }
+            Sort = new FieldOrderDto { Name = StorageConst.Current.Timestimap, IsDesc = !queryData.IsDesc }
         };
         if (query.End < query.Start)
         {
@@ -91,7 +91,7 @@ public class QueryHandler : EnvQueryHandler
             });
         }
 
-        bool isRawQuery = queryData.Query.IsRawQuery(ConfigConst.StorageConst.IsElasticSearch, ConfigConst.StorageConst.IsClickhouse);// (queryData.Query?.IndexOfAny(new char[] { '{', '}' }) ?? -1) >= 0;
+        bool isRawQuery = queryData.Query.IsRawQuery(ConfigConst.StorageSetting.IsElasticSearch, ConfigConst.StorageSetting.IsClickhouse);// (queryData.Query?.IndexOfAny(new char[] { '{', '}' }) ?? -1) >= 0;
         var query = new BaseRequestDto
         {
             Service = queryData.Service!,
@@ -101,7 +101,7 @@ public class QueryHandler : EnvQueryHandler
             RawQuery = isRawQuery ? queryData.Query! : string.Empty,
             Page = queryData.Page,
             PageSize = queryData.Size,
-            Sort = new FieldOrderDto { Name = string.IsNullOrEmpty(queryData.SortField) ? StorageConst.Timestimap(ConfigConst.IsElasticsearch, ConfigConst.IsClickhouse) : queryData.SortField, IsDesc = queryData.IsDesc },
+            Sort = new FieldOrderDto { Name = string.IsNullOrEmpty(queryData.SortField) ? StorageConst.Current.Timestimap : queryData.SortField, IsDesc = queryData.IsDesc },
             Conditions = conditions,
         };
         if (query.Page - 1 > 0)
@@ -130,7 +130,7 @@ public class QueryHandler : EnvQueryHandler
             Service = query.Service,
             Start = query.Start,
             End = query.End,
-            Name = StorageConst.ExceptionMessage,
+            Name = StorageConst.Current.ExceptionMessage,
             Type = AggregateTypes.GroupBy,
             MaxCount = 999,
             AllValue = true

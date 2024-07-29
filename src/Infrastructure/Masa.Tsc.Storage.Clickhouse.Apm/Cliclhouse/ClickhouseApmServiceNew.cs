@@ -24,16 +24,16 @@ internal partial class ClickhouseApmServiceNew : IApmService
         _logger = logger;
 
         serviceOrders ??= new() {
-            { nameof(ServiceListDto.Name), StorageConstaaa.Current.ServiceName },
-            { nameof(ServiceListDto.Envs), StorageConstaaa.Current.Environment },
+            { nameof(ServiceListDto.Name), StorageConst.Current.ServiceName },
+            { nameof(ServiceListDto.Envs), StorageConst.Current.Environment },
             { nameof(ServiceListDto.Latency), "Latency" },
             { nameof(ServiceListDto.Throughput), "Throughput" },
             { nameof(ServiceListDto.Failed), "Failed" },
         };
         endpointOrders ??= new() {
-            { nameof(EndpointListDto.Name), StorageConstaaa.Current.Trace.URL },
-            { nameof(EndpointListDto.Service), StorageConstaaa.Current.ServiceName },
-            { nameof(EndpointListDto.Method), StorageConstaaa.Current.Trace.HttpMethod },
+            { nameof(EndpointListDto.Name), StorageConst.Current.Trace.URL },
+            { nameof(EndpointListDto.Service), StorageConst.Current.ServiceName },
+            { nameof(EndpointListDto.Method), StorageConst.Current.Trace.HttpMethod },
             { nameof(EndpointListDto.Latency), "Latency" },
             { nameof(EndpointListDto.Throughput), "Throughput" },
             { nameof(EndpointListDto.Failed), "Failed" },
@@ -282,7 +282,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         {
             conditions.Add(new FieldConditionDto
             {
-                Name = StorageConstaaa.Current.Environment,
+                Name = StorageConst.Current.Environment,
                 Type = ConditionTypes.Equal,
                 Value = query.Env
             });
@@ -292,7 +292,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         {
             conditions.Add(new FieldConditionDto
             {
-                Name = StorageConstaaa.Current.Trace.Duration,
+                Name = StorageConst.Current.Trace.Duration,
                 Type = ConditionTypes.GreatEqual,
                 Value = (long)(query.LatMin.Value * MILLSECOND),
             });
@@ -303,7 +303,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
             || query.LatMin.HasValue && query.LatMax - query.LatMin.Value > 0))
             conditions.Add(new FieldConditionDto
             {
-                Name = StorageConstaaa.Current.Trace.Duration,
+                Name = StorageConst.Current.Trace.Duration,
                 Type = ConditionTypes.LessEqual,
                 Value = (long)(query.LatMax.Value * MILLSECOND),
             });
@@ -318,7 +318,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         //query.IsServer = default;
         //query.IsTrace = true;
         var (where, ors, parameters) = AppendWhere(query);
-        var orderBy = GetOrderBy(query, new() { { StorageConstaaa.Current.Timestimap, StorageConstaaa.Current.Timestimap } });
+        var orderBy = GetOrderBy(query, new() { { StorageConst.Current.Timestimap, StorageConst.Current.Timestimap } });
 
         PaginatedListBase<SimpleTraceListDto> result = new() { };
         if (query.HasPage)
@@ -340,11 +340,11 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
 
     private static SimpleTraceListDto ToSampleTraceListDto(IDataReader reader)
     {
-        var startTime = Convert.ToDateTime(reader[StorageConstaaa.Current.Timestimap]);
+        var startTime = Convert.ToDateTime(reader[StorageConst.Current.Timestimap]);
         long ns = Convert.ToInt64(reader["Duration"]);
         var result = new SimpleTraceListDto
         {
-            TraceId = reader[StorageConstaaa.Current.TraceId].ToString()!,
+            TraceId = reader[StorageConst.Current.TraceId].ToString()!,
             Timestamp = startTime,
             EndTimestamp = startTime.AddMilliseconds(ns / 1e6),
         };
@@ -603,11 +603,11 @@ order by `Attributes.http.status_code`";
         var period = GetPeriod(query);
         var tableName = Constants.GetAggregateTable(period);
         var (where, ors, parameters) = AppendWhere(query);
-        var sql = @$"select {StorageConstaaa.Current.Trace.URL}
+        var sql = @$"select {StorageConst.Current.Trace.URL}
             from {tableName}
             where {where}
-            group by ServiceName,{StorageConstaaa.Current.Trace.URL}
-            order by {StorageConstaaa.Current.Trace.URL}";
+            group by ServiceName,{StorageConst.Current.Trace.URL}
+            order by {StorageConst.Current.Trace.URL}";
         var result = new List<string>();
         using var reader = await Query(sql, parameters);
         while (await reader.NextResultAsync())
@@ -673,28 +673,28 @@ order by `Attributes.http.status_code`";
         if (!string.IsNullOrEmpty(query.ExType))
         {
             query.IsInstrument = true;
-            sql.AppendLine($" and {StorageConstaaa.Current.ExceptionType}=@exType");
+            sql.AppendLine($" and {StorageConst.Current.ExceptionType}=@exType");
             parameters.Add(new ClickHouseParameter { ParameterName = "exType", Value = query.ExType });
         }
 
         if (!string.IsNullOrEmpty(query.TraceId))
         {
             query.IsInstrument = true;
-            sql.AppendLine($" and {StorageConstaaa.Current.TraceId}=@traceId");
+            sql.AppendLine($" and {StorageConst.Current.TraceId}=@traceId");
             parameters.Add(new ClickHouseParameter { ParameterName = "traceId", Value = query.TraceId });
         }
 
         if (!string.IsNullOrEmpty(query.TextField) && !string.IsNullOrEmpty(query.TextValue))
         {
             query.IsInstrument = true;
-            if (string.Equals(query.TextField, StorageConstaaa.Current.TraceId))
+            if (string.Equals(query.TextField, StorageConst.Current.TraceId))
             {
-                sql.AppendLine($" and {StorageConstaaa.Current.TraceId}=@traceId");
+                sql.AppendLine($" and {StorageConst.Current.TraceId}=@traceId");
                 parameters.Add(new ClickHouseParameter { ParameterName = "traceId", Value = query.TextValue.Trim() });
             }
-            else if (string.Equals(query.TextField, StorageConstaaa.Current.SpanId))
+            else if (string.Equals(query.TextField, StorageConst.Current.SpanId))
             {
-                sql.AppendLine($" and {StorageConstaaa.Current.SpanId}=@spanId");
+                sql.AppendLine($" and {StorageConst.Current.SpanId}=@spanId");
                 parameters.Add(new ClickHouseParameter { ParameterName = "spanId", Value = query.TextValue.Trim() });
             }
             else
@@ -707,7 +707,7 @@ order by `Attributes.http.status_code`";
         if (!string.IsNullOrEmpty(query.ExMessage))
         {
             query.IsInstrument = true;
-            sql.AppendLine($" and {StorageConstaaa.Current.ExceptionMessage} like @exMessage");
+            sql.AppendLine($" and {StorageConst.Current.ExceptionMessage} like @exMessage");
             parameters.Add(new ClickHouseParameter { ParameterName = "exMessage", Value = $"{query.ExMessage}%" });
         }
 
@@ -762,7 +762,7 @@ order by `Attributes.http.status_code`";
         {
             if (!string.IsNullOrEmpty(traceQuery.Endpoint))
             {
-                sql.AppendLine($" and {ClickhouseHelper.GetName(StorageConstaaa.Current.Log.Url, true)} like @{name}");
+                sql.AppendLine($" and {ClickhouseHelper.GetName(StorageConst.Current.Log.Url, true)} like @{name}");
                 parameters.Add(new ClickHouseParameter { ParameterName = name, Value = $"{traceQuery.Endpoint}%" });
             }
         }
@@ -770,13 +770,13 @@ order by `Attributes.http.status_code`";
         {
             if (!string.IsNullOrEmpty(traceQuery.Endpoint))
             {
-                sql.AppendLine($" and {StorageConstaaa.Current.Trace.URL}=@{name}");
+                sql.AppendLine($" and {StorageConst.Current.Trace.URL}=@{name}");
                 parameters.Add(new ClickHouseParameter { ParameterName = name, Value = traceQuery.Endpoint });
             }
 
             if (!string.IsNullOrEmpty(traceQuery.Method))
             {
-                sql.AppendLine($" and {StorageConstaaa.Current.Trace.HttpMethod}=@method");
+                sql.AppendLine($" and {StorageConst.Current.Trace.HttpMethod}=@method");
                 parameters.Add(new ClickHouseParameter { ParameterName = "method", Value = traceQuery.Endpoint });
             }
 
@@ -785,7 +785,7 @@ order by `Attributes.http.status_code`";
                 if (traceQuery.IsTrace.HasValue && traceQuery.IsTrace!.Value && !string.IsNullOrEmpty(traceQuery.StatusCode))
                 {
                     traceQuery.IsInstrument = true;
-                    sql.AppendLine($" and {StorageConstaaa.Current.Trace.HttpStatusCode}=@status_code");
+                    sql.AppendLine($" and {StorageConst.Current.Trace.HttpStatusCode}=@status_code");
                     parameters.Add(new ClickHouseParameter { ParameterName = "status_code", Value = traceQuery.StatusCode });
                 }
             }
@@ -797,12 +797,12 @@ order by `Attributes.http.status_code`";
         if (query == null || !query.LatMin.HasValue && !query.LatMax.HasValue || query.IsMetric != null && query.IsMetric.Value) return;
         if (query.LatMin.HasValue && query.LatMin > 0)
         {
-            sql.AppendLine($" and {StorageConstaaa.Current.Trace.Duration} >=@minDuration");
+            sql.AppendLine($" and {StorageConst.Current.Trace.Duration} >=@minDuration");
             parameters.Add(new ClickHouseParameter { ParameterName = "minDuration", Value = (long)(query.LatMin * MILLSECOND) });
         }
         if (query.LatMax.HasValue && query.LatMax > 0)
         {
-            sql.AppendLine($" and {StorageConstaaa.Current.Trace.Duration} <=@maxDuration");
+            sql.AppendLine($" and {StorageConst.Current.Trace.Duration} <=@maxDuration");
             parameters.Add(new ClickHouseParameter { ParameterName = "maxDuration", Value = (long)(query.LatMax * MILLSECOND) });
         }
     }
@@ -1015,17 +1015,17 @@ order by `Attributes.http.status_code`";
     {
         List<ClickHouseParameter> parameters = new();
         var sql = new StringBuilder();
-        sql.AppendLine($" {StorageConstaaa.Current.Timestimap} between @startTime and @endTime");
+        sql.AppendLine($" {StorageConst.Current.Timestimap} between @startTime and @endTime");
         parameters.Add(new ClickHouseParameter { ParameterName = "startTime", Value = MasaStackClickhouseConnection.ToTimeZone(query.Start), DbType = DbType.DateTime });
         parameters.Add(new ClickHouseParameter { ParameterName = "endTime", Value = MasaStackClickhouseConnection.ToTimeZone(query.End), DbType = DbType.DateTime });
         if (!string.IsNullOrEmpty(query.Env))
         {
-            sql.AppendLine($" and {StorageConstaaa.Current.Environment}=@environment");
+            sql.AppendLine($" and {StorageConst.Current.Environment}=@environment");
             parameters.Add(new ClickHouseParameter { ParameterName = "environment", Value = query.Env });
         }
         if (!string.IsNullOrEmpty(query.Service))
         {
-            sql.AppendLine($" and {StorageConstaaa.Current.ServiceName}=@serviceName");
+            sql.AppendLine($" and {StorageConst.Current.ServiceName}=@serviceName");
             parameters.Add(new ClickHouseParameter { ParameterName = "serviceName", Value = query.Service });
         }
         if (isContainsEndpoint)

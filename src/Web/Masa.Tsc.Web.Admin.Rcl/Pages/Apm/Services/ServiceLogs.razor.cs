@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Storage.Contracts;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services;
 
 public partial class ServiceLogs
@@ -139,12 +137,12 @@ public partial class ServiceLogs
             };
             var list = new List<FieldConditionDto>();
             if (!string.IsNullOrEmpty(SearchData.Environment))
-                list.Add(new FieldConditionDto { Value = SearchData.Environment!, Name = StorageConstaaa.Current.Environment });
+                list.Add(new FieldConditionDto { Value = SearchData.Environment!, Name = StorageConst.Current.Environment });
             if (!ShowAppEvent)
             {
                 list.Add(new FieldConditionDto
                 {
-                    Name = StorageConstaaa.Current.Log.Body,
+                    Name = StorageConst.Current.Log.Body,
                     Value = "Event",
                     Type = ConditionTypes.NotRegex
                 });

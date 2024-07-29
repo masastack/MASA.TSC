@@ -38,7 +38,7 @@ internal class ConfigConst
 
     public static string ClickHouseTaceSourceTable => Configuration.Clickhouse?.TraceSource!;
 
-    internal sealed class StorageConst
+    internal sealed class StorageSetting
     {
         public static bool IsElasticSearch { get; private set; }
 
@@ -64,6 +64,6 @@ internal class ConfigConst
                 IsClickhouse = true;
         }
 
-        private StorageConst() { }
+        private StorageSetting() { }
     }
 }

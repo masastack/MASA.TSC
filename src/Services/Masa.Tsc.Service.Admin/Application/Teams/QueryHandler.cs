@@ -266,7 +266,7 @@ public class QueryHandler : EnvQueryHandler
 
         var query = new SimpleAggregateRequestDto
         {
-            Name = StorageConst.ServiceName,
+            Name = StorageConst.Current.ServiceName,
             Start = start.Value,
             End = end.Value,
             Type = AggregateTypes.GroupBy,
@@ -304,24 +304,24 @@ public class QueryHandler : EnvQueryHandler
     {
         var obj = await _traceService.AggregateAsync(new SimpleAggregateRequestDto
         {
-            Name = StorageConst.ServiceName,
+            Name = StorageConst.Current.ServiceName,
             Start = start ?? DateTime.MinValue,
             End = end ?? DateTime.MinValue,
             Type = AggregateTypes.GroupBy,
             MaxCount = 999,
             Conditions = new FieldConditionDto[] {
                 new FieldConditionDto{
-                    Name=StorageConst.Environment,
+                    Name=StorageConst.Current.Environment,
                     Type=ConditionTypes.Equal,
                     Value  =env
                 },
                 new FieldConditionDto{
-                    Name=StorageConst.HttpPort,
+                    Name=StorageConst.Current.Trace.HttpStatusCode,
                      Type= ConditionTypes.In,
                      Value=errorPorts.Select(num=>(object)num)
                 },
                 new FieldConditionDto{
-                    Name=StorageConst.ServiceName,
+                    Name=StorageConst.Current.ServiceName,
                      Type= ConditionTypes.In,
                      Value=appids
                 }
@@ -343,24 +343,24 @@ public class QueryHandler : EnvQueryHandler
             return default;
         var obj = await _traceService.AggregateAsync(new SimpleAggregateRequestDto
         {
-            Name = StorageConst.ServiceName,
+            Name = StorageConst.Current.ServiceName,
             Start = start ?? DateTime.MinValue,
             End = end ?? DateTime.MinValue,
             Type = AggregateTypes.Count,
             Conditions = new FieldConditionDto[] {
                 new FieldConditionDto{
-                    Name=StorageConst.Environment,
+                    Name=StorageConst.Current.Environment,
                     Type=ConditionTypes.Equal,
                     Value  =env
                 },
                 new FieldConditionDto{
-                    Name=StorageConst.HttpPort,
+                    Name=StorageConst.Current.Trace.HttpStatusCode,
                     Type = ConditionTypes.In,
                     Value=errorPorts.Select(num=>(object)num)
                 },
                 new FieldConditionDto
                 {
-                    Name=StorageConst.ServiceName,
+                    Name=StorageConst.Current.ServiceName,
                     Type= ConditionTypes.In,
                     Value=appids
                 }

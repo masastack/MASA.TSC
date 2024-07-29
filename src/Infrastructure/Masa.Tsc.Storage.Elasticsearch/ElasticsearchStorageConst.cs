@@ -1,21 +1,21 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-namespace Masa.Tsc.Storage.Clickhouse;
+namespace Masa.Tsc.Storage.Elasticsearch;
 
-public class ClickhouseStorageConst : StorageConst
+public class ElasticsearchStorageConst : StorageConst
 {
-    private readonly ClickhouseStorageLog log = new();
-    private readonly ClickhouseStorageTrace trace = new();
+    private readonly ElasticsearchStorageLog log = new();
+    private readonly ElasticsearchStorageTrace trace = new();
 
-    public ClickhouseStorageConst() : base()
+    public ElasticsearchStorageConst() : base()
     {
         Current = this;
     }
 
-    public override string Timestimap => "Timestamp";
+    public override string Timestimap => "@timestamp";
 
-    public override string ServiceName => "ServiceName";
+    public override string ServiceName => "Resource.service.name";
 
     public override string ServiceInstance => "Resource.service.instance.id";
 
@@ -34,9 +34,9 @@ public class ClickhouseStorageConst : StorageConst
     public override StorageTrace Trace => trace;
 }
 
-public class ClickhouseStorageLog : StorageLog
+public class ElasticsearchStorageLog : StorageLog
 {
-    internal ClickhouseStorageLog() { }
+    internal ElasticsearchStorageLog() { }
 
     public override string Body => "Body";
 
@@ -51,9 +51,9 @@ public class ClickhouseStorageLog : StorageLog
     public override string TaskId => "Attributes.TaskId";
 }
 
-public class ClickhouseStorageTrace : StorageTrace
+public class ElasticsearchStorageTrace : StorageTrace
 {
-    internal ClickhouseStorageTrace() { }
+    internal ElasticsearchStorageTrace() { }
 
     public override string URL => "Attributes.http.target";
 

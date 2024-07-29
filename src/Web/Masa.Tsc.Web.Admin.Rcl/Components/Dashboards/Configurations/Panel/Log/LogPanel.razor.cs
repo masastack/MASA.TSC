@@ -80,9 +80,9 @@ public partial class LogPanel
         if (!string.IsNullOrWhiteSpace(TaskId))
         {
             if (_storageSetting.IsClickhouse)
-                Search = $"{StorageConst.TaskId}='{TaskId}'";
+                Search = $"{StorageConst.Current.Log.TaskId}='{TaskId}'";
             else if (_storageSetting.IsElasticsearch)
-                Search = $"{{\"term\":{{\"{StorageConst.TaskId}.keyword\":\"{TaskId}\"}}}}";
+                Search = $"{{\"term\":{{\"{StorageConst.Current.Log.TaskId}.keyword\":\"{TaskId}\"}}}}";
         }
     }
 
@@ -200,16 +200,16 @@ public partial class LogPanel
             if (string.Equals("error", Keyword, StringComparison.InvariantCultureIgnoreCase))
             {
                 if (_storageSetting.IsClickhouse)
-                    Search = $"{StorageConst.ServiceName}='{Service}' and {StorageConst.LogLevelText}='{Keyword}'";
+                    Search = $"{StorageConst.Current.ServiceName}='{Service}' and {StorageConst.Current.Log.LogLevelText}='{Keyword}'";
                 else if (_storageSetting.IsElasticsearch)
-                    Search = $"{{\"term\":{{\"{StorageConst.ServiceName}.keyword\":\"{Service.Replace("'", "''")}\"}}}},{{\"term\":{{\"{StorageConst.LogLevelText}.keyword\": \"{Keyword.Replace("'", "''")}\"}}}}";
+                    Search = $"{{\"term\":{{\"{StorageConst.Current.ServiceName}.keyword\":\"{Service.Replace("'", "''")}\"}}}},{{\"term\":{{\"{StorageConst.Current.Log.LogLevelText}.keyword\": \"{Keyword.Replace("'", "''")}\"}}}}";
             }
             else
             {
                 if (_storageSetting.IsClickhouse)
-                    Search = $"{StorageConst.ServiceName}='{Service}' and {StorageConst.ExceptionMessage}='{Keyword.Replace("'", "''")}'";
+                    Search = $"{StorageConst.Current.ServiceName}='{Service}' and {StorageConst.Current.ExceptionMessage}='{Keyword.Replace("'", "''")}'";
                 else if (_storageSetting.IsElasticsearch)
-                    Search = $"{{\"term\":{{\"{StorageConst.ServiceName}.keyword\":\"{Service}\"}}}},{{\"term\":{{\"{StorageConst.ExceptionMessage}.keyword\": \"{Keyword}\"}}}}";
+                    Search = $"{{\"term\":{{\"{StorageConst.Current.ServiceName}.keyword\":\"{Service}\"}}}},{{\"term\":{{\"{StorageConst.Current.ExceptionMessage}.keyword\": \"{Keyword}\"}}}}";
             }
         }
         base.OnInitialized();

@@ -12,14 +12,14 @@ public sealed class ClickhouseHelper
 
     public static string GetName(string name, bool isLog)
     {
-        if (name.Equals("@timestamp", StringComparison.CurrentCultureIgnoreCase) || name.Equals(StorageConstaaa.Current.Timestimap, StringComparison.CurrentCultureIgnoreCase))
-            return StorageConstaaa.Current.Timestimap;
+        if (name.Equals("@timestamp", StringComparison.CurrentCultureIgnoreCase) || name.Equals(StorageConst.Current.Timestimap, StringComparison.CurrentCultureIgnoreCase))
+            return StorageConst.Current.Timestimap;
 
-        if (!isLog && name.Equals(StorageConstaaa.Current.Trace.Duration, StringComparison.CurrentCultureIgnoreCase))
-            return StorageConstaaa.Current.Trace.Duration;
+        if (!isLog && name.Equals(StorageConst.Current.Trace.Duration, StringComparison.CurrentCultureIgnoreCase))
+            return StorageConst.Current.Trace.Duration;
 
-        if (!isLog && (name.Equals("kind", StringComparison.InvariantCultureIgnoreCase) || name.Equals(StorageConstaaa.Current.Trace.SpanKind, StringComparison.InvariantCultureIgnoreCase)))
-            return StorageConstaaa.Current.Trace.SpanKind;
+        if (!isLog && (name.Equals("kind", StringComparison.InvariantCultureIgnoreCase) || name.Equals(StorageConst.Current.Trace.SpanKind, StringComparison.InvariantCultureIgnoreCase)))
+            return StorageConst.Current.Trace.SpanKind;
 
         if (name.StartsWith(RESOURCE_KEY, StringComparison.CurrentCultureIgnoreCase))
             return GetResourceName(name);

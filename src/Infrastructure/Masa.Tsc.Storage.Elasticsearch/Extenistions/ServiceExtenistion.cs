@@ -78,6 +78,7 @@ public static class ServiceExtenistion
 
     private static IServiceCollection AddElasticsearch(IServiceCollection services, string[] nodes, string name)
     {
+        _ = new ElasticsearchStorageConst();
         return services.AddElasticsearch(name, options =>
             {
                 options.UseNodes(nodes).UseConnectionSettings(setting => setting.EnableApiVersioningHeader(false));

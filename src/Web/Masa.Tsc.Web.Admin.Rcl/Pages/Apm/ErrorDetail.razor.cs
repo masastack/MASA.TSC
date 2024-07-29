@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Storage.Contracts;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm;
 
 public partial class ErrorDetail
@@ -94,19 +92,19 @@ public partial class ErrorDetail
         var list = new List<FieldConditionDto>();
         if (!string.IsNullOrEmpty(Search.Environment))
         {
-            list.Add(new FieldConditionDto { Name = StorageConstaaa.Current.Environment, Value = Search.Environment, Type = ConditionTypes.Equal });
+            list.Add(new FieldConditionDto { Name = StorageConst.Current.Environment, Value = Search.Environment, Type = ConditionTypes.Equal });
         }
         if (!string.IsNullOrEmpty(Search.ExceptionType))
         {
-            list.Add(new FieldConditionDto { Name = StorageConstaaa.Current.ExceptionType, Value = Search.ExceptionType, Type = ConditionTypes.Equal });
+            list.Add(new FieldConditionDto { Name = StorageConst.Current.ExceptionType, Value = Search.ExceptionType, Type = ConditionTypes.Equal });
         }
         if (!string.IsNullOrEmpty(Search.ExceptionMsg))
         {
-            list.Add(new FieldConditionDto { Name = StorageConstaaa.Current.Log.Body, Value = Search.ExceptionMsg, Type = ConditionTypes.Regex });
+            list.Add(new FieldConditionDto { Name = StorageConst.Current.Log.Body, Value = Search.ExceptionMsg, Type = ConditionTypes.Regex });
         }
         if (!string.IsNullOrEmpty(Search.TextField) && !string.IsNullOrEmpty(Search.TextValue))
         {
-            if (Search.TextField == StorageConstaaa.Current.ExceptionMessage || Search.TextField == StorageConstaaa.Current.Log.Body)
+            if (Search.TextField == StorageConst.Current.ExceptionMessage || Search.TextField == StorageConst.Current.Log.Body)
             {
                 list.Add(new FieldConditionDto { Name = Search.TextField, Value = Search.TextValue, Type = ConditionTypes.Regex });
             }

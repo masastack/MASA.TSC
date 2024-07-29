@@ -17,5 +17,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Clickhouse.Apm\Masa.Tsc.Storage.Clickhouse.Apm.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Elasticsearch\Masa.Tsc.Storage.Elasticsearch.csproj" />
 	</ItemGroup>
 </Project>

@@ -20,19 +20,19 @@ public static class AddTraceLogExtenstion
 
     private static void AddClickHouse()
     {
-        if (ConfigConst.StorageConst.HasInit || !ConfigConst.IsClickhouse) return;
+        if (ConfigConst.StorageSetting.HasInit || !ConfigConst.IsClickhouse) return;
         if (string.IsNullOrEmpty(ConfigConst.ClikhouseConnection)) return;
         _services.AddMASAStackApmClickhouse(ConfigConst.ClikhouseConnection, ConfigConst.ClickhouseTableSuffix, ConfigConst.ClickHouseLogSourceTable, ConfigConst.ClickHouseTaceSourceTable
             , appLogSourceTable: ConfigConst.ClickHouseAppLogSourceTable, AppTraceSourceTable: ConfigConst.ClickHouseAppTraceSourceTable);
-        ConfigConst.StorageConst.SetClickhouse();
+        ConfigConst.StorageSetting.SetClickhouse();
     }
 
     private static void AddElasticSearch()
     {
-        if (ConfigConst.StorageConst.HasInit || !ConfigConst.IsElasticsearch) return;
+        if (ConfigConst.StorageSetting.HasInit || !ConfigConst.IsElasticsearch) return;
         string[] elasticsearchUrls = _services.GetMasaStackConfig().ElasticModel.Nodes?.ToArray() ?? Array.Empty<string>();
         _services.AddElasticClientLogAndTrace(elasticsearchUrls, ConfigConst.LogIndex, ConfigConst.TraceIndex);
-        ConfigConst.StorageConst.SetElasticSearch();
+        ConfigConst.StorageSetting.SetElasticSearch();
     }
 
     private static void ValueChanged(AppSettingConfiguration config)

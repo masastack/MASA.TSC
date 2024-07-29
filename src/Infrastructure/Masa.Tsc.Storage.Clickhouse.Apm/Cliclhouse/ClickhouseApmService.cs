@@ -118,11 +118,11 @@ order by `Attributes.http.status_code`";
         var period = GetPeriod(query);
         var tableName = Constants.GetAggregateTable(period);
         var (where, ors, parameters) = AppendWhere(query);
-        var sql = @$"select {StorageConstaaa.Current.Trace.URL}
+        var sql = @$"select {StorageConst.Current.Trace.URL}
             from {tableName}
             where {where}
-            group by ServiceName,{StorageConstaaa.Current.Trace.URL}
-            order by {StorageConstaaa.Current.Trace.URL}";
+            group by ServiceName,{StorageConst.Current.Trace.URL}
+            order by {StorageConst.Current.Trace.URL}";
         var result = new List<string>();
         using var reader = await Query(sql, parameters);
         while (await reader.NextResultAsync())
@@ -330,7 +330,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         {
             conditions.Add(new FieldConditionDto
             {
-                Name = StorageConstaaa.Current.Environment,
+                Name = StorageConst.Current.Environment,
                 Type = ConditionTypes.Equal,
                 Value = query.Env
             });
@@ -340,7 +340,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         {
             conditions.Add(new FieldConditionDto
             {
-                Name = StorageConstaaa.Current.Trace.Duration,
+                Name = StorageConst.Current.Trace.Duration,
                 Type = ConditionTypes.GreatEqual,
                 Value = (long)(query.LatMin.Value * MILLSECOND),
             });
@@ -351,7 +351,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
             || query.LatMin.HasValue && query.LatMax - query.LatMin.Value > 0))
             conditions.Add(new FieldConditionDto
             {
-                Name = StorageConstaaa.Current.Trace.Duration,
+                Name = StorageConst.Current.Trace.Duration,
                 Type = ConditionTypes.LessEqual,
                 Value = (long)(query.LatMax.Value * MILLSECOND),
             });
@@ -388,11 +388,11 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
 
     private static SimpleTraceListDto ToSampleTraceListDto(IDataReader reader)
     {
-        var startTime = Convert.ToDateTime(reader[StorageConstaaa.Current.Timestimap]);
+        var startTime = Convert.ToDateTime(reader[StorageConst.Current.Timestimap]);
         long ns = Convert.ToInt64(reader["Duration"]);
         var result = new SimpleTraceListDto
         {
-            TraceId = reader[StorageConstaaa.Current.TraceId].ToString()!,
+            TraceId = reader[StorageConst.Current.TraceId].ToString()!,
             Timestamp = startTime,
             EndTimestamp = startTime.AddMilliseconds(ns / 1e6),
         };
@@ -656,17 +656,17 @@ from(
     {
         List<ClickHouseParameter> parameters = new();
         var sql = new StringBuilder();
-        sql.AppendLine($" {StorageConstaaa.Current.Timestimap} between @startTime and @endTime");
+        sql.AppendLine($" {StorageConst.Current.Timestimap} between @startTime and @endTime");
         parameters.Add(new ClickHouseParameter { ParameterName = "startTime", Value = MasaStackClickhouseConnection.ToTimeZone(query.Start), DbType = DbType.DateTime });
         parameters.Add(new ClickHouseParameter { ParameterName = "endTime", Value = MasaStackClickhouseConnection.ToTimeZone(query.End), DbType = DbType.DateTime });
         if (!string.IsNullOrEmpty(query.Env))
         {
-            sql.AppendLine($" and {StorageConstaaa.Current.Environment}=@environment");
+            sql.AppendLine($" and {StorageConst.Current.Environment}=@environment");
             parameters.Add(new ClickHouseParameter { ParameterName = "environment", Value = query.Env });
         }
         if (!string.IsNullOrEmpty(query.Service))
         {
-            sql.AppendLine($" and {StorageConstaaa.Current.ServiceName}=@serviceName");
+            sql.AppendLine($" and {StorageConst.Current.ServiceName}=@serviceName");
             parameters.Add(new ClickHouseParameter { ParameterName = "serviceName", Value = query.Service });
         }
         //if (query.IsServer.HasValue && (query.IsMetric == null || !query.IsMetric.Value))
@@ -703,11 +703,11 @@ from(
         {
             if (str.Length - 32 == 0)
             {
-                list.Add($" and {StorageConstaaa.Current.TraceId}='{str}'");
+                list.Add($" and {StorageConst.Current.TraceId}='{str}'");
             }
             else
             {
-                list.Add($" and {StorageConstaaa.Current.Trace.UserId}='{str}'");
+                list.Add($" and {StorageConst.Current.Trace.UserId}='{str}'");
             }
             return list;
         }
@@ -715,30 +715,30 @@ from(
         //status_code
         if (int.TryParse(str, out int num) && num - -1 >= 0 && num - 600 < 0 && isTrace)
         {
-            list.Add($" and {StorageConstaaa.Current.Trace.HttpStatusCode}='{query.Queries}'");
+            list.Add($" and {StorageConst.Current.Trace.HttpStatusCode}='{query.Queries}'");
             return list;
         }
 
         //exception
         if (str.EndsWith("exception", StringComparison.CurrentCultureIgnoreCase) && Regex.IsMatch(str, @"[\da-zA-Z]+"))
         {
-            list.Add($" and {StorageConstaaa.Current.ExceptionType} = '{str}'");
+            list.Add($" and {StorageConst.Current.ExceptionType} = '{str}'");
             return list;
         }
 
         if (isLog)
         {
-            list.Add(ClickhouseHelper.AppendLike(StorageConstaaa.Current.Log.Body, "p1", str));
+            list.Add(ClickhouseHelper.AppendLike(StorageConst.Current.Log.Body, "p1", str));
 
         }
         else if (isTrace)
         {
-            list.Add(ClickhouseHelper.AppendLike(StorageConstaaa.Current.Trace.URL, "p1", str));
-            list.Add(ClickhouseHelper.AppendLike(StorageConstaaa.Current.Trace.HttpRequestBody, "p1", str));
+            list.Add(ClickhouseHelper.AppendLike(StorageConst.Current.Trace.URL, "p1", str));
+            list.Add(ClickhouseHelper.AppendLike(StorageConst.Current.Trace.HttpRequestBody, "p1", str));
         }
 
         if (!isTrace)
-            list.Add(ClickhouseHelper.AppendLike(StorageConstaaa.Current.ExceptionMessage, "p1", str));
+            list.Add(ClickhouseHelper.AppendLike(StorageConst.Current.ExceptionMessage, "p1", str));
 
         parameters.Add(ClickhouseHelper.GetLikeParameter("p1", str));
         return list;
@@ -765,12 +765,12 @@ from(
         var name = "endpoint";
         if (traceQuery.IsLog.HasValue && traceQuery.IsLog.Value)
         {
-            sql.AppendLine($" and {ClickhouseHelper.GetName(StorageConstaaa.Current.Log.Url, true)} like @{name}");
+            sql.AppendLine($" and {ClickhouseHelper.GetName(StorageConst.Current.Log.Url, true)} like @{name}");
             parameters.Add(new ClickHouseParameter { ParameterName = name, Value = $"{traceQuery.Endpoint}%" });
         }
         else
         {
-            sql.AppendLine($" and {StorageConstaaa.Current.Trace.URL}=@{name}");
+            sql.AppendLine($" and {StorageConst.Current.Trace.URL}=@{name}");
             parameters.Add(new ClickHouseParameter { ParameterName = name, Value = traceQuery.Endpoint });
         }
     }
@@ -780,12 +780,12 @@ from(
         if (query == null || !query.LatMin.HasValue && !query.LatMax.HasValue || query.IsMetric != null && query.IsMetric.Value) return;
         if (query.LatMin.HasValue && query.LatMin > 0)
         {
-            sql.AppendLine($" and {StorageConstaaa.Current.Trace.Duration} >=@minDuration");
+            sql.AppendLine($" and {StorageConst.Current.Trace.Duration} >=@minDuration");
             parameters.Add(new ClickHouseParameter { ParameterName = "minDuration", Value = (long)(query.LatMin * MILLSECOND) });
         }
         if (query.LatMax.HasValue && query.LatMax > 0)
         {
-            sql.AppendLine($" and {StorageConstaaa.Current.Trace.Duration} <=@maxDuration");
+            sql.AppendLine($" and {StorageConst.Current.Trace.Duration} <=@maxDuration");
             parameters.Add(new ClickHouseParameter { ParameterName = "maxDuration", Value = (long)(query.LatMax * MILLSECOND) });
         }
     }

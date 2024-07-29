@@ -7,5 +7,5 @@ public class SettingService : ServiceBase
 {
     public SettingService() : base("/api/settings") { }
 
-    public SettingDto GetStorage() => new() { IsClickhouse = ConfigConst.StorageConst.IsClickhouse, IsElasticsearch = ConfigConst.StorageConst.IsClickhouse };
+    public SettingDto GetStorage() => new() { IsClickhouse = ConfigConst.StorageSetting.IsClickhouse, IsElasticsearch = ConfigConst.StorageSetting.IsClickhouse };
 }

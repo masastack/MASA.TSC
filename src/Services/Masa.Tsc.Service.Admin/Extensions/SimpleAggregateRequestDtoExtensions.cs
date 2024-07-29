@@ -26,11 +26,11 @@ internal static class BaseRequestDtoExtensions
 
         var list = dto.Conditions?.ToList() ?? new();
 
-        if (!list.Any() || !list.Exists(item => item.Name == StorageConst.Environment))
+        if (!list.Any() || !list.Exists(item => item.Name == StorageConst.Current.Environment))
         {
             list.Add(new FieldConditionDto
             {
-                Name = StorageConst.Environment,
+                Name = StorageConst.Current.Environment,
                 Type = ConditionTypes.Equal,
                 Value = envName
             });
