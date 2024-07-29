@@ -71,6 +71,7 @@ public static class ClickhouseInit
     LogAttributesValues Array(String) CODEC(ZSTD(1)),    
 
     INDEX idx_log_id TraceId TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_span_id SpanId TYPE bloom_filter(0.001) GRANULARITY 1,
 	INDEX idx_log_servicename ServiceName TYPE bloom_filter(0.001) GRANULARITY 1,
 	INDEX idx_log_serviceinstanceid `Resource.service.instance.id` TYPE bloom_filter(0.001) GRANULARITY 1,
 	INDEX idx_log_severitytext SeverityText TYPE bloom_filter(0.001) GRANULARITY 1,
@@ -172,15 +173,16 @@ FROM {sourceName}
     `SpanAttributesValues` Array(String) CODEC(ZSTD(1)),    
 
     INDEX idx_trace_id TraceId TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_span_id SpanId TYPE bloom_filter(0.001) GRANULARITY 1,
 	INDEX idx_trace_servicename ServiceName TYPE bloom_filter(0.001) GRANULARITY 1,
 	INDEX idx_trace_servicenamespace Resource.service.namespace TYPE bloom_filter(0.001) GRANULARITY 1,
 	INDEX idx_trace_serviceinstanceid Resource.service.instance.id TYPE bloom_filter(0.001) GRANULARITY 1,
 	INDEX idx_trace_statuscode Attributes.http.status_code TYPE bloom_filter(0.001) GRANULARITY 1,
     INDEX idx_trace_exceptiontype Attributes.exception.type TYPE bloom_filter(0.001) GRANULARITY 1,	
-    INDEX idx_string_target Attributes.http.target TYPE bloom_filter(0.001) GRANULARITY 1,	
-    INDEX idx_string_url Attributes.http.url TYPE bloom_filter(0.001) GRANULARITY 1,	
+    INDEX idx_string_target Attributes.http.target TYPE bloom_filter(0.001) GRANULARITY 1,    
     INDEX idx_string_method Attributes.http.method TYPE bloom_filter(0.001) GRANULARITY 1,	
-    INDEX idx_string_userid Attributes.enduser.id TYPE bloom_filter(0.001) GRANULARITY 1,	
+    INDEX idx_string_userid Attributes.enduser.id TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_string_url Attributes.http.url TYPE bloom_filter(0.001) GRANULARITY 1,	
 	
 	INDEX idx_string_requestbody Attributes.http.request_content_body TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1,
 	INDEX idx_string_responsebody Attributes.http.response_content_body TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1,

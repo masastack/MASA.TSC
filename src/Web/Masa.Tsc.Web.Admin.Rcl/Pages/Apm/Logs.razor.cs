@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Storage.Contracts;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm;
 
 public partial class Logs
@@ -29,33 +31,14 @@ public partial class Logs
     private bool dialogShow = false;
     private LogResponseDto current = null;
 
-    private string? exceptionType = null;
-    private string? exceptionMessage = null;
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        exceptionType = HttpUtility.ParseQueryString(uri.Query).Get("ex_type");
-        exceptionMessage = HttpUtility.ParseQueryString(uri.Query).Get("ex_msg");
-        var builder = new StringBuilder(Search.Text);
-        if (!string.IsNullOrEmpty(exceptionType))
-        {
-            builder.Append($" and {StorageConst.ExceptionType}=\"{exceptionType}\"");
-        }
-        if (builder.Length > 0 && string.IsNullOrEmpty(Search.Text))
-            builder.Remove(0, 4);
-        Search.Text = builder.ToString();
-    }
-
     public async Task OnTableOptionsChanged(DataOptions sort)
     {
         if (sort.SortBy.Any())
-            sortFiled = sort.SortBy.First();
+            sortFiled = sort.SortBy[0];
         else
             sortFiled = default;
         if (sort.SortDesc.Any())
-            sortBy = sort.SortDesc.First();
+            sortBy = sort.SortDesc[0];
         else
             sortBy = default;
         await LoadASync();
@@ -91,20 +74,41 @@ public partial class Logs
     private async Task LoadPageDataAsync()
     {
         isTableLoading = true;
-        var query = new LogPageQueryDto()
+        var query = new BaseRequestDto()
         {
             Start = Search.Start,
             End = Search.End,
             Service = Search.Service!,
             Page = page,
-            Env = Search.Environment!,
-            PageSize = defaultSize,
-            IsDesc = sortBy ?? false,
-            SortField = sortFiled!,
-            Query = Search.Text,
-            IsLimitEnv = false,
+            Sort = new FieldOrderDto
+            {
+                Name = sortFiled!,
+                IsDesc = sortBy ?? false
+            },
+            PageSize = defaultSize
         };
-        var result = await ApiCaller.LogService.GetPageAsync(query);
+        var list = new List<FieldConditionDto>();
+        if (!string.IsNullOrEmpty(Search.Environment))
+        {
+            list.Add(new FieldConditionDto { Name = StorageConstaaa.Current.Environment, Value = Search.Environment, Type = ConditionTypes.Equal });
+        }
+        if (!string.IsNullOrEmpty(Search.ExceptionType))
+        {
+            list.Add(new FieldConditionDto { Name = StorageConstaaa.Current.ExceptionType, Value = Search.ExceptionType, Type = ConditionTypes.Equal });
+        }
+        if (!string.IsNullOrEmpty(Search.TextField) && !string.IsNullOrEmpty(Search.TextValue))
+        {
+            if (Search.TextField == StorageConstaaa.Current.ExceptionMessage || Search.TextField == StorageConstaaa.Current.Log.Body)
+            {
+                list.Add(new FieldConditionDto { Name = Search.TextField, Value = Search.TextValue, Type = ConditionTypes.Regex });
+            }
+            else
+            {
+                list.Add(new FieldConditionDto { Name = Search.TextField, Value = Search.TextValue, Type = ConditionTypes.Equal });
+            }
+        }
+        query.Conditions = list;
+        var result = await ApiCaller.ApmService.GetLogListAsync(query);
         data.Clear();
         if (result.Result != null && result.Result.Any())
         {

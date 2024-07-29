@@ -48,7 +48,10 @@ public partial class Service
     {
         isTableLoading = true;
         if (data != null)
+        {
             Search = data;
+            page = 1;
+        }
         StateHasChanged();
         await LoadPageDataAsync();
         isTableLoading = false;
@@ -68,9 +71,14 @@ public partial class Service
             Service = Search.Service,
             Env = Search.Environment,
             OrderField = sortFiled,
+            ExType = Search.ExceptionType,
+            StatusCodes = Search.Status,
+            TraceId = Search.TraceId,
+            TextField = Search.TextField,
+            TextValue = Search.TextValue,
             IsDesc = sortBy,
             ComparisonType = Search.ComparisonType.ToComparisonType(),
-            Queries = Search.Text
+            //Queries = Search.Text
         };
         var result = await ApiCaller.ApmService.GetServicePageAsync(query);
         data.Clear();
@@ -100,7 +108,7 @@ public partial class Service
             End = Search.End,
             Service = Search.Service,
             Env = Search.Environment,
-            Queries = Search.Text,
+            //Queries = Search.Text,
             ComparisonType = Search.ComparisonType.ToComparisonType()
         };
         var result = await ApiCaller.ApmService.GetChartsAsync(query);

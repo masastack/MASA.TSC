@@ -3,12 +3,7 @@
 @page "/apm/logs"
 <PageTitle>@I18n.Apm("PageTitles.Log")</PageTitle>
 
-<ApmSearchComponent ShowButton
-                    ShowEnv
-                    ShowText
-                    ShowTime
-                    ShowService
-                    Value="Search"
+<ApmSearchComponent Value="Search" IsLog
                     ValueChanged="LoadASync" />
 <SDataTable Headers="headers"
             Stripe

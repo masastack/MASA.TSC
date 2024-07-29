@@ -3,12 +3,7 @@
 @page "/apm/errors"
 <PageTitle>@I18n.Apm("PageTitles.Error")</PageTitle>
 
-<ApmSearchComponent ShowButton
-                    ShowEnv
-                    ShowText
-                    ShowTime
-                    ShowService
-                    Value="Search"
+<ApmSearchComponent Value="Search"
                     ValueChanged="LoadASync" />
 <SDataTable Headers="headers"
             Stripe
@@ -57,6 +52,6 @@
     <SPagination Class="mt-2" @bind-Page="page" @bind-PageSize=defaultSize Total=total OnChange="OnPageChange" />
 </MCard>
 
-<SSheetDialog @bind-Value="showDetail" Title="@(message??type)">
-    <ErrorDetail Type="@type" Message="@message" SearchData="@Search" Show="showDetail" />
+<SSheetDialog @bind-Value="showDetail" Title="@(Search.ExceptionMsg??Search.ExceptionType)">
+    <ErrorDetail SearchData="@Search" Show="showDetail" />
 </SSheetDialog>

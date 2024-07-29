@@ -1,50 +1,20 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
-using System.Data.Common;
-
 namespace Masa.Tsc.Storage.Clickhouse.Apm;
 
-internal partial class ClickhouseApmService : IApmService
+internal partial class ClickhouseApmServiceNew : IApmService
 {
     private readonly MasaStackClickhouseConnection _dbConnection;
     private readonly ClickHouseCommand command;
     private readonly ITraceService _traceService;
-    private static readonly Dictionary<string, string> serviceOrders = new() {
-        {nameof(ServiceListDto.Name),"ServiceName"},
-        {nameof(ServiceListDto.Envs),"Resource.service.namespace"},
-        {nameof(ServiceListDto.Latency),"Latency"},
-        {nameof(ServiceListDto.Throughput),"Throughput"},
-        {nameof(ServiceListDto.Failed),"Failed"},
-    };
-
-    private static readonly Dictionary<string, string> endpointOrders = new() {
-        {nameof(EndpointListDto.Name),"Attributes.http.target"},
-        {nameof(EndpointListDto.Service),"ServiceName"},
-        {nameof(EndpointListDto.Method),"Attributes.http.method"},
-        {nameof(EndpointListDto.Latency),"Latency"},
-        {nameof(EndpointListDto.Throughput),"Throughput"},
-        {nameof(EndpointListDto.Failed),"Failed"},
-    };
-
-    private static readonly Dictionary<string, string> errorOrders = new() {
-        {nameof(ErrorMessageDto.Type),"Type"},
-        {nameof(ErrorMessageDto.Message),"Message"},
-        {nameof(ErrorMessageDto.LastTime),"time"},
-        {nameof(ErrorMessageDto.Total),"total"}
-    };
+    private static Dictionary<string, string> serviceOrders = default!;
+    private static Dictionary<string, string> endpointOrders = default!;
+    private static Dictionary<string, string> errorOrders = default!;
     const double MILLSECOND = 1e6;
-
     private readonly ILogger _logger;
 
-    private void Log(DateTime start, DateTime end, string sql, IEnumerable<ClickHouseParameter> parameters, bool isReader = false)
-    {
-        var duration = (end - start).TotalSeconds;
-        if (duration - 1 > 0)
-            _logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}, isReader:{isReader}", duration, sql, parameters, isReader);
-    }
-
-    public ClickhouseApmService(MasaStackClickhouseConnection dbConnection, ITraceService traceService, ILogger<ClickhouseApmService> logger)
+    public ClickhouseApmServiceNew(MasaStackClickhouseConnection dbConnection, ITraceService traceService, ILogger<ClickhouseApmServiceNew> logger)
     {
         _traceService = traceService;
         _dbConnection = dbConnection;
@@ -52,6 +22,35 @@ internal partial class ClickhouseApmService : IApmService
         if (_dbConnection.State == ConnectionState.Closed)
             _dbConnection.Open();
         _logger = logger;
+
+        serviceOrders ??= new() {
+            { nameof(ServiceListDto.Name), StorageConstaaa.Current.ServiceName },
+            { nameof(ServiceListDto.Envs), StorageConstaaa.Current.Environment },
+            { nameof(ServiceListDto.Latency), "Latency" },
+            { nameof(ServiceListDto.Throughput), "Throughput" },
+            { nameof(ServiceListDto.Failed), "Failed" },
+        };
+        endpointOrders ??= new() {
+            { nameof(EndpointListDto.Name), StorageConstaaa.Current.Trace.URL },
+            { nameof(EndpointListDto.Service), StorageConstaaa.Current.ServiceName },
+            { nameof(EndpointListDto.Method), StorageConstaaa.Current.Trace.HttpMethod },
+            { nameof(EndpointListDto.Latency), "Latency" },
+            { nameof(EndpointListDto.Throughput), "Throughput" },
+            { nameof(EndpointListDto.Failed), "Failed" },
+        };
+        errorOrders ??= new() {
+            {nameof(ErrorMessageDto.Type),"Type"},
+            {nameof(ErrorMessageDto.Message),"Message"},
+            {nameof(ErrorMessageDto.LastTime),"time"},
+            {nameof(ErrorMessageDto.Total),"total"}
+        };
+    }
+
+    private void Log(DateTime start, DateTime end, string sql, IEnumerable<ClickHouseParameter> parameters, bool isReader = false)
+    {
+        var duration = (end - start).TotalSeconds;
+        if (duration - 1 > 0)
+            _logger.LogWarning("Clickhouse query slow {Duration}s, rawSql:{Rawsql}, parameters:{Paramters}, isReader:{IsReader}", duration, sql, parameters, isReader);
     }
 
     public Task<PaginatedListBase<ServiceListDto>> ServicePageAsync(BaseApmRequestDto query)
@@ -67,7 +66,7 @@ internal partial class ClickhouseApmService : IApmService
     public async Task<EndpointLatencyDistributionDto> EndpointLatencyDistributionAsync(ApmEndpointRequestDto query)
     {
         query.IsTrace = true;
-        var (where, ors, parameters) = AppendWhere(query);
+        var (where, parameters) = GetMetricWhere(query, true);
         var period = GetPeriod(query);
         var tableName = Constants.GetAggregateTable(period);
         var result = new EndpointLatencyDistributionDto();
@@ -95,53 +94,6 @@ internal partial class ClickhouseApmService : IApmService
         Log(start, end, sql, parameters, true);
 
         result.Latencies = list;
-        return result;
-    }
-
-    public async Task<List<string>> GetStatusCodesAsync()
-    {
-        var sql = $@"select  `Attributes.http.status_code` from
-{MasaStackClickhouseConnection.TraceHttpServerTable}
-group by  `Attributes.http.status_code`
-order by `Attributes.http.status_code`";
-        var result = new List<string>();
-        using var reader = await Query(sql, default!);
-        while (await reader.NextResultAsync())
-            while (await reader.ReadAsync())
-                result.Add(reader[0].ToString()!);
-
-        return result;
-    }
-
-    public async Task<List<string>> GetEndpointsAsync(BaseApmRequestDto query)
-    {
-        var period = GetPeriod(query);
-        var tableName = Constants.GetAggregateTable(period);
-        var (where, ors, parameters) = AppendWhere(query);
-        var sql = @$"select {StorageConstaaa.Current.Trace.URL}
-            from {tableName}
-            where {where}
-            group by ServiceName,{StorageConstaaa.Current.Trace.URL}
-            order by {StorageConstaaa.Current.Trace.URL}";
-        var result = new List<string>();
-        using var reader = await Query(sql, parameters);
-        while (await reader.NextResultAsync())
-            while (await reader.ReadAsync())
-                result.Add(reader[0].ToString()!);
-
-        return result;
-    }
-
-    public async Task<List<string>> GetErrorTypesAsync(BaseApmRequestDto query)
-    {
-        var (where, ors, parameters) = AppendWhere(query);
-        var sql = $@"select `Attributes.exception.type` from {Constants.ErrorTable} where {where} group by `Attributes.exception.type` order by `Attributes.exception.type`";
-        var result = new List<string>();
-        using var reader = await Query(sql, parameters);
-        while (await reader.NextResultAsync())
-            while (await reader.ReadAsync())
-                result.Add(reader[0].ToString()!);
-
         return result;
     }
 
@@ -366,7 +318,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         //query.IsServer = default;
         //query.IsTrace = true;
         var (where, ors, parameters) = AppendWhere(query);
-        var orderBy = GetOrderBy(query, new());
+        var orderBy = GetOrderBy(query, new() { { StorageConstaaa.Current.Timestimap, StorageConstaaa.Current.Timestimap } });
 
         PaginatedListBase<SimpleTraceListDto> result = new() { };
         if (query.HasPage)
@@ -403,9 +355,8 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
     {
         query.IsServer = true;
         query.IsTrace = true;
-        bool isInstrument = !string.IsNullOrEmpty(query.Queries);
-        query.IsMetric = !isInstrument;
         var (where, ors, parameters) = AppendWhere(query);
+        var (metricWhere, _) = GetMetricWhere(query, true);
         string countSql, sql;
 
         string groupAppend = isEndpoint ? ",`Attributes.http.target`,`Attributes.http.method`" : string.Empty;
@@ -414,7 +365,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
 
         var period = GetPeriod(query);
         var tableName = Constants.GetAggregateTable(period);
-        if (isInstrument)
+        if (query.IsInstrument)
         {
             var sql2 = CombineOrs($"select DISTINCT  ServiceName{groupAppend} from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors);
             sql = @$"select a.* from(select
@@ -423,13 +374,13 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
                     countMerge(Throughput) as Throughput,
                     SumMerge(Failed) as Failed {groupAppend}
             from {tableName}
-            where {where}
+            where {metricWhere}
             group by ServiceName,`Resource.service.namespace`{groupAppend},Timestamp) a,
             (select DISTINCT ServiceName{groupAppend} from ({sql2})) b where a.ServiceName=b.ServiceName{(isEndpoint ? " and a.`Attributes.http.target`=b.`Attributes.http.target` and a.`Attributes.http.method`=b.`Attributes.http.method`" : "")}";
             countSql = @$"select a.* from(select
                     ServiceName{groupAppend}
             from {tableName}
-            where {where}
+            where {metricWhere}
             group by ServiceName{groupAppend}) a,
             (select DISTINCT ServiceName{groupAppend} from ({sql2})) b where a.ServiceName=b.ServiceName{(isEndpoint ? " and a.`Attributes.http.target`=b.`Attributes.http.target` and a.`Attributes.http.method`=b.`Attributes.http.method`" : "")}";
         }
@@ -441,9 +392,9 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
                     countMerge(Throughput) as Throughput,
                     SumMerge(Failed) as Failed {groupAppend}
             from {tableName}
-            where {where}
+            where {metricWhere}
             group by ServiceName,`Resource.service.namespace`{groupAppend},Timestamp";
-            countSql = $"select count(1) from {tableName} where {where} {groupby}";
+            countSql = $"select count(1) from {tableName} where {metricWhere} {groupby}";
         }
 
         countSql = $"select count(1) from ({countSql})";
@@ -632,6 +583,53 @@ from(
         return result;
     }
 
+    public async Task<List<string>> GetStatusCodesAsync()
+    {
+        var sql = $@"select  `Attributes.http.status_code` from
+{MasaStackClickhouseConnection.TraceHttpServerTable}
+group by  `Attributes.http.status_code`
+order by `Attributes.http.status_code`";
+        var result = new List<string>();
+        using var reader = await Query(sql, default!);
+        while (await reader.NextResultAsync())
+            while (await reader.ReadAsync())
+                result.Add(reader[0].ToString()!);
+
+        return result;
+    }
+
+    public async Task<List<string>> GetEndpointsAsync(BaseApmRequestDto query)
+    {
+        var period = GetPeriod(query);
+        var tableName = Constants.GetAggregateTable(period);
+        var (where, ors, parameters) = AppendWhere(query);
+        var sql = @$"select {StorageConstaaa.Current.Trace.URL}
+            from {tableName}
+            where {where}
+            group by ServiceName,{StorageConstaaa.Current.Trace.URL}
+            order by {StorageConstaaa.Current.Trace.URL}";
+        var result = new List<string>();
+        using var reader = await Query(sql, parameters);
+        while (await reader.NextResultAsync())
+            while (await reader.ReadAsync())
+                result.Add(reader[0].ToString()!);
+
+        return result;
+    }
+
+    public async Task<List<string>> GetErrorTypesAsync(BaseApmRequestDto query)
+    {
+        var (where, ors, parameters) = AppendWhere(query);
+        var sql = $@"select `Attributes.exception.type` from {Constants.ErrorTable} where {where} group by `Attributes.exception.type` order by `Attributes.exception.type`";
+        var result = new List<string>();
+        using var reader = await Query(sql, parameters);
+        while (await reader.NextResultAsync())
+            while (await reader.ReadAsync())
+                result.Add(reader[0].ToString()!);
+
+        return result;
+    }
+
     private async Task SetData<TResult>(string sql, List<ClickHouseParameter> parameters, PaginatedListBase<TResult> result, BaseApmRequestDto query, Func<IDataReader, TResult> parseFn) where TResult : class
     {
         var start = (query.Page - 1) * query.PageSize;
@@ -654,94 +652,91 @@ from(
 
     private static (string where, List<string> ors, List<ClickHouseParameter> parameters) AppendWhere<TQuery>(TQuery query) where TQuery : BaseApmRequestDto
     {
-        List<ClickHouseParameter> parameters = new();
-        var sql = new StringBuilder();
-        sql.AppendLine($" {StorageConstaaa.Current.Timestimap} between @startTime and @endTime");
-        parameters.Add(new ClickHouseParameter { ParameterName = "startTime", Value = MasaStackClickhouseConnection.ToTimeZone(query.Start), DbType = DbType.DateTime });
-        parameters.Add(new ClickHouseParameter { ParameterName = "endTime", Value = MasaStackClickhouseConnection.ToTimeZone(query.End), DbType = DbType.DateTime });
-        if (!string.IsNullOrEmpty(query.Env))
-        {
-            sql.AppendLine($" and {StorageConstaaa.Current.Environment}=@environment");
-            parameters.Add(new ClickHouseParameter { ParameterName = "environment", Value = query.Env });
-        }
-        if (!string.IsNullOrEmpty(query.Service))
-        {
-            sql.AppendLine($" and {StorageConstaaa.Current.ServiceName}=@serviceName");
-            parameters.Add(new ClickHouseParameter { ParameterName = "serviceName", Value = query.Service });
-        }
-        //if (query.IsServer.HasValue && (query.IsMetric == null || !query.IsMetric.Value))
+        (string where, List<ClickHouseParameter> parameters) = GetMetricWhere(query);
+        var sql = new StringBuilder(where);
+        var ors = new List<string>();
+
+        //sql.AppendLine($" {StorageConstaaa.Current.Timestimap} between @startTime and @endTime");
+        //parameters.Add(new ClickHouseParameter { ParameterName = "startTime", Value = MasaStackClickhouseConnection.ToTimeZone(query.Start), DbType = DbType.DateTime });
+        //parameters.Add(new ClickHouseParameter { ParameterName = "endTime", Value = MasaStackClickhouseConnection.ToTimeZone(query.End), DbType = DbType.DateTime });
+        //if (!string.IsNullOrEmpty(query.Env))
         //{
-        //    sql.AppendLine(" and SpanKind=@spanKind");
-        //    parameters.Add(new ClickHouseParameter { ParameterName = "spanKind", Value = query.IsServer.Value ? "SPAN_KIND_SERVER" : "SPAN_KIND_CLIENT" });
+        //    sql.AppendLine($" and {StorageConstaaa.Current.Environment}=@environment");
+        //    parameters.Add(new ClickHouseParameter { ParameterName = "environment", Value = query.Env });
         //}
-        AppendEndpoint(query as ApmEndpointRequestDto, sql, parameters);
-        AppendDuration(query as ApmTraceLatencyRequestDto, sql, parameters);
-        var ors = AppendRawQuery(query, parameters);
-        return (sql.ToString(), ors, parameters);
-    }
+        //if (!string.IsNullOrEmpty(query.Service))
+        //{
+        //    sql.AppendLine($" and {StorageConstaaa.Current.ServiceName}=@serviceName");
+        //    parameters.Add(new ClickHouseParameter { ParameterName = "serviceName", Value = query.Service });
+        //}
 
-    private static List<string> AppendRawQuery<TQuery>(TQuery query, List<ClickHouseParameter> parameters) where TQuery : BaseApmRequestDto
-    {
-
-        var list = new List<string>();
-        return list;
-        if (string.IsNullOrEmpty(query.Queries) || query.Queries.Trim().Length == 0)
-            return list;
-        //sql
-        if (query.Queries.Contains(" and ") || query.Queries.Contains(" or ") || query.Queries.Contains("='") || query.Queries.Contains(" in ") || query.Queries.Contains(" not in ") || query.Queries.Contains(" like ") || query.Queries.Contains(" not like  "))
+        if (!string.IsNullOrEmpty(query.ExType))
         {
-            list.Add(!query.Queries.Trim().StartsWith("and ", StringComparison.CurrentCultureIgnoreCase) ? $" and {query.Queries}" : query.Queries);
-            return list;
+            query.IsInstrument = true;
+            sql.AppendLine($" and {StorageConstaaa.Current.ExceptionType}=@exType");
+            parameters.Add(new ClickHouseParameter { ParameterName = "exType", Value = query.ExType });
         }
 
-        bool isTrace = query.IsTrace ?? default, isLog = query.IsLog ?? default, isError = query.IsError ?? default;
-        if (!(isTrace || isLog || isError))
-            return list;
-        var str = query.Queries.Trim();
-
-        if (Guid.TryParse(str, out var _))
+        if (!string.IsNullOrEmpty(query.TraceId))
         {
-            if (str.Length - 32 == 0)
+            query.IsInstrument = true;
+            sql.AppendLine($" and {StorageConstaaa.Current.TraceId}=@traceId");
+            parameters.Add(new ClickHouseParameter { ParameterName = "traceId", Value = query.TraceId });
+        }
+
+        if (!string.IsNullOrEmpty(query.TextField) && !string.IsNullOrEmpty(query.TextValue))
+        {
+            query.IsInstrument = true;
+            if (string.Equals(query.TextField, StorageConstaaa.Current.TraceId))
             {
-                list.Add($" and {StorageConstaaa.Current.TraceId}='{str}'");
+                sql.AppendLine($" and {StorageConstaaa.Current.TraceId}=@traceId");
+                parameters.Add(new ClickHouseParameter { ParameterName = "traceId", Value = query.TextValue.Trim() });
+            }
+            else if (string.Equals(query.TextField, StorageConstaaa.Current.SpanId))
+            {
+                sql.AppendLine($" and {StorageConstaaa.Current.SpanId}=@spanId");
+                parameters.Add(new ClickHouseParameter { ParameterName = "spanId", Value = query.TextValue.Trim() });
             }
             else
             {
-                list.Add($" and {StorageConstaaa.Current.Trace.UserId}='{str}'");
+                sql.AppendLine($" and `{query.TextField}` like @text");
+                parameters.Add(new ClickHouseParameter { ParameterName = "text", Value = $"%{query.TextValue}%" });
             }
-            return list;
         }
 
-        //status_code
-        if (int.TryParse(str, out int num) && num - -1 >= 0 && num - 600 < 0 && isTrace)
+        if (!string.IsNullOrEmpty(query.ExMessage))
         {
-            list.Add($" and {StorageConstaaa.Current.Trace.HttpStatusCode}='{query.Queries}'");
-            return list;
+            query.IsInstrument = true;
+            sql.AppendLine($" and {StorageConstaaa.Current.ExceptionMessage} like @exMessage");
+            parameters.Add(new ClickHouseParameter { ParameterName = "exMessage", Value = $"{query.ExMessage}%" });
         }
 
-        //exception
-        if (str.EndsWith("exception", StringComparison.CurrentCultureIgnoreCase) && Regex.IsMatch(str, @"[\da-zA-Z]+"))
+        //if (!string.IsNullOrEmpty(query.UrlParam))
+        //{
+        //    sql.AppendLine($" and {StorageConstaaa.Current.Trace.URLFull} like @urlParam");
+        //    parameters.Add(new ClickHouseParameter { ParameterName = "urlParam", Value = query.UrlParam });
+        //}
+
+        //if (!string.IsNullOrEmpty(query.BodyParam))
+        //{
+        //    sql.AppendLine($" and {StorageConstaaa.Current.Trace.HttpRequestBody} like @bodyParam");
+        //    parameters.Add(new ClickHouseParameter { ParameterName = "bodyParam", Value = query.BodyParam });
+        //}
+
+        //if (!string.IsNullOrEmpty(query.Body))
+        //{
+        //    sql.AppendLine($" and {StorageConstaaa.Current.Log.Body} like @body");
+        //    parameters.Add(new ClickHouseParameter { ParameterName = "body", Value = query.Body });
+        //}
+
+        AppendEndpoint(query as ApmEndpointRequestDto, sql, parameters);
+        AppendDuration(query as ApmTraceLatencyRequestDto, sql, parameters);
+        if (!string.IsNullOrEmpty(query.Queries))
         {
-            list.Add($" and {StorageConstaaa.Current.ExceptionType} = '{str}'");
-            return list;
+            sql.AppendLine(!query.Queries.Trim().StartsWith("and ", StringComparison.CurrentCultureIgnoreCase) ? $" and {query.Queries}" : query.Queries);
         }
 
-        if (isLog)
-        {
-            list.Add(ClickhouseHelper.AppendLike(StorageConstaaa.Current.Log.Body, "p1", str));
-
-        }
-        else if (isTrace)
-        {
-            list.Add(ClickhouseHelper.AppendLike(StorageConstaaa.Current.Trace.URL, "p1", str));
-            list.Add(ClickhouseHelper.AppendLike(StorageConstaaa.Current.Trace.HttpRequestBody, "p1", str));
-        }
-
-        if (!isTrace)
-            list.Add(ClickhouseHelper.AppendLike(StorageConstaaa.Current.ExceptionMessage, "p1", str));
-
-        parameters.Add(ClickhouseHelper.GetLikeParameter("p1", str));
-        return list;
+        return (sql.ToString(), ors, parameters);
     }
 
     private static string CombineOrs(string sql, IEnumerable<string> ors, string? orderBy = null, string? groupBy = null)
@@ -758,20 +753,42 @@ from(
         return text.ToString();
     }
 
-    private static void AppendEndpoint(ApmEndpointRequestDto? traceQuery, StringBuilder sql, List<ClickHouseParameter> parameters)
+    private static void AppendEndpoint(ApmEndpointRequestDto? traceQuery, StringBuilder sql, List<ClickHouseParameter> parameters, bool isMetric = false)
     {
-        if (traceQuery == null || string.IsNullOrEmpty(traceQuery.Endpoint))
+        if (traceQuery == null)
             return;
         var name = "endpoint";
         if (traceQuery.IsLog.HasValue && traceQuery.IsLog.Value)
         {
-            sql.AppendLine($" and {ClickhouseHelper.GetName(StorageConstaaa.Current.Log.Url, true)} like @{name}");
-            parameters.Add(new ClickHouseParameter { ParameterName = name, Value = $"{traceQuery.Endpoint}%" });
+            if (!string.IsNullOrEmpty(traceQuery.Endpoint))
+            {
+                sql.AppendLine($" and {ClickhouseHelper.GetName(StorageConstaaa.Current.Log.Url, true)} like @{name}");
+                parameters.Add(new ClickHouseParameter { ParameterName = name, Value = $"{traceQuery.Endpoint}%" });
+            }
         }
         else
         {
-            sql.AppendLine($" and {StorageConstaaa.Current.Trace.URL}=@{name}");
-            parameters.Add(new ClickHouseParameter { ParameterName = name, Value = traceQuery.Endpoint });
+            if (!string.IsNullOrEmpty(traceQuery.Endpoint))
+            {
+                sql.AppendLine($" and {StorageConstaaa.Current.Trace.URL}=@{name}");
+                parameters.Add(new ClickHouseParameter { ParameterName = name, Value = traceQuery.Endpoint });
+            }
+
+            if (!string.IsNullOrEmpty(traceQuery.Method))
+            {
+                sql.AppendLine($" and {StorageConstaaa.Current.Trace.HttpMethod}=@method");
+                parameters.Add(new ClickHouseParameter { ParameterName = "method", Value = traceQuery.Endpoint });
+            }
+
+            if (!isMetric)
+            {
+                if (traceQuery.IsTrace.HasValue && traceQuery.IsTrace!.Value && !string.IsNullOrEmpty(traceQuery.StatusCode))
+                {
+                    traceQuery.IsInstrument = true;
+                    sql.AppendLine($" and {StorageConstaaa.Current.Trace.HttpStatusCode}=@status_code");
+                    parameters.Add(new ClickHouseParameter { ParameterName = "status_code", Value = traceQuery.StatusCode });
+                }
+            }
         }
     }
 
@@ -813,20 +830,17 @@ from(
 
     private Task<object?> Scalar(string sql, IEnumerable<ClickHouseParameter> parameters)
     {
-        //lock (lockObj)
+        command.CommandText = sql;
+        SetParameters(parameters);
+        var start = DateTime.Now;
+        try
         {
-            command.CommandText = sql;
-            SetParameters(parameters);
-            var start = DateTime.Now;
-            try
-            {
-                return command.ExecuteScalarAsync();
-            }
-            finally
-            {
-                var end = DateTime.Now;
-                Log(start, end, sql, parameters);
-            }
+            return command.ExecuteScalarAsync();
+        }
+        finally
+        {
+            var end = DateTime.Now;
+            Log(start, end, sql, parameters);
         }
     }
 
@@ -867,6 +881,7 @@ from(
             _dbConnection.Dispose();
         }
     }
+
 
     private async Task<List<ChartLineCountDto>> GetChartCountData(string sql, IEnumerable<ClickHouseParameter> parameters, ComparisonTypes? comparisonTypes = null)
     {
@@ -987,5 +1002,34 @@ from(
         }
 
         return "1 month";
+    }
+
+
+
+
+
+
+
+
+    private static (string, List<ClickHouseParameter>) GetMetricWhere<TRequest>(TRequest query, bool isContainsEndpoint = false) where TRequest : BaseApmRequestDto
+    {
+        List<ClickHouseParameter> parameters = new();
+        var sql = new StringBuilder();
+        sql.AppendLine($" {StorageConstaaa.Current.Timestimap} between @startTime and @endTime");
+        parameters.Add(new ClickHouseParameter { ParameterName = "startTime", Value = MasaStackClickhouseConnection.ToTimeZone(query.Start), DbType = DbType.DateTime });
+        parameters.Add(new ClickHouseParameter { ParameterName = "endTime", Value = MasaStackClickhouseConnection.ToTimeZone(query.End), DbType = DbType.DateTime });
+        if (!string.IsNullOrEmpty(query.Env))
+        {
+            sql.AppendLine($" and {StorageConstaaa.Current.Environment}=@environment");
+            parameters.Add(new ClickHouseParameter { ParameterName = "environment", Value = query.Env });
+        }
+        if (!string.IsNullOrEmpty(query.Service))
+        {
+            sql.AppendLine($" and {StorageConstaaa.Current.ServiceName}=@serviceName");
+            parameters.Add(new ClickHouseParameter { ParameterName = "serviceName", Value = query.Service });
+        }
+        if (isContainsEndpoint)
+            AppendEndpoint(query as ApmEndpointRequestDto, sql, parameters, true);
+        return (sql.ToString(), parameters);
     }
 }

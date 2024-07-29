@@ -27,6 +27,22 @@ public class BaseApmRequestDto : RequestPageBase
 
     public bool HasPage { get; set; } = true;
 
+    public string ExType { get; set; }
+
+    public string TraceId { get; set; }
+
+    public string TextField { get; set; }
+
+    public string TextValue { get; set; }
+
+    public string ExMessage { get; set; }
+
+    //public string UrlParam { get; set; }
+
+    //public string BodyParam { get; set; }
+
+    //public string Body { get; set; }
+
     internal int[] GetErrorStatusCodes() => string.IsNullOrEmpty(StatusCodes) ? Constants.DefaultErrorStatus : StatusCodes.Split(',').Select(s => Convert.ToInt32(s)).Where(num => num != 0).ToArray();
 
     internal bool? IsServer { get; set; } = true;
@@ -38,4 +54,6 @@ public class BaseApmRequestDto : RequestPageBase
     internal bool? IsLog { get; set; }
 
     internal bool? IsError { get; set; }
+
+    internal bool IsInstrument { get; set; } = false;
 }

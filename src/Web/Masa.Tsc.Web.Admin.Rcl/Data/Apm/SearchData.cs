@@ -5,7 +5,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Data.Apm;
 
 public class SearchData
 {
-    public string Text { get; set; }
+    //public string Text { get; set; }
 
     public DateTime Start { get; set; }
 
@@ -19,7 +19,13 @@ public class SearchData
 
     public ApmComparisonTypes ComparisonType { get; set; }
 
-    //public long Timestamp { get; set; }
+    public string TextField { get; set; }
+
+    public string TextValue { get; set; }
+
+    public string Status { get; set; }
+
+    public string Method { get; set; }
 
     public string ExceptionType { get; set; }
 
@@ -27,7 +33,7 @@ public class SearchData
 
     public string TraceId { get; set; }
 
-    public string SpanId { get; set; }    
+    public string SpanId { get; set; }
 }
 
 public enum ApmComparisonTypes

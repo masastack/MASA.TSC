@@ -3,15 +3,9 @@
 
 @if (Search != null)
 {
-    @if (ShowText)
+    if (IsService)
     {
-        <div class="d-flex mb-4">
-            <ApmInputSearchComponent Value="@Search.Text" ValueChanged="OnTextChanged" />
-        </div>
-    }
-    <div class="d-flex mb-4 @(ShowText?"":"pt-2")">
-        @if (ShowEnv)
-        {
+        <div class="d-flex pt-2 mb-4">
             <SAutoComplete Label="@I18n.Apm("Search.Environment")"
                            Clearable
                            Items="environments"
@@ -29,10 +23,7 @@
                            BackgroundColor="white"
                            Value=Search.Environment
                            ValueChanged="OnEnvironmentChanged" />
-        }
 
-        @if (ShowService)
-        {
             <SAutoComplete Value=Search.Service
                            ValueChanged="OnServiceChanged"
                            Items="services"
@@ -50,11 +41,8 @@
                            Clearable
                            Class="rounded-2 mr-1"
                            Style="max-width:300px" />
-        }
 
-        @if (ShowComparison)
-        {
-            <SAutoComplete Placeholder="@I18n.Apm("Comparison")"
+            <SAutoComplete Placeholder="@I18n.Apm("Search.Comparison")"
                            Label="@I18n.Apm("Search.Comparison")"
                            Clearable
                            BackgroundColor="white"
@@ -70,9 +58,7 @@
                            HideSelected=false
                            Class="rounded-2 mr-1"
                            Style="max-width:200px" />
-        }
-        @if (ShowTime)
-        {
+
             <SDateTimeRangeToolbar Class="my-auto"
                                    StartDateTime="@Search.Start.ToDateTimeOffset(CurrentTimeZone)"
                                    EndDateTime="@Search.End.ToDateTimeOffset(CurrentTimeZone)"
@@ -82,10 +68,147 @@
                                    ShowTimeZoneSelector
                                    DefaultQuickRange="quickRangeKey"
                                    ShowInterval />
-        }
-        @* @if (ShowButton)
+        </div>
+    }
+    else
     {
-    <SButton OnClick="OnValueChanged" Color="white my-auto ml-auto rounded-2"><SIcon Small Class="pr-2">mdi-refresh</SIcon>@I18n.Apm("Search.Refresh")</SButton>
-    } *@
-    </div>
+        <div class="d-flex pt-2">
+            <SAutoComplete Label="@I18n.Apm("Search.Environment")"
+                           Clearable
+                           Items="environments"
+                           TItem="string"
+                           TValue="string"
+                           TItemValue="string"
+                           ItemText="item=>item"
+                           ItemValue="item=>item"
+                           Style="max-width:200px"
+                           Class="rounded-2 mr-1"
+                           Disabled="isEnvLoading"
+                           Loading="isEnvLoading"
+                           Small
+                           HideSelected=false
+                           BackgroundColor="white"
+                           Value=Search.Environment
+                           ValueChanged="OnEnvironmentChanged" />
+
+            <SAutoComplete Value=Search.Service
+                           ValueChanged="OnServiceChanged"
+                           Items="services"
+                           TItem="string"
+                           TValue="string"
+                           TItemValue="string"
+                           ItemText="item=>item"
+                           ItemValue="item=>item"
+                           Disabled="isServiceLoading"
+                           Small
+                           HideSelected=false
+                           Label="@I18n.Apm("Search.Service")"
+                           BackgroundColor="white"
+                           Loading="isServiceLoading"
+                           Clearable
+                           Class="rounded-2 mr-1"
+                           Style="max-width:300px" />            
+            @if (IsEndpoint)
+            {
+                <SAutoComplete Placeholder="@I18n.Apm("Search.Endpoint")"
+                               Label="@I18n.Apm("Search.Endpoint")"
+                               Clearable
+                               BackgroundColor="white"
+                               Items="endpoints"
+                               TItem="string"
+                               TValue="string"
+                               TItemValue="string"
+                               ItemText="item=>item"
+                               ItemValue="item=>item"
+                               ValueChanged="OnEndpointChange"
+                               Value=Search.Endpoint
+                               Small
+                               HideSelected=false
+                               Class="rounded-2 mr-1"
+                               Style="max-width:200px" />
+
+                <SAutoComplete Placeholder="@I18n.Apm("Search.StatusCode")"
+                               Label="@I18n.Apm("Search.StatusCode")"
+                               Clearable
+                               BackgroundColor="white"
+                               Items="statuses"
+                               TItem="string"
+                               TValue="string"
+                               TItemValue="string"
+                               ItemText="item=>item"
+                               ItemValue="item=>item"
+                               ValueChanged="OnStatusCodeChange"
+                               Value=Search.Status
+                               Small
+                               HideSelected=false
+                               Class="rounded-2 mr-1"
+                               Style="max-width:200px" />
+            }
+            <SDateTimeRangeToolbar Class="my-auto"
+                                   StartDateTime="@Search.Start.ToDateTimeOffset(CurrentTimeZone)"
+                                   EndDateTime="@Search.End.ToDateTimeOffset(CurrentTimeZone)"
+                                   OnUpdate="OnTimeUpdate"
+                                   OnAutoUpdate="OnTimeUpdate"
+                                   ShowQuickChange
+                                   ShowTimeZoneSelector
+                                   DefaultQuickRange="quickRangeKey"
+                                   ShowInterval />
+        </div>
+
+        <div class="d-flex pt-2 mb-4">
+            @if (ShowComparison)
+            {
+                <SAutoComplete Placeholder="@I18n.Apm("Search.Comparison")"
+                               Label="@I18n.Apm("Search.Comparison")"
+                               Clearable
+                               BackgroundColor="white"
+                               Items="listComparisons"
+                               TItem="(ApmComparisonTypes value, string text)"
+                               TValue="ApmComparisonTypes"
+                               TItemValue="ApmComparisonTypes"
+                               ItemText="item=>item.text"
+                               ItemValue="item=>item.value"
+                               ValueChanged="OnSelectChanged"
+                               Value=Search.ComparisonType
+                               Small
+                               HideSelected=false
+                               Class="rounded-2 mr-1"
+                               Style="max-width:200px" />
+            }
+            @if (!IsService && !IsEndpoint)
+            {
+                <SAutoComplete Placeholder="@I18n.Apm("Search.ExceptionType")"
+                Label="@I18n.Apm("Search.ExceptionType")"
+                Clearable
+                BackgroundColor="white"
+                Items="exceptions"
+                TItem="string"
+                TValue="string"
+                TItemValue="string"
+                ItemText="item=>item"
+                ItemValue="item=>item"
+                ValueChanged="OnExceptionChange"
+                Value=Search.ExceptionType
+                Small
+                HideSelected=false
+                Class="rounded-2 mr-1"
+                Style="max-width:200px" />
+            }
+            <SSelect Small @bind-Value="@Search.TextField"
+                     Placeholder="@I18n.Apm("Search.SelectFiled")"
+                     Label="@I18n.Apm("Search.SelectFiled")"
+                     Items="@textFileds"
+                     ItemText="item => item"
+                     ItemValue="item => item"
+                     BackgroundColor="white"
+                     HideDetails="@("auto")"
+                     TItem="string"
+                     TItemValue="string"
+                     TValue="string"
+                     Class="fill-card body2 mr-1"
+                     Style="max-width:200px">
+            </SSelect>
+            <STextField BackgroundColor="white" @bind-Value="@Search.TextValue" OnEnter="OnMessageEnter" Class="rounded-2" Style="width:100%" Small />
+        </div>
+    }
 }

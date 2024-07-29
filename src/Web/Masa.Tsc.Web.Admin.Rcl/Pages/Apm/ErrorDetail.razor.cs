@@ -1,16 +1,12 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Storage.Contracts;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm;
 
 public partial class ErrorDetail
 {
-    [Parameter]
-    public string Type { get; set; }
-
-    [Parameter]
-    public string Message { get; set; }
-
     [Parameter]
     public bool Show { get; set; }
 
@@ -71,11 +67,11 @@ public partial class ErrorDetail
         if (!Show)
             return;
         var key = MD5Utils.Encrypt(JsonSerializer.Serialize(Search));
-        if (lastKey != key || lastType != Type || lastMessage != Message)
+        if (lastKey != key || lastType != Search.ExceptionType || lastMessage != Search.ExceptionMsg)
         {
             lastKey = key;
-            lastType = Type;
-            lastMessage = Message;
+            lastType = Search.ExceptionType;
+            lastMessage = Search.ExceptionMsg;
             currentPage = 1;
             currentLog = default;
             _dic?.Clear();
@@ -84,36 +80,43 @@ public partial class ErrorDetail
         }
     }
 
-    private string GetText
-    {
-        get
-        {
-            var append = new StringBuilder();
-            if (!string.IsNullOrEmpty(SearchData.TraceId))
-                append.AppendFormat(" and `TraceId`='{0}'", SearchData.TraceId);
-            if (!string.IsNullOrEmpty(Type))
-                append.AppendFormat(" and `Attributes.exception.type`='{0}'", Type);
-            if (!string.IsNullOrEmpty(Message))
-                append.AppendFormat(" and `Body` like '{0}%'", Message.Replace("x2E", ".").Replace("'", "''").Split(':')[0]);
-            append.Remove(0, 5);
-            return append.ToString();
-        }
-    }
-
     private async Task LoadLogAysnc()
     {
         currentLog = default!;
-        var result = await ApiCaller.LogService.GetPageAsync(new LogPageQueryDto
+        var query = new BaseRequestDto
         {
             Service = Search.Service!,
-            Env = Search.Environment!,
             PageSize = 1,
             Page = currentPage,
-            Query = GetText,
             Start = Search.Start,
-            End = Search.End,
-            IsLimitEnv = false
-        });
+            End = Search.End
+        };
+        var list = new List<FieldConditionDto>();
+        if (!string.IsNullOrEmpty(Search.Environment))
+        {
+            list.Add(new FieldConditionDto { Name = StorageConstaaa.Current.Environment, Value = Search.Environment, Type = ConditionTypes.Equal });
+        }
+        if (!string.IsNullOrEmpty(Search.ExceptionType))
+        {
+            list.Add(new FieldConditionDto { Name = StorageConstaaa.Current.ExceptionType, Value = Search.ExceptionType, Type = ConditionTypes.Equal });
+        }
+        if (!string.IsNullOrEmpty(Search.ExceptionMsg))
+        {
+            list.Add(new FieldConditionDto { Name = StorageConstaaa.Current.Log.Body, Value = Search.ExceptionMsg, Type = ConditionTypes.Regex });
+        }
+        if (!string.IsNullOrEmpty(Search.TextField) && !string.IsNullOrEmpty(Search.TextValue))
+        {
+            if (Search.TextField == StorageConstaaa.Current.ExceptionMessage || Search.TextField == StorageConstaaa.Current.Log.Body)
+            {
+                list.Add(new FieldConditionDto { Name = Search.TextField, Value = Search.TextValue, Type = ConditionTypes.Regex });
+            }
+            else
+            {
+                list.Add(new FieldConditionDto { Name = Search.TextField, Value = Search.TextValue, Type = ConditionTypes.Equal });
+            }
+        }
+        query.Conditions = list;
+        var result = await ApiCaller.ApmService.GetLogListAsync(query);
         if (currentPage == 1)
         {
             total = (int)result.Total;
@@ -171,7 +174,7 @@ public partial class ErrorDetail
         {
             Start = Search.Start,
             End = Search.End,
-            Queries = GetText,
+            //Queries = GetText,
             Service = Search.Service,
             Endpoint = Search.Endpoint!,
             Env = Search.Environment,

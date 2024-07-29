@@ -26,11 +26,11 @@ public partial class Endpoint
     public async Task OnTableOptionsChanged(DataOptions sort)
     {
         if (sort.SortBy.Any())
-            sortFiled = sort.SortBy.First();
+            sortFiled = sort.SortBy[0];
         else
             sortFiled = default;
         if (sort.SortDesc.Any())
-            sortBy = sort.SortDesc.First();
+            sortBy = sort.SortDesc[0];
         else
             sortBy = default;
         await LoadASync();
@@ -47,7 +47,10 @@ public partial class Endpoint
     {
         isTableLoading = true;
         if (data != null)
+        {
+            page = 1;
             Search = data;
+        }
         StateHasChanged();
         await LoadPageDataAsync();
         isTableLoading = false;
@@ -58,7 +61,7 @@ public partial class Endpoint
     private async Task LoadPageDataAsync()
     {
         isTableLoading = true;
-        var query = new BaseApmRequestDto
+        var query = new ApmEndpointRequestDto
         {
             Page = page,
             PageSize = defaultSize,
@@ -68,7 +71,14 @@ public partial class Endpoint
             Env = Search.Environment,
             IsDesc = sortBy,
             Service = Search.Service,
-            Queries = Search.Text
+            TraceId = Search.TraceId,
+            ExType = Search.ExceptionType,
+            StatusCodes = Search.Status,
+            TextField = Search.TextField,
+            TextValue = Search.TextValue,
+            Endpoint = Search.Endpoint ?? string.Empty,
+            StatusCode = Search.Status,
+            //Queries = Search.Text
         };
         var result = await ApiCaller.ApmService.GetEndpointPageAsync(query);
         data.Clear();
@@ -109,7 +119,7 @@ public partial class Endpoint
 
         foreach (var service in data)
         {
-            var chartData = result.FirstOrDefault(s => s.Name == service.Name);
+            var chartData = result.Find(s => s.Name == service.Name);
             service.LatencyChartData = new();
             service.ThroughputChartData = new();
             service.FailedChartData = new();

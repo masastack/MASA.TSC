@@ -27,8 +27,8 @@ public partial class ServiceErrors
     private int page = 1;
     private List<ErrorMessageDto> data = new();
     private bool isTableLoading = false;
-    private string? sortFiled;
-    private bool? sortBy;
+    private string sortFiled = nameof(ErrorMessageDto.Total);
+    private bool sortBy = true;
     private string lastKey = string.Empty;
     private ChartData chart = new();
 
@@ -36,11 +36,11 @@ public partial class ServiceErrors
     private async Task OnTableOptionsChanged(DataOptions sort)
     {
         if (sort.SortBy.Any())
-            sortFiled = sort.SortBy.First();
+            sortFiled = sort.SortBy[0];
         else
-            sortFiled = default;
+            sortFiled = default!;
         if (sort.SortDesc.Any())
-            sortBy = sort.SortDesc.First();
+            sortBy = sort.SortDesc[0];
         else
             sortBy = default;
         await LoadASync();
@@ -110,7 +110,7 @@ public partial class ServiceErrors
     {
         if (isTableLoading) return;
         isTableLoading = true;
-        if (string.IsNullOrEmpty(SearchData.Service) && string.IsNullOrEmpty(SearchData.Text))
+        if (string.IsNullOrEmpty(SearchData.Service) && string.IsNullOrEmpty(SearchData.TraceId))
         {
             total = 0;
             data = new();
@@ -124,7 +124,8 @@ public partial class ServiceErrors
                 Start = SearchData.Start,
                 End = SearchData.End,
                 OrderField = sortFiled,
-                Queries = Search.Text,
+                //Queries = Search.Text,
+                TraceId = SearchData.TraceId,
                 Service = SearchData.Service,
                 Env = SearchData.Environment,
                 IsDesc = sortBy,
@@ -161,13 +162,12 @@ public partial class ServiceErrors
         return chart;
     }
 
-    string? type = default, message = default;
     bool showDetail = false;
 
     private void Show(string? type = default, string? message = default)
     {
-        this.type = type;
-        this.message = message;
+        Search.ExceptionType = type!;
+        Search.ExceptionMsg = message!;
         showDetail = true;
         StateHasChanged();
     }

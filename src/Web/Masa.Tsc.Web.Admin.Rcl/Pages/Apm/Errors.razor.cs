@@ -20,17 +20,17 @@ public partial class Errors
     private int page = 1;
     private List<ErrorMessageDto> data = new();
     private bool isTableLoading = false;
-    private string? sortFiled;
-    private bool? sortBy;
+    private string sortFiled = nameof(ErrorMessageDto.Total);
+    private bool sortBy = true;
 
     public async Task OnTableOptionsChanged(DataOptions sort)
     {
         if (sort.SortBy.Any())
-            sortFiled = sort.SortBy.First();
+            sortFiled = sort.SortBy[0];
         else
-            sortFiled = default;
+            sortFiled = default!;
         if (sort.SortDesc.Any())
-            sortBy = sort.SortDesc.First();
+            sortBy = sort.SortDesc[0];
         else
             sortBy = default;
         await LoadASync();
@@ -72,7 +72,10 @@ public partial class Errors
             Env = Search.Environment,
             IsDesc = sortBy,
             Service = Search.Service,
-            Queries = Search.Text
+            ExType = Search.ExceptionType,
+            TextField = Search.TextField,
+            TextValue = Search.TextValue
+            //Queries = Search.Text
         };
         var result = await ApiCaller.ApmService.GetErrorsPageAsync(query);
         data.Clear();
@@ -83,13 +86,12 @@ public partial class Errors
         total = (int)result.Total;
     }
 
-    string? type = default, message = default;
     bool showDetail = false;
 
     private void Show(string? type = default, string? message = default)
     {
-        this.type = type;
-        this.message = message;
+        Search.ExceptionType = type!;
+        Search.ExceptionMsg = message!;
         showDetail = true;
         StateHasChanged();
     }

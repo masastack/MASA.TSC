@@ -36,16 +36,16 @@ public partial class OverView
         }
     }
 
-    protected override void OnInitialized()
-    {
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        var queries = HttpUtility.ParseQueryString(uri.Query);
-        var endpoint = queries.Get("endpoint");
-        SearchData.Endpoint = endpoint;
-        query.Endpoint = endpoint!;
-        //traceId = queries.Get("traceId");
-        base.OnInitialized();
-    }
+    //protected override void OnInitialized()
+    //{
+    //    var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+    //    var queries = HttpUtility.ParseQueryString(uri.Query);
+    //    var endpoint = queries.Get("endpoint");
+    //    SearchData.Endpoint = endpoint;
+    //    query.Endpoint = endpoint!;
+    //    //traceId = queries.Get("traceId");
+    //    base.OnInitialized();
+    //}
 
     private async Task LoadTraceDetailAsync(int page = 1)
     {
@@ -66,7 +66,8 @@ public partial class OverView
                 Env = SearchData.Environment!,
                 Page = 1,
                 PageSize = 100,
-                Queries = SearchData.Text,
+                Method=query.Method,                 
+                //Queries = SearchData.Text,
                 OrderField = "Timestamp",
                 IsDesc = true
             });
@@ -84,11 +85,12 @@ public partial class OverView
                 Start = SearchData.Start,
                 End = SearchData.End,
                 Endpoint = SearchData.Endpoint!,
+                Method = query.Method,
                 Service = SearchData.Service!,
                 Env = SearchData.Environment!,
                 Page = 1,
                 PageSize = 100,
-                Queries = SearchData.Text,
+                //Queries = SearchData.Text,
                 OrderField = "Timestamp",
                 IsDesc = false,
                 HasPage = true
@@ -159,7 +161,7 @@ public partial class OverView
             Service = SearchData.Service,
             Env = SearchData.Environment,
             Endpoint = SearchData.Endpoint!,
-            Queries = SearchData.Text,
+            //Queries = SearchData.Text,
             ComparisonType = SearchData.ComparisonType.ToComparisonType()
         };
         var data = await ApiCaller.ApmService.GetChartsAsync(query);
@@ -239,7 +241,8 @@ public partial class OverView
             Service = SearchData.Service,
             Env = SearchData.Environment,
             Endpoint = SearchData.Endpoint!,
-            Queries = SearchData.Text,
+            Method = SearchData.Method,             
+            //Queries = SearchData.Text,
             ComparisonType = SearchData.ComparisonType.ToComparisonType()
         };
         await LoadTraceDetailAsync();

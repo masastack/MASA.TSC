@@ -25,8 +25,8 @@ public class ApmService : ServiceBase
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
         });
 
-    public async Task<PaginatedListBase<EndpointListDto>> GetEndpoints([FromServices] IApmService apmService, int page, int pageSize, string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
-        => await apmService.EndpointPageAsync(new BaseApmRequestDto
+    public async Task<PaginatedListBase<EndpointListDto>> GetEndpoints([FromServices] IApmService apmService, int page, int pageSize, string start, string end, string? env, string? service, string? endpoint, string? statusCode, string? textField, string? textValue, string? exType, string? traceId, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
+        => await apmService.EndpointPageAsync(new ApmEndpointRequestDto
         {
             Start = start.ParseUTCTime(),
             End = end.ParseUTCTime(),
@@ -37,6 +37,12 @@ public class ApmService : ServiceBase
             IsDesc = isDesc,
             Page = page,
             PageSize = pageSize,
+            Endpoint = endpoint!,
+            TextField = textField,
+            TextValue = textValue,
+            StatusCode = statusCode,
+            ExType = exType,
+            TraceId = traceId,
             Service = service,
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
         });
@@ -66,7 +72,7 @@ public class ApmService : ServiceBase
         return await apmService.ChartDataAsync(queryDto);
     }
 
-    public async Task<EndpointLatencyDistributionDto> GetLatencyDistributions([FromServices] IApmService apmService, string start, string end, string? env, string? service, string endpoint)
+    public async Task<EndpointLatencyDistributionDto> GetLatencyDistributions([FromServices] IApmService apmService, string start, string end, string? env, string? service, string endpoint, string? method, string? textField, string? textValue, string? exType, string? traceId)
         => await apmService.EndpointLatencyDistributionAsync(new ApmEndpointRequestDto
         {
             Start = start.ParseUTCTime(),
@@ -74,10 +80,11 @@ public class ApmService : ServiceBase
             Env = GetEnv(env),
             Service = service,
             Endpoint = endpoint,
+            Method = method!,
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
         });
 
-    public async Task<PaginatedListBase<ErrorMessageDto>> GetErrors([FromServices] IApmService apmService, int page, int pageSize, string start, string end, string? env, string? service, string? endpoint, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
+    public async Task<PaginatedListBase<ErrorMessageDto>> GetErrors([FromServices] IApmService apmService, int page, int pageSize, string start, string end, string? env, string? service, string? endpoint, string? exType, string? textField, string? textValue, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc, string? traceId)
         => await apmService.ErrorMessagePageAsync(new ApmEndpointRequestDto
         {
             Start = start.ParseUTCTime(),
@@ -88,8 +95,12 @@ public class ApmService : ServiceBase
             OrderField = orderField,
             IsDesc = isDesc,
             Page = page,
+            ExType = exType!,
+            TextField = textField!,
+            TextValue = textValue!,
             PageSize = pageSize,
-            Service = service
+            Service = service,
+            TraceId = traceId!
         });
 
     public Task<IEnumerable<ChartPointDto>> GetSpanErrors([FromServices] IApmService apmService, int page, int pageSize, string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
@@ -161,6 +172,15 @@ public class ApmService : ServiceBase
 
     public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceList([FromServices] IApmService apmService, [FromBody] ApmEndpointRequestDto query)
         => apmService.GetSimpleTraceListAsync(query);
+
+    public Task<List<string>> GetEndpointList([FromServices] IApmService apmService, [FromBody] BaseApmRequestDto query)
+        => apmService.GetEndpointsAsync(query);
+
+    public Task<List<string>> GetStatusCodes([FromServices] IApmService apmService)
+        => apmService.GetStatusCodesAsync();
+
+    public Task<List<string>> GetErrorTypes([FromServices] IApmService apmService, [FromBody] BaseApmRequestDto query)
+        => apmService.GetErrorTypesAsync(query);
 
     private static string? GetEnv(string? env) => string.Equals("all", env, StringComparison.CurrentCultureIgnoreCase) ? default : env;
 }

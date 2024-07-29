@@ -63,6 +63,6 @@
     </div>
 </div>
 
-<SSheetDialog @bind-Value="showDetail" Title="@(message??type)">
-    <ErrorDetail Type="@type" Message="@message" SearchData="@Search" Show="showDetail" />
+<SSheetDialog @bind-Value="showDetail" Title="@(Search.ExceptionMsg??Search.ExceptionType)">
+    <ErrorDetail SearchData="@Search" Show="showDetail" />
 </SSheetDialog>

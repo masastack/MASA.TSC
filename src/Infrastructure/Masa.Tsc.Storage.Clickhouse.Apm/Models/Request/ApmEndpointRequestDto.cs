@@ -6,4 +6,8 @@ namespace Masa.Tsc.Storage.Clickhouse.Apm.Models.Request;
 public class ApmEndpointRequestDto : BaseApmRequestDto
 {
     public string Endpoint { get; set; }
+
+    public string StatusCode { get; set; }    
+
+    public string Method { get; set; }
 }

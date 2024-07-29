@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Storage.Contracts;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Shared;
 
 public partial class TscComponentBase : MasaComponentBase, IAsyncDisposable
@@ -52,9 +54,23 @@ public partial class TscComponentBase : MasaComponentBase, IAsyncDisposable
         if (UserContext != null && !string.IsNullOrEmpty(UserContext.UserId))
             CurrentUserId = Guid.Parse(UserContext.UserId);
         Loading = false;
-
+        await SetStorage();
         await base.OnInitializedAsync();
     }
+
+    protected async Task SetStorage()
+    {
+        await base.OnInitializedAsync();
+        if (StorageConstaaa.Current != null) return;
+        var setting = await ApiCaller.SettingService.GetStorage();
+        if (setting == null)
+            throw new Exception("Storage setting is null");
+        if (setting.IsClickhouse)
+            StorageConstaaa.Init(new ClickhouseStorageConst());
+        else if (setting.IsElasticsearch)
+            ;//
+    }
+
 
     public async Task<bool> OpenConfirmDialog(string content)
     {

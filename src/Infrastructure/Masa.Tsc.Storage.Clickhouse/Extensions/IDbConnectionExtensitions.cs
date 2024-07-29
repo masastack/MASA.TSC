@@ -297,6 +297,16 @@ internal static class IDbConnectionExtensitions
                     ParseWhere(sql, item.Value, paramerters, fieldName, $"gt_{paramName}", ">");
                 }
                 break;
+            case ConditionTypes.Regex:
+                {
+                    ParseWhere(sql, $"%{item.Value}%", paramerters, fieldName, $"paramName", "like");
+                }
+                break;
+            case ConditionTypes.NotRegex:
+                {
+                    ParseWhere(sql, $"%{item.Value}%", paramerters, fieldName, $"paramName", "not like");
+                }
+                break;
         }
     }
 

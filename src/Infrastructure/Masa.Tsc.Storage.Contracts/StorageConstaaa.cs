@@ -17,6 +17,8 @@ public class StorageConstaaa
         }
     }
 
+    public static void Init(StorageConstaaa current) => Current ??= current;
+
     public virtual string Timestimap => "Timestamp";
 
     public virtual string ServiceName => "Resource.service.name";

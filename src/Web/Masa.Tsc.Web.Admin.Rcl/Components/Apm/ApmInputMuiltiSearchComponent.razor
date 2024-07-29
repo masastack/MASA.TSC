@@ -1,0 +1,70 @@
+﻿@* @namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm
+@inherits ApmComponentBase
+
+<div class="d-flex">
+    <SAutoComplete Placeholder="@I18n.Apm("Endpoint")"
+                   Label="@I18n.Apm("Search.Endpoint")"
+                   Clearable
+                   BackgroundColor="white"
+                   Items="endpoints"
+                   TItem="string"
+                   TValue="string"
+                   TItemValue="string"
+                   ItemText="item=>item"
+                   ItemValue="item=>item"
+                   ValueChanged="OnEndpointChange"
+                   Value=Value.Endpoint
+                   Small
+                   HideSelected=false
+                   Class="rounded-2 mr-1"
+                   Style="max-width:200px" />
+
+    <SAutoComplete Placeholder="@I18n.Apm("StatusCode")"
+                   Label="@I18n.Apm("Search.StatusCode")"
+                   Clearable
+                   BackgroundColor="white"
+                   Items="statuses"
+                   TItem="string"
+                   TValue="string"
+                   TItemValue="string"
+                   ItemText="item=>item"
+                   ItemValue="item=>item"
+                   ValueChanged="OnStatusCodeChange"
+                   Value=Value.Status
+                   Small
+                   HideSelected=false
+                   Class="rounded-2 mr-1"
+                   Style="max-width:200px" />
+</div>
+
+<div class="d-flex">
+    <div>
+        <SSearch BackgroundColor="white" @bind-Value="@Value.UrlParam" OnEnter="OnMessageEnter" Class="rounded-2" Style="width:100%" />
+    </div>
+    <div>
+        <SSearch BackgroundColor="white" @bind-Value="@Value.BodyParam" OnEnter="OnMessageEnter" Class="rounded-2" Style="width:100%" />
+    </div>
+</div>
+
+<div class="d-flex">
+    <SAutoComplete Placeholder="@I18n.Apm("ExceptionType")"
+                   Label="@I18n.Apm("Search.ExceptionType")"
+                   Clearable
+                   BackgroundColor="white"
+                   Items="exceptions"
+                   TItem="string"
+                   TValue="string"
+                   TItemValue="string"
+                   ItemText="item=>item"
+                   ItemValue="item=>item"
+                   ValueChanged="OnExceptionChange"
+                   Value=Value.Type
+                   Small
+                   HideSelected=false
+                   Class="rounded-2 mr-1"
+                   Style="max-width:200px" />
+    <div>
+        <SSearch BackgroundColor="white" @bind-Value="@Value.Message" OnEnter="OnMessageEnter" Class="rounded-2" Style="width:100%" />
+    </div>
+</div>
+ *@

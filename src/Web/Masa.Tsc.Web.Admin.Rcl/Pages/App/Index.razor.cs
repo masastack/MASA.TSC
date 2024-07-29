@@ -52,7 +52,7 @@ public partial class Index
         Search.Service = string.Empty;
         Search.Endpoint = string.Empty;
         Search.Environment = string.Empty;
-        Search.Text = string.Empty;
+        //Search.Text = string.Empty;
         Search.TraceId = string.Empty;
         string
             start = values.Get("start"), end = values.Get("end"),
@@ -167,7 +167,7 @@ public partial class Index
     private async Task UserChange(Guid userId)
     {
         if (_userId == userId)
-            return;
+            return;       
         ClearData();
         _userId = userId;
         if (roles == null)
@@ -489,6 +489,5 @@ public partial class Index
         Search.Environment = default!;
         Search.Endpoint = default!;
         Search.TraceId = currentTrace?.Data.TraceId!;
-        Search.Text = currentTrace != null ? $"TraceId='{currentTrace.Data.TraceId}'" : string.Empty;
     }
 }

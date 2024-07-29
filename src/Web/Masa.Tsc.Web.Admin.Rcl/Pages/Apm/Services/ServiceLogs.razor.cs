@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Storage.Contracts;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services;
 
 public partial class ServiceLogs
@@ -112,27 +114,43 @@ public partial class ServiceLogs
     {
         if (isTableLoading) return;
         isTableLoading = true;
-        if (string.IsNullOrEmpty(SearchData.Service) && string.IsNullOrEmpty(SearchData.Text))
+        if (string.IsNullOrEmpty(SearchData.Service) && string.IsNullOrEmpty(SearchData.TraceId))
         {
             data.Clear();
             total = 0;
         }
         else
         {
-            var query = new LogPageQueryDto()
+            var query = new BaseRequestDto
             {
+                Page = page,
+                PageSize = defaultSize,
                 Start = SearchData.Start,
                 End = SearchData.End,
-                Service = SearchData.Service!,
-                SortField = sortFiled,
-                IsDesc = sortBy,
-                Page = page,
-                Env = SearchData.Environment!,
-                Query = GetSearchText,
-                PageSize = defaultSize,
-                IsLimitEnv = false
+                TraceId = SearchData.TraceId,
+                Service = SearchData.Service,
+                Sort = new FieldOrderDto
+                {
+                    IsDesc = sortBy,
+                    Name = sortFiled!
+                },
+
+                Endpoint = SearchData.Endpoint!
             };
-            var result = await ApiCaller.LogService.GetPageAsync(query);
+            var list = new List<FieldConditionDto>();
+            if (!string.IsNullOrEmpty(SearchData.Environment))
+                list.Add(new FieldConditionDto { Value = SearchData.Environment!, Name = StorageConstaaa.Current.Environment });
+            if (!ShowAppEvent)
+            {
+                list.Add(new FieldConditionDto
+                {
+                    Name = StorageConstaaa.Current.Log.Body,
+                    Value = "Event",
+                    Type = ConditionTypes.NotRegex
+                });
+            }
+            query.Conditions = list;
+            var result = await ApiCaller.ApmService.GetLogListAsync(query);
             data.Clear();
             if (result.Result != null && result.Result.Any())
             {
@@ -141,16 +159,6 @@ public partial class ServiceLogs
             total = (int)result.Total;
         }
         isTableLoading = false;
-    }
-
-    string GetSearchText
-    {
-        get
-        {
-            if (ShowAppEvent) return Search.Text;
-            //if(!string.IsNullOrEmpty(Search.Text))
-            return $"{Search.Text} and Body not like 'Event %'";
-        }
     }
 
     private async Task OnPageChange((int page, int pageSize) pageData)

@@ -8,7 +8,7 @@ public class ClickhouseStorageConst : StorageConstaaa
     private readonly ClickhouseStorageLog log = new();
     private readonly ClickhouseStorageTrace trace = new();
 
-    internal ClickhouseStorageConst() : base()
+    public ClickhouseStorageConst() : base()
     {
         Current = this;
     }

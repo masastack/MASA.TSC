@@ -1,6 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.ReadWriteSplitting.Cqrs.Queries;
+using Masa.Contrib.Service.Caller;
+
 namespace Masa.Tsc.ApiGateways.Caller.Services;
 
 public sealed class ApmService : BaseService
@@ -31,7 +34,13 @@ public sealed class ApmService : BaseService
 
     public Task<PaginatedListBase<LogResponseDto>> GetLogListAsync(BaseRequestDto query) => Caller.GetByBodyAsync<PaginatedListBase<LogResponseDto>>($"{RootPath}/logList", body: query)!;
 
-    public Task<PhoneModelDto> GetDeviceModelAsync(string brand,string model) => Caller.GetAsync<PhoneModelDto>($"{RootPath}/model?brand={brand}&model={model}")!;
+    public Task<PhoneModelDto> GetDeviceModelAsync(string brand, string model) => Caller.GetAsync<PhoneModelDto>($"{RootPath}/model?brand={brand}&model={model}")!;
 
-    public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmEndpointRequestDto query)=> Caller.GetByBodyAsync<PaginatedListBase<SimpleTraceListDto>>($"{RootPath}/simpleTraceList", body: query)!;
+    public Task<List<string>> GetStatusCodesAsync() => Caller.GetAsync<List<string>>($"{RootPath}/statuscodes")!;
+
+    public Task<List<string>> GetEndpointsAsync(BaseRequestDto query) => Caller.GetByBodyAsync<List<string>>($"{RootPath}/endpointList", query)!;
+
+    public Task<List<string>> GetExceptionTypesAsync(BaseRequestDto query) => Caller.GetByBodyAsync<List<string>>($"{RootPath}/errorTypes", query)!;
+
+    public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmEndpointRequestDto query) => Caller.GetByBodyAsync<PaginatedListBase<SimpleTraceListDto>>($"{RootPath}/simpleTraceList", body: query)!;
 }

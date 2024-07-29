@@ -4,11 +4,7 @@
 <PageTitle>@I18n.Apm("PageTitles.Endpoint")</PageTitle>
 
 <ApmSearchComponent ShowComparison
-                    ShowButton
-                    ShowEnv
-                    ShowText
-                    ShowTime
-                    ShowService
+                    IsEndpoint
                     Value="Search"
                     ValueChanged="LoadASync" />
 
@@ -28,7 +24,7 @@
             <MTooltip Top Context="tooltipContent">
                 <ActivatorContent>
                     <div @attributes="@tooltipContent.Attrs" style="width:400px;overflow:hidden" class="text-truncate">
-                        <a href="/apm/endpoints/@(HttpUtility.UrlEncode(context.Item.Name)+GetUrlParam(service: context.Item.Service, env: GetSearchEnv(Search.Environment, context.Item.Envs?.Split(',')),endpoint:context.Item.Endpoint, comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End,search:Search.Text))"
+                        <a href="/apm/endpoints/@(HttpUtility.UrlEncode(context.Item.Name)+GetUrlParam(service: context.Item.Service, env: GetSearchEnv(Search.Environment, context.Item.Envs?.Split(',')),endpoint:context.Item.Endpoint, comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End))"
                            title="@context.Item.Name">@context.Item.Name</a>
                     </div>
                 </ActivatorContent>

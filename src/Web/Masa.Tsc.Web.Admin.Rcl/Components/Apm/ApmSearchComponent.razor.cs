@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Storage.Contracts;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm;
 
 public partial class ApmSearchComponent
@@ -9,19 +11,13 @@ public partial class ApmSearchComponent
     public bool ShowComparison { get; set; }
 
     [Parameter]
-    public bool ShowEnv { get; set; }
+    public bool IsEndpoint { get; set; }
 
     [Parameter]
-    public bool ShowText { get; set; }
+    public bool IsService { get; set; }
 
     [Parameter]
-    public bool ShowTime { get; set; }
-
-    [Parameter]
-    public bool ShowService { get; set; }
-
-    [Parameter]
-    public bool ShowButton { get; set; }
+    public bool IsLog { get; set; }
 
     [Parameter]
     public SearchData Value { get { return Search; } set { Search = value; } }
@@ -45,6 +41,7 @@ public partial class ApmSearchComponent
 
     private bool isCallQuery = false;
     private QuickRangeKey quickRangeKey = QuickRangeKey.Last15Minutes;
+    private List<string> textFileds;
 
     protected override async Task OnInitializedAsync()
     {
@@ -59,8 +56,11 @@ public partial class ApmSearchComponent
             await LoadEnvironmentAsync();
             await LoadServiceAsync();
             await OnValueChanged();
+            await LoadEndpointAsync();
+            await LoadErrorAsync();
             isCallQuery = true;
         }
+        await LoadAsync();
     }
 
     private void SetQuickRangeKey(TimeSpan timeSpan)
@@ -116,6 +116,25 @@ public partial class ApmSearchComponent
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        textFileds = new List<string> {
+                StorageConstaaa.Current.TraceId,
+                StorageConstaaa.Current.SpanId
+        };
+        if (IsEndpoint)
+        {
+            textFileds.AddRange(new string[] {
+                StorageConstaaa.Current.Trace.URLFull,
+                StorageConstaaa.Current.Trace.UserId,
+                StorageConstaaa.Current.Trace.HttpRequestBody
+            });
+        }
+        else if (!IsService)
+        {
+            textFileds.Add(StorageConstaaa.Current.ExceptionMessage);
+            if (IsLog)
+                textFileds.Add(StorageConstaaa.Current.Log.Body);
+        }
+        Value.TextField = textFileds[0];
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         if (string.IsNullOrEmpty(uri.Query))
         {
@@ -124,11 +143,21 @@ public partial class ApmSearchComponent
             if (Search.ComparisonType == ApmComparisonTypes.None)
                 Search.ComparisonType = ApmComparisonTypes.Day;
         }
+
+        if (!string.IsNullOrEmpty(Search.SpanId))
+        {
+            Search.TextField = StorageConstaaa.Current.SpanId;
+            Search.TextValue = Search.SpanId;
+        }
+        else if (!string.IsNullOrEmpty(Search.TraceId))
+        {
+            Search.TextField = StorageConstaaa.Current.TraceId;
+            Search.TextValue = Search.TraceId;
+        }
     }
 
     private async Task LoadServiceAsync()
     {
-        if (!ShowService) return;
         isServiceLoading = true;
         if (!string.IsNullOrEmpty(Search.Environment))
         {
@@ -150,7 +179,6 @@ public partial class ApmSearchComponent
 
     private async Task LoadEnvironmentAsync()
     {
-        if (!ShowEnv) return;
         isEnvLoading = true;
         var query = new BaseApmRequestDto
         {
@@ -165,18 +193,17 @@ public partial class ApmSearchComponent
         isEnvLoading = false;
     }
 
-    private async Task OnTextChanged(string text)
+    private async Task LoadEndpointAsync()
     {
-        Search.Text = text;
-        if (!string.IsNullOrEmpty(Search.TraceId) && !Search.Text.Contains($"TraceId='{Search.TraceId}'"))
-        {
-            Search.TraceId = string.Empty;
-        }
-        if (!string.IsNullOrEmpty(Search.SpanId) && !Search.Text.Contains($"SpanId='{Search.TraceId}'"))
-        {
-            Search.SpanId = string.Empty;
-        }
-        await OnValueChanged();
+        if (!string.IsNullOrEmpty(Search.Service))
+            endpoints = await ApiCaller.ApmService.GetEndpointsAsync(new BaseRequestDto { Service = Search.Service!, End = Search.End, Start = Search.Start });
+        if (!string.IsNullOrEmpty(Search.Endpoint) && endpoints != null && !endpoints.Contains(Search.Endpoint))
+            Search.Endpoint = default!;
+    }
+
+    private async Task LoadErrorAsync()
+    {
+        exceptions = await ApiCaller.ApmService.GetExceptionTypesAsync(new BaseRequestDto { Service = Search.Service!, End = Search.End, Start = Search.Start });
     }
 
     private async Task OnTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) times)
@@ -199,6 +226,8 @@ public partial class ApmSearchComponent
     private async Task OnServiceChanged(string? service)
     {
         Search.Service = service;
+        await LoadEndpointAsync();
+        await LoadErrorAsync();
         await OnValueChanged();
         StateHasChanged();
     }
@@ -210,11 +239,46 @@ public partial class ApmSearchComponent
         StateHasChanged();
     }
 
+    private List<string> endpoints = new();
+    private List<string> statuses = new();
+    private List<string> exceptions = new();
+
+
+    private async Task OnEndpointChange(string value)
+    {
+        Value.Endpoint = value;
+        await OnValueChanged();
+        StateHasChanged();
+    }
+
+    private async Task OnStatusCodeChange(string value)
+    {
+        Value.Status = value;
+        await OnValueChanged();
+        StateHasChanged();
+    }
+
+    private async Task OnExceptionChange(string value)
+    {
+        Value.ExceptionType = value;
+        await OnValueChanged();
+        StateHasChanged();
+    }
+
+    private async Task OnMessageEnter()
+    {
+        await OnValueChanged();
+        StateHasChanged();
+    }
+
     private async Task OnValueChanged()
     {
-        isCallQuery = true;
-        //Search.Timestamp = DateTime.Now.ToUnixTimestamp();
-        await ValueChanged.InvokeAsync(Search);
-        StateHasChanged();
+        if (ValueChanged.HasDelegate)
+            await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task LoadAsync()
+    {
+        statuses = await ApiCaller.ApmService.GetStatusCodesAsync();
     }
 }

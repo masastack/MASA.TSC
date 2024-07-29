@@ -13,7 +13,7 @@
                 <div style="color: rgb(52, 55, 65);width:1px" class="mx-2">|</div>
                 <div>@(defaultTimeLine?.Latency)  (@((100 * Percentile).ToString("0.##"))% of trace)</div>
                 <div style="color: rgb(52, 55, 65);width:1px" class="mx-2">|</div>
-                <div class="px-2 text-truncate" style="max-width:400px;background-color: rgb(211, 218, 230); color: rgb(0, 0, 0);" title="@(defaultTimeLine?.Trace?.Attributes["http.method"]) @(defaultTimeLine?.Trace?.Attributes["http.url"])">@(defaultTimeLine?.Trace?.Attributes["http.method"]) @(defaultTimeLine?.Trace?.Attributes["http.url"])</div>
+                <div class="px-2 text-truncate" style="max-width:calc(70% - 300px);background-color: rgb(211, 218, 230); color: rgb(0, 0, 0);" title="@(defaultTimeLine?.Trace?.Attributes["http.method"]) @(defaultTimeLine?.Trace?.Attributes["http.url"])">@(defaultTimeLine?.Trace?.Attributes["http.method"]) @(defaultTimeLine?.Trace?.Attributes["http.url"])</div>
                 <div class="px-2 rounded-sm" style="color:#fff;background-color:@((defaultTimeLine?.Faild ?? false)?"red":"green")">@(defaultTimeLine?.Trace?.Attributes["http.status_code"]) @((defaultTimeLine?.Faild ?? false) ? "Failed" : "OK")</div>
                 @if ((defaultTimeLine?.Trace?.Attributes.TryGetValue("user_agent.original", out var userAgent) ?? false))
                 {

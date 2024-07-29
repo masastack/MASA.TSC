@@ -28,7 +28,7 @@ public sealed class LogService : BaseService
     public async Task<PaginatedListBase<LogResponseDto>> GetPageAsync(LogPageQueryDto param)
     {
         return await Caller.GetAsync<PaginatedListBase<LogResponseDto>>($"{RootPath}/list", param) ?? default!;
-    }
+    }    
 
     public async Task<PaginatedListBase<LogDto>> GetDynamicPageAsync(LogPageQueryDto param)
     {

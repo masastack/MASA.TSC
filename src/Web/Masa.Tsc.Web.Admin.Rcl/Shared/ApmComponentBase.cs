@@ -1,21 +1,17 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the MIT License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Storage.Contracts;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Shared.Apm;
 
 public partial class ApmComponentBase : MasaComponentBase
 {
     [Inject]
-    public I18n I18n { get; set; }
-
-    [Inject]
     public JsInitVariables JsInitVariables { get; set; }
 
     [Inject]
     public TscCaller ApiCaller { get; set; }
-
-    [Inject]
-    public NavigationManager NavigationManager { get; set; }
 
     [Inject]
     public virtual SearchData Search { get; set; }
@@ -24,11 +20,9 @@ public partial class ApmComponentBase : MasaComponentBase
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender)
-        {
-            if (CurrentTimeZone == null || CurrentTimeZone.BaseUtcOffset != JsInitVariables.TimezoneOffset)
-                CurrentTimeZone = TimeZoneInfo.CreateCustomTimeZone("user custom timezone", JsInitVariables.TimezoneOffset, default, default);
-        }
+        if (firstRender && (CurrentTimeZone == null || CurrentTimeZone.BaseUtcOffset != JsInitVariables.TimezoneOffset))
+            CurrentTimeZone = TimeZoneInfo.CreateCustomTimeZone("user custom timezone", JsInitVariables.TimezoneOffset, default, default);
+
         base.OnAfterRender(firstRender);
     }
 
@@ -38,15 +32,29 @@ public partial class ApmComponentBase : MasaComponentBase
     {
     }
 
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (StorageConstaaa.Current != null) return;
+        var setting = await ApiCaller.SettingService.GetStorage();
+        if (setting == null)
+            throw new Exception("Storage setting is null");
+        if (setting.IsClickhouse)
+            StorageConstaaa.Init(new ClickhouseStorageConst());
+        else if (setting.IsElasticsearch)
+            ;//
+    }
     protected override void OnInitialized()
     {
         if (IsPage)
         {
-            Search.Text = default!;
+            //Search.Text = default!;
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
             var values = HttpUtility.ParseQueryString(uri.Query);
             var start = values.Get("start");
             var end = values.Get("end");
+
             if (DateTime.TryParse(start, out DateTime startTime) && DateTime.TryParse(end, out DateTime endTime) && endTime > startTime)
             {
                 Search.Start = startTime.ToDateTimeOffset(default).UtcDateTime;
@@ -67,35 +75,12 @@ public partial class ApmComponentBase : MasaComponentBase
             if (Enum.TryParse(compare, out ApmComparisonTypes type))
                 Search.ComparisonType = type;
 
-            var search = values.Get("search");
-            if (!string.IsNullOrEmpty(search))
-                Search.Text = search;
             Search.TraceId = values.Get("traceId")!;
+            Search.Status = values.Get("status")!;
+            Search.Method = values.Get("method")!;
             Search.SpanId = values.Get("spanId")!;
-
-            if (!string.IsNullOrEmpty(Search.TraceId))
-            {
-                var text = $"TraceId='{Search.TraceId}'";
-                if (string.IsNullOrEmpty(Search.Text) || !Search.Text.Contains(text))
-                {
-                    Search.Text = $"{Search.Text} and {text}";
-                }
-            }
-
-            if (!string.IsNullOrEmpty(Search.SpanId))
-            {
-                var text = $"SpanId='{Search.SpanId}'";
-                if (string.IsNullOrEmpty(Search.Text) || !Search.Text.Contains(text))
-                {
-                    Search.Text = $"{Search.Text} and {text}";
-                }
-            }
-
-
-            if (!string.IsNullOrEmpty(Search.Text) && Search.Text.Trim().StartsWith("and "))
-            {
-                Search.Text = Search.Text.Trim()[4..];
-            }
+            Search.ExceptionType = values.Get("ex_type")!;
+            Search.ExceptionMsg = values.Get("ex_msg")!;
         }
         base.OnInitialized();
     }

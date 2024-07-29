@@ -198,7 +198,14 @@ ServiceName String CODEC(ZSTD(1)),
 `Attributes.http.status_code` String CODEC(ZSTD(1)),
 `Attributes.http.target` String CODEC(ZSTD(1)),
 TraceId String CODEC(ZSTD(1)),
-Duration Int64 CODEC(ZSTD(1))
+Duration Int64 CODEC(ZSTD(1)),
+
+INDEX idx_servicename ServiceName TYPE bloom_filter(0.001) GRANULARITY 1,
+INDEX idx_namespace `Resource.service.namespace` TYPE bloom_filter(0.001) GRANULARITY 1,
+INDEX idx_method `Attributes.http.method` TYPE bloom_filter(0.001) GRANULARITY 1,
+INDEX idx_statuscode `Attributes.http.status_code` TYPE bloom_filter(0.001) GRANULARITY 1,
+INDEX idx_url `Attributes.http.target` TYPE bloom_filter(0.001) GRANULARITY 1,
+INDEX idx_traceid TraceId TYPE bloom_filter(0.001) GRANULARITY 1
 )
 ENGINE = MergeTree
 ORDER BY (
@@ -234,7 +241,12 @@ from
                             `Attributes.http.method` String CODEC(ZSTD(1)),
                             `Attributes.http.target` String CODEC(ZSTD(1)),
                             Duration Int64 CODEC(ZSTD(1)),
-                            Total AggregateFunction(count,UInt8)
+                            Total AggregateFunction(count,UInt8),
+                            
+                            INDEX idx_servicename ServiceName TYPE bloom_filter(0.001) GRANULARITY 1,
+                            INDEX idx_namespace `Resource.service.namespace` TYPE bloom_filter(0.001) GRANULARITY 1,
+                            INDEX idx_method `Attributes.http.method` TYPE bloom_filter(0.001) GRANULARITY 1,                           
+                            INDEX idx_url `Attributes.http.target` TYPE bloom_filter(0.001) GRANULARITY 1
                             )
                             ENGINE = AggregatingMergeTree
                             //PARTITION BY toYYYYMM(Timestamp)
