@@ -1,5 +1,5 @@
 ﻿[*.cs]
-file_header_template = Copyright (c) MASA Stack All rights reserved.\nLicensed under the MIT License. See LICENSE.txt in the project root for license information.
+file_header_template =  Copyright (c) MASA Stack All rights reserved.\nLicensed under the Apache License. See LICENSE.txt in the project root for license information.
 
 # Default severity for analyzer diagnostics with category 'Usage'
 dotnet_analyzer_diagnostic.category-Usage.severity = none

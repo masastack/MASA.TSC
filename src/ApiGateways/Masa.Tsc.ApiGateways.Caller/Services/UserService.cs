@@ -1,5 +1,5 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
-// Licensed under the MIT License. See LICENSE.txt in the project root for license information.
+// Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
 using Masa.BuildingBlocks.StackSdks.Auth;
 using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Model;
