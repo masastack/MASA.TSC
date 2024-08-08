@@ -29,6 +29,9 @@ public partial class ApmTraceView
     [Parameter]
     public StringNumber? Height { get; set; }
 
+    [Parameter]
+    public bool IsRedirectTrace { get; set; } = true;
+
     private async Task CloseAsync()
     {
         Show = false;

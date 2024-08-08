@@ -7,7 +7,7 @@ Write-Host "Hello $t"
 docker login --username=$u registry.cn-hangzhou.aliyuncs.com --password=$p
 
 $ServiceDockerfilePath="./src/Services/Masa.Tsc.Service.Admin/Dockerfile"
-$ServiceServerName="masa-tsc-service-admin"
+$ServiceServerName="masa-tsc-service"
 $WebDockerfilePath="./src/Web/Masa.Tsc.Web.Admin.Server/Dockerfile"
 $WebServerName="masa-tsc-web-admin"
 

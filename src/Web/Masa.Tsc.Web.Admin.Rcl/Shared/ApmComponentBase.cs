@@ -47,6 +47,7 @@ public partial class ApmComponentBase : MasaComponentBase
     {
         if (IsPage)
         {
+            Search.Method = default!;
             //Search.Text = default!;
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
             var values = HttpUtility.ParseQueryString(uri.Query);
@@ -93,7 +94,8 @@ public partial class ApmComponentBase : MasaComponentBase
          string? exMsg = default,
          string? traceId = default,
          string? spanId = default,
-         string? search = default)
+         string? search = default,
+         string? method = default)
     {
         var text = new StringBuilder();
         if (!string.IsNullOrEmpty(env))
@@ -118,6 +120,8 @@ public partial class ApmComponentBase : MasaComponentBase
             text.AppendFormat("&spanId={0}", HttpUtility.UrlEncode(spanId));
         if (!string.IsNullOrEmpty(search))
             text.AppendFormat("&search={0}", HttpUtility.UrlEncode(search));
+        if (!string.IsNullOrEmpty(method))
+            text.AppendFormat("&method={0}", method);
 
         if (text.Length > 0)
             text.Remove(0, 1).Insert(0, "?");

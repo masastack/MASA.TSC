@@ -14,7 +14,6 @@ public partial class OverView
     private ChartData failed = new();
     private readonly ChartData timeTypeCount = new();
     private string? lastKey = null;
-    private readonly ApmTraceLatencyRequestDto query = new();
     private List<TraceResponseDto>? traceDetails = null;
     private List<ChartPointDto>? errors = null;
     int page = 1, total = 1;
@@ -36,17 +35,6 @@ public partial class OverView
         }
     }
 
-    //protected override void OnInitialized()
-    //{
-    //    var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-    //    var queries = HttpUtility.ParseQueryString(uri.Query);
-    //    var endpoint = queries.Get("endpoint");
-    //    SearchData.Endpoint = endpoint;
-    //    query.Endpoint = endpoint!;
-    //    //traceId = queries.Get("traceId");
-    //    base.OnInitialized();
-    //}
-
     private async Task LoadTraceDetailAsync(int page = 1)
     {
         this.page = page;
@@ -66,7 +54,10 @@ public partial class OverView
                 Env = SearchData.Environment!,
                 Page = 1,
                 PageSize = 100,
-                Method=query.Method,                 
+                Method = SearchData.Method,
+                TextField = SearchData.TextField,
+                TextValue = SearchData.TextValue,
+                StatusCode = SearchData.Status,
                 //Queries = SearchData.Text,
                 OrderField = "Timestamp",
                 IsDesc = true
@@ -85,7 +76,7 @@ public partial class OverView
                 Start = SearchData.Start,
                 End = SearchData.End,
                 Endpoint = SearchData.Endpoint!,
-                Method = query.Method,
+                Method = SearchData.Method,
                 Service = SearchData.Service!,
                 Env = SearchData.Environment!,
                 Page = 1,
@@ -152,6 +143,7 @@ public partial class OverView
         percentile = lessTotal * 1.0 / sum;
     }
 
+    //需要优化，不是自己关注的条件不刷新数据
     private async Task LoadDataAsync()
     {
         var query = new ApmEndpointRequestDto
@@ -161,6 +153,7 @@ public partial class OverView
             Service = SearchData.Service,
             Env = SearchData.Environment,
             Endpoint = SearchData.Endpoint!,
+            Method = SearchData.Method,
             //Queries = SearchData.Text,
             ComparisonType = SearchData.ComparisonType.ToComparisonType()
         };
@@ -241,7 +234,7 @@ public partial class OverView
             Service = SearchData.Service,
             Env = SearchData.Environment,
             Endpoint = SearchData.Endpoint!,
-            Method = SearchData.Method,             
+            Method = SearchData.Method,
             //Queries = SearchData.Text,
             ComparisonType = SearchData.ComparisonType.ToComparisonType()
         };

@@ -315,28 +315,32 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
 
     public async Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmEndpointRequestDto query)
     {
-        //query.IsServer = default;
-        //query.IsTrace = true;
-        var (where, ors, parameters) = AppendWhere(query);
         var orderBy = GetOrderBy(query, new() { { StorageConst.Current.Timestimap, StorageConst.Current.Timestimap } });
-
+        var (where, ors, parameters) = AppendWhere(query);
         PaginatedListBase<SimpleTraceListDto> result = new() { };
         if (query.HasPage)
         {
-            //var sql1 = CombineOrs($@"select TraceId from {Constants.DurationTable} where {where}", ors);
-            //var countSql = $"select count(1) from {sql1}";
-            var sql1 = CombineOrs($@"select countMerge(Total) as Total from {Constants.DurationCountTable} where {where}", ors);
+            string sql1;
+            if (query.IsInstrument)
+            {
+                sql1 = $"select count(1) as Total from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}";
+            }
+            else
+            {
+                sql1 = $@"select countMerge(Total) as Total from {Constants.DurationCountTable} where {where}";
+            }
+
+            sql1 = CombineOrs(sql1, ors);           
             var countSql = $"select sum(Total) from({sql1})";
             result.Total = Convert.ToInt64(await Scalar(countSql, parameters));
         }
-        //Constants.DurationTable
-
-        var sql = CombineOrs($@"select TraceId,Duration,Timestamp from {Constants.DurationTable} where {where}", ors);
+      
+        var sql = CombineOrs($@"select TraceId,Duration,Timestamp from {(query.IsInstrument ? MasaStackClickhouseConnection.TraceHttpServerTable : Constants.DurationTable)} where {where}", ors);
         sql = $"select TraceId,Duration,Timestamp from {sql} {orderBy} @limit";
 
         await SetData(sql, parameters, result, query, ToSampleTraceListDto);
         return result;
-    }
+    }   
 
     private static SimpleTraceListDto ToSampleTraceListDto(IDataReader reader)
     {
@@ -777,7 +781,7 @@ order by `Attributes.http.status_code`";
             if (!string.IsNullOrEmpty(traceQuery.Method))
             {
                 sql.AppendLine($" and {StorageConst.Current.Trace.HttpMethod}=@method");
-                parameters.Add(new ClickHouseParameter { ParameterName = "method", Value = traceQuery.Endpoint });
+                parameters.Add(new ClickHouseParameter { ParameterName = "method", Value = traceQuery.Method });
             }
 
             if (!isMetric)

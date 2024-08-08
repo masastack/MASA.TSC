@@ -38,16 +38,16 @@ public class ApmService : ServiceBase
             Page = page,
             PageSize = pageSize,
             Endpoint = endpoint!,
-            TextField = textField,
-            TextValue = textValue,
-            StatusCode = statusCode,
-            ExType = exType,
-            TraceId = traceId,
+            TextField = textField!,
+            TextValue = textValue!,
+            StatusCode = statusCode!,
+            ExType = exType!,
+            TraceId = traceId!,
             Service = service,
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
         });
 
-    public async Task<IEnumerable<ChartLineDto>> GetCharts([FromServices] IApmService apmService, string start, string end, string? env, string? service, string? endpoint, ComparisonTypes? comparisonType, string? queries)
+    public async Task<IEnumerable<ChartLineDto>> GetCharts([FromServices] IApmService apmService, string start, string end, string? env, string? service, string? endpoint, string? method, ComparisonTypes? comparisonType, string? queries)
     {
         BaseApmRequestDto queryDto;
 
@@ -59,7 +59,8 @@ public class ApmService : ServiceBase
         {
             queryDto = new ApmEndpointRequestDto()
             {
-                Endpoint = endpoint.Equals("@all", StringComparison.InvariantCultureIgnoreCase) ? "" : endpoint!
+                Endpoint = endpoint.Equals("@all", StringComparison.InvariantCultureIgnoreCase) ? "" : endpoint!,
+                Method = method!
             };
         }
         queryDto.Start = start.ParseUTCTime();

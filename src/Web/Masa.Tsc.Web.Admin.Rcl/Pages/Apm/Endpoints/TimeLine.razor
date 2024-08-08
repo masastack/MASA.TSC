@@ -58,7 +58,7 @@
     </MCardText>
 </MCard>
 
-<ApmTraceView Value="currentTimeLine?.Trace" @bind-Show="showTraceDetail" LinkUrl="@spanLinkUrl" />
+<ApmTraceView Value="currentTimeLine?.Trace" @bind-Show="showTraceDetail" LinkUrl="@spanLinkUrl" IsRedirectTrace=false />
 
 @code {
 
@@ -75,7 +75,7 @@
             {
                 style = $"padding-left:{timeLine.Left}%";
             }
-            else if (35 - timeLine.Process - timeLine.Right >= 0)
+            else if (40 - timeLine.Process - timeLine.Right >= 0)
             {
                 className = "d-flex justify-end";
                 style = $"padding-right:{timeLine.Right}%";

@@ -7,7 +7,7 @@
                     ValueChanged="LoadASync" />
 <SDataTable Headers="headers"
             Stripe
-            Width="@("120%")"
+            Width="@("150%")"
             FixedHeader
             ServerItemsLength="total"
             ItemsPerPage="defaultSize"
@@ -51,7 +51,18 @@
         }
         else if (context.Header.Value == nameof(LogResponseDto.TraceId))
         {
-            @context.Item.TraceId
+            if (!string.IsNullOrEmpty(context.Item.TraceId))
+            {
+                context.Item.Attributes.TryGetValue("RequestPath", out var path);
+                DateTime start = context.Item.Timestamp.AddHours(-6), end = context.Item.Timestamp.AddHours(6);
+                var url = path?.ToString().Split('?')[0];
+                <div>
+                    <a style="text-decoration:none" href="/apm/endpoints/@(HttpUtility.UrlEncode(url)+GetUrlParam(service: context.Item.Resource["service.name"].ToString(), env: context.Item.Resource["service.namespace"].ToString(),endpoint:url, start: start, end: end,traceId:context.Item.TraceId))" target="_blank">@context.Item.TraceId</a>
+                </div>
+            }
+            else
+            {
+            }
         }
         else if (context.Header.Value == nameof(LogResponseDto.SpanId))
         {
@@ -70,7 +81,7 @@
 
 <style>
     .m-data-table .m-data-table__wrapper {
-        height: calc(100vh - 290px)
+        height: calc(100vh - 300px)
     }
 </style>
 

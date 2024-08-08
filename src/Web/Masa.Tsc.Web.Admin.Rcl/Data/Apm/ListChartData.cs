@@ -11,6 +11,8 @@ internal class ListChartData
 
     public string Endpoint { get; set; }
 
+    public string Method { get; set; }
+
     public string Envs { get; set; }
 
     public long Latency { get; set; }
@@ -31,10 +33,11 @@ internal class ListChartData
 
     public ChartData P95ChartData { get; set; }
 
-    public ChartData P99ChartData { get; set; }        
+    public ChartData P99ChartData { get; set; }
 }
 
-public class ChartData {
+public class ChartData
+{
 
     public bool HasChart { get; set; } = true;
 

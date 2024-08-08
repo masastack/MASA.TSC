@@ -75,7 +75,24 @@ else
 
                 <tr>
                     <td>@currentName</td>
-                    <td class="text-wrap">@value</td>
+                    <td class="text-wrap">
+                        @{
+                            if (IsRedirectTrace && string.Equals(currentName, StorageConst.Current.TraceId, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                var resources = (Dictionary<string, object>)dic["Resource"];
+                                var attributes = (Dictionary<string, object>)dic["Attributes"];
+                                attributes.TryGetValue("RequestPath", out var path);
+                                var time1 = (DateTime)dic["Timestamp"];
+                                DateTime start = time1.AddHours(-6), end = time1.AddHours(6);
+                                var url = path?.ToString().Split('?')[0];
+                                <a style="text-decoration:none" href="/apm/endpoints/@(HttpUtility.UrlEncode(url)+GetUrlParam(service: resources["service.name"].ToString(), env: resources["service.namespace"].ToString(),endpoint:url, start: start, end: end,traceId:dic["TraceId"].ToString()))" target="_blank">@value</a>
+                            }
+                            else
+                            {
+                                @value
+                            }
+                        }
+                    </td>
                 </tr>
             }
             else if (value is IDictionary<string, object> dicValue)

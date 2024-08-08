@@ -87,6 +87,7 @@ public partial class Endpoint
             data.AddRange(result.Result.Select(item => new ListChartData
             {
                 Name = $"{item.Method} {item.Endpoint}",
+                Method = item.Method,
                 Endpoint = item.Endpoint,
                 Service = item.Service,
                 Failed = item.Failed,

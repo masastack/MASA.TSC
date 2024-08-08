@@ -1,7 +1,7 @@
 ﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm
 @inherits ApmComponentBase
 
-<div class="pa-4 container overflow-y-auto" style="height:840px">
+<div class="pa-4 container overflow-y-auto" style="height:100%">
     <MCard Class="rounded-lg mt-4" Height="256" Style="border:solid #ccc 1px">
         <MCardSubtitle Class="d-flex">
             <div class="font-weight-black h6 ml-4 mt-2">@I18n.Apm("Chart.ErrorOccurrences")</div>
@@ -95,7 +95,26 @@
 
                 <tr>
                     <td>@currentName</td>
-                    <td><div class="right-error-text">@value</div></td>
+                    <td>
+                        <div class="right-error-text">
+                            @{
+                                if (string.Equals(currentName, StorageConst.Current.TraceId, StringComparison.CurrentCultureIgnoreCase))
+                                {
+                                    var resources = (Dictionary<string, object>)dic["Resource"];
+                                    var attributes = (Dictionary<string, object>)dic["Attributes"];
+                                    attributes.TryGetValue("RequestPath", out var path);
+                                    var time1 = (DateTime)dic["Timestamp"];
+                                    DateTime start = time1.AddHours(-6), end = time1.AddHours(6);
+                                    var url = path?.ToString().Split('?')[0];
+                                    <a style="text-decoration:none" href="/apm/endpoints/@(HttpUtility.UrlEncode(url)+GetUrlParam(service: resources["service.name"].ToString(), env: resources["service.namespace"].ToString(),endpoint:url, start: start, end: end,traceId:dic["TraceId"].ToString()))" target="_blank">@value</a>
+                                }
+                                else
+                                {
+                                    @value
+                                }
+                            }
+                        </div>
+                    </td>
                 </tr>
             }
             else if (value is IDictionary<string, object> dicValue)
@@ -109,4 +128,4 @@
     {
         return type.IsPrimitive || type.IsEnum || type.Equals(typeof(string)) || type.Equals(typeof(DateTime));
     }
-    }
+}
