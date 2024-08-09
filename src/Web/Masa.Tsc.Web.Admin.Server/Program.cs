@@ -51,9 +51,18 @@ var redisOption = new RedisConfigurationOptions
     DefaultDatabase = masaStackConfig.RedisModel.RedisDb,
     Password = masaStackConfig.RedisModel.RedisPassword
 };
+
 #if DEBUG
-await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC, authHost: "https://auth-service-dev.masastack.com", mcHost: "https://mc-service-dev.masastack.com", pmHost: "https://pm-service-dev.masastack.com");
-builder.Services.AddTscHttpApiCaller("http://localhost:18010", authApiUrl: "https://auth-service-dev.masastack.com").AddDccClient(redisOption);
+if (builder.Environment.EnvironmentName == "Development")
+{
+    await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC, authHost: "https://auth-service-dev.masastack.com", mcHost: "https://mc-service-dev.masastack.com", pmHost: "https://pm-service-dev.masastack.com");
+    builder.Services.AddTscHttpApiCaller("http://localhost:18010", authApiUrl: "https://auth-service-dev.masastack.com").AddDccClient(redisOption);
+}
+else
+{
+    await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC);
+    builder.Services.AddTscHttpApiCaller("http://localhost:18010", masaStackConfig.GetAuthServiceDomain()).AddDccClient(redisOption);
+}
 #else
     await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC);
     builder.Services.AddTscHttpApiCaller(masaStackConfig.GetTscServiceDomain(),masaStackConfig.GetAuthServiceDomain()).AddDccClient(redisOption);

@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm;
 
-public partial class ApmSearchComponent
+public partial class ApmSearchComponent : IDisposable
 {
     [Parameter]
     public bool ShowComparison { get; set; }
@@ -28,7 +28,9 @@ public partial class ApmSearchComponent
 
     [Inject]
     public GlobalConfig GlobalConfig { get; set; } = default!;
-    private static bool hasMonitorTeamId = false;
+
+    [Inject]
+    public MasaUser MasaUser { get; set; } = default;
 
     private static List<(ApmComparisonTypes value, string text)> listComparisons = new()
     {
@@ -47,7 +49,8 @@ public partial class ApmSearchComponent
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
+        await base.OnInitializedAsync();        
+        GlobalConfig.CurrentTeamId = MasaUser.CurrentTeamId;
         if (Search.Start > DateTime.MinValue && Search.End > Search.Start)
         {
             SetQuickRangeKey(Search.End - Search.Start);
@@ -118,11 +121,7 @@ public partial class ApmSearchComponent
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if (!hasMonitorTeamId)
-        {
-            GlobalConfig.OnCurrentTeamChanged += TeamChanged;
-            hasMonitorTeamId = true;
-        }
+        GlobalConfig.OnCurrentTeamChanged += TeamChanged;
         textFileds = new List<string> {
                 StorageConst.Current.TraceId,
                 StorageConst.Current.SpanId
@@ -166,9 +165,12 @@ public partial class ApmSearchComponent
     private void TeamChanged(Guid teamId)
     {
         GlobalConfig.CurrentTeamId = teamId;
-        var task = InvokeAsync(async () =>
+        _ = InvokeAsync(async () =>
         {
             await LoadEnvironmentAsync();
+            await LoadServiceAsync();
+            await OnValueChanged();
+            await LoadEndpointAsync();
             StateHasChanged();
         });
     }
@@ -291,5 +293,10 @@ public partial class ApmSearchComponent
     private async Task LoadAsync()
     {
         statuses = await ApiCaller.ApmService.GetStatusCodesAsync();
+    }
+
+    public void Dispose()
+    {
+        GlobalConfig.OnCurrentTeamChanged -= TeamChanged;
     }
 }
