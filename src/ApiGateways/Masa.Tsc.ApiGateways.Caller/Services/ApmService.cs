@@ -28,7 +28,7 @@ public sealed class ApmService : BaseService
 
     public Task<EndpointLatencyDistributionDto> GetLatencyDistributionAsync(ApmEndpointRequestDto query) => Caller.GetAsync<EndpointLatencyDistributionDto>($"{RootPath}/latencyDistributions", data: query)!;
 
-    public Task<Dictionary<string, List<string>>> GetEnviromentServiceAsync(BaseApmRequestDto query) => Caller.GetAsync<Dictionary<string, List<string>>>($"{RootPath}/enviromentService", data: query)!;
+    public Task<Dictionary<string, List<string>>> GetEnviromentServiceAsync(Guid teamId, DateTime start, DateTime end) => Caller.GetAsync<Dictionary<string, List<string>>>($"{RootPath}/enviromentService", data: new { teamId, start, end })!;
 
     public Task<PaginatedListBase<TraceResponseDto>> GetTraceListAsync(BaseRequestDto query) => Caller.GetByBodyAsync<PaginatedListBase<TraceResponseDto>>($"{RootPath}/traceList", body: query)!;
 

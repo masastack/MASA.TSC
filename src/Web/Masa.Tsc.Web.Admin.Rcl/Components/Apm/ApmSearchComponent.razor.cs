@@ -26,6 +26,11 @@ public partial class ApmSearchComponent
     [Inject]
     public IMultiEnvironmentUserContext UserContext { get; set; }
 
+    [Inject]
+    public GlobalConfig GlobalConfig { get; set; } = default!;
+    private static bool hasMonitorTeamId = false;
+    protected static Guid TeamId { get; set; }
+
     private static List<(ApmComparisonTypes value, string text)> listComparisons = new()
     {
         new (ApmComparisonTypes.None, "None"),
@@ -114,6 +119,11 @@ public partial class ApmSearchComponent
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        if (!hasMonitorTeamId)
+        {
+            GlobalConfig.OnCurrentTeamChanged += TeamChanged;
+            hasMonitorTeamId = true;
+        }
         textFileds = new List<string> {
                 StorageConst.Current.TraceId,
                 StorageConst.Current.SpanId
@@ -154,6 +164,15 @@ public partial class ApmSearchComponent
         }
     }
 
+    private void TeamChanged(Guid teamId)
+    {
+        TeamId = teamId;
+        var task = InvokeAsync(async () =>
+        {
+            await LoadEnvironmentAsync();
+            StateHasChanged();
+        });        
+    }
     private async Task LoadServiceAsync()
     {
         isServiceLoading = true;
@@ -178,12 +197,7 @@ public partial class ApmSearchComponent
     private async Task LoadEnvironmentAsync()
     {
         isEnvLoading = true;
-        var query = new BaseApmRequestDto
-        {
-            Start = Search.Start,
-            End = Search.End
-        };
-        var result = await ApiCaller.ApmService.GetEnviromentServiceAsync(query);
+        var result = await ApiCaller.ApmService.GetEnviromentServiceAsync(TeamId, Search.Start, Search.End);
         enviromentServices = result;
         environments = result.Keys.ToList();
         if (!string.IsNullOrEmpty(Search.Environment) && !environments.Contains(Search.Environment))

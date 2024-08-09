@@ -330,17 +330,17 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
                 sql1 = $@"select countMerge(Total) as Total from {Constants.DurationCountTable} where {where}";
             }
 
-            sql1 = CombineOrs(sql1, ors);           
+            sql1 = CombineOrs(sql1, ors);
             var countSql = $"select sum(Total) from({sql1})";
             result.Total = Convert.ToInt64(await Scalar(countSql, parameters));
         }
-      
+
         var sql = CombineOrs($@"select TraceId,Duration,Timestamp from {(query.IsInstrument ? MasaStackClickhouseConnection.TraceHttpServerTable : Constants.DurationTable)} where {where}", ors);
         sql = $"select TraceId,Duration,Timestamp from {sql} {orderBy} @limit";
 
         await SetData(sql, parameters, result, query, ToSampleTraceListDto);
         return result;
-    }   
+    }
 
     private static SimpleTraceListDto ToSampleTraceListDto(IDataReader reader)
     {
@@ -783,15 +783,11 @@ order by `Attributes.http.status_code`";
                 sql.AppendLine($" and {StorageConst.Current.Trace.HttpMethod}=@method");
                 parameters.Add(new ClickHouseParameter { ParameterName = "method", Value = traceQuery.Method });
             }
-
-            if (!isMetric)
+            if (!string.IsNullOrEmpty(traceQuery.StatusCode))
             {
-                if (traceQuery.IsTrace.HasValue && traceQuery.IsTrace!.Value && !string.IsNullOrEmpty(traceQuery.StatusCode))
-                {
-                    traceQuery.IsInstrument = true;
-                    sql.AppendLine($" and {StorageConst.Current.Trace.HttpStatusCode}=@status_code");
-                    parameters.Add(new ClickHouseParameter { ParameterName = "status_code", Value = traceQuery.StatusCode });
-                }
+                traceQuery.IsInstrument = true;
+                sql.AppendLine($" and {StorageConst.Current.Trace.HttpStatusCode}=@status_code");
+                parameters.Add(new ClickHouseParameter { ParameterName = "status_code", Value = traceQuery.StatusCode });
             }
         }
     }
