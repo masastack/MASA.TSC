@@ -1,10 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Masa.BuildingBlocks.Authentication.Identity;
-using Masa.BuildingBlocks.Isolation;
-using System.Linq;
-
 namespace Masa.Tsc.Service.Admin.Services;
 
 public class ApmService : ServiceBase
@@ -203,8 +199,10 @@ public class ApmService : ServiceBase
             var projects = await pmClient.ProjectService.GetListByTeamIdsAsync(new List<Guid> { teamId }, env);
             if (projects == null) continue;
             var apps = await pmClient.AppService.GetListByProjectIdsAsync(projects.Select(item => item.Id).ToList());
+            //var apps = await pmClient.ProjectService.GetProjectAppsAsync(env);
             result.Add(env, apps.Select(item => item.Identity).ToList());
         }
+
         return result;
     }
 

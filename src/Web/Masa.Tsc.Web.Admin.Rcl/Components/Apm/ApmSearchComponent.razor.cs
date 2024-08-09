@@ -29,7 +29,6 @@ public partial class ApmSearchComponent
     [Inject]
     public GlobalConfig GlobalConfig { get; set; } = default!;
     private static bool hasMonitorTeamId = false;
-    protected static Guid TeamId { get; set; }
 
     private static List<(ApmComparisonTypes value, string text)> listComparisons = new()
     {
@@ -166,12 +165,12 @@ public partial class ApmSearchComponent
 
     private void TeamChanged(Guid teamId)
     {
-        TeamId = teamId;
+        GlobalConfig.CurrentTeamId = teamId;
         var task = InvokeAsync(async () =>
         {
             await LoadEnvironmentAsync();
             StateHasChanged();
-        });        
+        });
     }
     private async Task LoadServiceAsync()
     {
@@ -197,7 +196,7 @@ public partial class ApmSearchComponent
     private async Task LoadEnvironmentAsync()
     {
         isEnvLoading = true;
-        var result = await ApiCaller.ApmService.GetEnviromentServiceAsync(TeamId, Search.Start, Search.End);
+        var result = await ApiCaller.ApmService.GetEnviromentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End);
         enviromentServices = result;
         environments = result.Keys.ToList();
         if (!string.IsNullOrEmpty(Search.Environment) && !environments.Contains(Search.Environment))
