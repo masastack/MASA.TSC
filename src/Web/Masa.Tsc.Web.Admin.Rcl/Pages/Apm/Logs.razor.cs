@@ -5,6 +5,9 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm;
 
 public partial class Logs
 {
+    [Parameter]
+    public string TaskId { get; set; }
+
     protected override bool IsPage => true;
 
     private List<DataTableHeader<LogResponseDto>> headers => new()
@@ -28,6 +31,17 @@ public partial class Logs
     private bool? sortBy = true;
     private bool dialogShow = false;
     private LogResponseDto current = null;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (!string.IsNullOrEmpty(TaskId))
+        {
+            Search.TextField = StorageConst.Current.Log.TaskId;
+            Search.TextValue = TaskId;
+            StateHasChanged();
+        }        
+    }
 
     public async Task OnTableOptionsChanged(DataOptions sort)
     {

@@ -2,8 +2,7 @@
 @inject GlobalConfig GlobalConfig
 @inject IMasaStackConfig MasaStackConfig
 
-<SLayout
-         Logo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo-h-en.png"
+<SLayout Logo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo-h-en.png"
          MiniLogo="https://cdn.masastack.com/stack/images/logo/MASAStack/logo.png"
          IsShowEnvironmentSwitch
          WhiteUris="_whiteUrlRoutes">
@@ -26,11 +25,10 @@
     private readonly List<string> _whiteUrlRoutes = new()
     {
         "apm/*",
-        // for scheduler logs jump
         "log/*",
         "trace/*",
         // for instrument like serviceList,endpointList,instanceList  jump to child instrument
-        "dashboard/*",
-        "teamDetail/*"
+        //"dashboard/*",
+        //"teamDetail/*"
     };
 }

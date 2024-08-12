@@ -5,6 +5,9 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm;
 
 public partial class Endpoint
 {
+    [Parameter]
+    public string TraceId { get; set; }
+
     protected override bool IsPage => true;
     private List<DataTableHeader<ListChartData>> headers => new()
     {
@@ -22,6 +25,16 @@ public partial class Endpoint
     private bool isTableLoading = false;
     private string? sortFiled;
     private bool? sortBy;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (!string.IsNullOrEmpty(TraceId))
+        {
+            Search.TextField = StorageConst.Current.TraceId;
+            Search.TextValue = TraceId;
+        }
+    }
 
     public async Task OnTableOptionsChanged(DataOptions sort)
     {

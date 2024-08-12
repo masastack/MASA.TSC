@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using System.Diagnostics;
+
 namespace Masa.Tsc.Service.Admin.Services;
 
 public class ApmService : ServiceBase
@@ -171,19 +173,24 @@ public class ApmService : ServiceBase
             Start = start.ParseUTCTime(),
             End = end.ParseUTCTime()
         });
-        var teamData = await GetTeamAppsAsync(authClient, pmClient, teamId, data.Keys);
-        if (teamData.Count == 0)
-            return new Dictionary<string, List<string>> { { multiEnvironmentContext.CurrentEnvironment, new() } };
-        var result = new Dictionary<string, List<string>>();
-        foreach (var env in teamData.Keys)
+#if RELEASE
         {
-            if (!data.ContainsKey(env)) continue;
-            result.Add(env, data[env].Where(appid => teamData[env].Contains(appid)).ToList());
+            var teamData = await GetTeamAppsAsync(authClient, pmClient, teamId, data.Keys);
+            if (teamData.Count == 0)
+                return new Dictionary<string, List<string>> { { multiEnvironmentContext.CurrentEnvironment, new() } };
+            var result = new Dictionary<string, List<string>>();
+            foreach (var env in teamData.Keys)
+            {
+                if (!data.ContainsKey(env)) continue;
+                result.Add(env, data[env].Where(appid => teamData[env].Contains(appid)).ToList());
+            }
+            if (result.Count == 0)
+            {
+                result.Add(multiEnvironmentContext.CurrentEnvironment, new());
+            }
+            return result;
         }
-        if (result.Count == 0)
-        {
-            result.Add(multiEnvironmentContext.CurrentEnvironment, new());
-        }
+#endif
         return data;
     }
 

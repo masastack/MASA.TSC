@@ -49,7 +49,7 @@ public partial class ApmSearchComponent : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();        
+        await base.OnInitializedAsync();
         GlobalConfig.CurrentTeamId = MasaUser.CurrentTeamId;
         if (Search.Start > DateTime.MinValue && Search.End > Search.Start)
         {
@@ -138,9 +138,13 @@ public partial class ApmSearchComponent : IDisposable
         {
             textFileds.Add(StorageConst.Current.ExceptionMessage);
             if (IsLog)
+            {
                 textFileds.Add(StorageConst.Current.Log.Body);
+                textFileds.Add(StorageConst.Current.Log.TaskId);
+            }
         }
-        Value.TextField = textFileds[0];
+        if (string.IsNullOrEmpty(Value.TextField) || !textFileds.Contains(Value.TextField))
+            Value.TextField = textFileds[0];
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         if (string.IsNullOrEmpty(uri.Query))
         {

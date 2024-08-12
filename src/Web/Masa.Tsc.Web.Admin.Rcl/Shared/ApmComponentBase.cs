@@ -12,9 +12,9 @@ public partial class ApmComponentBase : MasaComponentBase
     public TscCaller ApiCaller { get; set; }
 
     [Inject]
-    public virtual SearchData Search { get; set; }    
+    public virtual SearchData Search { get; set; }
 
-    public static TimeZoneInfo CurrentTimeZone { get; private set; }   
+    public static TimeZoneInfo CurrentTimeZone { get; private set; }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -47,6 +47,8 @@ public partial class ApmComponentBase : MasaComponentBase
         if (IsPage)
         {
             Search.Method = default!;
+            //Search.TextField = default!;
+            //Search.TextValue = default!;
             //Search.Text = default!;
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
             var values = HttpUtility.ParseQueryString(uri.Query);
@@ -80,7 +82,7 @@ public partial class ApmComponentBase : MasaComponentBase
             Search.ExceptionType = values.Get("ex_type")!;
             Search.ExceptionMsg = values.Get("ex_msg")!;
         }
-        
+
         base.OnInitialized();
     }
 
