@@ -53,7 +53,7 @@ public partial class OverView
                 Service = SearchData.Service!,
                 Env = SearchData.Environment!,
                 Page = 1,
-                PageSize = 100,
+                PageSize = 500,
                 Method = SearchData.Method,
                 TextField = SearchData.TextField,
                 TextValue = SearchData.TextValue,
@@ -66,32 +66,33 @@ public partial class OverView
             {
                 traceIds.AddRange(result1.Result);
                 total = (int)result1.Total;
+                if (total - 500 > 0) total = 500;
             }
         }
         //加载最后一页
-        else if (total - page >= 0 && traceIds.Count - page <= 0 && traceTails.Count == 0)
-        {
-            var result1 = await ApiCaller.ApmService.GetSimpleTraceListAsync(new ApmEndpointRequestDto
-            {
-                Start = SearchData.Start,
-                End = SearchData.End,
-                Endpoint = SearchData.Endpoint!,
-                Method = SearchData.Method,
-                Service = SearchData.Service!,
-                Env = SearchData.Environment!,
-                Page = 1,
-                PageSize = 100,
-                //Queries = SearchData.Text,
-                OrderField = "Timestamp",
-                IsDesc = false,
-                HasPage = true
-            });
+        //else if (total - page >= 0 && traceIds.Count - page <= 0 && traceTails.Count == 0)
+        //{
+        //    var result1 = await ApiCaller.ApmService.GetSimpleTraceListAsync(new ApmEndpointRequestDto
+        //    {
+        //        Start = SearchData.Start,
+        //        End = SearchData.End,
+        //        Endpoint = SearchData.Endpoint!,
+        //        Method = SearchData.Method,
+        //        Service = SearchData.Service!,
+        //        Env = SearchData.Environment!,
+        //        Page = 1,
+        //        PageSize = 100,
+        //        //Queries = SearchData.Text,
+        //        OrderField = "Timestamp",
+        //        IsDesc = false,
+        //        HasPage = true
+        //    });
 
-            if (result1 != null && result1.Result != null)
-            {
-                traceTails.AddRange(result1.Result.OrderByDescending(item => item.Timestamp));
-            }
-        }
+        //    if (result1 != null && result1.Result != null)
+        //    {
+        //        traceTails.AddRange(result1.Result.OrderByDescending(item => item.Timestamp));
+        //    }
+        //}
 
         if (traceIds.Count - page >= 0)
             trace = traceIds[page - 1];
@@ -306,7 +307,7 @@ public partial class OverView
                 p95 = index;
                 isFoundP95 = true;
             }
-            if (isFoundCurrent && isFoundCurrent)
+            if (isFoundCurrent && isFoundP95)
                 break;
             index--;
         } while (index >= 0);

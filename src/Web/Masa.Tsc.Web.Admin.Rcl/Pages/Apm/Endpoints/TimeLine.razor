@@ -11,7 +11,7 @@
             <div style="width:70%" class="d-flex justify-start pt-4">
                 <div>@(defaultTimeLine?.Trace?.Timestamp.FormatHistory())</div>
                 <div style="color: rgb(52, 55, 65);width:1px" class="mx-2">|</div>
-                <div>@(defaultTimeLine?.Latency)  (@((100 * Percentile).ToString("0.##"))% of trace)</div>
+                <div>@(defaultTimeLine?.Latency)  (@((defaultTimeLine?.Trace.Duration * 100.0 / totalDuration)?.ToString("0.##"))% of trace)</div>
                 <div style="color: rgb(52, 55, 65);width:1px" class="mx-2">|</div>
                 <div class="px-2 text-truncate" style="max-width:calc(70% - 300px);background-color: rgb(211, 218, 230); color: rgb(0, 0, 0);" title="@(defaultTimeLine?.Trace?.Attributes["http.method"]) @(defaultTimeLine?.Trace?.Attributes["http.url"])">@(defaultTimeLine?.Trace?.Attributes["http.method"]) @(defaultTimeLine?.Trace?.Attributes["http.url"])</div>
                 <div class="px-2 rounded-sm" style="color:#fff;background-color:@((defaultTimeLine?.Faild ?? false)?"red":"green")">@(defaultTimeLine?.Trace?.Attributes["http.status_code"]) @((defaultTimeLine?.Faild ?? false) ? "Failed" : "OK")</div>
@@ -24,10 +24,10 @@
             <div class="d-flex">
                 @if (!string.IsNullOrEmpty(traceLinkUrl))
                 {
-                    <SButton Class="white--text blue darken-1"
-                             Style="text-transform: none"
-                             BorderRadiusClass="rounded-lg"
-                             OnClick="OpenTraceLogAsync">@I18n.Apm("Trace.Detail.TraceLog")</SButton>
+                <SButton Class="white--text blue darken-1"
+                Style="text-transform: none"
+                BorderRadiusClass="rounded-lg"
+                OnClick="OpenTraceLogAsync">@I18n.Apm("Trace.Detail.TraceLog")</SButton>
                 }
             </div>
         </div>
@@ -36,7 +36,7 @@
             <div class="font-weight-bold">Services</div>
             @foreach (var service in services)
             {
-                <div class="pl-2">@service</div>
+                <div class="pl-2"> <SIcon Small Color="@colors[services.IndexOf(service)]">mdi-circle</SIcon> @service</div>
             }
         </div>
     </MCardSubtitle>
@@ -91,7 +91,7 @@
                 <div style="width:calc(100% - 100px)">
                     <div class="d-flex mt-2">
                         <div class="left" style="width:@timeLine.Left%"></div>
-                        <div @onclick="(()=>ShowTraceDetail(timeLine))" class="process" title="@timeLine.Label" style="width:@timeLine.Process%"></div>
+                        <div @onclick="(()=>ShowTraceDetail(timeLine))" class="process" title="@timeLine.Label" style="width:@timeLine.Process%;background-color:@colors[services.IndexOf(timeLine.Trace.Resource["service.name"].ToString())]"></div>
                         <div class="right" style="width:@timeLine.Right%"></div>
                     </div>
                     <div class="@className" style="@style">

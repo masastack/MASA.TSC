@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using static Masa.Tsc.Contracts.Admin.Infrastructure.Const.TraceKeyConst;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints;
 
 public partial class TimeLine
@@ -30,7 +32,7 @@ public partial class TimeLine
     private bool loading = true;
     private int totalDuration = 0;
     private int stepDuration = 0;
-    private int lastDuration = 0;
+    private int lastDuration;
     private List<TreeLineDto> timeLines = new();
     DateTime start, end;
     bool showTimeLine = true;
@@ -42,6 +44,11 @@ public partial class TimeLine
     List<string> services = new();
     string? traceLinkUrl = default, spanLinkUrl = default;
 
+    private static List<string> colors = new() {
+        "rgb(84, 179, 153)",
+        "#5b9bd5","#ed7d31","#70ad47","#ffc000","#4472c4","#91d024","#b235e6","#02ae75",
+        "#a565ef","#628cee","#eb9358","#bb60b2","#433e7c","#f47a75","#009db2","#024b51","#0780cf","#765005"
+    };
 
     string ShowTimeLineIcon
     {
@@ -110,12 +117,30 @@ public partial class TimeLine
             SetRootTimeLine(traces);
         }
         while (traces.Count > 0);
-
+        defaultTimeLine = GetDefaultLine(timeLines)!;
         timeLines = timeLines.OrderBy(item => item.Trace.Timestamp).ToList();
         services = services.Distinct().ToList();
-        traceLinkUrl = GetUrl(timeLines[0]);
+        traceLinkUrl = GetUrl(defaultTimeLine);
     }
 
+    private TreeLineDto? GetDefaultLine(List<TreeLineDto>? data)
+    {
+        if (data == null || !data.Any())
+            return default;
+        foreach (var item in data)
+        {
+            if (item.Trace.Resource["service.name"].ToString() == Search.Service
+                && item.Trace.Kind == "SPAN_KIND_SERVER"
+                && item.Trace.Attributes.ContainsKey("http.target") && item.Trace.Attributes.ContainsKey("http.method")
+                && item.Trace.Attributes["http.target"].ToString() == Search.Endpoint && item.Trace.Attributes["http.method"].ToString() == Search.Method)
+            {
+                return item;
+            }
+            var find = GetDefaultLine(item.Children);
+            if (find != null) return find;
+        }
+        return default;
+    }
 
     private void SetRootTimeLine(List<TraceResponseDto> traces)
     {
@@ -143,10 +168,6 @@ public partial class TimeLine
             if (spanError != null)
             {
                 timeLine.ErrorCount = Convert.ToInt32(spanError.Y);
-            }
-            if (timeLine.Trace.TryParseHttp(out var _))
-            {
-                defaultTimeLine = timeLine;
             }
             timeLines.Add(timeLine);
         }
@@ -217,46 +238,10 @@ public partial class TimeLine
     /// <returns></returns>
     private List<TraceResponseDto> GetInteruptRootNodes(List<TraceResponseDto> traces)
     {
-        var parentIds = traces.Select(item => item.ParentSpanId).Distinct().ToList();
+        //var parentIds = traces.Select(item => item.ParentSpanId).Distinct().ToList();
         var allSpanIds = traces.Select(item => item.SpanId).Distinct().ToList();
         var roots = traces.Where(item => !allSpanIds.Contains(item.ParentSpanId));
         return roots.OrderBy(t => t.Timestamp).ToList();
-
-        //var roots = traces.Where(item => parentIds.Contains(item.SpanId)).ToList();
-        //if (!roots.Any())
-
-        //do
-        //{
-        //    var nextRoots = roots.Where(item => parentIds.Contains(item.SpanId)).ToList();
-        //    if (nextRoots.Any())
-        //        roots = nextRoots;
-        //    else
-        //        return roots;
-        //} while (true);
-
-
-
-        //var childIds = traces.Where(item => !string.IsNullOrEmpty(item.ParentSpanId) && parentIds.Contains(item.ParentSpanId)).Select(item => item.SpanId).Distinct().ToList();
-        //var roots = traces.Where(item => !string.IsNullOrEmpty(item.ParentSpanId) && parentIds.Contains(item.SpanId) && !childIds.Contains(item.SpanId));
-        //return roots.OrderBy(t => t.Timestamp).ToList();
-
-
-
-        /*
-         *   2,1
-         *   3,2
-         *   4,2
-         *   5,3
-         * 
-         *   p: 1,2,3
-         *   c:  2,3,4,5
-         *   
-         *   1,2
-         *   2,3
-         * 
-         * 
-         * 
-         * */
     }
 
     private void CaculateTotalTime(DateTime start, DateTime end)
@@ -284,8 +269,6 @@ public partial class TimeLine
     {
         await JSRuntime.InvokeVoidAsync("open", traceLinkUrl, "_blank");
     }
-
-    private StringNumber index = 1;
 }
 
 public class TreeLineDto
@@ -395,11 +378,40 @@ public class TreeLineDto
         else if (trace.TryParseHttp(out var http))
         {
             IsClient = trace.Kind == "SPAN_KIND_CLIENT";
-            Name = $"{http.Method} {http.Url} ";
-            Icon = "md:http";
-            Type = $"HTTP {(IsClient ? "Client " : "")} {http.StatusCode}";
+            bool isMaui = trace.Attributes.ContainsKey("client.type") && trace.Attributes["client.type"].ToString() == "maui-blazor";
+            bool isDapr = trace.Attributes.ContainsKey("user_agent.original") && trace.Attributes["user_agent.original"].ToString()!.Contains("dapr-sdk");
+            if (isMaui)
+            {
+                if (trace.Attributes.ContainsKey("client.title"))
+                    Name = trace.Attributes["client.title"].ToString()!;
+                else if (trace.Attributes.ContainsKey("http.target"))
+                    Name = trace.Attributes["http.target"].ToString()!;
+                else
+                    Name = http.Url;
+                Icon = "fas fa-mobile";
+                Type = "HTTP MAUI";
+            }
+            else
+            {
+                Name = $"{http.Method} {http.Url} ";
+                if (isDapr)
+                {
+                    Icon = "fas fa-grip";
+                    Type = $"HTTP DaprClient {http.StatusCode}";
+                }
+                else
+                {
+                    Icon = "md:http";
+                    Type = $"HTTP {(IsClient ? "Client " : "")} {http.StatusCode}";
+                }
+            }
+
             NameClass = "font-weight-black";
             Faild = errorStatus.Contains(http.StatusCode);
+        }
+        else
+        {
+            Name = trace.Name;
         }
         if (trace.TryParseException(out var exception))
         {

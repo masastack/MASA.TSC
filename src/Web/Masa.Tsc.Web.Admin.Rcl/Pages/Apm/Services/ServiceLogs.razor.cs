@@ -59,7 +59,7 @@ public partial class ServiceLogs
 
     private StringNumber GetHeight()
     {
-        return ShowChart ? 300 : 500;
+        return ShowChart ? "calc(100vh - 620px)" : "calc(100vh - 420px)";
     }
 
     protected override async Task OnParametersSetAsync()

@@ -9,6 +9,7 @@
 <MTabs @bind-Value="index" Class="rounded-t-xl">
     <MTab Value="1">@I18n.Apm("Tabs.Overview")</MTab>
     <MTab Value="2">@I18n.Apm("Tabs.Errors")</MTab>
+    <MTab Value="3">@I18n.Apm("Tabs.Logs")</MTab>
 </MTabs>
 <CascadingValue Value="Search">
     <div style="height:calc(100vh - 280px)" class="overflow-y-scroll">
@@ -18,6 +19,9 @@
             </MTabItem>
             <MTabItem Value="2">
                 <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceErrors />
+            </MTabItem>
+            <MTabItem Value="3">
+                <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceLogs ShowChart=false />
             </MTabItem>
         </MTabsItems>
     </div>

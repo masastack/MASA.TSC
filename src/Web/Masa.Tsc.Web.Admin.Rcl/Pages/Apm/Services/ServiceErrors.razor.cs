@@ -62,7 +62,7 @@ public partial class ServiceErrors
 
     private StringNumber GetHeight()
     {
-        return ShowChart ? 300 : 500;
+        return ShowChart ? "calc(100vh - 620px)" : "calc(100vh - 420px)";
     }
 
     private async Task OnPageChange((int page, int pageSize) pageData)

@@ -26,9 +26,9 @@ public partial class Endpoint
     private string? sortFiled;
     private bool? sortBy;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
         if (!string.IsNullOrEmpty(TraceId))
         {
             Search.TextField = StorageConst.Current.TraceId;

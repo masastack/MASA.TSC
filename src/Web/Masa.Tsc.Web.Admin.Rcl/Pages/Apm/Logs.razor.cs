@@ -32,15 +32,15 @@ public partial class Logs
     private bool dialogShow = false;
     private LogResponseDto current = null;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
         if (!string.IsNullOrEmpty(TaskId))
         {
             Search.TextField = StorageConst.Current.Log.TaskId;
             Search.TextValue = TaskId;
             StateHasChanged();
-        }        
+        }
     }
 
     public async Task OnTableOptionsChanged(DataOptions sort)

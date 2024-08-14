@@ -783,7 +783,7 @@ order by `Attributes.http.status_code`";
                 sql.AppendLine($" and {StorageConst.Current.Trace.HttpMethod}=@method");
                 parameters.Add(new ClickHouseParameter { ParameterName = "method", Value = traceQuery.Method });
             }
-            if (!string.IsNullOrEmpty(traceQuery.StatusCode))
+            if (!isMetric && !string.IsNullOrEmpty(traceQuery.StatusCode))
             {
                 traceQuery.IsInstrument = true;
                 sql.AppendLine($" and {StorageConst.Current.Trace.HttpStatusCode}=@status_code");

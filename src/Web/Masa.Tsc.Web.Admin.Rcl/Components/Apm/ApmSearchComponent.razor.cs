@@ -45,11 +45,53 @@ public partial class ApmSearchComponent : IDisposable
 
     private bool isCallQuery = false;
     private QuickRangeKey quickRangeKey = QuickRangeKey.Last15Minutes;
-    private List<string> textFileds;
+    private List<string> textFileds=new();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        textFileds = new List<string> {
+                StorageConst.Current.TraceId,
+                StorageConst.Current.SpanId
+        };
+        if (IsEndpoint)
+        {
+            textFileds.AddRange(new string[] {
+                StorageConst.Current.Trace.URLFull,
+                StorageConst.Current.Trace.UserId,
+                StorageConst.Current.Trace.HttpRequestBody
+            });
+        }
+        else if (!IsService)
+        {
+            textFileds.Add(StorageConst.Current.ExceptionMessage);
+            if (IsLog)
+            {
+                textFileds.Add(StorageConst.Current.Log.Body);
+                textFileds.Add(StorageConst.Current.Log.TaskId);
+            }
+        }
+        if (string.IsNullOrEmpty(Value.TextField) || !textFileds.Contains(Value.TextField))
+            Value.TextField = textFileds[0];
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (string.IsNullOrEmpty(uri.Query))
+        {
+            if (string.IsNullOrEmpty(Search.Environment) && string.IsNullOrEmpty(Search.Service) && !string.IsNullOrEmpty(UserContext.Environment))
+                Search.Environment = UserContext.Environment;
+            if (Search.ComparisonType == ApmComparisonTypes.None)
+                Search.ComparisonType = ApmComparisonTypes.Day;
+        }
+
+        if (!string.IsNullOrEmpty(Search.SpanId))
+        {
+            Search.TextField = StorageConst.Current.SpanId;
+            Search.TextValue = Search.SpanId;
+        }
+        else if (!string.IsNullOrEmpty(Search.TraceId))
+        {
+            Search.TextField = StorageConst.Current.TraceId;
+            Search.TextValue = Search.TraceId;
+        }
         GlobalConfig.CurrentTeamId = MasaUser.CurrentTeamId;
         if (Search.Start > DateTime.MinValue && Search.End > Search.Start)
         {
@@ -121,49 +163,7 @@ public partial class ApmSearchComponent : IDisposable
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        GlobalConfig.OnCurrentTeamChanged += TeamChanged;
-        textFileds = new List<string> {
-                StorageConst.Current.TraceId,
-                StorageConst.Current.SpanId
-        };
-        if (IsEndpoint)
-        {
-            textFileds.AddRange(new string[] {
-                StorageConst.Current.Trace.URLFull,
-                StorageConst.Current.Trace.UserId,
-                StorageConst.Current.Trace.HttpRequestBody
-            });
-        }
-        else if (!IsService)
-        {
-            textFileds.Add(StorageConst.Current.ExceptionMessage);
-            if (IsLog)
-            {
-                textFileds.Add(StorageConst.Current.Log.Body);
-                textFileds.Add(StorageConst.Current.Log.TaskId);
-            }
-        }
-        if (string.IsNullOrEmpty(Value.TextField) || !textFileds.Contains(Value.TextField))
-            Value.TextField = textFileds[0];
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        if (string.IsNullOrEmpty(uri.Query))
-        {
-            if (string.IsNullOrEmpty(Search.Environment) && string.IsNullOrEmpty(Search.Service) && !string.IsNullOrEmpty(UserContext.Environment))
-                Search.Environment = UserContext.Environment;
-            if (Search.ComparisonType == ApmComparisonTypes.None)
-                Search.ComparisonType = ApmComparisonTypes.Day;
-        }
-
-        if (!string.IsNullOrEmpty(Search.SpanId))
-        {
-            Search.TextField = StorageConst.Current.SpanId;
-            Search.TextValue = Search.SpanId;
-        }
-        else if (!string.IsNullOrEmpty(Search.TraceId))
-        {
-            Search.TextField = StorageConst.Current.TraceId;
-            Search.TextValue = Search.TraceId;
-        }
+        GlobalConfig.OnCurrentTeamChanged += TeamChanged;        
     }
 
     private void TeamChanged(Guid teamId)

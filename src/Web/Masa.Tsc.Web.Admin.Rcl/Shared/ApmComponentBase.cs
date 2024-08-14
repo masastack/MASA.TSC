@@ -41,6 +41,7 @@ public partial class ApmComponentBase : MasaComponentBase
             StorageConst.Init(new ClickhouseStorageConst());
         else if (setting.IsElasticsearch)
             StorageConst.Init(new ElasticsearchStorageConst());
+
     }
     protected override void OnInitialized()
     {
@@ -97,7 +98,8 @@ public partial class ApmComponentBase : MasaComponentBase
          string? traceId = default,
          string? spanId = default,
          string? search = default,
-         string? method = default)
+         string? method = default,
+         string? statusCode = default)
     {
         var text = new StringBuilder();
         if (!string.IsNullOrEmpty(env))
@@ -124,6 +126,8 @@ public partial class ApmComponentBase : MasaComponentBase
             text.AppendFormat("&search={0}", HttpUtility.UrlEncode(search));
         if (!string.IsNullOrEmpty(method))
             text.AppendFormat("&method={0}", method);
+        if (!string.IsNullOrEmpty(statusCode))
+            text.AppendFormat("&status={0}", statusCode);
 
         if (text.Length > 0)
             text.Remove(0, 1).Insert(0, "?");
