@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using System;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services;
 
 public partial class ServiceEndpoints
@@ -84,6 +86,14 @@ public partial class ServiceEndpoints
     {
         if (isTableLoading) return;
         isTableLoading = true;
+        if (string.IsNullOrEmpty(SearchData.Service))
+        {
+            total = 0;
+            data.Clear();
+            isTableLoading = false;
+            return;
+        }
+
         var query = new BaseApmRequestDto
         {
             Page = page,

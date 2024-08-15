@@ -8,6 +8,15 @@ public partial class OverView
     [CascadingParameter]
     public SearchData SearchData { get; set; }
 
+    [Parameter]
+    public EventCallback<string> OnSpanIdChanged { get; set; }
+
+    private async Task SpanIdChange(string spanId)
+    {
+        if (OnSpanIdChanged.HasDelegate)
+            await OnSpanIdChanged.InvokeAsync(spanId);
+    }
+
     private static readonly List<(MetricTypes, string)> metricTypes = new() { (MetricTypes.Avg, "avg"), (MetricTypes.P95, "p95"), (MetricTypes.P99, "p99") };
     private readonly LatencyTypeChartData metricTypeChartData = new();
     private ChartData throughput = new();
@@ -69,30 +78,6 @@ public partial class OverView
                 if (total - 500 > 0) total = 500;
             }
         }
-        //加载最后一页
-        //else if (total - page >= 0 && traceIds.Count - page <= 0 && traceTails.Count == 0)
-        //{
-        //    var result1 = await ApiCaller.ApmService.GetSimpleTraceListAsync(new ApmEndpointRequestDto
-        //    {
-        //        Start = SearchData.Start,
-        //        End = SearchData.End,
-        //        Endpoint = SearchData.Endpoint!,
-        //        Method = SearchData.Method,
-        //        Service = SearchData.Service!,
-        //        Env = SearchData.Environment!,
-        //        Page = 1,
-        //        PageSize = 100,
-        //        //Queries = SearchData.Text,
-        //        OrderField = "Timestamp",
-        //        IsDesc = false,
-        //        HasPage = true
-        //    });
-
-        //    if (result1 != null && result1.Result != null)
-        //    {
-        //        traceTails.AddRange(result1.Result.OrderByDescending(item => item.Timestamp));
-        //    }
-        //}
 
         if (traceIds.Count - page >= 0)
             trace = traceIds[page - 1];

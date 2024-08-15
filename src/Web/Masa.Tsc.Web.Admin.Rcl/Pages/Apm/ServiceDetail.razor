@@ -3,8 +3,7 @@
 @page "/apm/services/{name}"
 <PageTitle>@I18n.Apm("PageTitles.ServiceDetail")</PageTitle>
 
-<ApmSearchComponent @bind-Value="Search" IsService
-                    ShowComparison />
+<ApmSearchComponent Value="Search" ValueChanged="OnSearchValueChanged" IsService ShowComparison />
 
 <MTabs @bind-Value="index" Class="rounded-t-xl">
     <MTab Value="1">@I18n.Apm("Tabs.Overview")</MTab>

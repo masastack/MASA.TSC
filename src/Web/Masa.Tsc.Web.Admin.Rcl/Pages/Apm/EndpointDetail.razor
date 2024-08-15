@@ -15,13 +15,13 @@
     <div style="height:calc(100vh - 280px)" class="overflow-y-scroll">
         <MTabsItems @bind-Value="index" Class="rounded-b-xl">
             <MTabItem Value="1">
-                <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints.OverView />
+                <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints.OverView OnSpanIdChanged="SpanIdChange" />
             </MTabItem>
             <MTabItem Value="2">
-                <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceErrors />
+                <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceErrors SpanId="@spanId" />
             </MTabItem>
             <MTabItem Value="3">
-                <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceLogs ShowChart=false />
+                <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceLogs ShowChart=false SpanId="@spanId" />
             </MTabItem>
         </MTabsItems>
     </div>

@@ -15,6 +15,9 @@ public partial class ServiceLogs
     public MetricTypes MetricType { get; set; }
 
     [Parameter]
+    public string SpanId { get; set; }
+
+    [Parameter]
     public bool ShowAppEvent { get; set; } = true;
 
     private List<DataTableHeader<LogResponseDto>> headers => new()
@@ -32,7 +35,7 @@ public partial class ServiceLogs
     private bool isTableLoading = false;
     private string? sortFiled = nameof(LogResponseDto.Timestamp);
     private bool sortBy = true;
-    private string lastKey = string.Empty;
+    private string lastKey = string.Empty, lastSpanId=string.Empty;
     private readonly ChartData chart = new();
     private bool dialogShow = false;
     private LogResponseDto current = null;
@@ -66,9 +69,10 @@ public partial class ServiceLogs
     {
         await base.OnParametersSetAsync();
         var key = MD5Utils.Encrypt(JsonSerializer.Serialize(SearchData));
-        if (lastKey != key)
+        if (lastKey != key || SpanId != null && SpanId != lastSpanId || SpanId == null && lastSpanId.Length > 0)
         {
             lastKey = key;
+            lastSpanId = SpanId ?? string.Empty;
             await LoadAsync();
             await LoadChartDataAsync();
         }
@@ -126,7 +130,7 @@ public partial class ServiceLogs
                 Start = SearchData.Start,
                 End = SearchData.End,
                 TraceId = SearchData.TraceId,
-                Service = SearchData.Service,
+                Service = SearchData.Service,                
                 Sort = new FieldOrderDto
                 {
                     IsDesc = sortBy,
@@ -145,6 +149,14 @@ public partial class ServiceLogs
                     Name = StorageConst.Current.Log.Body,
                     Value = "Event",
                     Type = ConditionTypes.NotRegex
+                });
+            }
+            if (!string.IsNullOrEmpty(lastSpanId))
+            {
+                list.Add(new FieldConditionDto {
+                    Name = StorageConst.Current.SpanId,
+                    Value = lastSpanId,
+                    Type = ConditionTypes.Equal
                 });
             }
             query.Conditions = list;

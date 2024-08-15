@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using static Masa.Tsc.Contracts.Admin.Infrastructure.Const.TraceKeyConst;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints;
 
 public partial class TimeLine
@@ -28,6 +26,9 @@ public partial class TimeLine
     [Parameter]
     public EventCallback<int> PageChanged { get; set; }
 
+    [Parameter]
+    public EventCallback<string> OnSpanIdChanged { get; set; }
+
     private string? lastKey = default;
     private bool loading = true;
     private int totalDuration = 0;
@@ -43,6 +44,7 @@ public partial class TimeLine
     TreeLineDto defaultTimeLine = null;
     List<string> services = new();
     string? traceLinkUrl = default, spanLinkUrl = default;
+    private string urlService, UrlEndpoint, urlMethod;
 
     private static List<string> colors = new() {
         "rgb(84, 179, 153)",
@@ -58,9 +60,9 @@ public partial class TimeLine
         }
     }
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
-        base.OnParametersSet();
+        await base.OnParametersSetAsync();
 
         var str = $"{JsonSerializer.Serialize(Data)}";
         var key = MD5Utils.Encrypt(str);
@@ -68,9 +70,19 @@ public partial class TimeLine
         {
             loading = true;
             lastKey = key;
-            CaculateTimelines(Data?.ToList());
+            await CaculateTimelines(Data?.ToList());
             loading = false;
         }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var values = HttpUtility.ParseQueryString(uri.Query);
+        urlService = values.Get("service")!;
+        UrlEndpoint = values.Get("endpoint")!;
+        urlMethod = values.Get("method")!;
     }
 
     protected override async Task OnInitializedAsync()
@@ -79,7 +91,7 @@ public partial class TimeLine
         await base.OnInitializedAsync();
     }
 
-    private void CaculateTimelines(List<TraceResponseDto>? traces)
+    private async Task CaculateTimelines(List<TraceResponseDto>? traces)
     {
         traceLinkUrl = default;
         spanLinkUrl = default;
@@ -118,6 +130,8 @@ public partial class TimeLine
         }
         while (traces.Count > 0);
         defaultTimeLine = GetDefaultLine(timeLines)!;
+        if (OnSpanIdChanged.HasDelegate)
+            await OnSpanIdChanged.InvokeAsync(defaultTimeLine?.Trace?.SpanId);
         timeLines = timeLines.OrderBy(item => item.Trace.Timestamp).ToList();
         services = services.Distinct().ToList();
         traceLinkUrl = GetUrl(defaultTimeLine);
@@ -129,10 +143,10 @@ public partial class TimeLine
             return default;
         foreach (var item in data)
         {
-            if (item.Trace.Resource["service.name"].ToString() == Search.Service
+            if (item.Trace.Resource["service.name"].ToString() == urlService
                 && item.Trace.Kind == "SPAN_KIND_SERVER"
                 && item.Trace.Attributes.ContainsKey("http.target") && item.Trace.Attributes.ContainsKey("http.method")
-                && item.Trace.Attributes["http.target"].ToString() == Search.Endpoint && item.Trace.Attributes["http.method"].ToString() == Search.Method)
+                && item.Trace.Attributes["http.target"].ToString() == UrlEndpoint && item.Trace.Attributes["http.method"].ToString() == urlMethod)
             {
                 return item;
             }
@@ -379,30 +393,30 @@ public class TreeLineDto
         {
             IsClient = trace.Kind == "SPAN_KIND_CLIENT";
             bool isMaui = trace.Attributes.ContainsKey("client.type") && trace.Attributes["client.type"].ToString() == "maui-blazor";
-            bool isDapr = trace.Attributes.ContainsKey("user_agent.original") && trace.Attributes["user_agent.original"].ToString()!.Contains("dapr-sdk");
+            bool isDapr = http.Url.StartsWith("http://127.0.0.1:3500/");
             if (isMaui)
             {
-                if (trace.Attributes.ContainsKey("client.title"))
+                if (trace.Attributes.ContainsKey("client.title") && trace.Attributes["client.title"].ToString()!.Length > 0)
                     Name = trace.Attributes["client.title"].ToString()!;
                 else if (trace.Attributes.ContainsKey("http.target"))
                     Name = trace.Attributes["http.target"].ToString()!;
                 else
                     Name = http.Url;
                 Icon = "fas fa-mobile";
-                Type = "HTTP MAUI";
+                Type = "MAUI Client";
             }
             else
             {
                 Name = $"{http.Method} {http.Url} ";
-                if (isDapr)
+                if (isDapr && IsClient)
                 {
                     Icon = "fas fa-grip";
-                    Type = $"HTTP DaprClient {http.StatusCode}";
+                    Type = $"Dapr Client {http.StatusCode}";
                 }
                 else
                 {
                     Icon = "md:http";
-                    Type = $"HTTP {(IsClient ? "Client " : "")} {http.StatusCode}";
+                    Type = $"Http {(IsClient ? "Client " : "")} {http.StatusCode}";
                 }
             }
 

@@ -8,6 +8,8 @@ public partial class EndpointDetail
     private StringNumber index = 1;
     protected override bool IsPage => true;
 
+    private string spanId = default!;
+
     [Parameter]
     public string Name { get; set; }
 
@@ -16,4 +18,6 @@ public partial class EndpointDetail
         Search = data;
         StateHasChanged();
     }
+
+    private void SpanIdChange(string spanId)=>this.spanId = spanId;
 }

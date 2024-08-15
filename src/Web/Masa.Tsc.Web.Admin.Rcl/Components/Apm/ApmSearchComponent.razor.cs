@@ -43,9 +43,9 @@ public partial class ApmSearchComponent : IDisposable
     private Dictionary<string, List<string>> enviromentServices = new();
     private bool isServiceLoading = true, isEnvLoading = true;
 
-    private bool isCallQuery = false;
+    private bool Isloaded = false;
     private QuickRangeKey quickRangeKey = QuickRangeKey.Last15Minutes;
-    private List<string> textFileds=new();
+    private List<string> textFileds = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -98,16 +98,17 @@ public partial class ApmSearchComponent : IDisposable
             SetQuickRangeKey(Search.End - Search.Start);
         }
 
-        if (!isCallQuery && Search.Start > DateTime.MinValue)
+        await OnValueChanged();
+
+        if (Search.Start > DateTime.MinValue)
         {
             await LoadEnvironmentAsync();
             await LoadServiceAsync();
-            await OnValueChanged();
             await LoadEndpointAsync();
             await LoadErrorAsync();
-            isCallQuery = true;
+            await LoadAsync();
+            Isloaded = true;
         }
-        await LoadAsync();
     }
 
     private void SetQuickRangeKey(TimeSpan timeSpan)
@@ -163,7 +164,7 @@ public partial class ApmSearchComponent : IDisposable
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        GlobalConfig.OnCurrentTeamChanged += TeamChanged;        
+        GlobalConfig.OnCurrentTeamChanged += TeamChanged;
     }
 
     private void TeamChanged(Guid teamId)
@@ -178,12 +179,13 @@ public partial class ApmSearchComponent : IDisposable
             StateHasChanged();
         });
     }
+
     private async Task LoadServiceAsync()
     {
         isServiceLoading = true;
         if (!string.IsNullOrEmpty(Search.Environment))
         {
-            if (!enviromentServices.TryGetValue(Search.Environment!, out services))
+            if (!enviromentServices.TryGetValue(Search.Environment!, out services!))
                 services = new();
         }
         else
@@ -197,6 +199,7 @@ public partial class ApmSearchComponent : IDisposable
         if (!string.IsNullOrEmpty(Search.Service) && !services.Contains(Search.Service))
             Search.Service = default!;
         isServiceLoading = false;
+        await Task.CompletedTask;
     }
 
     private async Task LoadEnvironmentAsync()
@@ -225,6 +228,8 @@ public partial class ApmSearchComponent : IDisposable
 
     private async Task OnTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) times)
     {
+        if (Search.Start > DateTime.MinValue && !Isloaded)
+            return;
         Search.Start = times.start!.Value.UtcDateTime;
         Search.End = times.end!.Value.UtcDateTime;
         await LoadEnvironmentAsync();

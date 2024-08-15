@@ -12,7 +12,7 @@ public partial class ApmComponentBase : MasaComponentBase
     public TscCaller ApiCaller { get; set; }
 
     [Inject]
-    public virtual SearchData Search { get; set; }
+    public virtual SearchData Search { get; set; }   
 
     public static TimeZoneInfo CurrentTimeZone { get; private set; }
 

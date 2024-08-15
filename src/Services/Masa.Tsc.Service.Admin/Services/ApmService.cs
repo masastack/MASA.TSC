@@ -75,7 +75,7 @@ public class ApmService : ServiceBase
         return await apmService.ChartDataAsync(queryDto);
     }
 
-    public async Task<EndpointLatencyDistributionDto> GetLatencyDistributions([FromServices] IApmService apmService, string start, string end, string? env, string? service, string endpoint, string? method, string? textField, string? textValue, string? exType, string? traceId)
+    public async Task<EndpointLatencyDistributionDto> GetLatencyDistributions([FromServices] IApmService apmService, string start, string end, string? env, string? service, string? endpoint, string? method, string? textField, string? textValue, string? exType, string? traceId)
         => await apmService.EndpointLatencyDistributionAsync(new ApmEndpointRequestDto
         {
             Start = start.ParseUTCTime(),

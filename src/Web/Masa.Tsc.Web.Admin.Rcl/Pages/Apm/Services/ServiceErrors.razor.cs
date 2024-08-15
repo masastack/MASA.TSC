@@ -8,6 +8,10 @@ public partial class ServiceErrors
     [CascadingParameter]
     public SearchData SearchData { get; set; }
 
+    //跟相关的接口关联查询使用
+    [Parameter]
+    public string SpanId { get; set; }
+
     [Parameter]
     public bool ShowChart { get; set; } = true;
 
@@ -29,9 +33,8 @@ public partial class ServiceErrors
     private bool isTableLoading = false;
     private string sortFiled = nameof(ErrorMessageDto.Total);
     private bool sortBy = true;
-    private string lastKey = string.Empty;
+    private string lastKey = string.Empty, lastSpanId = string.Empty;
     private ChartData chart = new();
-
 
     private async Task OnTableOptionsChanged(DataOptions sort)
     {
@@ -50,9 +53,10 @@ public partial class ServiceErrors
     protected override async Task OnParametersSetAsync()
     {
         var key = MD5Utils.Encrypt(JsonSerializer.Serialize(SearchData));
-        if (lastKey != key)
+        if (lastKey != key || SpanId != null && SpanId != lastSpanId || SpanId == null && lastSpanId.Length > 0)
         {
             lastKey = key;
+            lastSpanId = SpanId ?? string.Empty;
             await LoadASync();
             StateHasChanged();
             await LoadChartDataAsync();
@@ -124,12 +128,12 @@ public partial class ServiceErrors
                 Start = SearchData.Start,
                 End = SearchData.End,
                 OrderField = sortFiled,
-                //Queries = Search.Text,
                 TraceId = SearchData.TraceId,
                 Service = SearchData.Service,
                 Env = SearchData.Environment,
-                IsDesc = sortBy,
-                Endpoint = SearchData.Endpoint!
+                IsDesc = sortBy,                
+                TextField = StorageConst.Current.SpanId,
+                TextValue = lastSpanId
             };
             var result = await ApiCaller.ApmService.GetErrorsPageAsync(query);
             data = result.Result?.ToList() ?? new();

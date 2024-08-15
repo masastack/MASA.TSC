@@ -16,4 +16,10 @@ public partial class ServiceDetail
         base.OnInitialized();
         Search.Endpoint = default!;
     }
+
+    private void OnSearchValueChanged(SearchData data)
+    {
+        Search = data;
+        StateHasChanged();
+    }
 }
