@@ -5,17 +5,20 @@ namespace Masa.Tsc.Storage.Clickhouse.Apm;
 
 internal static class ApmClickhouseInit
 {
+    private static string AppLogTable = default!;
+    private static string AppTraceTable = default!;
+
     public static void Init(MasaStackClickhouseConnection connection, string suffix, string? logTable = null, string? traceTable = null)
     {
-        InitModelTable(connection);
-        InitErrorTable(connection, logTable);
         InitAppTable(connection, suffix, logTable, traceTable);
+        InitModelTable(connection);
+        InitErrorTable(connection);
         InitAggregateTable(connection);
         InitDurationTable(connection);
         InitDurationCountTable(connection);
     }
 
-    private static void InitErrorTable(MasaStackClickhouseConnection connection, string? appLogTable = null)
+    private static void InitErrorTable(MasaStackClickhouseConnection connection)
     {
         var sql = @$"CREATE TABLE {Constants.ErrorTable}
 (
@@ -54,10 +57,9 @@ SETTINGS index_granularity = 8192,
 ";
         ClickhouseInit.InitTable(connection, Constants.ErrorTable, sql);
         InitErrorView(connection, Constants.ErrorTable.Replace(".", ".v_"), MasaStackClickhouseConnection.LogSourceTable);
-        if (!string.IsNullOrEmpty(appLogTable))
+        if (!string.IsNullOrEmpty(AppLogTable))
         {
-            string database = string.IsNullOrEmpty(connection.ConnectionSettings.Database) ? default! : $"{connection.ConnectionSettings.Database}.";
-            InitErrorView(connection, $"{database}v_{appLogTable}_errors", appLogTable);
+            InitErrorView(connection, Constants.ErrorTable.Replace(".", ".v_app_"), AppLogTable);
         }
     }
 
@@ -73,24 +75,24 @@ multiIf(
   length(`Attributes.exception.message`)-150<=0,`Attributes.exception.message`,  
   extract(`Attributes.exception.message`, '[^,:\\.£º£¬\{{\[]+')) AS MsgGroupKey
 FROM {source}
-WHERE mapContains(LogAttributes, 'exception.type')
+WHERE SeverityText in ['Error','Critical'] and mapContains(LogAttributes, 'exception.type')
 ";
         ClickhouseInit.InitTable(connection, table, sql);
     }
 
     private static void InitAppTable(MasaStackClickhouseConnection connection, string suffix, string? logTable, string? traceTable)
     {
-        string database = string.IsNullOrEmpty(connection.ConnectionSettings.Database) ? default! : $"{connection.ConnectionSettings.Database}.";
-
         if (!string.IsNullOrEmpty(logTable))
         {
-            ClickhouseInit.InitLogView($"{database}v_{logTable}_{suffix}", logTable);
+            AppLogTable = logTable;
+            ClickhouseInit.InitLog(MasaStackClickhouseConnection.LogTable, MasaStackClickhouseConnection.LogTable.Replace(".", ".v_app_"), logTable);
         }
         if (!string.IsNullOrEmpty(traceTable))
         {
-            ClickhouseInit.InitTraceView($"{database}v_{traceTable}_spans_{suffix}", MasaStackClickhouseConnection.TraceHttpServerTable, traceTable, "where SpanKind =='SPAN_KIND_SERVER' and mapContains(SpanAttributes,'http.url')");
-            ClickhouseInit.InitTraceView($"{database}v_{traceTable}_clients_{suffix}", MasaStackClickhouseConnection.TraceHttpClientTable, traceTable, "where SpanKind =='SPAN_KIND_CLIENT' and mapContains(SpanAttributes,'http.url')");
-            ClickhouseInit.InitTraceView($"{database}v_{traceTable}_others_{suffix}", MasaStackClickhouseConnection.TraceOtherClientTable, traceTable, "where not (SpanKind =='SPAN_KIND_SERVER' and mapContains(SpanAttributes,'host.name')) and not (SpanKind =='SPAN_KIND_CLIENT' and mapContains(SpanAttributes,'http.url'))");
+            AppTraceTable = traceTable;
+            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, traceTable, MasaStackClickhouseConnection.TraceHttpServerTable.Replace(".", ".v_app_"), "where SpanKind =='SPAN_KIND_SERVER' and mapContainsKeyLike(SpanAttributes, 'http.%')");
+            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, traceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_app_"), "where SpanKind =='SPAN_KIND_CLIENT' and mapContainsKeyLike(SpanAttributes, 'http.%')");
+            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, traceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_app_"), "where not (SpanKind =='SPAN_KIND_SERVER' and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind =='SPAN_KIND_CLIENT' and mapContainsKeyLike(SpanAttributes, 'http.%'))");
         }
     }
 
@@ -105,8 +107,7 @@ WHERE mapContains(LogAttributes, 'exception.type')
     private static void InitAggregateTable(MasaStackClickhouseConnection connection, string interval, string tableName)
     {
         var viewTable = tableName.Replace(".", ".v_");
-        var sql = new string[] {
-        $@"CREATE TABLE {tableName}
+        var sql = $@"CREATE TABLE {tableName}
 (
     `ServiceName` String,
     `Resource.service.namespace` String,
@@ -129,7 +130,18 @@ Attributes.http.method,
  Resource.service.namespace 
  )
  TTL toDateTime(Timestamp) + toIntervalDay(30)
-SETTINGS index_granularity = 8192",
+SETTINGS index_granularity = 8192";
+        ClickhouseInit.InitTable(connection, tableName, sql);
+        InitAggregateTable1_5_1(connection, interval, tableName, viewTable, MasaStackClickhouseConnection.TraceSourceTable);
+        if (!string.IsNullOrEmpty(AppTraceTable))
+            InitAggregateTable1_5_1(connection, interval, tableName, tableName.Replace(".", ".v_app_"), AppTraceTable);
+        InitAggregateTable1_9_0(connection, interval, tableName, viewTable, MasaStackClickhouseConnection.TraceSourceTable);
+    }
+
+    private static void InitAggregateTable1_5_1(MasaStackClickhouseConnection connection, string interval, string tableName, string viewTable, string sourceTable)
+    {
+        viewTable = $"{viewTable}_{OpenTelemetrySdks.OpenTelemetrySdk1_5_1.Replace('.', '_')}";
+        var sql =
 $@"CREATE MATERIALIZED VIEW {viewTable} TO {tableName}
 (
     `ServiceName` String,
@@ -154,19 +166,58 @@ SELECT
     sumState(has(['400','500','501','502','503'],SpanAttributes['http.status_code'])) as Failed,
     quantileState(0.99)(Duration) as P99,
     quantileState(0.95)(Duration) as P95 
-FROM {MasaStackClickhouseConnection.TraceSourceTable}
+FROM {sourceTable}
 WHERE
 SpanKind='SPAN_KIND_SERVER'
+and ResourceAttributes ['telemetry.sdk.version'] in ['{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}','{OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid}']
 GROUP BY
     ServiceName,
     `Resource.service.namespace`,
     `Attributes.http.target`,
     `Attributes.http.method`,
-    Timestamp"
-        };
+    Timestamp";
+        ClickhouseInit.InitTable(connection, viewTable, sql);
+    }
 
-        ClickhouseInit.InitTable(connection, tableName, sql[0]);
-        ClickhouseInit.InitTable(connection, viewTable, sql[1]);
+    private static void InitAggregateTable1_9_0(MasaStackClickhouseConnection connection, string interval, string tableName, string viewTable, string sourceTable)
+    {
+        viewTable = $"{viewTable}_{OpenTelemetrySdks.OpenTelemetrySdk1_9_0.Replace('.', '_')}";
+        var sql =
+$@"CREATE MATERIALIZED VIEW {viewTable} TO {tableName}
+(
+    `ServiceName` String,
+    `Resource.service.namespace` String,
+     `Attributes.http.target` String,
+    `Attributes.http.method` String,
+    `Timestamp` DateTime64(9),
+    `Latency` AggregateFunction(avg, Float64),
+    `Throughput` AggregateFunction(count, UInt8),
+    `Failed` AggregateFunction(count, UInt8),
+    `P99` AggregateFunction(quantile(0.99),Int64),
+    `P95` AggregateFunction(quantile(0.95), Int64)
+) AS
+SELECT
+    ServiceName,
+    ResourceAttributes['service.namespace'] `Resource.service.namespace`,
+    if(mapContains(SpanAttributes,'http.route'),SpanAttributes['http.route'],SpanAttributes['url.path']) `Attributes.http.target`,
+    SpanAttributes['http.request.method'] `Attributes.http.method`,
+    toStartOfInterval(Timestamp,INTERVAL {interval}) AS Timestamp,
+    avgState(Duration) AS Latency,
+    countState(1) AS Throughput,
+    sumState(has(['400','500','501','502','503'],SpanAttributes['http.response.status_code'])) as Failed,
+    quantileState(0.99)(Duration) as P99,
+    quantileState(0.95)(Duration) as P95 
+FROM {sourceTable}
+WHERE
+SpanKind='SPAN_KIND_SERVER'
+and ResourceAttributes ['telemetry.sdk.version'] in ['{OpenTelemetrySdks.OpenTelemetrySdk1_9_0}']
+GROUP BY
+    ServiceName,
+    `Resource.service.namespace`,
+    `Attributes.http.target`,
+    `Attributes.http.method`,
+    Timestamp";
+        ClickhouseInit.InitTable(connection, viewTable, sql);
     }
 
     private static void InitModelTable(MasaStackClickhouseConnection connection)
@@ -220,15 +271,16 @@ Duration)
 TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;";
+        var viewTableName = table.Replace(".", ".v_");
         var sqlView =
- $@"CREATE MATERIALIZED VIEW {table.Replace(".", ".v_")} TO {table}
+ $@"CREATE MATERIALIZED VIEW {viewTableName} TO {table}
 AS
 select Timestamp,ServiceName,Resource.service.namespace,Attributes.http.method,Attributes.http.status_code,Attributes.http.target,TraceId,Duration
 from 
 {MasaStackClickhouseConnection.TraceHttpServerTable}
 ";
         ClickhouseInit.InitTable(connection, table, sql);
-        ClickhouseInit.InitTable(connection, table.Replace(".", ".v_"), sqlView);
+        ClickhouseInit.InitTable(connection, viewTableName, sqlView);
     }
 
     private static void InitDurationCountTable(MasaStackClickhouseConnection connection)
@@ -258,8 +310,9 @@ from
                              Resource.service.namespace)
                             TTL toDateTime(Timestamp) + toIntervalDay(30)
                             SETTINGS index_granularity = 8192";
+        var viewTableName = table.Replace(".", ".v_");
         var sqlView =
- $@"CREATE MATERIALIZED VIEW {table.Replace(".", ".v_")} TO {table}
+ $@"CREATE MATERIALIZED VIEW {viewTableName} TO {table}
         AS
         SELECT
             toStartOfInterval(Timestamp,toIntervalMinute(1)) AS Timestamp,
@@ -278,6 +331,7 @@ from
             Timestamp,
             Duration";
         ClickhouseInit.InitTable(connection, table, sql);
-        ClickhouseInit.InitTable(connection, table.Replace(".", ".v_"), sqlView);
+        ClickhouseInit.InitTable(connection, viewTableName, sqlView);
     }
+
 }

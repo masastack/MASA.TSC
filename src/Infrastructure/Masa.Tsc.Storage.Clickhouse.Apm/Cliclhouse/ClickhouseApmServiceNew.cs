@@ -330,7 +330,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
                 sql1 = $@"select countMerge(Total) as Total from {Constants.DurationCountTable} where {where}";
             }
 
-            sql1 = CombineOrs(sql1, ors);
+            sql1 = CombineOrs(sql1, ors); 
             var countSql = $"select sum(Total) from({sql1})";
             result.Total = Convert.ToInt64(await Scalar(countSql, parameters));
         }

@@ -11,7 +11,6 @@
 		<PackageReference Include="IdentityModel" Version="6.1.0-preview.1" />
 		<PackageReference Include="Masa.Contrib.Development.DaprStarter.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Isolation.MultiEnvironment" Version="$(MasaFrameworkPackageVersion)" />
-		<!--<PackageReference Include="Masa.Contrib.StackSdks.Config" Version="$(MasaSdkPackageVersion)" />-->
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\ApiGateways\Masa.Tsc.ApiGateways.Caller\Masa.Tsc.ApiGateways.Caller.csproj" />

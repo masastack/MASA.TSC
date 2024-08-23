@@ -21,10 +21,10 @@ public static class ClickhouseInit
                 throw new ArgumentNullException(MasaStackClickhouseConnection.TraceSourceTable);
             if (!ExistsTable(Connection, MasaStackClickhouseConnection.LogSourceTable))
                 throw new ArgumentNullException(MasaStackClickhouseConnection.LogSourceTable);
-            InitLog();
-            InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, "where SpanKind =='SPAN_KIND_SERVER' and mapContains(SpanAttributes,'http.url')", "Attributes.http.target");
-            InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, "where SpanKind =='SPAN_KIND_CLIENT' and mapContains(SpanAttributes,'http.url')");
-            InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, "where not (SpanKind =='SPAN_KIND_SERVER' and mapContains(SpanAttributes,'host.name')) and not (SpanKind =='SPAN_KIND_CLIENT' and mapContains(SpanAttributes,'http.url'))");
+            InitLog(MasaStackClickhouseConnection.LogTable, MasaStackClickhouseConnection.LogTable.Replace(".", ".v_"), MasaStackClickhouseConnection.LogSourceTable);
+            InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceHttpServerTable.Replace(".", ".v_"), "where SpanKind =='SPAN_KIND_SERVER' and mapContainsKeyLike(SpanAttributes, 'http.%')");
+            InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_"), "where SpanKind =='SPAN_KIND_CLIENT' and mapContainsKeyLike(SpanAttributes, 'http.%')");
+            InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_"), "where not (SpanKind =='SPAN_KIND_SERVER' and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind =='SPAN_KIND_CLIENT' and mapContainsKeyLike(SpanAttributes, 'http.%'))");
             InitMappingTable();
             var timezoneStr = GetTimezone(Connection);
             MasaStackClickhouseConnection.TimeZone = TZConvert.GetTimeZoneInfo(timezoneStr);
@@ -35,9 +35,8 @@ public static class ClickhouseInit
         }
     }
 
-    private static void InitLog()
+    public static void InitLog(string table, string viewTable, string sourceTable)
     {
-        var viewTable = MasaStackClickhouseConnection.LogTable.Replace(".", ".v_");
         string sql = @$"CREATE TABLE {MasaStackClickhouseConnection.LogTable}
 (
     `Timestamp` DateTime64(9) CODEC(Delta(8), ZSTD(1)),
@@ -100,8 +99,8 @@ TTL toDateTime(Timestamp) + toIntervalDay(30)
 SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
 ";
-        InitTable(MasaStackClickhouseConnection.LogTable, sql);
-        InitLogView(viewTable, MasaStackClickhouseConnection.LogSourceTable);
+        InitTable(table, sql);
+        InitLogView(viewTable, sourceTable);
     }
 
     public static void InitLogView(string name, string sourceName)
@@ -121,12 +120,12 @@ mapKeys(ResourceAttributes) as ResourceAttributesKeys,mapValues(ResourceAttribut
 mapKeys(LogAttributes) as LogAttributesKeys,mapValues(LogAttributes) as LogAttributesValues
 FROM {sourceName}
 ";
+
         InitTable(name, sql);
     }
 
-    private static void InitTrace(string table, string where, params string[] orders)
+    private static void InitTraceTable(string table)
     {
-        var viewTable = table.Replace(".", ".v_");
         string sql =
             @$"CREATE TABLE {table}
 (
@@ -210,11 +209,25 @@ SETTINGS index_granularity = 8192,
  ttl_only_drop_parts = 1;
 ";
         InitTable(table, sql);
-        InitTraceView(viewTable, table, MasaStackClickhouseConnection.TraceSourceTable, where);
     }
 
-    public static void InitTraceView(string viewTable, string table, string sourceTable, string? where = null)
+    public static void InitTrace(string table, string sourceTable, string viewTable, string where)
     {
+        InitTraceTable(table);
+        InitTraceView(viewTable, table, sourceTable, where);
+    }
+
+    private static void InitTraceView(string viewTable, string table, string sourceTable, string where)
+    {
+        InitTraceView1_5_1(viewTable, table, sourceTable, where);
+        InitTraceView1_9_0(viewTable, table, sourceTable, where);
+    }
+
+    private static void InitTraceView1_5_1(string viewTable, string table, string sourceTable, string? where = null)
+    {
+        var versions = new string[] { OpenTelemetrySdks.OpenTelemetrySdk1_5_1, OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid };
+        viewTable = $"{viewTable}_{versions[0].Replace('.', '_')}";
+        where = $"{where} and ResourceAttributes ['telemetry.sdk.version'] in ['{string.Join("','", versions!)}']";
         var sql = $@"CREATE MATERIALIZED VIEW {viewTable} TO {table}
 AS
 SELECT
@@ -236,6 +249,42 @@ SELECT
     SpanAttributes['exception.type'] as `Attributes.exception.type`,   
     SpanAttributes['exception.message'] as `Attributes.exception.message`, 
     //concat(SpanAttributes['http.url'],' ',SpanAttributes['http.request.content_body'],' ',SpanAttributes['http.request_content_body'],' ',SpanAttributes['enduser.id'],' ',SpanAttributes['exception.type'],' ',SpanAttributes['exception.message']) as MasaKeyword, 
+
+    mapKeys(ResourceAttributes) AS ResourceAttributesKeys,
+    mapValues(ResourceAttributes) AS ResourceAttributesValues,
+    mapKeys(SpanAttributes) AS SpanAttributesKeys,
+    mapValues(SpanAttributes) AS SpanAttributesValues
+FROM {sourceTable}
+{where}
+";
+        InitTable(viewTable, sql);
+    }
+
+    private static void InitTraceView1_9_0(string viewTable, string table, string sourceTable, string? where = null)
+    {
+        var versions = new string[] { OpenTelemetrySdks.OpenTelemetrySdk1_9_0 };
+        viewTable = $"{viewTable}_{versions[0].Replace('.', '_')}";
+        where = $"{where} and ResourceAttributes ['telemetry.sdk.version'] in ['{string.Join("','", versions!)}']";
+        var sql = $@"CREATE MATERIALIZED VIEW {viewTable} TO {table}
+AS
+SELECT
+    Timestamp,TraceId,SpanId,ParentSpanId,TraceState,SpanName,SpanKind,ServiceName,toJSONString(ResourceAttributes) AS Resources,
+    ScopeName,ScopeVersion,toJSONString(SpanAttributes) AS Spans,
+    Duration,StatusCode,StatusMessage,Events.Timestamp,Events.Name,Events.Attributes,
+    Links.TraceId,Links.SpanId,Links.TraceState,Links.Attributes,
+    
+    ResourceAttributes['service.namespace'] as `Resource.service.namespace`,ResourceAttributes['service.version'] as `Resource.service.version`,
+    ResourceAttributes['service.instance.id'] as `Resource.service.instance.id`,
+    
+    SpanAttributes['http.response.status_code'] as `Attributes.http.status_code`,
+    SpanAttributes['http.response_content_body'] as `Attributes.http.response_content_body`,
+    SpanAttributes['http.request_content_body'] as `Attributes.http.request_content_body`,
+    if(mapContains(SpanAttributes,'http.route'),SpanAttributes['http.route'],SpanAttributes['url.path']) as `Attributes.http.target`,
+    concat(SpanAttributes['url.path'],SpanAttributes['url.query']) as `Attributes.http.url`,
+    SpanAttributes['http.request.method'] as `Attributes.http.method`,
+    SpanAttributes['enduser.id'] as `Attributes.enduser.id`,
+    SpanAttributes['exception.type'] as `Attributes.exception.type`,
+    SpanAttributes['exception.message'] as `Attributes.exception.message`, 
 
     mapKeys(ResourceAttributes) AS ResourceAttributesKeys,
     mapValues(ResourceAttributes) AS ResourceAttributesValues,

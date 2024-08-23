@@ -143,12 +143,26 @@ public partial class TimeLine
             return default;
         foreach (var item in data)
         {
+            if (item.Trace.SpanId == "da9199454dbc36f6")
+                ;
+
             if (item.Trace.Resource["service.name"].ToString() == urlService
                 && item.Trace.Kind == "SPAN_KIND_SERVER"
-                && item.Trace.Attributes.ContainsKey("http.target") && item.Trace.Attributes.ContainsKey("http.method")
-                && item.Trace.Attributes["http.target"].ToString() == UrlEndpoint && item.Trace.Attributes["http.method"].ToString() == urlMethod)
+                && item.Trace.Resource.TryGetValue("telemetry.sdk.version", out var sdkVersion))
             {
-                return item;
+                if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid) || string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1))
+                {
+                    if (item.Trace.Attributes.TryGetValue("http.target", out var target) && string.Equals(UrlEndpoint, target.ToString()!, StringComparison.CurrentCultureIgnoreCase)
+                        && item.Trace.Attributes.TryGetValue("http.method", out var method) && string.Equals(urlMethod, method.ToString()!, StringComparison.CurrentCultureIgnoreCase))
+                        return item;
+                }
+                else if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_9_0))
+                {
+                    if (item.Trace.Attributes.TryGetValue("http.request.method", out var method) && string.Equals(urlMethod, method.ToString()!, StringComparison.CurrentCultureIgnoreCase)
+                        && (item.Trace.Attributes.TryGetValue("http.route", out var target) && string.Equals(UrlEndpoint, target.ToString()!, StringComparison.CurrentCultureIgnoreCase)
+                                 || item.Trace.Attributes.TryGetValue("url.path", out target) && string.Equals(UrlEndpoint, target.ToString()!, StringComparison.CurrentCultureIgnoreCase)))
+                        return item;
+                }
             }
             var find = GetDefaultLine(item.Children);
             if (find != null) return find;
@@ -282,177 +296,5 @@ public partial class TimeLine
     private async Task OpenTraceLogAsync()
     {
         await JSRuntime.InvokeVoidAsync("open", traceLinkUrl, "_blank");
-    }
-}
-
-public class TreeLineDto
-{
-    public string SpanId { get; set; }
-
-    public string ParentSpanId { get; set; }
-
-    public List<TreeLineDto> Children { get; set; }
-
-    public bool IsClient { get; set; }
-
-    public string Name { get; set; }
-
-    public string Type { get; set; }
-
-    public string Label
-    {
-        get
-        {
-            return $"{Type} {Name} {Latency}";
-        }
-    }
-
-    public string NameClass { get; set; }
-
-    public bool Faild { get; set; } = false;
-
-    public bool IsError
-    {
-        get
-        {
-            return ErrorCount > 0 || !string.IsNullOrEmpty(ErrorMessage);
-        }
-    }
-
-    /// <summary>
-    /// 多条error
-    /// </summary>
-    public int ErrorCount { get; set; }
-
-    /// <summary>
-    /// 单条error
-    /// </summary>
-    public string ErrorMessage { get; set; }
-
-    /// <summary>
-    /// 单位毫秒
-    /// </summary>
-    public string Latency => ((double)Trace.Duration).FormatTime();
-
-    public string Icon { get; set; }
-
-    public TraceResponseDto Trace { get; set; }
-
-    public int Left { get; set; }
-
-    public int Right { get; set; }
-
-    public int Process { get; set; }
-
-    public bool Show { get; set; } = true;
-
-    public string ShowIcon
-    {
-        get
-        {
-            return $"fa:fas fa-chevron-{(Show ? "down" : "up")}";
-        }
-    }
-
-    public void SetValue(TraceResponseDto trace, DateTime start, DateTime end, int total, int[] errorStatus)
-    {
-        if (trace.TryParseDatabase(out var database))
-        {
-            IsClient = true;
-            Name = $"{database.Name}";
-            Icon = "fa:fas fa-database";
-
-            var sqlKey = "db.statement";
-            if (trace.Attributes.ContainsKey(sqlKey))
-            {
-                var regAction = @"(?<=\s*)(select|update|insert|delete)(?=\s+)";
-                var sql = trace.Attributes[sqlKey].ToString();
-                var action = Regex.Match(sql!, regAction, RegexOptions.IgnoreCase).Value;
-                string table = "unkown";
-                if (!string.IsNullOrEmpty(action))
-                {
-                    bool isSelect = action.Equals("select", StringComparison.CurrentCultureIgnoreCase);
-                    var regTable = @$"(?<={(isSelect ? "from" : action)}\s+[\[`])\S+(?=[`\]]\s*)";
-                    var regTable2 = @$"(?<={(isSelect ? "from" : action)}\s+)\S+(?=\s*)";
-                    var matches = Regex.Matches(sql, regTable, RegexOptions.IgnoreCase);
-                    if (matches.Count == 0) matches = Regex.Matches(sql, regTable2, RegexOptions.IgnoreCase);
-
-                    if (matches.Count > 0)
-                        table = matches[0].Value;
-                }
-                else
-                {
-                    table = database.System;
-                }
-
-                Type = $"{action} {table}";
-            }
-
-        }
-        else if (trace.TryParseHttp(out var http))
-        {
-            IsClient = trace.Kind == "SPAN_KIND_CLIENT";
-            bool isMaui = trace.Attributes.ContainsKey("client.type") && trace.Attributes["client.type"].ToString() == "maui-blazor";
-            bool isDapr = http.Url.StartsWith("http://127.0.0.1:3500/");
-            if (isMaui)
-            {
-                if (trace.Attributes.ContainsKey("client.title") && trace.Attributes["client.title"].ToString()!.Length > 0)
-                    Name = trace.Attributes["client.title"].ToString()!;
-                else if (trace.Attributes.ContainsKey("http.target"))
-                    Name = trace.Attributes["http.target"].ToString()!;
-                else
-                    Name = http.Url;
-                Icon = "fas fa-mobile";
-                Type = "MAUI Client";
-            }
-            else
-            {
-                Name = $"{http.Method} {http.Url} ";
-                if (isDapr && IsClient)
-                {
-                    Icon = "fas fa-grip";
-                    Type = $"Dapr Client {http.StatusCode}";
-                }
-                else
-                {
-                    Icon = "md:http";
-                    Type = $"Http {(IsClient ? "Client " : "")} {http.StatusCode}";
-                }
-            }
-
-            NameClass = "font-weight-black";
-            Faild = errorStatus.Contains(http.StatusCode);
-        }
-        else
-        {
-            Name = trace.Name;
-        }
-        if (trace.TryParseException(out var exception))
-        {
-            Faild = true;
-        }
-        if (total == 0)
-        {
-            Process = 100;
-        }
-        else
-        {
-            Left = (int)Math.Floor(Math.Floor((trace.Timestamp - start).TotalMilliseconds) * 100 / total);
-            Process = (int)Math.Floor(Math.Floor((trace.EndTimestamp - trace.Timestamp).TotalMilliseconds) * 100 / total);
-            if (Process - 1 < 0) Process = 1;
-            if (Process + Left - 100 > 0)
-            {
-                Left = 100 - Process;
-            }
-            else
-            {
-                Right = 100 - Left - Process;
-                if (Right < 0)
-                {
-                    Right = 0;
-                    Left = 100 - Process;
-                }
-            }
-        }
     }
 }

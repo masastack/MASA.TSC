@@ -1,6 +1,6 @@
 <Project>
 	<PropertyGroup>
 		<MasaFrameworkPackageVersion>1.2.0-preview.2</MasaFrameworkPackageVersion>
-		<MasaSdkPackageVersion>1.1.0-preview.2</MasaSdkPackageVersion>
+		<MasaSdkPackageVersion>1.2.1-preview.1</MasaSdkPackageVersion>
 	</PropertyGroup>
 </Project>

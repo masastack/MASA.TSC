@@ -15,7 +15,13 @@ builder.Services.AddTraceLog()
         ServiceName = appid,
         Layer = masaStackConfig.Namespace,
         ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
-    }, masaStackConfig.OtlpUrl)
+    },
+    #if DEBUG
+       "http://localhost:4317"
+    #else
+        masaStackConfig.OtlpUrl
+    #endif
+    )
     .AddPrometheusClient(prometheusUrl, 15)
     .AddAuthorization()
     .AddAuthentication(options =>
@@ -73,9 +79,9 @@ pmServiceUrl = masaStackConfig.GetPmServiceDomain();
 authServiceUrl = masaStackConfig.GetAuthServiceDomain();
 builder.Services.AddMasaIdentity(options =>
 {
-    options.Environment = "environment";
-    options.UserName = "name";
-    options.UserId = "sub";
+    options.Environment = IdentityClaimConsts.ENVIRONMENT;
+    options.UserName = IdentityClaimConsts.USER_NAME;
+    options.UserId = IdentityClaimConsts.USER_ID;
     options.Mapping(nameof(MasaUser.CurrentTeamId), IdentityClaimConsts.CURRENT_TEAM);
     options.Mapping(nameof(MasaUser.StaffId), IdentityClaimConsts.STAFF);
     options.Mapping(nameof(MasaUser.Account), IdentityClaimConsts.ACCOUNT);
@@ -136,7 +142,6 @@ var app = builder.Services
             .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name), options =>
             {
                 options.CommandTimeout(1);
-                options.EnableRetryOnFailure(2);
             }).UseFilter())
             .UseRepository<TscDbContext>();
     })

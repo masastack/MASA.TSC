@@ -55,7 +55,8 @@ var redisOption = new RedisConfigurationOptions
 #if DEBUG
 if (builder.Environment.EnvironmentName == "Development")
 {
-    await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC, authHost: "https://auth-service-dev.masastack.com", mcHost: "https://mc-service-dev.masastack.com", pmHost: "https://pm-service-dev.masastack.com");
+    //await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC, authHost: "https://auth-service-dev.masastack.com", mcHost: "https://mc-service-dev.masastack.com", pmHost: "https://pm-service-dev.masastack.com");
+    await builder.Services.AddMasaStackComponentsWithNormalAppAsync(MasaStackProject.TSC, "http://localhost:4317", serviceVersion: "local1.0", authHost: "https://auth-service-dev.masastack.com", mcHost: "https://mc-service-dev.masastack.com", pmHost: "https://pm-service-dev.masastack.com");
     builder.Services.AddTscHttpApiCaller("http://localhost:18010", authApiUrl: "https://auth-service-dev.masastack.com").AddDccClient(redisOption);
 }
 else

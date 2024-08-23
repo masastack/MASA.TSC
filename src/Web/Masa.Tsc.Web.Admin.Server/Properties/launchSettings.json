@@ -14,6 +14,10 @@
       "launchBrowser": true,
       "applicationUrl": "https://localhost:18012;http://localhost:18013",
       "environmentVariables": {
+        "OTEL_DOTNET_EXPERIMENTAL_HTTPCLIENT_DISABLE_URL_QUERY_REDACTION": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_ASPNETCORE_DISABLE_URL_QUERY_REDACTION": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_ASPNETCORE_ENABLE_GRPC_INSTRUMENTATION": "true",
+
         //"ASPNETCORE_ENVIRONMENT": "Staging",
         //"MASA_VERSION": "1.0.0",
         //"IS_DEMO": "False",
