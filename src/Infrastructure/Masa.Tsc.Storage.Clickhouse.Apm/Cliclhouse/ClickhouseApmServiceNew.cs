@@ -518,7 +518,7 @@ from(
                 });
             }
         var end = DateTime.Now;
-        Log(start, end, default, default, true);
+        Log(start, end, default!, default!, true);
     }
 
     public async Task<IEnumerable<ChartLineDto>> ChartDataAsync(BaseApmRequestDto query)
@@ -951,7 +951,7 @@ order by `Attributes.http.status_code`";
                 list.Add(DateTime.Now);
             }
         var end = DateTime.Now;
-        Log(start, end, default, default, true);
+        Log(start, end, default!, default!, true);
     }
 
     private static string GetPeriod(BaseApmRequestDto query)

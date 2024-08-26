@@ -29,7 +29,7 @@ internal static class TraceResponseDtoExtenistion
         return default;
     }
 
-    private static string? UserAgent(this TraceResponseDto trace) => trace.Attributes.TryGetValue("user_agent.original", out var agent) || trace.Attributes.TryGetValue("http.user_agent", out agent) ? agent.ToString() : default;
+    public static string? UserAgent(this TraceResponseDto trace) => trace.Attributes.TryGetValue("user_agent.original", out var agent) || trace.Attributes.TryGetValue("http.user_agent", out agent) ? agent.ToString() : default;
 
     public static string? Target(this TraceResponseDto trace)
     {

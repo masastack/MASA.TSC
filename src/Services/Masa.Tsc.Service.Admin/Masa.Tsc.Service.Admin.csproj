@@ -31,7 +31,6 @@
 		<PackageReference Include="Masa.Contrib.StackSdks.Config" Version="$(MasaSdkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Scheduler" Version="$(MasaSdkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Middleware" Version="$(MasaSdkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Tsc" Version="$(MasaSdkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.OpenTelemetry" Version="$(MasaSdkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaSdkPackageVersion)" />
 

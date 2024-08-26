@@ -13,7 +13,7 @@ public class TscDbContextFactory : IDesignTimeDbContextFactory<TscDbContext>
             .AddJsonFile("appsettings.json")
             .AddJsonFile("appsettings.Development.json")
             .Build();
-        optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+        optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection")!);
 
         return new TscDbContext(optionsBuilder.MasaOptions);
     }

@@ -82,7 +82,7 @@ public class ApmService : ServiceBase
             End = end.ParseUTCTime(),
             Env = GetEnv(env),
             Service = service,
-            Endpoint = endpoint,
+            Endpoint = endpoint!,
             Method = method!,
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
         });

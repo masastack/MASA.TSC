@@ -4,7 +4,7 @@
 var builder = WebApplication.CreateBuilder(args);
 await builder.Services.AddMasaStackConfigAsync(MasaStackProject.TSC, MasaStackApp.Service);
 var masaStackConfig = builder.Services.GetMasaStackConfig();
-var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus");
+var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus")!;
 var appid = masaStackConfig.GetServiceId(MasaStackProject.TSC);
 var envAppid = $"{appid}_{masaStackConfig.Environment}";
 builder.Services.AddTraceLog()
@@ -14,7 +14,7 @@ builder.Services.AddTraceLog()
         ServiceVersion = masaStackConfig.Version,
         ServiceName = appid,
         Layer = masaStackConfig.Namespace,
-        ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")
+        ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")!
     },
     #if DEBUG
        "http://localhost:4317"

@@ -22,7 +22,7 @@ public static class IMultilevelCacheClientExtensions
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogError("GetAllMetricsAsync", ex);
+                    _logger?.LogError(ex, "GetAllMetricsAsync");
                     max--;
                     Task.Delay(10).ConfigureAwait(false).GetAwaiter().GetResult();
                 }
@@ -57,7 +57,7 @@ public static class IMultilevelCacheClientExtensions
             }
             catch (Exception ex)
             {
-                _logger?.LogError("GetAllMetricsAsync", ex);
+                _logger?.LogError(ex, "GetAllMetricsAsync");
                 max--;
                 Task.Delay(10).ConfigureAwait(false).GetAwaiter().GetResult();
             }

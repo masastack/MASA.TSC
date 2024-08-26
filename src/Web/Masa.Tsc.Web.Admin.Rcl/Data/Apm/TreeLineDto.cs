@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using Aliyun.Acs.Core.Http;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Data.Apm;
 
 public class TreeLineDto
@@ -11,7 +13,7 @@ public class TreeLineDto
 
     public List<TreeLineDto> Children { get; set; }
 
-    public bool IsClient { get; set; }   
+    public bool IsClient { get; set; }
 
     public string Name { get; set; }
 
@@ -114,8 +116,10 @@ public class TreeLineDto
             _ = trace.Attributes.TryGetValue("http.method", out var method) || trace.Attributes.TryGetValue("http.request.method", out method);
             _ = trace.Attributes.TryGetValue("http.target", out var target) || trace.Attributes.TryGetValue("url.path", out target) || trace.Attributes.TryGetValue("url.full", out target) || trace.Attributes.TryGetValue("http.url", out target) || trace.Attributes.TryGetValue("http.route", out target);
 
+            var userAgent = trace.UserAgent();
             bool isMaui = trace.Attributes.ContainsKey("client.type") && trace.Attributes["client.type"].ToString() == "maui-blazor";
             bool isDapr = target!.ToString()!.StartsWith("http://127.0.0.1:3500/");
+            bool isMasaSdk = userAgent != null && userAgent.Contains("masastack_sdk");
             if (isMaui)
             {
                 if (trace.Attributes.ContainsKey("client.title") && trace.Attributes["client.title"].ToString()!.Length > 0)
@@ -129,7 +133,6 @@ public class TreeLineDto
             }
             else
             {
-
                 Name = $"{method} {target} ";
                 if (isDapr && IsClient)
                 {
@@ -141,6 +144,11 @@ public class TreeLineDto
                     Icon = "md:http";
                     Type = $"Http {(IsClient ? "Client " : "")} {statusCode}";
                 }
+
+                if (IsClient && isMasaSdk)
+                {
+                    Type = $"{userAgent} {statusCode}";
+                }
             }
 
             NameClass = "font-weight-black";
@@ -150,6 +158,7 @@ public class TreeLineDto
         {
             Name = trace.Name;
         }
+
         if (trace.TryParseException(out var exception))
         {
             Faild = true;
