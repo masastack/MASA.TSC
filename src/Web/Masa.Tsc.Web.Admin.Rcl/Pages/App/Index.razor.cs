@@ -26,12 +26,13 @@ public partial class Index
     private List<string> services;
     private bool claimShow = false;
     private List<TraceResponseDto> traceLines;
-    private IJSObjectReference? module;
+    private IJSObjectReference? module = null;
 
     private string? spanId;
     private DateTime? logTime;
     private NameValueCollection? values;
     private bool dataLoading = false;
+    private bool isNeedSetPosition = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -40,6 +41,12 @@ public partial class Index
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/_content/Masa.Tsc.Web.Admin.Rcl/Pages/App/Index.razor.js");
         }
         await base.OnAfterRenderAsync(firstRender);
+        if (isNeedSetPosition && data.Count > 0)
+        {
+            await SetRecord();
+            await OnTabIndexChange(index);
+            isNeedSetPosition = false;
+        }
     }
 
     protected override void OnInitialized()
@@ -52,13 +59,13 @@ public partial class Index
         Search.Service = string.Empty;
         Search.Endpoint = string.Empty;
         Search.Environment = string.Empty;
-        //Search.Text = string.Empty;
         Search.TraceId = string.Empty;
         string
             start = values.Get("start"), end = values.Get("end"),
             userId = values.Get("userId"),
             logTime = values.Get("logTime"),
-            tabIndex = values.Get("index");
+            tabIndex = values.Get("tab"),
+            treeLineIndex = values.Get("treeIndex");
         serviceName = values.Get("service");
         if (DateTime.TryParse(start, default, default, out DateTime startTime) && DateTime.TryParse(end, default, default, out DateTime endTime) && endTime > startTime)
         {
@@ -71,6 +78,11 @@ public partial class Index
         if (tabIndex != null && int.TryParse(tabIndex, out var num) && num >= 1 && num - 4 <= 0)
         {
             index = num;
+        }
+        if (treeLineIndex != null && int.TryParse(treeLineIndex, out num) && num > 0)
+        {
+            treeIndex = num;
+            isNeedSetPosition = true;
         }
         if (DateTime.TryParse(logTime, default, default, out var time))
             this.logTime = time;
@@ -88,9 +100,10 @@ public partial class Index
         await LoadService();
         if (!string.IsNullOrEmpty(serviceName) && !services.Contains(serviceName))
             serviceName = default!;
+        isLoadService = false;
         if (values != null && values.Count > 0)
         {
-            await LoadTrace();
+            await LoadTrace(clearIndex: false);
             await LoadTraceTimeLines();
             StateHasChanged();
         }
@@ -218,8 +231,9 @@ public partial class Index
         await LoadTrace(isNext: true, seconds: seconds);
     }
 
-    private async Task LoadTrace(bool isPre = false, bool isNext = false, int seconds = 0)
+    private async Task LoadTrace(bool isPre = false, bool isNext = false, int seconds = 0, bool clearIndex = true)
     {
+        if (clearIndex) treeIndex = 1;
         if (_userId == Guid.Empty || string.IsNullOrEmpty(serviceName))
         {
             UpdateSearch();
@@ -261,7 +275,7 @@ public partial class Index
         SetTraceData(traces.Result!);
         await LoadLog(traces.Result?.Select(item => item.TraceId).Distinct().ToList()!);
         if (currentTrace == null && data.Count > 0)
-            currentTrace = data[0];
+            currentTrace = data[treeIndex - 1];
         else if (data.Count == 0)
         {
             currentTrace = default;
@@ -272,9 +286,10 @@ public partial class Index
         StateHasChanged();
     }
 
+    private bool isLoadService = true;
     private async Task LoadService()
     {
-        services.Clear();
+        isLoadService = true;
         var data = await ApiCaller.TraceService.GetAttrValuesAsync(new SimpleAggregateRequestDto
         {
             Start = DateTime.UtcNow.AddDays(-1),
@@ -289,8 +304,7 @@ public partial class Index
             Name = StorageConst.Current.ServiceName,
             Type = AggregateTypes.GroupBy
         });
-        if (data != null)
-            services.AddRange(data);
+        services = data?.ToList() ?? new();
     }
 
     private async Task SetDeviceModel(TraceResponseDto? trace)
@@ -358,7 +372,7 @@ public partial class Index
             Start = start,
             End = end,
             Page = 1,
-            PageSize = 200,
+            PageSize = 800,
             Conditions = new List<FieldConditionDto> {
                 new FieldConditionDto{
                     Name=StorageConst.Current.TraceId,
@@ -380,25 +394,34 @@ public partial class Index
         SetLogData(logs.Result);
     }
 
+    //private void SetLogData(List<LogResponseDto> logs)
+    //{
+    //    do
+    //    {
+    //        var first = logs[0];
+    //        var trace = data.Find(trace => trace.Data.TraceId == first.TraceId);
+    //        if (trace == null)
+    //        {
+    //            //该页面报错了,先不处理
+    //            logs.Remove(first);
+    //        }
+    //        else
+    //        {
+    //            var childLogs = logs.Where(log => log.TraceId == first.TraceId).ToList();
+    //            SetChild(trace, childLogs);
+    //            //logs.RemoveAll(childLogs);
+    //        }
+    //    }
+    //    while (logs.Count > 0);
+    //}
+
     private void SetLogData(List<LogResponseDto> logs)
     {
-        do
+        foreach (var trace in data)
         {
-            var first = logs[0];
-            var trace = data.Find(trace => trace.Data.TraceId == first.TraceId);
-            if (trace == null)
-            {
-                //该页面报错了,先不处理
-                logs.Remove(first);
-            }
-            else
-            {
-                var childLogs = logs.Where(log => log.TraceId == first.TraceId).ToList();
-                SetChild(trace, childLogs);
-                logs.RemoveAll(childLogs);
-            }
+            var childLogs = logs.Where(log => log.TraceId == trace.Data.TraceId).ToList();
+            SetChild(trace, childLogs);
         }
-        while (logs.Count > 0);
     }
 
     private static void SetChild(OperationLineTraceModel trace, List<LogResponseDto> logs)
@@ -426,19 +449,27 @@ public partial class Index
 
     private async Task Share()
     {
-        var str = $"apm/app?userId={_userId}&service={serviceName}&start={end}&end={start}&search={_searchText}&spanId={currentTrace?.Data?.SpanId}&logTime={currentLog?.Time}&tab={index}".ToSafeBlazorUrl();
+        var str = $"apm/app?userId={_userId}&service={serviceName}&start={start}&end={end}&search={_searchText}&spanId={currentTrace?.Data?.SpanId}&logTime={currentLog?.Time}&tab={index}&treeIndex={treeIndex}".ToSafeBlazorUrl();
         await JSRuntime.InvokeVoidAsync(JsInteropConstants.Copy, $"{NavigationManager.BaseUri}{str}");
         await Task.Delay(500);
     }
 
     private async Task Top()
     {
-        await module!.InvokeVoidAsync("setPosition", true);
+        await ChangeCurrent(data[0]);
+        await module!.InvokeVoidAsync("setPosition", 1, data.Count);
+    }
+
+    private async Task SetRecord()
+    {
+        await ChangeCurrent(data[treeIndex - 1]);
+        await module!.InvokeVoidAsync("setPosition", treeIndex, data.Count);
     }
 
     private async Task Bottom()
     {
-        await module!.InvokeVoidAsync("setPosition", false);
+        await ChangeCurrent(data[data.Count - 1]);
+        await module!.InvokeVoidAsync("setPosition", data.Count, data.Count);
     }
 
     private async Task Pre()

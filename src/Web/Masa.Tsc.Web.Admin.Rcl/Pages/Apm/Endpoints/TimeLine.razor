@@ -24,20 +24,22 @@
             <div class="d-flex">
                 @if (!string.IsNullOrEmpty(traceLinkUrl))
                 {
-                <SButton Class="white--text blue darken-1"
-                Style="text-transform: none"
-                BorderRadiusClass="rounded-lg"
-                OnClick="OpenTraceLogAsync">@I18n.Apm("Trace.Detail.TraceLog")</SButton>
+                    <SButton Class="white--text blue darken-1"
+                             Style="text-transform: none"
+                             BorderRadiusClass="rounded-lg"
+                             OnClick="OpenTraceLogAsync">@I18n.Apm("Trace.Detail.TraceLog")</SButton>
                 }
             </div>
         </div>
 
         <div class="d-flex justify-start pt-4">
-            <div class="font-weight-bold">Services</div>
-            @foreach (var service in services)
-            {
-                <div class="pl-2"> <SIcon Small Color="@colors[services.IndexOf(service)]">mdi-circle</SIcon> @service</div>
-            }
+            <div class="font-weight-bold align-self-center">Services</div>
+            <div class="d-flex justify-start flex-wrap">
+                @foreach (var service in services)
+                {
+                    <div class="pl-2"> <SIcon Small Color="@colors[services.IndexOf(service)]">mdi-circle</SIcon> @service</div>
+                }
+            </div>
         </div>
     </MCardSubtitle>
     <MCardText>

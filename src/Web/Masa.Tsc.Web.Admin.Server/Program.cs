@@ -38,7 +38,7 @@ MasaOpenIdConnectOptions masaOpenIdConnectOptions = new()
 };
 
 IdentityModelEventSource.ShowPII = true;
-builder.Services.AddMasaOpenIdConnect(masaOpenIdConnectOptions);
+builder.Services.AddMasaOpenIdConnect(masaOpenIdConnectOptions).AddMemoryCache();
 var redisOption = new RedisConfigurationOptions
 {
     Servers = new List<RedisServerOptions> {

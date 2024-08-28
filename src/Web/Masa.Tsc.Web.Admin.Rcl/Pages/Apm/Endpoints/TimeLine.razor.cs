@@ -29,6 +29,12 @@ public partial class TimeLine
     [Parameter]
     public EventCallback<string> OnSpanIdChanged { get; set; }
 
+    [Parameter]
+    public bool IsMaui { get; set; }
+
+    [Parameter]
+    public string RoutePath { get; set; }
+
     private string? lastKey = default;
     private bool loading = true;
     private int totalDuration = 0;
@@ -129,12 +135,19 @@ public partial class TimeLine
             SetRootTimeLine(traces);
         }
         while (traces.Count > 0);
-        defaultTimeLine = GetDefaultLine(timeLines)!;
+        defaultTimeLine = GetDefaultLine()!;
         if (OnSpanIdChanged.HasDelegate)
             await OnSpanIdChanged.InvokeAsync(defaultTimeLine?.Trace?.SpanId);
         timeLines = timeLines.OrderBy(item => item.Trace.Timestamp).ToList();
         services = services.Distinct().ToList();
         traceLinkUrl = GetUrl(defaultTimeLine);
+    }
+
+    private TreeLineDto? GetDefaultLine()
+    {
+        if (IsMaui)
+            return GetMauiDefaultLines(timeLines);
+        return GetDefaultLine(timeLines);
     }
 
     private TreeLineDto? GetDefaultLine(List<TreeLineDto>? data)
@@ -143,9 +156,6 @@ public partial class TimeLine
             return default;
         foreach (var item in data)
         {
-            if (item.Trace.SpanId == "da9199454dbc36f6")
-                ;
-
             if (item.Trace.Resource["service.name"].ToString() == urlService
                 && item.Trace.Kind == "SPAN_KIND_SERVER"
                 && item.Trace.Resource.TryGetValue("telemetry.sdk.version", out var sdkVersion))
@@ -165,6 +175,26 @@ public partial class TimeLine
                 }
             }
             var find = GetDefaultLine(item.Children);
+            if (find != null) return find;
+        }
+        return default;
+    }
+
+    private TreeLineDto GetMauiDefaultLines(List<TreeLineDto>? data)
+    {
+        if (!IsMaui || data == null || !data.Any() || string.IsNullOrEmpty(RoutePath))
+            return default;
+        foreach (var item in data)
+        {
+            if (item.Trace.Resource.TryGetValue("telemetry.sdk.version", out var sdkVersion))
+            {
+                if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid) || string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1))
+                {
+                    if (item.Trace.Attributes.TryGetValue("http.target", out var target) && string.Equals(RoutePath, target.ToString()!, StringComparison.CurrentCultureIgnoreCase))
+                        return item;
+                }
+            }
+            var find = GetMauiDefaultLines(item.Children);
             if (find != null) return find;
         }
         return default;

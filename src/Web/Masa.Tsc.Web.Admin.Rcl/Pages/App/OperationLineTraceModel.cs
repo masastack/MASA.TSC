@@ -55,7 +55,7 @@ public class OperationLineTraceModel
     /// </summary>
     public List<LogResponseDto> Logs { get; set; } = new();
 
-    public bool IsError => Logs.Exists(log => log.Attributes.ContainsKey("exception.type") || log.Attributes.ContainsKey("exception.message"));
+    public bool IsError => Logs.Exists(log => log.SeverityText == "Error" && !log.Body.ToString()!.Contains("Event") && (log.Attributes.ContainsKey("exception.type") || log.Attributes.ContainsKey("exception.message")));
 }
 
 public class OperationLineLogModel
@@ -79,7 +79,7 @@ public class OperationLineLogModel
         }
     }
 
-    public bool IsError => Data.Attributes.TryGetValue("exception.type", out var value) && !string.IsNullOrEmpty(value?.ToString());
+    public bool IsError => Data.SeverityText == "Error" && Data.Attributes.TryGetValue("exception.type", out var value) && !string.IsNullOrEmpty(value?.ToString());
 
     public LogResponseDto Data { get; }
 }

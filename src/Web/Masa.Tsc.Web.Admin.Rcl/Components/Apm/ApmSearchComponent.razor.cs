@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using Microsoft.Extensions.Caching.Memory;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm;
 
 public partial class ApmSearchComponent : IDisposable
@@ -30,7 +32,7 @@ public partial class ApmSearchComponent : IDisposable
     public GlobalConfig GlobalConfig { get; set; } = default!;
 
     [Inject]
-    public MasaUser MasaUser { get; set; } = default;
+    public IMemoryCache MemoryCache { get; set; }
 
     private static List<(ApmComparisonTypes value, string text)> listComparisons = new()
     {
@@ -301,7 +303,13 @@ public partial class ApmSearchComponent : IDisposable
 
     private async Task LoadAsync()
     {
+        var key = "mc_statuscodes";
+        statuses = MemoryCache.Get<List<string>>(key);
+        if (statuses != null && statuses.Any())
+            return;
         statuses = await ApiCaller.ApmService.GetStatusCodesAsync();
+        if (statuses != null && statuses.Any())
+            MemoryCache.Set(key, statuses, TimeSpan.FromMinutes(10));
     }
 
     public void Dispose()

@@ -109,7 +109,7 @@ public class TreeLineDto
             }
 
         }
-        else if (trace.Attributes.ContainsKey("http.scheme"))
+        else if (trace.Attributes.ContainsKey("http.scheme") || trace.Attributes.ContainsKey("http.url"))
         {
             IsClient = trace.Kind == "SPAN_KIND_CLIENT";
             _ = trace.Attributes.TryGetValue("http.status_code", out var statusCode) || trace.Attributes.TryGetValue("http.response.status_code", out statusCode);
@@ -117,12 +117,12 @@ public class TreeLineDto
             _ = trace.Attributes.TryGetValue("http.target", out var target) || trace.Attributes.TryGetValue("url.path", out target) || trace.Attributes.TryGetValue("url.full", out target) || trace.Attributes.TryGetValue("http.url", out target) || trace.Attributes.TryGetValue("http.route", out target);
 
             var userAgent = trace.UserAgent();
-            bool isMaui = trace.Attributes.ContainsKey("client.type") && trace.Attributes["client.type"].ToString() == "maui-blazor";
+            bool isMaui = trace.Attributes.TryGetValue("client.type", out var clientType) && clientType.ToString() == "maui-blazor";
             bool isDapr = target!.ToString()!.StartsWith("http://127.0.0.1:3500/");
             bool isMasaSdk = userAgent != null && userAgent.Contains("masastack_sdk");
             if (isMaui)
             {
-                if (trace.Attributes.ContainsKey("client.title") && trace.Attributes["client.title"].ToString()!.Length > 0)
+                if (trace.Attributes.TryGetValue("client.title", out var title) && title.ToString()!.Length > 0)
                     Name = trace.Attributes["client.title"].ToString()!;
                 else if (trace.Attributes.ContainsKey("http.target"))
                     Name = trace.Attributes["http.target"].ToString()!;

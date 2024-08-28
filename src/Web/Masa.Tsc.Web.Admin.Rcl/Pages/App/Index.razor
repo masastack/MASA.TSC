@@ -6,7 +6,7 @@
     <div class="d-flex">
         <SUserAutoComplete Small FillBackground=false Value="_userId" ValueChanged="UserChange" Class="@("user-auto-complete pr-2")" Placeholder="姓名/手机号码/Id" Label="姓名/手机号码/Id" Style="@("width:280px")" Clearable />
 
-        <SAutoComplete Small Items="services" Value="@serviceName" ValueChanged="ServiceChange"
+        <SAutoComplete Small Items="services" Value="@serviceName" ValueChanged="ServiceChange" Loading="isLoadService"
                        TItem="string"
                        TValue="string"
                        TItemValue="string"
@@ -55,8 +55,7 @@
         }
         else
         {
-            <MVirtualScroll Height="@("calc(100vh - 378px)")" Items="data"
-                            Id="infinite-scroll-virtual">
+            <MVirtualScroll Height="@("calc(100vh - 378px)")" Items="data" Id="infinite-scroll-virtual" ItemSize="32">
                 <ItemContent>
                     @((RenderFragment)(render => RenderTraces(render, context)))
                 </ItemContent>
@@ -88,7 +87,7 @@
                         <ApmTraceView Value="@(currentLog!=null?currentLog.Data:currentTrace?.Data)" Dialog=false Height="@("calc(100vh - 400px)")" />
                     </MTabItem>
                     <MTabItem Value="2" Class="mx-2">
-                        <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints.TimeLine Data="traceLines" />
+                        <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints.TimeLine Data="traceLines" IsMaui RoutePath="@(currentTrace!=null&&currentTrace.Data.Attributes.TryGetValue("http.target",out var target)?target.ToString():default)" />
                     </MTabItem>
                     <MTabItem Value="3">
                         <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceErrors ShowChart=false />
@@ -107,6 +106,7 @@
 @code {
     private OperationLineTraceModel? currentTrace;
     private OperationLineLogModel? currentLog;
+    private int treeIndex = 1;
 
     private readonly List<OperationLineTraceModel> data = new();
 
@@ -118,6 +118,7 @@
     private async Task ChangeCurrent(OperationLineTraceModel trace, OperationLineLogModel? log = null)
     {
         currentTrace = trace;
+        treeIndex = data.IndexOf(trace) + 1;
         currentLog = log;
         UpdateSearch();
         await LoadTraceTimeLines();

@@ -29,7 +29,7 @@ public static class StringExtensions
 
     public static DateTime ParseUTCTime(this string str)
     {
-        if (DateTime.TryParse(str, out var time))
+        if (DateTime.TryParse(str, default, default, out var time))
         {
             return new DateTimeOffset(time, TimeSpan.Zero).DateTime;
         }
