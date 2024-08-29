@@ -103,6 +103,7 @@ public partial class Index
         isLoadService = false;
         if (values != null && values.Count > 0)
         {
+            await LoadUserClaimsAsync();
             await LoadTrace(clearIndex: false);
             await LoadTraceTimeLines();
             StateHasChanged();
@@ -186,8 +187,16 @@ public partial class Index
         if (roles == null)
             roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
         user = await ApiCaller.UserService.GetUserDetailAsync(userId);
+        await LoadUserClaimsAsync();
+        await LoadTrace();
+    }
 
-        var claims = await ApiCaller.UserService.GetUserClaimAsync(userId);
+    private async Task LoadUserClaimsAsync()
+    {
+        this.claims.Clear();
+        if (_userId == Guid.Empty)
+            return;
+        var claims = await ApiCaller.UserService.GetUserClaimAsync(_userId);
         var claimTypes = await ApiCaller.UserService.GetClaimsAsync();
         if (claims != null && claims.Count > 0 && claimTypes != null && claimTypes.Count > 0)
         {
@@ -202,13 +211,12 @@ public partial class Index
                 claims.Remove(key);
                 claims.Add($"{key}({declare.Description})", value);
             }
+
+            foreach (var key in claims.Keys)
+            {
+                this.claims.Add(key, claims[key]);
+            }
         }
-        this.claims.Clear();
-        foreach (var key in claims.Keys)
-        {
-            this.claims.Add(key, claims[key]);
-        }
-        await LoadTrace();
     }
 
     private async Task ServiceChange(string service)
@@ -484,10 +492,11 @@ public partial class Index
         await LoadTrace(isNext: true, seconds: 60);
     }
 
-    protected override ValueTask DisposeAsyncCore()
+    protected override async ValueTask DisposeAsyncCore()
     {
-        module?.DisposeAsync();
-        return base.DisposeAsyncCore();
+        if (module != null)
+            await module.DisposeAsync();
+        await base.DisposeAsyncCore();
     }
 
     private async Task OnTabIndexChange(StringNumber current)

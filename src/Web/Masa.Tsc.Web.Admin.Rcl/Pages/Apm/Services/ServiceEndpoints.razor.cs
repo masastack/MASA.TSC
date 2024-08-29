@@ -72,6 +72,8 @@ public partial class ServiceEndpoints
             total = 0;
             SearchData = data;
         }
+        if (SearchData.Start == DateTime.MinValue || SearchData.End == DateTime.MinValue)
+            return;
         if (isTableLoading)
         {
             return;

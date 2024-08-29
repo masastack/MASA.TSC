@@ -71,13 +71,15 @@ public partial class Logs
 
     private async Task LoadASync(SearchData data = null!)
     {
-        isTableLoading = true;
         if (data != null)
         {
             total = 0;
             page = 1;
             Search = data;
         }
+        if (Search.Start == DateTime.MinValue || Search.End == DateTime.MinValue)
+            return;
+        isTableLoading = true;
         StateHasChanged();
         await LoadPageDataAsync();
         isTableLoading = false;

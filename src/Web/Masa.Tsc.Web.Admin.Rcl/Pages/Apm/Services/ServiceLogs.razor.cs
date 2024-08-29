@@ -35,7 +35,7 @@ public partial class ServiceLogs
     private bool isTableLoading = false;
     private string? sortFiled = nameof(LogResponseDto.Timestamp);
     private bool sortBy = true;
-    private string lastKey = string.Empty, lastSpanId=string.Empty;
+    private string lastKey = string.Empty, lastSpanId = string.Empty;
     private readonly ChartData chart = new();
     private bool dialogShow = false;
     private LogResponseDto current = null;
@@ -82,6 +82,8 @@ public partial class ServiceLogs
     {
         if (data != null)
             SearchData = data;
+        if (SearchData.Start == DateTime.MinValue || SearchData.End == DateTime.MinValue)
+            return;
         if (isTableLoading)
         {
             return;
@@ -130,7 +132,7 @@ public partial class ServiceLogs
                 Start = SearchData.Start,
                 End = SearchData.End,
                 TraceId = SearchData.TraceId,
-                Service = SearchData.Service,                
+                Service = SearchData.Service,
                 Sort = new FieldOrderDto
                 {
                     IsDesc = sortBy,
@@ -153,7 +155,8 @@ public partial class ServiceLogs
             }
             if (!string.IsNullOrEmpty(lastSpanId))
             {
-                list.Add(new FieldConditionDto {
+                list.Add(new FieldConditionDto
+                {
                     Name = StorageConst.Current.SpanId,
                     Value = lastSpanId,
                     Type = ConditionTypes.Equal

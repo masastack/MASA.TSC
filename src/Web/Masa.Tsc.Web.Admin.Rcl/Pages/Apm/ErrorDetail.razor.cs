@@ -47,13 +47,15 @@ public partial class ErrorDetail
 
     private async Task OnLoadAsync(SearchData data = null)
     {
-        loading = true;
         if (data != null)
         {
             currentPage = 1;
             total = 0;
             Search = data;
         }
+        if (Search.Start == DateTime.MinValue || Search.End == DateTime.MinValue)
+            return;
+        loading = true;
         await ChangeRecordAsync();
         loading = false;
         await LoadChartDataAsync();
