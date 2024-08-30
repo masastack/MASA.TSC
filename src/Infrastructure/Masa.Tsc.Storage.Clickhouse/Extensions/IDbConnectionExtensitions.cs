@@ -145,7 +145,7 @@ internal static class IDbConnectionExtensitions
         AppendConditions(query.Conditions, paramerters, sql, isTrace);
 
         if (!string.IsNullOrEmpty(query.RawQuery))
-            sql.Append($" and ({query.RawQuery})");
+            sql.AppendLine(!query.RawQuery.Trim().StartsWith("and ", StringComparison.CurrentCultureIgnoreCase) ? $" and {query.RawQuery}" : query.RawQuery);
 
         if (sql.Length > 0)
             sql.Remove(0, 4);
