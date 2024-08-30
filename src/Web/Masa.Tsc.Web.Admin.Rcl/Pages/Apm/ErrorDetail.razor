@@ -24,7 +24,7 @@
                 <div style="color: rgb(52, 55, 65);width:1px" class="px-2">|</div>
                 <div class="pl-2">@(currentLog?.Resource["service.name"])</div>
                 <div style="color: rgb(52, 55, 65);width:1px" class="px-2">|</div>
-                <div class="pl-2 text-truncate" style="max-width:400px;background-color: rgb(211, 218, 230); color: rgb(0, 0, 0);" title="@(currentTrace?.Attributes["http.method"]) @(currentTrace?.Attributes["http.url"])">@(currentTrace?.Attributes["http.method"]) @(currentTrace?.Attributes["http.url"])</div>
+                <div class="pl-2 text-truncate" style="max-width:400px;background-color: rgb(211, 218, 230); color: rgb(0, 0, 0);" title="@(currentTrace?.Method()) @(currentTrace?.Target())">@(currentTrace?.Method()) @(currentTrace?.Target())</div>
                 <div style="color: rgb(52, 55, 65);width:1px" class="px-2">|</div>
                 <div class="pl-2">@(currentLog?.Resource["service.namespace"])</div>
                 <div style="color: rgb(52, 55, 65);width:1px" class="px-2">|</div>
