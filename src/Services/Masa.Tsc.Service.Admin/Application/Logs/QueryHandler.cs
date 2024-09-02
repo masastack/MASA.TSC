@@ -33,6 +33,7 @@ public class QueryHandler : EnvQueryHandler
             Start = queryData.Start,
             End = queryData.End,
             RawQuery = queryData.Query,
+            Service=queryData.Service,
             Page = 1,
             PageSize = 1,
             Sort = new FieldOrderDto { Name = StorageConst.Current.Timestimap, IsDesc = !queryData.IsDesc }

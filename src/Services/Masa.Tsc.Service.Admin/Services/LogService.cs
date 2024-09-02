@@ -22,7 +22,7 @@ public class LogService : ServiceBase
 
     private async Task<LogResponseDto> GetLatestAsync([FromServices] IEventBus eventBus, [FromBody] RequestLogLatestDto param)
     {
-        var query = new LatestLogQuery(param.Start, param.End, param.Query, param.IsDesc);
+        var query = new LatestLogQuery(param.Start, param.End, param.Service, param.Query, param.IsDesc);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
