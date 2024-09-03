@@ -89,7 +89,8 @@ public partial class ErrorDetail
             PageSize = 1,
             Page = currentPage,
             Start = Search.Start,
-            End = Search.End
+            End = Search.End,
+            TraceId = Search.TraceId,
         };
         var list = new List<FieldConditionDto>();
         if (!string.IsNullOrEmpty(Search.Environment))

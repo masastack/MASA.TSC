@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using System;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services;
 
 public partial class ServiceErrors
@@ -131,7 +133,7 @@ public partial class ServiceErrors
                 TraceId = SearchData.TraceId,
                 Service = SearchData.Service,
                 Env = SearchData.Environment,
-                IsDesc = sortBy,                
+                IsDesc = sortBy,
                 TextField = StorageConst.Current.SpanId,
                 TextValue = lastSpanId
             };
@@ -172,6 +174,10 @@ public partial class ServiceErrors
     {
         Search.ExceptionType = type!;
         Search.ExceptionMsg = message!;
+        if (!string.IsNullOrEmpty(SearchData.TraceId))
+            Search.TraceId = SearchData.TraceId;
+        else
+            Search.TraceId = string.Empty;
         showDetail = true;
         StateHasChanged();
     }
