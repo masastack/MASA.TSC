@@ -32,9 +32,9 @@ public partial class Logs
     private bool dialogShow = false;
     private LogResponseDto current = null;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await base.OnInitializedAsync();
+        base.OnInitialized();
         if (!string.IsNullOrEmpty(TaskId))
         {
             Search.TextField = StorageConst.Current.Log.TaskId;

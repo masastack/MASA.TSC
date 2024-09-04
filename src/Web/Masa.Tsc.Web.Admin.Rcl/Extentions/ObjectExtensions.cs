@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Extentions;
 
-public static class ObjectExtensions
+internal static class ObjectExtensions
 {
     public static IDictionary<string, object> ToDictionary(this object source, params string[] excludedProperties)
     {

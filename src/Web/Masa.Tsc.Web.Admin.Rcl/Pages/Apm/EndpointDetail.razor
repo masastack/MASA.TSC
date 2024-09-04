@@ -3,7 +3,9 @@
 @page "/apm/endpoints/{name}"
 <PageTitle>@I18n.Apm("PageTitles.EndpointDetail")</PageTitle>
 
-<ApmSearchComponent Value="Search" ValueChanged="OnSearchValueChanged" IsEndpoint
+<ApmSearchComponent Value="Search"
+                    ValueChanged="OnSearchValueChanged"
+                    IsEndpoint
                     ShowComparison />
 
 <MTabs @bind-Value="index" Class="rounded-t-xl">

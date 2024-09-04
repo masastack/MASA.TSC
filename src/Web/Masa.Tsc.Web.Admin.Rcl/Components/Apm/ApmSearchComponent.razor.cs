@@ -1,11 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Microsoft.Extensions.Caching.Memory;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm;
 
-public partial class ApmSearchComponent : IDisposable
+public partial class ApmSearchComponent
 {
     [Parameter]
     public bool ShowComparison { get; set; }
@@ -52,56 +50,8 @@ public partial class ApmSearchComponent : IDisposable
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        textFileds = new List<string> {
-                StorageConst.Current.TraceId,
-                StorageConst.Current.SpanId
-        };
-        if (IsEndpoint)
-        {
-            textFileds.AddRange(new string[] {
-                StorageConst.Current.Trace.URLFull,
-                StorageConst.Current.Trace.UserId,
-                StorageConst.Current.Trace.HttpRequestBody
-            });
-        }
-        else if (!IsService)
-        {
-            textFileds.Add(StorageConst.Current.ExceptionMessage);
-            if (IsLog)
-            {
-                textFileds.Add(StorageConst.Current.Log.Body);
-                textFileds.Add(StorageConst.Current.Log.TaskId);
-            }
-        }
-        if (string.IsNullOrEmpty(Value.TextField) || !textFileds.Contains(Value.TextField))
-            Value.TextField = textFileds[0];
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        if (string.IsNullOrEmpty(uri.Query))
-        {
-            if (string.IsNullOrEmpty(Search.Environment) && string.IsNullOrEmpty(Search.Service) && !string.IsNullOrEmpty(UserContext.Environment))
-                Search.Environment = UserContext.Environment;
-            if (Search.ComparisonType == ApmComparisonTypes.None)
-                Search.ComparisonType = ApmComparisonTypes.Day;
-        }
-
-        if (!string.IsNullOrEmpty(Search.SpanId))
-        {
-            Search.TextField = StorageConst.Current.SpanId;
-            Search.TextValue = Search.SpanId;
-        }
-        else if (!string.IsNullOrEmpty(Search.TraceId))
-        {
-            Search.TextField = StorageConst.Current.TraceId;
-            Search.TextValue = Search.TraceId;
-        }
-        GlobalConfig.CurrentTeamId = MasaUser.CurrentTeamId;
-        if (Search.Start > DateTime.MinValue && Search.End > Search.Start)
-        {
-            SetQuickRangeKey(Search.End - Search.Start);
-        }
-
+        SetQueryList();
         await OnValueChanged();
-
         if (Search.Start > DateTime.MinValue)
         {
             await LoadEnvironmentAsync();
@@ -167,6 +117,60 @@ public partial class ApmSearchComponent : IDisposable
     {
         base.OnInitialized();
         GlobalConfig.OnCurrentTeamChanged += TeamChanged;
+        SetQueryList();
+    }
+
+    private void SetQueryList()
+    {
+        if (textFileds.Count > 0 || StorageConst.Current == null)
+            return;
+        textFileds = new List<string> {
+                StorageConst.Current.TraceId,
+                StorageConst.Current.SpanId
+        };
+        if (IsEndpoint)
+        {
+            textFileds.AddRange(new string[] {
+                StorageConst.Current.Trace.URLFull,
+                StorageConst.Current.Trace.UserId,
+                StorageConst.Current.Trace.HttpRequestBody
+            });
+        }
+        else if (!IsService)
+        {
+            textFileds.Add(StorageConst.Current.ExceptionMessage);
+            if (IsLog)
+            {
+                textFileds.Add(StorageConst.Current.Log.Body);
+                textFileds.Add(StorageConst.Current.Log.TaskId);
+            }
+        }
+        if (string.IsNullOrEmpty(Value.TextField) || !textFileds.Contains(Value.TextField))
+            Value.TextField = textFileds[0];
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (string.IsNullOrEmpty(uri.Query))
+        {
+            if (string.IsNullOrEmpty(Search.Environment) && string.IsNullOrEmpty(Search.Service) && !string.IsNullOrEmpty(UserContext.Environment))
+                Search.Environment = UserContext.Environment;
+            if (Search.ComparisonType == ApmComparisonTypes.None)
+                Search.ComparisonType = ApmComparisonTypes.Day;
+        }
+
+        if (!string.IsNullOrEmpty(Search.SpanId))
+        {
+            Search.TextField = StorageConst.Current.SpanId;
+            Search.TextValue = Search.SpanId;
+        }
+        else if (!string.IsNullOrEmpty(Search.TraceId))
+        {
+            Search.TextField = StorageConst.Current.TraceId;
+            Search.TextValue = Search.TraceId;
+        }
+        GlobalConfig.CurrentTeamId = MasaUser.CurrentTeamId;
+        if (Search.Start > DateTime.MinValue && Search.End > Search.Start)
+        {
+            SetQuickRangeKey(Search.End - Search.Start);
+        }
     }
 
     private void TeamChanged(Guid teamId)
@@ -312,8 +316,9 @@ public partial class ApmSearchComponent : IDisposable
             MemoryCache.Set(key, statuses, TimeSpan.FromMinutes(10));
     }
 
-    public void Dispose()
+    protected override ValueTask DisposeAsyncCore()
     {
         GlobalConfig.OnCurrentTeamChanged -= TeamChanged;
+        return base.DisposeAsyncCore();
     }
 }

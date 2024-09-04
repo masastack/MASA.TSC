@@ -12,7 +12,7 @@ public partial class ApmComponentBase : MasaComponentBase
     public TscCaller ApiCaller { get; set; }
 
     [Inject]
-    public virtual SearchData Search { get; set; }   
+    public virtual SearchData Search { get; set; }
 
     public static TimeZoneInfo CurrentTimeZone { get; private set; }
 
@@ -28,23 +28,29 @@ public partial class ApmComponentBase : MasaComponentBase
 
     public ApmComponentBase()
     {
+
+    }
+
+    private async Task SetStorage()
+    {
+        if (StorageConst.Current != null) return;
+        var setting = await ApiCaller.SettingService.GetStorage();
+        if (setting == null)
+            throw new InvalidDataException("Storage setting is null");
+        if (setting.IsClickhouse)
+            StorageConst.Init(new ClickhouseStorageConst());
+        else if (setting.IsElasticsearch)
+            StorageConst.Init(new ElasticsearchStorageConst());
     }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        if (StorageConst.Current != null) return;
-        var setting = await ApiCaller.SettingService.GetStorage();
-        if (setting == null)
-            throw new Exception("Storage setting is null");
-        if (setting.IsClickhouse)
-            StorageConst.Init(new ClickhouseStorageConst());
-        else if (setting.IsElasticsearch)
-            StorageConst.Init(new ElasticsearchStorageConst());
-
+        await SetStorage();
     }
     protected override void OnInitialized()
     {
+        base.OnInitialized();
         if (IsPage)
         {
             Search.Method = default!;
@@ -83,8 +89,6 @@ public partial class ApmComponentBase : MasaComponentBase
             Search.ExceptionType = values.Get("ex_type")!;
             Search.ExceptionMsg = values.Get("ex_msg")!;
         }
-
-        base.OnInitialized();
     }
 
     public string GetUrlParam(string? service = default,

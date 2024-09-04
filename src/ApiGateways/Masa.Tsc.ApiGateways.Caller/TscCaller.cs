@@ -9,7 +9,6 @@ public class TscCaller
 {
     internal TscCaller(IServiceProvider serviceProvider, ICallerFactory callerFactory)
     {
-        serviceProvider.GetRequiredService<IDccClient>();
         var caller = callerFactory.Create(ServiceExtensions.DEFAULT_CLIENT_NAME);
         AppService = new AppService(caller);
         SettingService = new SettingService(caller);
