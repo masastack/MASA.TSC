@@ -235,9 +235,10 @@ public partial class ApmSearchComponent
     private async Task OnTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) times)
     {
         if (Search.Start > DateTime.MinValue && !Isloaded)
-            return;
+            return;        
         Search.Start = times.start!.Value.UtcDateTime;
         Search.End = times.end!.Value.UtcDateTime;
+        Isloaded = true;
         await LoadEnvironmentAsync();
         await LoadServiceAsync();
         await OnValueChanged();
@@ -270,8 +271,6 @@ public partial class ApmSearchComponent
     private List<string> endpoints = new();
     private List<string> statuses = new();
     private List<string> exceptions = new();
-
-
     private async Task OnEndpointChange(string value)
     {
         Value.Endpoint = value;
