@@ -1,6 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using Masa.Blazor;
 using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Model;
 using Masa.Tsc.Contracts.Admin.User;
 using System.Collections.Specialized;
@@ -33,6 +34,7 @@ public partial class Index
     private NameValueCollection? values;
     private bool dataLoading = false;
     private bool isNeedSetPosition = false;
+    private static readonly Regex webviewReg = new(@"Chrome/(\d+\.?)+", default, TimeSpan.FromSeconds(1));
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -133,8 +135,18 @@ public partial class Index
 
     private string ClientOs()
     {
-        if (firstTrace == null) return default;
-        return firstTrace.Resource.TryGetValue("device.platform", out var platform) && firstTrace.Resource.TryGetValue("device.version", out var version) ? $"{platform} {version}" : default;
+        if (firstTrace == null) return default!;
+        return firstTrace.Resource.TryGetValue("device.platform", out var platform) && firstTrace.Resource.TryGetValue("device.version", out var version) ? $"{platform} {version}" : default!;
+    }
+
+    private string WebviewVersion()
+    {
+        if (firstTrace == null) return default!;
+        if (!firstTrace.Attributes.TryGetValue("client.user_agent", out var value)) return default!;
+        var userAgent = value.ToString();
+        if (string.IsNullOrEmpty(userAgent)) return default!;
+        if (!webviewReg.IsMatch(userAgent)) return default!;
+        return webviewReg.Match(userAgent).Value.Split('/')[1];
     }
 
     //auth获取
@@ -234,14 +246,26 @@ public partial class Index
 
     private async Task OnAutoTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) time)
     {
-        var seconds = Convert.ToInt32(Math.Floor((time.start!.Value.UtcDateTime - start).TotalSeconds));
+        //var seconds = Convert.ToInt32(Math.Floor((time.start!.Value.UtcDateTime - start).TotalSeconds));
+        //(start, end) = (time.start!.Value.UtcDateTime, time.end!.Value.UtcDateTime);
+        //await LoadTrace(isNext: true, seconds: seconds);
         (start, end) = (time.start!.Value.UtcDateTime, time.end!.Value.UtcDateTime);
-        await LoadTrace(isNext: true, seconds: seconds);
+        data.Clear();
+        await InvokeAsync(async () =>
+        {
+            await LoadTrace();
+        });
+
     }
 
     private async Task LoadTrace(bool isPre = false, bool isNext = false, int seconds = 0, bool clearIndex = true)
     {
-        if (clearIndex) treeIndex = 1;
+        if (clearIndex)
+        {
+            treeIndex = 1;
+            currentTrace = default;
+            currentLog = default;
+        }
         if (_userId == Guid.Empty || string.IsNullOrEmpty(serviceName))
         {
             UpdateSearch();
@@ -459,7 +483,7 @@ public partial class Index
     {
         var str = $"apm/app?userId={_userId}&service={serviceName}&start={start}&end={end}&search={_searchText}&spanId={currentTrace?.Data?.SpanId}&logTime={currentLog?.Time}&tab={index}&treeIndex={treeIndex}".ToSafeBlazorUrl();
         await JSRuntime.InvokeVoidAsync(JsInteropConstants.Copy, $"{NavigationManager.BaseUri}{str}");
-        await Task.Delay(500);
+        await PopupService.EnqueueSnackbarAsync("分享连接复制成功", AlertTypes.Success, true);
     }
 
     private async Task Top()

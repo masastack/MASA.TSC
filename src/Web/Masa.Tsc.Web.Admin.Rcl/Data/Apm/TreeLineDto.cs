@@ -152,7 +152,8 @@ public class TreeLineDto
             }
 
             NameClass = "font-weight-black";
-            Faild = errorStatus.Contains(Convert.ToInt32(statusCode!.ToString()));
+            if (statusCode != null)
+                Faild = errorStatus.Contains(Convert.ToInt32(statusCode!.ToString()));
         }
         else
         {
