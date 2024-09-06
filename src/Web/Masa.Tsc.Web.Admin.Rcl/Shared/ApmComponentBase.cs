@@ -14,6 +14,9 @@ public partial class ApmComponentBase : MasaComponentBase
     [Inject]
     public virtual SearchData Search { get; set; }
 
+    [Inject]
+    public GlobalConfig GlobalConfig { get; set; } = default!;
+
     public static TimeZoneInfo CurrentTimeZone { get; private set; }
 
     protected override void OnAfterRender(bool firstRender)

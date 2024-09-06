@@ -27,9 +27,6 @@ public partial class ApmSearchComponent
     public IMultiEnvironmentUserContext UserContext { get; set; }
 
     [Inject]
-    public GlobalConfig GlobalConfig { get; set; } = default!;
-
-    [Inject]
     public IMemoryCache MemoryCache { get; set; }
 
     private static List<(ApmComparisonTypes value, string text)> listComparisons = new()
@@ -51,6 +48,8 @@ public partial class ApmSearchComponent
     {
         await base.OnInitializedAsync();
         SetQueryList();
+        if (IsEndpoint)
+            await LoadAsync();
         await OnValueChanged();
         if (Search.Start > DateTime.MinValue)
         {
@@ -58,7 +57,6 @@ public partial class ApmSearchComponent
             await LoadServiceAsync();
             await LoadEndpointAsync();
             await LoadErrorAsync();
-            await LoadAsync();
             Isloaded = true;
         }
     }
@@ -211,9 +209,18 @@ public partial class ApmSearchComponent
     private async Task LoadEnvironmentAsync()
     {
         isEnvLoading = true;
-        var result = await ApiCaller.ApmService.GetEnviromentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End);
+        var result = await ApiCaller.ApmService.GetEnviromentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End) ?? new();
         enviromentServices = result;
         environments = result.Keys.ToList();
+        if (!string.IsNullOrEmpty(Search.Service) && string.IsNullOrEmpty(Search.Environment))
+        {
+            var findEnv = enviromentServices.Where(item => item.Value.Contains(Search.Service)).FirstOrDefault();
+            if (string.IsNullOrEmpty(findEnv.Key))
+                Search.Service = default!;
+            else
+                Search.Environment = findEnv.Key;
+        }
+
         if (!string.IsNullOrEmpty(Search.Environment) && !environments.Contains(Search.Environment))
             Search.Environment = default!;
         isEnvLoading = false;
@@ -222,7 +229,7 @@ public partial class ApmSearchComponent
     private async Task LoadEndpointAsync()
     {
         if (!string.IsNullOrEmpty(Search.Service))
-            endpoints = await ApiCaller.ApmService.GetEndpointsAsync(new BaseRequestDto { Service = Search.Service!, End = Search.End, Start = Search.Start });
+            endpoints = await ApiCaller.ApmService.GetEndpointsAsync(new BaseRequestDto { Service = Search.Service!, End = Search.End, Start = Search.Start }) ?? new();
         if (!string.IsNullOrEmpty(Search.Endpoint) && endpoints != null && !endpoints.Contains(Search.Endpoint))
             Search.Endpoint = default!;
     }
@@ -235,7 +242,7 @@ public partial class ApmSearchComponent
     private async Task OnTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) times)
     {
         if (Search.Start > DateTime.MinValue && !Isloaded)
-            return;        
+            return;
         Search.Start = times.start!.Value.UtcDateTime;
         Search.End = times.end!.Value.UtcDateTime;
         Isloaded = true;
@@ -307,12 +314,14 @@ public partial class ApmSearchComponent
     private async Task LoadAsync()
     {
         var key = "mc_statuscodes";
-        statuses = MemoryCache.Get<List<string>>(key);
-        if (statuses != null && statuses.Any())
+        statuses = MemoryCache.Get<List<string>>(key) ?? new();
+        if (statuses.Any())
             return;
-        statuses = await ApiCaller.ApmService.GetStatusCodesAsync();
-        if (statuses != null && statuses.Any())
+        statuses = (await ApiCaller.ApmService.GetStatusCodesAsync()) ?? new();
+        if (statuses.Any())
             MemoryCache.Set(key, statuses, TimeSpan.FromMinutes(10));
+        if (!string.IsNullOrEmpty(Search.Status) && !statuses.Contains(Search.Status))
+            Search.Status = default!;
     }
 
     protected override ValueTask DisposeAsyncCore()
