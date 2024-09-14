@@ -51,45 +51,19 @@ public static class ServiceExtensions
         }
         catch
         {
-            IServiceProvider serviceProviderCopy = services.BuildServiceProvider();
             services.AddCaller(DEFAULT_CLIENT_NAME, builder =>
             {
-                builder.UseHttpClient(options =>
-                {
-                    options.BaseAddress = tscApiUrl;
-                    options.Configure = (http) =>
-                    {
-                        var httpContext = serviceProviderCopy.GetRequiredService<IHttpContextAccessor>();
-                        if (httpContext.HttpContext == null)
-                            return;
-                        var token = httpContext.HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken).ConfigureAwait(false).GetAwaiter().GetResult();
-                        if (!string.IsNullOrEmpty(token))
-                            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                    };
-                });
+                builder.UseHttpClient(options => options.BaseAddress = tscApiUrl).UseAuthentication();
             })
             .AddCaller(AUTH_CLIENT_NAME, builder =>
                 {
-                    builder.UseHttpClient(options =>
-                    {
-                        options.BaseAddress = authApiUrl;
-                        options.Configure = (http) =>
-                        {
-                            var httpContext = serviceProviderCopy.GetRequiredService<IHttpContextAccessor>();
-                            if (httpContext.HttpContext == null)
-                                return;
-                            var token = httpContext.HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken).ConfigureAwait(false).GetAwaiter().GetResult();
-                            if (!string.IsNullOrEmpty(token))
-                                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                        };
-                    });
+                    builder.UseHttpClient(options => options.BaseAddress = authApiUrl).UseAuthentication();
                 });
 
             services.AddScoped(serviceProvider =>
             {
-                serviceProviderCopy = serviceProvider;
                 var callerFactory = serviceProvider.GetRequiredService<ICallerFactory>();
-                var client = new TscCaller(serviceProviderCopy, callerFactory);
+                var client = new TscCaller(serviceProvider, callerFactory);
                 return client;
             });
         }
