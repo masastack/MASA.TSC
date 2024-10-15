@@ -21,7 +21,7 @@ variables:
   NAMESPACE_TEST: masastack-test
   NAMESPACE_STAGING: masastack-staging
   NAMESPACE_PRD: masastack
-  NAMESPACE_SEC
+  NAMESPACE_SEC: masa-to-sec
   
 docker-dev:
   stage: docker-dev
