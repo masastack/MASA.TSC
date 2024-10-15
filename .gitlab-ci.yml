@@ -71,7 +71,7 @@ deploy-new-prd:
     - main
   script:
     - echo $KUBE_CONFIG_LSD_PRD_YDY | base64 -d > ./config
-    - echo $CI_COMMIT_TAG
+    - echo $CI_COMMIT_ID
     - kubectl --kubeconfig ./config set image deployment/tsc tsc=$TSC_Web_Image_DEV -n $NAMESPACE_PRD
     - kubectl --kubeconfig ./config set image deployment/tsc-service tsc-service=$TSC_Service_Image_DEV -n $NAMESPACE_PRD
   retry: 2
