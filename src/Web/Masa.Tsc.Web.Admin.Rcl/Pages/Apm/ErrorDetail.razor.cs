@@ -117,7 +117,7 @@ public partial class ErrorDetail
             }
         }
         query.Conditions = list;
-        var result = await ApiCaller.ApmService.GetLogListAsync(query);
+        var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
         if (currentPage == 1)
         {
             total = (int)result.Total;

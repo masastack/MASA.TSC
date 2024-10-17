@@ -26,5 +26,5 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Prometheus\Masa.Tsc.Storage.Prometheus.csproj" />
 	</ItemGroup>
-
+	
 </Project>

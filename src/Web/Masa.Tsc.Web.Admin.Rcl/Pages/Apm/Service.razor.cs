@@ -16,7 +16,7 @@ public partial class Service
         new() { Text = I18n.Apm("Service.List.Failed"), Value = nameof(ListChartData.Failed)}
     };
 
-    private int defaultSize = 50;
+    private int defaultSize = 10;
     private int total = 0;
     private int page = 1;
     private List<ListChartData> data = new();
@@ -42,6 +42,7 @@ public partial class Service
         page = pageData.page;
         defaultSize = pageData.pageSize;
         await LoadASync();
+        StateHasChanged();
     }
 
     private async Task LoadASync(SearchData data = null!)
@@ -82,9 +83,10 @@ public partial class Service
             ComparisonType = Search.ComparisonType.ToComparisonType(),
             //Queries = Search.Text
         };
-        var result = await ApiCaller.ApmService.GetServicePageAsync(query);
+        var result = await ApiCaller.ApmService.GetServicePageAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
-        if (result.Result != null && result.Result.Any())
+        total = 0;
+        if (result != null && result.Result != null && result.Result.Any())
         {
             data.AddRange(result.Result.Select(item => new ListChartData
             {
@@ -94,8 +96,9 @@ public partial class Service
                 Throughput = item.Throughput,
                 Latency = item.Latency
             }));
+            total = (int)result.Total;
         }
-        total = (int)result.Total;
+
     }
 
     private async Task LoadChartDataAsync()

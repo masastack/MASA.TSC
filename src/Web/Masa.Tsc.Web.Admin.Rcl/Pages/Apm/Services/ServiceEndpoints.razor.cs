@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using System;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services;
 
 public partial class ServiceEndpoints
@@ -21,7 +19,7 @@ public partial class ServiceEndpoints
         new() { Text = I18n.Apm("Endpoint.List.Failed"), Value = nameof(ListChartData.Failed)}
     };
 
-    private int defaultSize = 20;
+    private int defaultSize = 10;
     private int total = 0;
     private int page = 1;
     private List<ListChartData> data = new();
@@ -33,14 +31,14 @@ public partial class ServiceEndpoints
     private async Task OnTableOptionsChanged(DataOptions sort)
     {
         if (sort.SortBy.Any())
-            sortFiled = sort.SortBy.First();
+            sortFiled = sort.SortBy[0];
         else
             sortFiled = default;
         if (sort.SortDesc.Any())
-            sortBy = sort.SortDesc.First();
+            sortBy = sort.SortDesc[0];
         else
             sortBy = default;
-        await LoadASync(Search);
+        await LoadASync(Search);        
     }
 
     private ChartData GetLatencyChartData(ListChartData item)
@@ -107,9 +105,10 @@ public partial class ServiceEndpoints
             Env = SearchData.Environment,
             IsDesc = sortBy
         };
-        var result = await ApiCaller.ApmService.GetEndpointPageAsync(query);
+        var result = await ApiCaller.ApmService.GetEndpointPageAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
-        if (result.Result != null && result.Result.Any())
+        total = 0;
+        if (result != null && result.Result != null && result.Result.Any())
         {
             data.AddRange(result.Result.Select(item => new ListChartData
             {
@@ -120,8 +119,8 @@ public partial class ServiceEndpoints
                 Throughput = item.Throughput,
                 Latency = item.Latency
             }));
+            total = (int)result.Total;
         }
-        total = (int)result.Total;
         isTableLoading = false;
     }
 
@@ -129,7 +128,8 @@ public partial class ServiceEndpoints
     {
         page = pageData.page;
         defaultSize = pageData.pageSize;
-        await LoadPageDataAsync();
+        await LoadASync();
+        StateHasChanged();
     }
 
     private async Task LoadChartDataAsync()

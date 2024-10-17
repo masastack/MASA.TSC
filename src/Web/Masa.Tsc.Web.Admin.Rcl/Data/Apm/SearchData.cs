@@ -1,17 +1,26 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using Masa.BuildingBlocks.StackSdks.Pm.Enum;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Data.Apm;
 
 public class SearchData
 {
-    //public string Text { get; set; }
+    public SearchData()
+    {
+        ServiceType = AppTypes.Service.ToString();
+    }
 
     public DateTime Start { get; set; }
 
     public DateTime End { get; set; }
 
     public string? Environment { get; set; }
+
+    public string? ServiceType { get; set; }
+
+    public string? Project { get; set; }
 
     public string? Service { get; set; }
 

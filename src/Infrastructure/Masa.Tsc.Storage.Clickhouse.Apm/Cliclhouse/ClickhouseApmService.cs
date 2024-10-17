@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Storage.Clickhouse.Apm;
 
-internal partial class ClickhouseApmServiceNew : IApmService
+internal partial class ClickhouseApmService : IApmService
 {
     private readonly MasaStackClickhouseConnection _dbConnection;
     private readonly ClickHouseCommand command;
@@ -14,7 +14,7 @@ internal partial class ClickhouseApmServiceNew : IApmService
     const double MILLSECOND = 1e6;
     private readonly ILogger _logger;
 
-    public ClickhouseApmServiceNew(MasaStackClickhouseConnection dbConnection, ITraceService traceService, ILogger<ClickhouseApmServiceNew> logger)
+    public ClickhouseApmService(MasaStackClickhouseConnection dbConnection, ITraceService traceService, ILogger<ClickhouseApmService> logger)
     {
         _traceService = traceService;
         _dbConnection = dbConnection;
@@ -1004,13 +1004,6 @@ order by `Attributes.http.status_code`";
         return "1 month";
     }
 
-
-
-
-
-
-
-
     private static (string, List<ClickHouseParameter>) GetMetricWhere<TRequest>(TRequest query, bool isContainsEndpoint = false) where TRequest : BaseApmRequestDto
     {
         List<ClickHouseParameter> parameters = new();
@@ -1027,6 +1020,11 @@ order by `Attributes.http.status_code`";
         {
             sql.AppendLine($" and {StorageConst.Current.ServiceName}=@serviceName");
             parameters.Add(new ClickHouseParameter { ParameterName = "serviceName", Value = query.Service });
+        }
+        else if (query.AppIds != null && query.AppIds.Any())
+        {
+            sql.AppendLine($" and {StorageConst.Current.ServiceName} in (@serviceName)");
+            parameters.Add(new ClickHouseParameter { ParameterName = "serviceName", Value = query.AppIds });
         }
         if (isContainsEndpoint)
             AppendEndpoint(query as ApmEndpointRequestDto, sql, parameters, true);

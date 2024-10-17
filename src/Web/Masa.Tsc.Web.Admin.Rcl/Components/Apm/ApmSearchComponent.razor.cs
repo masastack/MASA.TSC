@@ -36,9 +36,15 @@ public partial class ApmSearchComponent
         new (ApmComparisonTypes.Week, "Week before"),
     };
     private List<string> services = new();
+    private List<string> projects = new();
     private List<string> environments = new();
-    private Dictionary<string, List<string>> enviromentServices = new();
+    private Dictionary<string, List<EnviromentAppDto>> enviromentServices = new();
     private bool isServiceLoading = true, isEnvLoading = true;
+    private List<string> types = new() {
+        AppTypes.UI.ToString(),
+        AppTypes.Service.ToString(),
+         AppTypes.Job.ToString()
+    };
 
     private bool Isloaded = false;
     private QuickRangeKey quickRangeKey = QuickRangeKey.Last15Minutes;
@@ -50,15 +56,13 @@ public partial class ApmSearchComponent
         SetQueryList();
         if (IsEndpoint)
             await LoadAsync();
-        await OnValueChanged();
         if (Search.Start > DateTime.MinValue)
         {
-            await LoadEnvironmentAsync();
-            await LoadServiceAsync();
-            await LoadEndpointAsync();
-            await LoadErrorAsync();
-            Isloaded = true;
+            await InitAsync();
         }
+        Isloaded = true;
+        await OnValueChanged();
+        StateHasChanged();
     }
 
     private void SetQuickRangeKey(TimeSpan timeSpan)
@@ -177,6 +181,8 @@ public partial class ApmSearchComponent
         _ = InvokeAsync(async () =>
         {
             await LoadEnvironmentAsync();
+            await LoadProjectAsync();
+            await LoadServiceTypeAsync();
             await LoadServiceAsync();
             await OnValueChanged();
             await LoadEndpointAsync();
@@ -184,22 +190,41 @@ public partial class ApmSearchComponent
         });
     }
 
+    private async Task ServiceTypeChanged(string value)
+    {
+        Search.ServiceType = value;
+        await LoadProjectAsync();
+        await LoadServiceAsync();
+        await OnValueChanged();
+    }
+
     private async Task LoadServiceAsync()
     {
         isServiceLoading = true;
+        List<EnviromentAppDto> projects = new();
         if (!string.IsNullOrEmpty(Search.Environment))
         {
-            if (!enviromentServices.TryGetValue(Search.Environment!, out services!))
-                services = new();
+            if (!enviromentServices.TryGetValue(Search.Environment!, out projects!))
+                projects = new();
         }
         else
         {
             foreach (var item in enviromentServices)
             {
-                services.AddRange(item.Value);
+                projects.AddRange(item.Value);
             }
-            services = services.Distinct().ToList();
         }
+        if (projects.Count > 0)
+        {
+            if (!string.IsNullOrEmpty(Search.Project))
+                projects = projects.Where(app => app.ProjectId == Search.Project).ToList();
+            if (!string.IsNullOrEmpty(Search.ServiceType))
+                projects = projects.Where(app => app.AppType.ToString() == Search.ServiceType).ToList();
+        }
+
+        services = projects.Select(app => app.AppId).Distinct().ToList();
+        if (!string.IsNullOrEmpty(Search.Project) && !projects.Exists(p => p.ProjectId == Search.Project))
+            Search.Service = default!;
         if (!string.IsNullOrEmpty(Search.Service) && !services.Contains(Search.Service))
             Search.Service = default!;
         isServiceLoading = false;
@@ -209,12 +234,12 @@ public partial class ApmSearchComponent
     private async Task LoadEnvironmentAsync()
     {
         isEnvLoading = true;
-        var result = await ApiCaller.ApmService.GetEnviromentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End) ?? new();
+        var result = await ApiCaller.ApmService.GetEnviromentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End, Search.Environment!) ?? new();
         enviromentServices = result;
         environments = result.Keys.ToList();
         if (!string.IsNullOrEmpty(Search.Service) && string.IsNullOrEmpty(Search.Environment))
         {
-            var findEnv = enviromentServices.Where(item => item.Value.Contains(Search.Service)).FirstOrDefault();
+            var findEnv = enviromentServices.FirstOrDefault(item => item.Value.Exists(app => app.AppId == Search.Service));
             if (string.IsNullOrEmpty(findEnv.Key))
                 Search.Service = default!;
             else
@@ -224,6 +249,78 @@ public partial class ApmSearchComponent
         if (!string.IsNullOrEmpty(Search.Environment) && !environments.Contains(Search.Environment))
             Search.Environment = default!;
         isEnvLoading = false;
+    }
+
+    private async Task LoadProjectAsync()
+    {
+        List<EnviromentAppDto> projects = new();
+        if (!string.IsNullOrEmpty(Search.Environment))
+        {
+            if (!enviromentServices.TryGetValue(Search.Environment!, out projects!))
+                projects = new();
+        }
+        else
+        {
+            foreach (var item in enviromentServices)
+            {
+                projects.AddRange(item.Value);
+            }
+        }
+        if (projects.Count > 0)
+        {
+            if (!string.IsNullOrEmpty(Search.ServiceType))
+                projects = projects.Where(app => app.AppType.ToString() == Search.ServiceType).ToList();
+        }
+
+        this.projects = projects.Select(p => p.ProjectId).Distinct().ToList();
+        if (string.IsNullOrEmpty(Search.Project) || !string.IsNullOrEmpty(Search.Project) && !this.projects.Contains(Search.Project))
+        {
+            EnviromentAppDto? project = null;
+            if (!string.IsNullOrEmpty(Search.Service))
+                project = projects.Find(app => app.AppId == Search.Service);
+            if (project != null)
+                Search.Project = project.ProjectId;
+            else
+                Search.Project = default!;
+        }
+
+        await Task.CompletedTask;
+    }
+
+    private async Task LoadServiceTypeAsync()
+    {       
+        List<EnviromentAppDto> projects = new();
+        if (!string.IsNullOrEmpty(Search.Environment))
+        {
+            if (!enviromentServices.TryGetValue(Search.Environment!, out projects!))
+                projects = new();
+        }
+        else
+        {
+            foreach (var item in enviromentServices)
+            {
+                projects.AddRange(item.Value);
+            }
+        }
+
+        if (projects.Count > 0)
+        {
+            if (!string.IsNullOrEmpty(Search.Project))
+                projects = projects.Where(app => app.ProjectId == Search.Project).ToList();
+        }
+
+        types = projects.Select(app => app.AppType.ToString()).Distinct().ToList();
+        if (string.IsNullOrEmpty(Search.ServiceType) || !string.IsNullOrEmpty(Search.ServiceType) && !types.Contains(Search.ServiceType))
+        {
+            EnviromentAppDto? projectApp = null;
+            if (!string.IsNullOrEmpty(Search.Service))
+                projectApp = projects.Find(app => app.ProjectId == Search.Project);
+            if (projectApp != null)
+                Search.ServiceType = projectApp!.AppType.ToString();
+            else
+                Search.ServiceType = default!;
+        }
+        await Task.CompletedTask;
     }
 
     private async Task LoadEndpointAsync()
@@ -237,24 +334,52 @@ public partial class ApmSearchComponent
     private async Task LoadErrorAsync()
     {
         exceptions = await ApiCaller.ApmService.GetExceptionTypesAsync(new BaseRequestDto { Service = Search.Service!, End = Search.End, Start = Search.Start });
+        if (exceptions == null || !exceptions.Contains(Search.ExceptionType))
+            Search.ExceptionType = default!;
     }
 
     private async Task OnTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) times)
     {
-        if (Search.Start > DateTime.MinValue && !Isloaded)
-            return;
-        Search.Start = times.start!.Value.UtcDateTime;
-        Search.End = times.end!.Value.UtcDateTime;
-        Isloaded = true;
+        if (Isloaded || Search.Start == DateTime.MinValue)
+        {
+            Search.Start = times.start!.Value.UtcDateTime;
+            Search.End = times.end!.Value.UtcDateTime;
+        }
+        if (Isloaded)
+        {
+            await InitAsync();
+            await OnValueChanged();
+            StateHasChanged();
+        }
+    }
+
+    private async Task InitAsync()
+    {
         await LoadEnvironmentAsync();
+        await LoadProjectAsync();
+        await LoadServiceTypeAsync();
         await LoadServiceAsync();
-        await OnValueChanged();
+        await LoadEndpointAsync();
+        await LoadErrorAsync();
     }
 
     private async Task OnEnvironmentChanged(string env)
     {
         Search.Environment = env;
+        await LoadProjectAsync();
+        await LoadServiceTypeAsync();
         await LoadServiceAsync();
+        await OnValueChanged();
+        StateHasChanged();
+    }
+
+    private async Task OnProjectChanged(string? project)
+    {
+        Search.Project = project;
+        await LoadServiceTypeAsync();
+        await LoadServiceAsync();
+        await LoadEndpointAsync();
+        await LoadErrorAsync();
         await OnValueChanged();
         StateHasChanged();
     }
@@ -262,6 +387,8 @@ public partial class ApmSearchComponent
     private async Task OnServiceChanged(string? service)
     {
         Search.Service = service;
+        await LoadProjectAsync();
+        await LoadServiceTypeAsync();
         await LoadEndpointAsync();
         await LoadErrorAsync();
         await OnValueChanged();
@@ -307,8 +434,11 @@ public partial class ApmSearchComponent
 
     private async Task OnValueChanged()
     {
+        if (!Isloaded || string.IsNullOrEmpty(Value.Environment))
+            return;
         if (ValueChanged.HasDelegate)
             await ValueChanged.InvokeAsync(Value);
+        StateHasChanged();
     }
 
     private async Task LoadAsync()
@@ -319,7 +449,10 @@ public partial class ApmSearchComponent
             return;
         statuses = (await ApiCaller.ApmService.GetStatusCodesAsync()) ?? new();
         if (statuses.Any())
+        {
+            statuses = statuses.Where(s => s.Trim().Length > 0).ToList();
             MemoryCache.Set(key, statuses, TimeSpan.FromMinutes(10));
+        }
         if (!string.IsNullOrEmpty(Search.Status) && !statuses.Contains(Search.Status))
             Search.Status = default!;
     }

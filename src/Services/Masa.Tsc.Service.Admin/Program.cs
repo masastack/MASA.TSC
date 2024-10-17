@@ -16,11 +16,11 @@ builder.Services.AddTraceLog()
         Layer = masaStackConfig.Namespace,
         ServiceInstanceId = builder.Configuration.GetValue<string>("HOSTNAME")!
     },
-    #if DEBUG
+#if DEBUG
        "http://localhost:4317"
-    #else
+#else
         masaStackConfig.OtlpUrl
-    #endif
+#endif
     )
     .AddPrometheusClient(prometheusUrl, 15)
     .AddAuthorization()
@@ -43,6 +43,7 @@ builder.Services.AddTraceLog()
 
 builder.Services.AddIsolation(services => services.UseMultiEnvironment());
 builder.Services.AddDaprClient();
+builder.Services.AddMemoryCache();
 
 //开启response stream读取
 builder.Services.Configure<KestrelServerOptions>(x => x.AllowSynchronousIO = true);
@@ -56,7 +57,8 @@ var redisOption = new RedisConfigurationOptions
         }
     },
     DefaultDatabase = masaStackConfig.RedisModel.RedisDb,
-    Password = masaStackConfig.RedisModel.RedisPassword
+    Password = masaStackConfig.RedisModel.RedisPassword,
+    ClientName = builder.Configuration.GetValue<string>("HOSTNAME")!
 };
 builder.Services.AddSchedulerClient(masaStackConfig.GetSchedulerServiceDomain());
 
@@ -139,10 +141,7 @@ var app = builder.Services
                 .UseEventLog<TscDbContext>()
                 .UseEventBus();
             })
-            .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name), options =>
-            {
-                options.CommandTimeout(1);
-            }).UseFilter())
+            .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name)).UseFilter())
             .UseRepository<TscDbContext>();
     })
     .AddServices(builder);

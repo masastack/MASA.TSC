@@ -235,8 +235,14 @@
     },
     "Search": {
       "Environment": "环境",
+      "Project": "项目",
       "Service": "服务",
-      "Comparison": "Comparison",
+      "ServiceType": "服务类型",
+      "Endpoint": "接口",
+      "StatusCode": "状态码",
+      "SelectField": "查询列",
+      "SearchValue": "查询文本",
+      "Comparison": "对比",
       "Refresh": "刷新"
     },
     "Service": {

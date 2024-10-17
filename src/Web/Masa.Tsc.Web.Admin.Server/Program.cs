@@ -19,11 +19,7 @@ builder.WebHost.UseKestrel(option =>
 {
     option.ConfigureHttpsDefaults(options =>
     {
-        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TLS_NAME")))
-        {
-            options.ServerCertificate = new X509Certificate2(Path.Combine("Certificates", "7348307__lonsid.cn.pfx"), "cqUza0MN");
-        }
-        else
+        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TLS_NAME")))
         {
             options.ServerCertificate = X509Certificate2.CreateFromPemFile("./ssl/tls.crt", "./ssl/tls.key");
         }
@@ -56,8 +52,8 @@ var redisOption = new RedisConfigurationOptions
 if (builder.Environment.EnvironmentName == "Development")
 {
     //await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC, authHost: "https://auth-service-dev.masastack.com", mcHost: "https://mc-service-dev.masastack.com", pmHost: "https://pm-service-dev.masastack.com");
-    await builder.Services.AddMasaStackComponentsWithNormalAppAsync(MasaStackProject.TSC, "http://localhost:4317", serviceVersion: "local1.0", authHost: "https://auth-service-dev.masastack.com", mcHost: "https://mc-service-dev.masastack.com", pmHost: "https://pm-service-dev.masastack.com");
-    builder.Services.AddTscHttpApiCaller("http://localhost:18010", authApiUrl: "https://auth-service-dev.masastack.com").AddDccClient(redisOption);
+    await builder.Services.AddMasaStackComponentsWithNormalAppAsync(MasaStackProject.TSC, "http://localhost:4317", serviceVersion: "local1.0", authHost: "https://auth-service-sec-staging.masastack.com", mcHost: "https://mc-service-sec-staging.masastack.com", pmHost: "https://pm-service-sec-staging.masastack.com");
+    builder.Services.AddTscHttpApiCaller("http://localhost:18010", authApiUrl: "https://auth-service-sec-staging.masastack.com").AddDccClient(redisOption);
 }
 else
 {

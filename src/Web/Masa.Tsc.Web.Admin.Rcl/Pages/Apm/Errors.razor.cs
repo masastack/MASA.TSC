@@ -41,6 +41,7 @@ public partial class Errors
         page = pageData.page;
         defaultSize = pageData.pageSize;
         await LoadASync();
+        StateHasChanged();
     }
 
     private async Task LoadASync(SearchData data = null!)
@@ -79,7 +80,7 @@ public partial class Errors
             TextValue = Search.TextValue
             //Queries = Search.Text
         };
-        var result = await ApiCaller.ApmService.GetErrorsPageAsync(query);
+        var result = await ApiCaller.ApmService.GetErrorsPageAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
         if (result.Result != null && result.Result.Any())
         {

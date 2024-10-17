@@ -418,7 +418,7 @@ public partial class Index
                 IsDesc = false
             }
         };
-        var logs = await ApiCaller.ApmService.GetLogListAsync(query);
+        var logs = await ApiCaller.ApmService.GetLogListAsync(Guid.Empty, query, ignoreTeam: true);
 
         if (logs == null || logs.Result == null || logs.Result.Count == 0)
             return;

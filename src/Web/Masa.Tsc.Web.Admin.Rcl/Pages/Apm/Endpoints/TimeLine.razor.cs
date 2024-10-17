@@ -162,13 +162,13 @@ public partial class TimeLine
             {
                 if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid) || string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1))
                 {
-                    if (item.Trace.Attributes.TryGetValue("http.target", out var target) && string.Equals(UrlEndpoint, target.ToString()!, StringComparison.CurrentCultureIgnoreCase)
+                    if ((string.IsNullOrEmpty(urlMethod) || item.Trace.Attributes.TryGetValue("http.target", out var target) && string.Equals(UrlEndpoint, target.ToString()!, StringComparison.CurrentCultureIgnoreCase))
                         && item.Trace.Attributes.TryGetValue("http.method", out var method) && string.Equals(urlMethod, method.ToString()!, StringComparison.CurrentCultureIgnoreCase))
                         return item;
                 }
                 else if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_9_0))
                 {
-                    if (item.Trace.Attributes.TryGetValue("http.request.method", out var method) && string.Equals(urlMethod, method.ToString()!, StringComparison.CurrentCultureIgnoreCase)
+                    if ((string.IsNullOrEmpty(urlMethod) || item.Trace.Attributes.TryGetValue("http.request.method", out var method) && string.Equals(urlMethod, method.ToString()!, StringComparison.CurrentCultureIgnoreCase))
                         && (item.Trace.Attributes.TryGetValue("http.route", out var target) && string.Equals(UrlEndpoint, target.ToString()!, StringComparison.CurrentCultureIgnoreCase)
                                  || item.Trace.Attributes.TryGetValue("url.path", out target) && string.Equals(UrlEndpoint, target.ToString()!, StringComparison.CurrentCultureIgnoreCase)))
                         return item;

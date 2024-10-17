@@ -135,9 +135,9 @@ public partial class ServiceErrors
                 TextField = StorageConst.Current.SpanId,
                 TextValue = lastSpanId
             };
-            var result = await ApiCaller.ApmService.GetErrorsPageAsync(query);
-            data = result.Result?.ToList() ?? new();
-            total = (int)result.Total;
+            var result = await ApiCaller.ApmService.GetErrorsPageAsync(GlobalConfig.CurrentTeamId, query, SearchData.Project, SearchData.ServiceType);
+            data = result?.Result?.ToList() ?? new();
+            total = (int)(result?.Total ?? 0);
         }
         isTableLoading = false;
     }

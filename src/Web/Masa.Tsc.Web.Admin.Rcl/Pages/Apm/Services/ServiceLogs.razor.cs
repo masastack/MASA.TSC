@@ -163,13 +163,17 @@ public partial class ServiceLogs
                 });
             }
             query.Conditions = list;
-            var result = await ApiCaller.ApmService.GetLogListAsync(query);
+            var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, SearchData.Project, SearchData.ServiceType);
             data.Clear();
-            if (result.Result != null && result.Result.Any())
+            total = 0;
+            if (result != null)
             {
-                data.AddRange(result.Result);
+                if (result.Result != null && result.Result.Any())
+                {
+                    data.AddRange(result.Result);
+                }
+                total = (int)result.Total;
             }
-            total = (int)result.Total;
         }
         isTableLoading = false;
     }

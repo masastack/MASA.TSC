@@ -95,9 +95,10 @@ public partial class Endpoint
             StatusCode = Search.Status,
             //Queries = Search.Text
         };
-        var result = await ApiCaller.ApmService.GetEndpointPageAsync(query);
+        var result = await ApiCaller.ApmService.GetEndpointPageAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
-        if (result.Result != null && result.Result.Any())
+        total = 0;
+        if (result != null && result.Result != null && result.Result.Any())
         {
             data.AddRange(result.Result.Select(item => new ListChartData
             {
@@ -109,8 +110,8 @@ public partial class Endpoint
                 Throughput = item.Throughput,
                 Latency = item.Latency
             }));
+            total = (int)result.Total;
         }
-        total = (int)result.Total;
     }
 
     private async Task LoadChartDataAsync()

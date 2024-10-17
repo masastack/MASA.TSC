@@ -67,6 +67,7 @@ public partial class Logs
         page = pageData.page;
         defaultSize = pageData.pageSize;
         await LoadASync();
+        StateHasChanged();
     }
 
     private async Task LoadASync(SearchData data = null!)
@@ -122,11 +123,11 @@ public partial class Logs
             }
         }
         query.Conditions = list;
-        var result = await ApiCaller.ApmService.GetLogListAsync(query);
+        var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
         if (result.Result != null && result.Result.Any())
         {
-            data.AddRange(result.Result);
+            data = result.Result;
         }
         if (total == 0)
             total = (int)result.Total;
