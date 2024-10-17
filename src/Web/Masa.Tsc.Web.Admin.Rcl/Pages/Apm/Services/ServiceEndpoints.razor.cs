@@ -19,7 +19,7 @@ public partial class ServiceEndpoints
         new() { Text = I18n.Apm("Endpoint.List.Failed"), Value = nameof(ListChartData.Failed)}
     };
 
-    private int defaultSize = 10;
+    private int defaultSize = 20;
     private int total = 0;
     private int page = 1;
     private List<ListChartData> data = new();
