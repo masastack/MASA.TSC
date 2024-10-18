@@ -168,7 +168,8 @@ public partial class ApmSearchComponent
             Search.TextField = StorageConst.Current.TraceId;
             Search.TextValue = Search.TraceId;
         }
-        GlobalConfig.CurrentTeamId = MasaUser.CurrentTeamId;
+        if (GlobalConfig.CurrentTeamId == Guid.Empty)
+            GlobalConfig.CurrentTeamId = MasaUser.CurrentTeamId;
         if (Search.Start > DateTime.MinValue && Search.End > Search.Start)
         {
             SetQuickRangeKey(Search.End - Search.Start);
@@ -288,7 +289,7 @@ public partial class ApmSearchComponent
     }
 
     private async Task LoadServiceTypeAsync()
-    {       
+    {
         List<EnviromentAppDto> projects = new();
         if (!string.IsNullOrEmpty(Search.Environment))
         {
