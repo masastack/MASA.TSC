@@ -33,6 +33,9 @@ public partial class TimeLine
     public bool IsMaui { get; set; }
 
     [Parameter]
+    public string? Service { get; set; }
+
+    [Parameter]
     public string RoutePath { get; set; }
 
     private string? lastKey = default;
@@ -100,6 +103,8 @@ public partial class TimeLine
 
     private async Task CaculateTimelines(List<TraceResponseDto>? traces)
     {
+        if (string.IsNullOrEmpty(urlService) && !string.IsNullOrEmpty(Service))
+            urlService = Service;
         traceLinkUrl = default;
         spanLinkUrl = default;
         timeLines.Clear();

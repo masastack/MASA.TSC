@@ -88,7 +88,7 @@
                         <ApmTraceView Value="@(currentLog!=null?currentLog.Data:currentTrace?.Data)" Dialog=false Height="@("calc(100vh - 400px)")" />
                     </MTabItem>
                     <MTabItem Value="2" Class="mx-2">
-                        <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints.TimeLine Data="traceLines" IsMaui RoutePath="@(currentTrace!=null&&currentTrace.Data.Attributes.TryGetValue("http.target",out var target)?target.ToString():default)" />
+                        <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints.TimeLine Data="traceLines" IsMaui RoutePath="@(currentTrace!=null&&currentTrace.Data.Attributes.TryGetValue("http.target",out var target)?target.ToString():default)" Service="@serviceName" />
                     </MTabItem>
                     <MTabItem Value="3">
                         <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceErrors ShowChart=false />
