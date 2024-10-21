@@ -38,7 +38,7 @@ public partial class ServiceEndpoints
             sortBy = sort.SortDesc[0];
         else
             sortBy = default;
-        await LoadASync(Search);        
+        await LoadASync(Search);
     }
 
     private ChartData GetLatencyChartData(ListChartData item)
@@ -117,7 +117,8 @@ public partial class ServiceEndpoints
                 Endpoint = item.Endpoint,
                 Failed = item.Failed,
                 Throughput = item.Throughput,
-                Latency = item.Latency
+                Latency = item.Latency,
+                Method = item.Method
             }));
             total = (int)result.Total;
         }

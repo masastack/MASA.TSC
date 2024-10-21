@@ -27,11 +27,11 @@ public partial class Service
     public async Task OnTableOptionsChanged(DataOptions sort)
     {
         if (sort.SortBy.Any())
-            sortFiled = sort.SortBy.First();
+            sortFiled = sort.SortBy[0];
         else
             sortFiled = default;
         if (sort.SortDesc.Any())
-            sortBy = sort.SortDesc.First();
+            sortBy = sort.SortDesc[0];
         else
             sortBy = default;
         await LoadASync();
@@ -81,7 +81,6 @@ public partial class Service
             TextValue = Search.TextValue,
             IsDesc = sortBy,
             ComparisonType = Search.ComparisonType.ToComparisonType(),
-            //Queries = Search.Text
         };
         var result = await ApiCaller.ApmService.GetServicePageAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
@@ -98,7 +97,6 @@ public partial class Service
             }));
             total = (int)result.Total;
         }
-
     }
 
     private async Task LoadChartDataAsync()
@@ -124,7 +122,7 @@ public partial class Service
 
         foreach (var service in data)
         {
-            var chartData = result.FirstOrDefault(s => s.Name == service.Name);
+            var chartData = result.Find(s => s.Name == service.Name);
             service.LatencyChartData = new();
             service.ThroughputChartData = new();
             service.FailedChartData = new();

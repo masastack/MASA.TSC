@@ -3,28 +3,28 @@
 
 <div class="mx-4">
     @* <div class="d-flex py-4">
-        <div class="col-6 rounded-lg pa-0" style="border:solid #ccc 1px">
-            <MCard>
-                <MCardSubtitle Class="font-weight-black h6 py-2">
-                    Span Count
-                </MCardSubtitle>
-                <MCardText Class="py-0">
-                    <MECharts Option="@(new())" Height="200" Style="@("width:100%")" />
-                </MCardText>
-            </MCard>
-        </div>
-        <div class="col-6 pa-0">
-            <div style="border:solid #ccc 1px;height:284px" class="rounded-lg ma-0 ml-4">
-                <MCard>
-                    <MCardSubtitle Class="font-weight-black h6 py-2">
-                        Time spent spans
-                    </MCardSubtitle>
-                    <MCardText Class="py-0">                        
-                        <MECharts Option="@(new())" Height="200" Style="@("width:100%")" />                        
-                    </MCardText>
-                </MCard>
-            </div>
-        </div>
+    <div class="col-6 rounded-lg pa-0" style="border:solid #ccc 1px">
+    <MCard>
+    <MCardSubtitle Class="font-weight-black h6 py-2">
+    Span Count
+    </MCardSubtitle>
+    <MCardText Class="py-0">
+    <MECharts Option="@(new())" Height="200" Style="@("width:100%")" />
+    </MCardText>
+    </MCard>
+    </div>
+    <div class="col-6 pa-0">
+    <div style="border:solid #ccc 1px;height:284px" class="rounded-lg ma-0 ml-4">
+    <MCard>
+    <MCardSubtitle Class="font-weight-black h6 py-2">
+    Time spent spans
+    </MCardSubtitle>
+    <MCardText Class="py-0">
+    <MECharts Option="@(new())" Height="200" Style="@("width:100%")" />
+    </MCardText>
+    </MCard>
+    </div>
+    </div>
     </div> *@
 
     <div class="col-12 rounded-lg" style="border:solid #ccc 1px">
@@ -35,9 +35,9 @@
                     FixedHeader
                     ServerItemsLength="total"
                     ItemsPerPage="defaultSize"
-                    Items="data"                    
+                    Items="data"
                     TItem="ListChartData"
-                    Loading="@isTableLoading"                    
+                    Loading="@isTableLoading"
                     OnOptionsUpdate="OnTableOptionsChanged">
             <ItemColContent>
                 @if (context.Header.Value == nameof(ListChartData.Name))
@@ -45,14 +45,14 @@
                     <MTooltip Top Context="tooltipContent">
                         <ActivatorContent>
                             <div @attributes="@tooltipContent.Attrs" style="width:400px;overflow:hidden" class="text-truncate">
-                                <a href="/apm/endpoints/@(HttpUtility.UrlEncode(context.Item.Name)+GetUrlParam(service: context.Item.Service, env: GetSearchEnv(Search.Environment, context.Item.Envs?.Split(',')),endpoint:context.Item.Endpoint, comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End))"
+                                <a href="/apm/endpoints/@(HttpUtility.UrlEncode(context.Item.Name)+GetUrlParam(service: context.Item.Service, env: GetSearchEnv(Search.Environment, context.Item.Envs?.Split(',')),endpoint:context.Item.Endpoint,method:context.Item.Method, comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End))"
                                    title="@context.Item.Name">@context.Item.Name</a>
                             </div>
                         </ActivatorContent>
                         <ChildContent>
                             <span>@context.Item.Name</span>
                         </ChildContent>
-                    </MTooltip>                    
+                    </MTooltip>
                 }
                 else if (context.Header.Value == nameof(ListChartData.Latency))
                 {

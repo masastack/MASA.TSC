@@ -49,6 +49,7 @@ public partial class TimeLine
     TreeLineDto? currentTimeLine = null;
     TreeLineDto defaultTimeLine = null;
     List<string> services = new();
+    List<string> selectedServices = new();
     string? traceLinkUrl = default, spanLinkUrl = default;
     private string urlService, UrlEndpoint, urlMethod;
 
@@ -103,6 +104,7 @@ public partial class TimeLine
         spanLinkUrl = default;
         timeLines.Clear();
         services.Clear();
+        selectedServices.Clear();
         if (traces == null || !traces.Any())
             return;
 
@@ -140,6 +142,7 @@ public partial class TimeLine
             await OnSpanIdChanged.InvokeAsync(defaultTimeLine?.Trace?.SpanId);
         timeLines = timeLines.OrderBy(item => item.Trace.Timestamp).ToList();
         services = services.Distinct().ToList();
+        selectedServices.Add(urlService);
         traceLinkUrl = GetUrl(defaultTimeLine);
     }
 
@@ -156,28 +159,40 @@ public partial class TimeLine
             return default;
         foreach (var item in data)
         {
-            if (item.Trace.Resource["service.name"].ToString() == urlService
-                && item.Trace.Kind == "SPAN_KIND_SERVER"
-                && item.Trace.Resource.TryGetValue("telemetry.sdk.version", out var sdkVersion))
-            {
-                if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid) || string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1))
-                {
-                    if ((string.IsNullOrEmpty(urlMethod) || item.Trace.Attributes.TryGetValue("http.target", out var target) && string.Equals(UrlEndpoint, target.ToString()!, StringComparison.CurrentCultureIgnoreCase))
-                        && item.Trace.Attributes.TryGetValue("http.method", out var method) && string.Equals(urlMethod, method.ToString()!, StringComparison.CurrentCultureIgnoreCase))
-                        return item;
-                }
-                else if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_9_0))
-                {
-                    if ((string.IsNullOrEmpty(urlMethod) || item.Trace.Attributes.TryGetValue("http.request.method", out var method) && string.Equals(urlMethod, method.ToString()!, StringComparison.CurrentCultureIgnoreCase))
-                        && (item.Trace.Attributes.TryGetValue("http.route", out var target) && string.Equals(UrlEndpoint, target.ToString()!, StringComparison.CurrentCultureIgnoreCase)
-                                 || item.Trace.Attributes.TryGetValue("url.path", out target) && string.Equals(UrlEndpoint, target.ToString()!, StringComparison.CurrentCultureIgnoreCase)))
-                        return item;
-                }
-            }
+            if (IsTarget(item))
+                return item;
             var find = GetDefaultLine(item.Children);
             if (find != null) return find;
         }
         return default;
+    }
+
+    private bool IsTarget(TreeLineDto item)
+    {
+        if (item.ServiceName == urlService
+               && item.Trace.Kind == "SPAN_KIND_SERVER"
+               && item.Trace.Resource.TryGetValue("telemetry.sdk.version", out var sdkVersion))
+        {
+            if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid) || string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1))
+            {
+                return IsNullOrEquals(item.Trace.Attributes, "http.method", urlMethod)
+                     && IsNullOrEquals(item.Trace.Attributes, "http.target", UrlEndpoint);
+
+            }
+
+            if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_9_0))
+            {
+                return IsNullOrEquals(item.Trace.Attributes, "http.request.method", urlMethod)
+                     && (IsNullOrEquals(item.Trace.Attributes, "http.route", UrlEndpoint) || IsNullOrEquals(item.Trace.Attributes, "url.path", UrlEndpoint));
+            }
+        }
+        return false;
+    }
+
+    private static bool IsNullOrEquals(Dictionary<string, object> values, string key, string? urlValue = default)
+    {
+        if (string.IsNullOrEmpty(urlValue)) return true;
+        return values.TryGetValue(key, out var value) && string.Equals(urlValue, value.ToString(), StringComparison.CurrentCultureIgnoreCase);
     }
 
     private TreeLineDto GetMauiDefaultLines(List<TreeLineDto>? data)
@@ -314,7 +329,7 @@ public partial class TimeLine
         if (current == null)
             return string.Empty;
         string spanId = current.Trace.SpanId;
-        return $"{baseUrl}{GetUrlParam(service: current.Trace.Resource["service.name"].ToString(), env: current.Trace.Resource["service.namespace"].ToString(), start: start.AddSeconds(-1), end: end.AddSeconds(1), traceId: current.Trace.TraceId, spanId: isSpan ? spanId : default)}";
+        return $"{baseUrl}{GetUrlParam(service: current.ServiceName, env: current.Trace.Resource["service.namespace"].ToString(), start: start.AddSeconds(-1), end: end.AddSeconds(1), traceId: current.Trace.TraceId, spanId: isSpan ? spanId : default)}";
     }
 
     private async Task OpenLogAsync(TreeLineDto item)
@@ -326,5 +341,23 @@ public partial class TimeLine
     private async Task OpenTraceLogAsync()
     {
         await JSRuntime.InvokeVoidAsync("open", traceLinkUrl, "_blank");
+    }
+
+    private string GetServiceStyle(string service)
+    {
+        return selectedServices.Contains(service) ? "background-color: rgb(211, 218, 230)" : "";
+    }
+
+    private void OnServiceSelected(string service)
+    {
+        if (service == urlService)
+            return;
+
+        if (selectedServices.Contains(service))
+            selectedServices.Remove(service);
+        else
+            selectedServices.Add(service);
+
+        StateHasChanged();
     }
 }

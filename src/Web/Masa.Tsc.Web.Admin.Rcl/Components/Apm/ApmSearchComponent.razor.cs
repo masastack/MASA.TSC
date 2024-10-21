@@ -179,6 +179,11 @@ public partial class ApmSearchComponent
     private void TeamChanged(Guid teamId)
     {
         GlobalConfig.CurrentTeamId = teamId;
+        if (Isloaded && CheckUrl())
+        {
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
+            return;
+        }
         _ = InvokeAsync(async () =>
         {
             await LoadEnvironmentAsync();
@@ -189,6 +194,18 @@ public partial class ApmSearchComponent
             await LoadEndpointAsync();
             StateHasChanged();
         });
+    }
+
+    private bool CheckUrl()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var values = HttpUtility.ParseQueryString(uri.Query);
+        if (values.Count > 0)
+        {
+            return true;
+        }
+        else
+            return false;
     }
 
     private async Task ServiceTypeChanged(string value)

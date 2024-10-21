@@ -31,6 +31,16 @@ public class TreeLineDto
 
     public bool Faild { get; set; } = false;
 
+    public string? ServiceName
+    {
+        get
+        {
+            if (Trace == null || Trace.Resource == null || !Trace.Resource.ContainsKey("service.name"))
+                return default;
+            return Trace.Resource["service.name"].ToString();
+        }
+    }
+
     public bool IsError
     {
         get

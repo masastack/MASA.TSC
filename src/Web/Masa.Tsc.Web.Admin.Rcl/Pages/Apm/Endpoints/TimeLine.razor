@@ -37,7 +37,9 @@
             <div class="d-flex justify-start flex-wrap">
                 @foreach (var service in services)
                 {
-                    <div class="pl-2"> <SIcon Small Color="@colors[services.IndexOf(service)]">mdi-circle</SIcon> @service</div>
+                    <div class="pl-2">
+                        <div class="pa-1 rounded-xl" style="cursor: pointer;@(GetServiceStyle(service))" @onclick="@(()=>OnServiceSelected(service))"><SIcon Small Color="@colors[services.IndexOf(service)]">mdi-circle</SIcon> @service</div>
+                    </div>
                 }
             </div>
         </div>
@@ -83,6 +85,8 @@
                 style = $"padding-right:{timeLine.Right}%";
             }
 
+            if (selectedServices.Contains(timeLine.ServiceName!))
+            {
             <div class="time_line d-flex justify-space-between">
                 <div class="left_col d-flex justify-space-start" style="margin-left:@(level*8)px;border-left:solid 1px #ccc">
                     @if (timeLine.Children != null && timeLine.Children.Any())
@@ -93,7 +97,7 @@
                 <div style="width:calc(100% - 100px)">
                     <div class="d-flex mt-2">
                         <div class="left" style="width:@timeLine.Left%"></div>
-                        <div @onclick="(()=>ShowTraceDetail(timeLine))" class="process" title="@timeLine.Label" style="width:@timeLine.Process%;background-color:@colors[services.IndexOf(timeLine.Trace.Resource["service.name"].ToString())]"></div>
+                        <div @onclick="(()=>ShowTraceDetail(timeLine))" class="process" title="@timeLine.Label" style="width:@timeLine.Process%;background-color:@colors[services.IndexOf(timeLine.ServiceName)]"></div>
                         <div class="right" style="width:@timeLine.Right%"></div>
                     </div>
                     <div class="@className" style="@style">
@@ -114,7 +118,7 @@
                 </div>
                 <div class="right_col"></div>
             </div>
-
+            }
             @if (level == 0 && !showTimeLine)
             {
                 if (!hasShow)
@@ -127,48 +131,5 @@
                 @((RenderFragment)(dictRender => RenderRootTimeLine(dictRender, timeLine.Children, level + 1)))
             }
         }
-    }
-
-    public void RenderChildTimeLines(RenderTreeBuilder __builder, List<TreeLineDto>? timeLines)
-    {
-        if (timeLines == null || !timeLines.Any())
-            return;
-
-        <div class="time_line d-flex justify-space-between">
-            @{
-                foreach (var timeLine in timeLines)
-                {
-                    <div class="left" style="width:@timeLine.Left.ToString("#.00")%">
-                    </div>
-                    <div class="content" style="width:@timeLine.Process.ToString("#.00")%">
-                        <div class="process" title="@timeLine.Name"></div>
-                        <div class="name text-truncate" title="@timeLine.Name">@timeLine.Name</div>
-                        @((RenderFragment)(dictRender => RenderChildTimeLine(dictRender, timeLine.Children)))
-                    </div>
-                }
-            }
-            <div class="right" style="width:@timeLines[timeLines.Count-1].Right.ToString("#.00")%"></div>
-        </div>
-    }
-
-    public void RenderChildTimeLine(RenderTreeBuilder __builder, List<TreeLineDto>? timeLines)
-    {
-        if (timeLines == null || !timeLines.Any())
-            return;
-
-        <div class="time_line d-flex justify-space-between">
-            @{
-                foreach (var timeLine in timeLines)
-                {
-                    <div class="left" style="width:@timeLine.Left.ToString("#.00")%"></div>
-                    <div class="content" style="width:@timeLine.Process.ToString("#.00")%">
-                        <div class="process" title="@timeLine.Name"></div>
-                        <div class="name text-truncate" title="@timeLine.Name">@timeLine.Name</div>
-                        @((RenderFragment)(dictRender => RenderChildTimeLine(dictRender, timeLine.Children)))
-                    </div>
-                }
-            }
-            <div class="right" style="width:@timeLines[timeLines.Count-1].Right.ToString("#.00")%"></div>
-        </div>
     }
 }
