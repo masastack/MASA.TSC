@@ -11,7 +11,7 @@ public sealed class ApmService : BaseService
 
     public Task<PaginatedListBase<EndpointListDto>> GetEndpointPageAsync(Guid teamId, BaseApmRequestDto query, string? projectId = default, string? appType = default) => Caller.GetAsync<PaginatedListBase<EndpointListDto>>($"{RootPath}/endpoints?teamId={teamId}&project={projectId}{(string.IsNullOrEmpty(appType) ? "" : $"&appType={appType}")}", data: query)!;
 
-    public Task<PaginatedListBase<ErrorMessageDto>> GetErrorsPageAsync(Guid teamId, ApmEndpointRequestDto query, string? projectId = default, string? appType = default) => Caller.GetAsync<PaginatedListBase<ErrorMessageDto>>($"{RootPath}/errors?teamId={teamId}&project={projectId}{(string.IsNullOrEmpty(appType) ? "" : $"&appType={appType}")}", data: query)!;
+    public Task<PaginatedListBase<ErrorMessageDto>> GetErrorsPageAsync(Guid teamId, ApmEndpointRequestDto query, string? projectId = default, string? appType = default,bool ignoreTeam=false) => Caller.GetAsync<PaginatedListBase<ErrorMessageDto>>($"{RootPath}/errors?teamId={teamId}&project={projectId}&ignoreTeam={ignoreTeam}{(string.IsNullOrEmpty(appType) ? "" : $"&appType={appType}")}", data: query)!;
 
     public Task<List<ChartPointDto>> GetSpanErrorsAsync(ApmEndpointRequestDto query) => Caller.GetAsync<List<ChartPointDto>>($"{RootPath}/spanErrors", data: query)!;
 

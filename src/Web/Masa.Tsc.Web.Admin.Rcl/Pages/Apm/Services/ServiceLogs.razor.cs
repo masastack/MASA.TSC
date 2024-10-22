@@ -43,11 +43,11 @@ public partial class ServiceLogs
     private async Task OnTableOptionsChanged(DataOptions sort)
     {
         if (sort.SortBy.Any())
-            sortFiled = sort.SortBy.First();
+            sortFiled = sort.SortBy[0];
         else
             sortFiled = default;
         if (sort.SortDesc.Any())
-            sortBy = sort.SortDesc.First();
+            sortBy = sort.SortDesc[0];
         else
             sortBy = default;
         await LoadAsync();
@@ -163,7 +163,7 @@ public partial class ServiceLogs
                 });
             }
             query.Conditions = list;
-            var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, SearchData.Project, SearchData.ServiceType);
+            var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, SearchData.Project, SearchData.ServiceType, string.IsNullOrEmpty(SearchData.Service));
             data.Clear();
             total = 0;
             if (result != null)

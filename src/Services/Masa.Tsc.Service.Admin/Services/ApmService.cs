@@ -100,7 +100,7 @@ public class ApmService : ServiceBase
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
         });
 
-    public async Task<PaginatedListBase<ErrorMessageDto>> GetErrors([FromServices] IApmService apmService, IAuthClient authClient, IPmClient pmClient, int page, int pageSize, string start, string end, Guid teamId, string project, AppTypes? appType, string? env, string? service, string? endpoint, string? exType, string? textField, string? textValue, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc, string? traceId)
+    public async Task<PaginatedListBase<ErrorMessageDto>> GetErrors([FromServices] IApmService apmService, IAuthClient authClient, IPmClient pmClient, int page, int pageSize, string start, string end, Guid teamId, string project, AppTypes? appType, bool ignoreTeam, string? env, string? service, string? endpoint, string? exType, string? textField, string? textValue, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc, string? traceId)
     {
         var query = new ApmEndpointRequestDto
         {
@@ -120,7 +120,7 @@ public class ApmService : ServiceBase
             TraceId = traceId!
         };
 
-        if (await GetApps(query, authClient, pmClient, teamId, project, appType))
+        if (ignoreTeam || await GetApps(query, authClient, pmClient, teamId, project, appType))
             return await apmService.ErrorMessagePageAsync(query);
 
         return default!;
