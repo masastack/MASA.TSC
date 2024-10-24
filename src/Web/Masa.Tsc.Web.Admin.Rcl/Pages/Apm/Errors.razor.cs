@@ -82,11 +82,13 @@ public partial class Errors
         };
         var result = await ApiCaller.ApmService.GetErrorsPageAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
-        if (result.Result != null && result.Result.Any())
+        total = 0;
+        if (result != null)
         {
-            data.AddRange(result.Result);
+            total = (int)result.Total;
+            if (result.Result != null && result.Result.Any())
+                data = result.Result;
         }
-        total = (int)result.Total;
     }
 
     bool showDetail = false;

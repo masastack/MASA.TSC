@@ -125,11 +125,12 @@ public partial class Logs
         query.Conditions = list;
         var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
-        if (result.Result != null && result.Result.Any())
+        total = 0;
+        if (result != null)
         {
-            data = result.Result;
-        }
-        if (total == 0)
             total = (int)result.Total;
+            if (result.Result != null && result.Result.Any())
+                data = result.Result;
+        }
     }
 }
