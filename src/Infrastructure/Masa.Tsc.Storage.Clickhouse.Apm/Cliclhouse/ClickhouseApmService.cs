@@ -330,7 +330,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
                 sql1 = $@"select countMerge(Total) as Total from {Constants.DurationCountTable} where {where}";
             }
 
-            sql1 = CombineOrs(sql1, ors); 
+            sql1 = CombineOrs(sql1, ors);
             var countSql = $"select sum(Total) from({sql1})";
             result.Total = Convert.ToInt64(await Scalar(countSql, parameters));
         }
@@ -418,6 +418,14 @@ from(
         ) {orderBy} @limit ";
         PaginatedListBase<T> result = new() { Total = Convert.ToInt64(await Scalar(countSql, parameters)) };
         await SetData(sql, parameters, result, query, reader => ToServiceList<T>(reader));
+        var totalMinits = Math.Floor((query.End - query.Start).TotalMinutes);
+        if (result.Result != null && result.Result.Count > 0)
+        {
+            result.Result.ForEach(x =>
+            {
+                x.Throughput = Math.Round(x.Throughput / totalMinits, 3);
+            });
+        }
         return result;
     }
 

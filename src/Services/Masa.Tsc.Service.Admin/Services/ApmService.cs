@@ -290,7 +290,8 @@ public class ApmService : ServiceBase
         {
             AppId = item.Identity,
             ProjectId = projects.Find(p => p.Id == item.ProjectId)?.Identity!,
-            AppType = item.Type
+            AppType = item.Type,
+            AppDescription = item.Description
         }).ToList());
         _memoryCache.Set(cacheKey, result, TimeSpan.FromMinutes(5));
         return result;

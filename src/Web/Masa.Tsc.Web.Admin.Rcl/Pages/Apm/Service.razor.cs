@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Web.Admin.Rcl.Components.Apm;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm;
 
 public partial class Service
@@ -16,6 +18,7 @@ public partial class Service
         new() { Text = I18n.Apm("Service.List.Failed"), Value = nameof(ListChartData.Failed)}
     };
 
+    private ApmSearchComponent _apmSearchComponent;
     private int defaultSize = 20;
     private int total = 0;
     private int page = 1;

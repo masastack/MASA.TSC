@@ -10,4 +10,6 @@ public class EnviromentAppDto
     public AppTypes AppType { get; set; }
 
     public string ProjectId { get; set; }
+
+    public string AppDescription { get; set; }
 }

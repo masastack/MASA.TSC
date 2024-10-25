@@ -4,7 +4,7 @@
 @page "/trace/{TraceId}"
 <PageTitle>@I18n.Apm("PageTitles.Endpoint")</PageTitle>
 
-<ApmSearchComponent ShowComparison
+<ApmSearchComponent ShowComparison @ref=_apmSearchComponent
                     IsEndpoint
                     Value="Search"
                     ValueChanged="LoadASync" />
@@ -36,7 +36,19 @@
         }
         else if (context.Header.Value == nameof(ListChartData.Service))
         {
-            @context.Item.Service
+            var text = _apmSearchComponent.GetService(context.Item.Name)?.AppDescription;
+            if (string.IsNullOrEmpty(text))
+                text = "无";
+            <MTooltip Top Left Context="tooltipContent">
+                <ActivatorContent>
+                    <div @attributes="@tooltipContent.Attrs" class="text-truncate">
+                        @context.Item.Service
+                    </div>
+                </ActivatorContent>
+                <ChildContent>
+                    <span>@text</span>
+                </ChildContent>
+            </MTooltip>
         }
         else if (context.Header.Value == nameof(ListChartData.Latency))
         {

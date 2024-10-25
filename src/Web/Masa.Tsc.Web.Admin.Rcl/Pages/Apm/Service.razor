@@ -3,7 +3,7 @@
 @page "/apm/services"
 <PageTitle>@I18n.Apm("PageTitles.Service")</PageTitle>
 
-<ApmSearchComponent ShowComparison
+<ApmSearchComponent ShowComparison @ref=_apmSearchComponent
                     IsService
                     Value="Search"
                     ValueChanged="LoadASync" />
@@ -20,7 +20,21 @@
     <ItemColContent>
         @if (context.Header.Value == nameof(ListChartData.Name))
         {
-            <a href="/apm/services/@(context.Item.Name+GetUrlParam(service: context.Item.Name, env: GetSearchEnv(Search.Environment, context.Item.Envs?.Split(',')), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End))">@context.Item.Name</a>
+            var text = _apmSearchComponent.GetService(context.Item.Name)?.AppDescription;
+            if (string.IsNullOrEmpty(text))
+                text = "无";
+            <MTooltip Top Left Context="tooltipContent">
+                <ActivatorContent>
+                    <div @attributes="@tooltipContent.Attrs" class="text-truncate">
+                        <a href="/apm/services/@(context.Item.Name+GetUrlParam(service: context.Item.Name, env: GetSearchEnv(Search.Environment, context.Item.Envs?.Split(',')), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End))">
+                            @context.Item.Name
+                        </a>
+                    </div>
+                </ActivatorContent>
+                <ChildContent>
+                    <span>@text</span>
+                </ChildContent>
+            </MTooltip>
         }
         else if (context.Header.Value == nameof(ListChartData.Envs))
         {

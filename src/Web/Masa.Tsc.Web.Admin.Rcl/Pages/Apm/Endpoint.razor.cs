@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Web.Admin.Rcl.Components.Apm;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm;
 
 public partial class Endpoint
@@ -25,6 +27,7 @@ public partial class Endpoint
     private bool isTableLoading = false;
     private string? sortFiled;
     private bool? sortBy;
+    private ApmSearchComponent _apmSearchComponent;
 
     protected override async Task OnInitializedAsync()
     {

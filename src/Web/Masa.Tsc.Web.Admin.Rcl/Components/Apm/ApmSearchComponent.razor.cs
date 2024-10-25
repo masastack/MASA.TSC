@@ -122,6 +122,25 @@ public partial class ApmSearchComponent
         SetQueryList();
     }
 
+    public EnviromentAppDto? GetService(string service)
+    {
+        if (string.IsNullOrEmpty(service))
+            return default;
+        if (enviromentServices.Count == 0)
+            return default;
+        foreach (var item in enviromentServices)
+        {
+            if (string.IsNullOrEmpty(Search.Environment) || item.Key == Search.Environment)
+            {
+                var findApp = item.Value.Find(app => app.AppId == service);
+                if (findApp != null)
+                    return findApp;
+            }
+        }
+
+        return default!;
+    }
+
     private void SetQueryList()
     {
         if (textFileds.Count > 0 || StorageConst.Current == null)
