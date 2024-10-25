@@ -36,7 +36,7 @@
         }
         else if (context.Header.Value == nameof(ListChartData.Service))
         {
-            var text = _apmSearchComponent.GetService(context.Item.Name)?.AppDescription;
+            var text = _apmSearchComponent.GetService(context.Item.Service)?.AppDescription;
             if (string.IsNullOrEmpty(text))
                 text = "无";
             <MTooltip Top Left Context="tooltipContent">
