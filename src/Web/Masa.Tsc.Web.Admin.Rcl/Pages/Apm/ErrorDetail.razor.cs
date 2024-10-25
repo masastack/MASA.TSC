@@ -83,6 +83,8 @@ public partial class ErrorDetail
     private async Task LoadLogAysnc()
     {
         currentLog = default!;
+        _dic = new Dictionary<string, object>();
+        total = 0;
         var query = new BaseRequestDto
         {
             Service = Search.Service!,
@@ -117,21 +119,19 @@ public partial class ErrorDetail
             }
         }
         query.Conditions = list;
-        var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
-        if (currentPage == 1)
+        var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType, ignoreTeam: !string.IsNullOrEmpty(Search.TraceId));
+        if (result != null)
         {
-            total = (int)result.Total;
-        }
+            if (currentPage == 1)
+            {
+                total = (int)result.Total;
+            }
 
-        if (result.Result == null || !result.Result.Any())
-        {
-            currentLog = null;
-            _dic = new Dictionary<string, object>();
-        }
-        else
-        {
-            currentLog = result.Result[0];
-            _dic = currentLog.ToDictionary();
+            if (result.Result != null && result.Result.Any())
+            {
+                currentLog = result.Result[0];
+                _dic = currentLog.ToDictionary();
+            }
         }
     }
 
