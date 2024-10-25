@@ -84,7 +84,6 @@ public partial class ErrorDetail
     {
         currentLog = default!;
         _dic = new Dictionary<string, object>();
-        total = 0;
         var query = new BaseRequestDto
         {
             Service = Search.Service!,
