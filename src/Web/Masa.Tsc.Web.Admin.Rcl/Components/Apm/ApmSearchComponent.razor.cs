@@ -351,6 +351,8 @@ public partial class ApmSearchComponent
         {
             EnviromentAppDto? projectApp = null;
             if (!string.IsNullOrEmpty(Search.Service))
+                projectApp = projects.Find(app => app.AppId == Search.Service);
+            else if (!string.IsNullOrEmpty(Search.Project))
                 projectApp = projects.Find(app => app.ProjectId == Search.Project);
             if (projectApp != null)
                 Search.ServiceType = projectApp!.AppType.ToString();
