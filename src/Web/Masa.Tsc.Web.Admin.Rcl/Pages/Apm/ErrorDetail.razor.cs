@@ -104,7 +104,7 @@ public partial class ErrorDetail
         }
         if (!string.IsNullOrEmpty(Search.ExceptionMsg))
         {
-            list.Add(new FieldConditionDto { Name = StorageConst.Current.Log.Body, Value = Search.ExceptionMsg, Type = ConditionTypes.Regex });
+            list.Add(new FieldConditionDto { Name = StorageConst.Current.ExceptionMessage, Value = Search.ExceptionMsg, Type = ConditionTypes.Regex });
         }
         if (!string.IsNullOrEmpty(Search.TextField) && !string.IsNullOrEmpty(Search.TextValue))
         {
@@ -118,20 +118,31 @@ public partial class ErrorDetail
             }
         }
         query.Conditions = list;
-        var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType, ignoreTeam: !string.IsNullOrEmpty(Search.TraceId));
-        if (result != null)
+        int count = 1;
+        do
         {
-            if (currentPage == 1)
+            if (count == 0)
             {
-                total = (int)result.Total;
+                var message = list.Find(item => item.Name == StorageConst.Current.ExceptionMessage)!;
+                message.Name = StorageConst.Current.Log.Body;
             }
+            var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType, ignoreTeam: !string.IsNullOrEmpty(Search.TraceId));
+            if (result != null)
+            {
+                if (currentPage == 1)
+                {
+                    total = (int)result.Total;
+                }
 
-            if (result.Result != null && result.Result.Any())
-            {
-                currentLog = result.Result[0];
-                _dic = currentLog.ToDictionary();
+                if (result.Result != null && result.Result.Any())
+                {
+                    currentLog = result.Result[0];
+                    _dic = currentLog.ToDictionary();
+                    break;
+                }
+               
             }
-        }
+        } while (count-- > 0);
     }
 
     private async Task LoadTraceAsync()
