@@ -69,11 +69,15 @@ SETTINGS index_granularity = 8192,
 $@"CREATE MATERIALIZED VIEW {table} TO {Constants.ErrorTable}
 AS
 SELECT
-    Timestamp,TraceId,SpanId, if(position(Body, '\n') > 0,extract(Body, '[^\n\r]+'),Body) `Attributes.exception.message`,LogAttributes['exception.type'] AS `Attributes.exception.type`,
+    Timestamp,TraceId,SpanId, 
+   multiIf(position(LogAttributes['exception.stacktrace'],'\n')==0,substring(LogAttributes['exception.stacktrace'],position(LogAttributes['exception.stacktrace'],': ')+2),
+position(LogAttributes['exception.stacktrace'],'\n')-position(LogAttributes['exception.stacktrace'],': ')-2<=0,substring(LogAttributes['exception.stacktrace'],position(LogAttributes['exception.stacktrace'],'\n')+1,position(LogAttributes['exception.stacktrace'],'\n',position(LogAttributes['exception.stacktrace'],'\n')+1)-position(LogAttributes['exception.stacktrace'],'\n')-2),
+substring(LogAttributes['exception.stacktrace'],
+position(LogAttributes['exception.stacktrace'],': ')+2,
+position(LogAttributes['exception.stacktrace'],'\n')-position(LogAttributes['exception.stacktrace'],': ')-2)) AS `Attributes.exception.message`,
+    LogAttributes['exception.type'] AS `Attributes.exception.type`,
     ServiceName,ResourceAttributes['service.namespace'] AS `Resource.service.namespace`, LogAttributes['RequestPath'] AS `Attributes.http.target`,
-multiIf(
-  length(`Attributes.exception.message`)-150<=0,`Attributes.exception.message`,  
-  extract(`Attributes.exception.message`, '[^,:\\.£º£¬\{{\[]+')) AS MsgGroupKey
+`Attributes.exception.message` AS MsgGroupKey
 FROM {source}
 WHERE SeverityText in ['Error','Critical'] and mapContains(LogAttributes, 'exception.type')
 ";
