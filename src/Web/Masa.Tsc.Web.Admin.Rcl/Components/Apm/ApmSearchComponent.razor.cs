@@ -35,7 +35,7 @@ public partial class ApmSearchComponent
         new (ApmComparisonTypes.Day, "Day before"),
         new (ApmComparisonTypes.Week, "Week before"),
     };
-    private List<string> services = new();
+    private List<ValueTuple<string, string>> services = new();
     private List<string> projects = new();
     private List<string> environments = new();
     private Dictionary<string, List<EnviromentAppDto>> enviromentServices = new();
@@ -259,10 +259,10 @@ public partial class ApmSearchComponent
                 projects = projects.Where(app => app.AppType.ToString() == Search.ServiceType).ToList();
         }
 
-        services = projects.Select(app => app.AppId).Distinct().ToList();
+        services = projects.Select(app => ValueTuple.Create(app.AppId, app.AppDescription)).Distinct().ToList();
         if (!string.IsNullOrEmpty(Search.Project) && !projects.Exists(p => p.ProjectId == Search.Project))
             Search.Service = default!;
-        if (!string.IsNullOrEmpty(Search.Service) && !services.Contains(Search.Service))
+        if (!string.IsNullOrEmpty(Search.Service) && !services.Exists(item => item.Item1 == Search.Service))
             Search.Service = default!;
         isServiceLoading = false;
         await Task.CompletedTask;

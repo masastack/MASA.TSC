@@ -38,7 +38,25 @@
                 @foreach (var service in services)
                 {
                     <div class="pl-2">
-                        <div class="pa-1 rounded-xl" style="cursor: pointer;@(GetServiceStyle(service))" @onclick="@(()=>OnServiceSelected(service))"><SIcon Small Color="@colors[services.IndexOf(service)]">mdi-circle</SIcon> @service</div>
+                        <div class="pa-1 rounded-xl" style="cursor: pointer;@(GetServiceStyle(service))" @onclick="@(()=>OnServiceSelected(service))">
+                            
+                            @{
+                                var text = GetService(service, Masa.Tsc.Web.Admin.Rcl.Pages.App.Index.GetService)?.AppDescription;
+                                if (string.IsNullOrEmpty(text))
+                                    text = "无";
+                                <MTooltip Top Left Context="tooltipContent">
+                                    <ActivatorContent>
+                                        <div @attributes="@tooltipContent.Attrs">
+                                            <SIcon Small Color="@colors[services.IndexOf(service)]">mdi-circle</SIcon>
+                                            @service
+                                        </div>
+                                    </ActivatorContent>
+                                    <ChildContent>
+                                        <span>@text</span>
+                                    </ChildContent>
+                                </MTooltip>
+                            }
+                            </div>
                     </div>
                 }
             </div>

@@ -11,7 +11,7 @@ public sealed class ApmService : BaseService
 
     public Task<PaginatedListBase<EndpointListDto>> GetEndpointPageAsync(Guid teamId, BaseApmRequestDto query, string? projectId = default, string? appType = default) => Caller.GetAsync<PaginatedListBase<EndpointListDto>>($"{RootPath}/endpoints?teamId={teamId}&project={projectId}{(string.IsNullOrEmpty(appType) ? "" : $"&appType={appType}")}", data: query)!;
 
-    public Task<PaginatedListBase<ErrorMessageDto>> GetErrorsPageAsync(Guid teamId, ApmEndpointRequestDto query, string? projectId = default, string? appType = default,bool ignoreTeam=false) => Caller.GetAsync<PaginatedListBase<ErrorMessageDto>>($"{RootPath}/errors?teamId={teamId}&project={projectId}&ignoreTeam={ignoreTeam}{(string.IsNullOrEmpty(appType) ? "" : $"&appType={appType}")}", data: query)!;
+    public Task<PaginatedListBase<ErrorMessageDto>> GetErrorsPageAsync(Guid teamId, ApmEndpointRequestDto query, string? projectId = default, string? appType = default, bool ignoreTeam = false) => Caller.GetAsync<PaginatedListBase<ErrorMessageDto>>($"{RootPath}/errors?teamId={teamId}&project={projectId}&ignoreTeam={ignoreTeam}{(string.IsNullOrEmpty(appType) ? "" : $"&appType={appType}")}", data: query)!;
 
     public Task<List<ChartPointDto>> GetSpanErrorsAsync(ApmEndpointRequestDto query) => Caller.GetAsync<List<ChartPointDto>>($"{RootPath}/spanErrors", data: query)!;
 
@@ -25,11 +25,11 @@ public sealed class ApmService : BaseService
 
     public Task<EndpointLatencyDistributionDto> GetLatencyDistributionAsync(ApmEndpointRequestDto query) => Caller.GetAsync<EndpointLatencyDistributionDto>($"{RootPath}/latencyDistributions", data: query)!;
 
-    public Task<Dictionary<string, List<EnviromentAppDto>>> GetEnviromentServiceAsync(Guid teamId, DateTime start, DateTime end, string env) => Caller.GetAsync<Dictionary<string, List<EnviromentAppDto>>>($"{RootPath}/enviromentService", data: new { teamId, start, end, env })!;
+    public Task<Dictionary<string, List<EnviromentAppDto>>> GetEnviromentServiceAsync(Guid teamId, DateTime start, DateTime end, string? env = default, bool ignoreTeam = false) => Caller.GetAsync<Dictionary<string, List<EnviromentAppDto>>>($"{RootPath}/enviromentService", data: new { teamId, start, end, env, ignoreTeam })!;
 
     public Task<PaginatedListBase<TraceResponseDto>> GetTraceListAsync(BaseRequestDto query) => Caller.GetByBodyAsync<PaginatedListBase<TraceResponseDto>>($"{RootPath}/traceList", body: query)!;
 
-    public Task<PaginatedListBase<LogResponseDto>> GetLogListAsync(Guid teamId, BaseRequestDto query, string? projectId = default, string? appType = default,bool ignoreTeam=false) => Caller.GetByBodyAsync<PaginatedListBase<LogResponseDto>>($"{RootPath}/logList?teamId={teamId}&project={projectId}&&ignoreTeam={ignoreTeam}{(string.IsNullOrEmpty(appType) ? "" : $"&appType={appType}")}", body: query)!;
+    public Task<PaginatedListBase<LogResponseDto>> GetLogListAsync(Guid teamId, BaseRequestDto query, string? projectId = default, string? appType = default, bool ignoreTeam = false) => Caller.GetByBodyAsync<PaginatedListBase<LogResponseDto>>($"{RootPath}/logList?teamId={teamId}&project={projectId}&&ignoreTeam={ignoreTeam}{(string.IsNullOrEmpty(appType) ? "" : $"&appType={appType}")}", body: query)!;
 
     public Task<PhoneModelDto> GetDeviceModelAsync(string brand, string model) => Caller.GetAsync<PhoneModelDto>($"{RootPath}/model?brand={brand}&model={model}")!;
 

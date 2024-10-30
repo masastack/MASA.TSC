@@ -19,6 +19,23 @@ public partial class ApmComponentBase : MasaComponentBase
 
     public static TimeZoneInfo CurrentTimeZone { get; private set; }
 
+    public static ApmSearchComponent ApmSearchComponent { get; set; }
+
+    public static EnviromentAppDto? GetService(string? service, Func<string, EnviromentAppDto?>? func = default)
+    {
+        if (string.IsNullOrEmpty(service)) return default;
+        if (func != null)
+        {
+            var value = func.Invoke(service);
+            if (value != null)
+                return value;
+        }
+
+        if (ApmSearchComponent != null)
+            return ApmSearchComponent.GetService(service);
+        return null;
+    }
+
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender && (CurrentTimeZone == null || CurrentTimeZone.BaseUtcOffset != JsInitVariables.TimezoneOffset))
@@ -94,7 +111,7 @@ public partial class ApmComponentBase : MasaComponentBase
         }
     }
 
-    public string GetUrlParam(string? service = default,
+    public static string GetUrlParam(string? service = default,
          string? env = default,
          string? endpoint = default,
          DateTime? start = default,

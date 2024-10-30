@@ -53,7 +53,30 @@
                 <tr>
                     <td></td>
                     <td>@currentName</td>
-                    <td><div class="text-wrap">@value</div></td>
+                    <td><div class="text-wrap">
+                            @if (string.Equals(currentName, "Resource.service.name"))
+                            {
+                                var service = value?.ToString();
+                                var text = GetService(service, Masa.Tsc.Web.Admin.Rcl.Pages.App.Index.GetService)?.AppDescription;
+                                if (string.IsNullOrEmpty(text))
+                                    text = "无";
+                                <MTooltip Top Left Context="tooltipContent">
+                                    <ActivatorContent>
+                                        <div @attributes="@tooltipContent.Attrs" class="text-truncate">
+                                            @service
+                                        </div>
+                                    </ActivatorContent>
+                                    <ChildContent>
+                                        <span>@text</span>
+                                    </ChildContent>
+                                </MTooltip>
+                            
+                            }
+                            else
+                            {
+                                @value
+                            }
+                        </div></td>
                 </tr>
             }
             else if (value is IDictionary<string, object> dicValue)

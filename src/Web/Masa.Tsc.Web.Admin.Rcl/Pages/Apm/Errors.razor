@@ -4,7 +4,7 @@
 <PageTitle>@I18n.Apm("PageTitles.Error")</PageTitle>
 
 <ApmSearchComponent Value="Search"
-                    ValueChanged="LoadASync" />
+                    ValueChanged="LoadASync" @ref="ApmSearchComponent" />
 <SDataTable Headers="headers"
             Stripe
             FixedHeader

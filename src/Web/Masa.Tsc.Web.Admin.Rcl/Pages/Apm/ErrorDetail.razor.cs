@@ -73,7 +73,7 @@ public partial class ErrorDetail
             lastType = Search.ExceptionType;
             lastMessage = Search.ExceptionMsg;
             currentPage = 1;
-            currentLog = default;
+            currentLog = default!;
             _dic?.Clear();
             total = 1;
             await OnLoadAsync();

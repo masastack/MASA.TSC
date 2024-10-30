@@ -7,11 +7,11 @@
         <SUserAutoComplete Small FillBackground=false Value="_userId" ValueChanged="UserChange" Class="@("user-auto-complete pr-2")" Placeholder="姓名/手机号码/Id" Label="姓名/手机号码/Id" Style="@("width:280px")" Clearable />
 
         <SAutoComplete Small Items="services" Value="@serviceName" ValueChanged="ServiceChange" Loading="isLoadService"
-                       TItem="string"
+                       TItem="ValueTuple<string,string>"
                        TValue="string"
                        TItemValue="string"
-                       ItemText="str=>str"
-                       ItemValue="str=>str"
+                       ItemText="@(item=>$"{item.Item1}{(string.IsNullOrEmpty(item.Item2)?string.Empty:$"  {item.Item2}")}")"
+                       ItemValue="item=>item.Item1"
                        BackgroundColor="white"
                        Style="@("width:220px")"
                        Class="@("user-auto-complete pr-2")"
@@ -38,7 +38,7 @@
     <div class="my-2 pl-4">操作系统：@ClientOs()</div>
     <div class="my-2 pl-4">Webview：@WebviewVersion()</div>
     <div class="my-2 pl-4 d-flex justify-start">
-        <div>角色名称：</div><TooltipCopy TextFunc="(obj)=>RolesNames()" ValueFunc="(obj)=>RolesNames()" TextStyle="max-width:500px"> </TooltipCopy>
+        <div>角色名称：</div><TooltipCopy TextFunc="(obj)=>RolesNames()" ValueFunc="(obj)=>RolesNames()" TextStyle="max-width:280px"> </TooltipCopy>
     </div>
     <div class="pl-4"><MButton OnClick="@(()=>claimShow=true)">查看用户申明数据</MButton></div>
 </div>

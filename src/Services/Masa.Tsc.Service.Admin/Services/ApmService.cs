@@ -215,32 +215,31 @@ public class ApmService : ServiceBase
     public async Task<PhoneModelDto> GetModel([FromServices] IApmService apmService, string brand, string model)
         => await apmService.GetDeviceModelAsync(brand, model);
 
-    public async Task<Dictionary<string, List<EnviromentAppDto>>> GetEnviromentService([FromServices] IApmService apmService, [FromServices] IAuthClient authClient, [FromServices] IPmClient pmClient, IMultiEnvironmentContext multiEnvironmentContext, Guid teamId, string start, string end)
+    public async Task<Dictionary<string, List<EnviromentAppDto>>> GetEnviromentService([FromServices] IApmService apmService
+        , [FromServices] IAuthClient authClient
+        , [FromServices] IPmClient pmClient
+        , IMultiEnvironmentContext multiEnvironmentContext, Guid teamId, string start, string end, bool ignoreTeam = false)
     {
         var data = await apmService.GetEnviromentServices(new BaseApmRequestDto
         {
             Start = start.ParseUTCTime(),
             End = end.ParseUTCTime()
         });
-        //#if RELEASE
+
+        var teamData = await GetTeamAllEnvAppsAsync(authClient, pmClient, teamId, data.Keys);
+        if (teamData.Count == 0)
+            return new Dictionary<string, List<EnviromentAppDto>> { { multiEnvironmentContext.CurrentEnvironment, new() } };
+        var result = new Dictionary<string, List<EnviromentAppDto>>();
+        foreach (var env in teamData.Keys)
         {
-            var teamData = await GetTeamAllEnvAppsAsync(authClient, pmClient, teamId, data.Keys);
-            if (teamData.Count == 0)
-                return new Dictionary<string, List<EnviromentAppDto>> { { multiEnvironmentContext.CurrentEnvironment, new() } };
-            var result = new Dictionary<string, List<EnviromentAppDto>>();
-            foreach (var env in teamData.Keys)
-            {
-                if (!data.ContainsKey(env)) continue;
-                result.Add(env, teamData[env].Where(app => data[env].Contains(app.AppId)).ToList());
-            }
-            if (result.Count == 0)
-            {
-                result.Add(multiEnvironmentContext.CurrentEnvironment, new());
-            }
-            return result;
+            if (!ignoreTeam && !data.ContainsKey(env)) continue;
+            result.Add(env, teamData[env].Where(app => data[env].Contains(app.AppId)).ToList());
         }
-        //#endif
-        //return data;
+        if (result.Count == 0)
+        {
+            result.Add(multiEnvironmentContext.CurrentEnvironment, new());
+        }
+        return result;
     }
 
     private async Task<bool> GetApps<Request>(Request request, IAuthClient authClient, IPmClient pmClient, Guid teamId, string? project, AppTypes? appType) where Request : BaseApmRequestDto

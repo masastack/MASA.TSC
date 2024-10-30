@@ -60,11 +60,11 @@
         <SAutoComplete Value=Search.Service
                        ValueChanged="OnServiceChanged"
                        Items="services"
-                       TItem="string"
+                       TItem="ValueTuple<string,string>"
                        TValue="string"
                        TItemValue="string"
-                       ItemText="item=>item"
-                       ItemValue="item=>item"
+                       ItemText="@(item=>string.IsNullOrEmpty(item.Item2)?item.Item1:$"{item.Item1}  {item.Item2}")"
+                       ItemValue="item=>item.Item1"
                        Disabled="isServiceLoading"
                        Small
                        HideSelected=false

@@ -85,7 +85,24 @@ else
                                 var time1 = (DateTime)dic["Timestamp"];
                                 DateTime start = time1.AddHours(-6), end = time1.AddHours(6);
                                 var url = path?.ToString().Split('?')[0];
-                                <a style="text-decoration:none" href="/apm/endpoints/@(HttpUtility.UrlEncode(url)+GetUrlParam(service: resources["service.name"].ToString(), env: resources["service.namespace"].ToString(),endpoint:url, start: start, end: end,traceId:dic["TraceId"].ToString()))" target="_blank">@value</a>
+                                <a style="text-decoration:none" href="/apm/endpoints/@(HttpUtility.UrlEncode(url)+ GetUrlParam(service: resources["service.name"].ToString(), env: resources["service.namespace"].ToString(),endpoint:url, start: start, end: end,traceId:dic["TraceId"].ToString()))" target="_blank">@value</a>
+                            }
+                            else if (string.Equals(currentName, "Resource.service.name"))
+                            {
+                                var service = value?.ToString();
+                                var text = GetService(service, Masa.Tsc.Web.Admin.Rcl.Pages.App.Index.GetService)?.AppDescription;
+                                if (string.IsNullOrEmpty(text))
+                                    text = "无";
+                                <MTooltip Top Left Context="tooltipContent">
+                                    <ActivatorContent>
+                                        <div @attributes="@tooltipContent.Attrs" class="text-truncate">
+                                            @service
+                                        </div>
+                                    </ActivatorContent>
+                                    <ChildContent>
+                                        <span>@text</span>
+                                    </ChildContent>
+                                </MTooltip>
                             }
                             else
                             {

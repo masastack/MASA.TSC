@@ -3,13 +3,16 @@
 @page "/apm/services/{name}"
 <PageTitle>@I18n.Apm("PageTitles.ServiceDetail")</PageTitle>
 
-<ApmSearchComponent Value="Search" ValueChanged="OnSearchValueChanged" IsService ShowComparison />
+<ApmSearchComponent Value="Search" ValueChanged="OnSearchValueChanged" IsService ShowComparison @ref="ApmSearchComponent" />
 
 <MTabs @bind-Value="index" Class="rounded-t-xl">
     <MTab Value="1">@I18n.Apm("Tabs.Overview")</MTab>
     <MTab Value="2">@I18n.Apm("Tabs.Endpoints")</MTab>
     <MTab Value="3">@I18n.Apm("Tabs.Errors")</MTab>
     <MTab Value="4">@I18n.Apm("Tabs.Logs")</MTab>
+    <div class="d-flex justify-end" style="width:calc(100% - 400px)">
+        <div class="pr-4 pt-4">@GetService(Search.Service!)?.AppDescription</div>
+    </div>
 </MTabs>
 <CascadingValue Value="Search">
     <div style="height:calc(100vh - 240px)" class="overflow-y-scroll">

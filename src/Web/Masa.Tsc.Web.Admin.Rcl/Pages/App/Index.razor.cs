@@ -23,7 +23,8 @@ public partial class Index
     private QuickRangeKey quickRangeKey = QuickRangeKey.Last5Minutes;
     private StringNumber index;
     private string serviceName;
-    private List<string> services;
+    private List<ValueTuple<string, string>> services;
+    private static Dictionary<string, List<EnviromentAppDto>> _teamServices = new();
     private bool claimShow = false;
     private List<TraceResponseDto> traceLines;
     private IJSObjectReference? module = null;
@@ -34,6 +35,16 @@ public partial class Index
     private bool dataLoading = false;
     private bool isNeedSetPosition = false;
     private static readonly Regex webviewReg = new(@"Chrome/(\d+\.?)+", default, TimeSpan.FromSeconds(1));
+
+    public static EnviromentAppDto? GetService(string service)
+    {
+        foreach (var item in _teamServices)
+        {
+            var app = item.Value.Find(item => item.AppId == service);
+            if (app != null) return app;
+        }
+        return default;
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -99,7 +110,7 @@ public partial class Index
     {
         await base.OnInitializedAsync();
         await LoadService();
-        if (!string.IsNullOrEmpty(serviceName) && !services.Contains(serviceName))
+        if (!string.IsNullOrEmpty(serviceName) && !services.Exists(item => item.Item1 == serviceName))
             serviceName = default!;
         isLoadService = false;
         if (values != null && values.Count > 0)
@@ -335,7 +346,33 @@ public partial class Index
             Name = StorageConst.Current.ServiceName,
             Type = AggregateTypes.GroupBy
         });
-        services = data?.ToList() ?? new();
+        services = new();
+        if (data == null || !data.Any())
+        {
+            services = new();
+            return;
+        }
+        _teamServices = await ApiCaller.ApmService.GetEnviromentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End, ignoreTeam: true) ?? new();
+        if (_teamServices != null && _teamServices.Count > 0)
+        {
+            foreach (var service in data)
+            {
+                bool find = false;
+                foreach (var item in _teamServices)
+                {
+                    var app = item.Value.Find(app => app.AppId == service);
+                    if (app != null)
+                    {
+                        services.Add(ValueTuple.Create(service, app.AppDescription));
+                        find = true;
+                        return;
+                    }
+                }
+                if (!find)
+                    services.Add(ValueTuple.Create(service, default(string)!));
+            }
+        }
+        //services = data?.ToList() ?? new();
     }
 
     private async Task SetDeviceModel(TraceResponseDto? trace)
