@@ -10,12 +10,22 @@
                        TItem="ValueTuple<string,string>"
                        TValue="string"
                        TItemValue="string"
-                       ItemText="@(item=>$"{item.Item1}{(string.IsNullOrEmpty(item.Item2)?string.Empty:$"  {item.Item2}")}")"
+                       ItemText="item=>item.Item1"
                        ItemValue="item=>item.Item1"
                        BackgroundColor="white"
                        Style="@("width:220px")"
                        Class="@("user-auto-complete pr-2")"
-                       Placeholder="应用" Label="应用" Clearable />
+                       Placeholder="应用" Label="应用" Clearable>
+            <ItemContent>
+                <div class="d-flex justify-space-between m-list-item__title">
+                    <div>@context.Item.Item1</div>
+                    @if (!string.IsNullOrEmpty(context.Item.Item2))
+                    {
+                        <div style="color:#BDBDBD" class="pl-2">@context.Item.Item2</div>
+                    }
+                </div>
+            </ItemContent>
+        </SAutoComplete>
 
         <STextField Small Clearable Value="_searchText" ValueChanged="SearchValueChange" TValue="string" BackgroundColor="white" OnEnter="OnErrorChanged" Label="报错关键信息" Placeholder="报错关键信息" Style="@("width:280px")" Class="rounded-2" />
     </div>
@@ -52,7 +62,7 @@
         </div>
         @if (dataLoading)
         {
-            <LoadingData DefaultClass=false Style="@("height:calc(100vh - 378px)")" Class="full-width" />
+            <LoadingData DefaultClass="false" Style="@("height:calc(100vh - 378px)")" Class="full-width" />
         }
         else
         {
