@@ -294,6 +294,10 @@ public partial class Index
             Page = 1,
             PageSize = 200,
             Conditions = new List<FieldConditionDto> {
+                //app特有查询
+                new FieldConditionDto{
+                    Name="MAUI"
+                },
                 new FieldConditionDto{
                     Name =StorageConst.Current.Trace.UserId,
                      Type= ConditionTypes.Equal,
@@ -520,6 +524,15 @@ public partial class Index
         var str = $"apm/app?userId={_userId}&service={serviceName}&start={start}&end={end}&search={_searchText}&spanId={currentTrace?.Data?.SpanId}&logTime={currentLog?.Time}&tab={index}&treeIndex={treeIndex}".ToSafeBlazorUrl();
         await JSRuntime.InvokeVoidAsync(JsInteropConstants.Copy, $"{NavigationManager.BaseUri}{str}");
         await PopupService.EnqueueSnackbarAsync("分享连接复制成功", AlertTypes.Success, true);
+    }
+
+    string btnText = "不显示正常HTTP";
+    bool showNormalClient = false;
+    private void ShowHideHttpTrace()
+    {
+        showNormalClient = !showNormalClient;
+        btnText = showNormalClient ? "显示所有HTTP" : "不显示正常HTTP";
+        StateHasChanged();
     }
 
     private async Task Top()

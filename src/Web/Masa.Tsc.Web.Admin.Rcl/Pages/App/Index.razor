@@ -10,12 +10,22 @@
                        TItem="ValueTuple<string,string>"
                        TValue="string"
                        TItemValue="string"
-                       ItemText="@(item=>$"{item.Item1}{(string.IsNullOrEmpty(item.Item2)?string.Empty:$"  {item.Item2}")}")"
+                       ItemText="item=>item.Item1"
                        ItemValue="item=>item.Item1"
                        BackgroundColor="white"
                        Style="@("width:220px")"
                        Class="@("user-auto-complete pr-2")"
-                       Placeholder="应用" Label="应用" Clearable />
+                       Placeholder="应用" Label="应用" Clearable>
+            <ItemContent>
+                <div class="d-flex justify-space-between m-list-item__title">
+                    <div>@context.Item.Item1</div>
+                    @if (!string.IsNullOrEmpty(context.Item.Item2))
+                    {
+                        <div style="color:#BDBDBD" class="pl-2">@context.Item.Item2</div>
+                    }
+                </div>
+            </ItemContent>
+        </SAutoComplete>
 
         <STextField Small Clearable Value="_searchText" ValueChanged="SearchValueChange" TValue="string" BackgroundColor="white" OnEnter="OnErrorChanged" Label="报错关键信息" Placeholder="报错关键信息" Style="@("width:280px")" Class="rounded-2" />
     </div>
@@ -47,12 +57,13 @@
     <!--left-->
     <div class="col-3 white rounded-lg py-0">
         <div class="py-4">
-            <SButton OnClick="Top" BorderRadiusClass="rounded-lg" Class="px-10">顶部</SButton>
-            <SButton OnClick="Pre" BorderRadiusClass="rounded-lg" Class="pl-4 px-10"> 前一分钟</SButton>
+            <SButton OnClick="Top" BorderRadiusClass="rounded-lg" Class="px-4">顶部</SButton>
+            <SButton OnClick="Pre" BorderRadiusClass="rounded-lg" Class="ml-2 px-4"> 前一分钟</SButton>
+            <SButton OnClick="ShowHideHttpTrace" BorderRadiusClass="rounded-lg" Class="ml-2 px-4"> @btnText</SButton>
         </div>
         @if (dataLoading)
         {
-            <LoadingData DefaultClass=false Style="@("height:calc(100vh - 378px)")" Class="full-width" />
+            <LoadingData DefaultClass="false" Style="@("height:calc(100vh - 378px)")" Class="full-width" />
         }
         else
         {
@@ -63,8 +74,8 @@
             </MVirtualScroll>
         }
         <div class="py-4">
-            <SButton OnClick="Bottom" BorderRadiusClass="rounded-lg px-10">尾部</SButton>
-            <SButton OnClick="Next" BorderRadiusClass="rounded-lg px-10" Class="pl-4"> 后一分钟</SButton>
+            <SButton OnClick="Bottom" BorderRadiusClass="rounded-lg px-4">尾部</SButton>
+            <SButton OnClick="Next" BorderRadiusClass="rounded-lg px-4" Class="ml-4"> 后一分钟</SButton>
         </div>
     </div>
     <!--end left-->
@@ -128,6 +139,8 @@
 
     private void RenderTraces(RenderTreeBuilder __builder, OperationLineTraceModel item)
     {
+        if (!showNormalClient && item.Data.Kind != "SPAN_KIND_SERVER" && !item.IsError)
+            return;
         bool isSelected = currentLog == null && currentTrace != null && item == currentTrace;
         bool isSearchMatched = IsSearchKeyword(item);
         var color = item.IsError ? "red" : isSelected ? "yellow lighten-2" : isSearchMatched ? "orange lighten-2" : "light-green lighten-2";
