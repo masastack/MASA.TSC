@@ -57,8 +57,9 @@
     <!--left-->
     <div class="col-3 white rounded-lg py-0">
         <div class="py-4">
-            <SButton OnClick="Top" BorderRadiusClass="rounded-lg" Class="px-10">顶部</SButton>
-            <SButton OnClick="Pre" BorderRadiusClass="rounded-lg" Class="pl-4 px-10"> 前一分钟</SButton>
+            <SButton OnClick="Top" BorderRadiusClass="rounded-lg" Class="px-4">顶部</SButton>
+            <SButton OnClick="Pre" BorderRadiusClass="rounded-lg" Class="ml-2 px-4"> 前一分钟</SButton>
+            <SButton OnClick="ShowHideHttpTrace" BorderRadiusClass="rounded-lg" Class="ml-2 px-4"> @btnText</SButton>
         </div>
         @if (dataLoading)
         {
@@ -73,8 +74,8 @@
             </MVirtualScroll>
         }
         <div class="py-4">
-            <SButton OnClick="Bottom" BorderRadiusClass="rounded-lg px-10">尾部</SButton>
-            <SButton OnClick="Next" BorderRadiusClass="rounded-lg px-10" Class="pl-4"> 后一分钟</SButton>
+            <SButton OnClick="Bottom" BorderRadiusClass="rounded-lg px-4">尾部</SButton>
+            <SButton OnClick="Next" BorderRadiusClass="rounded-lg px-4" Class="ml-4"> 后一分钟</SButton>
         </div>
     </div>
     <!--end left-->
@@ -138,6 +139,8 @@
 
     private void RenderTraces(RenderTreeBuilder __builder, OperationLineTraceModel item)
     {
+        if (!showNormalClient && item.Data.Kind != "SPAN_KIND_SERVER" && !item.IsError)
+            return;
         bool isSelected = currentLog == null && currentTrace != null && item == currentTrace;
         bool isSearchMatched = IsSearchKeyword(item);
         var color = item.IsError ? "red" : isSelected ? "yellow lighten-2" : isSearchMatched ? "orange lighten-2" : "light-green lighten-2";

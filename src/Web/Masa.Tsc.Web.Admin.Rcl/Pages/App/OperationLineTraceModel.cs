@@ -37,6 +37,10 @@ public class OperationLineTraceModel
             {
                 return url.ToString()!;
             }
+            if (Data.Kind != "SPAN_KIND_SERVER" && Data.Attributes.TryGetValue("http.url", out url) && !string.IsNullOrEmpty(url?.ToString()))
+            {
+                return url.ToString()!;
+            }
             return "未匹配到路由";
         }
     }
@@ -55,7 +59,19 @@ public class OperationLineTraceModel
     /// </summary>
     public List<LogResponseDto> Logs { get; set; } = new();
 
-    public bool IsError => Logs.Exists(log => log.SeverityText == "Error" && !log.Body.ToString()!.Contains("Event") && (log.Attributes.ContainsKey("exception.type") || log.Attributes.ContainsKey("exception.message")));
+    public bool IsError
+    {
+        get
+        {
+            if (Data.Attributes.TryGetValue("http.status_code", out var status))
+            {
+                var code = status.ToString();
+                if (string.IsNullOrEmpty(code) || code.Length - 3 < 0) return true;
+                return code == "400" || code[0] == '5' && code != "599";
+            }
+            return Logs.Exists(log => log.SeverityText == "Error" && !log.Body.ToString()!.Contains("Event") && (log.Attributes.ContainsKey("exception.type") || log.Attributes.ContainsKey("exception.message")));
+        }
+    }
 }
 
 public class OperationLineLogModel

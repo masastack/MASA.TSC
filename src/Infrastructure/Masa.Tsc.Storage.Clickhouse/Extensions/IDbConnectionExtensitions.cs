@@ -8,6 +8,12 @@ internal static class IDbConnectionExtensitions
 {
     public static PaginatedListBase<TraceResponseDto> QueryTrace(this IDbConnection connection, BaseRequestDto query)
     {
+        if (query.Conditions != null && query.Conditions.Any(c => c.Name == "MAUI"))
+        {
+            var list = query.Conditions.ToList();
+            list.RemoveAll((c => c.Name == "MAUI"));
+            return QueryMAUITrace(connection, query);
+        }
         var (where, parameters, ors) = AppendWhere(query);
         var orderBy = AppendOrderBy(query, false);
         var result = new PaginatedListBase<TraceResponseDto>() { Result = new() };
@@ -26,6 +32,34 @@ internal static class IDbConnectionExtensitions
 
         return result;
     }
+
+    private static PaginatedListBase<TraceResponseDto> QueryMAUITrace(this IDbConnection connection, BaseRequestDto query)
+    {
+        var (where, parameters, ors) = AppendWhere(query);
+        var orderBy = AppendOrderBy(query, false);
+        var result = new PaginatedListBase<TraceResponseDto>() { Result = new() };
+        var start = (query.Page - 1) * query.PageSize;
+        if (query.HasPage())
+        {
+            var countSql1 = CombineOrs($"select TraceId from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors);
+            var countSql2 = CombineOrs($"select TraceId from {MasaStackClickhouseConnection.TraceHttpClientTable} where {where} and ParentSpanId not in(select SpanId from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where})", ors);
+            var countSql = $"select count(1) as `total`  from ({countSql1} union all {countSql2})";
+            var total = Convert.ToInt64(ExecuteScalar(connection, $"select sum(`total`) from ({countSql})", parameters?.ToArray()));
+            result.Total = total;
+            if (total <= 0 || start - total >= 0)
+                return result;
+        }
+
+        var querySql1 = CombineOrs($"select ServiceName,{ClickhouseHelper.GetName("timestamp", false)},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors, orderBy);
+        var querySql2 = CombineOrs($"select ServiceName,{ClickhouseHelper.GetName("timestamp", false)},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceHttpClientTable} where {where} and ParentSpanId not in(select SpanId from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where})", ors, orderBy);
+        var querySql = $"({querySql1} union all {querySql2})";
+        result.Result = Query(connection, $"select * from {querySql} as t {orderBy} limit {start},{query.PageSize}", parameters?.ToArray(), ConvertTraceDto);
+
+        return result;
+
+    }
+
+
 
     public static PaginatedListBase<LogResponseDto> QueryLog(this IDbConnection connection, BaseRequestDto query)
     {
