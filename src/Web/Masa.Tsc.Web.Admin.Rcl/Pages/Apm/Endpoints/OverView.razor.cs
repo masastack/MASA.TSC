@@ -58,7 +58,7 @@ public partial class OverView
             {
                 var reference = echart.GetType().GetField("_selfReference", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField)!.GetValue(echart);
                 var echartJs = (IJSObjectReference)typeof(JSObjectReferenceProxy).GetField("_jsObjectReference", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField)!.GetValue(echart)!;
-                
+
                 if (reference != null && echartJs != null && echartEventModule == null && echartEventModule == null)
                 {
                     //重新注册
@@ -163,13 +163,10 @@ public partial class OverView
             if (lastSelect != null && !lastSelect.IsClear)
             {
                 var isEqal = lastSelect.Start == lastSelect.End;
-                int start = chartData[lastSelect.Start][0].FormatTimeToNumber(), end = chartData[lastSelect.End][0].FormatTimeToNumber();
+                int start = chartData[lastSelect.Start][0].FormatTimeToNumber(), end = chartData[lastSelect.End][0].FormatTimeToNumber(isEqal);
                 query.LatMin = start;
-                if (isEqal)
-                    query.LatMax = start + 1;
-                else
-                    query.LatMax = end;
-                Console.WriteLine($"start:{query.LatMin},end:{query.LatMax}");
+                query.LatMax = end;
+                //Console.WriteLine($"start:{query.LatMin},end:{query.LatMax}");
             }
 
             var result1 = await ApiCaller.ApmService.GetSimpleTraceListAsync(query);
