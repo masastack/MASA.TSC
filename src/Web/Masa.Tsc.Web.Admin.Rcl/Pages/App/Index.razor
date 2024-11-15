@@ -56,10 +56,12 @@
 <div class="d-flex flex-row">
     <!--left-->
     <div class="col-3 white rounded-lg py-0">
-        <div class="py-4">
+        <div class="py-4 d-flex">
             <SButton OnClick="Top" BorderRadiusClass="rounded-lg" Class="px-4">顶部</SButton>
             <SButton OnClick="Pre" BorderRadiusClass="rounded-lg" Class="ml-2 px-4"> 前一分钟</SButton>
-            <SButton OnClick="ShowHideHttpTrace" BorderRadiusClass="rounded-lg" Class="ml-2 px-4"> @btnText</SButton>
+            <MSwitch @bind-Value="showNormalClient" Label="显示正常Http" Class="my-2 py-0 pl-4"
+                     Color="info"
+                     HideDetails="true"></MSwitch>
         </div>
         @if (dataLoading)
         {

@@ -1,10 +1,18 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using Masa.Blazor.JSInterop;
+using System.Reflection;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints;
 
 public partial class OverView
 {
+    [Inject]
+    IJSRuntime JSRuntime { get; set; }
+    IJSObjectReference? echartEventModule = null;
+    DotNetObjectReference<OverView> objRef;
+
     [CascadingParameter]
     public SearchData SearchData { get; set; }
 
@@ -30,10 +38,92 @@ public partial class OverView
     double percentile = 0;
     private List<SimpleTraceListDto> traceIds = new();
     private List<SimpleTraceListDto> traceTails = new();
+    MECharts? mechart;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        objRef = DotNetObjectReference.Create(this);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (mechart != null)
+        {
+            await Task.Delay(1200);
+            var echart = typeof(MECharts).GetField("_echarts", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField)!.GetValue(mechart)!;
+            if (echart != null)
+            {
+                var reference = echart.GetType().GetField("_selfReference", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField)!.GetValue(echart);
+                var echartJs = (IJSObjectReference)typeof(JSObjectReferenceProxy).GetField("_jsObjectReference", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField)!.GetValue(echart)!;
+
+                if (reference != null && echartJs != null && echartEventModule == null)
+                {
+                    //重新注册
+                    echartEventModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/_content/Masa.Tsc.Web.Admin.Rcl/Pages/Apm/Endpoints/OverView.razor.js");
+                    await echartEventModule.InvokeVoidAsync("setChartEvent", echartJs, objRef);
+
+                }
+            }
+            else
+            {
+                if (echartEventModule != null)
+                {
+                    await echartEventModule.DisposeAsync();
+                    echartEventModule = null;
+                }
+            }
+        }
+    }
+
+    CancellationTokenSource source = null;
+    private EChartBrushEventArg lastSelect = new() { IsClear = true };
+    [JSInvokable("OnBrushEnd")]
+    public async Task BrushEnd(EChartBrushEventArg args)
+    {
+        bool isRefresh = false;
+        if (args.IsClear && !lastSelect.IsClear)
+        {
+            lastSelect.IsClear = false;
+            isRefresh = true;
+        }
+        else if (!args.IsClear && (lastSelect.IsClear || !lastSelect.IsClear && (lastSelect.Start - args.Start != 0 || lastSelect.End - args.Start != 0)))
+        {
+            lastSelect.IsClear = false;
+            lastSelect.Start = args.Start;
+            lastSelect.End = args.End;
+            isRefresh = true;
+        }
+
+        if (isRefresh)
+        {
+            source?.Cancel();
+            source = new CancellationTokenSource();
+            await RefreshDurationListAsync(source.Token);
+            await InvokeAsync(StateHasChanged);
+            source?.Dispose();
+            source = null;
+        }
+    }
+
+    private async Task RefreshDurationListAsync(CancellationToken token)
+    {
+        Console.WriteLine("1");
+        await Task.Delay(400);
+        total = 0;
+        if (token.IsCancellationRequested)
+            return;
+        Console.WriteLine("2");
+        await LoadTraceDetailAsync(1);
+    }
 
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
+        if (!SearchData.Loaded)
+            return;
         var text = JsonSerializer.Serialize(SearchData);
         var key = MD5Utils.Encrypt(text);
         if (lastKey != key)
@@ -54,7 +144,9 @@ public partial class OverView
         //首次
         if (total == 0 && page == 1)
         {
-            var result1 = await ApiCaller.ApmService.GetSimpleTraceListAsync(new ApmEndpointRequestDto
+            traceIds.Clear();
+            traceTails.Clear();
+            var query = new ApmTraceLatencyRequestDto
             {
                 Start = SearchData.Start,
                 End = SearchData.End,
@@ -62,7 +154,6 @@ public partial class OverView
                 Service = SearchData.Service!,
                 Env = SearchData.Environment!,
                 Page = 1,
-                PageSize = 500,
                 Method = SearchData.Method,
                 TextField = SearchData.TextField,
                 TextValue = SearchData.TextValue,
@@ -70,7 +161,20 @@ public partial class OverView
                 //Queries = SearchData.Text,
                 OrderField = "Timestamp",
                 IsDesc = true
-            });
+            };
+            if (lastSelect != null && !lastSelect.IsClear)
+            {
+                var isEqal = lastSelect.Start == lastSelect.End;
+                int start = chartData[lastSelect.Start][0].FormatTimeToNumber(), end = chartData[lastSelect.End][0].FormatTimeToNumber();
+                query.LatMin = start;
+                if (isEqal)
+                    query.LatMax = start + 1;
+                else
+                    query.LatMax = end;
+                Console.WriteLine($"start:{query.LatMin},end:{query.LatMax}");
+            }
+
+            var result1 = await ApiCaller.ApmService.GetSimpleTraceListAsync(query);
             if (result1 != null && result1.Result != null)
             {
                 traceIds.AddRange(result1.Result);
@@ -112,7 +216,7 @@ public partial class OverView
     {
         if (traceDetails == null || !traceDetails.Any())
             return;
-        var current = traceDetails.FirstOrDefault(item => item.Kind == "SPAN_KIND_SERVER"
+        var current = traceDetails.Find(item => item.Kind == "SPAN_KIND_SERVER"
                 && item.Attributes.TryGetValue("http.target", out var url) && string.Equals(SearchData.Endpoint, ((JsonElement)url).GetString())
                 && item.Resource.TryGetValue("service.name", out var service) && string.Equals(SearchData.Service, ((JsonElement)service).GetString())
                 )?.Duration;
@@ -129,7 +233,6 @@ public partial class OverView
         percentile = lessTotal * 1.0 / sum;
     }
 
-    //需要优化，不是自己关注的条件不刷新数据
     private async Task LoadDataAsync()
     {
         var query = new ApmEndpointRequestDto
@@ -146,7 +249,7 @@ public partial class OverView
         var data = await ApiCaller.ApmService.GetChartsAsync(query);
         if (data != null && data.Any())
         {
-            var chartData = data[0];
+            var chartData1 = data[0];
             {
                 metricTypeChartData.Avg = new();
                 metricTypeChartData.P95 = new();
@@ -154,11 +257,11 @@ public partial class OverView
                 throughput = new();
                 failed = new();
 
-                metricTypeChartData.Avg.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Latency, unit: "ms", lineName: "Average").Json;
-                metricTypeChartData.P95.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.P95, unit: "ms", lineName: "95th percentile").Json;
-                metricTypeChartData.P99.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.P99, unit: "ms", lineName: "99th percentile").Json;
-                throughput.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Throughput, unit: "tpm").Json;
-                failed.Data = ConvertLatencyChartData(chartData, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Failed, unit: "%").Json;
+                metricTypeChartData.Avg.Data = ConvertLatencyChartData(chartData1, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Latency, unit: "ms", lineName: "Average").Json;
+                metricTypeChartData.P95.Data = ConvertLatencyChartData(chartData1, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.P95, unit: "ms", lineName: "95th percentile").Json;
+                metricTypeChartData.P99.Data = ConvertLatencyChartData(chartData1, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.P99, unit: "ms", lineName: "99th percentile").Json;
+                throughput.Data = ConvertLatencyChartData(chartData1, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Throughput, unit: "tpm").Json;
+                failed.Data = ConvertLatencyChartData(chartData1, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Failed, unit: "%").Json;
 
                 metricTypeChartData.Avg.ChartLoading = false;
                 metricTypeChartData.P95.ChartLoading = false;
@@ -209,8 +312,6 @@ public partial class OverView
     private async Task LoadDistributionDataAsync()
     {
         latencies.Clear();
-        traceIds.Clear();
-        traceTails.Clear();
         total = 0;
         timeTypeCount.ChartLoading = true;
         var query = new ApmEndpointRequestDto
@@ -270,24 +371,24 @@ public partial class OverView
         }
         return findIndex;
     }
-
-    private static EChartType ConvertDistributionChartData(IEnumerable<ChartPointDto> data, int current, int p95)
+    private List<string[]> chartData = new();
+    private EChartType ConvertDistributionChartData(IEnumerable<ChartPointDto> data, int current, int p95)
     {
         var chart = EChartConst.Line;
         var list = data.Select(item => new[] { Convert.ToDouble(item.X).FormatTime(), item.Y }).ToList();
         string currentItem = list[current][0], p95Item = list[p95][0];
-        var array = list.GroupBy(item => item[0]).Select(item => new[] { item.Key, item.Sum(values => Convert.ToInt32(values[1])).ToString() }).ToList();
+        chartData = list.GroupBy(item => item[0]).Select(item => new[] { item.Key, item.Sum(values => Convert.ToInt32(values[1])).ToString() }).ToList();
 
         bool isFoundCurrent = false, isFoundP95 = false;
-        var index = array.Count - 1;
+        var index = chartData.Count - 1;
         do
         {
-            if (!isFoundCurrent && array[index][0] == currentItem)
+            if (!isFoundCurrent && chartData[index][0] == currentItem)
             {
                 current = index;
                 isFoundCurrent = true;
             }
-            if (!isFoundP95 && array[index][0] == p95Item)
+            if (!isFoundP95 && chartData[index][0] == p95Item)
             {
                 p95 = index;
                 isFoundP95 = true;
@@ -297,14 +398,33 @@ public partial class OverView
             index--;
         } while (index >= 0);
 
-        chart.SetValue("tooltip", new { trigger = "axis" });
+        chart.SetValue("tooltip", new { trigger = "axis", feature = new { dataZoom = new { yAxisIndex = false }, brush = new { type = new string[] { "lineX", "clear" } } } });
+        chart.SetValue("toolbox", new { top = -6, show = true });
+        chart.SetValue("grid.top", 40);
         chart.SetValue("xAxis", new { type = "category", boundaryGap = false });
         chart.SetValue("yAxis", new { type = "value", boundaryGap = false });
         chart.SetValue("series[0]", new { type = "line", step = "end", symbol = "none", areaStyle = new { } });
         chart.SetValue("series[0].markLine", new { symbol = new string[] { "none", "none" }, lineStyle = new { type = "solid", width = 2 }, label = new { show = true } });
         chart.SetValue("series[0].markLine.data[1]", new { xAxis = p95, lineStyle = new { color = "" }, label = new { formatter = "P95" } });
         chart.SetValue("series[0].markLine.data[0]", new { xAxis = current, lineStyle = new { color = "gray" }, label = new { formatter = "Current" } });
-        chart.SetValue("series[0].data", array);
+        chart.SetValue("series[0].data", chartData);
+        chart.SetValue("brush", new { xAxisIndex = "all", brushLink = "all", outOfBrush = new { colorAlpha = 0.1 }, toolbox = new string[] { "lineX", "clear" }, throttleType = "debounce", throttleDelay = 200, brushStyle = new { color = "#FFA726", borderColor = "#FFA726" } });
         return chart;
     }
+
+    protected override async ValueTask DisposeAsyncCore()
+    {
+        if (echartEventModule != null)
+            await echartEventModule.DisposeAsync();
+        await base.DisposeAsyncCore();
+    }
+}
+
+public class EChartBrushEventArg
+{
+    public bool IsClear { get; set; }
+
+    public int Start { get; set; }
+
+    public int End { get; set; }
 }

@@ -60,6 +60,21 @@ internal static class ObjectExtensions
         return $"{minis} min{(seconds > 0 ? $"{seconds} s" : "")}";
     }
 
+    public static int FormatTimeToNumber(this string s)
+    {
+        if (string.IsNullOrEmpty(s))
+            return 0;
+        if (s == "<1ms")
+            return 0;
+        if (s.EndsWith("ms"))
+            return Convert.ToInt32(s.Substring(0, s.Length - 2));
+        if (s.EndsWith(" s"))
+            return Convert.ToInt32(s.Substring(0, s.Length - 2)) * 60;
+        if (s.EndsWith(" min"))
+            return Convert.ToInt32(s.Substring(0, s.Length - 4)) * 360;
+        return default;
+    }
+
     public static string FormatHistory(this DateTime time)
     {
         var now = DateTime.UtcNow;

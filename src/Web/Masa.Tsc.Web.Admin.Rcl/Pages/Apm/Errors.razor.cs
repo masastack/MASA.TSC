@@ -52,7 +52,7 @@ public partial class Errors
             total = 0;
             Search = data;
         }
-        if (Search.Start == DateTime.MinValue || Search.End == DateTime.MinValue)
+        if (!Search.Loaded)
             return;
         isTableLoading = true;
         StateHasChanged();

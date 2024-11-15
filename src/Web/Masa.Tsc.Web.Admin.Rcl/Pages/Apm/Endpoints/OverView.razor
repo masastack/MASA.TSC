@@ -79,7 +79,7 @@
         <MCardText>
             @if (!timeTypeCount.ChartLoading && timeTypeCount.HasChart)
             {
-                <MECharts Option="@(timeTypeCount.Data)" Height="166" Style="@("width:100%")" />
+                <MECharts Option="@(timeTypeCount.Data)" Height="166" Style="@("width:100%")" @ref="mechart" />
             }
         </MCardText>
     </MCard>

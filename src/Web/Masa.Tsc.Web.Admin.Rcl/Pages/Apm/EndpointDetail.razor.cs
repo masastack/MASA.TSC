@@ -11,7 +11,7 @@ public partial class EndpointDetail
     private string spanId = default!;
 
     [Parameter]
-    public string Name { get; set; }
+    public string Name { get; set; }   
 
     private void OnSearchValueChanged(SearchData data)
     {

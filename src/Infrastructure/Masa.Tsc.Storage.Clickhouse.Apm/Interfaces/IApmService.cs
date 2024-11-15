@@ -69,7 +69,7 @@ public interface IApmService : IDisposable
     /// </summary>
     /// <param name="query"></param>
     /// <returns></returns>
-    Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmEndpointRequestDto query);
+    Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmTraceLatencyRequestDto query);
 
     Task<List<string>> GetErrorTypesAsync(BaseApmRequestDto query);
 

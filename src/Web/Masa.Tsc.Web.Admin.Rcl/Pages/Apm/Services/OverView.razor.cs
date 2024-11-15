@@ -32,6 +32,8 @@ public partial class OverView
 
     private async Task LoadDataAsync()
     {
+        if (!SearchData.Loaded)
+            return;
         var query = new ApmEndpointRequestDto
         {
             Start = SearchData.Start,

@@ -466,27 +466,6 @@ public partial class Index
         SetLogData(logs.Result);
     }
 
-    //private void SetLogData(List<LogResponseDto> logs)
-    //{
-    //    do
-    //    {
-    //        var first = logs[0];
-    //        var trace = data.Find(trace => trace.Data.TraceId == first.TraceId);
-    //        if (trace == null)
-    //        {
-    //            //该页面报错了,先不处理
-    //            logs.Remove(first);
-    //        }
-    //        else
-    //        {
-    //            var childLogs = logs.Where(log => log.TraceId == first.TraceId).ToList();
-    //            SetChild(trace, childLogs);
-    //            //logs.RemoveAll(childLogs);
-    //        }
-    //    }
-    //    while (logs.Count > 0);
-    //}
-
     private void SetLogData(List<LogResponseDto> logs)
     {
         foreach (var trace in data)
@@ -526,12 +505,12 @@ public partial class Index
         await PopupService.EnqueueSnackbarAsync("分享连接复制成功", AlertTypes.Success, true);
     }
 
-    string btnText = "不显示正常HTTP";
+    //string btnText = "不显示正常HTTP";
     bool showNormalClient = false;
     private void ShowHideHttpTrace()
     {
         showNormalClient = !showNormalClient;
-        btnText = showNormalClient ? "显示所有HTTP" : "不显示正常HTTP";
+        //btnText = showNormalClient ? "显示所有HTTP" : "不显示正常HTTP";
         StateHasChanged();
     }
 

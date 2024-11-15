@@ -41,6 +41,11 @@ public class SearchData
     public string TraceId { get; set; }
 
     public string SpanId { get; set; }
+
+    /// <summary>
+    /// search com
+    /// </summary>
+    public bool Loaded { get; set; }
 }
 
 public enum ApmComparisonTypes

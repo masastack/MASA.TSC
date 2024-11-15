@@ -39,5 +39,5 @@ public sealed class ApmService : BaseService
 
     public Task<List<string>> GetExceptionTypesAsync(BaseRequestDto query) => Caller.GetByBodyAsync<List<string>>($"{RootPath}/errorTypes", query)!;
 
-    public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmEndpointRequestDto query) => Caller.GetByBodyAsync<PaginatedListBase<SimpleTraceListDto>>($"{RootPath}/simpleTraceList", body: query)!;
+    public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmTraceLatencyRequestDto query) => Caller.GetByBodyAsync<PaginatedListBase<SimpleTraceListDto>>($"{RootPath}/simpleTraceList", body: query)!;
 }

@@ -45,8 +45,7 @@ public partial class ApmSearchComponent
         AppTypes.Service.ToString(),
          AppTypes.Job.ToString()
     };
-
-    private bool Isloaded = false;
+    
     private QuickRangeKey quickRangeKey = QuickRangeKey.Last15Minutes;
     private List<string> textFileds = new();
 
@@ -60,7 +59,7 @@ public partial class ApmSearchComponent
         {
             await InitAsync();
         }
-        Isloaded = true;
+        Search.Loaded = true;
         await OnValueChanged();
         StateHasChanged();
     }
@@ -198,7 +197,7 @@ public partial class ApmSearchComponent
     private void TeamChanged(Guid teamId)
     {
         GlobalConfig.CurrentTeamId = teamId;
-        if (Isloaded && CheckUrl())
+        if (Search.Loaded && CheckUrl())
         {
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
             return;
@@ -379,12 +378,12 @@ public partial class ApmSearchComponent
 
     private async Task OnTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) times)
     {
-        if (Isloaded || Search.Start == DateTime.MinValue)
+        if (Search.Loaded || Search.Start == DateTime.MinValue)
         {
             Search.Start = times.start!.Value.UtcDateTime;
             Search.End = times.end!.Value.UtcDateTime;
         }
-        if (Isloaded)
+        if (Search.Loaded)
         {
             await InitAsync();
             await OnValueChanged();
@@ -473,7 +472,7 @@ public partial class ApmSearchComponent
 
     private async Task OnValueChanged()
     {
-        if (!Isloaded || string.IsNullOrEmpty(Value.Environment))
+        if (!Search.Loaded || string.IsNullOrEmpty(Value.Environment))
             return;
         if (ValueChanged.HasDelegate)
             await ValueChanged.InvokeAsync(Value);

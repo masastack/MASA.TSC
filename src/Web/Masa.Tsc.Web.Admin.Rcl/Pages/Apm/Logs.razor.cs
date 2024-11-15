@@ -78,7 +78,7 @@ public partial class Logs
             page = 1;
             Search = data;
         }
-        if (Search.Start == DateTime.MinValue || Search.End == DateTime.MinValue)
+        if (!Search.Loaded)
             return;
         isTableLoading = true;
         StateHasChanged();

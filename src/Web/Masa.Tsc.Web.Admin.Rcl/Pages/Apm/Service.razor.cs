@@ -15,7 +15,7 @@ public partial class Service
         new() { Text = I18n.Apm("Service.List.Throughput"), Value = nameof(ListChartData.Throughput)},
         new() { Text = I18n.Apm("Service.List.Failed"), Value = nameof(ListChartData.Failed)}
     };
-  
+
     private int defaultSize = 20;
     private int total = 0;
     private int page = 1;
@@ -52,7 +52,7 @@ public partial class Service
             Search = data;
             page = 1;
         }
-        if (Search.Start == DateTime.MinValue || Search.End == DateTime.MinValue)
+        if (!Search.Loaded)
             return;
         isTableLoading = true;
         StateHasChanged();

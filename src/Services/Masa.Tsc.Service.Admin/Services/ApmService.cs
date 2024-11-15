@@ -308,7 +308,7 @@ public class ApmService : ServiceBase
         return result;
     }
 
-    public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceList([FromServices] IApmService apmService, [FromBody] ApmEndpointRequestDto query)
+    public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceList([FromServices] IApmService apmService, [FromBody] ApmTraceLatencyRequestDto query)
         => apmService.GetSimpleTraceListAsync(query);
 
     public Task<List<string>> GetEndpointList([FromServices] IApmService apmService, [FromBody] BaseApmRequestDto query)

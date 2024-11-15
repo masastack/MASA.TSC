@@ -15,5 +15,5 @@ public class ApmTraceLatencyRequestDto : ApmEndpointRequestDto
     /// </summary>
     public long? LatMax { get; set; }
 
-    public new int PageSize { get; } = 1;
+    public new int PageSize { get; } = 500;
 }
