@@ -58,13 +58,12 @@ public partial class OverView
             {
                 var reference = echart.GetType().GetField("_selfReference", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField)!.GetValue(echart);
                 var echartJs = (IJSObjectReference)typeof(JSObjectReferenceProxy).GetField("_jsObjectReference", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField)!.GetValue(echart)!;
-
-                if (reference != null && echartJs != null && echartEventModule == null)
+                
+                if (reference != null && echartJs != null && echartEventModule == null && echartEventModule == null)
                 {
                     //重新注册
                     echartEventModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/_content/Masa.Tsc.Web.Admin.Rcl/Pages/Apm/Endpoints/OverView.razor.js");
                     await echartEventModule.InvokeVoidAsync("setChartEvent", echartJs, objRef);
-
                 }
             }
             else
@@ -79,7 +78,7 @@ public partial class OverView
     }
 
     CancellationTokenSource source = null;
-    private EChartBrushEventArg lastSelect = new() { IsClear = true };
+    private EChartBrushEventArg lastSelect = new(true);
     [JSInvokable("OnBrushEnd")]
     public async Task BrushEnd(EChartBrushEventArg args)
     {
@@ -110,12 +109,10 @@ public partial class OverView
 
     private async Task RefreshDurationListAsync(CancellationToken token)
     {
-        Console.WriteLine("1");
         await Task.Delay(400);
         total = 0;
         if (token.IsCancellationRequested)
             return;
-        Console.WriteLine("2");
         await LoadTraceDetailAsync(1);
     }
 
@@ -129,6 +126,7 @@ public partial class OverView
         if (lastKey != key)
         {
             lastKey = key;
+            lastSelect.IsClear = true;
             await LoadDataAsync();
             await LoadDistributionDataAsync();
         }
@@ -422,6 +420,13 @@ public partial class OverView
 
 public class EChartBrushEventArg
 {
+    public EChartBrushEventArg() { }
+
+    public EChartBrushEventArg(bool isClear)
+    {
+        IsClear = isClear;
+    }
+
     public bool IsClear { get; set; }
 
     public int Start { get; set; }
