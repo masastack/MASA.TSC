@@ -39,7 +39,7 @@ public partial class ErrorDetail
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/_content/Masa.Tsc.Web.Admin.Rcl/Pages/Apm/ErrorDetail.razor.js");
         }
-        else
+        else if (module != null)
         {
             await module.InvokeVoidAsync("autoHeight");
         }
@@ -140,7 +140,7 @@ public partial class ErrorDetail
                     _dic = currentLog.ToDictionary();
                     break;
                 }
-               
+
             }
         } while (count-- > 0);
     }

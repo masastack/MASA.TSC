@@ -2,13 +2,10 @@
 let _dotnetHelper = false;
 function setChartEvent(module, donetHelper) {
     _dotnetHelper = donetHelper;
-    let mychart = module.getOriginInstance();
-    console.log("mychart")
-    console.log(mychart)
-    mychart.on("brushselected", function (e) {
-        var areas = e.batch[0].areas;
-        if (areas.length == 0) {
-            //清除选择
+    let mychart = module.getOriginInstance();   
+    mychart.on("brushend", function (e) {       
+        let areas = e.areas;
+        if (areas.length == 0) {            
             callBack(true);
         } else {
             let startIndex = areas[0].coordRange[0], endIndex = areas[0].coordRange[1];
