@@ -75,7 +75,7 @@ internal partial class ClickhouseApmService : IApmService
         if (p95 is not double.NaN)
             result.P95 = (long)Math.Floor(p95);
 
-        var sql = $@"select Duration,count(1) total from {Constants.DurationCountTable} where {where} group by Duration order by Duration";
+        var sql = $@"select Duration,countMerge(Total) total from {Constants.DurationCountTable} where {where} group by Duration order by Duration";
         var list = new List<ChartPointDto>();
 
         using var reader = await Query(sql, parameters);
@@ -327,7 +327,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
             }
             else
             {
-                sql1 = $@"select 1 as Total from {Constants.DurationCountTable} where {where}";
+                sql1 = $@"select 1 as Total from {Constants.DurationTable} where {where}";
             }
 
             sql1 = CombineOrs(sql1, ors);

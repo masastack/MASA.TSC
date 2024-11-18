@@ -311,7 +311,8 @@ from
                              ServiceName,
                              Attributes.http.target, 
                              Attributes.http.method,
-                             Resource.service.namespace)
+                             Resource.service.namespace,
+                             Duration)
                             TTL toDateTime(Timestamp) + toIntervalDay(30)
                             SETTINGS index_granularity = 8192";
         var viewTableName = table.Replace(".", ".v_");
