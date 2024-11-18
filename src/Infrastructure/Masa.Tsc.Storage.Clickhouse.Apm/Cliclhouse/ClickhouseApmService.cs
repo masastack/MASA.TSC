@@ -331,10 +331,8 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
             }
 
             sql1 = CombineOrs(sql1, ors);
-            var countSql = $"select sum(Total) from({sql1})";
-            SetMinDurationUnit(parameters);
+            var countSql = $"select sum(Total) from({sql1})";           
             result.Total = Convert.ToInt64(await Scalar(countSql, parameters));
-            ResetMinDurationUnit(parameters);
         }
 
         var sql = CombineOrs($@"select TraceId,Duration,Timestamp from {(query.IsInstrument ? MasaStackClickhouseConnection.TraceHttpServerTable : Constants.DurationTable)} where {where}", ors);
@@ -342,30 +340,6 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
 
         await SetData(sql, parameters, result, query, ToSampleTraceListDto);
         return result;
-    }
-
-    private void SetMinDurationUnit(List<ClickHouseParameter> parameters)
-    {
-        if (parameters == null || !parameters.Any())
-            return;
-        var param = parameters.Find(p => p.ParameterName == "minDuration");
-        if (param != null)
-            param.Value = (long)(((long)param.Value) / MILLSECOND);
-        param = parameters.Find(p => p.ParameterName == "maxDuration");
-        if (param != null)
-            param.Value = (long)(((long)param.Value) / MILLSECOND);
-    }
-
-    private void ResetMinDurationUnit(List<ClickHouseParameter> parameters)
-    {
-        if (parameters == null || !parameters.Any())
-            return;
-        var param = parameters.Find(p => p.ParameterName == "minDuration");
-        if (param != null)
-            param.Value = (long)(((long)param.Value) * MILLSECOND);
-        param = parameters.Find(p => p.ParameterName == "maxDuration");
-        if (param != null)
-            param.Value = (long)(((long)param.Value) * MILLSECOND);
     }
 
     private static SimpleTraceListDto ToSampleTraceListDto(IDataReader reader)
