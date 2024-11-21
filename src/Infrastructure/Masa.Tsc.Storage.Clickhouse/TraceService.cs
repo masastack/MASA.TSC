@@ -31,7 +31,7 @@ internal class TraceService : ITraceService
     {
         return Task.FromResult(_dbConnection.QueryTrace(query));
     }
-    
+
     public Task<PaginatedListBase<TraceResponseDto>> ScrollAsync(BaseRequestDto query)
     {
         return Task.FromResult(_dbConnection.QueryTrace(query));

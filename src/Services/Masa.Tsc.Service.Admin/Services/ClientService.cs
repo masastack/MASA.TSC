@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Services;
 
-public class ClientService : ServiceBase
+internal class ClientService : ServiceBase
 {
     public ClientService() : base("/api/client")
     { }

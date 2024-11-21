@@ -11,6 +11,7 @@ global using Masa.Tsc.Contracts.Admin.Infrastructure.Dtos;
 global using Masa.Tsc.Contracts.Admin.Infrastructure.Options.Utils;
 global using Masa.Tsc.Storage.Prometheus.Enums;
 global using Masa.Tsc.Storage.Prometheus.Model;
+global using Masa.Utils.Models;
 global using System.ComponentModel;
 global using System.Diagnostics.CodeAnalysis;
 global using System.Runtime.CompilerServices;

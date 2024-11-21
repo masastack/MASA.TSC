@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Services;
 
-public class AppService : ServiceBase
+internal class AppService : ServiceBase
 {
     public AppService() : base("/api/app")
     {

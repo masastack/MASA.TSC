@@ -121,7 +121,7 @@ public partial class ServiceErrors
         }
         else
         {
-            var query = new ApmEndpointRequestDto
+            var query = new ApmErrorRequestDto
             {
                 Page = page,
                 PageSize = defaultSize,
@@ -133,9 +133,10 @@ public partial class ServiceErrors
                 Env = SearchData.Environment,
                 IsDesc = sortBy,
                 TextField = StorageConst.Current.SpanId,
-                TextValue = lastSpanId
+                TextValue = lastSpanId,
+                Filter = SearchData.EnableExceptError
             };
-            var result = await ApiCaller.ApmService.GetErrorsPageAsync(GlobalConfig.CurrentTeamId, query, SearchData.Project, SearchData.ServiceType,string.IsNullOrEmpty(SearchData.Service));
+            var result = await ApiCaller.ApmService.GetErrorsPageAsync(GlobalConfig.CurrentTeamId, query, SearchData.Project, SearchData.ServiceType, string.IsNullOrEmpty(SearchData.Service));
             data = result?.Result?.ToList() ?? new();
             total = (int)(result?.Total ?? 0);
         }

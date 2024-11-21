@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Contracts.Admin.Apps;
 
-public class EnviromentAppDto
+public class EnvironmentAppDto
 {
     public string AppId { get; set; }
 

@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Logs;
 
-public class QueryHandler : EnvQueryHandler
+internal class QueryHandler : EnvQueryHandler
 {
     private readonly ILogService _logService;
 
@@ -22,6 +22,7 @@ public class QueryHandler : EnvQueryHandler
         }
         query.Data.SetValues();
         query.Data.SetEnv(GetServiceEnvironmentName(query.Data.Service));
+        query.Data.SetEnableExceptError();
         query.Result = await _logService.AggregateAsync(query.Data);
     }
 
@@ -33,7 +34,7 @@ public class QueryHandler : EnvQueryHandler
             Start = queryData.Start,
             End = queryData.End,
             RawQuery = queryData.Query,
-            Service=queryData.Service,
+            Service = queryData.Service,
             Page = 1,
             PageSize = 1,
             Sort = new FieldOrderDto { Name = StorageConst.Current.Timestimap, IsDesc = !queryData.IsDesc }
@@ -92,7 +93,7 @@ public class QueryHandler : EnvQueryHandler
             });
         }
 
-        bool isRawQuery = queryData.Query.IsRawQuery(ConfigConst.StorageSetting.IsElasticSearch, ConfigConst.StorageSetting.IsClickhouse);// (queryData.Query?.IndexOfAny(new char[] { '{', '}' }) ?? -1) >= 0;
+        bool isRawQuery = queryData.Query.IsRawQuery(ConfigConst.StorageSetting.IsElasticSearch, ConfigConst.StorageSetting.IsClickhouse);
         var query = new BaseRequestDto
         {
             Service = queryData.Service!,

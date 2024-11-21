@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Services;
 
-public class TopologyService : ServiceBase
+internal class TopologyService : ServiceBase
 {
     public TopologyService() : base("/api/topology")
     {

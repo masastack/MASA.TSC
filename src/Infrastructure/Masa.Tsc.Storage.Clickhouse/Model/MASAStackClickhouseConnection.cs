@@ -23,6 +23,14 @@ public sealed class MasaStackClickhouseConnection : ClickHouseConnection
 
     public static string MappingTable { get; private set; }
 
+    public static string ExceptErrorTable { get; private set; }
+
+    public static void SetEnableExceptError(string table)
+    {
+        if (string.IsNullOrEmpty(ExceptErrorTable))
+            ExceptErrorTable = table;
+    }
+
     public static TimeZoneInfo TimeZone { get; set; }
 
     public static DateTime ToTimeZone(DateTime time)

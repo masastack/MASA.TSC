@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>    
+  <ItemGroup>   
     <ProjectReference Include="..\Masa.Tsc.Storage.Clickhouse\Masa.Tsc.Storage.Clickhouse.csproj" />
   </ItemGroup>
 

@@ -1,0 +1,55 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm
+@inherits ApmComponentBase
+@page "/apm/except-errors"
+<PageTitle>@I18n.Apm("PageTitles.ExceptError")</PageTitle>
+
+<ApmSearchComponent @ref=ApmSearchComponent
+                    IsService
+                    Value="Search"
+                    ValueChanged="LoadASync" />
+<SDataTable Headers="headers"
+            Stripe
+            FixedHeader
+            ServerItemsLength="total"
+            ItemsPerPage="defaultSize"
+            Items="data"
+            TItem="ExceptErrorDto"
+            Loading="@isTableLoading"
+            MustSort
+            OnOptionsUpdate="OnTableOptionsChanged">
+    <ItemColContent>
+        @if (context.Header.Value == nameof(ExceptErrorDto.Message) || context.Header.Value == nameof(ExceptErrorDto.Comment))
+        {
+            <MTooltip Top Left Context="tooltipContent">
+                <ActivatorContent>
+                    <div @attributes="@tooltipContent.Attrs" class="text-truncate">
+                        @context.Value
+                    </div>
+                </ActivatorContent>
+                <ChildContent>
+                    <span>@context.Value</span>
+                </ChildContent>
+            </MTooltip>
+        }
+        else if (context.Header.Value == "Action")
+        {
+            <SIcon OnClick="()=>DeleteAsync(context.Item.Id)">mdi-delete</SIcon>
+        }
+        else if (context.Value is DateTime time)
+        {
+            @time.Format();            
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</SDataTable>
+<style>
+    .m-data-table .m-data-table__wrapper {
+        height: calc(100vh - 260px)
+    }
+</style>
+<MCard Rounded=true Class="px-6 py-2" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
+    <SPagination Class="mt-2" @bind-Page="page" @bind-PageSize=defaultSize Total=total OnChange="OnPageChange" />
+</MCard>

@@ -17,7 +17,8 @@ public static class ApmClickhouseServiceExtensions
              Constants.Init(clickhouseConnection.ConnectionSettings.Database, suffix);
              ApmClickhouseInit.Init(clickhouseConnection, suffix, appLogSourceTable, AppTraceSourceTable);
          });
-        services.AddScoped<IApmService, ClickhouseApmService>();
+        services.AddScoped<IApmService, ClickhouseApmService>()
+            .AddScoped<IExceptErrorService, ExceptErrorService>();
         return services;
     }
 }

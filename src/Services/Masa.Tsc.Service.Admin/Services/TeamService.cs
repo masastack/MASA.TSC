@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Services;
 
-public class TeamService : ServiceBase
+internal class TeamService : ServiceBase
 {
     public TeamService() : base("/api/team")
     {

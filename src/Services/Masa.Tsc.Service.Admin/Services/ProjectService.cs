@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Services;
 
-public class ProjectService : ServiceBase
+internal class ProjectService : ServiceBase
 {
     public ProjectService() : base("/api/project")
     {

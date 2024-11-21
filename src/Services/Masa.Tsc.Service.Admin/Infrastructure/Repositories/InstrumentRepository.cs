@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Infrastructure.Repositories;
 
-public class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, IInstrumentRepository
+internal class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, IInstrumentRepository
 {
     private readonly TscDbContext _context;
 

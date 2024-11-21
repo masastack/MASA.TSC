@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments;
 
-public class DirectoryQueryHandler
+internal class DirectoryQueryHandler
 {
     private readonly IDirectoryRepository _directoryRepository;
     private readonly IInstrumentRepository _instrumentRepository;

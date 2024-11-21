@@ -59,24 +59,38 @@ internal static class IDbConnectionExtensitions
 
     }
 
+    private static bool IsExceptError(BaseRequestDto query)
+    {
+        var list = query.Conditions?.ToList();
+        var filter = list?.Find(m => string.Equals("filter", m.Name, StringComparison.OrdinalIgnoreCase));
+        if (filter != null)
+        {
+            list!.Remove(filter);
+            query.Conditions = list;
+        }
 
+        return filter != null && Convert.ToBoolean(filter.Value.ToString());
+    }
 
     public static PaginatedListBase<LogResponseDto> QueryLog(this IDbConnection connection, BaseRequestDto query)
     {
+        bool isExceptError = IsExceptError(query);
         var (where, parameters, ors) = AppendWhere(query, false);
         var orderBy = AppendOrderBy(query, true);
         var start = (query.Page - 1) * query.PageSize;
         var result = new PaginatedListBase<LogResponseDto>() { Result = new() };
         if (query.HasPage())
         {
-            var countSql = CombineOrs($"select count(1) as `total` from {MasaStackClickhouseConnection.LogTable} where {where}", ors);
+            var countSql = isExceptError ? CombineOrs($"select count(1) as `total` from {MasaStackClickhouseConnection.LogTable} a left join {MasaStackClickhouseConnection.ExceptErrorTable} b on not IsDeleted and a.`Resource.service.namespace` =b.Environment  and a.ServiceName =b.Service  and a.`Attributes.exception.type` =b.`Type`  and a.`Attributes.exception.message` =b.Message  where {where} and b.Service =''", ors)
+                : CombineOrs($"select count(1) as `total` from {MasaStackClickhouseConnection.LogTable} where {where}", ors);
             var total = Convert.ToInt64(ExecuteScalar(connection, $"select sum(`total`) from {countSql}", parameters?.ToArray()));
             result.Total = total;
             if (total <= 0 || start - total >= 0)
                 return result;
         }
 
-        var querySql = CombineOrs($"select {ClickhouseHelper.GetName("timestamp", true)},TraceId,SpanId,TraceFlags,SeverityText,SeverityNumber,ServiceName,Body,Resources,Logs from {MasaStackClickhouseConnection.LogTable} where {where}", ors, orderBy);
+        var querySql = isExceptError ? CombineOrs($"select {ClickhouseHelper.GetName("timestamp", true)},TraceId,SpanId,TraceFlags,SeverityText,SeverityNumber,ServiceName,Body,Resources,Logs from {MasaStackClickhouseConnection.LogTable} a left join {MasaStackClickhouseConnection.ExceptErrorTable} b on not IsDeleted and a.`Resource.service.namespace` =b.Environment  and a.ServiceName =b.Service  and a.`Attributes.exception.type` =b.`Type`  and a.`Attributes.exception.message` =b.Message where {where} and b.Service =''", ors, orderBy)
+            : CombineOrs($"select {ClickhouseHelper.GetName("timestamp", true)},TraceId,SpanId,TraceFlags,SeverityText,SeverityNumber,ServiceName,Body,Resources,Logs from {MasaStackClickhouseConnection.LogTable} where {where}", ors, orderBy);
         result.Result = Query(connection, $"select * from {querySql} as t limit {start},{query.PageSize}", parameters?.ToArray(), ConvertLogDto);
 
         return result;
@@ -495,9 +509,23 @@ internal static class IDbConnectionExtensitions
         var appendWhere = new StringBuilder();
         var name = ClickhouseHelper.GetName(requestDto.Name, isLog);
         AppendAggtype(requestDto, sql, append, name, out var isScalar);
-        sql.AppendFormat(" from {0} ", isLog ? MasaStackClickhouseConnection.LogTable : MasaStackClickhouseConnection.TraceHttpServerTable);
+        bool isExceptError = IsExceptError(requestDto);
+        if (isLog)
+        {
+            var table = isExceptError ? $" {MasaStackClickhouseConnection.LogTable} a left join {MasaStackClickhouseConnection.ExceptErrorTable} b on not IsDeleted and a.`Resource.service.namespace` =b.Environment  and a.ServiceName =b.Service  and a.`Attributes.exception.type` =b.`Type`  and a.`Attributes.exception.message` =b.Message " : MasaStackClickhouseConnection.LogTable;
+            sql.AppendFormat(" from {0}", table);
+        }
+        else
+        {
+            sql.AppendFormat(" from {0}", MasaStackClickhouseConnection.TraceHttpServerTable);
+        }
+
         var (where, @paremeters, _) = AppendWhere(requestDto, !isLog);
-        sql.Append($" where {appendWhere} {where}");
+        if (isExceptError && isLog)
+            sql.Append($" where {appendWhere} {where} and b.Message=''");
+        else
+            sql.Append($" where {appendWhere} {where}");
+
         sql.Append(append);
         var paramArray = @paremeters?.ToArray()!;
 

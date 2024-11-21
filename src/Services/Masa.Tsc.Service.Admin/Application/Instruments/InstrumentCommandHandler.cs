@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Instruments;
 
-public class InstrumentCommandHandler
+internal class InstrumentCommandHandler
 {
     private readonly IInstrumentRepository _instrumentRepository;
 

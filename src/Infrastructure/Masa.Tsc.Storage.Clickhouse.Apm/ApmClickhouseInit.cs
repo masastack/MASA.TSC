@@ -16,6 +16,7 @@ internal static class ApmClickhouseInit
         InitAggregateTable(connection);
         InitDurationTable(connection);
         InitDurationCountTable(connection);
+        InitExceptErrorTable(connection);
     }
 
     private static void InitErrorTable(MasaStackClickhouseConnection connection)
@@ -337,6 +338,38 @@ from
             Duration";
         ClickhouseInit.InitTable(connection, table, sql);
         ClickhouseInit.InitTable(connection, viewTableName, sqlView);
+    }
+
+    private static void InitExceptErrorTable(MasaStackClickhouseConnection connection)
+    {
+        var table = Constants.ExceptErrorTable;
+        var sql = $@"CREATE TABLE {table}(
+    `Id` String CODEC(ZSTD(1)),
+    `Environment` String CODEC(ZSTD(1)),
+    `Project` String CODEC(ZSTD(1)),
+    `Service` String CODEC(ZSTD(1)),
+    `Type` String CODEC(ZSTD(1)),
+    `Message` String CODEC(ZSTD(1)),
+    `Comment` String CODEC(ZSTD(1)),
+    `CreationTime` DateTime64(9) CODEC(Delta(8), ZSTD(1)),
+    `Creator` String CODEC(ZSTD(1)),
+    `ModificationTime` DateTime64(9) CODEC(Delta(8), ZSTD(1)),
+    `Modifier` String CODEC(ZSTD(1)),
+    `IsDeleted` Bool,
+
+    INDEX idx_error_environment Environment TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_error_project Project TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_error_service Service TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_error_type Type TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_error_message Message TYPE bloom_filter(0.001) GRANULARITY 1
+)
+ENGINE = ReplacingMergeTree(ModificationTime)
+ORDER BY (Environment,
+ Project,
+ Service,
+ Type)
+SETTINGS index_granularity = 8192;";
+        ClickhouseInit.InitTable(connection, table, sql);
     }
 
 }

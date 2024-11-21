@@ -97,14 +97,16 @@ internal partial class ClickhouseApmService : IApmService
         return result;
     }
 
-    public async Task<PaginatedListBase<ErrorMessageDto>> ErrorMessagePageAsync(ApmEndpointRequestDto query)
+    public async Task<PaginatedListBase<ErrorMessageDto>> ErrorMessagePageAsync(ApmErrorRequestDto query)
     {
         query.IsServer = default;
         query.IsError = true;
         var (where, ors, parameters) = AppendWhere(query);
+        var table = query.Filter ? $"(select a.* from {Constants.ErrorTable} a left join {Constants.ExceptErrorTable} b on not b.IsDeleted and a.`Resource.service.namespace` =b.Environment  and a.ServiceName =b.Service  and a.`Attributes.exception.type` =b.`Type`  and a.MsgGroupKey =b.Message where b.Service ='')" : Constants.ErrorTable;
+
         var groupby = $"group by Type,Message{(string.IsNullOrEmpty(query.Endpoint) ? "" : ",Attributes.http.target")}";
         var append = string.IsNullOrEmpty(query.Endpoint) ? "" : ",Attributes.http.target";
-        var combineSql = CombineOrs($"select Attributes.exception.type,MsgGroupKey,Timestamp{append} from {Constants.ErrorTable} where {where} ", ors);
+        var combineSql = CombineOrs($"select Attributes.exception.type,MsgGroupKey,Timestamp{append} from {table} where {where} ", ors);
         var countSql = $"select count(1) from (select `Attributes.exception.type` as Type,MsgGroupKey as Message,max(Timestamp) time,count(1) from {combineSql} {groupby})";
         PaginatedListBase<ErrorMessageDto> result = new() { Total = Convert.ToInt64(await Scalar(countSql, parameters)) };
         var orderBy = GetOrderBy(query, errorOrders);
@@ -119,17 +121,29 @@ internal partial class ClickhouseApmService : IApmService
         return result;
     }
 
-    public async Task<IEnumerable<ChartLineCountDto>> GetErrorChartAsync(ApmEndpointRequestDto query)
+    public async Task<IEnumerable<ChartLineCountDto>> GetErrorChartAsync(ApmErrorRequestDto query)
     {
         query.IsServer = default;
         query.IsLog = true;
         var (where, ors, parameters) = AppendWhere(query);
         var groupby = "group by `time` order by `time`";
-        var sql = $@"select 
+        string sql;
+        if (query.Filter)
+        {
+            sql = $@"select 
 toStartOfInterval(`Timestamp` , INTERVAL  {GetPeriod(query)} ) as `time`,
 count(1) `total`
-from {MasaStackClickhouseConnection.LogTable} where {where} and SeverityText='Error' and `Attributes.exception.message`!='' {groupby}";
-
+from {Constants.ErrorTable} a left join {Constants.ExceptErrorTable} b 
+on not b.IsDeleted and a.`Resource.service.namespace` =b.Environment  and a.ServiceName =b.Service  and a.`Attributes.exception.type` =b.`Type` and a.MsgGroupKey =b.Message 
+where {where} and b.Service ='' {groupby}";
+        }
+        else
+        {
+            sql = $@"select 
+toStartOfInterval(`Timestamp` , INTERVAL  {GetPeriod(query)} ) as `time`,
+count(1) `total`
+from {Constants.ErrorTable} where {where} and SeverityText='Error' and `Attributes.exception.message`!='' {groupby}";
+        }
         return await GetChartCountData(sql, parameters, query.ComparisonType);
     }
 
@@ -187,7 +201,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         return list;
     }
 
-    public async Task<Dictionary<string, List<string>>> GetEnviromentServices(BaseApmRequestDto query)
+    public async Task<Dictionary<string, List<string>>> GetEnvironmentServices(BaseApmRequestDto query)
     {
         query.IsServer = true;
         query.IsMetric = true;
@@ -331,7 +345,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
             }
 
             sql1 = CombineOrs(sql1, ors);
-            var countSql = $"select sum(Total) from({sql1})";           
+            var countSql = $"select sum(Total) from({sql1})";
             result.Total = Convert.ToInt64(await Scalar(countSql, parameters));
         }
 

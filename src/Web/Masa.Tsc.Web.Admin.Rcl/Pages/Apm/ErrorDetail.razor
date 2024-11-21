@@ -48,7 +48,10 @@
                 <div class="pl-2">@((currentLog?.Resource.TryGetValue("service.version", out var serviceVersion) ?? false) ? serviceVersion : default)</div>
             </div>
             <div class="pt-4">
-                <div class="text-black Body-1 pt-4">@I18n.Apm("Error.Detail.Type")</div>
+                <div class="text-black Body-1 d-flex">
+                    <div class="py-2">@I18n.Apm("Error.Detail.Type")</div>
+                    <SIcon Class="ml-4" Tooltip="@("排除")" OnClick="()=>showExceptError=true">mdi-shield-check-outline</SIcon>
+                </div>
                 <div class="ex_context pl-8 py-4 Body-2 text-black">@currentLog?.Attributes["exception.type"]</div>
             </div>
             <div class="pt-4">
@@ -146,3 +149,4 @@
         return type.IsPrimitive || type.IsEnum || type.Equals(typeof(string)) || type.Equals(typeof(DateTime));
     }
 }
+<AddExceptError @bind-Visible=showExceptError Log="currentLog" />

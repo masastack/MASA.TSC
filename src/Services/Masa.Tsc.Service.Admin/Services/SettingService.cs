@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Services;
 
-public class SettingService : ServiceBase
+internal class SettingService : ServiceBase
 {
     public SettingService() : base("/api/settings") { }
 

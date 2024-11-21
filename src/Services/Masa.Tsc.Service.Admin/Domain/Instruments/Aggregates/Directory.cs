@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Domain.Aggregates;
 
-public class Directory : AggregateRoot<Guid>
+internal class Directory : AggregateRoot<Guid>
 {
     public Guid UserId { get; set; }
 

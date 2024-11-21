@@ -2,6 +2,7 @@
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
 global using Masa.BuildingBlocks.Service.Caller;
+global using Masa.BuildingBlocks.StackSdks.Auth;
 global using Masa.BuildingBlocks.StackSdks.Dcc;
 global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Log;
 global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Model;

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Masa.BuildingBlocks.StackSdks.Auth;
-
 namespace Masa.Tsc.ApiGateways.Caller;
 
 public class TscCaller
@@ -21,6 +19,7 @@ public class TscCaller
         MetricService = new MetricService(caller);
         TopologyService = new TopologyService(caller);
         ApmService = new ApmService(caller);
+        ExceptErrorService=new ExceptErrorService(caller);
         UserService = new UserService(callerFactory.Create(ServiceExtensions.AUTH_CLIENT_NAME), serviceProvider.GetRequiredService<IAuthClient>());
     }
 
@@ -47,4 +46,6 @@ public class TscCaller
     public SettingService SettingService { get; private init; }
 
     public UserService UserService { get; private init; }
+
+    public ExceptErrorService ExceptErrorService { get; private init; }
 }

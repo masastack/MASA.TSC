@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Services;
 
-public class MetricService : ServiceBase
+internal class MetricService : ServiceBase
 {
     public MetricService() : base("/api/metric")
     {

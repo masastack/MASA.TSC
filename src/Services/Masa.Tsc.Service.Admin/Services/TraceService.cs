@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Services;
 
-public class TraceService : ServiceBase
+internal class TraceService : ServiceBase
 {
     public TraceService() : base("/api/trace")
     {

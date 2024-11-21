@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Services;
 
-public class LogService : ServiceBase
+internal class LogService : ServiceBase
 {
     public LogService() : base("/api/log")
     {
@@ -15,13 +15,14 @@ public class LogService : ServiceBase
 
     private async Task<object> AggregateAsync([FromServices] IEventBus eventBus, [FromBody] SimpleAggregateRequestDto param)
     {
+        param.SetEnableExceptError();
         var query = new LogAggQuery(param);
         await eventBus.PublishAsync(query);
         return query.Result;
     }
 
     private async Task<LogResponseDto> GetLatestAsync([FromServices] IEventBus eventBus, [FromBody] RequestLogLatestDto param)
-    {
+    {        
         var query = new LatestLogQuery(param.Start, param.End, param.Service, param.Query, param.IsDesc);
         await eventBus.PublishAsync(query);
         return query.Result;

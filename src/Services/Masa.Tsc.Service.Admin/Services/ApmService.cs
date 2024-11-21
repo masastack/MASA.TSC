@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Services;
 
-public class ApmService : ServiceBase
+internal class ApmService : ServiceBase
 {
     private readonly IMemoryCache _memoryCache;
     public ApmService(IMemoryCache memoryCache) : base("/api/apm")
@@ -100,9 +100,9 @@ public class ApmService : ServiceBase
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
         });
 
-    public async Task<PaginatedListBase<ErrorMessageDto>> GetErrors([FromServices] IApmService apmService, IAuthClient authClient, IPmClient pmClient, int page, int pageSize, string start, string end, Guid teamId, string project, AppTypes? appType, bool ignoreTeam, string? env, string? service, string? endpoint, string? exType, string? textField, string? textValue, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc, string? traceId)
+    public async Task<PaginatedListBase<ErrorMessageDto>> GetErrors([FromServices] IApmService apmService, IAuthClient authClient, IPmClient pmClient, int page, int pageSize, string start, string end, Guid teamId, string project, AppTypes? appType, bool ignoreTeam, string? env, string? service, string? endpoint, string? exType, string? textField, string? textValue, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc, string? traceId,bool filter=true)
     {
-        var query = new ApmEndpointRequestDto
+        var query = new ApmErrorRequestDto
         {
             Start = start.ParseUTCTime(),
             End = end.ParseUTCTime(),
@@ -117,7 +117,8 @@ public class ApmService : ServiceBase
             TextValue = textValue!,
             PageSize = pageSize,
             Service = service,
-            TraceId = traceId!
+            TraceId = traceId!,
+            Filter= filter
         };
 
         if (ignoreTeam || await GetApps(query, authClient, pmClient, teamId, project, appType))
@@ -153,17 +154,20 @@ public class ApmService : ServiceBase
             LatMin = latMin
         });
 
-    public async Task<IEnumerable<ChartLineCountDto>> GetErrorChart([FromServices] IApmService apmService, string start, string end, string? env, string? service, string? endpoint, ComparisonTypes? comparisonType, string? queries)
-         => await apmService.GetErrorChartAsync(new ApmEndpointRequestDto
+    public async Task<IEnumerable<ChartLineCountDto>> GetErrorChart([FromServices] IApmService apmService, string start, string end, string? env, string? service, string? endpoint, ComparisonTypes? comparisonType, string? queries, string? exType, string? exMessage, bool filter = true)
+         => await apmService.GetErrorChartAsync(new ApmErrorRequestDto
          {
              Start = start.ParseUTCTime(),
              End = end.ParseUTCTime(),
              Env = GetEnv(env),
              ComparisonType = comparisonType,
              Queries = queries,
+             ExType = exType!,
+             ExMessage = exMessage!,
              Service = service,
              Endpoint = endpoint!,
-             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
+             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus),
+             Filter = filter
          });
 
     public async Task<IEnumerable<ChartLineCountDto>> GetLogChart([FromServices] IApmService apmService, string start, string end, string? env, string? service, ComparisonTypes? comparisonType, string? queries)
@@ -215,12 +219,12 @@ public class ApmService : ServiceBase
     public async Task<PhoneModelDto> GetModel([FromServices] IApmService apmService, string brand, string model)
         => await apmService.GetDeviceModelAsync(brand, model);
 
-    public async Task<Dictionary<string, List<EnviromentAppDto>>> GetEnviromentService([FromServices] IApmService apmService
+    public async Task<Dictionary<string, List<EnvironmentAppDto>>> GetEnvironmentService([FromServices] IApmService apmService
         , [FromServices] IAuthClient authClient
         , [FromServices] IPmClient pmClient
         , IMultiEnvironmentContext multiEnvironmentContext, Guid teamId, string start, string end, bool ignoreTeam = false)
     {
-        var data = await apmService.GetEnviromentServices(new BaseApmRequestDto
+        var data = await apmService.GetEnvironmentServices(new BaseApmRequestDto
         {
             Start = start.ParseUTCTime(),
             End = end.ParseUTCTime()
@@ -228,8 +232,8 @@ public class ApmService : ServiceBase
 
         var teamData = await GetTeamAllEnvAppsAsync(authClient, pmClient, teamId, data.Keys);
         if (teamData.Count == 0)
-            return new Dictionary<string, List<EnviromentAppDto>> { { multiEnvironmentContext.CurrentEnvironment, new() } };
-        var result = new Dictionary<string, List<EnviromentAppDto>>();
+            return new Dictionary<string, List<EnvironmentAppDto>> { { multiEnvironmentContext.CurrentEnvironment, new() } };
+        var result = new Dictionary<string, List<EnvironmentAppDto>>();
         foreach (var env in teamData.Keys)
         {
             if (!ignoreTeam && !data.ContainsKey(env)) continue;
@@ -246,11 +250,11 @@ public class ApmService : ServiceBase
     {
         if (string.IsNullOrEmpty(request.Env))
             return false;
-        var aaaa = await GetTeamAppsAsync(authClient, pmClient, teamId, request.Env!);
-        if (aaaa == null || aaaa.Count == 0)
+        var apps = await GetTeamAppsAsync(authClient, pmClient, teamId, request.Env!);
+        if (apps == null || apps.Count == 0)
             return false;
 
-        IEnumerable<EnviromentAppDto> filters = aaaa.First().Value;
+        IEnumerable<EnvironmentAppDto> filters = apps.First().Value;
         project = project?.ToLower();
         if (!string.IsNullOrEmpty(project))
         {
@@ -269,9 +273,9 @@ public class ApmService : ServiceBase
         return request.AppIds.Any();
     }
 
-    private async Task<Dictionary<string, List<EnviromentAppDto>>> GetTeamAppsAsync(IAuthClient authClient, IPmClient pmClient, Guid teamId, string env)
+    private async Task<Dictionary<string, List<EnvironmentAppDto>>> GetTeamAppsAsync(IAuthClient authClient, IPmClient pmClient, Guid teamId, string env)
     {
-        var result = new Dictionary<string, List<EnviromentAppDto>>();
+        var result = new Dictionary<string, List<EnvironmentAppDto>>();
         if (teamId == Guid.Empty || string.IsNullOrEmpty(env))
             return result;
 
@@ -285,7 +289,7 @@ public class ApmService : ServiceBase
         var projects = await pmClient.ProjectService.GetListByTeamIdsAsync(new List<Guid> { teamId }, env);
         if (projects == null || projects.Count == 0) return result;
         var apps = await pmClient.AppService.GetListByProjectIdsAsync(projects.Select(item => item.Id).ToList());
-        result.Add(env, apps.Select(item => new EnviromentAppDto
+        result.Add(env, apps.Select(item => new EnvironmentAppDto
         {
             AppId = item.Identity,
             ProjectId = projects.Find(p => p.Id == item.ProjectId)?.Identity!,
@@ -296,9 +300,9 @@ public class ApmService : ServiceBase
         return result;
     }
 
-    private async Task<Dictionary<string, List<EnviromentAppDto>>> GetTeamAllEnvAppsAsync(IAuthClient authClient, IPmClient pmClient, Guid teamId, IEnumerable<string> envs)
+    private async Task<Dictionary<string, List<EnvironmentAppDto>>> GetTeamAllEnvAppsAsync(IAuthClient authClient, IPmClient pmClient, Guid teamId, IEnumerable<string> envs)
     {
-        var result = new Dictionary<string, List<EnviromentAppDto>>();
+        var result = new Dictionary<string, List<EnvironmentAppDto>>();
         foreach (var env in envs)
         {
             var item = await GetTeamAppsAsync(authClient, pmClient, teamId, env);

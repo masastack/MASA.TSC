@@ -18,6 +18,9 @@ public partial class ApmSearchComponent
     public bool IsLog { get; set; }
 
     [Parameter]
+    public bool ShowExceptError { get; set; }
+
+    [Parameter]
     public SearchData Value { get { return Search; } set { Search = value; } }
 
     [Parameter]
@@ -38,14 +41,14 @@ public partial class ApmSearchComponent
     private List<ValueTuple<string, string>> services = new();
     private List<string> projects = new();
     private List<string> environments = new();
-    private Dictionary<string, List<EnviromentAppDto>> enviromentServices = new();
+    private Dictionary<string, List<EnvironmentAppDto>> EnvironmentServices = new();
     private bool isServiceLoading = true, isEnvLoading = true;
     private List<string> types = new() {
         AppTypes.UI.ToString(),
         AppTypes.Service.ToString(),
          AppTypes.Job.ToString()
     };
-    
+
     private QuickRangeKey quickRangeKey = QuickRangeKey.Last15Minutes;
     private List<string> textFileds = new();
 
@@ -121,13 +124,13 @@ public partial class ApmSearchComponent
         SetQueryList();
     }
 
-    public EnviromentAppDto? GetService(string service)
+    public EnvironmentAppDto? GetService(string service)
     {
         if (string.IsNullOrEmpty(service))
             return default;
-        if (enviromentServices.Count == 0)
+        if (EnvironmentServices.Count == 0)
             return default;
-        foreach (var item in enviromentServices)
+        foreach (var item in EnvironmentServices)
         {
             if (string.IsNullOrEmpty(Search.Environment) || item.Key == Search.Environment)
             {
@@ -214,6 +217,12 @@ public partial class ApmSearchComponent
         });
     }
 
+    private async Task EnableErrorExceptChange(bool selected)
+    {
+        Search.EnableExceptError = selected;
+        await OnValueChanged();
+    }
+
     private bool CheckUrl()
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
@@ -237,15 +246,15 @@ public partial class ApmSearchComponent
     private async Task LoadServiceAsync()
     {
         isServiceLoading = true;
-        List<EnviromentAppDto> projects = new();
+        List<EnvironmentAppDto> projects = new();
         if (!string.IsNullOrEmpty(Search.Environment))
         {
-            if (!enviromentServices.TryGetValue(Search.Environment!, out projects!))
+            if (!EnvironmentServices.TryGetValue(Search.Environment!, out projects!))
                 projects = new();
         }
         else
         {
-            foreach (var item in enviromentServices)
+            foreach (var item in EnvironmentServices)
             {
                 projects.AddRange(item.Value);
             }
@@ -270,12 +279,12 @@ public partial class ApmSearchComponent
     private async Task LoadEnvironmentAsync()
     {
         isEnvLoading = true;
-        var result = await ApiCaller.ApmService.GetEnviromentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End, Search.Environment!) ?? new();
-        enviromentServices = result;
+        var result = await ApiCaller.ApmService.GetEnvironmentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End, Search.Environment!) ?? new();
+        EnvironmentServices = result;
         environments = result.Keys.ToList();
         if (!string.IsNullOrEmpty(Search.Service) && string.IsNullOrEmpty(Search.Environment))
         {
-            var findEnv = enviromentServices.FirstOrDefault(item => item.Value.Exists(app => app.AppId == Search.Service));
+            var findEnv = EnvironmentServices.FirstOrDefault(item => item.Value.Exists(app => app.AppId == Search.Service));
             if (string.IsNullOrEmpty(findEnv.Key))
                 Search.Service = default!;
             else
@@ -289,15 +298,15 @@ public partial class ApmSearchComponent
 
     private async Task LoadProjectAsync()
     {
-        List<EnviromentAppDto> projects = new();
+        List<EnvironmentAppDto> projects = new();
         if (!string.IsNullOrEmpty(Search.Environment))
         {
-            if (!enviromentServices.TryGetValue(Search.Environment!, out projects!))
+            if (!EnvironmentServices.TryGetValue(Search.Environment!, out projects!))
                 projects = new();
         }
         else
         {
-            foreach (var item in enviromentServices)
+            foreach (var item in EnvironmentServices)
             {
                 projects.AddRange(item.Value);
             }
@@ -311,7 +320,7 @@ public partial class ApmSearchComponent
         this.projects = projects.Select(p => p.ProjectId).Distinct().ToList();
         if (string.IsNullOrEmpty(Search.Project) || !string.IsNullOrEmpty(Search.Project) && !this.projects.Contains(Search.Project))
         {
-            EnviromentAppDto? project = null;
+            EnvironmentAppDto? project = null;
             if (!string.IsNullOrEmpty(Search.Service))
                 project = projects.Find(app => app.AppId == Search.Service);
             if (project != null)
@@ -325,15 +334,15 @@ public partial class ApmSearchComponent
 
     private async Task LoadServiceTypeAsync()
     {
-        List<EnviromentAppDto> projects = new();
+        List<EnvironmentAppDto> projects = new();
         if (!string.IsNullOrEmpty(Search.Environment))
         {
-            if (!enviromentServices.TryGetValue(Search.Environment!, out projects!))
+            if (!EnvironmentServices.TryGetValue(Search.Environment!, out projects!))
                 projects = new();
         }
         else
         {
-            foreach (var item in enviromentServices)
+            foreach (var item in EnvironmentServices)
             {
                 projects.AddRange(item.Value);
             }
@@ -348,7 +357,7 @@ public partial class ApmSearchComponent
         types = projects.Select(app => app.AppType.ToString()).Distinct().ToList();
         if (string.IsNullOrEmpty(Search.ServiceType) || !string.IsNullOrEmpty(Search.ServiceType) && !types.Contains(Search.ServiceType))
         {
-            EnviromentAppDto? projectApp = null;
+            EnvironmentAppDto? projectApp = null;
             if (!string.IsNullOrEmpty(Search.Service))
                 projectApp = projects.Find(app => app.AppId == Search.Service);
             else if (!string.IsNullOrEmpty(Search.Project))

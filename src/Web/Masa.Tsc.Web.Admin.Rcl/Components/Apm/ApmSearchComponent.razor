@@ -11,7 +11,7 @@
                        TItemValue="string"
                        ItemText="item=>item"
                        ItemValue="item=>item"
-                       Style="max-width:150px"
+                       Style="max-width:130px"
                        Class="rounded-2 mr-1"
                        Disabled="isEnvLoading"
                        Loading="isEnvLoading"
@@ -37,7 +37,7 @@
                        Loading="isServiceLoading"
                        Clearable
                        Class="rounded-2 mr-1"
-                       Style="max-width:250px" />
+                       Style="max-width:200px" />
 
         <SAutoComplete Label="@I18n.Apm("Search.ServiceType")"
                        Clearable
@@ -47,7 +47,7 @@
                        TItemValue="string"
                        ItemText="item=>item"
                        ItemValue="item=>item"
-                       Style="max-width:150px"
+                       Style="max-width:130px"
                        Class="rounded-2 mr-1"
                        Disabled="isEnvLoading"
                        Loading="isEnvLoading"
@@ -73,7 +73,7 @@
                        Loading="isServiceLoading"
                        Clearable
                        Class="rounded-2 mr-1"
-                       Style="max-width:250px">
+                       Style="max-width:200px">
             <ItemContent>
                 <div class="d-flex justify-space-between m-list-item__title">
                     <div>@context.Item.Item1</div>
@@ -114,6 +114,13 @@
                                ShowTimeZoneSelector
                                DefaultQuickRange="quickRangeKey"
                                ShowInterval />
+        @if (ShowExceptError)
+        {
+            <MSwitch Value="Search.EnableExceptError" Label="白名单" Class="my-2 py-0 pl-4"
+                     Color="info" ValueChanged="@((bool selected)=>EnableErrorExceptChange(selected))"
+                     HideDetails="true"></MSwitch>
+        }
+
     </div>
     @if (!IsService)
     {

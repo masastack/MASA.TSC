@@ -4,11 +4,10 @@
 @page "/log/{TaskId}"
 <PageTitle>@I18n.Apm("PageTitles.Log")</PageTitle>
 
-<ApmSearchComponent Value="Search" IsLog @ref="ApmSearchComponent"
-                    ValueChanged="LoadASync" />
+<ApmSearchComponent Value="Search" IsLog @ref="ApmSearchComponent" ShowExceptError
+                    ValueChanged="LoadAsync" />
 <SDataTable Headers="headers"
-            Stripe
-            Width="@("150%")"
+            Stripe            
             FixedHeader
             ServerItemsLength="total"
             ItemsPerPage="defaultSize"

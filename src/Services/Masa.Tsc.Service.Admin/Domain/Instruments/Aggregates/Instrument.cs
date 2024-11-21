@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Domain.Aggregates;
 
-public class Instrument : FullAggregateRoot<Guid, Guid>
+internal class Instrument : FullAggregateRoot<Guid, Guid>
 {
     public Directory Directory { get; set; }
 

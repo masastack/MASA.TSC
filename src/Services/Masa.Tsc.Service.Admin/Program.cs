@@ -97,7 +97,7 @@ builder.Services.AddMasaIdentity(options =>
             multilevelCacheOptions.SubscribeKeyPrefix = MasaStackProject.TSC.Name;
             multilevelCacheOptions.SubscribeKeyType = SubscribeKeyType.ValueTypeFullNameAndKey;
         });
-
+builder.Services.AddMapster();
 builder.Services.AddI18n(Path.Combine("Resources", "I18n"));
 builder.Services.AddStackMiddleware().AddHealthChecks();
 
@@ -138,7 +138,7 @@ var app = builder.Services
             .UseIntegrationEventBus(options =>
             {
                 options.UseDapr()
-                .UseEventLog<TscDbContext>()
+                //.UseEventLog<TscDbContext>()
                 .UseEventBus();
             })
             .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name)).UseFilter())

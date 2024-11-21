@@ -9,6 +9,7 @@
   "Creator": "创建人",
   "Remove": "删除",
   "CreationTime": "创建时间",
+  "Comments": "创建时间",
   "Modifier": "修改人",
   "ModificationTime": "修改时间",
   "Ok": "确定",
@@ -85,6 +86,7 @@
   "apmendpoints": "接口",
   "apmerrors": "错误",
   "apmapps": "Apps",
+  "excepterrors": "错误白名单",
   "Team": {
     "ProjectTeam": "项目团队",
     "Project name": "项目名称",
@@ -318,6 +320,9 @@
       "Average": "平均值",
       "p95": "p95",
       "p99": "p99"
-    }
+    },
+    "Add except error": "添加错误白名单",
+    "Add except error success": "添加错误白名单成功",
+    "Comment is Reqired": "备注不可为空"
   }
 }

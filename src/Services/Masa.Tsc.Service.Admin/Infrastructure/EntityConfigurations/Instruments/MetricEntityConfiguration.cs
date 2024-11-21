@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Infrastructure.EntityConfigurations;
 
-public class MetricEntityConfiguration : IEntityTypeConfiguration<PanelMetric>
+internal class MetricEntityConfiguration : IEntityTypeConfiguration<PanelMetric>
 {
     public void Configure(EntityTypeBuilder<PanelMetric> builder)
     {

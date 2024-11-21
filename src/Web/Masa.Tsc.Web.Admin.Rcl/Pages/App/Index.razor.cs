@@ -24,7 +24,7 @@ public partial class Index
     private StringNumber index;
     private string serviceName;
     private List<ValueTuple<string, string>> services;
-    private static Dictionary<string, List<EnviromentAppDto>> _teamServices = new();
+    private static Dictionary<string, List<EnvironmentAppDto>> _teamServices = new();
     private bool claimShow = false;
     private List<TraceResponseDto> traceLines;
     private IJSObjectReference? module = null;
@@ -36,7 +36,7 @@ public partial class Index
     private bool isNeedSetPosition = false;
     private static readonly Regex webviewReg = new(@"Chrome/(\d+\.?)+", default, TimeSpan.FromSeconds(1));
 
-    public static EnviromentAppDto? GetService(string service)
+    public static EnvironmentAppDto? GetService(string service)
     {
         foreach (var item in _teamServices)
         {
@@ -356,7 +356,7 @@ public partial class Index
             services = new();
             return;
         }
-        _teamServices = await ApiCaller.ApmService.GetEnviromentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End, ignoreTeam: true) ?? new();
+        _teamServices = await ApiCaller.ApmService.GetEnvironmentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End, ignoreTeam: true) ?? new();
         if (_teamServices != null && _teamServices.Count > 0)
         {
             foreach (var service in data)

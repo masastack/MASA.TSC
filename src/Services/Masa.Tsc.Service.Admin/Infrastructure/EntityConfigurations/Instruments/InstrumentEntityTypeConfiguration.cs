@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Infrastructure.EntityConfigurations.Instruments;
 
-public class InstrumentEntityTypeConfiguration : IEntityTypeConfiguration<Instrument>
+internal class InstrumentEntityTypeConfiguration : IEntityTypeConfiguration<Instrument>
 {
     public void Configure(EntityTypeBuilder<Instrument> builder)
     {

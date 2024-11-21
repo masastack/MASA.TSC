@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Projects;
 
-public class QueryHandler
+internal class QueryHandler
 {
     private readonly IPmClient _pmClient;
     private readonly IAuthClient _authClient;

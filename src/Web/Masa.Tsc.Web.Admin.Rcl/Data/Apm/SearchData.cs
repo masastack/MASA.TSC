@@ -42,6 +42,8 @@ public class SearchData
 
     public string SpanId { get; set; }
 
+    public bool EnableExceptError { get; set; } = true;
+
     /// <summary>
     /// search com
     /// </summary>

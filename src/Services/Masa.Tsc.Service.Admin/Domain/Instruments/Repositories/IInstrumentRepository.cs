@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Domain.Repositories;
 
-public interface IInstrumentRepository : IRepository<Instrument>
+internal interface IInstrumentRepository : IRepository<Instrument>
 {
     Task<Instrument> GetAsync(Guid id, Guid userId);
 

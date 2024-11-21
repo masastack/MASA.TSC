@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Services.Instruments;
 
-public class InstrumentService : ServiceBase
+internal class InstrumentService : ServiceBase
 {
     public InstrumentService() : base("/api/Instrument")
     {

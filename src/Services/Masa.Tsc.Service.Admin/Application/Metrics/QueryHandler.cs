@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Metrics;
 
-public class QueryHandler : EnvQueryHandler
+internal class QueryHandler : EnvQueryHandler
 {
     private readonly IMasaPrometheusClient _prometheusClient;
     private readonly IMultilevelCacheClient _multilevelCacheClient;

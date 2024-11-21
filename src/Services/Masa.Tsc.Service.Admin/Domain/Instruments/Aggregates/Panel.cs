@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Domain.Aggregates;
 
-public class Panel : AggregateRoot<Guid>
+internal class Panel : AggregateRoot<Guid>
 {
     public Instrument Instrument { get; set; }
 

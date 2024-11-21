@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Teams;
 
-public class QueryHandler : EnvQueryHandler
+internal class QueryHandler : EnvQueryHandler
 {
     private readonly IAuthClient _authClient;
     private readonly IPmClient _pmClient;

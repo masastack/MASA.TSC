@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Domain.Aggregates;
 
-public class PanelMetric : AggregateRoot<Guid>
+internal class PanelMetric : AggregateRoot<Guid>
 {
     public PanelMetric() : base() { }
 

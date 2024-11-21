@@ -21,7 +21,7 @@ public partial class ApmComponentBase : MasaComponentBase
 
     public static ApmSearchComponent ApmSearchComponent { get; set; }
 
-    public static EnviromentAppDto? GetService(string? service, Func<string, EnviromentAppDto?>? func = default)
+    public static EnvironmentAppDto? GetService(string? service, Func<string, EnvironmentAppDto?>? func = default)
     {
         if (string.IsNullOrEmpty(service)) return default;
         if (func != null)

@@ -45,7 +45,7 @@ public interface IApmService : IDisposable
     /// </summary>
     /// <param name="query"></param>
     /// <returns></returns>
-    Task<PaginatedListBase<ErrorMessageDto>> ErrorMessagePageAsync(ApmEndpointRequestDto query);
+    Task<PaginatedListBase<ErrorMessageDto>> ErrorMessagePageAsync(ApmErrorRequestDto query);
 
     /// <summary>
     /// 获取trace下的错误信息统计，按照spanId
@@ -54,13 +54,13 @@ public interface IApmService : IDisposable
     /// <returns></returns>
     Task<IEnumerable<ChartPointDto>> GetTraceErrorsAsync(ApmEndpointRequestDto query);
 
-    Task<IEnumerable<ChartLineCountDto>> GetErrorChartAsync(ApmEndpointRequestDto query);
+    Task<IEnumerable<ChartLineCountDto>> GetErrorChartAsync(ApmErrorRequestDto query);
 
     Task<IEnumerable<ChartLineCountDto>> GetEndpointChartAsync(ApmEndpointRequestDto query);
 
     Task<IEnumerable<ChartLineCountDto>> GetLogChartAsync(ApmEndpointRequestDto query);
 
-    Task<Dictionary<string, List<string>>> GetEnviromentServices(BaseApmRequestDto query);
+    Task<Dictionary<string, List<string>>> GetEnvironmentServices(BaseApmRequestDto query);
 
     Task<PhoneModelDto> GetDeviceModelAsync(string brand, string model);
 

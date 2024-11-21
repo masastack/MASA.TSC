@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Topologies;
 
-public class QueryHandler
+internal class QueryHandler
 {
     [EventHandler]
     public void GetTopology(TopologyQuery query)

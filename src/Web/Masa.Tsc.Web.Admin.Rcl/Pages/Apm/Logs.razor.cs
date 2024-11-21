@@ -12,14 +12,14 @@ public partial class Logs
 
     private List<DataTableHeader<LogResponseDto>> headers => new()
     {
-        new() { Text = I18n.Apm("Log.List.Timestamp"), Value = nameof(LogResponseDto.Timestamp),Fixed = DataTableFixed.Left},
-        new() { Text = I18n.Apm("Log.List.Environment"), Value ="Resource.service.namespace",Fixed = DataTableFixed.Left},
-        new() { Text = I18n.Apm("Log.List.ServiceName"), Value ="Resource.service.name",Fixed = DataTableFixed.Left },
-        new() { Text = I18n.Apm("Log.List.SeverityText"), Value = nameof(LogResponseDto.SeverityText),Fixed = DataTableFixed.Left},
-        new() { Text = I18n.Apm("Log.List.TraceId"), Value = nameof(LogResponseDto.TraceId)},
-        new() { Text = I18n.Apm("Log.List.SpanId"), Value = nameof(LogResponseDto.SpanId)},
+        new() { Text = I18n.Apm("Log.List.Timestamp"), Value = nameof(LogResponseDto.Timestamp), Width=250, Fixed = DataTableFixed.Left},
+        new() { Text = I18n.Apm("Log.List.Environment"), Value ="Resource.service.namespace",Width=150,Fixed = DataTableFixed.Left},
+        new() { Text = I18n.Apm("Log.List.ServiceName"), Value ="Resource.service.name",Width=200,Fixed = DataTableFixed.Left },
+        new() { Text = I18n.Apm("Log.List.SeverityText"), Value = nameof(LogResponseDto.SeverityText),Width=150,Fixed = DataTableFixed.Left},
+        new() { Text = I18n.Apm("Log.List.TraceId"), Value = nameof(LogResponseDto.TraceId),Width=200},
+        new() { Text = I18n.Apm("Log.List.SpanId"), Value = nameof(LogResponseDto.SpanId), Width = 150},
         new() { Text = I18n.Apm("Log.List.Body"), Value = nameof(LogResponseDto.Body)},
-        new() { Text = I18n.Apm("Log.List.ExceptionType"), Value = "Attributes.exception.type"}
+        new() { Text = I18n.Apm("Log.List.ExceptionType"), Value = "Attributes.exception.type", Width = 200}
     };
 
     private int defaultSize = 50;
@@ -53,7 +53,7 @@ public partial class Logs
             sortBy = sort.SortDesc[0];
         else
             sortBy = default;
-        await LoadASync();
+        await LoadAsync();
     }
 
     private void OpenAsync(LogResponseDto item)
@@ -66,11 +66,11 @@ public partial class Logs
     {
         page = pageData.page;
         defaultSize = pageData.pageSize;
-        await LoadASync();
+        await LoadAsync();
         StateHasChanged();
     }
 
-    private async Task LoadASync(SearchData data = null!)
+    private async Task LoadAsync(SearchData data = null!)
     {
         if (data != null)
         {
@@ -122,6 +122,9 @@ public partial class Logs
                 list.Add(new FieldConditionDto { Name = Search.TextField, Value = Search.TextValue, Type = ConditionTypes.Equal });
             }
         }
+        if (Search.EnableExceptError)
+            list.Add(new FieldConditionDto { Name = nameof(ApmErrorRequestDto.Filter), Value = true, Type = ConditionTypes.Equal });
+
         query.Conditions = list;
         var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();

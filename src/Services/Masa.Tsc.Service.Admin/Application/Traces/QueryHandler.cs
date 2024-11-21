@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Application.Traces;
 
-public class QueryHandler : EnvQueryHandler
+internal class QueryHandler : EnvQueryHandler
 {
     private readonly ITraceService _traceService;
 

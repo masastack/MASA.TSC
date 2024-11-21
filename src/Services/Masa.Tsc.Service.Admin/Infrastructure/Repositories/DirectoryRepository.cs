@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Infrastructure.Repositories;
 
-public class DirectoryRepository : Repository<TscDbContext, Domain.Aggregates.Directory, Guid>, IDirectoryRepository
+internal class DirectoryRepository : Repository<TscDbContext, Domain.Aggregates.Directory, Guid>, IDirectoryRepository
 {
     private readonly TscDbContext _context;
 

@@ -1,0 +1,35 @@
+﻿@namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm
+@inherits ApmComponentBase
+
+<DefaultDialog Value=Visible ValueChanged=UpdateVisible Title="@I18n.Apm("Add except error")" Width="600">
+    <ChildContent>
+        <MForm @ref="Form" Model=model EnableI18n>
+            <div class="py-2 d-flex">
+                <div>@I18n.Apm("Search.Environment")：</div>
+                <div>@model.Environment</div>
+            </div>
+            <div class="py-2 d-flex">
+                <div>@I18n.Apm("Search.Project")：</div>
+                <div>@model.Project</div>
+            </div>
+            <div class="py-2 d-flex">
+                <div>@I18n.Apm("Search.Service")：</div>
+                <div>@model.Service</div>
+            </div>
+            <div class="py-2 d-flex">
+                <div class="text-no-wrap">@I18n.Apm("Error.List.Type")：</div>
+                <div>@model.Type</div>
+            </div>
+            <div class="py-2 d-flex">
+                <div class="text-no-wrap">@I18n.Apm("Error.List.Message")：</div>
+                <div>@model.Message</div>
+            </div>
+            <STextarea @bind-Value="model.Comment" Label="@I18n.T("Comments")" />
+        </MForm>
+    </ChildContent>
+    <FooterContent>
+        <div class="d-flex justify-center">
+            <SButton Large OnClick="AddAsync" Class="my-auto">@I18n.T("Save")</SButton>
+        </div>
+    </FooterContent>
+</DefaultDialog>

@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Services;
 
-public class DirectoryService : ServiceBase
+internal class DirectoryService : ServiceBase
 {
     public DirectoryService() : base("/api/Instrument/directory")
     {

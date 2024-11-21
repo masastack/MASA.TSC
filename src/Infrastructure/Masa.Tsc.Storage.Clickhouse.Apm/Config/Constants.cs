@@ -7,6 +7,8 @@ internal static class Constants
 {
     public static string ErrorTable { get; private set; }
 
+    public static string ExceptErrorTable { get; private set; }
+
     private const string AggregateTable = "otel_trace_metrics@interval";
 
     public static string DurationTable { get; private set; }
@@ -41,9 +43,11 @@ internal static class Constants
         DurationTable = $"{database}otel_traces_spans_duration_{suffix}";
         DurationCountTable = $"{database}otel_traces_spans_duration_count_{suffix}";
         ModelsTable = $"{database}tsc_phone_models_{suffix}";
+        ExceptErrorTable = $"{database}tsc_except_errors_{suffix}";
         foreach (var key in INTERVALS)
         {
             DicAggregateTable.Add(key, database + GetAggregateTable(key, suffix));
         }
+        MasaStackClickhouseConnection.SetEnableExceptError(ExceptErrorTable);
     }
 }

@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Infrastructure.EntityConfigurations.Instruments;
 
-public class PanelEntityTypeConfiguration : IEntityTypeConfiguration<Panel>
+internal class PanelEntityTypeConfiguration : IEntityTypeConfiguration<Panel>
 {
     public void Configure(EntityTypeBuilder<Panel> builder)
     {

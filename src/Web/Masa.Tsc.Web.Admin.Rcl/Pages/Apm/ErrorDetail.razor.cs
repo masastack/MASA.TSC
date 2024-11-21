@@ -9,15 +9,14 @@ public partial class ErrorDetail
     public bool Show { get; set; }
 
     ChartData errorChart = new();
-
     LogResponseDto currentLog = null;
-
     TraceResponseDto currentTrace = null;
+    IJSObjectReference module = null;
+
+    bool showExceptError = false;
 
     [Inject]
     IJSRuntime JSRuntime { get; set; }
-
-    IJSObjectReference module = null;
 
     int currentPage = 1;
     int total = 1;
@@ -53,7 +52,7 @@ public partial class ErrorDetail
             total = 0;
             Search = data;
         }
-        if (Search.Start == DateTime.MinValue || Search.End == DateTime.MinValue)
+        if (!Search.Loaded)
             return;
         loading = true;
         await ChangeRecordAsync();
@@ -117,6 +116,8 @@ public partial class ErrorDetail
                 list.Add(new FieldConditionDto { Name = Search.TextField, Value = Search.TextValue, Type = ConditionTypes.Equal });
             }
         }
+        if (Search.EnableExceptError)
+            list.Add(new FieldConditionDto { Name = nameof(ApmErrorRequestDto.Filter), Value = true, Type = ConditionTypes.Equal });
         query.Conditions = list;
         int count = 1;
         do
@@ -189,6 +190,8 @@ public partial class ErrorDetail
             Service = Search.Service,
             Endpoint = Search.Endpoint!,
             Env = Search.Environment,
+            ExType = Search.ExceptionType,
+            ExMessage = Search.ExceptionMsg
         };
         var result = await ApiCaller.ApmService.GetErrorChartAsync(query);
         errorChart.Data = ConvertLatencyChartData(result, lineName: "error count").Json;

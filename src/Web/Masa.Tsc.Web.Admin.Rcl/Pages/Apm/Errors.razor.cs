@@ -22,6 +22,7 @@ public partial class Errors
     private bool isTableLoading = false;
     private string sortFiled = nameof(ErrorMessageDto.Total);
     private bool sortBy = true;
+    bool showDetail = false;
 
     public async Task OnTableOptionsChanged(DataOptions sort)
     {
@@ -58,14 +59,12 @@ public partial class Errors
         StateHasChanged();
         await LoadPageDataAsync();
         isTableLoading = false;
-        //StateHasChanged();
-        //await LoadChartDataAsync();
     }
 
     private async Task LoadPageDataAsync()
     {
         isTableLoading = true;
-        var query = new ApmEndpointRequestDto
+        var query = new ApmErrorRequestDto
         {
             Page = page,
             PageSize = defaultSize,
@@ -77,8 +76,8 @@ public partial class Errors
             Service = Search.Service,
             ExType = Search.ExceptionType,
             TextField = Search.TextField,
-            TextValue = Search.TextValue
-            //Queries = Search.Text
+            TextValue = Search.TextValue,
+            Filter = Search.EnableExceptError
         };
         var result = await ApiCaller.ApmService.GetErrorsPageAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
@@ -90,8 +89,6 @@ public partial class Errors
                 data = result.Result;
         }
     }
-
-    bool showDetail = false;
 
     private void Show(string? type = default, string? message = default)
     {
