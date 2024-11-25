@@ -506,8 +506,7 @@ internal static class IDbConnectionExtensitions
     {
         var sql = new StringBuilder("select ");
         bool isExceptError = IsExceptError(requestDto);
-        var append = new StringBuilder();
-        //var appendWhere = new StringBuilder();
+        var append = new StringBuilder();        
         var name = ClickhouseHelper.GetName(requestDto.Name, isLog);
         AppendAggtype(requestDto, sql, append, name, out var isScalar); 
         var (where, @paremeters, _) = AppendWhere(requestDto, !isLog);       
