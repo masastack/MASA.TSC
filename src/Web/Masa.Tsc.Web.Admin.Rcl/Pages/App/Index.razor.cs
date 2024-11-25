@@ -255,17 +255,13 @@ public partial class Index
     }
 
     private async Task OnAutoTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) time)
-    {
-        //var seconds = Convert.ToInt32(Math.Floor((time.start!.Value.UtcDateTime - start).TotalSeconds));
-        //(start, end) = (time.start!.Value.UtcDateTime, time.end!.Value.UtcDateTime);
-        //await LoadTrace(isNext: true, seconds: seconds);
+    {       
         (start, end) = (time.start!.Value.UtcDateTime, time.end!.Value.UtcDateTime);
         data.Clear();
         await InvokeAsync(async () =>
         {
             await LoadTrace();
         });
-
     }
 
     private async Task LoadTrace(bool isPre = false, bool isNext = false, int seconds = 0, bool clearIndex = true)
@@ -317,7 +313,7 @@ public partial class Index
             query.Start = query.End.AddMinutes(-seconds);
 
         var traces = await ApiCaller.ApmService.GetTraceListAsync(query);
-        await SetDeviceModel(traces.Result?.FirstOrDefault());
+        await SetDeviceModel(traces.Result?.LastOrDefault());
         SetTraceData(traces.Result!);
         await LoadLog(traces.Result?.Select(item => item.TraceId).Distinct().ToList()!);
         if (currentTrace == null && data.Count > 0)
@@ -504,13 +500,11 @@ public partial class Index
         await JSRuntime.InvokeVoidAsync(JsInteropConstants.Copy, $"{NavigationManager.BaseUri}{str}");
         await PopupService.EnqueueSnackbarAsync("分享连接复制成功", AlertTypes.Success, true);
     }
-
-    //string btnText = "不显示正常HTTP";
+    
     bool showNormalClient = false;
     private void ShowHideHttpTrace()
     {
         showNormalClient = !showNormalClient;
-        //btnText = showNormalClient ? "显示所有HTTP" : "不显示正常HTTP";
         StateHasChanged();
     }
 
