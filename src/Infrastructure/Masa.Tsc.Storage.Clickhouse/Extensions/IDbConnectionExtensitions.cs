@@ -512,7 +512,7 @@ internal static class IDbConnectionExtensitions
         var (where, @paremeters, _) = AppendWhere(requestDto, !isLog);       
         if (isLog)
         {
-            var table = isExceptError ? $" (select Resource.service.namespace,ServiceName,Attributes.exception.type,Attributes.exception.message,{name} from {MasaStackClickhouseConnection.LogTable} where {where}) a left join {MasaStackClickhouseConnection.ExceptErrorTable} b on not IsDeleted and a.`Resource.service.namespace` =b.Environment  and a.ServiceName =b.Service  and a.`Attributes.exception.type` =b.`Type`  and a.`Attributes.exception.message` =b.Message " : MasaStackClickhouseConnection.LogTable;
+            var table = isExceptError ? $" (select * from {MasaStackClickhouseConnection.LogTable} where {where}) a left join {MasaStackClickhouseConnection.ExceptErrorTable} b on not IsDeleted and a.`Resource.service.namespace` =b.Environment  and a.ServiceName =b.Service  and a.`Attributes.exception.type` =b.`Type`  and a.`Attributes.exception.message` =b.Message " : MasaStackClickhouseConnection.LogTable;
             sql.AppendFormat(" from {0}", table);
         }
         else
