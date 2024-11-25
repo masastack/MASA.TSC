@@ -101,16 +101,16 @@ internal partial class ClickhouseApmService : IApmService
     {
         query.IsServer = default;
         query.IsError = true;
+        var orderBy = GetOrderBy(query, errorOrders);
         var (where, ors, parameters) = AppendWhere(query);
-        var table = query.Filter ? $"(select a.* from {Constants.ErrorTable} a left join {Constants.ExceptErrorTable} b on not b.IsDeleted and a.`Resource.service.namespace` =b.Environment  and a.ServiceName =b.Service  and a.`Attributes.exception.type` =b.`Type`  and a.MsgGroupKey =b.Message where b.Service ='')" : Constants.ErrorTable;
-
+        var table = query.Filter ? $"{CombineOrs($"select * from {Constants.ErrorTable} where {where}", ors)} a left join {Constants.ExceptErrorTable} b on not b.IsDeleted and a.`Resource.service.namespace` =b.Environment  and a.ServiceName =b.Service  and a.`Attributes.exception.type` =b.`Type`  and a.MsgGroupKey =b.Message where b.Service =''" : Constants.ErrorTable;
         var groupby = $"group by Type,Message{(string.IsNullOrEmpty(query.Endpoint) ? "" : ",Attributes.http.target")}";
         var append = string.IsNullOrEmpty(query.Endpoint) ? "" : ",Attributes.http.target";
-        var combineSql = CombineOrs($"select Attributes.exception.type,MsgGroupKey,Timestamp{append} from {table} where {where} ", ors);
-        var countSql = $"select count(1) from (select `Attributes.exception.type` as Type,MsgGroupKey as Message,max(Timestamp) time,count(1) from {combineSql} {groupby})";
+        var selectFileds = $"`Attributes.exception.type` as Type,MsgGroupKey as Message,max(Timestamp) time,count(1) total{append}";
+        var countSql = $"select count(1) from (select {selectFileds} from {table} {groupby})";
         PaginatedListBase<ErrorMessageDto> result = new() { Total = Convert.ToInt64(await Scalar(countSql, parameters)) };
-        var orderBy = GetOrderBy(query, errorOrders);
-        var sql = $@"select * from( select `Attributes.exception.type` as Type,MsgGroupKey as Message,max(Timestamp) time,count(1) total from {combineSql} {groupby} {orderBy} @limit)";
+
+        var sql = $@"select * from( select {selectFileds} from {table} {groupby}) {orderBy} @limit";
         await SetData(sql, parameters, result, query, reader => new ErrorMessageDto()
         {
             Type = reader[0]?.ToString()!,
@@ -133,9 +133,9 @@ internal partial class ClickhouseApmService : IApmService
             sql = $@"select 
 toStartOfInterval(`Timestamp` , INTERVAL  {GetPeriod(query)} ) as `time`,
 count(1) `total`
-from {Constants.ErrorTable} a left join {Constants.ExceptErrorTable} b 
+from (select * from {Constants.ErrorTable} where {where}) a left join {Constants.ExceptErrorTable} b 
 on not b.IsDeleted and a.`Resource.service.namespace` =b.Environment  and a.ServiceName =b.Service  and a.`Attributes.exception.type` =b.`Type` and a.MsgGroupKey =b.Message 
-where {where} and b.Service ='' {groupby}";
+where b.Service ='' {groupby}";
         }
         else
         {

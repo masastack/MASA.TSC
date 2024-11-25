@@ -44,11 +44,12 @@ internal static class BaseRequestDtoExtensions
         var find = list.Find(m => string.Equals(m.Name, nameof(ApmErrorRequestDto.Filter), StringComparison.OrdinalIgnoreCase));
         if (find == null)
         {
-            list.Add(new FieldConditionDto { Name = StorageConst.Current.Environment, Type = ConditionTypes.Equal, Value = true });
+            list.Add(new FieldConditionDto { Name = nameof(ApmErrorRequestDto.Filter), Type = ConditionTypes.Equal, Value = true });
         }
         else
         {
             find.Value = true;
         }
+        dto.Conditions = list;
     }
 }
