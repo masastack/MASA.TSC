@@ -110,13 +110,13 @@ internal partial class ClickhouseApmService : IApmService
         if (query.Filter)
         {
             var table = $"{CombineOrs($"select * from {Constants.ErrorTable} where {where}", ors)} a left join {Constants.ExceptErrorTable} b on not b.IsDeleted and a.`Resource.service.namespace` =b.Environment  and a.ServiceName =b.Service  and a.`Attributes.exception.type` =b.`Type`  and a.MsgGroupKey =b.Message where b.Service =''";
-            countSql = $"select count(1) from (select 1 from {table})";
+            countSql = $"select count(1) from (select {selectFileds} from {table} {groupby})";
             sql = $@" select {selectFileds} from {table} {groupby} {orderBy} @limit";
         }
         else
         {
             var table = Constants.ErrorTable;
-            countSql = $"select sum(total) from {CombineOrs($"select count(1) as total from {table} where {where}", ors)}";
+            countSql = $"select count(1) from {CombineOrs($"select  {selectFileds} from {table} where {where}", ors, groupby)}";
             sql = $@"select {selectFileds} from {CombineOrs($"select * from {table} where {where}", ors)} {groupby} {orderBy} @limit";
         }
         PaginatedListBase<ErrorMessageDto> result = new() { Total = Convert.ToInt64(await Scalar(countSql, parameters)) };

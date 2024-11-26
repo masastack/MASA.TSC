@@ -367,7 +367,8 @@ ENGINE = ReplacingMergeTree(ModificationTime)
 ORDER BY (Environment,
  Project,
  Service,
- Type)
+ `Type`,
+ `Message`)
 SETTINGS index_granularity = 8192;";
         ClickhouseInit.InitTable(connection, table, sql);
     }
