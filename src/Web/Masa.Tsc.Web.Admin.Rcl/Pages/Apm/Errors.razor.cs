@@ -97,4 +97,14 @@ public partial class Errors
         showDetail = true;
         StateHasChanged();
     }
+
+    private void Hide(bool show)
+    {
+        if (!show)
+        {
+            Search.ExceptionType = default!;
+            Search.ExceptionMsg = default!;
+        }
+        showDetail = show;
+    }
 }

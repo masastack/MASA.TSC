@@ -52,6 +52,6 @@
     <SPagination Class="mt-2" @bind-Page="page" @bind-PageSize=defaultSize Total=total OnChange="OnPageChange" />
 </MCard>
 
-<SSheetDialog @bind-Value="showDetail" Title="@(Search.ExceptionMsg??Search.ExceptionType)">
+<SSheetDialog Value="showDetail" ValueChanged="Hide" Title="@(Search.ExceptionMsg??Search.ExceptionType)">
     <ErrorDetail SearchData="@Search" Show="showDetail" />
 </SSheetDialog>

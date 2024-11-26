@@ -6,6 +6,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm;
 public partial class Service
 {
     protected override bool IsPage => true;
+    protected override bool IsServicePage => true;
 
     private List<DataTableHeader<ListChartData>> headers => new()
     {

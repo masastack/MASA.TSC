@@ -9,6 +9,7 @@ public partial class Endpoint
     public string TraceId { get; set; }
 
     protected override bool IsPage => true;
+    protected override bool IsEndPointPage => true;
     private List<DataTableHeader<ListChartData>> headers => new()
     {
         new() { Text = I18n.Apm("Endpoint.List.Name"), Value = nameof(ListChartData.Name) },

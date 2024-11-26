@@ -46,6 +46,10 @@ public partial class ApmComponentBase : MasaComponentBase
 
     protected virtual bool IsPage { get; set; } = false;
 
+    protected virtual bool IsServicePage { get; }
+    protected virtual bool IsEndPointPage { get; }
+    protected virtual bool IsErrorPage { get; set; }
+
     public ApmComponentBase()
     {
 
@@ -73,10 +77,21 @@ public partial class ApmComponentBase : MasaComponentBase
         base.OnInitialized();
         if (IsPage)
         {
-            Search.Method = default!;
-            //Search.TextField = default!;
-            //Search.TextValue = default!;
-            //Search.Text = default!;
+            if (IsServicePage)
+            {
+                Search.Project = default!;
+                Search.Service = default!;
+            }
+            if (IsServicePage || IsEndPointPage)
+            {
+                Search.Method = default!;
+                Search.Endpoint = default!;
+            }
+            Search.ExceptionType = nameof(AppTypes.Service);
+            Search.ExceptionMsg = default!;
+            Search.TraceId = default!;
+            Search.TextField = default!;
+            Search.TextValue = default!;
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
             var values = HttpUtility.ParseQueryString(uri.Query);
             var start = values.Get("start");

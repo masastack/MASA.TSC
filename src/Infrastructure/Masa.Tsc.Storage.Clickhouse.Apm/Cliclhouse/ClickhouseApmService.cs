@@ -913,7 +913,6 @@ order by `Attributes.http.status_code`";
         }
     }
 
-
     private async Task<List<ChartLineCountDto>> GetChartCountData(string sql, IEnumerable<ClickHouseParameter> parameters, ComparisonTypes? comparisonTypes = null)
     {
         var result = new List<ChartLineCountDto>();
