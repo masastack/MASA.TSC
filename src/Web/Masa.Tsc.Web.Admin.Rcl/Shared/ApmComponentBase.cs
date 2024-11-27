@@ -70,13 +70,18 @@ public partial class ApmComponentBase : MasaComponentBase
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        await SetStorage();
+        if (IsPage)
+        {
+            await SetStorage();
+        }
     }
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
         if (IsPage)
         {
+            Search.Loaded = false;
             if (IsServicePage)
             {
                 Search.Project = default!;

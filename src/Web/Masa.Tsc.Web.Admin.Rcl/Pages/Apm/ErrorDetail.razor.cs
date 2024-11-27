@@ -111,7 +111,7 @@ public partial class ErrorDetail
             {
                 list.Add(new FieldConditionDto { Name = Search.TextField, Value = Search.TextValue, Type = ConditionTypes.Regex });
             }
-            else
+            else if (Search.TextField == StorageConst.Current.TraceId || Search.TextField == StorageConst.Current.SpanId)
             {
                 list.Add(new FieldConditionDto { Name = Search.TextField, Value = Search.TextValue, Type = ConditionTypes.Equal });
             }

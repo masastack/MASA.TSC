@@ -145,6 +145,8 @@ public partial class ApmSearchComponent
 
     private void SetQueryList()
     {
+        if (GlobalConfig.CurrentTeamId == Guid.Empty)
+            GlobalConfig.CurrentTeamId = MasaUser.CurrentTeamId;
         if (textFileds.Count > 0 || StorageConst.Current == null)
             return;
         textFileds = new List<string> {
@@ -189,8 +191,7 @@ public partial class ApmSearchComponent
             Search.TextField = StorageConst.Current.TraceId;
             Search.TextValue = Search.TraceId;
         }
-        if (GlobalConfig.CurrentTeamId == Guid.Empty)
-            GlobalConfig.CurrentTeamId = MasaUser.CurrentTeamId;
+
         if (Search.Start > DateTime.MinValue && Search.End > Search.Start)
         {
             SetQuickRangeKey(Search.End - Search.Start);
@@ -203,18 +204,7 @@ public partial class ApmSearchComponent
         if (Search.Loaded && CheckUrl())
         {
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
-            return;
         }
-        _ = InvokeAsync(async () =>
-        {
-            await LoadEnvironmentAsync();
-            await LoadProjectAsync();
-            await LoadServiceTypeAsync();
-            await LoadServiceAsync();
-            await OnValueChanged();
-            await LoadEndpointAsync();
-            StateHasChanged();
-        });
     }
 
     private async Task EnableErrorExceptChange(bool selected)
@@ -282,7 +272,7 @@ public partial class ApmSearchComponent
         var result = await ApiCaller.ApmService.GetEnvironmentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End, Search.Environment!) ?? new();
         EnvironmentServices = result;
         environments = result.Keys.ToList();
-        if (!string.IsNullOrEmpty(Search.Service) && string.IsNullOrEmpty(Search.Environment))
+        if (!string.IsNullOrEmpty(Search.Service))
         {
             var findEnv = EnvironmentServices.FirstOrDefault(item => item.Value.Exists(app => app.AppId == Search.Service));
             if (string.IsNullOrEmpty(findEnv.Key))
@@ -387,7 +377,7 @@ public partial class ApmSearchComponent
 
     private async Task OnTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) times)
     {
-        if (Search.Loaded || Search.Start == DateTime.MinValue)
+        if (Search.Start == DateTime.MinValue || Search.Loaded)
         {
             Search.Start = times.start!.Value.UtcDateTime;
             Search.End = times.end!.Value.UtcDateTime;
