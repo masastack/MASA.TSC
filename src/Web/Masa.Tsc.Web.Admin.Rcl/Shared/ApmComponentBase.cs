@@ -70,10 +70,7 @@ public partial class ApmComponentBase : MasaComponentBase
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        if (IsPage)
-        {
-            await SetStorage();
-        }
+        await SetStorage();
     }
 
     protected override void OnInitialized()

@@ -201,9 +201,23 @@ public partial class ApmSearchComponent
     private void TeamChanged(Guid teamId)
     {
         GlobalConfig.CurrentTeamId = teamId;
-        if (Search.Loaded && CheckUrl())
+        if (Search.Loaded)
         {
-            NavigationManager.NavigateTo(NavigationManager.Uri, true);
+            if (CheckUrl())
+            {
+                NavigationManager.NavigateTo(NavigationManager.Uri, true);
+            }
+            else
+            {
+                _ = InvokeAsync(async () =>
+                {
+                    Search.Loaded = false;
+                    SetQueryList();
+                    await InitAsync();
+                    Search.Loaded = true;
+                    StateHasChanged();
+                });
+            }
         }
     }
 
