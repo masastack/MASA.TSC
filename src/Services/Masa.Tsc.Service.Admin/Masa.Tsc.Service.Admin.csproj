@@ -19,8 +19,8 @@
 		<PackageReference Include="Masa.Contrib.ReadWriteSplitting.Cqrs" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Ddd.Domain.Repository.EFCore" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EFCore" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.Data.EFCore.SqlServer" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.Data.UoW.EFCore" Version="$(MasaFrameworkPackageVersion)" />
+		<!--<PackageReference Include="Masa.Contrib.Data.EFCore.SqlServer" Version="$(MasaFrameworkPackageVersion)" />-->
+		<!--<PackageReference Include="Masa.Contrib.Data.UoW.EFCore" Version="$(MasaFrameworkPackageVersion)" />-->
 		<PackageReference Include="Masa.Contrib.Data.Contracts" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Isolation.MultiEnvironment" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Development.DaprStarter.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
@@ -37,21 +37,24 @@
 
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.33" />
+		<!--<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.33" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.33">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.33" />
+		
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.33">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
+		</PackageReference>-->
 		<PackageReference Include="Dapr.AspNetCore" Version="1.10.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.EFCore.PostgreSQL\Masa.Tsc.EFCore.PostgreSQL.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.EFCore.Sqlserver\Masa.Tsc.EFCore.Sqlserver.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Repository\Masa.Tsc.Repository.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Clickhouse.Apm\Masa.Tsc.Storage.Clickhouse.Apm.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Elasticsearch\Masa.Tsc.Storage.Elasticsearch.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Prometheus\Masa.Tsc.Storage.Prometheus.csproj" />
@@ -60,9 +63,6 @@
 	<ItemGroup>
 		<None Update="Dockerfile">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="init-db.txt">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 

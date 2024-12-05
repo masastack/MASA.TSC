@@ -18,9 +18,6 @@
 		<ProjectReference Include="..\Masa.Tsc.Web.Admin.Rcl\Masa.Tsc.Web.Admin.Rcl.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Update="Certificates\7348307__lonsid.cn.pfx">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
 		<None Update="Dockerfile">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

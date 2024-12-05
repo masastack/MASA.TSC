@@ -91,7 +91,7 @@ internal class DirectoryQueryHandler
         }
     }
 
-    private IEnumerable<DirectoryTreeDto> ToTree(List<Domain.Aggregates.Directory> directories, Guid parentId)
+    private IEnumerable<DirectoryTreeDto> ToTree(List<Domain.Instruments.Aggregates.Directory> directories, Guid parentId)
     {
         var children = directories.Where(t => t.ParentId == parentId).ToList();
         if (!children.Any())
