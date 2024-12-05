@@ -18,7 +18,7 @@ internal class DirectoryCommandHandler
         if (await _directoryRepository.GetCountAsync(t => t.Name == command.Name) > 0)
             throw new UserFriendlyException("Directory name {0} is exists", command.Name);
 
-        await _directoryRepository.AddAsync(new Domain.Aggregates.Directory
+        await _directoryRepository.AddAsync(new Domain.Instruments.Aggregates.Directory
         {
             Name = command.Name,
             ParentId = command.ParentId,

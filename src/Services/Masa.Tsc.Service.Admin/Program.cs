@@ -7,6 +7,10 @@ var masaStackConfig = builder.Services.GetMasaStackConfig();
 var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus")!;
 var appid = masaStackConfig.GetServiceId(MasaStackProject.TSC);
 var envAppid = $"{appid}_{masaStackConfig.Environment}";
+var connStr = masaStackConfig.GetValue(MasaStackConfigConstant.CONNECTIONSTRING);
+var dbModel = JsonSerializer.Deserialize<DbModel>(connStr)!;
+bool isPgsql = string.Equals(dbModel.DbType, "postgresql", StringComparison.CurrentCultureIgnoreCase);
+
 builder.Services.AddTraceLog()
     .AddObservable(builder.Logging, new MasaObservableOptions
     {
@@ -135,16 +139,28 @@ var app = builder.Services
     .AddDomainEventBus(dispatcherOptions =>
     {
         dispatcherOptions
-            .UseIntegrationEventBus(options =>
+        .UseIntegrationEventBus(options =>
+        {
+            options.UseDapr()
+            .UseEventBus();
+        })
+        .UseUoW<TscDbContext>(dbOptions =>
+        {
+            if (isPgsql)
             {
-                options.UseDapr()
-                //.UseEventLog<TscDbContext>()
-                .UseEventBus();
-            })
-            .UseUoW<TscDbContext>(dbOptions => dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name)).UseFilter())
-            .UseRepository<TscDbContext>();
+                var assembly = typeof(Masa.Tsc.EFCore.PostgreSQL.TscDbPgContextFactory).Assembly;
+                TscDbContext.RegistAssembly(assembly);
+                dbOptions.UsePgsql(masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name), options => options.MigrationsAssembly("Masa.Tsc.EFCore.PostgreSQL")).UseFilter();
+            }
+            else
+            {
+                TscDbContext.RegistAssembly(typeof(Masa.Tsc.EFCore.Sqlserver.TscDbSqlserverContextFactory).Assembly);
+                dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name), options => options.MigrationsAssembly("Masa.Tsc.EFCore.Sqlserver")).UseFilter();
+            }
+        })
+        .UseRepository<TscDbContext>();
     })
-    .AddServices(builder);
+    .AddServices(builder, new Assembly[] { typeof(Masa.Tsc.Repository.IDirectoryRepository).Assembly, typeof(Masa.Tsc.Service.Admin.Services.TraceService).Assembly });
 
 #if DEBUG
 app.UseSwagger();
@@ -158,7 +174,10 @@ app.UseAuthorization();
 app.UseI18n();
 app.UseIsolation();
 app.UseStackMiddleware();
-await builder.Services.MigrateAsync();
+if (isPgsql)
+    await builder.Services.MigratePgAsync();
+else
+    await builder.Services.MigrateSqlAsync();
 app.UseMasaExceptionHandler(opt =>
 {
     opt.ExceptionHandler = context =>

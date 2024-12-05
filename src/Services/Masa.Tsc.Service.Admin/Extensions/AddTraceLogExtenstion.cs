@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Service.Admin.Infrastructure.Repositories;
-
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class AddTraceLogExtenstion
@@ -27,7 +25,6 @@ public static class AddTraceLogExtenstion
         _services.AddMASAStackApmClickhouse(ConfigConst.ClikhouseConnection, ConfigConst.ClickhouseTableSuffix, ConfigConst.ClickHouseLogSourceTable, ConfigConst.ClickHouseTaceSourceTable
             , appLogSourceTable: ConfigConst.ClickHouseAppLogSourceTable, AppTraceSourceTable: ConfigConst.ClickHouseAppTraceSourceTable);
         ConfigConst.StorageSetting.SetClickhouse();
-        _services.AddScoped<IExceptErrorRepository, ExceptErrorRepository>();
     }
 
     private static void AddElasticSearch()

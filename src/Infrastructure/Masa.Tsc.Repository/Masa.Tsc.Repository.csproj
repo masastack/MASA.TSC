@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Masa.Tsc.Domain\Masa.Tsc.Domain.csproj" />
+    <ProjectReference Include="..\Masa.Tsc.EFCore\Masa.Tsc.EFCore.csproj" />
+    <ProjectReference Include="..\Masa.Tsc.Storage.Clickhouse\Masa.Tsc.Storage.Clickhouse.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Masa.Contrib.Ddd.Domain.Repository.EFCore" Version="$(MasaFrameworkPackageVersion)" />
+	</ItemGroup>
+	
+</Project>
