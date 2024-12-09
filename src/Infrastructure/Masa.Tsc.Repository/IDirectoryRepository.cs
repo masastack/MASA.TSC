@@ -3,9 +3,9 @@
 
 namespace Masa.Tsc.Repository;
 
-public interface IDirectoryRepository : IRepository<Tsc.Domain.Instruments.Aggregates.Directory>
+public interface IDirectoryRepository : IRepository<Domain.Shared.Entities.Directory>
 {
-    Task<Tuple<int, List<Tsc.Domain.Instruments.Aggregates.Directory>>> GetListIncludeInstrumentsAsync(Guid userId, int page, int pageSize, string keyword, bool isIncludeInstrument);
+    Task<Tuple<int, List<Domain.Shared.Entities.Directory>>> GetListIncludeInstrumentsAsync(Guid userId, int page, int pageSize, string keyword, bool isIncludeInstrument);
 
-    Task<Tsc.Domain.Instruments.Aggregates.Directory> GetIncludeInstrumentsAsync(Guid id);
+    Task<Domain.Shared.Entities.Directory> GetIncludeInstrumentsAsync(Guid id);
 }

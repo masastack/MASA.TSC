@@ -11,7 +11,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Masa.Tsc.Domain\Masa.Tsc.Domain.csproj" />
+	  <ProjectReference Include="..\Masa.Tsc.Domain.Shared\Masa.Tsc.Domain.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -3,9 +3,9 @@
 
 namespace Masa.Tsc.EFCore.PostgreSQL.EntityConfigurations;
 
-internal class DirectoryEntityTypeConfiguration : IEntityTypeConfiguration<Masa.Tsc.Domain.Instruments.Aggregates.Directory>
+internal class DirectoryEntityTypeConfiguration : IEntityTypeConfiguration<Domain.Shared.Entities.Directory>
 {
-    public void Configure(EntityTypeBuilder<Masa.Tsc.Domain.Instruments.Aggregates.Directory> builder)
+    public void Configure(EntityTypeBuilder<Domain.Shared.Entities.Directory> builder)
     {
         builder.HasKey(x => x.Id);
         builder.HasIndex(x => x.UserId);

@@ -16,12 +16,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Masa.Tsc.Domain\Masa.Tsc.Domain.csproj" />
 		<ProjectReference Include="..\Masa.Tsc.EFCore\Masa.Tsc.EFCore.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="appsettings.json">
+	  <None Update="migrate-pgsql.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	  <None Update="init-pg-db.txt">

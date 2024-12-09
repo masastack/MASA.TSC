@@ -2,6 +2,7 @@
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
 using Masa.Tsc.Contracts.Admin.Enums;
+using Masa.Tsc.Domain.Shared.Entities;
 
 namespace Masa.Tsc.Repository.Repositories;
 
