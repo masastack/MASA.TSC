@@ -107,8 +107,9 @@ builder.Services.AddStackMiddleware().AddHealthChecks();
 
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-    .AddEndpointsApiExplorer()
 #if DEBUG
+    .AddEndpointsApiExplorer()
+    //.AddSwaggerGen()
     .AddSwaggerGen(options =>
     {
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
@@ -146,21 +147,29 @@ var app = builder.Services
         })
         .UseUoW<TscDbContext>(dbOptions =>
         {
+            var constr = masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name);
             if (isPgsql)
             {
                 var assembly = typeof(Masa.Tsc.EFCore.PostgreSQL.TscDbPgContextFactory).Assembly;
                 TscDbContext.RegistAssembly(assembly);
-                dbOptions.UsePgsql(masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name), options => options.MigrationsAssembly("Masa.Tsc.EFCore.PostgreSQL")).UseFilter();
+                dbOptions.UsePgsql(constr, options => options.MigrationsAssembly("Masa.Tsc.EFCore.PostgreSQL")).UseFilter();
             }
             else
             {
+                if (constr.IndexOf("TrustServerCertificate=true", StringComparison.CurrentCultureIgnoreCase) < 0)
+                {
+                    if (constr.EndsWith(';'))
+                        constr = $"{constr}TrustServerCertificate=true;";
+                    else
+                        constr = $"{constr};TrustServerCertificate=true;";
+                }
                 TscDbContext.RegistAssembly(typeof(Masa.Tsc.EFCore.Sqlserver.TscDbSqlserverContextFactory).Assembly);
-                dbOptions.UseSqlServer(masaStackConfig.GetConnectionString(MasaStackProject.TSC.Name), options => options.MigrationsAssembly("Masa.Tsc.EFCore.Sqlserver")).UseFilter();
+                dbOptions.UseSqlServer(constr, options => options.MigrationsAssembly("Masa.Tsc.EFCore.Sqlserver")).UseFilter();
             }
         })
         .UseRepository<TscDbContext>();
     })
-    .AddServices(builder, new Assembly[] { typeof(Masa.Tsc.Repository.IDirectoryRepository).Assembly, typeof(Masa.Tsc.Service.Admin.Services.TraceService).Assembly });
+    .AddServices(builder, new [] { typeof(IDirectoryRepository).Assembly, typeof(Masa.Tsc.Service.Admin.Services.TraceService).Assembly });
 
 #if DEBUG
 app.UseSwagger();

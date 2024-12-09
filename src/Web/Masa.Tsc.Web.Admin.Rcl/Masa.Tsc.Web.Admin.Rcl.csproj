@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+	<PropertyGroup>		
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
@@ -16,7 +15,7 @@
 		<PackageReference Include="Mapster" Version="7.3.0" />
 		<!--<PackageReference Include="Masa.Blazor" Version="1.4.0-beta.3" />-->
 		<PackageReference Include="Masa.Stack.Components" Version="0.0.486" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="$(DotnetVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>
