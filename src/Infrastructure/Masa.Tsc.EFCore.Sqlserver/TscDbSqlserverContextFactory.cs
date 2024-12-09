@@ -10,7 +10,7 @@ public class TscDbSqlserverContextFactory : IDesignTimeDbContextFactory<TscDbCon
         var optionsBuilder = new MasaDbContextOptionsBuilder<TscDbContext>();
         var configurationBuilder = new ConfigurationBuilder();
         var configuration = configurationBuilder
-            .AddJsonFile("appsettings.json")
+            .AddJsonFile("migrate-sqlserver.json")
             .Build();
 
         optionsBuilder.DbContextOptionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection")!, b => b.MigrationsAssembly("Masa.Tsc.EFCore.Sqlserver"));

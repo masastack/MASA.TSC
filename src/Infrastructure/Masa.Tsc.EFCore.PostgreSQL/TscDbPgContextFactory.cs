@@ -11,7 +11,7 @@ public class TscDbPgContextFactory : IDesignTimeDbContextFactory<TscDbContext>
         var optionsBuilder = new MasaDbContextOptionsBuilder<TscDbContext>();
         var configurationBuilder = new ConfigurationBuilder();
         var configuration = configurationBuilder
-            .AddJsonFile("appsettings.json")
+            .AddJsonFile("migrate-pgsql.json")
             .Build();
        
         optionsBuilder.DbContextOptionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection")!, b => b.MigrationsAssembly("Masa.Tsc.EFCore.PostgreSQL"));

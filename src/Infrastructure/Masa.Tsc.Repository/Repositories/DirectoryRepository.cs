@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Service.Admin.Infrastructure.Repositories;
 
-internal class DirectoryRepository : Repository<TscDbContext, Domain.Instruments.Aggregates.Directory, Guid>, IDirectoryRepository
+internal class DirectoryRepository : Repository<TscDbContext, Domain.Shared.Entities.Directory, Guid>, IDirectoryRepository
 {
     private readonly TscDbContext _context;
 
@@ -12,17 +12,17 @@ internal class DirectoryRepository : Repository<TscDbContext, Domain.Instruments
         _context = context;
     }
 
-    public async Task<Domain.Instruments.Aggregates.Directory> GetIncludeInstrumentsAsync(Guid id)
+    public async Task<Domain.Shared.Entities.Directory> GetIncludeInstrumentsAsync(Guid id)
     {
-        return (await _context.Set<Domain.Instruments.Aggregates.Directory>().Where(item => item.Id == id).Include(d => d.Instruments!.OrderBy(d => d.Sort)).FirstOrDefaultAsync())!;
+        return (await _context.Set<Domain.Shared.Entities.Directory>().Where(item => item.Id == id).Include(d => d.Instruments!.OrderBy(d => d.Sort)).FirstOrDefaultAsync())!;
     }
 
-    public async Task<Tuple<int, List<Domain.Instruments.Aggregates.Directory>>> GetListIncludeInstrumentsAsync(Guid userId, int page, int pageSize, string keyword, bool isIncludeInstrument)
+    public async Task<Tuple<int, List<Domain.Shared.Entities.Directory>>> GetListIncludeInstrumentsAsync(Guid userId, int page, int pageSize, string keyword, bool isIncludeInstrument)
     {
         var start = page <= 1 ? 0 : (page - 1) * pageSize;
-        var query = _context.Set<Domain.Instruments.Aggregates.Directory>().AsQueryable();
+        var query = _context.Set<Domain.Shared.Entities.Directory>().AsQueryable();
 
-        List<Domain.Instruments.Aggregates.Directory> data;
+        List<Domain.Shared.Entities.Directory> data;
 
         if (isIncludeInstrument)
             data = await query.Include(d => d.Instruments!.Where(instrument => string.IsNullOrEmpty(keyword) || instrument.Name.Contains(keyword)).OrderBy(d => d.Sort)).ToListAsync();

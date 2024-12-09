@@ -3,9 +3,9 @@
 
 namespace Masa.Tsc.EFCore.Sqlserver.EntityConfigurations;
 
-internal class DirectoryEntityTypeConfiguration : IEntityTypeConfiguration<Domain.Instruments.Aggregates.Directory>
+internal class DirectoryEntityTypeConfiguration : IEntityTypeConfiguration<Domain.Shared.Entities.Directory>
 {
-    public void Configure(EntityTypeBuilder<Domain.Instruments.Aggregates.Directory> builder)
+    public void Configure(EntityTypeBuilder<Domain.Shared.Entities.Directory> builder)
     {
         builder.HasKey(x => x.Id);
         builder.HasIndex(x => x.UserId);

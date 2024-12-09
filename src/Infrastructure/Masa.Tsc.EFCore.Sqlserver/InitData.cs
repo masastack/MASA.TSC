@@ -21,7 +21,7 @@ public static class InitData
     private static async Task SeedAsync(MasaDbContext context, IServiceProvider serviceProvider)
     {
         var serviceDirectoryId = Guid.Parse("21e43ab2-a853-41df-7baf-08dae7dc60af");
-        if (await context.Set<Masa.Tsc.Domain.Instruments.Aggregates.Directory>().AnyAsync(item => item.Id == serviceDirectoryId))
+        if (await context.Set<Masa.Tsc.Domain.Shared.Entities.Directory>().AnyAsync(item => item.Id == serviceDirectoryId))
             return;
 
         try
