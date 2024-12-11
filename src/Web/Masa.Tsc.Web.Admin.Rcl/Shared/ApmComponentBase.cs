@@ -65,6 +65,7 @@ public partial class ApmComponentBase : MasaComponentBase
             StorageConst.Init(new ClickhouseStorageConst());
         else if (setting.IsElasticsearch)
             StorageConst.Init(new ElasticsearchStorageConst());
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
     }
 
     protected override async Task OnInitializedAsync()

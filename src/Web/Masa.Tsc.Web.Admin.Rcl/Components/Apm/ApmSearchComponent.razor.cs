@@ -55,6 +55,7 @@ public partial class ApmSearchComponent
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        if (StorageConst.Current == null) return;
         SetQueryList();
         if (IsEndpoint)
             await LoadAsync();
@@ -120,6 +121,7 @@ public partial class ApmSearchComponent
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        if (StorageConst.Current == null) return;
         GlobalConfig.OnCurrentTeamChanged += TeamChanged;
         SetQueryList();
     }
