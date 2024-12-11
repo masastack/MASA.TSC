@@ -55,8 +55,7 @@ public partial class ApmSearchComponent
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        if (StorageConst.Current == null) return;
-        SetQueryList();
+        if (StorageConst.Current == null) return;       
         if (IsEndpoint)
             await LoadAsync();
         if (Search.Start > DateTime.MinValue)

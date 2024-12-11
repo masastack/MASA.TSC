@@ -77,6 +77,7 @@ public partial class ApmComponentBase : MasaComponentBase
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        if (StorageConst.Current == null) return;
         if (IsPage)
         {
             Search.Loaded = false;
