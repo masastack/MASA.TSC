@@ -55,9 +55,15 @@ public partial class ApmSearchComponent
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        if (StorageConst.Current == null) return;       
+        if (StorageConst.Current == null) return;
         if (IsEndpoint)
             await LoadAsync();
+        await ReLoadAsync();
+    }
+
+    private async Task ReLoadAsync()
+    {
+        Search.Loaded = false;
         if (Search.Start > DateTime.MinValue)
         {
             await InitAsync();
@@ -66,6 +72,7 @@ public partial class ApmSearchComponent
         await OnValueChanged();
         StateHasChanged();
     }
+
 
     private void SetQuickRangeKey(TimeSpan timeSpan)
     {
@@ -145,7 +152,7 @@ public partial class ApmSearchComponent
     }
 
     private void SetQueryList()
-    {       
+    {
         if (textFileds.Count > 0 || StorageConst.Current == null)
             return;
         textFileds = new List<string> {
@@ -202,31 +209,14 @@ public partial class ApmSearchComponent
         GlobalConfig.CurrentTeamId = teamId;
         if (Search.Loaded)
         {
-            if (CheckUrl())
-            {
-                NavigationManager.NavigateTo(NavigationManager.Uri, true);
-            }
-            else
-            {
-                _ = InvokeAsync(async () =>
-                {
-                    Search.Loaded = false;
-                    SetQueryList();
-                    await InitAsync();
-                    Search.Loaded = true;
-                    StateHasChanged();
-                });
-            }
+            if (HasUrl())
+                LoadParamter();
+            _ = InvokeAsync(ReLoadAsync);
+            StateHasChanged();
         }
     }
 
-    private async Task EnableErrorExceptChange(bool selected)
-    {
-        Search.EnableExceptError = selected;
-        await OnValueChanged();
-    }
-
-    private bool CheckUrl()
+    private bool HasUrl()
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         var values = HttpUtility.ParseQueryString(uri.Query);
@@ -236,6 +226,12 @@ public partial class ApmSearchComponent
         }
         else
             return false;
+    }
+
+    private async Task EnableErrorExceptChange(bool selected)
+    {
+        Search.EnableExceptError = selected;
+        await OnValueChanged();
     }
 
     private async Task ServiceTypeChanged(string value)

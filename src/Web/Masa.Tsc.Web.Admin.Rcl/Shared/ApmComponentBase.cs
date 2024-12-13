@@ -81,54 +81,59 @@ public partial class ApmComponentBase : MasaComponentBase
         if (StorageConst.Current == null) return;
         if (IsPage)
         {
-            Search.Loaded = false;
-            if (IsServicePage)
-            {
-                Search.Project = default!;
-                Search.Service = default!;
-            }
-            if (IsServicePage || IsEndPointPage)
-            {
-                Search.Method = default!;
-                Search.Endpoint = default!;
-            }
-            Search.ExceptionType = nameof(AppTypes.Service);
-            Search.ExceptionMsg = default!;
-            Search.TraceId = default!;
-            Search.TextField = default!;
-            Search.TextValue = default!;
-            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-            var values = HttpUtility.ParseQueryString(uri.Query);
-            var start = values.Get("start");
-            var end = values.Get("end");
-
-            if (DateTime.TryParse(start, out DateTime startTime) && DateTime.TryParse(end, out DateTime endTime) && endTime > startTime)
-            {
-                Search.Start = startTime.ToDateTimeOffset(default).UtcDateTime;
-                Search.End = endTime.ToDateTimeOffset(default).UtcDateTime;
-            }
-            var service = values.Get("service");
-            var env = values.Get("env");
-            if (!string.IsNullOrEmpty(env))
-                Search.Environment = env;
-            if (!string.IsNullOrEmpty(service))
-                Search.Service = service;
-
-            var endpoint = values.Get("endpoint");
-            if (!string.IsNullOrEmpty(endpoint))
-                Search.Endpoint = endpoint;
-
-            var compare = values.Get("comparison");
-            if (Enum.TryParse(compare, out ApmComparisonTypes type))
-                Search.ComparisonType = type;
-
-            Search.TraceId = values.Get("traceId")!;
-            Search.Status = values.Get("status")!;
-            Search.Method = values.Get("method")!;
-            Search.SpanId = values.Get("spanId")!;
-            Search.ExceptionType = values.Get("ex_type")!;
-            Search.ExceptionMsg = values.Get("ex_msg")!;
+            LoadParamter();
         }
+    }
+
+    protected void LoadParamter()
+    {
+        Search.Loaded = false;
+        if (IsServicePage)
+        {
+            Search.Project = default!;
+            Search.Service = default!;
+        }
+        if (IsServicePage || IsEndPointPage)
+        {
+            Search.Method = default!;
+            Search.Endpoint = default!;
+        }
+        Search.ExceptionType = nameof(AppTypes.Service);
+        Search.ExceptionMsg = default!;
+        Search.TraceId = default!;
+        Search.TextField = default!;
+        Search.TextValue = default!;
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var values = HttpUtility.ParseQueryString(uri.Query);
+        var start = values.Get("start");
+        var end = values.Get("end");
+
+        if (DateTime.TryParse(start, out DateTime startTime) && DateTime.TryParse(end, out DateTime endTime) && endTime > startTime)
+        {
+            Search.Start = startTime.ToDateTimeOffset(default).UtcDateTime;
+            Search.End = endTime.ToDateTimeOffset(default).UtcDateTime;
+        }
+        var service = values.Get("service");
+        var env = values.Get("env");
+        if (!string.IsNullOrEmpty(env))
+            Search.Environment = env;
+        if (!string.IsNullOrEmpty(service))
+            Search.Service = service;
+
+        var endpoint = values.Get("endpoint");
+        if (!string.IsNullOrEmpty(endpoint))
+            Search.Endpoint = endpoint;
+
+        var compare = values.Get("comparison");
+        if (Enum.TryParse(compare, out ApmComparisonTypes type))
+            Search.ComparisonType = type;
+
+        Search.TraceId = values.Get("traceId")!;
+        Search.Status = values.Get("status")!;
+        Search.Method = values.Get("method")!;
+        Search.SpanId = values.Get("spanId")!;
+        Search.ExceptionType = values.Get("ex_type")!;
+        Search.ExceptionMsg = values.Get("ex_msg")!;
     }
 
     public static string GetUrlParam(string? service = default,
