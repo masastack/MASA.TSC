@@ -145,9 +145,7 @@ public partial class ApmSearchComponent
     }
 
     private void SetQueryList()
-    {
-        if (GlobalConfig.CurrentTeamId == Guid.Empty)
-            GlobalConfig.CurrentTeamId = MasaUser.CurrentTeamId;
+    {       
         if (textFileds.Count > 0 || StorageConst.Current == null)
             return;
         textFileds = new List<string> {
