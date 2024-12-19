@@ -17,6 +17,9 @@ public partial class ApmComponentBase : MasaComponentBase
     [Inject]
     public GlobalConfig GlobalConfig { get; set; } = default!;
 
+    [Inject]
+    public IMultiEnvironmentUserContext UserContext { get; set; }
+
     public static TimeZoneInfo CurrentTimeZone { get; private set; }
 
     public static ApmSearchComponent ApmSearchComponent { get; set; }

@@ -27,9 +27,6 @@ public partial class ApmSearchComponent
     public EventCallback<SearchData> ValueChanged { get; set; }
 
     [Inject]
-    public IMultiEnvironmentUserContext UserContext { get; set; }
-
-    [Inject]
     public IMemoryCache MemoryCache { get; set; }
 
     private static List<(ApmComparisonTypes value, string text)> listComparisons = new()
@@ -46,7 +43,7 @@ public partial class ApmSearchComponent
     private List<string> types = new() {
         AppTypes.UI.ToString(),
         AppTypes.Service.ToString(),
-         AppTypes.Job.ToString()
+        AppTypes.Job.ToString()
     };
 
     private QuickRangeKey quickRangeKey = QuickRangeKey.Last15Minutes;

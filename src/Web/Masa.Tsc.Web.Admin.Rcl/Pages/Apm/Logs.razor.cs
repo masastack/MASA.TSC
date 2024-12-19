@@ -38,7 +38,9 @@ public partial class Logs
         if (!string.IsNullOrEmpty(TaskId))
         {
             Search.TextField = StorageConst.Current.Log.TaskId;
+            Search.Environment = UserContext.Environment;
             Search.TextValue = TaskId;
+            await LoadAsync();
             StateHasChanged();
         }
     }
