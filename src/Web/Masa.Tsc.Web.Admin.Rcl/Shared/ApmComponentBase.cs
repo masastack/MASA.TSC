@@ -17,6 +17,8 @@ public partial class ApmComponentBase : MasaComponentBase
     [Inject]
     public GlobalConfig GlobalConfig { get; set; } = default!;
 
+    protected static Guid CurrentTeamId { get; set; }
+
     [Inject]
     public IMultiEnvironmentUserContext UserContext { get; set; }
 

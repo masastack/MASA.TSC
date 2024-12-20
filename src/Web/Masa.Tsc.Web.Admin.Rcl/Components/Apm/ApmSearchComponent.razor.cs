@@ -203,7 +203,7 @@ public partial class ApmSearchComponent
 
     private void TeamChanged(Guid teamId)
     {
-        GlobalConfig.CurrentTeamId = teamId;
+        CurrentTeamId = teamId;
         if (Search.Loaded)
         {
             if (HasUrl())
@@ -275,7 +275,7 @@ public partial class ApmSearchComponent
     private async Task LoadEnvironmentAsync()
     {
         isEnvLoading = true;
-        var result = await ApiCaller.ApmService.GetEnvironmentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End, Search.Environment!) ?? new();
+        var result = await ApiCaller.ApmService.GetEnvironmentServiceAsync(CurrentTeamId, Search.Start, Search.End, Search.Environment!) ?? new();
         EnvironmentServices = result;
         environments = result.Keys.ToList();
         if (!string.IsNullOrEmpty(Search.Service))

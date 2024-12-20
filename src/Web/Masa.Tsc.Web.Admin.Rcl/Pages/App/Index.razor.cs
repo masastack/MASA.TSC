@@ -352,7 +352,7 @@ public partial class Index
             services = new();
             return;
         }
-        _teamServices = await ApiCaller.ApmService.GetEnvironmentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End, ignoreTeam: true) ?? new();
+        _teamServices = await ApiCaller.ApmService.GetEnvironmentServiceAsync(CurrentTeamId, Search.Start, Search.End, ignoreTeam: true) ?? new();
         if (_teamServices != null && _teamServices.Count > 0)
         {
             foreach (var service in data)

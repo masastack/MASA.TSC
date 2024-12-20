@@ -32,8 +32,7 @@ public partial class Endpoint
         await base.OnInitializedAsync();
         if (!string.IsNullOrEmpty(TraceId))
         {
-            Search.TextField = StorageConst.Current.TraceId;
-            Search.TextValue = TraceId;
+            Search.TraceId = TraceId;
         }
     }
 
@@ -96,7 +95,7 @@ public partial class Endpoint
             StatusCode = Search.Status,
             //Queries = Search.Text
         };
-        var result = await ApiCaller.ApmService.GetEndpointPageAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
+        var result = await ApiCaller.ApmService.GetEndpointPageAsync(CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
         total = 0;
         if (result != null && result.Result != null && result.Result.Any())
