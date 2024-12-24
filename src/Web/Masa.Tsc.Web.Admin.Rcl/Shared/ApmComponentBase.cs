@@ -9,6 +9,9 @@ public partial class ApmComponentBase : MasaComponentBase
     public JsInitVariables JsInitVariables { get; set; }
 
     [Inject]
+    IHttpContextAccessor HttpContextAccessor { get; set; }
+
+    [Inject]
     public TscCaller ApiCaller { get; set; }
 
     [Inject]
@@ -77,7 +80,9 @@ public partial class ApmComponentBase : MasaComponentBase
     {
         await base.OnInitializedAsync();
         if (IsPage)
+        {
             await SetStorage();
+        }
     }
 
     protected override void OnInitialized()
@@ -102,12 +107,13 @@ public partial class ApmComponentBase : MasaComponentBase
         {
             Search.Method = default!;
             Search.Endpoint = default!;
+            Search.ExceptionType = nameof(AppTypes.Service);
+            Search.ExceptionMsg = default!;
+            Search.TraceId = default!;
+            Search.TextField = default!;
+            Search.TextValue = default!;
         }
-        Search.ExceptionType = nameof(AppTypes.Service);
-        Search.ExceptionMsg = default!;
-        Search.TraceId = default!;
-        Search.TextField = default!;
-        Search.TextValue = default!;
+
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         var values = HttpUtility.ParseQueryString(uri.Query);
         var start = values.Get("start");

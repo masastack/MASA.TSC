@@ -2,6 +2,8 @@
 @inherits ApmComponentBase
 @page "/apm/endpoints"
 @page "/trace/{TraceId}"
+@page "/trace/aaaa/{A}/{B?}"
+@page "/trace/c/{A?}/{B}"
 <PageTitle>@I18n.Apm("PageTitles.Endpoint")</PageTitle>
 
 <ApmSearchComponent ShowComparison @ref=ApmSearchComponent
@@ -114,3 +116,11 @@
 <MCard Rounded=true Class="px-6 py-2" Style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
     <SPagination Class="mt-2" @bind-Page="page" @bind-PageSize=defaultSize Total=total OnChange="OnPageChange" />
 </MCard>
+
+@code{
+    [Parameter]
+    public string? A { get; set; }
+
+    [Parameter]
+    public string? B { get; set; }
+}
