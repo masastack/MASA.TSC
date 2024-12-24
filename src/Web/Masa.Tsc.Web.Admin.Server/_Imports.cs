@@ -21,3 +21,5 @@ global using Microsoft.IdentityModel.Logging;
 global using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 global using System.Diagnostics;
 global using System.Security.Cryptography.X509Certificates;
+global using Masa.Contrib.StackSdks.Tsc.OpenTelemetry.Blazor;
+global using System.Reflection;

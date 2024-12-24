@@ -47,7 +47,7 @@ var redisOption = new RedisConfigurationOptions
     DefaultDatabase = masaStackConfig.RedisModel.RedisDb,
     Password = masaStackConfig.RedisModel.RedisPassword
 };
-
+BlazorRouteManager.InitRoute(Assembly.Load("Masa.Tsc.Web.Admin.Rcl"));
 #if DEBUG
 if (builder.Environment.EnvironmentName == "Development")
 {

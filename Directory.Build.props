@@ -3,6 +3,6 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<DotnetVersion>8.0</DotnetVersion>
 		<MasaFrameworkPackageVersion>1.2.0-preview.5</MasaFrameworkPackageVersion>
-		<MasaSdkPackageVersion>1.2.1-preview.9</MasaSdkPackageVersion>
+		<MasaSdkPackageVersion>1.2.1-preview.14</MasaSdkPackageVersion>
 	</PropertyGroup>
 </Project>
