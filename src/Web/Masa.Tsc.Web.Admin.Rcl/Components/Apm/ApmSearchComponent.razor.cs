@@ -280,7 +280,7 @@ public partial class ApmSearchComponent
         environments = result.Keys.ToList();
         if (!string.IsNullOrEmpty(Search.Service))
         {
-            var findEnv = EnvironmentServices.FirstOrDefault(item => item.Value.Exists(app => app.AppId == Search.Service));
+            var findEnv = EnvironmentServices.FirstOrDefault(item => (string.IsNullOrEmpty(Search.Environment) || Search.Environment == item.Key) && item.Value.Exists(app => (string.IsNullOrEmpty(Search.Project) || app.ProjectId == Search.Project) && (app.AppId == Search.Service)));
             if (string.IsNullOrEmpty(findEnv.Key))
                 Search.Service = default!;
             else
