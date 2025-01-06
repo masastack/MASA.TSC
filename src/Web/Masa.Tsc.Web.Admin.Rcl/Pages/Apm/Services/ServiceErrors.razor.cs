@@ -136,7 +136,7 @@ public partial class ServiceErrors
                 TextValue = lastSpanId,
                 Filter = SearchData.EnableExceptError
             };
-            var result = await ApiCaller.ApmService.GetErrorsPageAsync(CurrentTeamId, query, SearchData.Project, SearchData.ServiceType, string.IsNullOrEmpty(SearchData.Service));
+            var result = await ApiCaller.ApmService.GetErrorsPageAsync(GlobalConfig.CurrentTeamId, query, SearchData.Project, SearchData.ServiceType, string.IsNullOrEmpty(SearchData.Service));
             data = result?.Result?.ToList() ?? new();
             total = (int)(result?.Total ?? 0);
         }

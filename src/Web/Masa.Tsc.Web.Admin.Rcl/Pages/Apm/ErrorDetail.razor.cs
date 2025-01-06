@@ -127,7 +127,7 @@ public partial class ErrorDetail
                 var message = list.Find(item => item.Name == StorageConst.Current.ExceptionMessage)!;
                 message.Name = StorageConst.Current.Log.Body;
             }
-            var result = await ApiCaller.ApmService.GetLogListAsync(CurrentTeamId, query, Search.Project, Search.ServiceType, ignoreTeam: !string.IsNullOrEmpty(Search.TraceId) || string.IsNullOrEmpty(Search.Service));
+            var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType, ignoreTeam: !string.IsNullOrEmpty(Search.TraceId) || string.IsNullOrEmpty(Search.Service));
             if (result != null)
             {
                 if (currentPage == 1)

@@ -79,7 +79,7 @@ public partial class Errors
             TextValue = Search.TextValue,
             Filter = Search.EnableExceptError
         };
-        var result = await ApiCaller.ApmService.GetErrorsPageAsync(CurrentTeamId, query, Search.Project, Search.ServiceType);
+        var result = await ApiCaller.ApmService.GetErrorsPageAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
         total = 0;
         if (result != null)

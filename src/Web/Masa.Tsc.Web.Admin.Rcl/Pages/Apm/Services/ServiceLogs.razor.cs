@@ -165,7 +165,7 @@ public partial class ServiceLogs
             if (Search.EnableExceptError)
                 list.Add(new FieldConditionDto { Name = nameof(ApmErrorRequestDto.Filter), Value = true, Type = ConditionTypes.Equal });
             query.Conditions = list;
-            var result = await ApiCaller.ApmService.GetLogListAsync(CurrentTeamId, query, SearchData.Project, SearchData.ServiceType, string.IsNullOrEmpty(SearchData.Service));
+            var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, SearchData.Project, SearchData.ServiceType, string.IsNullOrEmpty(SearchData.Service));
             data.Clear();
             total = 0;
             if (result != null)

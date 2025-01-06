@@ -105,7 +105,7 @@ public partial class ServiceEndpoints
             Env = SearchData.Environment,
             IsDesc = sortBy
         };
-        var result = await ApiCaller.ApmService.GetEndpointPageAsync(CurrentTeamId, query, Search.Project, Search.ServiceType);
+        var result = await ApiCaller.ApmService.GetEndpointPageAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
         total = 0;
         if (result != null && result.Result != null && result.Result.Any())
