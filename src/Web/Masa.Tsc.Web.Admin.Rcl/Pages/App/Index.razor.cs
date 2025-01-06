@@ -35,6 +35,7 @@ public partial class Index
     private bool dataLoading = false;
     private bool isNeedSetPosition = false;
     private static readonly Regex webviewReg = new(@"Chrome/(\d+\.?)+", default, TimeSpan.FromSeconds(1));
+    protected override bool IsPage => true;
 
     public static EnvironmentAppDto? GetService(string service)
     {
@@ -255,7 +256,7 @@ public partial class Index
     }
 
     private async Task OnAutoTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) time)
-    {       
+    {
         (start, end) = (time.start!.Value.UtcDateTime, time.end!.Value.UtcDateTime);
         data.Clear();
         await InvokeAsync(async () =>
@@ -313,7 +314,7 @@ public partial class Index
             query.Start = query.End.AddMinutes(-seconds);
 
         var traces = await ApiCaller.ApmService.GetTraceListAsync(query);
-        await SetDeviceModel(traces.Result?.LastOrDefault());
+        await SetDeviceModel(traces.Result?.LastOrDefault(item => item.Attributes.ContainsKey("client.type")));
         SetTraceData(traces.Result!);
         await LoadLog(traces.Result?.Select(item => item.TraceId).Distinct().ToList()!);
         if (currentTrace == null && data.Count > 0)
@@ -500,7 +501,7 @@ public partial class Index
         await JSRuntime.InvokeVoidAsync(JsInteropConstants.Copy, $"{NavigationManager.BaseUri}{str}");
         await PopupService.EnqueueSnackbarAsync("分享连接复制成功", AlertTypes.Success, true);
     }
-    
+
     bool showNormalClient = false;
     private void ShowHideHttpTrace()
     {

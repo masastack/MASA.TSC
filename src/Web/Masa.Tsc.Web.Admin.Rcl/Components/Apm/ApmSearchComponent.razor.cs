@@ -70,7 +70,6 @@ public partial class ApmSearchComponent
         StateHasChanged();
     }
 
-
     private void SetQuickRangeKey(TimeSpan timeSpan)
     {
         var minutes = (int)timeSpan.TotalMinutes;
@@ -124,6 +123,7 @@ public partial class ApmSearchComponent
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        CurrentTeamId = GlobalConfig.CurrentTeamId;
         if (StorageConst.Current == null) return;
         GlobalConfig.OnCurrentTeamChanged += TeamChanged;
         SetQueryList();
@@ -203,6 +203,8 @@ public partial class ApmSearchComponent
 
     private void TeamChanged(Guid teamId)
     {
+        if (CurrentTeamId == teamId)
+            return;
         CurrentTeamId = teamId;
         if (Search.Loaded)
         {
