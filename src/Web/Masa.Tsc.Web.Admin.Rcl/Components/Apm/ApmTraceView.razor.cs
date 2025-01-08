@@ -69,4 +69,13 @@ public partial class ApmTraceView
     {
         await JSRuntime.InvokeVoidAsync("open", LinkUrl, "_blank");
     }
+
+    private void ShowJwt(string value) {
+        showJwt = true;
+        jwtValue = value;
+        StateHasChanged();
+    }
+
+    private bool showJwt = false;
+    private string? jwtValue = default;
 }

@@ -6,6 +6,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Components\Apm\JwtBearaToken.razor.cs" />
+	  <Compile Remove="Components\Apm\MMonacoEditor.razor.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Components\Apm\ApmJwtBearaToken.razor.cs" />
+	  <Content Include="Components\Apm\MonacoEditor.razor.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<SupportedPlatform Include="browser" />
 	</ItemGroup>
 

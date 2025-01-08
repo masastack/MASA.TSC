@@ -245,6 +245,7 @@ public partial class Index
     private async Task ServiceChange(string service)
     {
         serviceName = service;
+        ClearData();
         await LoadTrace();
     }
 
@@ -353,7 +354,7 @@ public partial class Index
             services = new();
             return;
         }
-        _teamServices = await ApiCaller.ApmService.GetEnvironmentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End, ignoreTeam: true) ?? new();
+        _teamServices = await ApiCaller.ApmService.GetEnvironmentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End, ignoreTeam: true);
         if (_teamServices != null && _teamServices.Count > 0)
         {
             foreach (var service in data)
