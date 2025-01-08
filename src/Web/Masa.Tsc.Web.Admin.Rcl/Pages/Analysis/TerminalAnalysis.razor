@@ -87,26 +87,42 @@
     </MRow>
 </MSticky>
 
-@if (_allData.Count > 0)
-{
-    <MRow Dense>
+<MRow Dense>
+    @if (_platforms.Count > 0)
+    {
         <MCol Cols="12" Md="6">
             <MECharts Class="white rounded pa-4" Option="@_platformOption" Height="500"/>
         </MCol>
+    }
+    
+    @if (_brands.Count > 0)
+    {
         <MCol Cols="12" Md="6">
             <MECharts Class="white rounded pa-4" Option="@_brandOption" Height="500"/>
         </MCol>
+    }
+    
+    @if (_appVersions.Count > 0)
+    {
         <MCol Cols="12" Md="4">
             <MECharts Class="white rounded pa-4 pb-0" Option="@_appVersionOption" Height="1000"/>
         </MCol>
+    }
+    
+    @if (_devices.Count > 0)
+    {
         <MCol Cols="12" Md="4">
             <MECharts Class="white rounded pa-4 pb-0" Option="@_deviceOption" Height="1000"/>
         </MCol>
+    }
+    
+    @if (_models.Count > 0)
+    {
         <MCol Cols="12" Md="4">
             <MECharts Class="white rounded pa-4 pb-0" Option="@_modelOption" Height="1000"/>
         </MCol>
-    </MRow>
-}
+    }
+</MRow>
 
 @code {
 
@@ -124,11 +140,11 @@
 
     private void OnFilter()
     {
-        RefreshPlatformECharts();
-        RefreshBrandECharts();
-        RefreshAppVersionECharts();
-        RefreshDeviceECharts();
-        RefreshModelECharts();
+        Task.Run(RefreshPlatformECharts);
+        Task.Run(RefreshBrandECharts);
+        Task.Run(RefreshAppVersionECharts);
+        Task.Run(RefreshDeviceECharts);
+        Task.Run(RefreshModelECharts);
     }
 
 }
