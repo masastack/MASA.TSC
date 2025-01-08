@@ -408,3 +408,15 @@ div[style*="visibility: hidden; opacity: 0;"] {
 .m-breadcrumbs__item {
     max-width: 600px !important
 }
+
+.m-sticky--fixed .analysis__filter {
+    box-shadow: 0 18px 40px rgba(112, 144, 176, 0.12);
+}
+
+.analysis__filter {
+    padding: 12px;
+    margin: 0 0 8px 0;
+    border-radius: 4px;
+    background-color: white;
+    transition: all 0.3s ease;
+}
