@@ -1,16 +1,17 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 {
-    public partial class TerminalAnalysis
+    public partial class TerminalAnalysis : IDisposable
     {
-        [Inject] private IConfiguration Configuration { get; set; } = null!;
-
         [Inject] private IPopupService PopupService { get; set; } = null!;
+
+        [Inject] private IHttpClientFactory HttpClientFactory { get; set; } = null!;
 
         private object _brandOption = new { };
         private object _platformOption = new { };
@@ -20,151 +21,135 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private const int Take = 50;
 
-        private List<DataItem> _allData = [];
+        private GraphQLHttpClient _graphClient = null!;
+
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+
+            var httpClient = HttpClientFactory.CreateClient("analysis");
+            _graphClient = new GraphQLHttpClient("http://10.130.0.33:4000/cubejs-api/graphql",
+                new SystemTextJsonSerializer(),
+                httpClient: httpClient);
+        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                
-                var token = Configuration.GetValue<string>("CUBE_JWT_TOKEN");
-                if (string.IsNullOrWhiteSpace(token))
-                {
-                    await PopupService.EnqueueSnackbarAsync("token未找到, 请检查配置", AlertTypes.Error);
-                    return;
-                }
-
-                var httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Add("Authorization", $"bearer {token}");
-                httpClient.DefaultRequestHeaders.Add("X-Request-Type", "GraphQL");
-
-                try
-                {
-                    PopupService.ShowProgressLinear();
-                    var graphClient = new GraphQLHttpClient("http://10.130.0.33:4000/cubejs-api/graphql",
-                        new SystemTextJsonSerializer(),
-                        httpClient: httpClient);
-
-                    var response = await graphClient.SendQueryAsync<Data>(GetQuery());
-                    _allData = response.Data.Items;
-
-                    OnFilter();
-                    StateHasChanged();
-                }
-                catch (Exception e)
-                {
-                    await PopupService.EnqueueSnackbarAsync(title: "获取数据失败", content: e.Message, AlertTypes.Error);
-                }
-                finally
-                {
-                    PopupService.HideProgressLinear();
-                }
+                OnFilter();
             }
         }
 
-        private IEnumerable<DataItem> ComputedData
+        private async Task RefreshBrandECharts()
         {
-            get
-            {
-                return _allData
-                    .Where(u => _selectedPlatforms.Count == 0 || _selectedPlatforms.Contains(u.DeviceVisit.Platform))
-                    .Where(u => _selectedBrands.Count == 0 || _selectedBrands.Contains(u.DeviceVisit.Brand))
-                    .Where(u => _selectedModels.Count == 0 || _selectedModels.Contains(u.DeviceVisit.Model))
-                    .Where(u => _selectedDevices.Count == 0 || _selectedDevices.Contains(u.DeviceVisit.Device))
-                    .Where(u => _selectedAppVersions.Count == 0 ||
-                                _selectedAppVersions.Contains(u.DeviceVisit.AppVersion));
-            }
-        }
+            var dataItems = await QueryAsync("brand");
 
-        private void RefreshBrandECharts()
-        {
-            var brandData = ComputedData
-                .GroupBy(u => u.DeviceVisit.Brand)
-                .ToDictionary(g => g.Key, v => v.Sum(u => u.DeviceVisit.Qty));
+            var data = dataItems.OrderByDescending(u => u.DeviceVisit.Qty).ToList();
 
             if (_brands.Count == 0)
             {
-                _brands = brandData.Keys.Order().ToList();
+                _brands = data.Select(u => u.DeviceVisit.Brand).ToList();
             }
 
-            var data = brandData
-                .OrderByDescending(u => u.Value)
-                .Select(item => new
+            var items = data
+                .Select(u => new
                 {
-                    name = item.Key,
-                    value = item.Value,
+                    name = u.DeviceVisit.Brand,
+                    value = u.DeviceVisit.Qty,
                     itemStyle = new
                     {
-                        color = TerminalAnalysisData.KnowBrandColor.GetValueOrDefault(item.Key)
+                        color = TerminalAnalysisData.KnowBrandColor.GetValueOrDefault(u.DeviceVisit.Brand)
                     }
-                });
+                })
+                .ToList();
 
-            _brandOption = GetPieOption("品牌", data);
+            _brandOption = GetPieOption("品牌", items);
+
+            await InvokeAsync(StateHasChanged);
         }
 
-        private void RefreshPlatformECharts()
+        private async Task<List<DataItem>> QueryAsync(string type)
         {
-            var platformData = ComputedData
-                .GroupBy(u => u.DeviceVisit.Platform)
-                .ToDictionary(g => g.Key, v => v.Sum(u => u.DeviceVisit.Qty));
+            try
+            {
+                var query = GetQuery(type);
+                var result = await _graphClient.SendQueryAsync<Data>(query);
+                return result.Data.Items;
+            }
+            catch (Exception e)
+            {
+                await PopupService.EnqueueSnackbarAsync("查询失败", e.Message, AlertTypes.Error);
+                return [];
+            }
+        }
+
+        private async Task RefreshPlatformECharts()
+        {
+            var dataItems = await QueryAsync("platform");
+
+            var data = dataItems.OrderByDescending(u => u.DeviceVisit.Qty).ToList();
 
             if (_platforms.Count == 0)
             {
-                _platforms = platformData.Keys.Order().ToList();
+                _platforms = data.Select(u => u.DeviceVisit.Platform).ToList();
             }
 
-            var data = platformData
-                .OrderByDescending(u => u.Value)
-                .Select(item => new
+            var items = data
+                .Select(u => new
                 {
-                    name = item.Key,
-                    value = item.Value,
+                    name = u.DeviceVisit.Platform,
+                    value = u.DeviceVisit.Qty,
                     itemStyle = new
                     {
-                        color = TerminalAnalysisData.KnowPlatformColor.GetValueOrDefault(item.Key)
+                        color = TerminalAnalysisData.KnowPlatformColor.GetValueOrDefault(u.DeviceVisit.Platform)
                     }
-                });
-            _platformOption = GetPieOption("平台", data);
+                })
+                .ToList();
+
+            _platformOption = GetPieOption("平台", items);
+
+            await InvokeAsync(StateHasChanged);
         }
 
-        private void RefreshModelECharts()
+        private async Task RefreshModelECharts()
         {
-            var modelData = ComputedData
-                .GroupBy(u => u.DeviceVisit.Model)
-                .ToDictionary(g => g.Key, v => v.Sum(u => u.DeviceVisit.Qty));
-
-            var data = modelData
-                .OrderByDescending(u => u.Value)
-                .ToList();
+            var dataItems = await QueryAsync("modle");
 
             if (_models.Count == 0)
             {
-                _models = data.Select(u => u.Key).ToList();
+                _models = dataItems.OrderByDescending(u => u.DeviceVisit.Qty)
+                    .Select(u => u.DeviceVisit.Model).ToList();
             }
+
+            var dict = dataItems.ToDictionary(u => u.DeviceVisit.Model, u => u.DeviceVisit.Qty);
+
+            var data = dict
+                .OrderByDescending(u => u.Value)
+                .ToList();
 
             var newData = data.Take(Take).OrderBy(u => u.Value).ToList();
             var sumOfOther = data.Skip(Take).Sum(u => u.Value);
             if (sumOfOther > 0)
             {
-                newData.Insert(0, new KeyValuePair<string, int>($"剩余（{data.Count - Take}）", sumOfOther));
+                newData.Insert(0,
+                    new KeyValuePair<string, int>($"剩余（{data.Count - Take}）", sumOfOther));
             }
 
             var max = Math.Max(TryGetMaxQty(data), sumOfOther / 3);
 
-            _modelOption = GetBarOption(
-                "机型",
-                newData.Select(u => u.Key).ToArray(),
-                newData.Select(u => u.Value).ToArray(),
-                max);
+            _modelOption = GetBarOption("机型", newData.Select(u => u.Key), newData.Select(u => u.Value), max);
+
+            await InvokeAsync(StateHasChanged);
         }
 
-        private void RefreshDeviceECharts()
+        private async Task RefreshDeviceECharts()
         {
-            var deviceData = ComputedData
-                .GroupBy(u => u.DeviceVisit.Device)
-                .ToDictionary(g => g.Key, v => v.Sum(u => u.DeviceVisit.Qty));
+            var dataItems = await QueryAsync("devicever");
 
-            var data = deviceData
+            var dict = dataItems.ToDictionary(u => u.DeviceVisit.Device, u => u.DeviceVisit.Qty);
+
+            var data = dict
                 .OrderByDescending(u => u.Value)
                 .ToList();
 
@@ -182,30 +167,24 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
             var max = TryGetMaxQty(data);
 
-            _deviceOption = GetBarOption(
-                "系统版本",
-                newData.Select(u => u.Key).ToArray(),
-                newData.Select(u => u.Value).ToArray(),
-                max);
+            _deviceOption = GetBarOption("系统版本", newData.Select(u => u.Key).ToArray(),
+                newData.Select(u => u.Value).ToArray(), max);
+
+            await InvokeAsync(StateHasChanged);
         }
 
-        private static int TryGetMaxQty(List<KeyValuePair<string, int>> data)
+        private async Task RefreshAppVersionECharts()
         {
-            return data.Count != 0 ? (int)(data.Max(u => u.Value) * 1.1) : 0;
-        }
+            var dataItems = await QueryAsync("appversion");
 
-        private void RefreshAppVersionECharts()
-        {
-            var appVersionData = ComputedData
-                .GroupBy(u => u.DeviceVisit.AppVersion)
-                .ToDictionary(g => g.Key, v => v.Sum(u => u.DeviceVisit.Qty));
+            var dict = dataItems.ToDictionary(u => u.DeviceVisit.AppVersion, u => u.DeviceVisit.Qty);
 
             if (_appVersions.Count == 0)
             {
-                _appVersions = appVersionData.OrderByDescending(u => u.Value).Select(u => u.Key).ToList();
+                _appVersions = dict.OrderByDescending(u => u.Value).Select(u => u.Key).ToList();
             }
 
-            var data = appVersionData
+            var data = dict
                 .OrderBy(u => u.Value)
                 .ToList();
 
@@ -216,6 +195,13 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
                 data.Select(u => u.Key).ToArray(),
                 data.Select(u => u.Value).ToArray(),
                 max);
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        private static int TryGetMaxQty(List<KeyValuePair<string, int>> data)
+        {
+            return data.Count != 0 ? (int)(data.Max(u => u.Value) * 1.1) : 0;
         }
 
         private static object GetPieOption(string name, IEnumerable<object> data)
@@ -320,19 +306,46 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             };
         }
 
-        private static GraphQLHttpRequest GetQuery()
+        private GraphQLHttpRequest GetQuery(string type)
         {
+            List<string> filters = [];
+
+            if (_selectedPlatforms.Count > 0)
+            {
+                filters.Add("{platform: {in: [" + string.Join(", ", _selectedPlatforms.Select(u => $"\"{u}\"")) +
+                            "]}}");
+            }
+
+            if (_selectedBrands.Count > 0)
+            {
+                filters.Add("{brand: {in: [" + string.Join(", ", _selectedBrands.Select(u => $"\"{u}\"")) + "]}}");
+            }
+
+            if (_selectedModels.Count > 0)
+            {
+                filters.Add("{modle: {in: [" + string.Join(", ", _selectedModels.Select(u => $"\"{u}\"")) + "]}}");
+            }
+
+            if (_selectedDevices.Count > 0)
+            {
+                filters.Add("{devicever: {in: [" + string.Join(", ", _selectedDevices.Select(u => $"\"{u}\"")) + "]}}");
+            }
+
+            if (_selectedAppVersions.Count > 0)
+            {
+                filters.Add("{appversion: {in: [" + string.Join(", ", _selectedAppVersions.Select(u => $"\"{u}\"")) +
+                            "]}}");
+            }
+
+            var filter = string.Join(", ", filters);
+
             return new GraphQLHttpRequest(
                 $$"""
                     query {
                       cube {
-                        devicevisit {
+                        devicevisit(where: {AND: [{{filter}}]}) {
                           qty
-                          brand
-                          platform
-                          modle
-                          devicever
-                          appversion  
+                          {{type}}
                         }
                       }
                     }
@@ -354,5 +367,10 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             string Device,
             string AppVersion,
             int Qty);
+
+        public void Dispose()
+        {
+            _graphClient.Dispose();
+        }
     }
 }

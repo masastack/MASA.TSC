@@ -10,6 +10,13 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddRcl().AddScoped<TokenProvider>();
 
+builder.Services.AddHttpClient("analysis", client =>
+{
+    var token = builder.Configuration.GetValue<string>("CUBE_JWT_TOKEN");
+    client.DefaultRequestHeaders.Add("Authorization", $"bearer {token}");
+    client.DefaultRequestHeaders.Add("X-Request-Type", "GraphQL");
+});
+
 builder.Services.Configure<JsonOptions>(option =>
 {
     option.JsonSerializerOptions.Converters.Add(new QueryResultDataResponseConverter());

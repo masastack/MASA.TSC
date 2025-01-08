@@ -3,45 +3,38 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 {
-    public static class TerminalAnalysisData
+    internal static class TerminalAnalysisData
     {
-        private const string KnowBrandColorJson
-            = """
-              {
-                  "华为": "#ff4d4f",
-                  "vivo": "#66b3ff",
-                  "OPPO": "#66ff66",
-                  "荣耀": "#99ccff",
-                  "Apple": "#333333",
-                  "小米": "#ff9f00",
-                  "realme": "#ffe74c",
-                  "一加": "#ff6b6b",
-                  "三星": "#6699ff",
-                  "Motorola": "#cd5c5c",
-                  "中兴": "#6699ff",
-                  "努比亚": "#ff6666",
-                  "黑鲨": "#4d4d4d",
-                  "酷派": "#6699ff",
-                  "联想": "#4d4d4d",
-                  "索尼": "#4d4d4d",
-                  "坚果": "#ff6666",
-                  "华硕": "#ff6666"
-              }
-              """;
+        private static readonly string[] EchartsBuiltInColor =
+            ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"];
 
-        private const string KnowPlatformColorJson
-            = """
-              {
-                "Android": "#c9d89a",
-                "iOS": "#333333",
-                "HarmonyOS": "#66a3ff"
-              }
-              """;
+        private static readonly string[] KnowBrands =
+        [
+            "华为", "vivo", "OPPO", "荣耀", "Apple", "小米", "realme", "一加", "三星", "Motorola", "中兴", "努比亚", "黑鲨", "酷派", "联想",
+            "索尼", "坚果", "华硕"
+        ];
 
-        public static IReadOnlyDictionary<string, string> KnowBrandColor { get; } =
-            JsonSerializer.Deserialize<Dictionary<string, string>>(KnowBrandColorJson)!;
+        private static readonly string[] KnowPlatforms = ["Android", "iOS", "HarmonyOS"];
 
-        public static IReadOnlyDictionary<string, string> KnowPlatformColor { get; } =
-            JsonSerializer.Deserialize<Dictionary<string, string>>(KnowPlatformColorJson)!;
+        static TerminalAnalysisData()
+        {
+            for (int i = 0; i < KnowBrands.Length; i++)
+            {
+                var brand = KnowBrands[i];
+                var colorIndex = i % EchartsBuiltInColor.Length;
+                KnowBrandColor[brand] = EchartsBuiltInColor[colorIndex];
+            }
+
+            for (int i = 0; i < KnowPlatforms.Length; i++)
+            {
+                var platform = KnowPlatforms[i];
+                var colorIndex = i % EchartsBuiltInColor.Length;
+                KnowPlatformColor[platform] = EchartsBuiltInColor[colorIndex];
+            }
+        }
+
+        internal static Dictionary<string, string> KnowBrandColor { get; } = [];
+
+        internal static Dictionary<string, string> KnowPlatformColor { get; } = [];
     }
 }
