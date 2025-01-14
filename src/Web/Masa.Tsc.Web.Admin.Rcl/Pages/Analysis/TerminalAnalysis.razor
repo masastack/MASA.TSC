@@ -1,0 +1,150 @@
+﻿@page "/analysis/terminal"
+
+<MSticky OffsetTop="96">
+    <MRow Dense Class="analysis__filter">
+        <MInputsFilter OnFieldChanged="OnFilter">
+            <MCol Cols="12" Sm="12" Md="6">
+                <MAutocomplete @bind-Value="@_selectedPlatforms"
+                               Items="@_platforms"
+                               ItemText="p => p"
+                               ItemValue="p => p"
+                               Clearable
+                               Chips
+                               DeletableChips
+                               SmallChips
+                               Dense
+                               Multiple
+                               HideDetails="true"
+                               Label="平台"
+                               Outlined>
+                </MAutocomplete>
+            </MCol>
+            <MCol Cols="12" Sm="12" Md="6">
+                <MAutocomplete @bind-Value="@_selectedBrands"
+                               Items="@_brands"
+                               ItemText="p => p"
+                               ItemValue="p => p"
+                               Clearable
+                               Chips
+                               DeletableChips
+                               SmallChips
+                               Dense
+                               Multiple
+                               HideDetails="true"
+                               Label="品牌"
+                               Outlined>
+                </MAutocomplete>
+            </MCol>
+            <MCol Cols="12" Sm="12" Md="4">
+                <MAutocomplete @bind-Value="@_selectedAppVersions"
+                               Items="@_appVersions"
+                               ItemText="p => p"
+                               ItemValue="p => p"
+                               Clearable
+                               Chips
+                               DeletableChips
+                               SmallChips
+                               Dense
+                               Multiple
+                               HideDetails="true"
+                               Label="APP 版本"
+                               Outlined>
+                </MAutocomplete>
+            </MCol>
+            <MCol Cols="12" Sm="12" Md="4">
+                <MAutocomplete @bind-Value="@_selectedDevices"
+                               Items="@_devices"
+                               ItemText="p => p"
+                               ItemValue="p => p"
+                               Clearable
+                               Chips
+                               DeletableChips
+                               SmallChips
+                               Dense
+                               Multiple
+                               HideDetails="true"
+                               Label="系统版本"
+                               Outlined>
+                </MAutocomplete>
+            </MCol>
+            <MCol Cols="12" Sm="12" Md="4">
+                <MAutocomplete @bind-Value="@_selectedModels"
+                               Items="@_models"
+                               ItemText="p => p"
+                               ItemValue="p => p"
+                               Clearable
+                               Chips
+                               DeletableChips
+                               SmallChips
+                               Dense
+                               Multiple
+                               HideDetails="true"
+                               Label="机型"
+                               Outlined>
+                </MAutocomplete>
+            </MCol>
+        </MInputsFilter>
+    </MRow>
+</MSticky>
+
+<MRow Dense>
+    @if (_platforms.Count > 0)
+    {
+        <MCol Cols="12" Md="6">
+            <MECharts Class="white rounded pa-4" Option="@_platformOption" Height="500"/>
+        </MCol>
+    }
+    
+    @if (_brands.Count > 0)
+    {
+        <MCol Cols="12" Md="6">
+            <MECharts Class="white rounded pa-4" Option="@_brandOption" Height="500"/>
+        </MCol>
+    }
+    
+    @if (_appVersions.Count > 0)
+    {
+        <MCol Cols="12" Md="4">
+            <MECharts Class="white rounded pa-4 pb-0" Option="@_appVersionOption" Height="1000"/>
+        </MCol>
+    }
+    
+    @if (_devices.Count > 0)
+    {
+        <MCol Cols="12" Md="4">
+            <MECharts Class="white rounded pa-4 pb-0" Option="@_deviceOption" Height="1000"/>
+        </MCol>
+    }
+    
+    @if (_models.Count > 0)
+    {
+        <MCol Cols="12" Md="4">
+            <MECharts Class="white rounded pa-4 pb-0" Option="@_modelOption" Height="1000"/>
+        </MCol>
+    }
+</MRow>
+
+@code {
+
+    private IList<string> _brands = [];
+    private IList<string> _models = [];
+    private IList<string> _platforms = [];
+    private IList<string> _appVersions = [];
+    private IList<string> _devices = [];
+
+    private IList<string> _selectedBrands = [];
+    private IList<string> _selectedModels = [];
+    private IList<string> _selectedPlatforms = [];
+    private IList<string> _selectedAppVersions = [];
+    private IList<string> _selectedDevices = [];
+
+    private void OnFilter()
+    {
+        Task.Run(RefreshPlatformECharts);
+        Task.Run(RefreshBrandECharts);
+        Task.Run(RefreshAppVersionECharts);
+        Task.Run(RefreshDeviceECharts);
+        Task.Run(RefreshModelECharts);
+    }
+
+}
