@@ -9,7 +9,7 @@ using Timer = System.Timers.Timer;
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 {
-    public partial class AppVisitAnalysis : IDisposable
+    public partial class AppVisitAnalysis : TscComponentBase
     {
         [Inject] private IHttpClientFactory HttpClientFactory { get; set; } = null!;
 
@@ -120,10 +120,10 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private async Task RefreshMapDataAsync()
         {
-            var response = await _graphClient.SendQueryAsync<Data<AreaVisitItem>>(GetMapDataQuery());
+            var response = await _graphClient.SendQueryAsync<CubeData<AreaVisitItem>>(GetMapDataQuery());
             var data = response.Data.Items.Select(x => new
             {
-                name = ADCodeName[x.AreaVisit.ADCode],
+                name = TerminalAnalysisData.ADCodeName[x.AreaVisit.ADCode],
                 value = x.AreaVisit.Pv,
                 uv = x.AreaVisit.Uv,
                 uvt = x.AreaVisit.Uvt
@@ -135,7 +135,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private async Task RefreshAppVisitHourAsync()
         {
-            var response = await _graphClient.SendQueryAsync<Data<AppVisitHourItem>>(GetAppVisitHourQuery());
+            var response = await _graphClient.SendQueryAsync<CubeData<AppVisitHourItem>>(GetAppVisitHourQuery());
 
             var x = response.Data.Items.Select(u => u.AppVisitHour.TimeKey).ToArray();
             var tuv = response.Data.Items.Select(u => u.AppVisitHour.Tuv).ToArray();
@@ -164,7 +164,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private async Task<object> RefreshAppVisitPageAsync(AppVisitType type)
         {
-            var response = await _graphClient.SendQueryAsync<Data<AppVisitPageItem>>(GetAppVisitPageQuery(type));
+            var response = await _graphClient.SendQueryAsync<CubeData<AppVisitPageItem>>(GetAppVisitPageQuery(type));
             var data = response.Data.Items.Select(x => new
             {
                 x.AppVisitPage.Path,
@@ -191,7 +191,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
         private async Task<AppVisit> GetAppVisitAsync(AppVisitType type)
         {
             var query = GetAppVisitQuery(type);
-            var response = await _graphClient.SendQueryAsync<Data<AppVisitItem>>(query);
+            var response = await _graphClient.SendQueryAsync<CubeData<AppVisitItem>>(query);
             return response.Data.Items.First().AppVisit;
         }
 
@@ -500,6 +500,21 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             return (first + 1) * (int)Math.Pow(10, length - 1);
         }
 
+        protected override ValueTask DisposeAsyncCore()
+        {
+            _graphClient.Dispose();
+
+            if (_timer != null)
+            {
+                _timer.Stop();
+                _timer.Elapsed -= TimerOnElapsed;
+                _timer.Dispose();
+                _timer = null;
+            }
+
+            return base.DisposeAsyncCore();
+        }
+
         private enum AppVisitType
         {
             /// <summary>
@@ -522,8 +537,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             /// </summary>
             Aliverate
         }
-
-        private record Data<T>([property: JsonPropertyName("cube")] List<T> Items) where T : class;
 
         private record AppVisitItem(
             [property: JsonPropertyName("appinitvisit")]
@@ -559,56 +572,5 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             AppVisitPage AppVisitPage);
 
         private record AppVisitPage(string Path, int Count, double Rate);
-
-        private static IReadOnlyDictionary<string, string> ADCodeName = new Dictionary<string, string>()
-        {
-            { "110000", "北京" },
-            { "120000", "天津" },
-            { "130000", "河北" },
-            { "140000", "山西" },
-            { "150000", "内蒙古" },
-            { "210000", "辽宁" },
-            { "220000", "吉林" },
-            { "230000", "黑龙江" },
-            { "310000", "上海" },
-            { "320000", "江苏" },
-            { "330000", "浙江" },
-            { "340000", "安徽" },
-            { "350000", "福建" },
-            { "360000", "江西" },
-            { "370000", "山东" },
-            { "410000", "河南" },
-            { "420000", "湖北" },
-            { "430000", "湖南" },
-            { "440000", "广东" },
-            { "450000", "广西" },
-            { "460000", "海南" },
-            { "500000", "重庆" },
-            { "510000", "四川" },
-            { "520000", "贵州" },
-            { "530000", "云南" },
-            { "540000", "西藏" },
-            { "610000", "陕西" },
-            { "620000", "甘肃" },
-            { "630000", "青海" },
-            { "640000", "宁夏" },
-            { "650000", "新疆" },
-            { "710000", "台湾" },
-            { "810000", "香港" },
-            { "820000", "澳门" }
-        };
-
-        public void Dispose()
-        {
-            _graphClient.Dispose();
-
-            if (_timer != null)
-            {
-                _timer.Stop();
-                _timer.Elapsed -= TimerOnElapsed;
-                _timer.Dispose();
-                _timer = null;
-            }
-        }
     }
 }

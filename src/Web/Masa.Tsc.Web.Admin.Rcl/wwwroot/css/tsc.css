@@ -416,7 +416,7 @@ div[style*="visibility: hidden; opacity: 0;"] {
 .analysis__filter {
     padding: 12px;
     margin: 0 0 8px 0;
-    border-radius: 4px;
+    border-radius: 20px;
     background-color: white;
     transition: all 0.3s ease;
 }

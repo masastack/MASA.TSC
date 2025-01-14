@@ -1,11 +1,12 @@
 ﻿@page "/analysis/appvisit"
+@inherits TscComponentBase
 
 <MRow Dense>
     <MCol Cols="12" Class="d-flex align-center justify-end">
         <MMenu>
             <ActivatorContent>
                 <MButton Plain Small @attributes="@context.Attrs">
-                    每@(_interval)分钟刷新一次，上次刷新时间：@_lastRefreshTime.ToString("HH:mm:ss")
+                    每@(_interval)分钟刷新一次，上次刷新时间：@_lastRefreshTime.Add(CurrentTimeZone.BaseUtcOffset).ToString("HH:mm:ss")
                 </MButton>
             </ActivatorContent>
             <ChildContent>
@@ -25,53 +26,50 @@
                  Loading="@_loading"
                  OnClick="@ReloadAll"/>
     </MCol>
-    <MCol Cols="12"
-          Sm="6"
-          Md="3">
-        @GenAppVisitCard(UvTitle, _uva)
+    <MCol Cols="12" Lg="12" Xl="3">
+        <MRow Dense>
+            <MCol Cols="12" Sm="6" Md="6" Lg="3" Xl="12">
+                @GenAppVisitCard(UvTitle, _uva)
+            </MCol>
+            <MCol Cols="12" Sm="6" Md="6" Lg="3" Xl="12">
+                @GenAppVisitCard(UvTitle, _uvta)
+            </MCol>
+            <MCol Cols="12" Sm="6" Md="6" Lg="3" Xl="12">
+                @GenAppVisitCard(PvTitle, _pva)
+            </MCol>
+            <MCol Cols="12" Sm="6" Md="6" Lg="3" Xl="12">
+                @GenAliveRate(_aliverate)
+            </MCol>
+        </MRow>
     </MCol>
-    <MCol Cols="12"
-          Sm="6"
-          Md="3">
-        @GenAppVisitCard(UvTitle, _uvta)
-    </MCol>
-    <MCol Cols="12"
-          Sm="6"
-          Md="3">
-        @GenAppVisitCard(PvTitle, _pva)
-    </MCol>
-    <MCol Cols="12"
-          Sm="6"
-          Md="3">
-        @GenAliveRate(_aliverate)
-    </MCol>
-    <MCol Cols="12">
+    <MCol Cols="12" Lg="12" Xl="9">
         <MCard Class="pa-4">
             <MECharts Option="@_mapOption"
                       IncludeFunctionsInOption
-                      Height="600">
+                      MinHeight="616">
+                Height="@("100%")">
             </MECharts>
         </MCard>
     </MCol>
-    <MCol Cols="12">
+    <MCol Cols="12" Xl="4">
         <MCard Class="pa-4">
             <MECharts Option="_uvOption"
                       Height="260"/>
         </MCard>
     </MCol>
-    <MCol Cols="12">
+    <MCol Cols="12" Xl="4">
         <MCard Class="pa-4">
             <MECharts Option="_uvtOption"
                       Height="260"/>
         </MCard>
     </MCol>
-    <MCol Cols="12">
+    <MCol Cols="12" Xl="4">
         <MCard Class="pa-4">
             <MECharts Option="_pvOption"
                       Height="260"/>
         </MCard>
     </MCol>
-    <MCol Cols="12">
+    <MCol Cols="12" Xl="4">
         <MCard Class="echarts-card"
                Title="@Top10UvTitle">
             <MCardText>
@@ -82,7 +80,7 @@
             </MCardText>
         </MCard>
     </MCol>
-    <MCol Cols="12">
+    <MCol Cols="12" Xl="4">
         <MCard Class="echarts-card"
                Title="@Top10UvtTitle">
             <MCardText>
@@ -93,7 +91,7 @@
             </MCardText>
         </MCard>
     </MCol>
-    <MCol Cols="12">
+    <MCol Cols="12" Xl="4">
         <MCard Class="echarts-card"
                Title="@Top10PvTitle">
             <MCardText>
