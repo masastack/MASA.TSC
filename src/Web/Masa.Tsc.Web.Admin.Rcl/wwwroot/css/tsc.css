@@ -420,3 +420,10 @@ div[style*="visibility: hidden; opacity: 0;"] {
     background-color: white;
     transition: all 0.3s ease;
 }
+
+.echarts-card .m-card__title {
+    font-size: 1.1rem;
+    line-height: initial;
+    font-weight: bold;
+    margin-left: 4px;
+}
