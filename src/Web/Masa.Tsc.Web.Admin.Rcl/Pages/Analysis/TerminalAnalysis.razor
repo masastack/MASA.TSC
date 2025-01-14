@@ -91,35 +91,55 @@
     @if (_platforms.Count > 0)
     {
         <MCol Cols="12" Md="6">
-            <MECharts Class="white rounded pa-4" Option="@_platformOption" Height="500"/>
+            <MCard Title="平台" Class="echarts-card">
+                <MCardText>
+                    <MECharts Option="@_platformOption" Height="500"/>
+                </MCardText>
+            </MCard>
         </MCol>
     }
-    
+
     @if (_brands.Count > 0)
     {
         <MCol Cols="12" Md="6">
-            <MECharts Class="white rounded pa-4" Option="@_brandOption" Height="500"/>
+            <MCard Title="品牌" Class="echarts-card">
+                <MCardText>
+                    <MECharts Option="@_brandOption" Height="500"/>
+                </MCardText>
+            </MCard>
         </MCol>
     }
-    
+
     @if (_appVersions.Count > 0)
     {
         <MCol Cols="12" Md="4">
-            <MECharts Class="white rounded pa-4 pb-0" Option="@_appVersionOption" Height="1000"/>
+            <MCard Title="APP 版本" Class="echarts-card">
+                <MCardText>
+                    <MECharts Option="@_appVersionOption" Height="1000"/>
+                </MCardText>
+            </MCard>
         </MCol>
     }
-    
+
     @if (_devices.Count > 0)
     {
         <MCol Cols="12" Md="4">
-            <MECharts Class="white rounded pa-4 pb-0" Option="@_deviceOption" Height="1000"/>
+            <MCard Title="系统版本" Class="echarts-card">
+                <MCardText>
+                    <MECharts Option="@_deviceOption" Height="1000"/>
+                </MCardText>
+            </MCard>
         </MCol>
     }
-    
+
     @if (_models.Count > 0)
     {
         <MCol Cols="12" Md="4">
-            <MECharts Class="white rounded pa-4 pb-0" Option="@_modelOption" Height="1000"/>
+            <MCard Title="机型" Class="echarts-card">
+                <MCardText>
+                    <MECharts Option="@_modelOption" Height="1000"/>
+                </MCardText>
+            </MCard>
         </MCol>
     }
 </MRow>

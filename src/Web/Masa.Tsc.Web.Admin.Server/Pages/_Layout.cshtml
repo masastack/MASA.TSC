@@ -57,5 +57,12 @@
     <script src="https://cdn.masastack.com/npm/monaco-editor/0.34.1/min/vs/loader.js"></script>
     <script src="https://cdn.masastack.com/npm/monaco-editor/0.34.1/min/vs/editor/editor.main.nls.js"></script>
     <script src="https://cdn.masastack.com/npm/monaco-editor/0.34.1/min/vs/editor/editor.main.js"></script>
+    <script>
+        fetch('_content/Masa.Tsc.Web.Admin.Rcl/data/geo-china.json')
+            .then(response => response.json())
+            .then(data => {
+                echarts.registerMap('china', data);
+            });
+    </script>
 </body>
 </html>
