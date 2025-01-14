@@ -52,9 +52,10 @@ ORDER BY (Timestamp,
 `Attributes.exception.message`,
 `Resource.service.namespace`
 )
-TTL toDateTime(Timestamp) + toIntervalDay(30)
+TTL toDateTime(Timestamp) + toIntervalDay({MasaStackClickhouseConnection.TTL_Days})
 SETTINGS index_granularity = 8192,
- ttl_only_drop_parts = 1;
+ ttl_only_drop_parts = 1
+{MasaStackClickhouseConnection.StorgePolicy};
 ";
         ClickhouseInit.InitTable(connection, Constants.ErrorTable, sql);
         InitErrorView(connection, Constants.ErrorTable.Replace(".", ".v_"), MasaStackClickhouseConnection.LogSourceTable);
@@ -134,8 +135,9 @@ Timestamp,
 Attributes.http.method,
  Resource.service.namespace 
  )
- TTL toDateTime(Timestamp) + toIntervalDay(30)
-SETTINGS index_granularity = 8192";
+ TTL toDateTime(Timestamp) + toIntervalDay({MasaStackClickhouseConnection.TTL_Days})
+SETTINGS index_granularity = 8192
+{MasaStackClickhouseConnection.StorgePolicy};";
         ClickhouseInit.InitTable(connection, tableName, sql);
         InitAggregateTable1_5_1(connection, interval, tableName, viewTable, MasaStackClickhouseConnection.TraceSourceTable);
         if (!string.IsNullOrEmpty(AppTraceTable))
@@ -239,7 +241,8 @@ GROUP BY
 )
 engine = MergeTree
 Order by (`Brand`,`Model`,`CodeAlis`)
-SETTINGS index_granularity = 8192";
+SETTINGS index_granularity = 8192
+{MasaStackClickhouseConnection.StorgePolicy};";
         ClickhouseInit.InitTable(connection, Constants.ModelsTable, sql);
     }
 
@@ -273,9 +276,10 @@ ORDER BY (
  Attributes.http.method,
  Resource.service.namespace,
 Duration)
-TTL toDateTime(Timestamp) + toIntervalDay(30)
+TTL toDateTime(Timestamp) + toIntervalDay({MasaStackClickhouseConnection.TTL_Days})
 SETTINGS index_granularity = 8192,
- ttl_only_drop_parts = 1;";
+ ttl_only_drop_parts = 1
+{MasaStackClickhouseConnection.StorgePolicy};";
         var viewTableName = table.Replace(".", ".v_");
         var sqlView =
  $@"CREATE MATERIALIZED VIEW {viewTableName} TO {table}
@@ -314,8 +318,9 @@ from
                              Attributes.http.method,
                              Resource.service.namespace,
                              Duration)
-                            TTL toDateTime(Timestamp) + toIntervalDay(30)
-                            SETTINGS index_granularity = 8192";
+                            TTL toDateTime(Timestamp) + toIntervalDay({MasaStackClickhouseConnection.TTL_Days})
+                            SETTINGS index_granularity = 8192
+                            {MasaStackClickhouseConnection.StorgePolicy};";
         var viewTableName = table.Replace(".", ".v_");
         var sqlView =
  $@"CREATE MATERIALIZED VIEW {viewTableName} TO {table}
@@ -369,8 +374,8 @@ ORDER BY (Environment,
  Service,
  `Type`,
  `Message`)
-SETTINGS index_granularity = 8192;";
+SETTINGS index_granularity = 8192
+{MasaStackClickhouseConnection.StorgePolicy};";
         ClickhouseInit.InitTable(connection, table, sql);
     }
-
 }

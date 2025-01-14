@@ -23,7 +23,8 @@ public static class AddTraceLogExtenstion
         if (ConfigConst.StorageSetting.HasInit || !ConfigConst.IsClickhouse) return;
         if (string.IsNullOrEmpty(ConfigConst.ClikhouseConnection)) return;
         _services.AddMASAStackApmClickhouse(ConfigConst.ClikhouseConnection, ConfigConst.ClickhouseTableSuffix, ConfigConst.ClickHouseLogSourceTable, ConfigConst.ClickHouseTaceSourceTable
-            , appLogSourceTable: ConfigConst.ClickHouseAppLogSourceTable, AppTraceSourceTable: ConfigConst.ClickHouseAppTraceSourceTable);
+            , appLogSourceTable: ConfigConst.ClickHouseAppLogSourceTable, AppTraceSourceTable: ConfigConst.ClickHouseAppTraceSourceTable,
+            ConfigConst.ClickHouseStoragePolicy, ConfigConst.ClickHouseTTLDays);
         ConfigConst.StorageSetting.SetClickhouse();
     }
 

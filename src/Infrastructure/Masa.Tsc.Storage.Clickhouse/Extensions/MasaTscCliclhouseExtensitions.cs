@@ -7,9 +7,20 @@ public static class MasaTscCliclhouseExtensitions
 {
     internal static ILogger? Logger { get; }
 
-    public static IServiceCollection AddMASAStackClickhouse(this IServiceCollection services, string connectionStr, string suffix = "masastack", string? logSourceTable = null, string? traceSourceTable = null, Action<IDbConnection>? configer = null)
+    public static IServiceCollection AddMASAStackClickhouse(this IServiceCollection services,
+        string connectionStr,
+        string suffix = "masastack",
+        string? logSourceTable = null,
+        string? traceSourceTable = null,
+        string? storagePolicy = null,
+        int ttlDays = 30,
+        Action<IDbConnection>? configer = null)
     {
         _ = new ClickhouseStorageConst();
+        if (!string.IsNullOrEmpty(storagePolicy))
+            MasaStackClickhouseConnection.StorgePolicy = $",storage_policy = '{storagePolicy}'";
+        if (ttlDays > 0)
+            MasaStackClickhouseConnection.TTL_Days = ttlDays;
         services.AddScoped(services => new MasaStackClickhouseConnection(connectionStr, suffix, logSourceTable, traceSourceTable))
             .AddScoped<ILogService, LogService>()
             .AddScoped<ITraceService, TraceService>();

@@ -95,9 +95,10 @@ ORDER BY (
  Attributes.exception.message,
  SpanId
  )
-TTL toDateTime(Timestamp) + toIntervalDay(30)
+TTL toDateTime(Timestamp) + toIntervalDay({MasaStackClickhouseConnection.TTL_Days})
 SETTINGS index_granularity = 8192,
- ttl_only_drop_parts = 1;
+ ttl_only_drop_parts = 1
+{MasaStackClickhouseConnection.StorgePolicy};
 ";
         InitTable(table, sql);
         InitLogView(viewTable, sourceTable);
@@ -204,9 +205,10 @@ ORDER BY (
  SpanKind,
  SpanId
  )
-TTL toDateTime(Timestamp) + toIntervalDay(30)
+TTL toDateTime(Timestamp) + toIntervalDay({MasaStackClickhouseConnection.TTL_Days})
 SETTINGS index_granularity = 8192,
- ttl_only_drop_parts = 1;
+ ttl_only_drop_parts = 1
+{MasaStackClickhouseConnection.StorgePolicy};
 ";
         InitTable(table, sql);
     }
@@ -310,7 +312,8 @@ CREATE TABLE {MasaStackClickhouseConnection.MappingTable}
 ENGINE = ReplacingMergeTree(Id)
 PRIMARY KEY (`Id`)
 ORDER BY (`Id`,`Type`,`Name`)
-SETTINGS index_granularity = 8192;",
+SETTINGS index_granularity = 8192
+{MasaStackClickhouseConnection.StorgePolicy};",
 @$"CREATE MATERIALIZED VIEW {MasaStackClickhouseConnection.MappingTable.Replace(mappingTable,"v_otel_traces_attribute_mapping")} to {MasaStackClickhouseConnection.MappingTable}
 as
 select 

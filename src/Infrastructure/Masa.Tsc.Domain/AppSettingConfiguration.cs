@@ -36,4 +36,8 @@ public class ClickhouseConfiguration
     public string AppTraceTable { get; set; }
 
     public string Suffix { get; set; }
+
+    public int? TTLDays { get; set; }
+
+    public string StoragePolicy { get; set; }
 }

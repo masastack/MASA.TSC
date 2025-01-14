@@ -9,9 +9,9 @@ public static class ApmClickhouseServiceExtensions
 
     public static IServiceCollection AddMASAStackApmClickhouse(this IServiceCollection services, string connectionStr, string suffix = "masastack",
         string? logSourceTable = null, string? traceSourceTable = null,
-        string? appLogSourceTable = null, string? AppTraceSourceTable = null)
+        string? appLogSourceTable = null, string? AppTraceSourceTable = null, string? storagePlicy = null, int ttlDays = 30)
     {
-        services.AddMASAStackClickhouse(connectionStr, suffix, logSourceTable, traceSourceTable, con =>
+        services.AddMASAStackClickhouse(connectionStr, suffix, logSourceTable, traceSourceTable, storagePlicy, ttlDays, con =>
          {
              var clickhouseConnection = (MasaStackClickhouseConnection)con;
              Constants.Init(clickhouseConnection.ConnectionSettings.Database, suffix);

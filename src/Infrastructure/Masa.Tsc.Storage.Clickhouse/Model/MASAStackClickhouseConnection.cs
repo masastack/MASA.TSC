@@ -19,11 +19,13 @@ public sealed class MasaStackClickhouseConnection : ClickHouseConnection
 
     public static string TraceOtherClientTable { get; private set; }
 
-    public static string MasaKeyword => "MasaKeyword";
-
     public static string MappingTable { get; private set; }
 
     public static string ExceptErrorTable { get; private set; }
+
+    public static string StorgePolicy { get; internal set; }
+
+    public static int TTL_Days { get; set; } = 30;
 
     public static void SetEnableExceptError(string table)
     {

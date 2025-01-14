@@ -38,6 +38,10 @@ public class ConfigConst
 
     public static string ClickHouseTaceSourceTable => Configuration.Clickhouse?.TraceSource!;
 
+    public static string ClickHouseStoragePolicy => Configuration.Clickhouse?.StoragePolicy!;
+
+    public static int ClickHouseTTLDays => Configuration.Clickhouse?.TTLDays ?? 30;
+
     public sealed class StorageSetting
     {
         public static bool IsElasticSearch { get; private set; }
