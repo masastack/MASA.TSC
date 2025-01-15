@@ -334,7 +334,7 @@ public partial class TimeLine
         if (current == null)
             return string.Empty;
         string spanId = current.Trace.SpanId;
-        return $"{baseUrl}{GetUrlParam(service: current.ServiceName, env: current.Trace.Resource["service.namespace"].ToString(), start: start.AddSeconds(-1), end: end.AddSeconds(1), traceId: current.Trace.TraceId, spanId: isSpan ? spanId : default)}";
+        return $"{baseUrl}{GetUrlParam(service: current.ServiceName, env: current.Trace.Resource.TryGetValue("service.namespace", out var env) ? env.ToString() : "", start: start.AddSeconds(-1), end: end.AddSeconds(1), traceId: current.Trace.TraceId, spanId: isSpan ? spanId : default)}";
     }
 
     private async Task OpenLogAsync(TreeLineDto item)
