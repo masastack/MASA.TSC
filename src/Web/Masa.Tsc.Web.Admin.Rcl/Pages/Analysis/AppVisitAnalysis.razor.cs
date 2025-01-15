@@ -7,12 +7,13 @@ using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
 using Timer = System.Timers.Timer;
 
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 {
     public partial class AppVisitAnalysis : TscComponentBase
     {
         [Inject] private IHttpClientFactory HttpClientFactory { get; set; } = null!;
+
+        [Inject] private MasaBlazor MasaBlazor { get; set; } = null!;
 
         private const string UvTitle = "访问人数";
         private const string UvtTitle = "打开次数";
@@ -22,6 +23,12 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
         private const string Top10PvTitle = PvTitle + " Top10";
 
         private static readonly CultureInfo ZhCN = new("zh-CN");
+        
+        private static readonly object AxisLabelWithMinWidth = new
+        {
+            overflow = "break",
+            width = 150
+        };
 
         private GraphQLHttpClient _graphClient = null!;
         private AppVisit? _uva;
@@ -42,8 +49,10 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
         private DateTime _lastRefreshTime = DateTime.UtcNow;
         private Timer? _timer;
 
-        private bool ignoreLogin;
-        private bool ignoreHome;
+        private bool _ignoreLogin;
+        private bool _ignoreHome;
+
+        private object _axisLabelForPage = new { };
 
         protected override void OnInitialized()
         {
@@ -53,12 +62,33 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             _graphClient = new GraphQLHttpClient("http://10.130.0.33:4000/cubejs-api/graphql",
                 new SystemTextJsonSerializer(),
                 httpClient: httpClient);
+
+            MasaBlazor.BreakpointChanged += MasaBlazorOnBreakpointChanged;
+        }
+
+        private void MasaBlazorOnBreakpointChanged(object? sender, BreakpointChangedEventArgs e)
+        {
+            if (e.Breakpoint is Breakpoints.Xl or Breakpoints.Md)
+            {
+                _axisLabelForPage = AxisLabelWithMinWidth;
+                InvokeAsync(RefreshAppVisitPageAsync);
+            }
+            else if (e.Breakpoint == Breakpoints.Lg)
+            {
+                _axisLabelForPage = new { };
+                InvokeAsync(RefreshAppVisitPageAsync);
+            }
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
+                if (MasaBlazor.Breakpoint.Name != Breakpoints.Lg)
+                {
+                    _axisLabelForPage = AxisLabelWithMinWidth;
+                }
+                
                 await ReloadAll();
 
                 _timer = new Timer(TimeSpan.FromMinutes(_interval.ToInt32()));
@@ -87,7 +117,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
             _ = RefreshMapDataAsync();
             _ = RefreshAppVisitHourAsync();
-            _ = RefreshAppVisitPageAsync2();
+            _ = RefreshAppVisitPageAsync();
         }
 
         private void OnIntervalChanged(StringNumber val)
@@ -111,14 +141,14 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private void OnIgnoreLoginChanged(bool val)
         {
-            ignoreLogin = val;
-            _ = RefreshAppVisitPageAsync2();
+            _ignoreLogin = val;
+            _ = RefreshAppVisitPageAsync();
         }
 
         private void OnIgnoreHomeChanged(bool val)
         {
-            ignoreHome = val;
-            _ = RefreshAppVisitPageAsync2();
+            _ignoreHome = val;
+            _ = RefreshAppVisitPageAsync();
         }
 
         private async Task RefreshMapDataAsync()
@@ -171,7 +201,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
                 yuvt.Add(item.AppVisitHour.Yuvt);
                 suvt.Add(item.AppVisitHour.Suvt);
-                
+
                 if (item.AppVisitHour.TimeNum <= currentHour)
                 {
                     tpv.Add(item.AppVisitHour.Tpv);
@@ -188,15 +218,15 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             StateHasChanged();
         }
 
-        private async Task RefreshAppVisitPageAsync2()
+        private async Task RefreshAppVisitPageAsync()
         {
-            _uvPageOption = await RefreshAppVisitPageAsync(AppVisitType.Uv);
-            _uvtPageOption = await RefreshAppVisitPageAsync(AppVisitType.Uvt);
-            _pvPageOption = await RefreshAppVisitPageAsync(AppVisitType.Pv);
+            _uvPageOption = await RefreshSharedAppVisitPageAsync(AppVisitType.Uv);
+            _uvtPageOption = await RefreshSharedAppVisitPageAsync(AppVisitType.Uvt);
+            _pvPageOption = await RefreshSharedAppVisitPageAsync(AppVisitType.Pv);
             StateHasChanged();
         }
 
-        private async Task<object> RefreshAppVisitPageAsync(AppVisitType type)
+        private async Task<object> RefreshSharedAppVisitPageAsync(AppVisitType type)
         {
             var response = await _graphClient.SendQueryAsync<CubeData<AppVisitPageItem>>(GetAppVisitPageQuery(type));
             var data = response.Data.Items.Select(x => new
@@ -264,7 +294,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
                 {
                     type = "map",
                     map = "china",
-                    roam = true,
                     data
                 }
             };
@@ -294,13 +323,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
                     right = "4%",
                     bottom = "3%",
                     containLabel = true
-                },
-                toolbox = new
-                {
-                    feature = new
-                    {
-                        saveAsImage = new { }
-                    }
                 },
                 xAxis = new
                 {
@@ -339,7 +361,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             };
         }
 
-        private static object GetSharedAppVisitPageOption(string[] keys, object[] data, int max)
+        private object GetSharedAppVisitPageOption(string[] keys, object[] data, int max)
         {
             return new
             {
@@ -373,11 +395,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
                 {
                     type = "category",
                     data = keys,
-                    axisLabel = new
-                    {
-                        overflow = "break",
-                        width = 250
-                    }
+                    axisLabel = _axisLabelForPage
                 },
                 series = new[]
                 {
@@ -497,12 +515,12 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             var filter = string.Empty;
             List<string> _urls = [];
 
-            if (ignoreLogin)
+            if (_ignoreLogin)
             {
                 _urls.Add("/home/index/{IsLogin:bool}");
             }
 
-            if (ignoreHome)
+            if (_ignoreHome)
             {
                 _urls.Add("/");
             }
