@@ -69,12 +69,12 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             await InvokeAsync(StateHasChanged);
         }
 
-        private async Task<List<DataItem>> QueryAsync(string type)
+        private async Task<List<DeviceVisitItem>> QueryAsync(string type)
         {
             try
             {
                 var query = GetQuery(type);
-                var result = await _graphClient.SendQueryAsync<Data>(query);
+                var result = await _graphClient.SendQueryAsync<CubeData<DeviceVisitItem>>(query);
                 return result.Data.Items;
             }
             catch (Exception e)
@@ -208,10 +208,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
         {
             return new
             {
-                title = new
-                {
-                    text = name,
-                },
                 tooltip = new
                 {
                     trigger = "item",
@@ -261,10 +257,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
         {
             return new
             {
-                title = new
-                {
-                    text = name
-                },
                 tooltip = new
                 {
                     trigger = "axis",
@@ -352,9 +344,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
                   """);
         }
 
-        private record Data([property: JsonPropertyName("cube")] List<DataItem> Items);
-
-        private record DataItem(
+        private record DeviceVisitItem(
             [property: JsonPropertyName("devicevisit")]
             DeviceVisit DeviceVisit);
 

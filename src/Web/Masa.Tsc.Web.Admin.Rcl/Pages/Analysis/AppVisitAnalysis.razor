@@ -1,0 +1,182 @@
+﻿@page "/analysis/appvisit"
+@inherits TscComponentBase
+
+<MRow Dense>
+    <MCol Cols="12" Class="d-flex align-center justify-end">
+        <MMenu>
+            <ActivatorContent>
+                <MButton Plain Small @attributes="@context.Attrs">
+                    每@(_interval)分钟刷新一次，上次刷新时间：@_lastRefreshTime.Add(CurrentTimeZone.BaseUtcOffset).ToString("HH:mm:ss")
+                </MButton>
+            </ActivatorContent>
+            <ChildContent>
+                <MList Dense>
+                    <MListItemGroup Value="@_interval"
+                                    ValueChanged="@OnIntervalChanged"
+                                    Mandatory>
+                        <MListItem Value="5">每5分钟</MListItem>
+                        <MListItem Value="15">每15分钟</MListItem>
+                        <MListItem Value="30">每30分钟</MListItem>
+                        <MListItem Value="60">每60分钟</MListItem>
+                    </MListItemGroup>
+                </MList>
+            </ChildContent>
+        </MMenu>
+        <MButton IconName="mdi-reload"
+                 Loading="@_loading"
+                 OnClick="@ReloadAll"/>
+    </MCol>
+    <MCol Cols="12" Lg="12" Xl="3">
+        <MRow Dense>
+            <MCol Cols="12" Sm="6" Md="6" Lg="3" Xl="12">
+                @GenAppVisitCard(UvTitle, _uva)
+            </MCol>
+            <MCol Cols="12" Sm="6" Md="6" Lg="3" Xl="12">
+                @GenAppVisitCard(UvtTitle, _uvta)
+            </MCol>
+            <MCol Cols="12" Sm="6" Md="6" Lg="3" Xl="12">
+                @GenAppVisitCard(PvTitle, _pva)
+            </MCol>
+            <MCol Cols="12" Sm="6" Md="6" Lg="3" Xl="12">
+                @GenAliveRate(_aliverate)
+            </MCol>
+        </MRow>
+    </MCol>
+    <MCol Cols="12" Lg="12" Xl="9">
+        <MCard Class="pa-4">
+            <MECharts Option="@_mapOption"
+                      IncludeFunctionsInOption
+                      MinHeight="616">
+                Height="@("100%")">
+            </MECharts>
+        </MCard>
+    </MCol>
+    <MCol Cols="12" Xl="4">
+        <MCard Class="pa-4">
+            <MECharts Option="_uvOption"
+                      Height="260"/>
+        </MCard>
+    </MCol>
+    <MCol Cols="12" Xl="4">
+        <MCard Class="pa-4">
+            <MECharts Option="_uvtOption"
+                      Height="260"/>
+        </MCard>
+    </MCol>
+    <MCol Cols="12" Xl="4">
+        <MCard Class="pa-4">
+            <MECharts Option="_pvOption"
+                      Height="260"/>
+        </MCard>
+    </MCol>
+    <MCol Cols="12" Xl="4">
+        <MCard Class="echarts-card"
+               Title="@Top10UvTitle">
+            <MCardText>
+                @GenPageFilter()
+                <MECharts Option="_uvPageOption"
+                          IncludeFunctionsInOption
+                          Height="500"/>
+            </MCardText>
+        </MCard>
+    </MCol>
+    <MCol Cols="12" Xl="4">
+        <MCard Class="echarts-card"
+               Title="@Top10UvtTitle">
+            <MCardText>
+                @GenPageFilter()
+                <MECharts Option="_uvtPageOption"
+                          IncludeFunctionsInOption
+                          Height="500"/>
+            </MCardText>
+        </MCard>
+    </MCol>
+    <MCol Cols="12" Xl="4">
+        <MCard Class="echarts-card"
+               Title="@Top10PvTitle">
+            <MCardText>
+                @GenPageFilter()
+                <MECharts Option="_pvPageOption"
+                          IncludeFunctionsInOption
+                          Height="500"/>
+            </MCardText>
+        </MCard>
+    </MCol>
+</MRow>
+
+@code {
+
+    private static RenderFragment GenAppVisitCard(string title, AppVisit? appVisit) => __builder =>
+    {
+        <MCard Class="echarts-card"
+               Title="@title"
+               MinHeight="156">
+            @if (appVisit is not null)
+            {
+                <MCardText Class="text-center">
+                    <div class="text-h5">@appVisit!.Data1.ToString("N0")</div>
+                    @GenRate("较昨日", appVisit.Data2)
+                    @GenRate("较七天前", appVisit.Data3)
+                </MCardText>
+            }
+        </MCard>
+    };
+
+    private static RenderFragment GenRate(string label, double rate) => __builder =>
+    {
+        var color = rate > 0 ? "success--text" : "error--text";
+        var icon = rate > 0 ? "mdi-arrow-up" : "mdi-arrow-down";
+
+        <div class="subtitle-2">
+            <span>
+                @label
+            </span>
+            <span class="@color">
+                <MIcon Style="color: inherit;" Small>@icon</MIcon>
+                <span>@(rate.ToString("P", ZhCN))</span>
+            </span>
+        </div>
+    };
+
+    private static RenderFragment GenAliveRate(AppVisit? appVisit) => __builder =>
+    {
+        var color = "success--text";
+
+        <MCard Title="用户新增及留存"
+               Class="echarts-card"
+               MinHeight="156">
+            @if (appVisit is not null)
+            {
+                <MCardText Class="text-center">
+                    <div class="text-h5 @color">
+                        <span class="body-2">留存率：</span>
+                        <span>@appVisit!.Data1.ToString("P")</span>
+                    </div>
+                    <div>日新增用户：@appVisit.Data2</div>
+                    <div>打开次数(新用户)：@appVisit.Data3</div>
+                </MCardText>
+            }
+        </MCard>
+    };
+
+    private RenderFragment GenPageFilter() => __builder =>
+    {
+        <div class="d-flex align-center justify-end pr-4">
+            <MCheckbox Value="_ignoreLogin"
+                       ValueChanged="OnIgnoreLoginChanged"
+                       TValue="bool"
+                       Label="忽视登录页"
+                       HideDetails="@true"
+                       Class="mt-0 mr-2"
+                       Dense/>
+            <MCheckbox Value="_ignoreHome"
+                       ValueChanged="OnIgnoreHomeChanged"
+                       TValue="bool"
+                       Label="忽视首页"
+                       HideDetails="@true"
+                       Class="mt-0"
+                       Dense/>
+        </div>
+    };
+
+}
