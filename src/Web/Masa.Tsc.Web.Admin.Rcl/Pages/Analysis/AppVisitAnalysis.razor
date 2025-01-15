@@ -32,7 +32,7 @@
                 @GenAppVisitCard(UvTitle, _uva)
             </MCol>
             <MCol Cols="12" Sm="6" Md="6" Lg="3" Xl="12">
-                @GenAppVisitCard(UvTitle, _uvta)
+                @GenAppVisitCard(UvtTitle, _uvta)
             </MCol>
             <MCol Cols="12" Sm="6" Md="6" Lg="3" Xl="12">
                 @GenAppVisitCard(PvTitle, _pva)
@@ -133,7 +133,7 @@
             </span>
             <span class="@color">
                 <MIcon Style="color: inherit;" Small>@icon</MIcon>
-                <span>@(rate.ToString("P"))%</span>
+                <span>@(rate.ToString("P", ZhCN))</span>
             </span>
         </div>
     };

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using System.Globalization;
 using System.Timers;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
@@ -19,6 +20,8 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
         private const string Top10UvTitle = UvTitle + " Top10";
         private const string Top10UvtTitle = UvtTitle + " Top10";
         private const string Top10PvTitle = PvTitle + " Top10";
+
+        private static readonly CultureInfo ZhCN = new("zh-CN");
 
         private GraphQLHttpClient _graphClient = null!;
         private AppVisit? _uva;
@@ -137,20 +140,51 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
         {
             var response = await _graphClient.SendQueryAsync<CubeData<AppVisitHourItem>>(GetAppVisitHourQuery());
 
-            var x = response.Data.Items.Select(u => u.AppVisitHour.TimeKey).ToArray();
-            var tuv = response.Data.Items.Select(u => u.AppVisitHour.Tuv).ToArray();
-            var yuv = response.Data.Items.Select(u => u.AppVisitHour.Yuv).ToArray();
-            var suv = response.Data.Items.Select(u => u.AppVisitHour.Suv).ToArray();
-            var tuvt = response.Data.Items.Select(u => u.AppVisitHour.Tuvt).ToArray();
-            var yuvt = response.Data.Items.Select(u => u.AppVisitHour.Yuvt).ToArray();
-            var suvt = response.Data.Items.Select(u => u.AppVisitHour.Suvt).ToArray();
-            var tpv = response.Data.Items.Select(u => u.AppVisitHour.Tpv).ToArray();
-            var ypv = response.Data.Items.Select(u => u.AppVisitHour.Ypv).ToArray();
-            var spv = response.Data.Items.Select(u => u.AppVisitHour.Spv).ToArray();
+            var currentHour = DateTime.UtcNow.Add(CurrentTimeZone.BaseUtcOffset).Hour;
+
+            var x = new List<string>();
+            var tuv = new List<int>();
+            var yuv = new List<int>();
+            var suv = new List<int>();
+            var tuvt = new List<int>();
+            var yuvt = new List<int>();
+            var suvt = new List<int>();
+            var tpv = new List<int>();
+            var ypv = new List<int>();
+            var spv = new List<int>();
+
+            foreach (var item in response.Data.Items)
+            {
+                x.Add(item.AppVisitHour.TimeKey);
+                if (item.AppVisitHour.TimeNum <= currentHour)
+                {
+                    tuv.Add(item.AppVisitHour.Tuv);
+                }
+
+                yuv.Add(item.AppVisitHour.Yuv);
+                suv.Add(item.AppVisitHour.Suv);
+
+                if (item.AppVisitHour.TimeNum <= currentHour)
+                {
+                    tuvt.Add(item.AppVisitHour.Tuvt);
+                }
+
+                yuvt.Add(item.AppVisitHour.Yuvt);
+                suvt.Add(item.AppVisitHour.Suvt);
+                
+                if (item.AppVisitHour.TimeNum <= currentHour)
+                {
+                    tpv.Add(item.AppVisitHour.Tpv);
+                }
+
+                ypv.Add(item.AppVisitHour.Ypv);
+                spv.Add(item.AppVisitHour.Spv);
+            }
 
             _uvOption = GetSharedHourOption(UvTitle, x, tuv, yuv, suv);
             _uvtOption = GetSharedHourOption(UvtTitle, x, tuvt, yuvt, suvt);
             _pvOption = GetSharedHourOption(PvTitle, x, tpv, ypv, spv);
+
             StateHasChanged();
         }
 
@@ -177,7 +211,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
             return GetSharedAppVisitPageOption(keys, data, max);
         }
-
 
         private async Task RefreshAppVisitDataAsync()
         {
@@ -239,7 +272,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             StateHasChanged();
         }
 
-        private static object GetSharedHourOption(string title, string[] x, int[] t, int[] y, int[] s)
+        private static object GetSharedHourOption(string title, List<string> x, List<int> t, List<int> y, List<int> s)
         {
             return new
             {
@@ -340,6 +373,11 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
                 {
                     type = "category",
                     data = keys,
+                    axisLabel = new
+                    {
+                        overflow = "break",
+                        width = 250
+                    }
                 },
                 series = new[]
                 {
@@ -347,6 +385,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
                     {
                         name = "数量",
                         type = "bar",
+                        barMinWidth = "50%",
                         data = data,
                         label = new
                         {
@@ -369,8 +408,8 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
                                    """,
                 AppVisitType.Uvt => """
                                     data1: uvta
-                                    data2: yesterdayuvrate
-                                    data3: seventhuvrate
+                                    data2: yesterdayuvtrate
+                                    data3: seventhuvtrate
                                     """,
                 AppVisitType.Pv => """
                                    data1: pva
@@ -473,7 +512,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
                 filter = $"path:{{notIn:[{string.Join(",", _urls.Select(x => $"\"{x}\""))}]}}";
             }
 
-            var r = new GraphQLHttpRequest(
+            return new GraphQLHttpRequest(
                 $$"""
                     query {
                       cube(limit:10) {
@@ -485,10 +524,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
                       }
                     }
                   """);
-
-            Console.Out.WriteLine("query: " + r.Query);
-
-            return r;
         }
 
         // TODO: Test this method, like value 0 or there has more effective way to implement this method
