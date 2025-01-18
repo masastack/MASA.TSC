@@ -8,8 +8,8 @@ public partial class ApmComponentBase : MasaComponentBase
     [Inject]
     public JsInitVariables JsInitVariables { get; set; }
 
-    [Inject]
-    IHttpContextAccessor HttpContextAccessor { get; set; }
+    //[Inject]
+    //IHttpContextAccessor HttpContextAccessor { get; set; }
 
     [Inject]
     public TscCaller ApiCaller { get; set; }
