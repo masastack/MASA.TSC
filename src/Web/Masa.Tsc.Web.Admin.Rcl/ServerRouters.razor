@@ -1,0 +1,16 @@
+﻿@inject TokenProvider TokenProvider
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(ServerRouters).Assembly"
+                                                    AdditionalAssemblies='new List<Assembly>(){ Assembly.Load("Masa.Stack.Components")}'>
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <MApp>
+                <NotFound />
+            </MApp>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

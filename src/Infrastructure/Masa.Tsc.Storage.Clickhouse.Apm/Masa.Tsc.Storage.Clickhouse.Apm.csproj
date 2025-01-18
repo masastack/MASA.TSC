@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>   
+    <ProjectReference Include="..\Masa.Tsc.Storage.Clickhouse.Apm.Shared\Masa.Tsc.Storage.Clickhouse.Apm.Shared.csproj" />   
     <ProjectReference Include="..\Masa.Tsc.Storage.Clickhouse\Masa.Tsc.Storage.Clickhouse.csproj" />
   </ItemGroup>
 

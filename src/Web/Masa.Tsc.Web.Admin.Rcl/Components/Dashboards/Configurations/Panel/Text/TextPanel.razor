@@ -14,8 +14,8 @@
 @code {
     private MEditor _editor;
 
-    [Inject]
-    public IObjectStorageClient Client { get; set; } = default!;
+    // [Inject]
+    // public IObjectStorageClient Client { get; set; } = default!;
 
     [Inject]
     private IJSRuntime JS { get; set; }
@@ -49,23 +49,23 @@
 
     private async Task<bool> BeforeAllUploadAsync(List<EditorUploadFileItem> flist)
     {
-        foreach (var item in flist)
-        {
-            if (item.Size > MaximumFileSize)
-            {
-                await PopupService.EnqueueSnackbarAsync($"{item.FileName} of {item.Size} bytes is larger than the limit of {MaximumFileSize} bytes", AlertTypes.Error);
-                return false;
-            }
-        }
-        var response = Client.GetSecurityToken();
-        var stsToken = response.SessionToken;
-        var accessId = response.AccessKeyId;
-        var accessSecret = response.AccessKeySecret;
-        var region = "oss-cn-hangzhou";
-        var bucket = OssOptions.Bucket;
-        var paramter = new SecurityTokenModel(region, accessId, accessSecret, stsToken, bucket);
+        // foreach (var item in flist)
+        // {
+        //     if (item.Size > MaximumFileSize)
+        //     {
+        //         await PopupService.EnqueueSnackbarAsync($"{item.FileName} of {item.Size} bytes is larger than the limit of {MaximumFileSize} bytes", AlertTypes.Error);
+        //         return false;
+        //     }
+        // }
+        // var response = Client.GetSecurityToken();
+        // var stsToken = response.SessionToken;
+        // var accessId = response.AccessKeyId;
+        // var accessSecret = response.AccessKeySecret;
+        // var region = "oss-cn-hangzhou";
+        // var bucket = OssOptions.Bucket;
+        // var paramter = new SecurityTokenModel(region, accessId, accessSecret, stsToken, bucket);
 
-        await JS.InvokeVoidAsync("EditorUploadImageToOss", _editor.ContentRef, _editor.Ref, paramter);
+        // await JS.InvokeVoidAsync("EditorUploadImageToOss", _editor.ContentRef, _editor.Ref, paramter);
         return true;
     }
 }

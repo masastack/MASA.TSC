@@ -7,7 +7,7 @@ public class TscCaller
 {
     internal TscCaller(IServiceProvider serviceProvider, ICallerFactory callerFactory)
     {
-        var caller = callerFactory.Create(ServiceExtensions.DEFAULT_CLIENT_NAME);
+        var caller = callerFactory.Create(TscCallerServiceExtensions.DEFAULT_CLIENT_NAME);
         AppService = new AppService(caller);
         SettingService = new SettingService(caller);
         ProjectService = new ProjectService(caller, serviceProvider.GetRequiredService<IDccClient>());
@@ -20,7 +20,7 @@ public class TscCaller
         TopologyService = new TopologyService(caller);
         ApmService = new ApmService(caller);
         ExceptErrorService=new ExceptErrorService(caller);
-        UserService = new UserService(callerFactory.Create(ServiceExtensions.AUTH_CLIENT_NAME), serviceProvider.GetRequiredService<IAuthClient>());
+        UserService = new UserService(callerFactory.Create(TscCallerServiceExtensions.AUTH_CLIENT_NAME), serviceProvider.GetRequiredService<IAuthClient>());
     }
 
     public AppService AppService { get; private init; }

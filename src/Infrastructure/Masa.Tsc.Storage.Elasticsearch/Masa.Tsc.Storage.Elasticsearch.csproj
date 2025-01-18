@@ -8,12 +8,12 @@
 	<ItemGroup>
 		<PackageReference Include="NEST" Version="7.17.5" />
 		<PackageReference Include="Masa.Utils.Data.Elasticsearch" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Caller" Version="$(MasaSdkPackageVersion)" />
+		<!--<PackageReference Include="Masa.Contrib.StackSdks.Caller.Wasm" Version="$(MasaSdkPackageVersion)" />-->
 		<PackageReference Include="Masa.Contrib.Service.Caller.HttpClient" Version="$(MasaFrameworkPackageVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Masa.Tsc.Storage.Contracts\Masa.Tsc.Storage.Contracts.csproj" />
+	  <ProjectReference Include="..\Masa.Tsc.Storage.Elasticsearch.Shared\Masa.Tsc.Storage.Elasticsearch.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

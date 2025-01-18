@@ -13,6 +13,7 @@ internal partial class ClickhouseApmService : IApmService
     private static Dictionary<string, string> errorOrders = default!;
     const double MILLSECOND = 1e6;
     private readonly ILogger _logger;
+    private QueryFilter filter = new QueryFilter();
 
     public ClickhouseApmService(MasaStackClickhouseConnection dbConnection, ITraceService traceService, ILogger<ClickhouseApmService> logger)
     {
@@ -65,8 +66,8 @@ internal partial class ClickhouseApmService : IApmService
 
     public async Task<EndpointLatencyDistributionDto> EndpointLatencyDistributionAsync(ApmEndpointRequestDto query)
     {
-        query.IsTrace = true;
-        var (where, parameters) = GetMetricWhere(query, true);
+        filter.IsTrace = true;
+        var (where, parameters) = GetMetricWhere(query, filter, true);
         var period = GetPeriod(query);
         var tableName = Constants.GetAggregateTable(period);
         var result = new EndpointLatencyDistributionDto();
@@ -99,10 +100,10 @@ internal partial class ClickhouseApmService : IApmService
 
     public async Task<PaginatedListBase<ErrorMessageDto>> ErrorMessagePageAsync(ApmErrorRequestDto query)
     {
-        query.IsServer = default;
-        query.IsError = true;
+        filter.IsServer = default;
+        filter.IsError = true;
         var orderBy = GetOrderBy(query, errorOrders);
-        var (where, ors, parameters) = AppendWhere(query);
+        var (where, ors, parameters) = AppendWhere(query, filter);
         var groupby = $"group by Type,Message{(string.IsNullOrEmpty(query.Endpoint) ? "" : ",Attributes.http.target")}";
         var append = string.IsNullOrEmpty(query.Endpoint) ? "" : ",Attributes.http.target";
         var selectFileds = $"`Attributes.exception.type` as Type,MsgGroupKey as Message,max(Timestamp) time,count(1) total{append}";
@@ -132,9 +133,9 @@ internal partial class ClickhouseApmService : IApmService
 
     public async Task<IEnumerable<ChartLineCountDto>> GetErrorChartAsync(ApmErrorRequestDto query)
     {
-        query.IsServer = default;
-        query.IsLog = true;
-        var (where, ors, parameters) = AppendWhere(query);
+        filter.IsServer = default;
+        filter.IsLog = true;
+        var (where, ors, parameters) = AppendWhere(query, filter);
         var groupby = "group by `time` order by `time`";
         string sql;
         if (query.Filter)
@@ -158,8 +159,8 @@ from {Constants.ErrorTable} where {where} and SeverityText='Error' and `Attribut
 
     public async Task<IEnumerable<ChartLineCountDto>> GetEndpointChartAsync(ApmEndpointRequestDto query)
     {
-        query.IsServer = false;
-        var (where, ors, parameters) = AppendWhere(query);
+        filter.IsServer = false;
+        var (where, ors, parameters) = AppendWhere(query, filter);
         var groupby = "group by `time` order by `time`";
         var sql = $@"select 
 toStartOfInterval(`Timestamp` , INTERVAL  {GetPeriod(query)} ) as `time`,
@@ -171,9 +172,9 @@ from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where} {groupby
 
     public async Task<IEnumerable<ChartLineCountDto>> GetLogChartAsync(ApmEndpointRequestDto query)
     {
-        query.IsServer = default;
-        query.IsLog = true;
-        var (where, ors, parameters) = AppendWhere(query);
+        filter.IsServer = default;
+        filter.IsLog = true;
+        var (where, ors, parameters) = AppendWhere(query, filter);
         var groupby = "group by `time` order by `time`";
         var sql = $@"select 
 toStartOfInterval(`Timestamp` , INTERVAL  {GetPeriod(query)} ) as `time`,
@@ -184,9 +185,9 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
 
     public async Task<IEnumerable<ChartPointDto>> GetTraceErrorsAsync(ApmEndpointRequestDto query)
     {
-        query.IsServer = default;
-        query.IsError = true;
-        var (where, ors, parameters) = AppendWhere(query);
+        filter.IsServer = default;
+        filter.IsError = true;
+        var (where, ors, parameters) = AppendWhere(query, filter);
         var groupby = "group by `SpanId` order by `SpanId`";
         var sql = CombineOrs($@"select SpanId from {Constants.ErrorTable} where {where}", ors);
         sql = $"select SpanId,count(1) `total` from ({sql}) {groupby}";
@@ -212,8 +213,8 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
 
     public async Task<Dictionary<string, List<string>>> GetEnvironmentServices(BaseApmRequestDto query)
     {
-        query.IsServer = true;
-        query.IsMetric = true;
+        filter.IsServer = true;
+        filter.IsMetric = true;
         var period = GetPeriod(query);
         var result = new Dictionary<string, List<string>>();
         var tableName = Constants.GetAggregateTable(period);
@@ -339,12 +340,12 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
     public async Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmTraceLatencyRequestDto query)
     {
         var orderBy = GetOrderBy(query, new() { { StorageConst.Current.Timestimap, StorageConst.Current.Timestimap } });
-        var (where, ors, parameters) = AppendWhere(query);
+        var (where, ors, parameters) = AppendWhere(query, filter);
         PaginatedListBase<SimpleTraceListDto> result = new() { };
         if (query.HasPage)
         {
             string sql1;
-            if (query.IsInstrument)
+            if (filter.IsInstrument)
             {
                 sql1 = $"select 1 as Total from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}";
             }
@@ -358,7 +359,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
             result.Total = Convert.ToInt64(await Scalar(countSql, parameters));
         }
 
-        var sql = CombineOrs($@"select TraceId,Duration,Timestamp from {(query.IsInstrument ? MasaStackClickhouseConnection.TraceHttpServerTable : Constants.DurationTable)} where {where}", ors);
+        var sql = CombineOrs($@"select TraceId,Duration,Timestamp from {(filter.IsInstrument ? MasaStackClickhouseConnection.TraceHttpServerTable : Constants.DurationTable)} where {where}", ors);
         sql = $"select TraceId,Duration,Timestamp from {sql} {orderBy} @limit";
 
         await SetData(sql, parameters, result, query, ToSampleTraceListDto);
@@ -380,10 +381,10 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
 
     private async Task<PaginatedListBase<T>> MetricListAsync<T>(BaseApmRequestDto query, bool isEndpoint) where T : ServiceListDto, new()
     {
-        query.IsServer = true;
-        query.IsTrace = true;
-        var (where, ors, parameters) = AppendWhere(query);
-        var (metricWhere, _) = GetMetricWhere(query, true);
+        filter.IsServer = true;
+        filter.IsTrace = true;
+        var (where, ors, parameters) = AppendWhere(query, filter);
+        var (metricWhere, _) = GetMetricWhere(query, filter, true);
         string countSql, sql;
 
         string groupAppend = isEndpoint ? ",`Attributes.http.target`,`Attributes.http.method`" : string.Empty;
@@ -392,7 +393,7 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
 
         var period = GetPeriod(query);
         var tableName = Constants.GetAggregateTable(period);
-        if (query.IsInstrument)
+        if (filter.IsInstrument)
         {
             var sql2 = CombineOrs($"select DISTINCT  ServiceName{groupAppend} from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors);
             sql = @$"select a.* from(select
@@ -554,13 +555,13 @@ from(
 
     public async Task<IEnumerable<ChartLineDto>> ChartDataAsync(BaseApmRequestDto query)
     {
-        query.IsServer = true;
-        query.IsTrace = true;
+        filter.IsServer = true;
+        filter.IsTrace = true;
         bool isInstrument = !string.IsNullOrEmpty(query.Queries);
-        query.IsMetric = !isInstrument;
+        filter.IsMetric = !isInstrument;
         var period = GetPeriod(query);
         var tableName = Constants.GetAggregateTable(period);
-        var (where, ors, parameters) = AppendWhere(query);
+        var (where, ors, parameters) = AppendWhere(query, filter);
         bool isEndpoint = query is ApmEndpointRequestDto;
         string groupAppend = isEndpoint ? ",`Attributes.http.target`,`Attributes.http.method`" : string.Empty;
         string sql;
@@ -637,7 +638,7 @@ order by `Attributes.http.status_code`";
     {
         var period = GetPeriod(query);
         var tableName = Constants.GetAggregateTable(period);
-        var (where, ors, parameters) = AppendWhere(query);
+        var (where, ors, parameters) = AppendWhere(query, filter);
         var sql = @$"select {StorageConst.Current.Trace.URL}
             from {tableName}
             where {where}
@@ -654,7 +655,7 @@ order by `Attributes.http.status_code`";
 
     public async Task<List<string>> GetErrorTypesAsync(BaseApmRequestDto query)
     {
-        var (where, ors, parameters) = AppendWhere(query);
+        var (where, ors, parameters) = AppendWhere(query, filter);
         var sql = $@"select `Attributes.exception.type` from {Constants.ErrorTable} where {where} group by `Attributes.exception.type` order by `Attributes.exception.type`";
         var result = new List<string>();
         using var reader = await Query(sql, parameters);
@@ -685,9 +686,9 @@ order by `Attributes.http.status_code`";
         }
     }
 
-    private static (string where, List<string> ors, List<ClickHouseParameter> parameters) AppendWhere<TQuery>(TQuery query) where TQuery : BaseApmRequestDto
+    private static (string where, List<string> ors, List<ClickHouseParameter> parameters) AppendWhere<TQuery>(TQuery query, QueryFilter filter) where TQuery : BaseApmRequestDto
     {
-        (string where, List<ClickHouseParameter> parameters) = GetMetricWhere(query);
+        (string where, List<ClickHouseParameter> parameters) = GetMetricWhere(query, filter);
         var sql = new StringBuilder(where);
         var ors = new List<string>();
 
@@ -707,21 +708,21 @@ order by `Attributes.http.status_code`";
 
         if (!string.IsNullOrEmpty(query.ExType))
         {
-            query.IsInstrument = true;
+            filter.IsInstrument = true;
             sql.AppendLine($" and {StorageConst.Current.ExceptionType}=@exType");
             parameters.Add(new ClickHouseParameter { ParameterName = "exType", Value = query.ExType });
         }
 
         if (!string.IsNullOrEmpty(query.TraceId))
         {
-            query.IsInstrument = true;
+            filter.IsInstrument = true;
             sql.AppendLine($" and {StorageConst.Current.TraceId}=@traceId");
             parameters.Add(new ClickHouseParameter { ParameterName = "traceId", Value = query.TraceId });
         }
 
         if (!string.IsNullOrEmpty(query.TextField) && !string.IsNullOrEmpty(query.TextValue))
         {
-            query.IsInstrument = true;
+            filter.IsInstrument = true;
             if (string.Equals(query.TextField, StorageConst.Current.TraceId))
             {
                 sql.AppendLine($" and {StorageConst.Current.TraceId}=@traceId");
@@ -741,7 +742,7 @@ order by `Attributes.http.status_code`";
 
         if (!string.IsNullOrEmpty(query.ExMessage))
         {
-            query.IsInstrument = true;
+            filter.IsInstrument = true;
             sql.AppendLine($" and {StorageConst.Current.ExceptionMessage} like @exMessage");
             parameters.Add(new ClickHouseParameter { ParameterName = "exMessage", Value = $"{query.ExMessage}%" });
         }
@@ -764,8 +765,8 @@ order by `Attributes.http.status_code`";
         //    parameters.Add(new ClickHouseParameter { ParameterName = "body", Value = query.Body });
         //}
 
-        AppendEndpoint(query as ApmEndpointRequestDto, sql, parameters);
-        AppendDuration(query as ApmTraceLatencyRequestDto, sql, parameters);
+        AppendEndpoint(query as ApmEndpointRequestDto, filter, sql, parameters);
+        AppendDuration(query as ApmTraceLatencyRequestDto, filter, sql, parameters);
         if (!string.IsNullOrEmpty(query.Queries))
         {
             sql.AppendLine(!query.Queries.Trim().StartsWith("and ", StringComparison.CurrentCultureIgnoreCase) ? $" and {query.Queries}" : query.Queries);
@@ -788,12 +789,12 @@ order by `Attributes.http.status_code`";
         return text.ToString();
     }
 
-    private static void AppendEndpoint(ApmEndpointRequestDto? traceQuery, StringBuilder sql, List<ClickHouseParameter> parameters, bool isMetric = false)
+    private static void AppendEndpoint(ApmEndpointRequestDto? traceQuery, QueryFilter filter, StringBuilder sql, List<ClickHouseParameter> parameters, bool isMetric = false)
     {
         if (traceQuery == null)
             return;
         var name = "endpoint";
-        if (traceQuery.IsLog.HasValue && traceQuery.IsLog.Value)
+        if (filter.IsLog.HasValue && filter.IsLog.Value)
         {
             if (!string.IsNullOrEmpty(traceQuery.Endpoint))
             {
@@ -816,16 +817,16 @@ order by `Attributes.http.status_code`";
             }
             if (!isMetric && !string.IsNullOrEmpty(traceQuery.StatusCode))
             {
-                traceQuery.IsInstrument = true;
+                filter.IsInstrument = true;
                 sql.AppendLine($" and {StorageConst.Current.Trace.HttpStatusCode}=@status_code");
                 parameters.Add(new ClickHouseParameter { ParameterName = "status_code", Value = traceQuery.StatusCode });
             }
         }
     }
 
-    private static void AppendDuration(ApmTraceLatencyRequestDto? query, StringBuilder sql, List<ClickHouseParameter> parameters)
+    private static void AppendDuration(ApmTraceLatencyRequestDto? query, QueryFilter filter, StringBuilder sql, List<ClickHouseParameter> parameters)
     {
-        if (query == null || !query.LatMin.HasValue && !query.LatMax.HasValue || query.IsMetric != null && query.IsMetric.Value) return;
+        if (query == null || !query.LatMin.HasValue && !query.LatMax.HasValue || filter.IsMetric != null && filter.IsMetric.Value) return;
         if (query.LatMin.HasValue && query.LatMin > 0)
         {
             sql.AppendLine($" and {StorageConst.Current.Trace.Duration} >=@minDuration");
@@ -1034,7 +1035,7 @@ order by `Attributes.http.status_code`";
         return "1 month";
     }
 
-    private static (string, List<ClickHouseParameter>) GetMetricWhere<TRequest>(TRequest query, bool isContainsEndpoint = false) where TRequest : BaseApmRequestDto
+    private static (string, List<ClickHouseParameter>) GetMetricWhere<TRequest>(TRequest query, QueryFilter filter, bool isContainsEndpoint = false) where TRequest : BaseApmRequestDto
     {
         List<ClickHouseParameter> parameters = new();
         var sql = new StringBuilder();
@@ -1057,7 +1058,7 @@ order by `Attributes.http.status_code`";
             parameters.Add(new ClickHouseParameter { ParameterName = "serviceName", Value = query.AppIds });
         }
         if (isContainsEndpoint)
-            AppendEndpoint(query as ApmEndpointRequestDto, sql, parameters, true);
+            AppendEndpoint(query as ApmEndpointRequestDto, filter, sql, parameters, true);
         return (sql.ToString(), parameters);
     }
 }
