@@ -6,16 +6,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaSdkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.Service.Caller.DaprClient" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.BuildingBlocks.Data.Contracts" Version="$(MasaFrameworkPackageVersion)" />
-		<PackageReference Include="Masa.BuildingBlocks.StackSdks.Tsc.Contracts" Version="$(MasaSdkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Dcc.Wasm" Version="$(MasaSdkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Pm.Wasm" Version="$(MasaSdkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Auth.Wasm" Version="$(MasaSdkPackageVersion)" />
+		<!--<PackageReference Include="Masa.Contrib.Service.Caller.DaprClient" Version="$(MasaFrameworkPackageVersion)" />-->
+		<!--<PackageReference Include="Masa.BuildingBlocks.Data.Contracts" Version="$(MasaFrameworkPackageVersion)" />-->		
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(DotnetVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />
-		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Clickhouse.Apm\Masa.Tsc.Storage.Clickhouse.Apm.csproj" />
-		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Elasticsearch\Masa.Tsc.Storage.Elasticsearch.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Clickhouse.Apm.Shared\Masa.Tsc.Storage.Clickhouse.Apm.Shared.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Elasticsearch.Shared\Masa.Tsc.Storage.Elasticsearch.Shared.csproj" />
 	</ItemGroup>
 </Project>

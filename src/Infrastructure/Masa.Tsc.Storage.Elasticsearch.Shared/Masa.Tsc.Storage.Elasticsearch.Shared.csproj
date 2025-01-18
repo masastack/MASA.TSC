@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>  
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>    
+    <ProjectReference Include="..\Masa.Tsc.Storage.Contracts\Masa.Tsc.Storage.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

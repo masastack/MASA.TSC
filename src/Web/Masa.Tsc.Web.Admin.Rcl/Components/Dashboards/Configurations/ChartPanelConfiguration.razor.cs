@@ -7,10 +7,7 @@ public partial class ChartPanelConfiguration : TscComponentBase
 {
     List<StringNumber> _trash = new List<StringNumber> { 1 };
     ChartPanel _chartPanel;
-    string _valueBackup;
-
-    [Inject]
-    public NavigationManager NavigationManager { get; set; }
+    string _valueBackup;  
 
     [Parameter]
     public UpsertChartPanelDto Value { get; set; }

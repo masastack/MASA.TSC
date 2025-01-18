@@ -4,3 +4,7 @@
 global using Masa.Tsc.Web.Admin.Rcl;
 global using Microsoft.AspNetCore.Components.Web;
 global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+global using Masa.Contrib.StackSdks.Config;
+global using Masa.Stack.Components;
+global using Masa.Stack.Components.Extensions.OpenIdConnect;
+global using Masa.Tsc.Web.Admin.Wasm;

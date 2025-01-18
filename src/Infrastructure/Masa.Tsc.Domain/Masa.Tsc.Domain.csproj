@@ -9,6 +9,9 @@
 		<PackageReference Include="Mapster" Version="7.3.0" />
 		<PackageReference Include="Masa.Contrib.Caching.MultilevelCache" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Config" Version="$(MasaStackSdksPackageVersion)" />
+		<!--<PackageReference Include="Masa.Contrib.StackSdks.Dcc.Wasm" Version="$(MasaSdkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Pm.Wasm" Version="$(MasaSdkPackageVersion)" />-->
+		<PackageReference Include="Masa.Contrib.StackSdks.Auth" Version="$(MasaSdkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Middleware" Version="$(MasaSdkPackageVersion)" />
 	</ItemGroup>
@@ -18,6 +21,7 @@
 	  <ProjectReference Include="..\Masa.Tsc.EFCore\Masa.Tsc.EFCore.csproj" />
 	  <ProjectReference Include="..\Masa.Tsc.Repository\Masa.Tsc.Repository.csproj" />
 	  <ProjectReference Include="..\Masa.Tsc.Storage.Clickhouse.Apm\Masa.Tsc.Storage.Clickhouse.Apm.csproj" />
+	  <ProjectReference Include="..\Masa.Tsc.Storage.Prometheus\Masa.Tsc.Storage.Prometheus.csproj" />
 	</ItemGroup>
 
 </Project>
