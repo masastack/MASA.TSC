@@ -5,22 +5,17 @@
 		<BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Compile Remove="wwwroot\i18n\**" />
+	  <Content Remove="wwwroot\i18n\**" />
+	  <EmbeddedResource Remove="wwwroot\i18n\**" />
+	  <None Remove="wwwroot\i18n\**" />
+	</ItemGroup>
+	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.10" PrivateAssets="all" />
 		<!--<PackageReference Include="Masa.Contrib.StackSdks.Config.Wasm" Version="$(MasaSdkPackageVersion)" />-->
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Masa.Tsc.Web.Admin.Rcl\Masa.Tsc.Web.Admin.Rcl.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Content Update="wwwroot\i18n\en-US.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="wwwroot\i18n\supportedCultures.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="wwwroot\i18n\zh-CN.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
 	</ItemGroup>
 </Project>
