@@ -1,0 +1,74 @@
+{
+  "$Text": "English",
+  "$DateTimeFormat": "MM/dd/yyyy HH:mm:ss",
+  "Off": "Off",
+  "Loading data": "Loading.....",
+  "OperationConfirmation": "Operation confirmation",
+  "Trace": {
+    "service.name": "Service",
+    "http.target": "Caller"
+  },
+  "apmlogs": "Logs",
+  "apmservices": "Services",
+  "apmendpoints": "Endpoints",
+  "apmerrors": "Errors",
+  "apmapps": "Apps",
+  "excepterrors": "ExceptErrors",
+  "DateTimeRange": {
+    "Off": "Off",
+    "Last5Minutes": "Last 5 minutes",
+    "Last15Minutes": "Last 15 minutes",
+    "Last30Minutes": "Last 30 minutes",
+    "Last1Hour": "Last 1 hour",
+    "Last3Hours": "Last 3 hours",
+    "Last6Hours": "Last 6 hours",
+    "Last12Hours": "Last 12 hours",
+    "Last24Hours": "Last 24 hours",
+    "Last2Days": "Last 2 days",
+    "Last7Days": "Last 7 days",
+    "Last30Days": "Last 30 days",
+    "Last6Months": "Last 6 months",
+    "Last1Year": "Last 1 year",
+    "Yesterday": "Yesterday",
+    "DayBeforeYesterday": "Day before yesterday",
+    "DayLastWeek": "Day last week",
+    "LastWeek": "Last week",
+    "LastMonth": "Last month",
+    "LastQuarter": "Last quarter",
+    "LastYear": "Last year",
+    "Today": "Today",
+    "TodaySoFar": "Today so far",
+    "ThisWeek": "This week",
+    "ThisWeekSoFar": "ThisWeek so far",
+    "ThisMonth": "This month",
+    "ThisMonthSoFar": "This month so far",
+    "ThisYear": "This year",
+    "ThisYearSoFar": "This year so far"
+  },
+  "Apm": {
+    "Tabs": {
+      "Stacktrace": "Exception stack trace"
+    },
+    "Error": {
+      "Detail": {
+        "Sample": "Error sample",
+        "Type": "Exception type",
+        "Message": "Exception message"
+      }
+    },
+    "Trace": {
+      "Detail": {
+        "Sample": "Trace sample"
+      }
+    },
+    "Chart": {
+      "SpanKinds": "Time spent by span type",
+      "ErrorCount": "Error count",
+      "LogCount": "Log count",
+      "ErrorOccurrences": "Error occurrences",
+      "LatencyDistribution": "Latency distribution",
+      "p95": "95th percentile",
+      "p99": "99th percentile"
+    }
+  }
+}
