@@ -74,8 +74,8 @@ public partial class TimeLine
     {
         await base.OnParametersSetAsync();
 
-        var str = $"{JsonSerializer.Serialize(Data)}";
-        var key = MD5Utils.Encrypt(str);
+        var str = $"{JsonSerializer.Serialize(Data)}";      
+        var key = Encrypt(str);
         if (lastKey != key)
         {
             loading = true;
@@ -88,7 +88,7 @@ public partial class TimeLine
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var uri = NavigationManager.ToAbsoluteUri(CurrentUrl);
         var values = HttpUtility.ParseQueryString(uri.Query);
         urlService = values.Get("service")!;
         UrlEndpoint = values.Get("endpoint")!;

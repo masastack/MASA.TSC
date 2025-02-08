@@ -27,6 +27,9 @@ builder.Services.AddTraceLog()
 #endif
     )
     .AddPrometheusClient(prometheusUrl, 15)
+    .AddCors(options => { 
+        options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    })
     .AddAuthorization()
     .AddAuthentication(options =>
     {
@@ -176,6 +179,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 #endif
 app.UseRouting();
+app.UseCors();
+
 //app.UseMASAHttpReponseLog();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -209,4 +214,5 @@ app.UseEndpoints(endpoints =>
 });
 app.UseHttpsRedirection();
 app.UseHealthChecks("/healthy");
+
 app.Run();

@@ -75,3 +75,4 @@ global using System.Text.Json.Serialization;
 global using System.Text.RegularExpressions;
 global using System.Web;
 global using Masa.Tsc.Web.Admin.Rcl.Components.Apm;
+global using System.Security.Cryptography;

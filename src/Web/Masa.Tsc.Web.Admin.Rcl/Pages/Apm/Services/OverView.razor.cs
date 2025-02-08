@@ -15,7 +15,8 @@ public partial class OverView
 
     protected override async Task OnParametersSetAsync()
     {
-        var key = MD5Utils.Encrypt(JsonSerializer.Serialize(SearchData));
+        //var key = MD5Utils.Encrypt(JsonSerializer.Serialize(SearchData));
+        var key = Encrypt(JsonSerializer.Serialize(SearchData));
         if (lastKey != key)
         {
             lastKey = key;
@@ -24,11 +25,11 @@ public partial class OverView
         await base.OnParametersSetAsync();
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadDataAsync();
-        await base.OnInitializedAsync();
-    }
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    await LoadDataAsync();
+    //    await base.OnInitializedAsync();
+    //}
 
     private async Task LoadDataAsync()
     {

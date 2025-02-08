@@ -33,7 +33,9 @@ builder.Services.AddHttpClient("analysis", client =>
 
 builder.Services.AddMasaStackComponent(MasaStackProject.TSC, $"{builder.HostEnvironment.BaseAddress}i18n");
 builder.Services.AddRcl();
-builder.Services.AddTscHttpApiCaller(masaStackConfig.GetTscServiceDomain(), masaStackConfig.GetAuthServiceDomain()).AddDccClient(masaStackConfig.GetDccServiceDomain());
+//https://tsc-service-dev.masastack.com
+//http://localhost:18010
+builder.Services.AddTscHttpApiCaller("http://localhost:18010", masaStackConfig.GetAuthServiceDomain()).AddDccClient(masaStackConfig.GetDccServiceDomain());
 var host = builder.Build();
 await host.Services.InitializeMasaStackApplicationAsync();
 await host.RunAsync();
