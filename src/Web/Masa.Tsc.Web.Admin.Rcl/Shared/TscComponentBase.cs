@@ -42,24 +42,9 @@ public partial class TscComponentBase : MasaComponentBase, IAsyncDisposable
             JsInitVariables.TimezoneOffsetChanged += OnTimeZoneInfoChanged;
         if (UserContext != null && !string.IsNullOrEmpty(UserContext.UserId))
             CurrentUserId = Guid.Parse(UserContext.UserId);
-        Loading = false;
-        await SetStorage();
+        Loading = false;        
         await base.OnInitializedAsync();
     }
-
-    protected async Task SetStorage()
-    {
-        await base.OnInitializedAsync();
-        if (StorageConst.Current != null) return;
-        var setting = await ApiCaller.SettingService.GetStorage();
-        if (setting == null)
-            throw new Exception("Storage setting is null");
-        if (setting.IsClickhouse)
-            StorageConst.Init(new ClickhouseStorageConst());
-        else if (setting.IsElasticsearch)
-            StorageConst.Init(new ElasticsearchStorageConst());
-    }
-
 
     public async Task<bool> OpenConfirmDialog(string content)
     {

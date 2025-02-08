@@ -67,7 +67,7 @@ public partial class Index
         base.OnInitialized();
         services = new();
         traceLines = new();
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri.ToNomalBlazorUrl());
+        var uri = NavigationManager.ToAbsoluteUri(CurrentUrl.ToNomalBlazorUrl());
         values = HttpUtility.ParseQueryString(uri.Query);
         Search.Service = string.Empty;
         Search.Endpoint = string.Empty;

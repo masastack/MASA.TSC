@@ -24,7 +24,7 @@ public sealed class TraceService : BaseService
 
     public async Task<IEnumerable<string>> GetAttrValuesAsync(SimpleAggregateRequestDto model)
     {
-        return await Caller.GetByBodyAsync<IEnumerable<string>>($"{RootPath}/attr-values", model) ?? Array.Empty<string>();
+        return await Caller.PostAsync<IEnumerable<string>>($"{RootPath}/attr-values", model) ?? Array.Empty<string>();
     }
 
     public async Task<TResult> AggregateAsync<TResult>(SimpleAggregateRequestDto model)

@@ -96,8 +96,7 @@ ORDER BY (
  SpanId
  )
 TTL toDateTime(Timestamp) + toIntervalDay({MasaStackClickhouseConnection.TTL_Days})
-SETTINGS index_granularity = 8192,
- ttl_only_drop_parts = 1
+SETTINGS index_granularity = 8192
 {MasaStackClickhouseConnection.StorgePolicy};
 ";
         InitTable(table, sql);
@@ -206,8 +205,7 @@ ORDER BY (
  SpanId
  )
 TTL toDateTime(Timestamp) + toIntervalDay({MasaStackClickhouseConnection.TTL_Days})
-SETTINGS index_granularity = 8192,
- ttl_only_drop_parts = 1
+SETTINGS index_granularity = 8192
 {MasaStackClickhouseConnection.StorgePolicy};
 ";
         InitTable(table, sql);

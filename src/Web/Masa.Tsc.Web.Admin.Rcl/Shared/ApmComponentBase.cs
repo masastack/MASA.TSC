@@ -8,9 +8,6 @@ public partial class ApmComponentBase : MasaComponentBase
     [Inject]
     public JsInitVariables JsInitVariables { get; set; }
 
-    //[Inject]
-    //IHttpContextAccessor HttpContextAccessor { get; set; }
-
     [Inject]
     public TscCaller ApiCaller { get; set; }
 
@@ -21,6 +18,8 @@ public partial class ApmComponentBase : MasaComponentBase
     public GlobalConfig GlobalConfig { get; set; } = default!;
 
     protected Guid CurrentTeamId { get; set; }
+
+    public static string CurrentUrl { get; set; } = default!;
 
     [Inject]
     public IMultiEnvironmentUserContext UserContext { get; set; }
@@ -63,17 +62,21 @@ public partial class ApmComponentBase : MasaComponentBase
 
     }
 
-    private async Task SetStorage()
+    protected override void OnInitialized()
     {
-        if (StorageConst.Current != null) return;
-        var setting = await ApiCaller.SettingService.GetStorage();
-        if (setting == null)
-            throw new InvalidDataException("Storage setting is null");
-        if (setting.IsClickhouse)
-            StorageConst.Init(new ClickhouseStorageConst());
-        else if (setting.IsElasticsearch)
-            StorageConst.Init(new ElasticsearchStorageConst());
-        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+        base.OnInitialized();
+        if (IsPage)
+        {
+            if (string.IsNullOrEmpty(CurrentUrl))
+                CurrentUrl = NavigationManager.Uri;
+            LoadParamter();
+        }
+    }
+
+    protected static string Encrypt(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return string.Empty;
+        return string.Join("", SHA1.HashData(Encoding.UTF8.GetBytes(text)).Select(b => b.ToString("x2")));
     }
 
     protected override async Task OnInitializedAsync()
@@ -81,23 +84,21 @@ public partial class ApmComponentBase : MasaComponentBase
         await base.OnInitializedAsync();
         if (IsPage)
         {
-            await SetStorage();
-        }
-    }
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        if (StorageConst.Current == null) return;
-        if (IsPage)
-        {
-            LoadParamter();
+            if (StorageConst.Current != null) return;
+            var setting = await ApiCaller.SettingService.GetStorage();
+            if (setting == null)
+                throw new InvalidDataException("Storage setting is null");
+            if (setting.IsClickhouse)
+                StorageConst.Init(new ClickhouseStorageConst());
+            else if (setting.IsElasticsearch)
+                StorageConst.Init(new ElasticsearchStorageConst());
         }
     }
 
     protected void LoadParamter()
     {
         Search.Loaded = false;
+        if (StorageConst.Current == null) return;
         if (IsServicePage)
         {
             Search.Project = default!;
@@ -114,7 +115,7 @@ public partial class ApmComponentBase : MasaComponentBase
             Search.TextValue = default!;
         }
 
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var uri = NavigationManager.ToAbsoluteUri(CurrentUrl);
         var values = HttpUtility.ParseQueryString(uri.Query);
         var start = values.Get("start");
         var end = values.Get("end");

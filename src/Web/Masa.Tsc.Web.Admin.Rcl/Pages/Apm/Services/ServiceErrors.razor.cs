@@ -52,7 +52,7 @@ public partial class ServiceErrors
 
     protected override async Task OnParametersSetAsync()
     {
-        var key = MD5Utils.Encrypt(JsonSerializer.Serialize(SearchData));
+        var key = Encrypt(JsonSerializer.Serialize(SearchData));
         if (lastKey != key || SpanId != null && SpanId != lastSpanId || SpanId == null && lastSpanId.Length > 0)
         {
             lastKey = key;

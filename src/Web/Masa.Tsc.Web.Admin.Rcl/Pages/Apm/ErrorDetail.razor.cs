@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using System.Security.Cryptography;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm;
 
 public partial class ErrorDetail
@@ -64,8 +66,8 @@ public partial class ErrorDetail
     {
         await base.OnParametersSetAsync();
         if (!Show)
-            return;
-        var key = MD5Utils.Encrypt(JsonSerializer.Serialize(Search));
+            return;       
+        var key = Encrypt(JsonSerializer.Serialize(Search));
         if (lastKey != key || lastType != Search.ExceptionType || lastMessage != Search.ExceptionMsg)
         {
             lastKey = key;
@@ -77,7 +79,7 @@ public partial class ErrorDetail
             total = 1;
             await OnLoadAsync();
         }
-    }
+    }   
 
     private async Task LoadLogAysnc()
     {
@@ -142,7 +144,7 @@ public partial class ErrorDetail
                     break;
                 }
 
-            }            
+            }
         } while (count-- > 0);
     }
 

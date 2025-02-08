@@ -9,7 +9,7 @@ internal class TraceService : ServiceBase
     {
         App.MapGet($"{BaseUri}/{{traceId}}", GetAsync);
         App.MapGet($"{BaseUri}/list", GetListAsync);
-        App.MapGet($"{BaseUri}/attr-values", GetAttrValuesAsync);
+        App.MapPost($"{BaseUri}/attr-values", GetAttrValuesAsync);
         App.MapGet($"{BaseUri}/aggregate", AggregateAsync);
         App.MapGet($"{BaseUri}/getTraceIdByMetric", GetTraceIdByMetricAsync);
     }

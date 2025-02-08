@@ -27,17 +27,17 @@ public sealed class ApmService : BaseService
 
     public Task<Dictionary<string, List<EnvironmentAppDto>>> GetEnvironmentServiceAsync(Guid teamId, DateTime start, DateTime end, string? env = default, bool ignoreTeam = false) => Caller.GetAsync<Dictionary<string, List<EnvironmentAppDto>>>($"{RootPath}/EnvironmentService", data: new { teamId, start, end, env, ignoreTeam })!;
 
-    public Task<PaginatedListBase<TraceResponseDto>> GetTraceListAsync(BaseRequestDto query) => Caller.GetByBodyAsync<PaginatedListBase<TraceResponseDto>>($"{RootPath}/traceList", body: query)!;
+    public Task<PaginatedListBase<TraceResponseDto>> GetTraceListAsync(BaseRequestDto query) => Caller.PostAsync<PaginatedListBase<TraceResponseDto>>($"{RootPath}/traceList", query)!;
 
-    public Task<PaginatedListBase<LogResponseDto>> GetLogListAsync(Guid teamId, BaseRequestDto query, string? projectId = default, string? appType = default, bool ignoreTeam = false) => Caller.GetByBodyAsync<PaginatedListBase<LogResponseDto>>($"{RootPath}/logList?teamId={teamId}&project={projectId}&&ignoreTeam={ignoreTeam}{(string.IsNullOrEmpty(appType) ? "" : $"&appType={appType}")}", body: query)!;
+    public Task<PaginatedListBase<LogResponseDto>> GetLogListAsync(Guid teamId, BaseRequestDto query, string? projectId = default, string? appType = default, bool ignoreTeam = false) => Caller.PostAsync<PaginatedListBase<LogResponseDto>>($"{RootPath}/logList?teamId={teamId}&project={projectId}&&ignoreTeam={ignoreTeam}{(string.IsNullOrEmpty(appType) ? "" : $"&appType={appType}")}", query)!;
 
     public Task<PhoneModelDto> GetDeviceModelAsync(string brand, string model) => Caller.GetAsync<PhoneModelDto>($"{RootPath}/model?brand={brand}&model={model}")!;
 
     public Task<List<string>> GetStatusCodesAsync() => Caller.GetAsync<List<string>>($"{RootPath}/statuscodes")!;
 
-    public Task<List<string>> GetEndpointsAsync(BaseRequestDto query) => Caller.GetByBodyAsync<List<string>>($"{RootPath}/endpointList", query)!;
+    public Task<List<string>> GetEndpointsAsync(BaseRequestDto query) => Caller.PostAsync<List<string>>($"{RootPath}/endpointList", query)!;
 
-    public Task<List<string>> GetExceptionTypesAsync(BaseRequestDto query) => Caller.GetByBodyAsync<List<string>>($"{RootPath}/errorTypes", query)!;
+    public Task<List<string>> GetExceptionTypesAsync(BaseRequestDto query) => Caller.PostAsync<List<string>>($"{RootPath}/errorTypes", query)!;
 
-    public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmTraceLatencyRequestDto query) => Caller.GetByBodyAsync<PaginatedListBase<SimpleTraceListDto>>($"{RootPath}/simpleTraceList", body: query)!;
+    public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceListAsync(ApmTraceLatencyRequestDto query) => Caller.PostAsync<PaginatedListBase<SimpleTraceListDto>>($"{RootPath}/simpleTraceList", query)!;
 }

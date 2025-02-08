@@ -49,18 +49,41 @@ public partial class ApmSearchComponent
     private QuickRangeKey quickRangeKey = QuickRangeKey.Last15Minutes;
     private List<string> textFileds = new();
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        GlobalConfig.OnCurrentTeamChanged += TeamChanged;
+        SetQueryList();
+    }
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        if (StorageConst.Current == null) return;
+        SetQueryList();
         if (IsEndpoint)
             await LoadAsync();
-        await ReLoadAsync();
+        if (CurrentTeamId != Guid.Empty)
+            await ReLoadAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (StorageConst.Current != null && !Search.Loaded)
+        {
+            //bool init = textFileds.Count > 0;
+            SetQueryList();
+            //if (!init)
+            {
+                await ReLoadAsync();
+                StateHasChanged();
+            }
+        }
     }
 
     private async Task ReLoadAsync()
     {
-        Search.Loaded = false;
+        if (StorageConst.Current == null || Search.Loaded) return;
         if (Search.Start > DateTime.MinValue)
         {
             await InitAsync();
@@ -120,15 +143,6 @@ public partial class ApmSearchComponent
         }
     }
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        CurrentTeamId = GlobalConfig.CurrentTeamId;
-        if (StorageConst.Current == null) return;
-        GlobalConfig.OnCurrentTeamChanged += TeamChanged;
-        SetQueryList();
-    }
-
     public EnvironmentAppDto? GetService(string service)
     {
         if (string.IsNullOrEmpty(service))
@@ -150,6 +164,7 @@ public partial class ApmSearchComponent
 
     private void SetQueryList()
     {
+        if (StorageConst.Current == null) return;
         if (textFileds.Count > 0 || StorageConst.Current == null)
             return;
         textFileds = new List<string> {
@@ -175,7 +190,7 @@ public partial class ApmSearchComponent
         }
         if (string.IsNullOrEmpty(Value.TextField) || !textFileds.Contains(Value.TextField))
             Value.TextField = textFileds[0];
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var uri = NavigationManager.ToAbsoluteUri(CurrentUrl);
         if (string.IsNullOrEmpty(uri.Query))
         {
             if (string.IsNullOrEmpty(Search.Environment) && string.IsNullOrEmpty(Search.Service) && !string.IsNullOrEmpty(UserContext.Environment))
@@ -206,8 +221,10 @@ public partial class ApmSearchComponent
         if (CurrentTeamId == teamId)
             return;
         CurrentTeamId = teamId;
+        StateHasChanged();
         if (Search.Loaded)
         {
+            Search.Loaded = false;
             if (HasUrl())
                 LoadParamter();
             _ = InvokeAsync(ReLoadAsync);
@@ -217,7 +234,7 @@ public partial class ApmSearchComponent
 
     private bool HasUrl()
     {
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var uri = NavigationManager.ToAbsoluteUri(CurrentUrl);
         var values = HttpUtility.ParseQueryString(uri.Query);
         if (values.Count > 0)
         {
