@@ -181,10 +181,10 @@ internal class ApmService : ServiceBase
             Service = service
         });
 
-    public async Task<PaginatedListBase<TraceResponseDto>> GetTraceList([FromServices] ITraceService traceService, [FromBody] BaseRequestDto query)
+    public async Task<PaginatedListBase<TraceResponseDto>> AddTraceList([FromServices] ITraceService traceService, [FromBody] BaseRequestDto query)
         => await traceService.ListAsync(query);
 
-    public async Task<PaginatedListBase<LogResponseDto>> GetLogList([FromServices] ILogService logService, IAuthClient authClient, IPmClient pmClient, [FromBody] BaseRequestDto query, [FromQuery] Guid teamId, [FromQuery] string project, [FromQuery] AppTypes? appType, [FromQuery] bool ignoreTeam = false)
+    public async Task<PaginatedListBase<LogResponseDto>> AddLogList([FromServices] ILogService logService, IAuthClient authClient, IPmClient pmClient, [FromBody] BaseRequestDto query, [FromQuery] Guid teamId, [FromQuery] string project, [FromQuery] AppTypes? appType, [FromQuery] bool ignoreTeam = false)
     {
         var apmQuery = new BaseApmRequestDto
         {
@@ -312,16 +312,16 @@ internal class ApmService : ServiceBase
         return result;
     }
 
-    public Task<PaginatedListBase<SimpleTraceListDto>> GetSimpleTraceList([FromServices] IApmService apmService, [FromBody] ApmTraceLatencyRequestDto query)
+    public Task<PaginatedListBase<SimpleTraceListDto>> AddSimpleTraceList([FromServices] IApmService apmService, [FromBody] ApmTraceLatencyRequestDto query)
         => apmService.GetSimpleTraceListAsync(query);
 
-    public Task<List<string>> GetEndpointList([FromServices] IApmService apmService, [FromBody] BaseApmRequestDto query)
+    public Task<List<string>> AddEndpointList([FromServices] IApmService apmService, [FromBody] BaseApmRequestDto query)
         => apmService.GetEndpointsAsync(query);
 
     public Task<List<string>> GetStatusCodes([FromServices] IApmService apmService)
         => apmService.GetStatusCodesAsync();
 
-    public Task<List<string>> GetErrorTypes([FromServices] IApmService apmService, [FromBody] BaseApmRequestDto query)
+    public Task<List<string>> AddErrorTypes([FromServices] IApmService apmService, [FromBody] BaseApmRequestDto query)
         => apmService.GetErrorTypesAsync(query);
 
     private static string? GetEnv(string? env) => string.Equals("all", env, StringComparison.CurrentCultureIgnoreCase) ? default : env;
