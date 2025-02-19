@@ -82,7 +82,7 @@ StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configurat
 //    opt.DaprGrpcPort = 3603;
 //});
 //#endif
-builder.Services.AddDaprClient();
+//builder.Services.AddDaprClient();
 
 builder.Services.AddHttpContextAccessor();
 var app = builder.Build();

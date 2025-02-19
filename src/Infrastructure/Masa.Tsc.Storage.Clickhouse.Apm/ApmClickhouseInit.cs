@@ -53,8 +53,7 @@ ORDER BY (Timestamp,
 `Resource.service.namespace`
 )
 TTL toDateTime(Timestamp) + toIntervalDay({MasaStackClickhouseConnection.TTL_Days})
-SETTINGS index_granularity = 8192,
- ttl_only_drop_parts = 1
+SETTINGS index_granularity = 8192
 {MasaStackClickhouseConnection.StorgePolicy};
 ";
         ClickhouseInit.InitTable(connection, Constants.ErrorTable, sql);
@@ -277,8 +276,7 @@ ORDER BY (
  Resource.service.namespace,
 Duration)
 TTL toDateTime(Timestamp) + toIntervalDay({MasaStackClickhouseConnection.TTL_Days})
-SETTINGS index_granularity = 8192,
- ttl_only_drop_parts = 1
+SETTINGS index_granularity = 8192
 {MasaStackClickhouseConnection.StorgePolicy};";
         var viewTableName = table.Replace(".", ".v_");
         var sqlView =

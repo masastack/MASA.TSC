@@ -122,7 +122,7 @@ public partial class OverView
         if (!SearchData.Loaded)
             return;
         var text = JsonSerializer.Serialize(SearchData);
-        var key = MD5Utils.Encrypt(text);
+        var key = Encrypt(text);
         if (lastKey != key)
         {
             lastKey = key;

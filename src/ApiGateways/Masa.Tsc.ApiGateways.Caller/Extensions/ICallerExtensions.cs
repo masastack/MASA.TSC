@@ -8,12 +8,12 @@ internal static class ICallerExtensions
     public static async Task<TResult> GetByBodyAsync<TResult>(this ICaller caller, string url, object body, CancellationToken? token = null) where TResult : class
     {
 
-        if (caller is DaprCaller daprCaller)
-        {
-            var request = daprCaller.CreateRequest(HttpMethod.Get, url, body);
-            return (await daprCaller.SendAsync<TResult>(request, token ?? default)) ?? default!;
-        }
-        else
+        //if (caller is DaprCaller daprCaller)
+        //{
+        //    var request = daprCaller.CreateRequest(HttpMethod.Get, url, body);
+        //    return (await daprCaller.SendAsync<TResult>(request, token ?? default)) ?? default!;
+        //}
+        //else
         {
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             if (body != null)

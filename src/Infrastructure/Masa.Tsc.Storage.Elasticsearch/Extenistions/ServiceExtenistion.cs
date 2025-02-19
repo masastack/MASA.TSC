@@ -89,7 +89,7 @@ public static class ServiceExtenistion
                 callerBuilder.UseHttpClient(builder =>
                 {
                     builder.BaseAddress = nodes[0];
-                }).UseAuthentication();
+                });//.UseAuthentication();
             });
     }
 
@@ -103,7 +103,7 @@ public static class ServiceExtenistion
 
         if (factory == null || factory.Create(name) == null || callerFactory == null || callerFactory.Create(name) == null)
             services.AddElasticsearch(name, elasticsearchConnectionAction)
-               .AddCaller(name, option => option.UseHttpClient(callerAction).UseAuthentication());
+               .AddCaller(name, option => option.UseHttpClient(callerAction));//.UseAuthentication());
         return services;
     }
 

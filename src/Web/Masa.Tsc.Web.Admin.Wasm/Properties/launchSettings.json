@@ -12,10 +12,10 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development"        
       },
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
-      "applicationUrl": "https://localhost:7181;http://localhost:5181",
+      "applicationUrl": "https://localhost:18012;http://localhost:5181",
       "dotnetRunMessages": true
     },
     "IIS Express": {

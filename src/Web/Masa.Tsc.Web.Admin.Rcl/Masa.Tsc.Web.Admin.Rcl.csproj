@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-	<PropertyGroup>		
+	<PropertyGroup>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Components\Apm\JwtBearaToken.razor.cs" />
-	  <Compile Remove="Components\Apm\MMonacoEditor.razor.cs" />
+		<Compile Remove="Components\Apm\JwtBearaToken.razor.cs" />
+		<Compile Remove="Components\Apm\MMonacoEditor.razor.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Include="Components\Apm\ApmJwtBearaToken.razor.cs" />
-	  <Content Include="Components\Apm\MonacoEditor.razor.cs" />
+		<Content Include="Components\Apm\ApmJwtBearaToken.razor.cs" />
+		<Content Include="Components\Apm\MonacoEditor.razor.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -22,17 +22,16 @@
 	<ItemGroup>
 		<PackageReference Include="GraphQL.Client" Version="6.1.0" />
 		<PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.1.0" />
-		<PackageReference Include="Humanizer.Core" Version="2.14.1" />
-		<PackageReference Include="Humanizer.Core.zh-CN" Version="2.14.1" />
-		<PackageReference Include="Mapster" Version="7.3.0" />
-<!--		<PackageReference Include="Masa.Blazor" Version="1.8.3" />-->
-		<PackageReference Include="Masa.Stack.Components" Version="0.0.497" />
+		<PackageReference Include="Mapster" Version="7.3.0" />		
+		<PackageReference Include="Masa.Stack.Components" Version="0.0.497" />		
+		<PackageReference Include="Masa.Utils.Security.Cryptography" Version="1.2.0-preview.5" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="$(DotnetVersion)" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
 	</ItemGroup>
 
-	<ItemGroup>		
+	<ItemGroup>
 		<ProjectReference Include="..\..\ApiGateways\Masa.Tsc.ApiGateways.Caller\Masa.Tsc.ApiGateways.Caller.csproj" />
-		<ProjectReference Include="..\..\Contracts\Masa.Tsc.Contracts.Admin\Masa.Tsc.Contracts.Admin.csproj" />		
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Clickhouse.Shared\Masa.Tsc.Storage.Clickhouse.Shared.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

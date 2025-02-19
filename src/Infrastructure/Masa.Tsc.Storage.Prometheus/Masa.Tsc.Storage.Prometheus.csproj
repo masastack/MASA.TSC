@@ -8,4 +8,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Http" Version="$(DotnetVersion)" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Masa.Tsc.Storage.Prometheus.Shared\Masa.Tsc.Storage.Prometheus.Shared.csproj" />
+  </ItemGroup>
 </Project>

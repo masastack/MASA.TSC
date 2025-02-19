@@ -13,7 +13,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Masa.Tsc.Storage.Contracts\Masa.Tsc.Storage.Contracts.csproj" />
+	  <ProjectReference Include="..\Masa.Tsc.Storage.Clickhouse.Shared\Masa.Tsc.Storage.Clickhouse.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

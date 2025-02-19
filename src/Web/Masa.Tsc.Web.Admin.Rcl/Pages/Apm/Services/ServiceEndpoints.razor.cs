@@ -53,7 +53,7 @@ public partial class ServiceEndpoints
 
     protected override async Task OnParametersSetAsync()
     {
-        var key = MD5Utils.Encrypt(JsonSerializer.Serialize(SearchData));
+        var key = Encrypt(JsonSerializer.Serialize(SearchData));
         if (lastKey != key)
         {
             lastKey = key;
