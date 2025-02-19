@@ -6,11 +6,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Masa.Contrib.StackSdks.Dcc.Wasm" Version="$(MasaSdkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Pm.Wasm" Version="$(MasaSdkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Auth.Wasm" Version="$(MasaSdkPackageVersion)" />
-		<!--<PackageReference Include="Masa.Contrib.Service.Caller.DaprClient" Version="$(MasaFrameworkPackageVersion)" />-->
-		<!--<PackageReference Include="Masa.BuildingBlocks.Data.Contracts" Version="$(MasaFrameworkPackageVersion)" />-->		
+		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaSdkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Pm" Version="$(MasaSdkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Auth" Version="$(MasaSdkPackageVersion)" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(DotnetVersion)" />
 	</ItemGroup>
 

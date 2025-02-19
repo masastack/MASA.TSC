@@ -1,4 +1,4 @@
-﻿<CascadingAuthenticationState>
+﻿@* <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(WasmRoutes).Assembly"
             AdditionalAssemblies='new []{ Assembly.Load("Masa.Stack.Components")}' OnNavigateAsync="OnNavigateAsync">
         <Found Context="routeData">
@@ -19,4 +19,4 @@
         ApmComponentBase.CurrentUrl = args.Path;
         await Task.CompletedTask;
     }
-}
+} *@
