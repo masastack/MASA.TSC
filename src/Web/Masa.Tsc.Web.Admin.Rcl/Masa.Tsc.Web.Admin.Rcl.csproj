@@ -23,10 +23,8 @@
 		<PackageReference Include="GraphQL.Client" Version="6.1.0" />
 		<PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.1.0" />
 		<PackageReference Include="Mapster" Version="7.3.0" />		
-		<PackageReference Include="Masa.Stack.Components" Version="0.0.497" />		
-		<PackageReference Include="Masa.Utils.Security.Cryptography" Version="1.2.0-preview.5" />
+		<PackageReference Include="Masa.Stack.Components" Version="0.0.497" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="$(DotnetVersion)" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
 	</ItemGroup>
 
 	<ItemGroup>

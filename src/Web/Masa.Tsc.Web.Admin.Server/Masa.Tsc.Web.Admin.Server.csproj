@@ -6,9 +6,8 @@
 		<ServerGarbageCollection>false</ServerGarbageCollection>
 		<ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
 	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="IdentityModel" Version="6.1.0-preview.1" />
-		<PackageReference Include="Masa.Contrib.Development.DaprStarter.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />
+	<ItemGroup>		
+		<PackageReference Include="Masa.Contrib.Development.DaprStarter.AspNetCore" Version="$(MasaFrameworkPackageVersion)" />		
 		<PackageReference Include="Masa.Contrib.Isolation.MultiEnvironment" Version="$(MasaFrameworkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.OpenTelemetry" Version="$(MasaSdkPackageVersion)" />
 	</ItemGroup>

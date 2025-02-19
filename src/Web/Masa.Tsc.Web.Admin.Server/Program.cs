@@ -37,7 +37,8 @@ MasaOpenIdConnectOptions masaOpenIdConnectOptions = new()
 {
     Authority = masaStackConfig.GetSsoDomain(),
     ClientId = masaStackConfig.GetWebId(MasaStackProject.TSC),
-    Scopes = new List<string> { "offline_access" }
+    Scopes = new List<string> { "offline_access" },
+    
 };
 
 IdentityModelEventSource.ShowPII = true;
@@ -55,6 +56,7 @@ var redisOption = new RedisConfigurationOptions
     Password = masaStackConfig.RedisModel.RedisPassword
 };
 BlazorRouteManager.InitRoute(Assembly.Load("Masa.Tsc.Web.Admin.Rcl"));
+
 #if DEBUG
 if (builder.Environment.EnvironmentName == "Development")
 {
