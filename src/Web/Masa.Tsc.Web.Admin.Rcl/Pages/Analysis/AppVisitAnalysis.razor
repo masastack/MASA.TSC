@@ -47,7 +47,6 @@
             <MECharts Option="@_mapOption"
                       IncludeFunctionsInOption
                       MinHeight="616">
-                Height="@("100%")">
             </MECharts>
         </MCard>
     </MCol>
@@ -122,7 +121,7 @@
         </MCard>
     };
 
-    private static RenderFragment GenRate(string label, double rate) => __builder =>
+    internal static RenderFragment GenRate(string label, double rate) => __builder =>
     {
         var color = rate > 0 ? "success--text" : "error--text";
         var icon = rate > 0 ? "mdi-arrow-up" : "mdi-arrow-down";

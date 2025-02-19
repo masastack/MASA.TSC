@@ -1,0 +1,118 @@
+﻿@page "/analysis/core"
+@inherits TscComponentBase
+
+<MRow Dense>
+    <MCol Cols="12" Lg="6">
+        <MCard Class="echarts-card"
+               Title="累计用户-用户注册"
+               MinHeight="156">
+            @if (_mainData is not null)
+            {
+                <MCardText Class="text-center">
+                    <div class="text-h3 font-weight-bold">@_mainData.UserSign.ToString("N0")</div>
+                    <div>@_mainData.DateKey[..10]</div>
+                    <div>@AppVisitAnalysis.GenRate($"较昨日（{_mainData.ToYesterday}）", _mainData.Rate)</div>
+                </MCardText>
+            }
+        </MCard>
+    </MCol>
+    <MCol Cols="12" Lg="6">
+        <MCard Class="echarts-card"
+               MinHeight="156">
+            <MCardTitle>
+                核心数据-用户
+                <MTooltip Top>
+                    <ActivatorContent>
+                        <span style="border-bottom: dashed" @attributes="@context.Attrs">流失率</span>
+                    </ActivatorContent>
+                    <ChildContent>
+                        示例：7月份流失率=1-(8月份用户数(7月份访问)÷7月份访问用户数)×100%
+                    </ChildContent>
+                </MTooltip>
+                (较一个月前)
+            </MCardTitle>
+            <MCardText>
+                @if (_mainData is not null)
+                {
+                    <div class="text-center">
+                        <div class="text-h3 font-weight-bold">@_mainData.FinalUv.ToString("N0")</div>
+                        <div>@_mainData.DateKey[..10]</div>
+                        <div class="subtitle-2">
+                            <span>较一个月前（@_mainData.StartUv）</span>
+                            <span class="error--text">
+                                <MIcon Style="color: inherit;" Small>mdi-arrow-down</MIcon>
+                                <span>@(_mainData.AliveRate.ToString("P"))</span>
+                            </span>
+                        </div>
+                    </div>
+                }
+            </MCardText>
+        </MCard>
+    </MCol>
+    <MCol Cols="12">
+        <MCard Class="echarts-card"
+               Title="核心数据-忠诚用户">
+            <MCardText>
+                <MECharts Option="@_permonOption"
+                          MinHeight="260"/>
+            </MCardText>
+        </MCard>
+    </MCol>
+    <MCol Cols="12">
+        <MCard Class="echarts-card"
+               Title="累计用户趋势">
+            <MCardText>
+                <MECharts Option="@_monVisitOption"
+                          MinHeight="260"/>
+            </MCardText>
+        </MCard>
+    </MCol>
+    <MCol Cols="12">
+        <MCard Class="echarts-card"
+               Title="日访问趋势">
+            <MCardText>
+                <MECharts Option="@_monUserOption"
+                          MinHeight="360"/>
+            </MCardText>
+        </MCard>
+    </MCol>
+    <MCol Cols="12">
+        <MCard Class="echarts-card"
+               Title="新增用户">
+            <MCardText>
+                <MECharts Option="@_monUserVisitOption"
+                          MinHeight="360"/>
+            </MCardText>
+        </MCard>
+    </MCol>
+    <MCol Cols="12">
+        <MCard Class="echarts-card"
+               Title="用户流失率-近1月">
+            <MCardText>
+                <MECharts Option="@_userLoseByDayOption"
+                          IncludeFunctionsInOption
+                          MinHeight="360"/>
+            </MCardText>
+        </MCard>
+    </MCol>
+    <MCol Cols="12">
+        <MCard Class="echarts-card"
+               Title="用户流失率-按周">
+            <MCardText>
+                <MECharts Option="@_userLoseByWeekOption"
+                          IncludeFunctionsInOption
+                          MinHeight="360"/>
+            </MCardText>
+        </MCard>
+    </MCol>
+    <MCol Cols="12">
+        <MCard Class="echarts-card"
+               Title="用户流失率-按月">
+            <MCardText>
+                <MECharts Option="@_userLoseByMonOption"
+                          IncludeFunctionsInOption
+                          MinHeight="360"/>
+            </MCardText>
+        </MCard>
+    </MCol>
+</MRow>
