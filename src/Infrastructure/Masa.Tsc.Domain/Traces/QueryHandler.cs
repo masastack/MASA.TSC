@@ -162,8 +162,8 @@ internal class QueryHandler : EnvQueryHandler
         list.Add(new FieldConditionDto
         {
             Name = StorageConst.Current.Trace.SpanKind,
-            Type = ConditionTypes.Equal,
-            Value = "SPAN_KIND_SERVER"
+            Type = ConditionTypes.In,
+            Value = new string[] { "SPAN_KIND_SERVER", "Server" }
         });
 
         if (string.IsNullOrEmpty(query.Data.Service))

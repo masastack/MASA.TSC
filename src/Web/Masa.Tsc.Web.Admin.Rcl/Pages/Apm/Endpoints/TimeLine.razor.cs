@@ -36,7 +36,7 @@ public partial class TimeLine
     public string? Service { get; set; }
 
     [Parameter]
-    public string RoutePath { get; set; }   
+    public string RoutePath { get; set; }
 
     private string? lastKey = default;
     private bool loading = true;
@@ -74,7 +74,7 @@ public partial class TimeLine
     {
         await base.OnParametersSetAsync();
 
-        var str = $"{JsonSerializer.Serialize(Data)}";      
+        var str = $"{JsonSerializer.Serialize(Data)}";
         var key = Encrypt(str);
         if (lastKey != key)
         {
@@ -87,7 +87,7 @@ public partial class TimeLine
 
     protected override void OnInitialized()
     {
-        base.OnInitialized();        
+        base.OnInitialized();
         var uri = NavigationManager.ToAbsoluteUri(CurrentUrl);
         var values = HttpUtility.ParseQueryString(uri.Query);
         urlService = values.Get("service")!;
@@ -175,7 +175,7 @@ public partial class TimeLine
     private bool IsTarget(TreeLineDto item)
     {
         if (item.ServiceName == urlService
-               && item.Trace.Kind == "SPAN_KIND_SERVER"
+               && (item.Trace.Kind == "SPAN_KIND_SERVER" || item.Trace.Kind == "Server")
                && item.Trace.Resource.TryGetValue("telemetry.sdk.version", out var sdkVersion))
         {
             if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid) || string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1))

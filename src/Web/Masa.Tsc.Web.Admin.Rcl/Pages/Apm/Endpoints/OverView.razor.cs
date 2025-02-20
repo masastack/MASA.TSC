@@ -211,7 +211,7 @@ public partial class OverView
     {
         if (traceDetails == null || !traceDetails.Any())
             return;
-        var current = traceDetails.Find(item => item.Kind == "SPAN_KIND_SERVER"
+        var current = traceDetails.Find(item => (item.Kind == "SPAN_KIND_SERVER" || item.Kind == "Server")
                 && item.Attributes.TryGetValue("http.target", out var url) && string.Equals(SearchData.Endpoint, ((JsonElement)url).GetString())
                 && item.Resource.TryGetValue("service.name", out var service) && string.Equals(SearchData.Service, ((JsonElement)service).GetString())
                 )?.Duration;

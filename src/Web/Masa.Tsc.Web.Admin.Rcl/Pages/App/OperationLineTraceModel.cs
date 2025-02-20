@@ -37,9 +37,9 @@ public class OperationLineTraceModel
             {
                 return url.ToString()!;
             }
-            if (Data.Kind != "SPAN_KIND_SERVER" && Data.Attributes.TryGetValue("http.url", out url) && !string.IsNullOrEmpty(url?.ToString()))
+            if (!(Data.Kind == "SPAN_KIND_SERVER" || Data.Kind == "Server") && Data.Attributes.TryGetValue("http.url", out url) && !string.IsNullOrEmpty(url?.ToString()))
             {
-                return url.ToString()!;
+                return url!.ToString()!;
             }
             return "未匹配到路由";
         }

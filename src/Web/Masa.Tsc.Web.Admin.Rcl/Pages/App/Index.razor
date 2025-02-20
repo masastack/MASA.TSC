@@ -141,7 +141,7 @@
 
     private void RenderTraces(RenderTreeBuilder __builder, OperationLineTraceModel item)
     {
-        if (!showNormalClient && item.Data.Kind != "SPAN_KIND_SERVER" && !item.IsError)
+        if (!showNormalClient && !(item.Data.Kind == "SPAN_KIND_SERVER"|| item.Data.Kind=="Server") && !item.IsError)
             return;
         bool isSelected = currentLog == null && currentTrace != null && item == currentTrace;
         bool isSearchMatched = IsSearchKeyword(item);

@@ -120,7 +120,7 @@ public partial class TscTraceList : TscComponentBase
         }
         else if (dto.Attributes.ContainsKey("http.method"))
         {
-            if (dto.Kind == "SPAN_KIND_CLIENT")
+            if (dto.Kind == "SPAN_KIND_CLIENT" || dto.Kind == "Client")
             {
                 return dto.Attributes["http.url"].ToString();
             }

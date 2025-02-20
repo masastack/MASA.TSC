@@ -95,9 +95,9 @@ WHERE SeverityText in ['Error','Critical'] and mapContains(LogAttributes, 'excep
         if (!string.IsNullOrEmpty(traceTable))
         {
             AppTraceTable = traceTable;
-            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, traceTable, MasaStackClickhouseConnection.TraceHttpServerTable.Replace(".", ".v_app_"), "where SpanKind =='SPAN_KIND_SERVER' and mapContainsKeyLike(SpanAttributes, 'http.%')");
-            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, traceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_app_"), "where SpanKind =='SPAN_KIND_CLIENT' and mapContainsKeyLike(SpanAttributes, 'http.%')");
-            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, traceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_app_"), "where not (SpanKind =='SPAN_KIND_SERVER' and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind =='SPAN_KIND_CLIENT' and mapContainsKeyLike(SpanAttributes, 'http.%'))");
+            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, traceTable, MasaStackClickhouseConnection.TraceHttpServerTable.Replace(".", ".v_app_"), "where SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')");
+            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, traceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_app_"), "where SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%')");
+            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, traceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_app_"), "where not (SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%'))");
         }
     }
 
@@ -174,7 +174,7 @@ SELECT
     quantileState(0.95)(Duration) as P95 
 FROM {sourceTable}
 WHERE
-SpanKind='SPAN_KIND_SERVER'
+SpanKind in ('SPAN_KIND_SERVER','Server')
 and ResourceAttributes ['telemetry.sdk.version'] in ['{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}','{OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid}']
 GROUP BY
     ServiceName,
@@ -215,7 +215,7 @@ SELECT
     quantileState(0.95)(Duration) as P95 
 FROM {sourceTable}
 WHERE
-SpanKind='SPAN_KIND_SERVER'
+SpanKind in ('SPAN_KIND_SERVER','Server')
 and ResourceAttributes ['telemetry.sdk.version'] in ['{OpenTelemetrySdks.OpenTelemetrySdk1_9_0}']
 GROUP BY
     ServiceName,

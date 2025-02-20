@@ -119,7 +119,7 @@ public class TreeLineDto
         }
         else if (trace.Attributes.ContainsKey("http.scheme") || trace.Attributes.ContainsKey("http.url"))
         {
-            IsClient = trace.Kind == "SPAN_KIND_CLIENT";
+            IsClient = trace.Kind == "SPAN_KIND_CLIENT" || trace.Kind == "Client";
             _ = trace.Attributes.TryGetValue("http.status_code", out var statusCode) || trace.Attributes.TryGetValue("http.response.status_code", out statusCode);
             _ = trace.Attributes.TryGetValue("http.method", out var method) || trace.Attributes.TryGetValue("http.request.method", out method);
             _ = trace.Attributes.TryGetValue("http.target", out var target) || trace.Attributes.TryGetValue("url.path", out target) || trace.Attributes.TryGetValue("url.full", out target) || trace.Attributes.TryGetValue("http.url", out target) || trace.Attributes.TryGetValue("http.route", out target);

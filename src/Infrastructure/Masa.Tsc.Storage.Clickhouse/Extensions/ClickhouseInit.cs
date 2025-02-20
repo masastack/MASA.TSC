@@ -23,8 +23,8 @@ public static class ClickhouseInit
                 throw new ArgumentNullException(MasaStackClickhouseConnection.LogSourceTable);
             InitLog(MasaStackClickhouseConnection.LogTable, MasaStackClickhouseConnection.LogTable.Replace(".", ".v_"), MasaStackClickhouseConnection.LogSourceTable);
             InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceHttpServerTable.Replace(".", ".v_"), "where SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')");
-            InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_"), "where SpanKind in('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%')");
-            InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_"), "where not (SpanKind in('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind in('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%'))");
+            InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_"), "where SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%')");
+            InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_"), "where not (SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind in('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%'))");
             InitMappingTable();
             var timezoneStr = GetTimezone(Connection);
             MasaStackClickhouseConnection.TimeZone = TZConvert.GetTimeZoneInfo(timezoneStr);
