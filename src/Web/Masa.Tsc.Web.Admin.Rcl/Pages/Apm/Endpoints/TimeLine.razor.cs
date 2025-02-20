@@ -36,7 +36,7 @@ public partial class TimeLine
     public string? Service { get; set; }
 
     [Parameter]
-    public string RoutePath { get; set; }
+    public string RoutePath { get; set; }   
 
     private string? lastKey = default;
     private bool loading = true;
@@ -87,7 +87,7 @@ public partial class TimeLine
 
     protected override void OnInitialized()
     {
-        base.OnInitialized();
+        base.OnInitialized();        
         var uri = NavigationManager.ToAbsoluteUri(CurrentUrl);
         var values = HttpUtility.ParseQueryString(uri.Query);
         urlService = values.Get("service")!;

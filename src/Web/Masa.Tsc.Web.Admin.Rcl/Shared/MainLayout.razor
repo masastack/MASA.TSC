@@ -41,15 +41,15 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        if (StorageConst.Current != null) return;
-        var setting = await ApiCaller.SettingService.GetStorage();
-        if (setting == null)
-            throw new InvalidDataException("Storage setting is null");
-        if (setting.IsClickhouse)
-            StorageConst.Init(new ClickhouseStorageConst());
-        else if (setting.IsElasticsearch)
-            StorageConst.Init(new ElasticsearchStorageConst());
-        //StateHasChanged();
+        // if (StorageConst.Current != null) return;
+        // var setting = await ApiCaller.SettingService.GetStorage();
+        // if (setting == null)
+        //     throw new InvalidDataException("Storage setting is null");
+        // if (setting.IsClickhouse)
+        //     StorageConst.Init(new ClickhouseStorageConst());
+        // else if (setting.IsElasticsearch)
+        //     StorageConst.Init(new ElasticsearchStorageConst());
+        // StateHasChanged();
         //NavigationManager.NavigateTo(ApmComponentBase.CurrentUrl, true);
     }
 }

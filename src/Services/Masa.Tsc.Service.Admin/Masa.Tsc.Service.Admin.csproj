@@ -31,7 +31,6 @@
 		<PackageReference Include="Masa.Contrib.StackSdks.Tsc.OpenTelemetry" Version="$(MasaSdkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaSdkPackageVersion)" />
 		<PackageReference Include="Masa.Contrib.StackSdks.Pm" Version="$(MasaSdkPackageVersion)" />
-
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />		
 		<PackageReference Include="Dapr.AspNetCore" Version="1.10.0" />

@@ -9,6 +9,9 @@ public partial class ApmComponentBase : MasaComponentBase
     public JsInitVariables JsInitVariables { get; set; }
 
     [Inject]
+    IHttpContextAccessor HttpContextAccessor { get; set; }
+
+    [Inject]
     public TscCaller ApiCaller { get; set; }
 
     [Inject]
@@ -19,10 +22,11 @@ public partial class ApmComponentBase : MasaComponentBase
 
     protected Guid CurrentTeamId { get; set; }
 
-    public static string CurrentUrl { get; set; } = default!;
-
     [Inject]
     public IMultiEnvironmentUserContext UserContext { get; set; }
+
+    [Inject]
+    public MasaUser MasaUser { get; set; }
 
     public static TimeZoneInfo CurrentTimeZone { get; private set; }
 
@@ -51,32 +55,44 @@ public partial class ApmComponentBase : MasaComponentBase
         base.OnAfterRender(firstRender);
     }
 
+    protected bool IsNeedRefresh = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!initialized && StorageConst.Current != null)
+        {
+            IsNeedRefresh = true;
+            initialized = true;
+            LoadParamter();
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
     protected virtual bool IsPage { get; set; } = false;
 
     protected virtual bool IsServicePage { get; }
     protected virtual bool IsEndPointPage { get; }
     protected virtual bool IsErrorPage { get; set; }
 
+    protected string CurrentUrl { get; set; }
+
     public ApmComponentBase()
     {
 
     }
 
-    protected override void OnInitialized()
+    private async Task SetStorage()
     {
-        base.OnInitialized();
-        if (IsPage)
-        {
-            if (string.IsNullOrEmpty(CurrentUrl))
-                CurrentUrl = NavigationManager.Uri;
-            LoadParamter();
-        }
-    }
-
-    protected static string Encrypt(string text)
-    {
-        if (string.IsNullOrEmpty(text)) return string.Empty;
-        return string.Join("", SHA1.HashData(Encoding.UTF8.GetBytes(text)).Select(b => b.ToString("x2")));
+        if (StorageConst.Current != null) return;
+        var setting = await ApiCaller.SettingService.GetStorage();
+        if (setting == null)
+            throw new InvalidDataException("Storage setting is null");
+        if (setting.IsClickhouse)
+            StorageConst.Init(new ClickhouseStorageConst());
+        else if (setting.IsElasticsearch)
+            StorageConst.Init(new ElasticsearchStorageConst());
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
@@ -84,21 +100,26 @@ public partial class ApmComponentBase : MasaComponentBase
         await base.OnInitializedAsync();
         if (IsPage)
         {
-            if (StorageConst.Current != null) return;
-            var setting = await ApiCaller.SettingService.GetStorage();
-            if (setting == null)
-                throw new InvalidDataException("Storage setting is null");
-            if (setting.IsClickhouse)
-                StorageConst.Init(new ClickhouseStorageConst());
-            else if (setting.IsElasticsearch)
-                StorageConst.Init(new ElasticsearchStorageConst());
+            await SetStorage();
+        }
+    }
+    bool initialized = false;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        CurrentUrl = NavigationManager.Uri;
+        initialized = StorageConst.Current != null;
+        if (!initialized) return;
+        if (IsPage)
+        {
+            LoadParamter();
         }
     }
 
     protected void LoadParamter()
     {
         Search.Loaded = false;
-        if (StorageConst.Current == null) return;
         if (IsServicePage)
         {
             Search.Project = default!;
@@ -115,7 +136,7 @@ public partial class ApmComponentBase : MasaComponentBase
             Search.TextValue = default!;
         }
 
-        var uri = NavigationManager.ToAbsoluteUri(CurrentUrl);
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         var values = HttpUtility.ParseQueryString(uri.Query);
         var start = values.Get("start");
         var end = values.Get("end");
@@ -202,5 +223,11 @@ public partial class ApmComponentBase : MasaComponentBase
         if (envs != null && envs.Length == 1)
             return envs[0];
         return default;
+    }
+
+    protected static string Encrypt(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return string.Empty;
+        return string.Join("", SHA1.HashData(Encoding.UTF8.GetBytes(text)).Select(b => b.ToString("x2")));
     }
 }
