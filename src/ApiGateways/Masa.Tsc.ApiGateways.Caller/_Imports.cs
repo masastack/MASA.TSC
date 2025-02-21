@@ -3,14 +3,14 @@
 
 global using Masa.BuildingBlocks.Service.Caller;
 global using Masa.BuildingBlocks.StackSdks.Auth;
+global using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Model;
 global using Masa.BuildingBlocks.StackSdks.Dcc;
 global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Log;
 global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Model;
 global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Model.Aggregate;
 global using Masa.BuildingBlocks.StackSdks.Tsc.Contracts.Trace;
 global using Masa.Contrib.Service.Caller;
-//global using Masa.Contrib.Service.Caller.DaprClient;
-//global using Masa.Contrib.StackSdks.Caller;
+global using Masa.Tsc.ApiGateways.Caller;
 global using Masa.Tsc.ApiGateways.Caller.Services;
 global using Masa.Tsc.Contracts.Admin;
 global using Masa.Tsc.Contracts.Admin.Apps;
@@ -31,4 +31,3 @@ global using Masa.Utils.Models;
 global using Microsoft.Extensions.DependencyInjection;
 global using System.Text;
 global using System.Text.Json;
-global using Masa.Tsc.ApiGateways.Caller;

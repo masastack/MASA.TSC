@@ -1,9 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Contracts.Admin.Enums;
-using Masa.Tsc.Domain.Shared.Entities;
-
 namespace Masa.Tsc.Repository.Repositories;
 
 internal class InstrumentRepository : Repository<TscDbContext, Instrument, Guid>, IInstrumentRepository

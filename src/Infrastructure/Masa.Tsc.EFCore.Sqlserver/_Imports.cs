@@ -1,4 +1,5 @@
 ﻿global using Masa.Tsc.Contracts.Admin.Enums;
+global using Masa.Tsc.Domain.Shared.Entities;
 global using Masa.Tsc.EFCore;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Design;

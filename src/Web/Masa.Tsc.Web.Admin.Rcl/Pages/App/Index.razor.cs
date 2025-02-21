@@ -1,10 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Masa.BuildingBlocks.StackSdks.Auth.Contracts.Model;
-using Masa.Tsc.Contracts.Admin.User;
-using System.Collections.Specialized;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.App;
 
 public partial class Index

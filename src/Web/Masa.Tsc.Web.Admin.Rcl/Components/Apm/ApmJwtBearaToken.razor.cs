@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using System.IdentityModel.Tokens.Jwt;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm;
 
 public partial class ApmJwtBearaToken

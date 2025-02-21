@@ -1,9 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Masa.Blazor.JSInterop;
-using System.Reflection;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints;
 
 public partial class OverView
