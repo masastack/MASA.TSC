@@ -11,7 +11,13 @@
                 <MCardText Class="text-center">
                     <div class="text-h3 font-weight-bold">@_mainData.UserSign.ToString("N0")</div>
                     <div>@_mainData.DateKey[..10]</div>
-                    <div>@AppVisitAnalysis.GenRate($"较昨日（{_mainData.ToYesterday}）", _mainData.Rate)</div>
+                    <div class="subtitle-2">
+                        <span>较昨日（@_mainData.ToYesterday）</span>
+                        <span class="green--text">
+                                <MIcon Style="color: inherit;" Small>mdi-arrow-up</MIcon>
+                                <span>@(_mainData.Rate.ToString("P"))</span>
+                            </span>
+                    </div>
                 </MCardText>
             }
         </MCard>
@@ -39,7 +45,7 @@
                         <div>@_mainData.DateKey[..10]</div>
                         <div class="subtitle-2">
                             <span>较一个月前（@_mainData.StartUv）</span>
-                            <span class="error--text">
+                            <span class="red--text">
                                 <MIcon Style="color: inherit;" Small>mdi-arrow-down</MIcon>
                                 <span>@(_mainData.AliveRate.ToString("P"))</span>
                             </span>
