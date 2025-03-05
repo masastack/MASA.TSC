@@ -14,7 +14,8 @@ public partial class ApmJwtBearaToken
     JwtSecurityTokenHandler handler = new();
     JsonSerializerOptions _options = new JsonSerializerOptions
     {
-        WriteIndented = true
+        WriteIndented = true,
+        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
     };
 
     protected override void OnParametersSet()
