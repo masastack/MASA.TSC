@@ -81,3 +81,5 @@ global using System.Collections.Specialized;
 global using System.IdentityModel.Tokens.Jwt;
 global using Masa.Blazor.JSInterop;
 global using System.Reflection;
+global using System.Text.Encodings.Web;
+global using System.Text.Unicode;
