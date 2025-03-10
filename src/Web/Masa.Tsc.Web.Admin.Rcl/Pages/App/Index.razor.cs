@@ -248,6 +248,7 @@ public partial class Index
     private async Task OnTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) time)
     {
         (start, end) = (time.start!.Value.UtcDateTime, time.end!.Value.UtcDateTime);
+        //await LoadService();
         data.Clear();
         await LoadTrace();
     }
@@ -337,8 +338,8 @@ public partial class Index
             {
                 new FieldConditionDto{
                     Name="ScopeName",
-                    Type= ConditionTypes.Equal,
-                    Value="MAUI"
+                    Type= ConditionTypes.In,
+                    Value=new string[]{ "MAUI","web" }
                 }
             },
             Name = StorageConst.Current.ServiceName,
@@ -350,7 +351,7 @@ public partial class Index
             services = new();
             return;
         }
-        _teamServices = await ApiCaller.ApmService.GetEnvironmentServiceAsync(GlobalConfig.CurrentTeamId, Search.Start, Search.End, ignoreTeam: true);
+        _teamServices = await ApiCaller.ApmService.GetEnvironmentServiceAsync(GlobalConfig.CurrentTeamId, Search.End, Search.End, ignoreTeam: true);
         if (_teamServices != null && _teamServices.Count > 0)
         {
             foreach (var service in data)
@@ -573,5 +574,14 @@ public partial class Index
         Search.Environment = default!;
         Search.Endpoint = default!;
         Search.TraceId = currentTrace?.Data.TraceId!;
+    }
+
+    private static string GetVersion(Dictionary<string, object>? dic)
+    {
+        if (dic == null || dic.Count == 0)
+            return string.Empty;
+        if (dic.TryGetValue("service.version", out var version) && version != null)
+            return version.ToString()!;
+        return string.Empty;
     }
 }

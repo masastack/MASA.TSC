@@ -42,7 +42,7 @@
     </div>
 </div>
 <div class="d-flex justify-space-between py-2">
-    <div class="my-2 pl-1">APP版本号：@firstTrace?.Resource["service.version"]</div>
+    <div class="my-2 pl-1">APP版本号：@GetVersion(firstTrace?.Resource)</div>
     <div class="my-2 pl-4">终端类型：@ClientType()</div>
     <div class="my-2 pl-4">手机型号：@PhoneModel()</div>
     <div class="my-2 pl-4">操作系统：@ClientOs()</div>
@@ -141,7 +141,7 @@
 
     private void RenderTraces(RenderTreeBuilder __builder, OperationLineTraceModel item)
     {
-        if (!showNormalClient && !(item.Data.Kind == "SPAN_KIND_SERVER"|| item.Data.Kind=="Server") && !item.IsError)
+        if (!showNormalClient && !(item.Data.Kind == "SPAN_KIND_SERVER" || item.Data.Kind == "Server") && !item.IsError)
             return;
         bool isSelected = currentLog == null && currentTrace != null && item == currentTrace;
         bool isSearchMatched = IsSearchKeyword(item);

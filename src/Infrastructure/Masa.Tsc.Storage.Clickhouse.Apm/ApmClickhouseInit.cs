@@ -140,7 +140,10 @@ SETTINGS index_granularity = 8192
         ClickhouseInit.InitTable(connection, tableName, sql);
         InitAggregateTable1_5_1(connection, interval, tableName, viewTable, MasaStackClickhouseConnection.TraceSourceTable);
         if (!string.IsNullOrEmpty(AppTraceTable))
+        {
             InitAggregateTable1_5_1(connection, interval, tableName, tableName.Replace(".", ".v_app_"), AppTraceTable);
+            InitAggregateTable1_25_1(connection, interval, tableName, tableName.Replace(".", ".v_app_"), AppTraceTable);
+        }
         InitAggregateTable1_9_0(connection, interval, tableName, viewTable, MasaStackClickhouseConnection.TraceSourceTable);
     }
 
@@ -176,6 +179,47 @@ FROM {sourceTable}
 WHERE
 SpanKind in ('SPAN_KIND_SERVER','Server')
 and ResourceAttributes ['telemetry.sdk.version'] in ['{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}','{OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid}']
+GROUP BY
+    ServiceName,
+    `Resource.service.namespace`,
+    `Attributes.http.target`,
+    `Attributes.http.method`,
+    Timestamp";
+        ClickhouseInit.InitTable(connection, viewTable, sql);
+    }
+
+    private static void InitAggregateTable1_25_1(MasaStackClickhouseConnection connection, string interval, string tableName, string viewTable, string sourceTable)
+    {
+        viewTable = $"{viewTable}_{OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1.Replace('.', '_')}";
+        var sql =
+$@"CREATE MATERIALIZED VIEW {viewTable} TO {tableName}
+(
+    `ServiceName` String,
+    `Resource.service.namespace` String,
+     `Attributes.http.target` String,
+    `Attributes.http.method` String,
+    `Timestamp` DateTime64(9),
+    `Latency` AggregateFunction(avg, Float64),
+    `Throughput` AggregateFunction(count, UInt8),
+    `Failed` AggregateFunction(count, UInt8),
+    `P99` AggregateFunction(quantile(0.99),Int64),
+    `P95` AggregateFunction(quantile(0.95), Int64)
+) AS
+SELECT
+    ServiceName,
+    ResourceAttributes['service.namespace'] `Resource.service.namespace`,
+    SpanAttributes['http.target'] `Attributes.http.target`,
+    SpanAttributes['http.method'] `Attributes.http.method`,
+    toStartOfInterval(Timestamp,INTERVAL {interval}) AS Timestamp,
+    avgState(Duration) AS Latency,
+    countState(1) AS Throughput,
+    sumState(has(['400','500','501','502','503'],SpanAttributes['http.status_code'])) as Failed,
+    quantileState(0.99)(Duration) as P99,
+    quantileState(0.95)(Duration) as P95 
+FROM {sourceTable}
+WHERE
+SpanKind in ('SPAN_KIND_SERVER','Server')
+and ResourceAttributes ['telemetry.sdk.version'] in ['{OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1}']
 GROUP BY
     ServiceName,
     `Resource.service.namespace`,
