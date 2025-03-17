@@ -159,7 +159,7 @@ public partial class Index
     //auth获取
     private string RolesNames()
     {
-        if (roles == null || !roles.Any() || user == null || user.Roles == null || !user.Roles.Any())
+        if (roles == null || !roles.Any() || user == null || user.Roles == null || user.Roles.Count == 0)
             return default;
         return string.Join(", ", roles.Where(role => user.Roles.Exists(r => r.Id == role.Id)).Select(role => role.Name));
     }
@@ -201,10 +201,11 @@ public partial class Index
     {
         if (_userId == userId)
             return;
-        ClearData();
+        ClearData(true);
         _userId = userId;
-        roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
         user = await ApiCaller.UserService.GetUserDetailAsync(userId);
+        if (roles == null || roles.Count == 0)
+            roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
         await LoadUserClaimsAsync();
         await LoadTrace();
     }
@@ -389,15 +390,18 @@ public partial class Index
         }
     }
 
-    private void ClearData()
+    private void ClearData(bool clearUser = false)
     {
-        user = null;
+        if (clearUser)
+        {
+            user = null;
+            claims.Clear();
+        }
         currentLog = null;
         currentTrace = null;
         traceLines.Clear();
         firstTrace = null;
         phoneModel = null;
-        claims.Clear();
         data.Clear();
         StateHasChanged();
     }
