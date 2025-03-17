@@ -204,8 +204,7 @@ public partial class Index
         ClearData(true);
         _userId = userId;
         user = await ApiCaller.UserService.GetUserDetailAsync(userId);
-        if (roles == null || roles.Count == 0)
-            roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
+        roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
         await LoadUserClaimsAsync();
         await LoadTrace();
     }
