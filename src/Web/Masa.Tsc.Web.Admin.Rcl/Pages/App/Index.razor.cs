@@ -203,8 +203,7 @@ public partial class Index
             return;
         ClearData();
         _userId = userId;
-        if (roles == null)
-            roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
+        roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
         user = await ApiCaller.UserService.GetUserDetailAsync(userId);
         await LoadUserClaimsAsync();
         await LoadTrace();
@@ -247,8 +246,11 @@ public partial class Index
 
     private async Task OnTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) time)
     {
+        if (Search.Start == DateTime.MinValue)
+        {
+            await LoadService();
+        }
         (start, end) = (time.start!.Value.UtcDateTime, time.end!.Value.UtcDateTime);
-        //await LoadService();
         data.Clear();
         await LoadTrace();
     }
@@ -330,6 +332,9 @@ public partial class Index
     private bool isLoadService = true;
     private async Task LoadService()
     {
+        if (services != null && services.Count > 0 || start == DateTime.MinValue)
+            return;
+
         isLoadService = true;
         var data = await ApiCaller.TraceService.GetAttrValuesAsync(new SimpleAggregateRequestDto
         {
@@ -351,7 +356,7 @@ public partial class Index
             services = new();
             return;
         }
-        _teamServices = await ApiCaller.ApmService.GetEnvironmentServiceAsync(GlobalConfig.CurrentTeamId, Search.End, Search.End, ignoreTeam: true);
+        _teamServices = await ApiCaller.ApmService.GetEnvironmentServiceAsync(GlobalConfig.CurrentTeamId, end.AddDays(-30), end, ignoreTeam: true);
         if (_teamServices != null && _teamServices.Count > 0)
         {
             foreach (var service in data)
