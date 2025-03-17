@@ -10,7 +10,6 @@ public partial class Index
     private Guid _userId;
     private string _searchText;
     private bool isSearchEnd = false;
-    private List<UserRoleDto>? roles = default;
     private UserModel? user = default;
     private TraceResponseDto? firstTrace;
     private PhoneModelDto? phoneModel;
@@ -159,9 +158,9 @@ public partial class Index
     //auth获取
     private string RolesNames()
     {
-        if (roles == null || !roles.Any() || user == null || user.Roles == null || user.Roles.Count == 0)
+        if (user == null || user.Roles == null || user.Roles.Count == 0)
             return default;
-        return string.Join(", ", roles.Where(role => user.Roles.Exists(r => r.Id == role.Id)).Select(role => role.Name));
+        return string.Join(", ", user.Roles.Select(role => role.Name));
     }
 
     private void SearchValueChange(string value)
@@ -204,7 +203,6 @@ public partial class Index
         ClearData(true);
         _userId = userId;
         user = await ApiCaller.UserService.GetUserDetailAsync(userId);
-        roles = await ApiCaller.UserService.GetUserRolesAsync(userId);
         await LoadUserClaimsAsync();
         await LoadTrace();
     }
