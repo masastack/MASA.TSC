@@ -13,7 +13,7 @@ public class UserService : BaseService
 
     public Task<UserModel> GetUserDetailAsync(Guid userId)
     {
-        return _authClient.UserService.GetByIdAsync(userId)!;
+        return _authClient.UserService.GetDetailAsync(userId)!;
     }
 
     public Task<List<UserRoleDto>> GetUserRolesAsync(Guid userId)

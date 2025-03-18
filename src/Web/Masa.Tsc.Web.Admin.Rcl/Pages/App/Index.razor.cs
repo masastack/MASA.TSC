@@ -203,7 +203,6 @@ public partial class Index
         ClearData(true);
         _userId = userId;
         user = await ApiCaller.UserService.GetUserDetailAsync(userId);
-        StateHasChanged();
         await LoadUserClaimsAsync();
         await LoadTrace();
     }
