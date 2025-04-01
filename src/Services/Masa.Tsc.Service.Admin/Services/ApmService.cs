@@ -104,7 +104,7 @@ internal class ApmService : ServiceBase
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus)
         });
 
-    public async Task<PaginatedListBase<ErrorMessageDto>> GetErrors([FromServices] IApmService apmService, IAuthClient authClient, IPmClient pmClient, int page, int pageSize, string start, string end, Guid teamId, string project, AppTypes? appType, bool ignoreTeam, string? env, string? service, string? endpoint, string? exType, string? textField, string? textValue, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc, string? traceId,bool filter=true)
+    public async Task<PaginatedListBase<ErrorMessageDto>> GetErrors([FromServices] IApmService apmService, IAuthClient authClient, IPmClient pmClient, int page, int pageSize, string start, string end, Guid teamId, string project, AppTypes? appType, bool ignoreTeam, string? env, string? service, string? endpoint, string? exType, string? textField, string? textValue, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc, string? traceId, bool filter = true)
     {
         var query = new ApmErrorRequestDto
         {
@@ -122,7 +122,7 @@ internal class ApmService : ServiceBase
             PageSize = pageSize,
             Service = service,
             TraceId = traceId!,
-            Filter= filter
+            Filter = filter
         };
 
         if (ignoreTeam || await GetApps(query, authClient, pmClient, teamId, project, appType))
@@ -234,7 +234,7 @@ internal class ApmService : ServiceBase
             End = end.ParseUTCTime()
         });
 
-        var teamData = await GetTeamAllEnvAppsAsync(authClient, pmClient, teamId, data.Keys);
+        var teamData = await GetTeamAllEnvAppsAsync(authClient, pmClient, teamId, data.Keys, ignoreTeam);
         if (teamData.Count == 0)
             return new Dictionary<string, List<EnvironmentAppDto>> { { multiEnvironmentContext.CurrentEnvironment, new() } };
         var result = new Dictionary<string, List<EnvironmentAppDto>>();
@@ -254,7 +254,7 @@ internal class ApmService : ServiceBase
     {
         if (string.IsNullOrEmpty(request.Env))
             return false;
-        var apps = await GetTeamAppsAsync(authClient, pmClient, teamId, request.Env!);
+        var apps = await GetTeamAppsAsync(authClient, pmClient, request.Env!, teamId);
         if (apps == null || apps.Count == 0)
             return false;
 
@@ -277,20 +277,18 @@ internal class ApmService : ServiceBase
         return request.AppIds.Any();
     }
 
-    private async Task<Dictionary<string, List<EnvironmentAppDto>>> GetTeamAppsAsync(IAuthClient authClient, IPmClient pmClient, Guid teamId, string env)
+    private async Task<Dictionary<string, List<EnvironmentAppDto>>> GetTeamAppsAsync(IAuthClient authClient, IPmClient pmClient, string env, params Guid[] teamIds)
     {
         var result = new Dictionary<string, List<EnvironmentAppDto>>();
-        if (teamId == Guid.Empty || string.IsNullOrEmpty(env))
+        if (teamIds.Length == 0 || teamIds.All(teamId => teamId == Guid.Empty) || string.IsNullOrEmpty(env))
             return result;
 
-        var cacheKey = $"env-app_{teamId}_{env}";
+        var cacheKey = $"env-app_{(teamIds.Length > 1 ? "all" : teamIds[0])}_{env}";
         if (_memoryCache.TryGetValue(cacheKey, out result))
             return result!;
         result = new();
-        var team = await authClient.TeamService.GetDetailAsync(teamId);
-        if (team == null) return result;
 
-        var projects = await pmClient.ProjectService.GetListByTeamIdsAsync(new List<Guid> { teamId }, env);
+        var projects = await pmClient.ProjectService.GetListByTeamIdsAsync([.. teamIds], env);
         if (projects == null || projects.Count == 0) return result;
         var apps = await pmClient.AppService.GetListByProjectIdsAsync(projects.Select(item => item.Id).ToList());
         result.Add(env, apps.Select(item => new EnvironmentAppDto
@@ -304,12 +302,20 @@ internal class ApmService : ServiceBase
         return result;
     }
 
-    private async Task<Dictionary<string, List<EnvironmentAppDto>>> GetTeamAllEnvAppsAsync(IAuthClient authClient, IPmClient pmClient, Guid teamId, IEnumerable<string> envs)
+    private async Task<Dictionary<string, List<EnvironmentAppDto>>> GetTeamAllEnvAppsAsync(IAuthClient authClient, IPmClient pmClient, Guid teamId, IEnumerable<string> envs, bool ignoreTeam = false)
     {
         var result = new Dictionary<string, List<EnvironmentAppDto>>();
         foreach (var env in envs)
         {
-            var item = await GetTeamAppsAsync(authClient, pmClient, teamId, env);
+            var teamIds = new[] { teamId };
+            if (ignoreTeam)
+            {
+                var teams = await authClient.TeamService.GetAllAsync(env);
+                if (teams == null || !teams.Any()) continue;
+                teamIds = teams.Select(t => t.Id).ToArray();
+            }
+
+            var item = await GetTeamAppsAsync(authClient, pmClient, env, teamIds);
             if (item != null && item.Count > 0)
                 result.Add(item.First().Key, item.First().Value);
         }
