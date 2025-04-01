@@ -83,7 +83,7 @@ public partial class Service
             IsDesc = sortBy,
             ComparisonType = Search.ComparisonType.ToComparisonType(),
         };
-        var result = await ApiCaller.ApmService.GetServicePageAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
+        var result = await ApiCaller.ApmService.GetServicePageAsync(CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
         total = 0;
         if (result != null && result.Result != null && result.Result.Any())

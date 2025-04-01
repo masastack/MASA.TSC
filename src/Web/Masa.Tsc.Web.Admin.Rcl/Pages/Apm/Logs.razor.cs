@@ -128,7 +128,7 @@ public partial class Logs
             list.Add(new FieldConditionDto { Name = nameof(ApmErrorRequestDto.Filter), Value = true, Type = ConditionTypes.Equal });
 
         query.Conditions = list;
-        var result = await ApiCaller.ApmService.GetLogListAsync(GlobalConfig.CurrentTeamId, query, Search.Project, Search.ServiceType);
+        var result = await ApiCaller.ApmService.GetLogListAsync(CurrentTeamId, query, Search.Project, Search.ServiceType);
         data.Clear();
         total = 0;
         if (result != null)
