@@ -56,6 +56,7 @@ public partial class ApmSearchComponent
         if (IsEndpoint)
             await LoadAsync();
         await ReLoadAsync();
+        text.AppendLine(MasaUser.CurrentTeamId.ToString());
     }
 
     private async Task ReLoadAsync()
@@ -121,16 +122,21 @@ public partial class ApmSearchComponent
         }
     }
 
+
+    StringBuilder text = new StringBuilder();
+
     protected override void OnInitialized()
     {
-        base.OnInitialized();
+        text.AppendLine(MasaUser.CurrentTeamId.ToString());
         if (MasaUser.CurrentTeamId != Guid.Empty)
         {
             GlobalConfig.CurrentTeamId = MasaUser.CurrentTeamId;
         }
         CurrentTeamId = GlobalConfig.CurrentTeamId;
+        text.AppendLine(CurrentTeamId.ToString());
         GlobalConfig.OnCurrentTeamChanged += TeamChanged;
         SetQueryList();
+        base.OnInitialized();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -255,6 +261,15 @@ public partial class ApmSearchComponent
         await LoadProjectAsync();
         await LoadServiceAsync();
         await OnValueChanged();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (CurrentTeamId != MasaUser.CurrentTeamId)
+        {
+            CurrentTeamId = MasaUser.CurrentTeamId;
+        }
+        base.OnParametersSet();
     }
 
     private async Task LoadServiceAsync()
