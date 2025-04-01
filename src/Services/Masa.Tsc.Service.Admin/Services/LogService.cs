@@ -12,10 +12,10 @@ internal class LogService : ServiceBase
             builder.RequireAuthorization();
         };
 
-        App.MapGet($"{BaseUri}/aggregate", AggregateAsync).RequireAuthorization();
-        App.MapGet($"{BaseUri}/latest", GetLatestAsync).RequireAuthorization();
-        App.MapGet($"{BaseUri}/mapping", GetMappingFieldAsync).RequireAuthorization();
-        App.MapGet($"{BaseUri}/list", GetPageAsync).RequireAuthorization();
+        App.MapGet($"{BaseUri}/aggregate", AggregateAsync);
+        App.MapGet($"{BaseUri}/latest", GetLatestAsync);
+        App.MapGet($"{BaseUri}/mapping", GetMappingFieldAsync);
+        App.MapGet($"{BaseUri}/list", GetPageAsync);
     }
 
     private async Task<object> AggregateAsync([FromServices] IEventBus eventBus, [FromBody] SimpleAggregateRequestDto param)
@@ -27,7 +27,7 @@ internal class LogService : ServiceBase
     }
 
     private async Task<LogResponseDto> GetLatestAsync([FromServices] IEventBus eventBus, [FromBody] RequestLogLatestDto param)
-    {        
+    {
         var query = new LatestLogQuery(param.Start, param.End, param.Service, param.Query, param.IsDesc);
         await eventBus.PublishAsync(query);
         return query.Result;

@@ -11,11 +11,11 @@ internal class MetricService : ServiceBase
         {
             builder.RequireAuthorization();
         };
-        App.MapGet($"{BaseUri}/label-values", GetLabelValuesAsync).RequireAuthorization();
-        App.MapGet($"{BaseUri}/range-values", GetRangeValuesAsync).RequireAuthorization();
-        App.MapGet($"{BaseUri}/query-range", GetQueryRangeAsync).RequireAuthorization();
-        App.MapGet($"{BaseUri}/multi-range", GetMultiRangeAsync).RequireAuthorization();
-        App.MapGet($"{BaseUri}/multi-query", GetMultiQueryAsync).RequireAuthorization();
+        App.MapGet($"{BaseUri}/label-values", GetLabelValuesAsync);
+        App.MapGet($"{BaseUri}/range-values", GetRangeValuesAsync);
+        App.MapGet($"{BaseUri}/query-range", GetQueryRangeAsync);
+        App.MapGet($"{BaseUri}/multi-range", GetMultiRangeAsync);
+        App.MapGet($"{BaseUri}/multi-query", GetMultiQueryAsync);
     }
 
     public async Task<IEnumerable<string>> GetNamesAsync([FromServices] IEventBus eventBus, [FromQuery] string? match)
