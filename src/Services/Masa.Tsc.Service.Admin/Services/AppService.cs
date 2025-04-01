@@ -7,7 +7,10 @@ internal class AppService : ServiceBase
 {
     public AppService() : base("/api/app")
     {
-
+        RouteHandlerBuilder = builder =>
+        {
+            builder.RequireAuthorization();
+        };
     }
 
     public async Task<List<AppDto>> GetListAsync([FromServices] IEventBus eventBus, string projectId)

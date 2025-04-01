@@ -7,8 +7,12 @@ internal class ProjectService : ServiceBase
 {
     public ProjectService() : base("/api/project")
     {
-        App.MapGet($"{BaseUri}/overview", OverviewAsync);
-        App.MapGet($"{BaseUri}", GetProjectsAsync);
+        RouteHandlerBuilder = builder =>
+        {
+            builder.RequireAuthorization();
+        };
+        App.MapGet($"{BaseUri}/overview", OverviewAsync).RequireAuthorization();
+        App.MapGet($"{BaseUri}", GetProjectsAsync).RequireAuthorization();
     }
 
     private async Task<List<ProjectDto>> GetProjectsAsync([FromServices] IEventBus eventBus, [FromQuery] Guid userId)

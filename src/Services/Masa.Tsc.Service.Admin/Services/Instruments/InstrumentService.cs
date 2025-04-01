@@ -7,8 +7,12 @@ internal class InstrumentService : ServiceBase
 {
     public InstrumentService() : base("/api/Instrument")
     {
-        App.MapPost($"{BaseUri}/set-root/{{id}}/{{isRoot}}", SetRootAsync);
-        App.MapPost($"{BaseUri}/upsert/{{instrumentId}}", UpsertAsync);
+        RouteHandlerBuilder = builder =>
+        {
+            builder.RequireAuthorization();
+        };
+        App.MapPost($"{BaseUri}/set-root/{{id}}/{{isRoot}}", SetRootAsync).RequireAuthorization();
+        App.MapPost($"{BaseUri}/upsert/{{instrumentId}}", UpsertAsync).RequireAuthorization();
     }
 
     public async Task AddAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, [FromBody] AddDashboardDto model)

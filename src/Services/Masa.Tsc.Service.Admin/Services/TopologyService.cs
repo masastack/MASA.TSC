@@ -7,7 +7,11 @@ internal class TopologyService : ServiceBase
 {
     public TopologyService() : base("/api/topology")
     {
-        App.MapGet($"{BaseUri}/start", StartAsync);
+        RouteHandlerBuilder = builder =>
+        {
+            builder.RequireAuthorization();
+        };
+        App.MapGet($"{BaseUri}/start", StartAsync).RequireAuthorization();
     }
 
     public async Task StartAsync([FromServices] IEventBus eventBus, [FromQuery] DateTimeOffset? excuteTime)

@@ -124,7 +124,7 @@ public partial class ApmSearchComponent
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if (GlobalConfig.CurrentTeamId == Guid.Empty && MasaUser.CurrentTeamId != Guid.Empty)
+        if (MasaUser.CurrentTeamId != Guid.Empty)
         {
             GlobalConfig.CurrentTeamId = MasaUser.CurrentTeamId;
         }

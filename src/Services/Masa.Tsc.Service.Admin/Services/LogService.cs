@@ -7,10 +7,15 @@ internal class LogService : ServiceBase
 {
     public LogService() : base("/api/log")
     {
-        App.MapGet($"{BaseUri}/aggregate", AggregateAsync);
-        App.MapGet($"{BaseUri}/latest", GetLatestAsync);
-        App.MapGet($"{BaseUri}/mapping", GetMappingFieldAsync);
-        App.MapGet($"{BaseUri}/list", GetPageAsync);
+        RouteHandlerBuilder = builder =>
+        {
+            builder.RequireAuthorization();
+        };
+
+        App.MapGet($"{BaseUri}/aggregate", AggregateAsync).RequireAuthorization();
+        App.MapGet($"{BaseUri}/latest", GetLatestAsync).RequireAuthorization();
+        App.MapGet($"{BaseUri}/mapping", GetMappingFieldAsync).RequireAuthorization();
+        App.MapGet($"{BaseUri}/list", GetPageAsync).RequireAuthorization();
     }
 
     private async Task<object> AggregateAsync([FromServices] IEventBus eventBus, [FromBody] SimpleAggregateRequestDto param)

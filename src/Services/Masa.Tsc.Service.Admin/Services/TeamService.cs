@@ -7,7 +7,11 @@ internal class TeamService : ServiceBase
 {
     public TeamService() : base("/api/team")
     {
-        App.MapGet($"{BaseUri}/{{teamId}}/{{projectId}}", GetAsync);
+        RouteHandlerBuilder = builder =>
+        {
+            builder.RequireAuthorization();
+        };
+        App.MapGet($"{BaseUri}/{{teamId}}/{{projectId}}", GetAsync).RequireAuthorization();
     }
 
     private async Task<TeamDto> GetAsync([FromServices] IEventBus eventBus, Guid teamId, string projectId)

@@ -7,7 +7,11 @@ internal class DirectoryService : ServiceBase
 {
     public DirectoryService() : base("/api/Instrument/directory")
     {
-        App.MapGet($"{BaseUri}/tree/{{isContainsInstrument}}", GetTreeAsync);
+        RouteHandlerBuilder = builder =>
+        {
+             builder.RequireAuthorization();
+        };
+        App.MapGet($"{BaseUri}/tree/{{isContainsInstrument}}", GetTreeAsync).RequireAuthorization();
     }
 
     public async Task<IEnumerable<DirectoryTreeDto>> GetTreeAsync([FromServices] IEventBus eventBus, [FromServices] IUserContext userContext, bool isContainsInstrument)

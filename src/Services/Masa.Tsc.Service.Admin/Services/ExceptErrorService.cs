@@ -7,7 +7,10 @@ internal class ExceptErrorService : ServiceBase
 {   
     public ExceptErrorService() : base("/api/except-error")
     {
-       
+        RouteHandlerBuilder = builder =>
+        {
+            builder.RequireAuthorization();
+        };
     }
 
     public async Task AddAsync([FromServices] IEventBus eventBus,[FromServices] IUserContext userContext, [FromBody] RequestAddExceptError request)

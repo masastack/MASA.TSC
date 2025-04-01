@@ -6,7 +6,12 @@ namespace Masa.Tsc.Service.Admin.Services;
 internal class ClientService : ServiceBase
 {
     public ClientService() : base("/api/client")
-    { }
+    {
+        RouteHandlerBuilder = builder =>
+        {
+            builder.RequireAuthorization();
+        };
+    }
 
     public string GetIp([FromServices] IHttpContextAccessor httpContext)
     {

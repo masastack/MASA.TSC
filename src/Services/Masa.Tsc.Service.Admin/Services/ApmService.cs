@@ -8,6 +8,10 @@ internal class ApmService : ServiceBase
     private readonly IMemoryCache _memoryCache;
     public ApmService(IMemoryCache memoryCache) : base("/api/apm")
     {
+        RouteHandlerBuilder = builder =>
+        {
+            builder.RequireAuthorization();
+        };
         _memoryCache = memoryCache;
     }
 

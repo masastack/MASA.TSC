@@ -7,11 +7,15 @@ internal class TraceService : ServiceBase
 {
     public TraceService() : base("/api/trace")
     {
-        App.MapGet($"{BaseUri}/{{traceId}}", GetAsync);
-        App.MapGet($"{BaseUri}/list", GetListAsync);
-        App.MapPost($"{BaseUri}/attr-values", GetAttrValuesAsync);
-        App.MapGet($"{BaseUri}/aggregate", AggregateAsync);
-        App.MapGet($"{BaseUri}/getTraceIdByMetric", GetTraceIdByMetricAsync);
+        RouteHandlerBuilder = builder =>
+        {
+            builder.RequireAuthorization();
+        };
+        App.MapGet($"{BaseUri}/{{traceId}}", GetAsync).RequireAuthorization();
+        App.MapGet($"{BaseUri}/list", GetListAsync).RequireAuthorization();
+        App.MapPost($"{BaseUri}/attr-values", GetAttrValuesAsync).RequireAuthorization();
+        App.MapGet($"{BaseUri}/aggregate", AggregateAsync).RequireAuthorization();
+        App.MapGet($"{BaseUri}/getTraceIdByMetric", GetTraceIdByMetricAsync).RequireAuthorization();
     }
 
     private async Task<IEnumerable<TraceResponseDto>> GetAsync([FromServices] IEventBus eventBus, [FromRoute] string traceId, [FromQuery] string start, [FromQuery] string end)
