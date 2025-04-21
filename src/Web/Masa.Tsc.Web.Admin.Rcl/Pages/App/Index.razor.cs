@@ -367,7 +367,7 @@ public partial class Index
                     {
                         services.Add(ValueTuple.Create(service, app.AppDescription));
                         find = true;
-                        return;
+                        break;
                     }
                 }
                 if (!find)

@@ -218,7 +218,7 @@ SELECT
     quantileState(0.95)(Duration) as P95 
 FROM {sourceTable}
 WHERE
-SpanKind in ('SPAN_KIND_SERVER','Server')
+SpanKind in ('SPAN_KIND_SERVER','Server') and `Attributes.http.target`!=''
 and ResourceAttributes ['telemetry.sdk.version'] in ['{OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1}']
 GROUP BY
     ServiceName,
@@ -329,6 +329,7 @@ AS
 select Timestamp,ServiceName,Resource.service.namespace,Attributes.http.method,Attributes.http.status_code,Attributes.http.target,TraceId,Duration
 from 
 {MasaStackClickhouseConnection.TraceHttpServerTable}
+where `Attributes.http.target`!=''
 ";
         ClickhouseInit.InitTable(connection, table, sql);
         ClickhouseInit.InitTable(connection, viewTableName, sqlView);
@@ -376,6 +377,7 @@ from
             floor(Duration/1000000) as Duration,
             countState(1) AS Total
         FROM {Constants.DurationTable}
+        where `Attributes.http.target`!=''
         GROUP BY
             ServiceName,
             `Resource.service.namespace`,

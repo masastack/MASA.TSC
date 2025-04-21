@@ -313,7 +313,7 @@ SELECT
     ResourceAttributes['service.namespace'] as `Resource.service.namespace`,ResourceAttributes['service.version'] as `Resource.service.version`,
     ResourceAttributes['service.instance.id'] as `Resource.service.instance.id`,
     
-    SpanAttributes['http.status_code'] as `Attributes.http.status_code`,
+    SpanAttributes['http.response.status_code'] as `Attributes.http.status_code`,
     SpanAttributes['http.response_content_body'] as `Attributes.http.response_content_body`,
     SpanAttributes['http.request_content_body'] as `Attributes.http.request_content_body`,
     SpanAttributes['http.target'] as `Attributes.http.target`,    
