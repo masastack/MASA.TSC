@@ -14,6 +14,8 @@ internal static class TraceResponseDtoExtenistion
             return trace.Attributes.TryGetValue("http.status_code", out var statusCode) && int.TryParse(statusCode.ToString(), out var num) ? num : default;
         else if (sdkVersion == OpenTelemetrySdks.OpenTelemetrySdk1_9_0)
             return trace.Attributes.TryGetValue("http.response.status_code", out var statusCode) && int.TryParse(statusCode.ToString(), out var num) ? num : default;
+        else if (sdkVersion == OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1)
+            return trace.Attributes.TryGetValue("http.response.status_code", out var statusCode) && int.TryParse(statusCode.ToString(), out var num) ? num : default;
         return default;
     }
 
@@ -26,10 +28,18 @@ internal static class TraceResponseDtoExtenistion
             return trace.Attributes.TryGetValue("http.method", out var method) ? method.ToString() : default;
         else if (sdkVersion == OpenTelemetrySdks.OpenTelemetrySdk1_9_0)
             return trace.Attributes.TryGetValue("http.request.method", out var method) ? method.ToString() : default;
+        else if (sdkVersion == OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1)
+            return trace.Attributes.TryGetValue("http.method", out var method) ? method.ToString() : default;
         return default;
     }
 
-    public static string? UserAgent(this TraceResponseDto trace) => trace.Attributes.TryGetValue("user_agent.original", out var agent) || trace.Attributes.TryGetValue("http.user_agent", out agent) ? agent.ToString() : default;
+    public static string? UserAgent(this TraceResponseDto trace) => trace.Attributes.TryGetValue("user_agent.original", out var agent) || trace.Attributes.TryGetValue("http.user_agent", out agent) || trace.Attributes.TryGetValue("client.user_agent", out agent) ? agent.ToString() : default;
+
+    public static bool TryGetUserAgent(this TraceResponseDto trace, out string? userAgent)
+    {
+        userAgent = trace.UserAgent();
+        return string.IsNullOrEmpty(userAgent);
+    }
 
     public static string? Target(this TraceResponseDto trace)
     {
@@ -40,6 +50,8 @@ internal static class TraceResponseDtoExtenistion
             return trace.Attributes.TryGetValue("http.url", out var url) ? url.ToString() : default;
         else if (sdkVersion == OpenTelemetrySdks.OpenTelemetrySdk1_9_0)
             return trace.Attributes.TryGetValue("url.path", out var url) ? url.ToString() : default;
+        else if (sdkVersion == OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1)
+            return trace.Attributes.TryGetValue("http.target", out var url) ? url.ToString() : default;
         return default;
     }
 

@@ -190,6 +190,12 @@ public partial class TimeLine
                 return IsNullOrEquals(item.Trace.Attributes, "http.request.method", urlMethod)
                      && (IsNullOrEquals(item.Trace.Attributes, "http.route", UrlEndpoint) || IsNullOrEquals(item.Trace.Attributes, "url.path", UrlEndpoint));
             }
+
+            if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1))
+            {
+                return IsNullOrEquals(item.Trace.Attributes, "http.method", urlMethod)
+                     && IsNullOrEquals(item.Trace.Attributes, "http.target", UrlEndpoint);
+            }
         }
         return false;
     }
@@ -329,7 +335,7 @@ public partial class TimeLine
         lastDuration = totalDuration;
     }
 
-    private string GetUrl(TreeLineDto current, bool isSpan = false, string baseUrl = "/apm/logs")
+    private string GetUrl(TreeLineDto? current, bool isSpan = false, string baseUrl = "/apm/logs")
     {
         if (current == null)
             return string.Empty;

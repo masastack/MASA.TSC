@@ -15,7 +15,7 @@
                 <div style="color: rgb(52, 55, 65);width:1px" class="mx-2">|</div>
                 <div class="px-2 text-truncate" style="max-width:calc(70% - 300px);background-color: rgb(211, 218, 230); color: rgb(0, 0, 0);" title="@(defaultTimeLine?.Trace?.Method()) @(defaultTimeLine?.Trace?.Target())">@(defaultTimeLine?.Trace?.Method()) @(defaultTimeLine?.Trace?.Target())</div>
                 <div class="px-2 rounded-sm" style="color:#fff;background-color:@((defaultTimeLine?.Faild ?? false)?"red":"green")">@(defaultTimeLine?.Trace?.StatusCode()) @((defaultTimeLine?.Faild ?? false) ? "Failed" : "OK")</div>
-                @if ((defaultTimeLine?.Trace?.Attributes.TryGetValue("user_agent.original", out var userAgent) ?? false))
+                @if (defaultTimeLine?.Trace != null && defaultTimeLine!.Trace!.TryGetUserAgent(out string? userAgent))
                 {
                     <div class="px-2" style="color: rgb(52, 55, 65);width:1px">|</div>
                     <div class="px-2 text-truncate" style="max-width:200px" title="@userAgent">@userAgent</div>
@@ -39,7 +39,7 @@
                 {
                     <div class="pl-2">
                         <div class="pa-1 rounded-xl" style="cursor: pointer;@(GetServiceStyle(service))" @onclick="@(()=>OnServiceSelected(service))">
-                            
+
                             @{
                                 var text = GetService(service, Masa.Tsc.Web.Admin.Rcl.Pages.App.Index.GetService)?.AppDescription;
                                 if (string.IsNullOrEmpty(text))
@@ -56,7 +56,7 @@
                                     </ChildContent>
                                 </MTooltip>
                             }
-                            </div>
+                        </div>
                     </div>
                 }
             </div>
@@ -105,37 +105,37 @@
 
             if (selectedServices.Contains(timeLine.ServiceName!))
             {
-            <div class="time_line d-flex justify-space-between">
-                <div class="left_col d-flex justify-space-start" style="margin-left:@(level*8)px;border-left:solid 1px #ccc">
-                    @if (timeLine.Children != null && timeLine.Children.Any())
-                    {
-                        <SIcon Small Color="black" Class="pl-4 pr-2" OnClick="@(()=>ShowOrHideLine(timeLine))">@timeLine.ShowIcon</SIcon> <span class="pt-4" style="font-size:900">@timeLine.Children.Count</span>
-                    }
-                </div>
-                <div style="width:calc(100% - 100px)">
-                    <div class="d-flex mt-2">
-                        <div class="left" style="width:@timeLine.Left%"></div>
-                        <div @onclick="(()=>ShowTraceDetail(timeLine))" class="process" title="@timeLine.Label" style="width:@timeLine.Process%;background-color:@colors[services.IndexOf(timeLine.ServiceName)]"></div>
-                        <div class="right" style="width:@timeLine.Right%"></div>
+                <div class="time_line d-flex justify-space-between">
+                    <div class="left_col d-flex justify-space-start" style="margin-left:@(level*8)px;border-left:solid 1px #ccc">
+                        @if (timeLine.Children != null && timeLine.Children.Any())
+                        {
+                            <SIcon Small Color="black" Class="pl-4 pr-2" OnClick="@(()=>ShowOrHideLine(timeLine))">@timeLine.ShowIcon</SIcon> <span class="pt-4" style="font-size:900">@timeLine.Children.Count</span>
+                        }
                     </div>
-                    <div class="@className" style="@style">
-                        <div class="content" @onclick="(()=>ShowTraceDetail(timeLine))">
-                            <div class="name d-flex" title="@timeLine.Label">
-                                <SIcon>@timeLine.Icon</SIcon> <i class="pl-2" style="line-height:30px">@timeLine.Type</i> <div class="@($"{timeLine.NameClass} subtitle-1 text-truncate ml-2")" style="max-width:400px">@timeLine.Name</div> <i class="pl-2" style="line-height:30px">@timeLine.Latency</i>
-                                @if (timeLine.Faild)
-                                {
-                                    <SButton XSmall Color="red white--text ml-2 mt-1" Style="text-transform:none">@I18n.T("failure")</SButton>
-                                }
-                                @if (timeLine.IsError)
-                                {
-                                    <SButton XSmall OnClickStopPropagation=true Color="red white--text ml-2 mt-1" Style="text-transform:none" OnClick="@(()=>OpenLogAsync(timeLine))">View related error</SButton>
-                                }
+                    <div style="width:calc(100% - 100px)">
+                        <div class="d-flex mt-2">
+                            <div class="left" style="width:@timeLine.Left%"></div>
+                            <div @onclick="(()=>ShowTraceDetail(timeLine))" class="process" title="@timeLine.Label" style="width:@timeLine.Process%;background-color:@colors[services.IndexOf(timeLine.ServiceName)]"></div>
+                            <div class="right" style="width:@timeLine.Right%"></div>
+                        </div>
+                        <div class="@className" style="@style">
+                            <div class="content" @onclick="(()=>ShowTraceDetail(timeLine))">
+                                <div class="name d-flex" title="@timeLine.Label">
+                                    <SIcon>@timeLine.Icon</SIcon> <i class="pl-2" style="line-height:30px">@timeLine.Type</i> <div class="@($"{timeLine.NameClass} subtitle-1 text-truncate ml-2")" style="max-width:400px">@timeLine.Name</div> <i class="pl-2" style="line-height:30px">@timeLine.Latency</i>
+                                    @if (timeLine.Faild)
+                                    {
+                                        <SButton XSmall Color="red white--text ml-2 mt-1" Style="text-transform:none">@I18n.T("failure")</SButton>
+                                    }
+                                    @if (timeLine.IsError)
+                                    {
+                                        <SButton XSmall OnClickStopPropagation=true Color="red white--text ml-2 mt-1" Style="text-transform:none" OnClick="@(()=>OpenLogAsync(timeLine))">View related error</SButton>
+                                    }
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <div class="right_col"></div>
                 </div>
-                <div class="right_col"></div>
-            </div>
             }
             @if (level == 0 && !showTimeLine)
             {
