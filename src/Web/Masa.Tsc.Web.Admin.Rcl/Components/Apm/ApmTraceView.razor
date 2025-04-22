@@ -116,6 +116,10 @@ else
                                     @value
                                 </a>
                             }
+                            else if (string.Equals(currentName, "Attributes.http.request_content_body"))
+                            {
+                                @FormatForm(value?.ToString())
+                            }
                             else
                             {
                                 @value
@@ -134,5 +138,67 @@ else
     private static bool IsFundamental(Type type)
     {
         return type.IsPrimitive || type.IsEnum || type.Equals(typeof(string)) || type.Equals(typeof(DateTime));
+    }
+
+    private static string FormatForm(string? body)
+    {
+        if (string.IsNullOrEmpty(body))
+            return string.Empty;
+        var data = body.Split("\r\n");
+
+        var index = 0;
+        var startLine = string.Empty;
+        var files = new List<string>();
+        bool isFile = false;
+        string lastValue = string.Empty;
+        do
+        {
+            var temp = data[index++];
+            if (!string.IsNullOrEmpty(temp))
+            {
+                if (temp.StartsWith("-----"))
+                {
+                    if (string.IsNullOrEmpty(startLine))
+                    {
+                        startLine = temp;
+                    }
+                    else
+                    {
+                        if (!isFile)
+                            files.Add(lastValue);
+                        //文件结束
+                        //startLine = string.Empty;
+                        lastValue = string.Empty;
+                        isFile = false;
+                    }
+                }
+                else if (temp.IndexOf("filename=") > 0)
+                {
+                    isFile = true;
+                    var startIndex = temp.IndexOf("filename=") + "filename=".Length + 1;
+                    var fileName = temp.Substring(startIndex, temp.IndexOf('"', startIndex + 1) - startIndex);
+                    files.Add(fileName);
+                }
+                else if (temp.IndexOf("name=") > 0)
+                {
+                    var startIndex = temp.IndexOf("name=") + "name=".Length + 1;
+                    var keyName = temp.Substring(startIndex, temp.IndexOf('"', startIndex + 1) - startIndex);
+                    lastValue = keyName;
+                }
+                else if (!string.IsNullOrEmpty(lastValue))
+                {
+                    lastValue = $"{lastValue}: {temp}";
+                }
+            }
+            if (data.Length - index == 0)
+            {
+                break;
+            }
+        }
+        while (true);
+        if(files.Count>0)
+            return string.Join("\r\n", files);
+
+        return body;
     }
 }
