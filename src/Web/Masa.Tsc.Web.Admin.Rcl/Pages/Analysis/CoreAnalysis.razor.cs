@@ -33,9 +33,17 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
         private object? _userLoseByWeekOption;
         private object? _userLoseByMonOption;
 
+        private bool _dateRangeMenu;
+        private List<DateOnly> _dateRange = [];
+
         protected override void OnInitialized()
         {
             base.OnInitialized();
+
+            var now = DateTime.UtcNow.Add(CurrentTimeZone.BaseUtcOffset);
+            var nowDate = DateOnly.FromDateTime(now);
+
+            _dateRange = [nowDate.AddMonths(-1), nowDate];
 
             var httpClient = HttpClientFactory.CreateClient("analysis");
             _graphClient = new GraphQLHttpClient("http://10.130.0.33:4000/cubejs-api/graphql",
@@ -57,6 +65,17 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             }
 
             await base.OnAfterRenderAsync(firstRender);
+        }
+
+        private async Task OnDateRangeUpdate()
+        {
+            if (_dateRange.Count != 2)
+            {
+                return;
+            }
+
+            _dateRangeMenu = false;
+            await GetMonUserDataAsync();
         }
 
         private async Task GetMainDataAsync()
@@ -99,9 +118,10 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
         private async Task GetMonUserDataAsync()
         {
             var response = await _graphClient.SendQueryAsync<CubeData<MonUserItem>>(
-                GenGraphQLQuery("coremonuser", "datekey", "uv", "uvt", "pv", "newuser", "newvisit"));
+                GenGraphQLQuery("coremonuser", _dateRange[0], _dateRange[1], "uv", "uvt", "pv", "newuser",
+                    "newvisit"));
             var monUserDatas = response.Data.Items.Select(x => x.MonUser).ToArray();
-            var x = monUserDatas.Select(u => u.DateKey[..10]).ToArray();
+            var x = monUserDatas.Select(u => u.DateKey.Day[..10]).ToArray();
             var uv = monUserDatas.Select(u => u.Uv).ToArray();
             var uvt = monUserDatas.Select(u => u.Uvt).ToArray();
             var pv = monUserDatas.Select(u => u.Pv).ToArray();
@@ -374,6 +394,28 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
                   """);
         }
 
+        private static GraphQLHttpRequest GenGraphQLQuery(string dataName, DateOnly startDate, DateOnly endDate,
+            params string[] fields)
+        {
+            var start = startDate.ToString("yyyy-MM-dd");
+            var end = endDate.ToString("yyyy-MM-dd");
+            var condition = $"(orderBy:{{datekey:asc}},where:{{datekey:{{inDateRange:[\"{start}\", \"{end}\"]}}}})";
+
+            return new GraphQLHttpRequest(
+                $$"""
+                  query {
+                    cube {
+                      {{dataName}}{{condition}} {
+                        datekey {
+                          day
+                        }
+                        {{string.Join("\n      ", fields)}}
+                      }
+                    }
+                  }
+                  """);
+        }
+
         private record CoreMainItem(
             [property: JsonPropertyName("coremain")]
             CoreMainData CoreMain);
@@ -418,7 +460,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private record MonUserData(
             [property: JsonPropertyName("datekey")]
-            string DateKey,
+            DateKey DateKey,
             int Uv,
             int Uvt,
             int Pv,
@@ -426,6 +468,8 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             int? NewUser,
             [property: JsonPropertyName("newvisit")]
             int? NewVisit);
+
+        private record DateKey(string Day);
 
         private record UserLoseByDayItem(
             [property: JsonPropertyName("coreulosebyday")]
