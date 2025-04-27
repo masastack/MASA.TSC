@@ -1,31 +1,35 @@
 ﻿@page "/analysis/core"
 @inherits TscComponentBase
 
-<MRow Dense>
-    <MCol Cols="12" Class="d-flex align-center justify-end">
-        <MMenu @bind-Value="_dateRangeMenu" CloseOnContentClick="false" OffsetY>
-            <ActivatorContent>
-                <MButton @attributes="@context.Attrs" Plain Right>
-                    <MTooltip Top>
-                        <ActivatorContent Context="tContext">
-                            <MIcon @attributes="@tContext.Attrs" Small Class="mr-1">mdi-help-circle-outline</MIcon>
-                        </ActivatorContent>
-                        <ChildContent>
-                            查询“日访问趋势”和“新增用户”数据的日期范围
-                        </ChildContent>
-                    </MTooltip>
+<MSticky ZIndex="7" OffsetTop="52" Context="stickyContext">
+    <MRow Dense>
+        <MCol Cols="12" Class="d-flex align-center justify-center">
+            <MMenu @bind-Value="_dateRangeMenu" CloseOnContentClick="false" OffsetY>
+                <ActivatorContent>
+                    <MButton @attributes="@context.Attrs" Class="surface" Style="z-index: 7" Plain Right >
+                        <MTooltip Top>
+                            <ActivatorContent Context="tContext">
+                                <MIcon @attributes="@tContext.Attrs" Small Class="mr-1">mdi-help-circle-outline</MIcon>
+                            </ActivatorContent>
+                            <ChildContent>
+                                查询“日访问趋势”和“新增用户”数据的日期范围
+                            </ChildContent>
+                        </MTooltip>
 
-                    @string.Join(" - ", _dateRange.Select(d => d.ToString(CultureInfo.CurrentUICulture)))
-                </MButton>
-            </ActivatorContent>
-            <ChildContent>
-                <MDatePicker @bind-Value="@_dateRange" Range
-                             NoTitle
-                             @bind-Value:after="OnDateRangeUpdate">
-                </MDatePicker>
-            </ChildContent>
-        </MMenu>
-    </MCol>
+                        @string.Join(" - ", _dateRange.Select(d => d.ToString(CultureInfo.CurrentUICulture)))
+                    </MButton>
+                </ActivatorContent>
+                <ChildContent>
+                    <MDatePicker @bind-Value="@_dateRange" Range
+                                 NoTitle
+                                 @bind-Value:after="OnDateRangeUpdate">
+                    </MDatePicker>
+                </ChildContent>
+            </MMenu>
+        </MCol>
+    </MRow>
+</MSticky>
+<MRow>
     <MCol Cols="12" Lg="6">
         <MCard Class="echarts-card"
                Title="累计用户-用户注册"
