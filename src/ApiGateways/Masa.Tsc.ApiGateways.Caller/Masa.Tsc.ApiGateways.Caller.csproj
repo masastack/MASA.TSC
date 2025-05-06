@@ -6,9 +6,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaSdkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Pm" Version="$(MasaSdkPackageVersion)" />
-		<PackageReference Include="Masa.Contrib.StackSdks.Auth" Version="$(MasaSdkPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Dcc" Version="$(MasaSdkBlazorServerPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Pm" Version="$(MasaSdkBlazorServerPackageVersion)" />
+		<PackageReference Include="Masa.Contrib.StackSdks.Auth" Version="$(MasaSdkBlazorServerPackageVersion)" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(DotnetVersion)" />
 	</ItemGroup>
 
