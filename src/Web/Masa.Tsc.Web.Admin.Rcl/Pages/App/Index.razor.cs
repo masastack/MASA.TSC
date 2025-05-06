@@ -29,7 +29,7 @@ public partial class Index
     private NameValueCollection? values;
     private bool dataLoading = false;
     private bool isNeedSetPosition = false;
-    private static readonly Regex webviewReg = new(@"Chrome/(\d+\.?)+", default, TimeSpan.FromSeconds(1));
+    private const string andriodWebviewVersionReg = @"Chrome/(\d+\.?)+", iosWebviewVersionReg = @"AppleWebKit/(\d+\.?)+";
     protected override bool IsPage => true;
 
     public static EnvironmentAppDto? GetService(string service)
@@ -151,8 +151,15 @@ public partial class Index
         if (!firstTrace.Attributes.TryGetValue("client.user_agent", out var value)) return default!;
         var userAgent = value.ToString();
         if (string.IsNullOrEmpty(userAgent)) return default!;
-        if (!webviewReg.IsMatch(userAgent)) return default!;
-        return webviewReg.Match(userAgent).Value.Split('/')[1];
+        if (Regex.IsMatch(userAgent, andriodWebviewVersionReg))
+        {
+            return Regex.Match(userAgent, andriodWebviewVersionReg).Value.Split('/')[1];
+        }
+        if (Regex.IsMatch(userAgent, iosWebviewVersionReg))
+        {
+            return Regex.Match(userAgent, iosWebviewVersionReg).Value.Split('/')[1];
+        }
+        return default!;
     }
 
     //auth获取

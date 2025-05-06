@@ -2,7 +2,11 @@
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
 var builder = WebApplication.CreateBuilder(args);
-await builder.Services.AddMasaStackConfigAsync(MasaStackProject.TSC, MasaStackApp.Service);
+
+await builder.Services.AddMasaStackConfigAsync(MasaStackProject.TSC, MasaStackApp.Service, callerAction: callerAction =>
+{
+    callerAction.UseAuthentication();
+});
 var masaStackConfig = builder.Services.GetMasaStackConfig();
 var prometheusUrl = builder.Configuration.GetValue<string>("Prometheus")!;
 var appid = masaStackConfig.GetServiceId(MasaStackProject.TSC);
@@ -27,7 +31,8 @@ builder.Services.AddTraceLog()
 #endif
     )
     .AddPrometheusClient(prometheusUrl, 15)
-    .AddCors(options => { 
+    .AddCors(options =>
+    {
         options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
     })
     .AddAuthorization()
@@ -97,6 +102,7 @@ builder.Services.AddMasaIdentity(options =>
 }).AddAuthenticationCore()
     .AddAuthClient(authServiceUrl, redisOption)
     .AddPmClient(pmServiceUrl)
+    .AddDccClient(redisOption)
     .AddMultilevelCache(envAppid,
         distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
         multilevelCacheOptions =>
@@ -172,7 +178,7 @@ var app = builder.Services
         })
         .UseRepository<TscDbContext>();
     })
-    .AddServices(builder, new [] { typeof(IDirectoryRepository).Assembly, typeof(Masa.Tsc.Service.Admin.Services.TraceService).Assembly });
+    .AddServices(builder, new[] { typeof(IDirectoryRepository).Assembly, typeof(Masa.Tsc.Service.Admin.Services.TraceService).Assembly });
 
 #if DEBUG
 app.UseSwagger();

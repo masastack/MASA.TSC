@@ -2,7 +2,8 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<DotnetVersion>8.0</DotnetVersion>
-		<MasaFrameworkPackageVersion>1.2.0-preview.5</MasaFrameworkPackageVersion>
-		<MasaSdkPackageVersion>1.2.1-preview.20</MasaSdkPackageVersion>
+		<MasaFrameworkPackageVersion>1.2.0-preview.6</MasaFrameworkPackageVersion>
+		<MasaSdkBlazorServerPackageVersion>1.2.1-preview.20</MasaSdkBlazorServerPackageVersion>
+		<MasaSdkPackageVersion>1.2.1-preview.37</MasaSdkPackageVersion>
 	</PropertyGroup>
 </Project>
