@@ -20,6 +20,10 @@ internal class QueryHandler : EnvQueryHandler
         {
             (query.Data.End, query.Data.Start) = (query.Data.Start, query.Data.End);
         }
+        else if (query.Data.End == query.Data.Start)
+        {
+            query.Data.Start = query.Data.Start.AddSeconds(-300);
+        }
         query.Data.SetValues();
         query.Data.SetEnv(GetServiceEnvironmentName(query.Data.Service));
         query.Data.SetEnableExceptError();
