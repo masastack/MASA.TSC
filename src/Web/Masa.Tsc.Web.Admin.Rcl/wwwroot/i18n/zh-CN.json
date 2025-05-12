@@ -233,7 +233,8 @@
       "Errors": "错误",
       "Logs": "日志",
       "Stacktrace": "异常堆栈",
-      "Metadata": "详细信息"
+      "Metadata": "详细信息",
+      "Legend": "图例"
     },
     "Search": {
       "Environment": "环境",

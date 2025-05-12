@@ -5,6 +5,9 @@ namespace Masa.Tsc.Service.Admin.Services;
 
 internal class AppService : ServiceBase
 {
+
+    IEventBus EventBus => GetRequiredService<IEventBus>();
+
     public AppService() : base("/api/app")
     {
         RouteHandlerBuilder = builder =>
