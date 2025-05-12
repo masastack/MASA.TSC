@@ -90,6 +90,7 @@
                     <MTab Value="2">@I18n.Apm("Tabs.Trace")</MTab>
                     <MTab Value="3">@I18n.Apm("Tabs.Errors")</MTab>
                     <MTab Value="4">@I18n.Apm("Tabs.Logs")</MTab>
+                    <MTab Value="5">@I18n.Apm("Tabs.Legend")</MTab>
                 </MTabs>
             </div>
             <div><SIcon Class="pr-4 pt-2" Tooltip="分享" OnClick="Share">mdi-share</SIcon></div>
@@ -108,6 +109,16 @@
                     </MTabItem>
                     <MTabItem Value="4">
                         <Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Services.ServiceLogs ShowChart=false ShowAppEvent=false />
+                    </MTabItem>
+                    <MTabItem Value="5">
+                        @if (!string.IsNullOrEmpty(_legend))
+                        {
+                            <MImage Src="@_legend" Class="mt-4 ml-8" Width="400" />
+                        }
+                        else
+                        {
+                            <div class="text-center h6 pt-4">请先到auth配置图例</div>
+                        }
                     </MTabItem>
                 </MTabsItems>
             </div>
@@ -135,6 +146,7 @@
         treeIndex = data.IndexOf(trace) + 1;
         currentLog = log;
         UpdateSearch();
+        GetUrlLegend(trace);
         await LoadTraceTimeLines();
         StateHasChanged();
     }

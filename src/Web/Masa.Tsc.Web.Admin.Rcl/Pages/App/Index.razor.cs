@@ -1,6 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using Microsoft.AspNetCore.Routing;
+using System;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.App;
 
 public partial class Index
@@ -23,6 +26,7 @@ public partial class Index
     private bool claimShow = false;
     private List<TraceResponseDto> traceLines;
     private IJSObjectReference? module = null;
+    private List<MenuModel>? _menus = default;
 
     private string? spanId;
     private DateTime? logTime;
@@ -247,6 +251,7 @@ public partial class Index
         serviceName = service;
         ClearData();
         await LoadTrace();
+        await LoadAppMenusAsync();
     }
 
     private async Task OnTimeUpdate((DateTimeOffset? start, DateTimeOffset? end) time)
@@ -560,6 +565,7 @@ public partial class Index
     private async Task OnTabIndexChange(StringNumber current)
     {
         index = current;
+        await LoadAppMenusAsync();
         await LoadTraceTimeLines();
     }
 
@@ -579,6 +585,76 @@ public partial class Index
         }
     }
 
+    private string? _legend = default;
+    private string? lastRoute = default!;
+    private void GetUrlLegend(OperationLineTraceModel data)
+    {
+        if (_menus == null || _menus.Count == 0)
+            return;
+
+        if (data.Data.Attributes.ContainsKey("client.path") && data.Data.Attributes.ContainsKey("client.path.route"))
+        {
+            var route = data.Data.Attributes["client.path.route"].ToString();
+            if (lastRoute == route)
+                return;
+            lastRoute = route;
+            var item = UrlToName(data.Data.Attributes["client.path"].ToString()!, route);
+            _legend = item.Item2;
+        }
+        else
+        {
+            _legend = default;
+        }
+        StateHasChanged();
+    }
+
+    private static ValueTuple<string, string> UrlToName(string url, string? route)
+    {
+        if (_permissions == null || _permissions.Count == 0 || string.IsNullOrEmpty(url))
+            return ValueTuple.Create<string, string>(default!, default!);
+
+        url = url.ToLower();
+        var length = url.Split('/').Length;
+
+        var matchKeys = _permissions.Keys.Where(key => url.StartsWith(key) && key.Split('/').Length - length == 0).ToList();
+        if (matchKeys.Count == 1)
+            return _permissions[matchKeys[0]];
+        else if (matchKeys.Count > 1)
+        {
+            var equalKey = matchKeys.Find(key => key == url);
+            if (!string.IsNullOrEmpty(equalKey))
+                return _permissions[equalKey];
+            else
+                return _permissions[matchKeys.OrderByDescending(key => key.Length).First()];
+        }
+        //使用路由匹配
+        else if (!string.IsNullOrEmpty(route))
+        {
+            route = route.ToLower();
+            var matchKey = _permissions.Keys.FirstOrDefault(key => route == key);
+            if (!string.IsNullOrEmpty(matchKey))
+                return _permissions[matchKey];
+        }
+        return ValueTuple.Create<string, string>(default!, default!);
+    }
+
+    private static Dictionary<string, ValueTuple<string, string>>? _permissions = new();
+
+    private static void ConverToDic(List<MenuModel>? menus)
+    {
+        if (menus == null || menus.Count == 0)
+            return;
+        foreach (var item in menus)
+        {
+            if (!string.IsNullOrEmpty(item.Url) && !_permissions!.ContainsKey(item.Url.ToLower()))
+            {
+                _permissions.Add(item.Url.ToLower(), ValueTuple.Create(item.Name, item.Legend));
+            }
+            ConverToDic(item.Children);
+        }
+    }
+
+
     private void UpdateSearch()
     {
         Search.Start = start;
@@ -596,5 +672,34 @@ public partial class Index
         if (dic.TryGetValue("service.version", out var version) && version != null)
             return version.ToString()!;
         return string.Empty;
+    }
+
+    private string? lastServiceName = default;
+
+    private async Task LoadAppMenusAsync()
+    {
+        if (!string.IsNullOrEmpty(serviceName) && index == 5 && lastServiceName != serviceName)
+        {
+            if (serviceName == "lonsid-fusion")
+            {
+                if (lastServiceName != "lonsid-fusion-app")
+                    lastServiceName = "lonsid-fusion-app";
+            }
+            else if (lastServiceName != serviceName)
+            {
+                lastServiceName = serviceName;
+            }
+            else
+            {
+                return;
+            }
+
+            lastRoute = default;
+            _legend = default;
+            _menus = await AuthClient.PermissionService.GetMenusAsync(lastServiceName);
+            _permissions?.Clear();
+            ConverToDic(_menus);
+            GetUrlLegend(currentTrace!);
+        }
     }
 }

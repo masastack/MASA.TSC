@@ -4,6 +4,6 @@
 		<DotnetVersion>8.0</DotnetVersion>
 		<MasaFrameworkPackageVersion>1.2.0-preview.6</MasaFrameworkPackageVersion>
 		<MasaSdkBlazorServerPackageVersion>1.2.1-preview.20</MasaSdkBlazorServerPackageVersion>
-		<MasaSdkPackageVersion>1.2.1-preview.37</MasaSdkPackageVersion>
+		<MasaSdkPackageVersion>1.2.1-preview.38</MasaSdkPackageVersion>
 	</PropertyGroup>
 </Project>
