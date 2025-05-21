@@ -246,7 +246,8 @@
       "SelectField": "查询列",
       "SearchValue": "查询文本",
       "Comparison": "对比",
-      "Refresh": "刷新"
+      "Refresh": "刷新",
+      "ExceptionType": "异常类型"
     },
     "Service": {
       "List": {

@@ -15,7 +15,7 @@ public partial class ApmJwtBearaToken
     JsonSerializerOptions _options = new JsonSerializerOptions
     {
         WriteIndented = true,
-        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
     protected override void OnParametersSet()
