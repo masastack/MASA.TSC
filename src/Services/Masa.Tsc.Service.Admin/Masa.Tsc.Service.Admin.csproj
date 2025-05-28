@@ -40,7 +40,8 @@
 		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Domain\Masa.Tsc.Domain.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.EFCore.PostgreSQL\Masa.Tsc.EFCore.PostgreSQL.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.EFCore.Sqlserver\Masa.Tsc.EFCore.Sqlserver.csproj" />		
-		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Clickhouse.Apm\Masa.Tsc.Storage.Clickhouse.Apm.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Clickhouse.Apm\Masa.Tsc.Storage.Clickhouse.Apm.csproj" />		
+		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Cubejs.Apm\Masa.Tsc.Storage.Cubejs.Apm.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Elasticsearch\Masa.Tsc.Storage.Elasticsearch.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Masa.Tsc.Storage.Prometheus\Masa.Tsc.Storage.Prometheus.csproj" />
 	</ItemGroup>

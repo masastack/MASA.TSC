@@ -73,6 +73,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Masa.Tsc.Storage.Prometheus
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Masa.Tsc.Storage.Clickhouse.Shared", "src\Infrastructure\Masa.Tsc.Storage.Clickhouse.Shared\Masa.Tsc.Storage.Clickhouse.Shared.csproj", "{DDBBABB5-AAC0-4FBE-8630-8BBD403987A2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Masa.Tsc.Storage.Cubejs.Apm", "src\Infrastructure\Masa.Tsc.Storage.Cubejs.Apm\Masa.Tsc.Storage.Cubejs.Apm.csproj", "{3C64CA7B-D620-43F6-B646-DAA22B9102A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -256,6 +258,18 @@ Global
 		{DDBBABB5-AAC0-4FBE-8630-8BBD403987A2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DDBBABB5-AAC0-4FBE-8630-8BBD403987A2}.Release|x86.ActiveCfg = Release|Any CPU
 		{DDBBABB5-AAC0-4FBE-8630-8BBD403987A2}.Release|x86.Build.0 = Release|Any CPU
+		{3C64CA7B-D620-43F6-B646-DAA22B9102A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C64CA7B-D620-43F6-B646-DAA22B9102A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C64CA7B-D620-43F6-B646-DAA22B9102A9}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{3C64CA7B-D620-43F6-B646-DAA22B9102A9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3C64CA7B-D620-43F6-B646-DAA22B9102A9}.Debug|x86.Build.0 = Debug|Any CPU
+		{3C64CA7B-D620-43F6-B646-DAA22B9102A9}.Debug|x86.Deploy.0 = Debug|Any CPU
+		{3C64CA7B-D620-43F6-B646-DAA22B9102A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C64CA7B-D620-43F6-B646-DAA22B9102A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C64CA7B-D620-43F6-B646-DAA22B9102A9}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{3C64CA7B-D620-43F6-B646-DAA22B9102A9}.Release|x86.ActiveCfg = Release|Any CPU
+		{3C64CA7B-D620-43F6-B646-DAA22B9102A9}.Release|x86.Build.0 = Release|Any CPU
+		{3C64CA7B-D620-43F6-B646-DAA22B9102A9}.Release|x86.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -288,6 +302,7 @@ Global
 		{89BC571F-908D-4C91-B3F5-18E559E83470} = {386CA149-7280-4F1F-A064-4F3B9643C082}
 		{978E03D2-4335-4F94-A8DE-450FD9CB6A4E} = {386CA149-7280-4F1F-A064-4F3B9643C082}
 		{DDBBABB5-AAC0-4FBE-8630-8BBD403987A2} = {386CA149-7280-4F1F-A064-4F3B9643C082}
+		{3C64CA7B-D620-43F6-B646-DAA22B9102A9} = {386CA149-7280-4F1F-A064-4F3B9643C082}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B83BA2BA-19E5-41FB-A92A-16A03DA229E4}
