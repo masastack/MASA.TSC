@@ -79,12 +79,12 @@ string pmServiceUrl, authServiceUrl;
 
 #if DEBUG
 redis = builder.Environment.EnvironmentName == "Development" ? AppSettings.GetModel<RedisConfigurationOptions>("LocalRedisOptions") : redisOption;
-builder.Services.AddDaprStarter(opt =>
-{
-    opt.AppId = appid;
-    opt.DaprHttpPort = 3606;
-    opt.DaprGrpcPort = 3607;
-});
+//builder.Services.AddDaprStarter(opt =>
+//{
+//    opt.AppId = appid;
+//    opt.DaprHttpPort = 3606;
+//    opt.DaprGrpcPort = 3607;
+//});
 #else
 redis = redisOption;
 #endif

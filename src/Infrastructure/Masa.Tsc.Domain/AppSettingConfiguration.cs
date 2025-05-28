@@ -16,6 +16,8 @@ public class AppSettingConfiguration
     public bool IsClickHouse { get; set; }
 
     public bool IsElasticsearch { get; set; } = true;
+
+    public CubejsConfig Cubejs { get; set; }
 }
 
 public class AppSettingTraceConfiguration
@@ -40,4 +42,11 @@ public class ClickhouseConfiguration
     public int? TTLDays { get; set; }
 
     public string StoragePolicy { get; set; }
+}
+
+public class CubejsConfig
+{
+    public string Endpoint { get; set; }
+
+    public string Token { get; set; }
 }

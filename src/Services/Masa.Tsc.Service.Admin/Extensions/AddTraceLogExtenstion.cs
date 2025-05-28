@@ -11,10 +11,41 @@ public static class AddTraceLogExtenstion
     {
         _services = services;
         var client = _services.BuildServiceProvider().GetRequiredService<IConfigurationApiClient>();
-        var config = client.GetAsync<AppSettingConfiguration>(ConfigConst.ConfigRoot, ValueChanged).ConfigureAwait(false).GetAwaiter().GetResult();
+        var config1 = client.GetAsync<AppSettingConfiguration>(ConfigConst.ConfigRoot, ValueChanged).ConfigureAwait(false).GetAwaiter().GetResult();
+
+
+
+        var config = new AppSettingConfiguration
+        {
+            IsClickHouse = true,
+            Clickhouse = new ClickhouseConfiguration
+            {
+                Connection = "Compress=True;CheckCompressedHash=False;Compressor=lz4;SocketTimeout=10000;Host=10.130.0.11;Port=9000;User=otel;Password=otel@prd;Database=otel_prd",
+                AppLogTable = "otel_logs",
+                AppTraceTable = "otel_traces",
+                LogSource = "otel_logs_masa",
+                TraceSource = "otel_traces_masa",
+                Suffix = "masa_v1"
+            },
+            Trace = new AppSettingTraceConfiguration
+            {
+                ErrorStatus = new int[] {
+                           400,
+                           500,
+                           501,
+                           502,
+                           503
+                         }
+            },
+            Cubejs = config1.Cubejs
+        };
+
         ConfigConst.SetConfiguration(config);
+
         AddClickHouse();
         AddElasticSearch();
+        ArgumentNullException.ThrowIfNull(config.Cubejs);
+        _services.AddCubeApmService(config.Cubejs.Endpoint, config.Cubejs.Token);
         return _services;
     }
 

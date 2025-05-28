@@ -15,7 +15,7 @@ internal class ApmService : ServiceBase
         _memoryCache = memoryCache;
     }
 
-    public async Task<PaginatedListBase<ServiceListDto>> GetServices([FromServices] IApmService apmService, IAuthClient authClient, IPmClient pmClient, int page, int pageSize, string start, string end, Guid teamId, string project, AppTypes? appType, string? env, string? service, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
+    public async Task<PaginatedListBase<ServiceListDto>> GetServices([FromServices] IServiceProvider serviceProvider, [FromServices] IApmService apmService, IAuthClient authClient, IPmClient pmClient, int page, int pageSize, string start, string end, Guid teamId, string project, AppTypes? appType, string? env, string? service, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
     {
         var query = new BaseApmRequestDto
         {
@@ -32,12 +32,15 @@ internal class ApmService : ServiceBase
             StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus),
         };
         if (await GetApps(query, authClient, pmClient, teamId, project, appType))
-            return await apmService.ServicePageAsync(query);
+        {
+            return await serviceProvider.GetCubeApmService().ServicePageAsync(query);
+            //return await apmService.ServicePageAsync(query);
+        }
 
         return default!;
     }
 
-    public async Task<PaginatedListBase<EndpointListDto>> GetEndpoints([FromServices] IApmService apmService, IAuthClient authClient, IPmClient pmClient, int page, int pageSize, string start, string end, Guid teamId, string project, AppTypes? appType, string? env, string? service, string? endpoint, string? statusCode, string? textField, string? textValue, string? exType, string? traceId, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
+    public async Task<PaginatedListBase<EndpointListDto>> GetEndpoints([FromServices] IServiceProvider serviceProvider, [FromServices] IApmService apmService, IAuthClient authClient, IPmClient pmClient, int page, int pageSize, string start, string end, Guid teamId, string project, AppTypes? appType, string? env, string? service, string? endpoint, string? statusCode, string? textField, string? textValue, string? exType, string? traceId, ComparisonTypes? comparisonType, string? queries, string? orderField, bool? isDesc)
     {
         var query = new ApmEndpointRequestDto
         {
@@ -61,12 +64,16 @@ internal class ApmService : ServiceBase
         };
 
         if (await GetApps(query, authClient, pmClient, teamId, project, appType))
-            return await apmService.EndpointPageAsync(query);
+        {
+            return await serviceProvider.GetCubeApmService().EndpointPageAsync(query);
+            //return await apmService.EndpointPageAsync(query);
+        }
+
 
         return default!;
     }
 
-    public async Task<IEnumerable<ChartLineDto>> GetCharts([FromServices] IApmService apmService, string start, string end, string? env, string? service, string? endpoint, string? method, ComparisonTypes? comparisonType, string? queries)
+    public async Task<IEnumerable<ChartLineDto>> GetCharts([FromServices] IServiceProvider serviceProvider, [FromServices] IApmService apmService, string start, string end, string? env, string? service, string? endpoint, string? method, ComparisonTypes? comparisonType, string? queries)
     {
         BaseApmRequestDto queryDto;
 
@@ -89,7 +96,8 @@ internal class ApmService : ServiceBase
         queryDto.Queries = queries;
         queryDto.Service = service;
         queryDto.StatusCodes = string.Join(',', ConfigConst.TraceErrorStatus);
-        return await apmService.ChartDataAsync(queryDto);
+        return await serviceProvider.GetCubeApmService().ChartDataAsync(queryDto);
+        //return await apmService.ChartDataAsync(queryDto);
     }
 
     public async Task<EndpointLatencyDistributionDto> GetLatencyDistributions([FromServices] IApmService apmService, string start, string end, string? env, string? service, string? endpoint, string? method, string? textField, string? textValue, string? exType, string? traceId)
