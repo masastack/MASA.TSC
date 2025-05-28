@@ -29,4 +29,10 @@ public static class CubejsExtensions
     {
         return serviceProvider.GetRequiredKeyedService<IApmService>(Cubejs_Client_Name);
     }
+
+    public static ValueTuple<string, string> GetCubeSetting(this IServiceProvider serviceProvider)
+    {
+        var client = serviceProvider.GetRequiredKeyedService<GraphQLHttpClient>(Cubejs_Client_Name);
+        return ValueTuple.Create(client.Options.EndPoint!.ToString(), client.HttpClient.DefaultRequestHeaders.Authorization!.Parameter!);
+    }
 }

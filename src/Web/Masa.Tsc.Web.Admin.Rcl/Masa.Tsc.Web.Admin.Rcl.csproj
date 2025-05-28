@@ -45,6 +45,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Cubejs\Request\Endpoint\" />
 		<Folder Include="wwwroot\img\team\" />
 	</ItemGroup>
 

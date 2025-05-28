@@ -1,12 +1,25 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using GraphQL.Client.Http;
+using Masa.BuildingBlocks.Authentication.OpenIdConnect.Domain.Entities;
+using Masa.Tsc.Web.Admin.Rcl.Cubejs;
+using Masa.Tsc.Web.Admin.Rcl.Cubejs.Request;
+using Masa.Tsc.Web.Admin.Rcl.Cubejs.Response;
+using System.Collections.Generic;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm;
 
 public partial class Endpoint
 {
+
+    const double MILLSECOND = 1e6;
+
     [Parameter]
     public string TraceId { get; set; }
+
+    [Inject(Key = RclServiceCollectionExtensions.Cubejs_Client_Name)]
+    GraphQL.Client.Http.GraphQLHttpClient Client { get; set; }
 
     protected override bool IsPage => true;
     protected override bool IsEndPointPage => true;
@@ -67,7 +80,8 @@ public partial class Endpoint
             return;
         isTableLoading = true;
         StateHasChanged();
-        await LoadPageDataAsync();
+        //await LoadPageDataAsync();
+        await LoadCubePageDataAsync();
         isTableLoading = false;
         StateHasChanged();
         await LoadChartDataAsync();
@@ -114,6 +128,41 @@ public partial class Endpoint
         }
     }
 
+
+    private async Task LoadCubePageDataAsync()
+    {
+        var where = CubeJsRequestUtils.GetEndpintListWhere(Search.Start, Search.End, Search.Environment, Search.Service, CurrentTeamId, Search.Endpoint, Search.Method);
+        var totalRequest = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_VIEW, where, fields: CubejsConstants.ENDPOINT_LIST_COUNT));
+        isTableLoading = true;
+        var totalResponse = await Client.SendQueryAsync<CubejsBaseResponse<EndpointTotalResponse>>(totalRequest);
+        total = (int)totalResponse.Data.Data[0].Item.Total;
+        data.Clear();
+        if (total == 0)
+        {
+            isTableLoading = true;
+            return;
+        }
+
+        var pageRequest = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_VIEW, where, default, page, defaultSize, CubejsConstants.SERVICENAME, CubejsConstants.TARGET, CubejsConstants.METHOD, CubejsConstants.FAILED_AGG, CubejsConstants.LATENCY_AGG, CubejsConstants.THROUGHPUT));
+        var pageResponse = await Client.SendQueryAsync<CubejsBaseResponse<EndpointListResponse>>(pageRequest);
+
+        var totalMinits = Math.Floor((Search.End - Search.Start).TotalMinutes);
+        if (pageResponse != null && pageResponse.Data.Data != null && pageResponse.Data.Data.Count > 0)
+        {
+            data.AddRange(pageResponse.Data.Data.Select(item => new ListChartData
+            {
+                Name = $"{item.Item.Method} {item.Item.Target}",
+                Method = item.Item.Method,
+                Endpoint = item.Item.Target,
+                Service = item.Item.ServiceName,
+                Failed = Math.Round(item.Item.FailedAgg * 100.0, 2),
+                Throughput = Math.Round(item.Item.Throughput / totalMinits, 3),
+                Latency = (long)Math.Floor(item.Item.LatencyAgg / MILLSECOND),
+            }));
+        }
+        isTableLoading = true;
+    }
+
     private async Task LoadChartDataAsync()
     {
         if (data.Count == 0)
@@ -129,7 +178,7 @@ public partial class Endpoint
             Env = Search.Environment
         };
         var result = await ApiCaller.ApmService.GetChartsAsync(query);
-        if (result == null || !result.Any())
+        if (result == null || result.Count == 0)
         {
             return;
         }

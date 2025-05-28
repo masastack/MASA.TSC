@@ -5,6 +5,8 @@ namespace Masa.Tsc.Web.Admin.Rcl.Shared;
 
 public partial class TscComponentBase : MasaComponentBase, IAsyncDisposable
 {
+     [Inject] public IServiceProvider ServiceProvider { get; set; }
+
     [Inject]
     public IUserContext UserContext { get; set; }
 

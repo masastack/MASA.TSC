@@ -5,7 +5,8 @@ namespace Masa.Tsc.Service.Admin.Services;
 
 internal class SettingService : ServiceBase
 {
-    public SettingService() : base("/api/settings") {
+    public SettingService() : base("/api/settings")
+    {
         RouteHandlerBuilder = builder =>
         {
             builder.RequireAuthorization();
@@ -13,4 +14,10 @@ internal class SettingService : ServiceBase
     }
 
     public SettingDto GetStorage() => new() { IsClickhouse = ConfigConst.StorageSetting.IsClickhouse, IsElasticsearch = ConfigConst.StorageSetting.IsClickhouse };
+
+    public CubejsSettingDto GetCubejs([FromServices] IServiceProvider serviceProvider)
+    {
+        (string endpoint, string token) = serviceProvider.GetCubeSetting();
+        return new CubejsSettingDto() { Endpoint = endpoint, Token = token };
+    }
 }
