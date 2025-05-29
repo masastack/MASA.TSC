@@ -5,11 +5,13 @@ namespace Masa.Tsc.Web.Admin.Rcl.Shared.Apm;
 
 public partial class ApmComponentBase : MasaComponentBase
 {
+    public const double MILLSECOND = 1e6;
+
     [Inject]
     public JsInitVariables JsInitVariables { get; set; }
 
-    [Inject]
-    IHttpContextAccessor HttpContextAccessor { get; set; }
+    [Inject(Key = RclServiceCollectionExtensions.Cubejs_Client_Name)]
+    public GraphQL.Client.Http.GraphQLHttpClient CubejsClient { get; set; }
 
     [Inject]
     public TscCaller ApiCaller { get; set; }

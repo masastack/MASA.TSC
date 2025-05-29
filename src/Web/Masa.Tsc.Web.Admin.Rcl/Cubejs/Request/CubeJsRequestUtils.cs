@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Web.Admin.Rcl.Pages.Apm;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Cubejs.Request;
 
 internal partial class CubeJsRequestUtils
@@ -33,7 +35,7 @@ internal partial class CubeJsRequestUtils
         if (hasWhere)
             text.AppendLine($" (where: {{{where}}}");
         if (hasOrderBy)
-            text.AppendLine($"{(hasWhere ? " (" : ", ")}orderBy: {{{orderBy}}}");
+            text.AppendLine($"{(hasWhere ? " ," : " (")}orderBy: {{{orderBy}}}");
         if (hasWhere || hasOrderBy)
             text.AppendLine(")");
         text.AppendLine("{");
@@ -60,9 +62,40 @@ internal partial class CubeJsRequestUtils
         return text.ToString();
     }
 
-    public static string GetEndpintListOrderBy(string order, bool isDesc)
+    public static string GetEndpintListChartWhere(DateTime startUtc, DateTime endUtc, string? env, string[] services, string[] endpoints, string[] methods)
     {
-        return "";
+        var text = new StringBuilder();
+        text.Append($"{CubejsConstants.TIMESTAMP_AGG}: {{inDateRange: [\"{startUtc}\",\"{endUtc}\"]}}");
+        text.Append($",period:{{equals:\"{GetPeriod(startUtc, endUtc)}\"}}");
+        if (!string.IsNullOrEmpty(env))
+            text.Append($",{CubejsConstants.ENV_AGG}:{{equals:\"{env}\"}}");
+        if (services != null && services.Length > 0)
+            text.Append($",{CubejsConstants.SERVICENAME}:{{in:[\"{string.Join("\",\"", services)}\"]}}");
+        if (endpoints!=null&&endpoints.Length>0)
+            text.Append($",{CubejsConstants.TARGET}:{{in:[\"{string.Join("\",\"",endpoints)}\"]}}");
+        if (methods!=null&&methods.Length>0)
+            text.Append($",{CubejsConstants.METHOD}:{{in:[\"{string.Join("\",\"",methods)}\"]}}");
+        return text.ToString();
+    }
+
+    public static string GetEndpintListOrderBy(string? order, bool? isDesc)
+    {
+        var desc = isDesc ?? true ? "desc" : "asc";
+        switch (order?.ToLower())
+        {
+            case "name":
+                return $"{CubejsConstants.TARGET}:{desc},{CubejsConstants.METHOD}:{desc}";
+            case "service":
+                return $"{CubejsConstants.SERVICENAME}:{desc}";
+            case "latency":
+                return $"{CubejsConstants.LATENCY}:{desc}";
+            case "throughput":
+                return $"{CubejsConstants.THROUGHPUT}:{desc}";
+            case "failed":
+            default:
+                return $"{CubejsConstants.FAILED}:{desc}";
+
+        }
     }
 
     private static string GetPeriod(DateTime start, DateTime end, string? period = default)
