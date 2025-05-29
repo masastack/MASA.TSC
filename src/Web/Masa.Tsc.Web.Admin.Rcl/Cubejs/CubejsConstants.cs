@@ -21,4 +21,5 @@ internal sealed class CubejsConstants
     public const string ENDPOINT_LIST_COUNT = "dcnt";
 
     public const string ENDPOINT_LIST_VIEW = "metrics";
+    public const string ENDPOINT_LIST_CHART_VIEW = "metrics";
 }
