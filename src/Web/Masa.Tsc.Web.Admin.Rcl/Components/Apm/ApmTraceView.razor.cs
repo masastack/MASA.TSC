@@ -75,6 +75,7 @@ public partial class ApmTraceView
         jwtValue = value;
         StateHasChanged();
     }
+    
 
     private bool showJwt = false;
     private string? jwtValue = default;

@@ -140,10 +140,10 @@ else
         return type.IsPrimitive || type.IsEnum || type.Equals(typeof(string)) || type.Equals(typeof(DateTime));
     }
 
-    private static string FormatForm(string? body)
+    private static string? FormatForm(string? body)
     {
-        if (string.IsNullOrEmpty(body))
-            return string.Empty;
+        if (string.IsNullOrEmpty(body) || !body.StartsWith("-----"))
+            return body;
         var data = body.Split("\r\n");
 
         var index = 0;
@@ -176,12 +176,18 @@ else
                 {
                     isFile = true;
                     var startIndex = temp.IndexOf("filename=") + "filename=".Length + 1;
+                    var length = temp.IndexOf('"', startIndex + 1) - startIndex;
+                    if (length <= 0)
+                        continue; // Skip if no filename found
                     var fileName = temp.Substring(startIndex, temp.IndexOf('"', startIndex + 1) - startIndex);
                     files.Add(fileName);
                 }
                 else if (temp.IndexOf("name=") > 0)
                 {
                     var startIndex = temp.IndexOf("name=") + "name=".Length + 1;
+                    var length = temp.IndexOf('"', startIndex + 1) - startIndex;
+                    if (length <= 0)
+                        continue; // Skip if no filename found
                     var keyName = temp.Substring(startIndex, temp.IndexOf('"', startIndex + 1) - startIndex);
                     lastValue = keyName;
                 }
@@ -196,7 +202,7 @@ else
             }
         }
         while (true);
-        if(files.Count>0)
+        if (files.Count > 0)
             return string.Join("\r\n", files);
 
         return body;
