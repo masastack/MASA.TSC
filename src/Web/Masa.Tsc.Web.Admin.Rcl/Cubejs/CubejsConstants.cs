@@ -5,6 +5,8 @@ namespace Masa.Tsc.Web.Admin.Rcl.Cubejs;
 
 internal sealed class CubejsConstants
 {
+    private CubejsConstants() { }
+
     public const string CUBEJS_IDENTITY = "cube";
     public const string TIMESTAMP_AGG = "datekey";
     public const string TIMESTAMP_AGG_VALUE = "value";
@@ -17,6 +19,9 @@ internal sealed class CubejsConstants
     public const string FAILED = "failed";
     public const string FAILED_AGG = "failedagg";
     public const string LATENCY_AGG = "latencyagg";
+    public const string TEAM_ID = "teamid";
+    public const string PROJECT = "projectIdentity";
+    public const string SERVICE_DESCRIPTION = "appdescription";
 
     public const string ENDPOINT_LIST_COUNT = "dcnt";
 

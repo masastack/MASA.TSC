@@ -167,7 +167,7 @@ public partial class Endpoint
 
     private async Task LoadCubePageDataAsync()
     {
-        var where = CubeJsRequestUtils.GetEndpintListWhere(Search.Start, Search.End, Search.Environment, Search.Service, CurrentTeamId, Search.Endpoint, Search.Method);
+        var where = CubeJsRequestUtils.GetEndpintListWhere(Search.Start, Search.End, Guid.Empty, Search.Environment, Search.Service, Search.Endpoint, Search.Method, Search.Project);
         var totalRequest = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_VIEW, where, fields: CubejsConstants.ENDPOINT_LIST_COUNT));
         isTableLoading = true;
         var totalResponse = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointTotalResponse>>(totalRequest);
