@@ -1,8 +1,7 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Routing;
-using System;
+using Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Panel.Chart.Models;
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.App;
 
@@ -16,7 +15,7 @@ public partial class Index
     private UserModel? user = default;
     private TraceResponseDto? firstTrace;
     private PhoneModelDto? phoneModel;
-    private Dictionary<string, object> claims = new();
+    private Dictionary<string, object> claims = [];
     private DateTime end, start;
     private QuickRangeKey quickRangeKey = QuickRangeKey.Last5Minutes;
     private StringNumber index;
@@ -324,7 +323,8 @@ public partial class Index
             query.Start = query.End.AddMinutes(-seconds);
 
         var traces = await ApiCaller.ApmService.GetTraceListAsync(query);
-        await SetDeviceModel(traces.Result?.LastOrDefault(item => item.Attributes.ContainsKey("client.type")));
+        if (traces.Result != null && traces.Result.Count > 0)
+            await SetDeviceModel(traces.Result?.LastOrDefault(item => item.Attributes.ContainsKey("client.type")));
         SetTraceData(traces.Result!);
         await LoadLog(traces.Result?.Select(item => item.TraceId).Distinct().ToList()!);
         if (currentTrace == null && data.Count > 0)
@@ -406,6 +406,8 @@ public partial class Index
             user = null;
             claims.Clear();
         }
+        Search.TraceId = default!;
+        _legend = string.Empty;
         currentLog = null;
         currentTrace = null;
         traceLines.Clear();
@@ -519,14 +521,15 @@ public partial class Index
     }
 
     bool showNormalClient = false;
-    private void ShowHideHttpTrace()
-    {
-        showNormalClient = !showNormalClient;
-        StateHasChanged();
-    }
+    //private void ShowHideHttpTrace()
+    //{
+    //    showNormalClient = !showNormalClient;
+    //    StateHasChanged();
+    //}
 
     private async Task Top()
     {
+        if (data.Count == 0) return;
         await ChangeCurrent(data[0]);
         await module!.InvokeVoidAsync("setPosition", 1, data.Count);
     }
@@ -539,6 +542,7 @@ public partial class Index
 
     private async Task Bottom()
     {
+        if (data.Count == 0) return;
         await ChangeCurrent(data[data.Count - 1]);
         await module!.InvokeVoidAsync("setPosition", data.Count, data.Count);
     }
@@ -589,7 +593,7 @@ public partial class Index
     private string? lastRoute = default!;
     private void GetUrlLegend(OperationLineTraceModel data)
     {
-        if (_menus == null || _menus.Count == 0)
+        if (_menus == null || _menus.Count == 0 || data == null)
             return;
 
         if (data.Data.Attributes.ContainsKey("client.path") && data.Data.Attributes.ContainsKey("client.path.route"))

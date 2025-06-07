@@ -42,8 +42,9 @@ public partial class ApmTraceView
 
     protected override void OnParametersSet()
     {
-        if ((!Dialog || Show) && Value != null)
+        if ((!Dialog || Show))
         {
+            if (Value == null) Value = new Dictionary<string, object>();
             var newKey = JsonSerializer.Serialize(Value);
             if (!string.Equals(md5Key, newKey))
             {
@@ -70,12 +71,13 @@ public partial class ApmTraceView
         await JSRuntime.InvokeVoidAsync("open", LinkUrl, "_blank");
     }
 
-    private void ShowJwt(string value) {
+    private void ShowJwt(string value)
+    {
         showJwt = true;
         jwtValue = value;
         StateHasChanged();
     }
-    
+
 
     private bool showJwt = false;
     private string? jwtValue = default;
