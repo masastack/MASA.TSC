@@ -219,30 +219,30 @@ public partial class Index
 
     private async Task LoadUserClaimsAsync()
     {
-        this.claims.Clear();
+        claims.Clear();
         if (_userId == Guid.Empty)
             return;
-        var claims = await ApiCaller.UserService.GetUserClaimAsync(_userId);
+        var userClaims = await ApiCaller.UserService.GetUserClaimAsync(_userId);
         var claimTypes = await ApiCaller.UserService.GetClaimsAsync();
-        if (claims != null && claims.Count > 0 && claimTypes != null && claimTypes.Count > 0)
+        if (userClaims != null && userClaims.Count > 0 && claimTypes != null && claimTypes.Count > 0)
         {
-            var keys = claims.Keys.ToList();
-
+            var keys = userClaims.Keys.ToList();
             foreach (var key in keys)
             {
                 var declare = claimTypes.Find(item => item.Name == key);
                 if (declare == null || string.IsNullOrEmpty(declare.Description) || declare.Description == key)
                     continue;
-                var value = claims[key];
-                claims.Remove(key);
-                claims.Add($"{key}({declare.Description})", value);
+                var value = userClaims[key];
+                userClaims.Remove(key);
+                userClaims.Add($"{key}({declare.Description})", value);
             }
 
-            foreach (var key in claims.Keys)
+            foreach (var key in userClaims.Keys)
             {
-                this.claims.Add(key, claims[key]);
+                claims.Add(key, userClaims[key]);
             }
         }
+        StateHasChanged();
     }
 
     private async Task ServiceChange(string service)
