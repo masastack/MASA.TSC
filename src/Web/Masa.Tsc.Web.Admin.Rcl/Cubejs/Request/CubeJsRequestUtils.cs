@@ -46,7 +46,7 @@ internal partial class CubeJsRequestUtils
         return text.ToString();
     }
 
-    public static string GetEndpintListWhere(DateTime startUtc, DateTime endUtc, string? env, string? service = default, Guid? teamId = default, string? endpoint = default, string? method = default)
+    public static string GetEndpintListWhere(DateTime startUtc, DateTime endUtc, Guid teamId, string? env, string? service = default, string? endpoint = default, string? method = default, string? project = default)
     {
         var text = new StringBuilder();
         text.Append($"{CubejsConstants.TIMESTAMP_AGG}: {{inDateRange: [\"{startUtc}\",\"{endUtc}\"]}}");
@@ -59,6 +59,9 @@ internal partial class CubeJsRequestUtils
             text.Append($",{CubejsConstants.TARGET}:{{equals:\"{endpoint}\"}}");
         if (!string.IsNullOrEmpty(method))
             text.Append($",{CubejsConstants.METHOD}:{{equals:\"{method}\"}}");
+        text.Append($",{CubejsConstants.TEAM_ID}:{{equals:\"{teamId}\"}}");
+        if (!string.IsNullOrEmpty(project))
+            text.Append($",{CubejsConstants.PROJECT}:{{equals:\"{project}\"}}");
         return text.ToString();
     }
 
@@ -71,10 +74,10 @@ internal partial class CubeJsRequestUtils
             text.Append($",{CubejsConstants.ENV_AGG}:{{equals:\"{env}\"}}");
         if (services != null && services.Length > 0)
             text.Append($",{CubejsConstants.SERVICENAME}:{{in:[\"{string.Join("\",\"", services)}\"]}}");
-        if (endpoints!=null&&endpoints.Length>0)
-            text.Append($",{CubejsConstants.TARGET}:{{in:[\"{string.Join("\",\"",endpoints)}\"]}}");
-        if (methods!=null&&methods.Length>0)
-            text.Append($",{CubejsConstants.METHOD}:{{in:[\"{string.Join("\",\"",methods)}\"]}}");
+        if (endpoints != null && endpoints.Length > 0)
+            text.Append($",{CubejsConstants.TARGET}:{{in:[\"{string.Join("\",\"", endpoints)}\"]}}");
+        if (methods != null && methods.Length > 0)
+            text.Append($",{CubejsConstants.METHOD}:{{in:[\"{string.Join("\",\"", methods)}\"]}}");
         return text.ToString();
     }
 
