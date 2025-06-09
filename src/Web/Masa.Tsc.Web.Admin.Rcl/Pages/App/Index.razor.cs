@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Web.Admin.Rcl.Components.Dashboards.Configurations.Panel.Chart.Models;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.App;
 
 public partial class Index
@@ -226,21 +224,19 @@ public partial class Index
         var claimTypes = await ApiCaller.UserService.GetClaimsAsync();
         if (userClaims != null && userClaims.Count > 0 && claimTypes != null && claimTypes.Count > 0)
         {
-            var keys = userClaims.Keys.ToList();
-            foreach (var key in keys)
+            claims.TryAddRange(
+            userClaims.Select(item =>
             {
-                var declare = claimTypes.Find(item => item.Name == key);
-                if (declare == null || string.IsNullOrEmpty(declare.Description) || declare.Description == key)
-                    continue;
-                var value = userClaims[key];
-                userClaims.Remove(key);
-                userClaims.Add($"{key}({declare.Description})", value);
-            }
-
-            foreach (var key in userClaims.Keys)
+                var declare = claimTypes.Find(c => c.Name == item.Key);
+                if (declare != null && !string.IsNullOrEmpty(declare.Description))
+                    return KeyValuePair.Create($"{item.Key}({declare.Description})", (object)item.Value);
+                return KeyValuePair.Create(item.Key, (object)item.Value);
+            }).GroupBy(item => item.Key).Select(item =>
             {
-                claims.Add(key, userClaims[key]);
-            }
+                if (item.Count() == 1)
+                    return item.First();
+                return KeyValuePair.Create(item.Key, (object)string.Join(',', item.Select(i => (string)i.Value)));
+            }));
         }
         StateHasChanged();
     }

@@ -21,11 +21,11 @@ public class UserService : BaseService
         return Caller.GetAsync<List<UserRoleDto>>($"{RootPath}/role/getSelectForUser?userId={userId}")!;
     }
 
-    public Task<Dictionary<string, string>> GetUserClaimAsync(Guid userId)
+    public Task<List<KeyValuePair<string, string>>> GetUserClaimAsync(Guid userId)
     {
-        return _authClient.UserService.GetClaimValuesAsync(userId);
+        //var ttt = await _authClient.UserService.GetClaimValuesAsync(userId);
 
-        //return await Caller.GetAsync<Dictionary<string, object>>($"{RootPath}/user/claim-values/{userId}");
+        return Caller.GetAsync<List<KeyValuePair<string, string>>>($"{RootPath}/user/claim-values/{userId}")!;
     }
 
     public async Task<List<UserClaimDto>> GetClaimsAsync()
