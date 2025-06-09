@@ -228,7 +228,7 @@ public partial class Index
             userClaims.Select(item =>
             {
                 var declare = claimTypes.Find(c => c.Name == item.Key);
-                if (declare != null && !string.IsNullOrEmpty(declare.Description))
+                if (declare != null && !string.IsNullOrEmpty(declare.Description) && declare.Description != item.Key)
                     return KeyValuePair.Create($"{item.Key}({declare.Description})", (object)item.Value);
                 return KeyValuePair.Create(item.Key, (object)item.Value);
             }).GroupBy(item => item.Key).Select(item =>
