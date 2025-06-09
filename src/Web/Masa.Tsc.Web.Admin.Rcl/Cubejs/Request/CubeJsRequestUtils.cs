@@ -65,13 +65,14 @@ internal partial class CubeJsRequestUtils
         return text.ToString();
     }
 
-    public static string GetEndpintListChartWhere(DateTime startUtc, DateTime endUtc, string? env, string[] services, string[] endpoints, string[] methods)
+    public static string GetEndpintListChartWhere(DateTime startUtc, DateTime endUtc, string? env, Guid teamId, string[] services, string[] endpoints, string[] methods)
     {
         var text = new StringBuilder();
         text.Append($"{CubejsConstants.TIMESTAMP_AGG}: {{inDateRange: [\"{startUtc}\",\"{endUtc}\"]}}");
         text.Append($",period:{{equals:\"{GetPeriod(startUtc, endUtc)}\"}}");
         if (!string.IsNullOrEmpty(env))
             text.Append($",{CubejsConstants.ENV_AGG}:{{equals:\"{env}\"}}");
+        text.Append($",{CubejsConstants.TEAM_ID}:{{equals:\"{teamId}\"}}");
         if (services != null && services.Length > 0)
             text.Append($",{CubejsConstants.SERVICENAME}:{{in:[\"{string.Join("\",\"", services)}\"]}}");
         if (endpoints != null && endpoints.Length > 0)

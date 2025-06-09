@@ -167,7 +167,7 @@ public partial class Endpoint
 
     private async Task LoadCubePageDataAsync()
     {
-        var where = CubeJsRequestUtils.GetEndpintListWhere(Search.Start, Search.End, Guid.Empty, Search.Environment, Search.Service, Search.Endpoint, Search.Method, Search.Project);
+        var where = CubeJsRequestUtils.GetEndpintListWhere(Search.Start, Search.End, Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c"), Search.Environment, Search.Service, Search.Endpoint, Search.Method, Search.Project);
         var totalRequest = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_VIEW, where, fields: CubejsConstants.ENDPOINT_LIST_COUNT));
         isTableLoading = true;
         var totalResponse = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointTotalResponse>>(totalRequest);
@@ -203,19 +203,19 @@ public partial class Endpoint
         isTableLoading = true;
         if (data.Count == 0)
             return;
-
+        var teamId = Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
         var services = data.Select(item => item.Service).Distinct().ToArray();
         var targets = data.Select(item => item.Name.Split(' ')[1]).Distinct().ToArray();
         var methods = data.Select(item => item.Name.Split(' ')[0]).Distinct().ToArray();
         var result = new List<ChartLineDto>();
-        var list = await GetChartDataAsync(Search.Start, Search.End, services, targets, methods);
+        var list = await GetChartDataAsync(Search.Start, Search.End, teamId, services, targets, methods);
 
 
         SetChartData(result, list, false, false);
         (bool hasPrious, DateTime start, DateTime end) = SetAndCheckPreviousTime();
         if (hasPrious)
         {
-            var previousList = await GetChartDataAsync(start, end, services, targets, methods);
+            var previousList = await GetChartDataAsync(start, end, teamId, services, targets, methods);
             SetChartData(result, list, false, true);
         }
 
@@ -249,9 +249,9 @@ public partial class Endpoint
     }
 
 
-    private async Task<List<EndpointListChartItemResponse>> GetChartDataAsync(DateTime start, DateTime end, string[] services, string[] endpoints, string[] methods)
+    private async Task<List<EndpointListChartItemResponse>> GetChartDataAsync(DateTime start, DateTime end, Guid teamId, string[] services, string[] endpoints, string[] methods)
     {
-        var where = CubeJsRequestUtils.GetEndpintListChartWhere(start, end, Search.Environment, services, endpoints, methods);
+        var where = CubeJsRequestUtils.GetEndpintListChartWhere(start, end, Search.Environment, teamId, services, endpoints, methods);
         var orderBy = $"{CubejsConstants.SERVICENAME}:asc,{CubejsConstants.TARGET}:asc,{CubejsConstants.METHOD}:asc";
         var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_CHART_VIEW, where, orderBy, fields: [CubejsConstants.SERVICENAME, CubejsConstants.TARGET, CubejsConstants.METHOD, CubejsConstants.FAILED, CubejsConstants.LATENCY, CubejsConstants.THROUGHPUT, $"{CubejsConstants.TIMESTAMP_AGG}{{{CubejsConstants.TIMESTAMP_AGG_VALUE}}}"]));
         var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointListChartResponse>>(request);
