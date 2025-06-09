@@ -69,8 +69,9 @@ public partial class Endpoint
         StateHasChanged();
         //await LoadPageDataAsync();
         await LoadCubePageDataAsync();
-        await LoadCubeChartDataAsync();
         isTableLoading = false;
+        StateHasChanged();
+        await LoadCubeChartDataAsync();
         StateHasChanged();
         //await LoadChartDataAsync();
     }
@@ -167,7 +168,7 @@ public partial class Endpoint
 
     private async Task LoadCubePageDataAsync()
     {
-        var teamId = Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
+        var teamId = CurrentTeamId;// Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
         var where = CubeJsRequestUtils.GetEndpintListWhere(Search.Start, Search.End, teamId, Search.Environment, Search.Service, Search.Endpoint, Search.Method, Search.Project);
         var totalRequest = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_VIEW, where, fields: CubejsConstants.ENDPOINT_LIST_COUNT));
         isTableLoading = true;
@@ -206,10 +207,9 @@ public partial class Endpoint
 
     private async Task LoadCubeChartDataAsync()
     {
-        isTableLoading = true;
         if (data.Count == 0)
             return;
-        var teamId = Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
+        var teamId = CurrentTeamId; // Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
         var services = data.Select(item => item.Service).Distinct().ToArray();
         var targets = data.Select(item => item.Name.Split(' ')[1]).Distinct().ToArray();
         var methods = data.Select(item => item.Name.Split(' ')[0]).Distinct().ToArray();
