@@ -43,6 +43,7 @@ internal partial class CubeJsRequestUtils
         text.AppendLine("}");
         text.AppendLine("}");
         text.AppendLine("}");
+        Console.WriteLine(text.ToString());
         return text.ToString();
     }
 

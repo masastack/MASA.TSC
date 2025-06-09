@@ -167,11 +167,15 @@ public partial class Endpoint
 
     private async Task LoadCubePageDataAsync()
     {
-        var where = CubeJsRequestUtils.GetEndpintListWhere(Search.Start, Search.End, CurrentTeamId, Search.Environment, Search.Service, Search.Endpoint, Search.Method, Search.Project);
+        var teamId = Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
+        var where = CubeJsRequestUtils.GetEndpintListWhere(Search.Start, Search.End, teamId, Search.Environment, Search.Service, Search.Endpoint, Search.Method, Search.Project);
         var totalRequest = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_VIEW, where, fields: CubejsConstants.ENDPOINT_LIST_COUNT));
         isTableLoading = true;
+        Console.WriteLine("LoadCubePageDataAsync page start,{0}", DateTime.Now);
         var totalResponse = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointTotalResponse>>(totalRequest);
+        Console.WriteLine("LoadCubePageDataAsync page end,{0}", DateTime.Now);
         total = (int)totalResponse.Data.Data[0].Item.Total;
+
         data.Clear();
         if (total == 0)
         {
@@ -180,7 +184,9 @@ public partial class Endpoint
 
         var orderBy = CubeJsRequestUtils.GetEndpintListOrderBy(sortFiled, sortBy);
         var pageRequest = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_VIEW, where, orderBy, page, defaultSize, CubejsConstants.SERVICENAME, CubejsConstants.TARGET, CubejsConstants.METHOD, CubejsConstants.FAILED_AGG, CubejsConstants.LATENCY_AGG, CubejsConstants.THROUGHPUT));
+        Console.WriteLine("LoadCubePageDataAsync pagedata start,{0}", DateTime.Now);
         var pageResponse = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointListResponse>>(pageRequest);
+        Console.WriteLine("LoadCubePageDataAsync pagedata end,{0}", DateTime.Now);
 
         var totalMinits = Math.Floor((Search.End - Search.Start).TotalMinutes);
         if (pageResponse != null && pageResponse.Data.Data != null && pageResponse.Data.Data.Count > 0)
@@ -203,19 +209,23 @@ public partial class Endpoint
         isTableLoading = true;
         if (data.Count == 0)
             return;
-        var teamId = CurrentTeamId;
+        var teamId = Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
         var services = data.Select(item => item.Service).Distinct().ToArray();
         var targets = data.Select(item => item.Name.Split(' ')[1]).Distinct().ToArray();
         var methods = data.Select(item => item.Name.Split(' ')[0]).Distinct().ToArray();
         var result = new List<ChartLineDto>();
+        Console.WriteLine("LoadCubePageDataAsync chartdata1 start,{0}", DateTime.Now);
         var list = await GetChartDataAsync(Search.Start, Search.End, teamId, services, targets, methods);
+        Console.WriteLine("LoadCubePageDataAsync pagedata1 end,{0}", DateTime.Now);
 
 
         SetChartData(result, list, false, false);
         (bool hasPrious, DateTime start, DateTime end) = SetAndCheckPreviousTime();
         if (hasPrious)
         {
+            Console.WriteLine("LoadCubePageDataAsync chartdata2 start,{0}", DateTime.Now);
             var previousList = await GetChartDataAsync(start, end, teamId, services, targets, methods);
+            Console.WriteLine("LoadCubePageDataAsync pagedata2 end,{0}", DateTime.Now);
             SetChartData(result, list, false, true);
         }
 
