@@ -21,10 +21,21 @@ internal sealed class CubejsConstants
     public const string LATENCY_AGG = "latencyagg";
     public const string TEAM_ID = "teamid";
     public const string PROJECT = "projectIdentity";
+    public const string APPTYPE = "apptype";
     public const string SERVICE_DESCRIPTION = "appdescription";
+    public const string STATUS_CODE = "statuscode";
+    public const string TRACEID = "traceid";
+    public const string SPANID = "spanid";
+    public const string USERID = "enduserid";
+    public const string EXCEPTION_TYPE = "exceptiontype";
+    public const string EXCEPTION_MESSAGE = "exceptionmessage";
+    public const string REQUEST_QUERY = "url";
+    public const string REQUEST_BODY = "requestcontentbody";
 
     public const string ENDPOINT_LIST_COUNT = "dcnt";
+    public const string ENDPOINT_LIST_BYDETAIL_COUNT = "dcnt";
 
     public const string ENDPOINT_LIST_VIEW = "metrics";
     public const string ENDPOINT_LIST_CHART_VIEW = "metrics";
+    public const string ENDPOINT_LIST_BYDETAIL_VIEW = "listdetail";
 }

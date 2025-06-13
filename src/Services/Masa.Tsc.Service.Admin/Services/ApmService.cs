@@ -33,8 +33,8 @@ internal class ApmService : ServiceBase
         };
         if (await GetApps(query, authClient, pmClient, teamId, project, appType))
         {
-            return await serviceProvider.GetCubeApmService().ServicePageAsync(query);
-            //return await apmService.ServicePageAsync(query);
+            //return await serviceProvider.GetCubeApmService().ServicePageAsync(query);
+            return await apmService.ServicePageAsync(query);
         }
 
         return default!;
@@ -65,8 +65,8 @@ internal class ApmService : ServiceBase
 
         if (await GetApps(query, authClient, pmClient, teamId, project, appType))
         {
-            return await serviceProvider.GetCubeApmService().EndpointPageAsync(query);
-            //return await apmService.EndpointPageAsync(query);
+            //return await serviceProvider.GetCubeApmService().EndpointPageAsync(query);
+            return await apmService.EndpointPageAsync(query);
         }
 
 
