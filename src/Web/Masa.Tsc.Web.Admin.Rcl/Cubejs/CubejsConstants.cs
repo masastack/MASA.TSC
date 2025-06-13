@@ -31,6 +31,8 @@ internal sealed class CubejsConstants
     public const string EXCEPTION_MESSAGE = "exceptionmessage";
     public const string REQUEST_QUERY = "url";
     public const string REQUEST_BODY = "requestcontentbody";
+    public const string P99 = "pninetynine";
+    public const string P95 = "pninetyfive";
 
     public const string ENDPOINT_LIST_COUNT = "dcnt";
     public const string ENDPOINT_LIST_BYDETAIL_COUNT = "dcnt";
@@ -38,4 +40,5 @@ internal sealed class CubejsConstants
     public const string ENDPOINT_LIST_VIEW = "metrics";
     public const string ENDPOINT_LIST_CHART_VIEW = "metrics";
     public const string ENDPOINT_LIST_BYDETAIL_VIEW = "listdetail";
+    public const string ENDPOINT_DETAIL_CHART_VIEW = "metricspageone";
 }

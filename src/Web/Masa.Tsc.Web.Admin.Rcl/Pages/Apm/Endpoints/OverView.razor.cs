@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Web.Admin.Rcl.Cubejs.Response.EndpointDetail;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints;
 
 public partial class OverView
@@ -106,7 +108,7 @@ public partial class OverView
 
     private async Task RefreshDurationListAsync(CancellationToken token)
     {
-        await Task.Delay(400);
+        await Task.Delay(400, token);
         total = 0;
         if (token.IsCancellationRequested)
             return;
@@ -124,7 +126,8 @@ public partial class OverView
         {
             lastKey = key;
             lastSelect.IsClear = true;
-            await LoadDataAsync();
+            //await LoadChartDataAsync();
+            await LoadCubeChartDataAsync();
             await LoadDistributionDataAsync();
         }
     }
@@ -225,7 +228,82 @@ public partial class OverView
         percentile = lessTotal * 1.0 / sum;
     }
 
-    private async Task LoadDataAsync()
+
+
+
+    private async Task LoadCubeChartDataAsync()
+    {
+        //var teamId = CurrentTeamId;
+        var teamId = Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
+
+        var result = new List<ChartLineDto>() { new ChartLineDto() { Currents = new List<ChartLineItemDto>(), Previous = new List<ChartLineItemDto>() } };
+        if (!string.IsNullOrEmpty(Search.Endpoint))
+        {
+            var list = await GetChartDataAsync(Search.Start, Search.End);
+            SetChartData(result, list, false);
+            (bool hasPrious, DateTime start, DateTime end) = SetAndCheckPreviousTime();
+            if (hasPrious)
+            {
+                var previousList = await GetChartDataAsync(start, end);
+                SetChartData(result, previousList, true);
+            }
+        }
+        SetChartUiJson(result[0]);
+    }
+
+    private async Task<List<EndpointDetailChartItemResponse>> GetChartDataAsync(DateTime start, DateTime end)
+    {
+        var where = CubeJsRequestUtils.GetEndpintDetailChartWhere(start, end, Search.Environment, Search.Service!, Search.Endpoint!, Search.Method);
+        var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
+        var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_CHART_VIEW, where, orderBy, fields: [CubejsConstants.FAILED, CubejsConstants.LATENCY, CubejsConstants.THROUGHPUT, CubejsConstants.P95, CubejsConstants.P99, $"{CubejsConstants.TIMESTAMP_AGG}{{{CubejsConstants.TIMESTAMP_AGG_VALUE}}}"]));
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailChartResponse>>(request);
+        return response.Data.Data.Select(item => item.Data).ToList();
+    }
+
+    private ValueTuple<bool, DateTime, DateTime> SetAndCheckPreviousTime()
+    {
+        int day = 0;
+        switch (Search.ComparisonType)
+        {
+            case ApmComparisonTypes.Day:
+                day = -1;
+                break;
+            case ApmComparisonTypes.Week:
+                day = -7;
+                break;
+        }
+        if (day == 0)
+            return (false, default, default);
+
+        return (true, Search.Start.AddDays(day), Search.End.AddDays(day));
+    }
+
+    private void SetChartData(List<ChartLineDto> result, List<EndpointDetailChartItemResponse> data, bool isPrevious = false)
+    {
+        ChartLineDto? current = result[0];
+        var start = DateTime.Now;
+        int index = 0;
+        if (data == null || data.Count == 0) return;
+        do
+        {
+            var item = data[index];
+            var name = item.DateKey.Value;
+            var time = new DateTimeOffset(name).ToUnixTimeSeconds();
+            ((List<ChartLineItemDto>)(isPrevious ? current.Previous : current.Currents)).Add(
+                new()
+                {
+                    Latency = item.Latency,
+                    Throughput = Math.Round((double)item.Throughput, 2, MidpointRounding.ToZero),
+                    Failed = Math.Round(item.Failed, 2, MidpointRounding.ToZero),
+                    P99 = item.PNinetyNine,
+                    P95 = item.PNinetyNine,
+                    Time = time
+                });
+            index++;
+        } while (data.Count - index > 0);
+    }
+
+    private async Task LoadChartDataAsync()
     {
         var query = new ApmEndpointRequestDto
         {
@@ -239,28 +317,31 @@ public partial class OverView
             ComparisonType = SearchData.ComparisonType.ToComparisonType()
         };
         var data = await ApiCaller.ApmService.GetChartsAsync(query);
-        if (data != null && data.Any())
+        SetChartUiJson(data?.FirstOrDefault());
+    }
+
+    private void SetChartUiJson(ChartLineDto data)
+    {
+        if (data != null && data.Currents != null && data.Currents.Any())
         {
-            var chartData1 = data[0];
-            {
-                metricTypeChartData.Avg = new();
-                metricTypeChartData.P95 = new();
-                metricTypeChartData.P99 = new();
-                throughput = new();
-                failed = new();
+            metricTypeChartData.Avg = new();
+            metricTypeChartData.P95 = new();
+            metricTypeChartData.P99 = new();
+            throughput = new();
+            failed = new();
 
-                metricTypeChartData.Avg.Data = ConvertLatencyChartData(chartData1, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Latency, unit: "ms", lineName: "Average").Json;
-                metricTypeChartData.P95.Data = ConvertLatencyChartData(chartData1, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.P95, unit: "ms", lineName: "95th percentile").Json;
-                metricTypeChartData.P99.Data = ConvertLatencyChartData(chartData1, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.P99, unit: "ms", lineName: "99th percentile").Json;
-                throughput.Data = ConvertLatencyChartData(chartData1, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Throughput, unit: "tpm").Json;
-                failed.Data = ConvertLatencyChartData(chartData1, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Failed, unit: "%").Json;
+            metricTypeChartData.Avg.Data = ConvertLatencyChartData(data, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Latency, unit: "ms", lineName: "Average").Json;
+            metricTypeChartData.P95.Data = ConvertLatencyChartData(data, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.P95, unit: "ms", lineName: "95th percentile").Json;
+            metricTypeChartData.P99.Data = ConvertLatencyChartData(data, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.P99, unit: "ms", lineName: "99th percentile").Json;
+            throughput.Data = ConvertLatencyChartData(data, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Throughput, unit: "tpm").Json;
+            failed.Data = ConvertLatencyChartData(data, item => item.Time.ToDateTime(CurrentTimeZone).ToString("yyyy/MM/dd HH:mm:ss"), item => item.Failed, unit: "%").Json;
 
-                metricTypeChartData.Avg.ChartLoading = false;
-                metricTypeChartData.P95.ChartLoading = false;
-                metricTypeChartData.P99.ChartLoading = false;
-                throughput.ChartLoading = false;
-                failed.ChartLoading = false;
-            }
+            metricTypeChartData.Avg.ChartLoading = false;
+            metricTypeChartData.P95.ChartLoading = false;
+            metricTypeChartData.P99.ChartLoading = false;
+            throughput.ChartLoading = false;
+            failed.ChartLoading = false;
+
         }
         else
         {
