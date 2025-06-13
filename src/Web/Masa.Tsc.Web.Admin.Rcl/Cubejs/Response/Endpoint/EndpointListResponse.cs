@@ -15,3 +15,10 @@ public record EndpointTotalItemResponse([property: JsonPropertyName(CubejsConsta
 public record EndpointListChartResponse([property: JsonPropertyName(CubejsConstants.ENDPOINT_LIST_CHART_VIEW)] EndpointListChartItemResponse Data);
 
 public record EndpointListChartItemResponse(string ServiceName, string Target, string Method, double Latency, long Throughput, double Failed, [property: JsonPropertyName(CubejsConstants.TIMESTAMP_AGG)] CubejsAggDateTimeValueResponse DateKey);
+
+
+public record EndpointByDetailTotalResponse([property: JsonPropertyName(CubejsConstants.ENDPOINT_LIST_BYDETAIL_VIEW)] EndpointTotalItemResponse Item);
+
+public record EndpointListByDetailResponse([property: JsonPropertyName(CubejsConstants.ENDPOINT_LIST_BYDETAIL_VIEW)] EndpointListItemByDetailResponse Item);
+
+public record EndpointListItemByDetailResponse(string ServiceName, string Target, string Method, int Cnt);

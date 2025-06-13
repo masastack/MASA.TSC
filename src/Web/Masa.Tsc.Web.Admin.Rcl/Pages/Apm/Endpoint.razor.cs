@@ -26,6 +26,7 @@ public partial class Endpoint
     private bool isTableLoading = false;
     private string? sortFiled;
     private bool? sortBy;
+    private List<EndpointListItemByDetailResponse>? _detailFilters = default;
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,17 +47,17 @@ public partial class Endpoint
             sortBy = sort.SortDesc[0];
         else
             sortBy = default;
-        await LoadASync();
+        await LoadAsync();
     }
 
     private async Task OnPageChange((int page, int pageSize) pageData)
     {
         page = pageData.page;
         defaultSize = pageData.pageSize;
-        await LoadASync();
+        await LoadAsync();
     }
 
-    private async Task LoadASync(SearchData data = null!)
+    private async Task LoadAsync(SearchData data = null!)
     {
         if (data != null)
         {
@@ -166,15 +167,40 @@ public partial class Endpoint
         StateHasChanged();
     }
 
+    private async Task LoadCubePageByDetailAsync()
+    {
+        _detailFilters = null;
+        if (string.IsNullOrEmpty(Search.Status) && (string.IsNullOrEmpty(Search.TextField) || string.IsNullOrEmpty(Search.TextValue)))
+            return;
+
+        var teamId = CurrentTeamId;
+        //var teamId = Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
+        var where = CubeJsRequestUtils.GetEndpintListWhereByDetail(Search.Start, Search.End, teamId, Search.Environment, Search.ServiceType, Search.Service, Search.Endpoint, Search.Method, Search.Project, Search.Status, Search.TextField, Search.TextValue);
+        var totalRequest = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_BYDETAIL_VIEW, where, fields: CubejsConstants.ENDPOINT_LIST_BYDETAIL_COUNT));
+        isTableLoading = true;
+        var totalResponse = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointByDetailTotalResponse>>(totalRequest);
+        total = (int)totalResponse.Data.Data[0].Item.Total;
+        _detailFilters = new();
+        if (total == 0)
+            return;
+
+        //var orderBy = CubeJsRequestUtils.GetEndpintListOrderBy(sortFiled, sortBy);
+        var pageRequest = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_BYDETAIL_VIEW, where, default, 1, 100, CubejsConstants.SERVICENAME, CubejsConstants.TARGET, CubejsConstants.METHOD, "cnt"));
+        var pageResponse = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointListByDetailResponse>>(pageRequest);
+
+        _detailFilters = pageResponse.Data.Data.Select(item => item.Item).ToList();
+    }
+
     private async Task LoadCubePageDataAsync()
     {
-        var teamId = CurrentTeamId;// Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
-        var where = CubeJsRequestUtils.GetEndpintListWhere(Search.Start, Search.End, teamId, Search.Environment, Search.Service, Search.Endpoint, Search.Method, Search.Project);
+        await LoadCubePageByDetailAsync();
+
+        var teamId = CurrentTeamId;
+        //var teamId = Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
+        var where = CubeJsRequestUtils.GetEndpintListWhere(Search.Start, Search.End, teamId, Search.Environment, Search.ServiceType, Search.Service, Search.Endpoint, Search.Method, Search.Project, _detailFilters);
         var totalRequest = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_VIEW, where, fields: CubejsConstants.ENDPOINT_LIST_COUNT));
         isTableLoading = true;
-        Console.WriteLine("LoadCubePageDataAsync page start,{0}", DateTime.Now);
         var totalResponse = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointTotalResponse>>(totalRequest);
-        Console.WriteLine("LoadCubePageDataAsync page end,{0}", DateTime.Now);
         total = (int)totalResponse.Data.Data[0].Item.Total;
 
         data.Clear();
@@ -185,14 +211,13 @@ public partial class Endpoint
 
         var orderBy = CubeJsRequestUtils.GetEndpintListOrderBy(sortFiled, sortBy);
         var pageRequest = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_VIEW, where, orderBy, page, defaultSize, CubejsConstants.SERVICENAME, CubejsConstants.TARGET, CubejsConstants.METHOD, CubejsConstants.FAILED_AGG, CubejsConstants.LATENCY_AGG, CubejsConstants.THROUGHPUT));
-        Console.WriteLine("LoadCubePageDataAsync pagedata start,{0}", DateTime.Now);
         var pageResponse = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointListResponse>>(pageRequest);
-        Console.WriteLine("LoadCubePageDataAsync pagedata end,{0}", DateTime.Now);
 
         var totalMinits = Math.Floor((Search.End - Search.Start).TotalMinutes);
         if (pageResponse != null && pageResponse.Data.Data != null && pageResponse.Data.Data.Count > 0)
         {
-            data.AddRange(pageResponse.Data.Data.Select(item => new ListChartData
+            data.AddRange(pageResponse.Data.Data.Where(item => _detailFilters == null
+            || _detailFilters.Count > 0 && _detailFilters.Any(filter => item.Item.ServiceName == filter.ServiceName && item.Item.Target == filter.Target && item.Item.Method == filter.Method)).Select(item => new ListChartData
             {
                 Name = $"{item.Item.Method} {item.Item.Target}",
                 Method = item.Item.Method,
@@ -209,7 +234,8 @@ public partial class Endpoint
     {
         if (data.Count == 0)
             return;
-        var teamId = CurrentTeamId; // Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
+        var teamId = CurrentTeamId;
+        //var teamId = Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
         var services = data.Select(item => item.Service).Distinct().ToArray();
         var targets = data.Select(item => item.Name.Split(' ')[1]).Distinct().ToArray();
         var methods = data.Select(item => item.Name.Split(' ')[0]).Distinct().ToArray();
@@ -258,7 +284,6 @@ public partial class Endpoint
         StateHasChanged();
     }
 
-
     private async Task<List<EndpointListChartItemResponse>> GetChartDataAsync(DateTime start, DateTime end, Guid teamId, string[] services, string[] endpoints, string[] methods)
     {
         var where = CubeJsRequestUtils.GetEndpintListChartWhere(start, end, Search.Environment, teamId, services, endpoints, methods);
@@ -285,24 +310,6 @@ public partial class Endpoint
 
         return (true, Search.Start.AddDays(day), Search.End.AddDays(day));
     }
-
-
-    //private async Task GetPreviousChartData(BaseApmRequestDto query, bool isService, List<ChartLineDto> result, bool isPrevious)
-    //{
-    //    if (isService)
-    //    {
-    //        var request = GraphQLRequestUtils.GetServiceChartRequest(query);
-    //        var list = await _client.SendQueryAsync<CubeListData<ServiceChartItemListResponse>>(request);
-    //        SetChartData(result, list.Data.Items.Select(item => item.Data).ToList(), isService, isPrevious);
-    //    }
-    //    else
-    //    {
-    //        var request = GraphQLRequestUtils.GetEndpointChartRequest((ApmEndpointRequestDto)query);
-    //        var list = await _client.SendQueryAsync<CubeListData<EndpointChartItemListResponse>>(request);
-    //        SetChartData(result, list.Data.Items.Select(item => item.Data).ToList(), isService, isPrevious);
-    //    }
-    //}
-
 
     private void SetChartData(List<ChartLineDto> result, List<EndpointListChartItemResponse> data, bool isService, bool isPrevious = false)
     {
@@ -354,14 +361,6 @@ public partial class Endpoint
             index++;
         } while (data.Count - index > 0);
     }
-
-
-
-
-
-
-
-
 
     private static EChartType ConvertLatencyChartData(ChartLineDto data, Func<ChartLineItemDto, object> fnProperty, string? lineColor = null, string? areaLineColor = null)
     {

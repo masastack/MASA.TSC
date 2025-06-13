@@ -1,11 +1,9 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Web.Admin.Rcl.Pages.Apm;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Cubejs.Request;
 
-internal partial class CubeJsRequestUtils
+internal static partial class CubeJsRequestUtils
 {
     public static string GetCompleteCubejsQuery(string view, string? where = default, string? orderBy = default, int? page = default, int? pageSize = default, params string[] fields)
     {
@@ -47,22 +45,89 @@ internal partial class CubeJsRequestUtils
         return text.ToString();
     }
 
-    public static string GetEndpintListWhere(DateTime startUtc, DateTime endUtc, Guid teamId, string? env, string? service = default, string? endpoint = default, string? method = default, string? project = default)
+    public static string GetEndpintListWhereByDetail(DateTime startUtc, DateTime endUtc, Guid teamId, string? env, string? appType = default, string? service = default, string? endpoint = default, string? method = default, string? project = default,
+        string? statusCode = default, string? textField = default, string? textValue = default)
     {
+        var text = new StringBuilder(AppendEnvService(startUtc, endUtc, env, service, endpoint, method));
+        if (!string.IsNullOrEmpty(statusCode))
+            text.Append($",{CubejsConstants.STATUS_CODE}:{{equals:\"{statusCode}\"}}");
+        if (!string.IsNullOrEmpty(textField) && !string.IsNullOrEmpty(textValue))
+        {
+            if (textField == StorageConst.Current.TraceId)
+                text.Append($",{CubejsConstants.TRACEID}:{{equals:\"{textValue}\"}}");
+            else if (textField == StorageConst.Current.SpanId)
+                text.Append($",{CubejsConstants.SPANID}:{{equals:\"{textValue}\"}}");
+            else if (textField == StorageConst.Current.Trace.UserId)
+                text.Append($",{CubejsConstants.USERID}:{{equals:\"{textValue}\"}}");
+            else if (textField == StorageConst.Current.Trace.URLFull)
+                text.Append($",{CubejsConstants.REQUEST_QUERY}:{{contains:\"{textValue}\"}}");
+            else if (textField == StorageConst.Current.Trace.HttpRequestBody)
+                text.Append($",{CubejsConstants.REQUEST_BODY}:{{contains:\"{textValue}\"}}");
+        }
+        return text.ToString();
+    }
+
+    public static string GetEndpintListWhere(DateTime startUtc, DateTime endUtc, Guid teamId, string? env, string? appType = default, string? service = default, string? endpoint = default, string? method = default, string? project = default, List<EndpointListItemByDetailResponse>? filters = default)
+    {
+        var text = new StringBuilder(AppendEnvService(startUtc, endUtc, env, service, endpoint, method, filters, true));
+        text.Append(AppendTeamProject(teamId, project, appType));
+        //text.Append(AppendDetailFilter(filters, env, service, endpoint, method));
+        return text.ToString();
+    }
+
+    //private static string AppendDetailFilter(List<EndpointListItemByDetailResponse>? filters, string? env, string? service, string? endpoint, string? method)
+    //{
+    //    if (filters == null || filters.Count == 0) return default!;
+    //    var text = new StringBuilder();
+    //    foreach (var item in filters)
+    //    {
+    //        text.Append(",or:");
+    //        text.Append($"{{{CubejsConstants.SERVICENAME}:{{equals:\"{item.ServiceName}\"}},{CubejsConstants.TARGET}:{{equals:\"{item.Target}\"}},{CubejsConstants.METHOD}:{{equals:\"{item.Method}\"}}}}");
+    //    }
+    //    text.Remove(0, 4).Append("}").Insert(0, ",and: {");
+    //    return text.ToString();
+    //}
+
+    public static string AppendEnvService(DateTime startUtc, DateTime endUtc, string? env, string? service = default, string? endpoint = default, string? method = default, List<EndpointListItemByDetailResponse>? filters = default, bool hasPeriod = false)
+    {
+        (string[]? services, string[]? endpoints, string[]? methods) = (filters?.Select(item => item.ServiceName).ToArray(), filters?.Select(item => item.Target).ToArray(), filters?.Select(item => item.Method).ToArray());
+
+        if (services != null && services.Length == 0)
+            services = [string.Empty];
+        if (endpoints != null && endpoints.Length == 0)
+            endpoints = [string.Empty];
+        if (methods != null && methods.Length == 0)
+            methods = [string.Empty];
+
         var text = new StringBuilder();
         text.Append($"{CubejsConstants.TIMESTAMP_AGG}: {{inDateRange: [\"{startUtc}\",\"{endUtc}\"]}}");
-        text.Append($",period:{{equals:\"{GetPeriod(startUtc, endUtc)}\"}}");
+        if (hasPeriod)
+            text.Append($",period:{{equals:\"{GetPeriod(startUtc, endUtc)}\"}}");
         if (!string.IsNullOrEmpty(env))
             text.Append($",{CubejsConstants.ENV_AGG}:{{equals:\"{env}\"}}");
         if (!string.IsNullOrEmpty(service))
             text.Append($",{CubejsConstants.SERVICENAME}:{{equals:\"{service}\"}}");
+        else if (services != null && services.Length > 0)
+            text.Append($",{CubejsConstants.SERVICENAME}:{{in:[\"{string.Join("\",\"", services)}\"]}}");
         if (!string.IsNullOrEmpty(endpoint))
             text.Append($",{CubejsConstants.TARGET}:{{equals:\"{endpoint}\"}}");
+        else if (endpoints != null && endpoints.Length > 0)
+            text.Append($",{CubejsConstants.TARGET}:{{in:[\"{string.Join("\",\"", endpoints)}\"]}}");
         if (!string.IsNullOrEmpty(method))
             text.Append($",{CubejsConstants.METHOD}:{{equals:\"{method}\"}}");
+        else if (methods != null && methods.Length > 0)
+            text.Append($",{CubejsConstants.METHOD}:{{in:[\"{string.Join("\",\"", methods)}\"]}}");
+        return text.ToString();
+    }
+
+    public static string AppendTeamProject(Guid teamId, string? project = default, string? appType = default)
+    {
+        var text = new StringBuilder();
         text.Append($",{CubejsConstants.TEAM_ID}:{{equals:\"{teamId}\"}}");
         if (!string.IsNullOrEmpty(project))
             text.Append($",{CubejsConstants.PROJECT}:{{equals:\"{project}\"}}");
+        if (!string.IsNullOrEmpty(appType) && Enum.TryParse(appType, out AppTypes appTypeEnum))
+            text.Append($",{CubejsConstants.APPTYPE}:{{equals:\"{(int)appTypeEnum}\"}}");
         return text.ToString();
     }
 
