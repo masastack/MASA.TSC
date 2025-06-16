@@ -85,12 +85,15 @@ redis = builder.Environment.EnvironmentName == "Development" ? AppSettings.GetMo
 //    opt.DaprHttpPort = 3606;
 //    opt.DaprGrpcPort = 3607;
 //});
+pmServiceUrl = "https://pm-service.lonsid.cn";
+authServiceUrl = "https://auth-service.lonsid.cn";
 #else
 redis = redisOption;
+pmServiceUrl = "https://auth-service.lonsid.cn"; masaStackConfig.GetPmServiceDomain();
+authServiceUrl = masaStackConfig.GetAuthServiceDomain();
 #endif
 
-pmServiceUrl = masaStackConfig.GetPmServiceDomain();
-authServiceUrl = masaStackConfig.GetAuthServiceDomain();
+
 builder.Services.AddMasaIdentity(options =>
 {
     options.Environment = IdentityClaimConsts.ENVIRONMENT;

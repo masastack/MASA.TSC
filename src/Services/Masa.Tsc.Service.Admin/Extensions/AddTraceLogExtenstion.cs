@@ -10,8 +10,8 @@ public static class AddTraceLogExtenstion
     public static IServiceCollection AddTraceLog(this IServiceCollection services)
     {
         _services = services;
-        var client = _services.BuildServiceProvider().GetRequiredService<IConfigurationApiClient>();
-        var config1 = client.GetAsync<AppSettingConfiguration>(ConfigConst.ConfigRoot, ValueChanged).ConfigureAwait(false).GetAwaiter().GetResult();
+        // var client = _services.BuildServiceProvider().GetRequiredService<IConfigurationApiClient>();
+        //var config1 = client.GetAsync<AppSettingConfiguration>(ConfigConst.ConfigRoot, ValueChanged).ConfigureAwait(false).GetAwaiter().GetResult();
 
 
 
@@ -37,7 +37,10 @@ public static class AddTraceLogExtenstion
                            503
                          }
             },
-            Cubejs = config1.Cubejs
+            Cubejs = new CubejsConfig {
+                 Endpoint= "http://10.130.0.33:4000/cubejs-api/graphql",
+                 Token= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0Mn0.V8hDRVWs1NslqGrvv-rMcNX0VTC4ZCC3LMIDS72Z7rI"
+            }
         };
 
         ConfigConst.SetConfiguration(config);

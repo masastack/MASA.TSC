@@ -53,9 +53,9 @@ BlazorRouteManager.InitRoute(Assembly.Load("Masa.Tsc.Web.Admin.Rcl"));
 #if DEBUG
 if (builder.Environment.EnvironmentName == "Development")
 {
-    //await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC, authHost: "https://auth-service-dev.masastack.com", mcHost: "https://mc-service-dev.masastack.com", pmHost: "https://pm-service-dev.masastack.com");
-    await builder.Services.AddMasaStackComponentsWithNormalAppAsync(MasaStackProject.TSC, "http://localhost:4317", serviceVersion: "local1.0", authHost: "https://auth-service-sec-staging.masastack.com", mcHost: "https://mc-service-sec-staging.masastack.com", pmHost: "https://pm-service-sec-staging.masastack.com");
-    builder.Services.AddTscHttpApiCaller("http://localhost:18010", authApiUrl: "https://auth-service-sec-staging.masastack.com").AddDccClient(redisOption);
+    //await builder.Services.AddMasaStackComponentsAsync(MasaStackProject.TSC, authHost: "https://auth-service.lonsid.cn", mcHost: "https://mc-service.lonsid.cn", pmHost: "https://pm-service.lonsid.cn");
+    await builder.Services.AddMasaStackComponentsWithNormalAppAsync(MasaStackProject.TSC, "http://localhost:4317", serviceVersion: "local1.0", authHost: "https://auth-service.lonsid.cn", mcHost: "https://mc-service.lonsid.cn", pmHost: "https://pm-service.lonsid.cn");
+    builder.Services.AddTscHttpApiCaller("http://localhost:18010", authApiUrl: "https://auth-service.lonsid.cn").AddDccClient(redisOption);
 }
 else
 {
