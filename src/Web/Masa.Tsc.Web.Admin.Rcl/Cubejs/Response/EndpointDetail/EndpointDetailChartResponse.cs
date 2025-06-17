@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Web.Admin.Rcl.Cubejs.Response.EndpointDetail;
 
-internal record EndpointDetailChartResponse([property: JsonPropertyName(CubejsConstants.ENDPOINT_DETAIL_CHART_VIEW)] EndpointDetailChartItemResponse Data);
+internal record EndpointDetailChartResponse<TData>([property: JsonPropertyName(CubejsConstants.ENDPOINT_DETAIL_CHART_VIEW)] TData Data) where TData : class;
 
 internal record EndpointDetailChartItemResponse(
     long Latency,
@@ -13,3 +13,5 @@ internal record EndpointDetailChartItemResponse(
     long PNinetyFive,
     CubejsAggDateTimeValueResponse DateKey
     );
+
+internal record EndpointDetailPageP95Response(double PNinetyFive);

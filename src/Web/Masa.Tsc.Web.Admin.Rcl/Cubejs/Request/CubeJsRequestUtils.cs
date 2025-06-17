@@ -149,20 +149,31 @@ internal static partial class CubeJsRequestUtils
         return text.ToString();
     }
 
-    public static string GetEndpintDetailChartWhere(DateTime startUtc, DateTime endUtc, string? env, string service, string endpoint, string method)
+    public static string GetEndpintDetailChartWhere(DateTime startUtc, DateTime endUtc, string? env, string service, string endpoint, string method, bool hasPeriod = true)
     {
         var text = new StringBuilder();
         text.Append($"{CubejsConstants.TIMESTAMP_AGG}: {{inDateRange: [\"{startUtc}\",\"{endUtc}\"]}}");
-        text.Append($",period:{{equals:\"{GetPeriod(startUtc, endUtc)}\"}}");
+        if (hasPeriod)
+            text.Append($",period:{{equals:\"{GetPeriod(startUtc, endUtc)}\"}}");
         if (!string.IsNullOrEmpty(env))
-            text.Append($",{CubejsConstants.ENV_AGG}:{{equals:\"{env}\"}}");       
+            text.Append($",{CubejsConstants.ENV_AGG}:{{equals:\"{env}\"}}");
 
         if (!string.IsNullOrEmpty(service))
             text.Append($",{CubejsConstants.SERVICENAME}:{{equals:\"{service}\"}}");
-        if(!string.IsNullOrEmpty(endpoint))
+        if (!string.IsNullOrEmpty(endpoint))
             text.Append($",{CubejsConstants.TARGET}:{{equals:\"{endpoint}\"}}");
-        if(!string.IsNullOrEmpty(method))
-            text.Append($",{CubejsConstants.METHOD}:{{equals:\"{method}\"}}");       
+        if (!string.IsNullOrEmpty(method))
+            text.Append($",{CubejsConstants.METHOD}:{{equals:\"{method}\"}}");
+        return text.ToString();
+    }
+
+    public static string GetEndpintDetailTracePageWhere(DateTime startUtc, DateTime endUtc, string? env, string service, string endpoint, string method, long startDuration, long endDuration)
+    {
+        var text = new StringBuilder(GetEndpintDetailChartWhere(startUtc, endUtc, env, service, endpoint, method, false));
+
+        if (startDuration > 0 && endDuration > 0 && endDuration - startDuration > 0)
+            text.Append($",{CubejsConstants.LATENCY_DURATION}:{{gte:{startDuration * 1e6},lte:{endDuration * 1e6}}}");
+
         return text.ToString();
     }
 
