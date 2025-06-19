@@ -1,14 +1,12 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.SystemTextJson;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 {
-    public partial class CoreAnalysis : TscComponentBase
+    public partial class CoreAnalysis
     {
-        [Inject] private IHttpClientFactory HttpClientFactory { get; set; } = null!;
+        [Inject(Key = RclServiceCollectionExtensions.Cubejs_Client_Name)]
+        public GraphQL.Client.Http.GraphQLHttpClient CubejsClient { get; set; }
 
         private static readonly Dictionary<string, string> UserVisitDisplay = new()
         {
@@ -23,7 +21,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             { "newvisit", "新增用户当日打开次数" }
         };
 
-        private GraphQLHttpClient _graphClient = null!;
         private CoreMainData? _mainData;
         private object? _permonOption;
         private object? _monVisitOption;
@@ -44,11 +41,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             var nowDate = DateOnly.FromDateTime(now);
 
             _dateRange = [nowDate.AddMonths(-1), nowDate];
-
-            var httpClient = HttpClientFactory.CreateClient("analysis");
-            _graphClient = new GraphQLHttpClient("http://10.130.0.33:4000/cubejs-api/graphql",
-                new SystemTextJsonSerializer(),
-                httpClient: httpClient);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -80,14 +72,14 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private async Task GetMainDataAsync()
         {
-            var response = await _graphClient.SendQueryAsync<CubeData<CoreMainItem>>(GetMainDataQuery());
+            var response = await CubejsClient.SendQueryAsync<CubeData<CoreMainItem>>(GetMainDataQuery());
             _mainData = response.Data.Items.FirstOrDefault()?.CoreMain;
             StateHasChanged();
         }
 
         private async Task GetPermonDataAsync()
         {
-            var response = await _graphClient.SendQueryAsync<CubeData<PerMonItem>>(GetPermonDataQuery());
+            var response = await CubejsClient.SendQueryAsync<CubeData<PerMonItem>>(GetPermonDataQuery());
             var permonDatas = response.Data.Items.Select(x => x.PerMon).ToArray();
             var legendData = permonDatas.Select(x => x.Category).ToArray();
             var data = permonDatas.Select(x => new { name = x.Category, value = x.Count }).ToArray();
@@ -98,7 +90,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
         private async Task GetMonVisitDataAsync()
         {
             var response =
-                await _graphClient.SendQueryAsync<CubeData<MonVisitItem>>(GenGraphQLQuery("coremonvisit", "datekey",
+                await CubejsClient.SendQueryAsync<CubeData<MonVisitItem>>(GenGraphQLQuery("coremonvisit", "datekey",
                     "cnt"));
             var monVisitDatas = response.Data.Items.Select(x => x.MonVisit).ToArray();
             var x = monVisitDatas.Select(u => u.DateKey[..10]).ToArray();
@@ -117,7 +109,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private async Task GetMonUserDataAsync()
         {
-            var response = await _graphClient.SendQueryAsync<CubeData<MonUserItem>>(
+            var response = await CubejsClient.SendQueryAsync<CubeData<MonUserItem>>(
                 GenGraphQLQuery("coremonuser", _dateRange[0], _dateRange[1], "uv", "uvt", "pv", "newuser",
                     "newvisit"));
             var monUserDatas = response.Data.Items.Select(x => x.MonUser).ToArray();
@@ -191,7 +183,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private async Task GetUserLoseByDayDataAsync()
         {
-            var response = await _graphClient.SendQueryAsync<CubeData<UserLoseByDayItem>>(
+            var response = await CubejsClient.SendQueryAsync<CubeData<UserLoseByDayItem>>(
                 GenGraphQLQuery("coreulosebyday", "datekey", "cnt", "alive", "rate"));
 
             var items = response.Data.Items.Select(x => x.UserLoseByDay).ToArray();
@@ -216,7 +208,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private async Task GetUserLoseByWeekDataAsync()
         {
-            var response = await _graphClient.SendQueryAsync<CubeData<UserLoseByWeekItem>>(
+            var response = await CubejsClient.SendQueryAsync<CubeData<UserLoseByWeekItem>>(
                 GenGraphQLQuery("coreulosebyweek(orderBy:{yearweek:asc})", "weekname", "yearweek", "cnt", "alive",
                     "rate"));
 
@@ -241,7 +233,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private async Task GetUserLoseByMonDataAsync()
         {
-            var response = await _graphClient.SendQueryAsync<CubeData<UserLoseByMonItem>>(
+            var response = await CubejsClient.SendQueryAsync<CubeData<UserLoseByMonItem>>(
                 GenGraphQLQuery("coreulosebymon(orderBy:{monnum:asc})", "mon", "monnum", "cnt", "alive", "rate"));
 
             var items = response.Data.Items.Select(x => x.UserLoseByMon).ToArray();

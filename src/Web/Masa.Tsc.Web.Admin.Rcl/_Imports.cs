@@ -53,6 +53,7 @@ global using Masa.Tsc.Web.Admin.Rcl.Components.Project.Charts;
 global using Masa.Tsc.Web.Admin.Rcl.Cubejs;
 global using Masa.Tsc.Web.Admin.Rcl.Cubejs.Request;
 global using Masa.Tsc.Web.Admin.Rcl.Cubejs.Response;
+global using Masa.Tsc.Web.Admin.Rcl.Cubejs.Response.EndpointDetail;
 global using Masa.Tsc.Web.Admin.Rcl.Data.Apm;
 global using Masa.Tsc.Web.Admin.Rcl.Data.Team;
 global using Masa.Tsc.Web.Admin.Rcl.Extentions;

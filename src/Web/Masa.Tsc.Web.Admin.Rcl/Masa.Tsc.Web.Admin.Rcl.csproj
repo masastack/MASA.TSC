@@ -6,6 +6,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Cubejs\Request\Endpoint\**" />
+	  <Content Remove="Cubejs\Request\Endpoint\**" />
+	  <EmbeddedResource Remove="Cubejs\Request\Endpoint\**" />
+	  <None Remove="Cubejs\Request\Endpoint\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Remove="Components\Apm\JwtBearaToken.razor.cs" />
 		<Compile Remove="Components\Apm\MMonacoEditor.razor.cs" />
 	</ItemGroup>
@@ -45,7 +52,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Cubejs\Request\Endpoint\" />
 		<Folder Include="wwwroot\img\team\" />
 	</ItemGroup>
 

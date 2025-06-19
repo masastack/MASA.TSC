@@ -173,8 +173,7 @@ public partial class Endpoint
         if (string.IsNullOrEmpty(Search.Status) && (string.IsNullOrEmpty(Search.TextField) || string.IsNullOrEmpty(Search.TextValue)))
             return;
 
-        //var teamId = CurrentTeamId;
-        var teamId = Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
+        var teamId = CurrentTeamId;
         var where = CubeJsRequestUtils.GetEndpintListWhereByDetail(Search.Start, Search.End, teamId, Search.Environment, Search.ServiceType, Search.Service, Search.Endpoint, Search.Method, Search.Project, Search.Status, Search.TextField, Search.TextValue);
         //var totalRequest = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_BYDETAIL_VIEW, where, fields: CubejsConstants.ENDPOINT_LIST_BYDETAIL_COUNT));
         //isTableLoading = true;
@@ -195,8 +194,7 @@ public partial class Endpoint
     {
         await LoadCubePageByDetailAsync();
 
-        //var teamId = CurrentTeamId;
-        var teamId = Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
+        var teamId = CurrentTeamId;
         var where = CubeJsRequestUtils.GetEndpintListWhere(Search.Start, Search.End, teamId, Search.Environment, Search.ServiceType, Search.Service, Search.Endpoint, Search.Method, Search.Project, _detailFilters);
         var totalRequest = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_VIEW, where, fields: CubejsConstants.ENDPOINT_LIST_COUNT));
         isTableLoading = true;
@@ -234,24 +232,18 @@ public partial class Endpoint
     {
         if (data.Count == 0)
             return;
-        //var teamId = CurrentTeamId;
-        var teamId = Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
+        var teamId = CurrentTeamId;
         var services = data.Select(item => item.Service).Distinct().ToArray();
         var targets = data.Select(item => item.Name.Split(' ')[1]).Distinct().ToArray();
         var methods = data.Select(item => item.Name.Split(' ')[0]).Distinct().ToArray();
-        var result = new List<ChartLineDto>();
-        Console.WriteLine("LoadCubePageDataAsync chartdata1 start,{0}", DateTime.Now);
+        var result = new List<ChartLineDto>();       
         var list = await GetChartDataAsync(Search.Start, Search.End, teamId, services, targets, methods);
-        Console.WriteLine("LoadCubePageDataAsync pagedata1 end,{0}", DateTime.Now);
-
 
         SetChartData(result, list, false, false);
         (bool hasPrious, DateTime start, DateTime end) = SetAndCheckPreviousTime();
         if (hasPrious)
         {
-            Console.WriteLine("LoadCubePageDataAsync chartdata2 start,{0}", DateTime.Now);
-            var previousList = await GetChartDataAsync(start, end, teamId, services, targets, methods);
-            Console.WriteLine("LoadCubePageDataAsync pagedata2 end,{0}", DateTime.Now);
+            var previousList = await GetChartDataAsync(start, end, teamId, services, targets, methods);            
             SetChartData(result, previousList, false, true);
         }
 
@@ -329,7 +321,7 @@ public partial class Endpoint
             {
                 name = $"{item.Method} {item.Target}";
             }
-            var time = new DateTimeOffset(item.DateKey.Value).ToUnixTimeSeconds();
+            var time = new DateTimeOffset(item.DateKey.Value!.Value).ToUnixTimeSeconds();
             if (current == null || current.Name != name)
             {
                 if (isPrevious && result.Exists(item => item.Name == name))

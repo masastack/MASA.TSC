@@ -8,7 +8,6 @@ public partial class ServiceErrors
     [CascadingParameter]
     public SearchData SearchData { get; set; }
 
-    //跟相关的接口关联查询使用
     [Parameter]
     public string SpanId { get; set; }
 
@@ -59,7 +58,8 @@ public partial class ServiceErrors
             lastSpanId = SpanId ?? string.Empty;
             await LoadASync();
             StateHasChanged();
-            await LoadChartDataAsync();
+            //await LoadChartDataAsync();
+            await LoadCubeChartDataAsync();
         }
         await base.OnParametersSetAsync();
     }
@@ -78,11 +78,149 @@ public partial class ServiceErrors
 
     private async Task LoadASync()
     {
-        if (isTableLoading)
+        await LoadCubePageDataAsync();
+        //await LoadPageDataAsync();
+    }
+
+    private async Task LoadCubePageDataAsync()
+    {
+        if (string.IsNullOrEmpty(SearchData.Service) && string.IsNullOrEmpty(SearchData.TraceId))
         {
+            total = 0;
+            data = [];
             return;
         }
-        await LoadPageDataAsync();
+        if (isTableLoading) return;
+        isTableLoading = true;
+        var traceId = !string.IsNullOrEmpty(SearchData.TextValue) && SearchData.TextField == StorageConst.Current.TraceId ? SearchData.TextValue : null;
+        var where = CubeJsRequestUtils.GetErrorChartWhere(SearchData.Start, SearchData.End, default, SearchData.Service!, default!, default!, traceId, SpanId);
+        var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
+
+        var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_ERROR_LIST_VIEW, where, orderBy, fields: [CubejsConstants.ERROR_PAGE_COUNT]));
+        var responseTotal = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailErrorResponse<ServiceErrorListItemTotalResponse>>>(request);
+        if (responseTotal.Data != null && responseTotal.Data.Data != null && responseTotal.Data.Data.Count > 0)
+        {
+            total = responseTotal.Data.Data[0].Data.GrCnt;
+        }
+        else
+        {
+            total = 0;
+            data = [];
+            isTableLoading = false;
+            return;
+        }
+
+        request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_ERROR_LIST_VIEW, where, orderBy, page, defaultSize, fields: [CubejsConstants.ERROR_TYPE, CubejsConstants.ERROR_MESSAGE, CubejsConstants.COUNT, CubejsConstants.ERROR_PAGE_MAX_TIME]));
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailErrorResponse<ServiceErrorListItemResponse>>>(request);
+        if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
+        {
+            data = response.Data.Data.Select(item => new ErrorMessageDto
+            {
+                Type = item.Data.ExceptionType,
+                Message = item.Data.MsgGroupKey,
+                Total = item.Data.Cnt,
+                LastTime = item.Data.MaxT
+            }).ToList();
+        }
+        else
+        {
+            data = [];
+        }
+        isTableLoading = false;
+    }
+
+
+    private async Task LoadCubeChartDataAsync()
+    {
+        if (!ShowChart)
+            return;
+        List<ChartLineCountDto> result = [];
+
+        var traceId = !string.IsNullOrEmpty(SearchData.TextValue) && SearchData.TextField == StorageConst.Current.TraceId ? SearchData.TextValue : null;
+        var list = await GetChartDataAsync(Search.Start, Search.End, traceId);
+
+        SetChartData(result, list, false);
+        //(bool hasPrious, DateTime start, DateTime end) = SetAndCheckPreviousTime();
+        //if (hasPrious && string.IsNullOrEmpty(traceId))
+        //{
+        //    var previousList = await GetChartDataAsync(start, end);
+        //    SetChartData(result, previousList, true);
+        //}
+        chart.Data = ConvertLatencyChartData(result.Count > 0 ? result[0] : default, lineName: I18n.Apm("Chart.ErrorCount")).Json;
+        chart.ChartLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task<List<ServiceErrorChartResponse>> GetChartDataAsync(DateTime start, DateTime end, string? traceId = default)
+    {
+        var where = CubeJsRequestUtils.GetErrorChartWhere(start, end, SearchData.Environment, SearchData.Service!, default!, default!, traceId,SpanId);
+        var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
+        var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_ERROR_LIST_VIEW, where, orderBy, fields: [CubejsConstants.COUNT, $"{CubejsConstants.TIMESTAMP_AGG}{{{CubeJsRequestUtils.GetCubeTimePeriod(SearchData.Start, SearchData.End)}}}"]));
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailErrorResponse<ServiceErrorChartResponse>>>(request);
+        if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
+        {
+            return response.Data.Data.Select(item => item.Data).ToList();
+        }
+        else
+        {
+            return [];
+        }
+    }
+
+    private ValueTuple<bool, DateTime, DateTime> SetAndCheckPreviousTime()
+    {
+        int day = 0;
+        switch (Search.ComparisonType)
+        {
+            case ApmComparisonTypes.Day:
+                day = -1;
+                break;
+            case ApmComparisonTypes.Week:
+                day = -7;
+                break;
+        }
+        if (day == 0)
+            return (false, default, default);
+
+        return (true, Search.Start.AddDays(day), Search.End.AddDays(day));
+    }
+
+    private void SetChartData(List<ChartLineCountDto> result, List<ServiceErrorChartResponse> data, bool isPrevious = false)
+    {
+        ChartLineCountDto? current = null;
+        int index = 0;
+        if (data == null || data.Count == 0) return;
+        do
+        {
+            var item = data[index];
+            var time = item.DateKey.DateTime!.Value.ToUnixTimestamp();
+            var name = time.ToString();
+            if (current == null || current.Name != name)
+            {
+                if (isPrevious && result.Exists(item => item.Name == name))
+                {
+                    current = result.First(item => item.Name == name);
+                }
+                else
+                {
+                    current = new ChartLineCountDto
+                    {
+                        Name = name,
+                        Previous = new List<ChartLineCountItemDto>(),
+                        Currents = new List<ChartLineCountItemDto>()
+                    };
+                    result.Add(current);
+                }
+            }
+
+        ((List<ChartLineCountItemDto>)(isPrevious ? current.Previous : current.Currents)).Add(
+            new()
+            {
+                Value = item.Cnt.ToString(),
+                Time = time
+            });
+            index++;
+        } while (data.Count - index > 0);
     }
 
     private async Task LoadChartDataAsync()
@@ -106,7 +244,7 @@ public partial class ServiceErrors
             };
             result = await ApiCaller.ApmService.GetErrorChartAsync(query);
         }
-        chart.Data = ConvertLatencyChartData(result, lineName: I18n.Apm("Chart.ErrorCount")).Json;
+        chart.Data = ConvertLatencyChartData(result.Count > 0 ? result[0] : default, lineName: I18n.Apm("Chart.ErrorCount")).Json;
         chart.ChartLoading = false;
     }
 
@@ -143,7 +281,30 @@ public partial class ServiceErrors
         isTableLoading = false;
     }
 
-    private EChartType ConvertLatencyChartData(List<ChartLineCountDto> data, string lineColor = null, string areaLineColor = null, string? unit = null, string? lineName = null)
+    //private EChartType ConvertLatencyChartData(List<ChartLineCountDto> data, string lineColor = null, string areaLineColor = null, string? unit = null, string? lineName = null)
+    //{
+    //    var chart = EChartConst.Line;
+    //    chart.SetValue("tooltip", new { trigger = "axis" });
+    //    if (!string.IsNullOrEmpty(lineName))
+    //    {
+    //        chart.SetValue("legend", new { data = new string[] { $"{lineName}" }, bottom = "2%" });
+    //    }
+
+    //    chart.SetValue("yAxis", new object[] {
+    //        new {type="value",axisLabel=new{formatter=$"{{value}} {unit}" } }
+    //    });
+    //    chart.SetValue("grid", new { top = "10%", left = "2%", right = "5%", bottom = "15%", containLabel = true });
+    //    //if (data != null && data.Any())
+    //    {
+    //        chart.SetValue("xAxis", new object[] {
+    //            new { type="category",boundaryGap=false,data=data?.Select(item=>item.Currents.First().Time.ToDateTime(CurrentTimeZone).Format()) }
+    //        });
+    //        chart.SetValue($"series[0]", new { name = $"{lineName}", type = "line", smooth = true, areaStyle = new { }, lineStyle = new { width = 1 }, symbol = "none", data = data?.Select(item => item.Currents.First().Value) });
+    //    }
+    //}
+
+
+    private EChartType ConvertLatencyChartData(ChartLineCountDto? data, string? lineName = null, string? unit = null)
     {
         var chart = EChartConst.Line;
         chart.SetValue("tooltip", new { trigger = "axis" });
@@ -159,12 +320,46 @@ public partial class ServiceErrors
         //if (data != null && data.Any())
         {
             chart.SetValue("xAxis", new object[] {
-                new { type="category",boundaryGap=false,data=data?.Select(item=>item.Currents.First().Time.ToDateTime(CurrentTimeZone).Format()) }
+                new { type="category",boundaryGap=false,data=data?.Currents?.Select(item=>item.Time.ToDateTime(CurrentTimeZone).Format())??[] }
             });
-            chart.SetValue($"series[0]", new { name = $"{lineName}", type = "line", smooth = true, areaStyle = new { }, lineStyle = new { width = 1 }, symbol = "none", data = data?.Select(item => item.Currents.First().Value) });
+            chart.SetValue($"series[0]", new { name = $"{lineName}", type = "line", smooth = true, areaStyle = new { }, lineStyle = new { width = 1 }, symbol = "none", data = data?.Currents.Select(item => item.Value) ?? [] });
         }
 
+
+        //var chart = EChartConst.Line;
+        //chart.SetValue("tooltip", new { trigger = "axis" });
+        //if (!string.IsNullOrEmpty(lineName))
+        //{
+        //    chart.SetValue("legend", new { data = new string[] { $"current {lineName}", $"previous {lineName}" }, bottom = "2%" });
+        //}
+        //chart.SetValue("xAxis", new object[] {
+        //    new { type="category",boundaryGap=false,data=data?.Currents?.Select(item=>item.Time)??[]}
+        //});
+        //chart.SetValue("yAxis", new object[] {
+        //    new {type="value",axisLabel=new{formatter=$"{{value}} {unit}" } }
+        //});
+        //chart.SetValue("grid", new { top = "10%", left = "2%", right = "5%", bottom = "15%", containLabel = true });
+        //var index = 0;
+        //chart.SetValue($"series[{index++}]", new { name = $"current {lineName}", type = "line", smooth = true, symbol = "none", data = data?.Currents?.Select(item => item.Value) ?? [] });
+        //chart.SetValue($"series[{index}]", new { name = $"previous {lineName}", type = "line", smooth = true, areaStyle = new { }, lineStyle = new { width = 1 }, symbol = "none", data = data?.Previous?.Select(item => item.Value) ?? [] });
+        //return chart;
+
+
+
+        ////return chart;        
+        //var chart = EChartConst.Line;
+        //chart.SetValue("tooltip", new { });
+        //chart.SetValue("legend", new { });
+        //chart.SetValue("xAxis.show", false);
+        //chart.SetValue("yAxis.show", false);
+        //chart.SetValue("grid", new { top = "0%", left = "0%", right = "0%", bottom = "0%" });
+        //var index = 0;
+
+        //chart.SetValue($"series[{index++}]", new { type = "line", smooth = true, symbol = "none", data = data?.Currents?.Select(x => x.Time) ?? [] });
+        //chart.SetValue($"series[{index}]", new { type = "line", smooth = true, areaStyle = new { }, lineStyle = new { width = 1 }, symbol = "none", data = data?.Previous?.Select(x => x.Value) ?? [] });
+
         return chart;
+
     }
 
     bool showDetail = false;

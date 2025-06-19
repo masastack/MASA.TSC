@@ -1,17 +1,14 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.SystemTextJson;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 {
-    public partial class TerminalAnalysis : IDisposable
+    public partial class TerminalAnalysis 
     {
         [Inject] private IPopupService PopupService { get; set; } = null!;
 
-        [Inject] private IHttpClientFactory HttpClientFactory { get; set; } = null!;
+        [Inject(Key = RclServiceCollectionExtensions.Cubejs_Client_Name)]
+        public GraphQL.Client.Http.GraphQLHttpClient CubejsClient { get; set; }
 
         private object _brandOption = new { };
         private object _platformOption = new { };
@@ -20,18 +17,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
         private object _deviceOption = new { };
 
         private const int Take = 50;
-
-        private GraphQLHttpClient _graphClient = null!;
-
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-
-            var httpClient = HttpClientFactory.CreateClient("analysis");
-            _graphClient = new GraphQLHttpClient("http://10.130.0.33:4000/cubejs-api/graphql",
-                new SystemTextJsonSerializer(),
-                httpClient: httpClient);
-        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -74,7 +59,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             try
             {
                 var query = GetQuery(type);
-                var result = await _graphClient.SendQueryAsync<CubeData<DeviceVisitItem>>(query);
+                var result = await CubejsClient.SendQueryAsync<CubeData<DeviceVisitItem>>(query);
                 return result.Data.Items;
             }
             catch (Exception e)
@@ -357,10 +342,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             string Device,
             string AppVersion,
             int Qty);
-
-        public void Dispose()
-        {
-            _graphClient.Dispose();
-        }
+       
     }
 }

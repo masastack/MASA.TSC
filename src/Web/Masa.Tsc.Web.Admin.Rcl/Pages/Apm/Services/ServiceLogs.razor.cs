@@ -31,7 +31,7 @@ public partial class ServiceLogs
     private int defaultSize = 20;
     private int total = 0;
     private int page = 1;
-    private readonly List<LogResponseDto> data = new();
+    private List<LogResponseDto> data = new();
     private bool isTableLoading = false;
     private string? sortFiled = nameof(LogResponseDto.Timestamp);
     private bool sortBy = true;
@@ -74,7 +74,8 @@ public partial class ServiceLogs
             lastKey = key;
             lastSpanId = SpanId ?? string.Empty;
             await LoadAsync();
-            await LoadChartDataAsync();
+            await LoadCubeChartDataAsync();
+            //await LoadChartDataAsync();
         }
     }
 
@@ -84,11 +85,8 @@ public partial class ServiceLogs
             SearchData = data;
         if (SearchData.Start == DateTime.MinValue || SearchData.End == DateTime.MinValue)
             return;
-        if (isTableLoading)
-        {
-            return;
-        }
-        await LoadPageDataAsync();
+        await LoadCubePageDataAsync();
+        //await LoadPageDataAsync();
     }
 
     private async Task LoadChartDataAsync()
@@ -110,9 +108,33 @@ public partial class ServiceLogs
             };
             result = await ApiCaller.ApmService.GetLogChartAsync(query);
         }
+        //chart.Data = ConvertLatencyChartData(result, lineName: "log count").Json;
+        chart.ChartLoading = false;
+    }
+
+    private async Task LoadCubeChartDataAsync()
+    {
+        if (!ShowChart) return;
+        ChartLineCountDto result = new ChartLineCountDto { Currents = new List<ChartLineCountItemDto>() };
+        var traceId = !string.IsNullOrEmpty(SearchData.TextValue) && SearchData.TextField == StorageConst.Current.TraceId ? SearchData.TextValue : null;
+
+        var where = CubeJsRequestUtils.GetErrorChartWhere(SearchData.Start, SearchData.End, SearchData.Environment, SearchData.Service!, default!, default!, traceId, SpanId);
+        var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
+        var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_LOG_DETAIL_VIEW, where, orderBy, fields: [CubejsConstants.COUNT, $"{CubejsConstants.TIMESTAMP_AGG}{{{CubeJsRequestUtils.GetCubeTimePeriod(SearchData.Start, SearchData.End)}}}"]));
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailLogResponse<EndpointDetailLogChartItemResponse>>>(request);
+        if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
+        {
+            ((List<ChartLineCountItemDto>)result.Currents).AddRange(response.Data.Data.Select(item => new ChartLineCountItemDto
+            {
+                Time = item.Data.DateKey.DateTime!.Value.ToUnixTimestamp(),
+                Value = item.Data.Cnt
+            }));
+        }
+
         chart.Data = ConvertLatencyChartData(result, lineName: "log count").Json;
         chart.ChartLoading = false;
     }
+
 
     private async Task LoadPageDataAsync()
     {
@@ -180,14 +202,65 @@ public partial class ServiceLogs
         isTableLoading = false;
     }
 
+    private async Task LoadCubePageDataAsync()
+    {
+        if (string.IsNullOrEmpty(SearchData.Service) && string.IsNullOrEmpty(SearchData.TraceId))
+        {
+            total = 0;
+            data = [];
+            return;
+        }
+        if (isTableLoading) return;
+        isTableLoading = true;
+        var traceId = !string.IsNullOrEmpty(SearchData.TextValue) && SearchData.TextField == StorageConst.Current.TraceId ? SearchData.TextValue : null;
+        var where = CubeJsRequestUtils.GetErrorChartWhere(SearchData.Start, SearchData.End, default, SearchData.Service!, default!, default!, traceId, SpanId);
+        var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
+
+        var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_LOG_DETAIL_VIEW, where, orderBy, 1, 1, fields: [CubejsConstants.COUNT]));
+        var responseTotal = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailLogResponse<EndpointDetailLogListTotalResponse>>>(request);
+        if (responseTotal.Data != null && responseTotal.Data.Data != null && responseTotal.Data.Data.Count > 0)
+        {
+            total = responseTotal.Data.Data[0].Data.Cnt;
+        }
+        else
+        {
+            total = 0;
+            data = [];
+            isTableLoading = false;
+            return;
+        }
+
+        request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_LOG_DETAIL_VIEW, where, orderBy, page, defaultSize, fields: [CubejsConstants.TRACEID, CubejsConstants.SPANID, "severitytext", "severitynumber", "body", "resources", "logs", $"{CubejsConstants.TIMESTAMP_AGG}{{{CubejsConstants.TIMESTAMP_AGG_VALUE}}}"]));
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailLogResponse<EndpointDetailLogListItemResponse>>>(request);
+        if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
+        {
+            data = response.Data.Data.Select(item => new LogResponseDto
+            {
+                SpanId = item.Data.SpanId,
+                TraceId = item.Data.TraceId,
+                Body = item.Data.Body,
+                SeverityText = item.Data.SeverityText,
+                SeverityNumber = int.Parse(item.Data.SeverityNumber),
+                Timestamp = item.Data.DateKey.DateTime!.Value,
+                Attributes = JsonSerializer.Deserialize<Dictionary<string, object>>(item.Data.Logs)!,
+                Resource = JsonSerializer.Deserialize<Dictionary<string, object>>(item.Data.Resources)!
+            }).ToList();
+        }
+        else
+        {
+            data = [];
+        }
+        isTableLoading = false;
+    }
+
     private async Task OnPageChange((int page, int pageSize) pageData)
     {
         page = pageData.page;
         defaultSize = pageData.pageSize;
-        await LoadPageDataAsync();
+        await LoadAsync();
     }
 
-    private EChartType ConvertLatencyChartData(List<ChartLineCountDto> data, string lineColor = null, string areaLineColor = null, string? unit = null, string? lineName = null)
+    private EChartType ConvertLatencyChartData(ChartLineCountDto data, string lineColor = null, string areaLineColor = null, string? unit = null, string? lineName = null)
     {
         var chart = EChartConst.Line;
         chart.SetValue("tooltip", new { trigger = "axis" });
@@ -196,7 +269,7 @@ public partial class ServiceLogs
             chart.SetValue("legend", new { data = new string[] { $"{lineName}" }, bottom = "2%" });
         }
         chart.SetValue("xAxis", new object[] {
-            new { type="category",boundaryGap=false,data=data?.Select(item=>item.Currents.First().Time.ToDateTime(CurrentTimeZone).Format()) }
+            new { type="category",boundaryGap=false,data=data?.Currents?.Select(item=>item.Time.ToDateTime(CurrentTimeZone).Format())??[] }
         });
         chart.SetValue("yAxis", new object[] {
             new {type="value",axisLabel=new{formatter=$"{{value}} {unit}" } }
@@ -204,7 +277,7 @@ public partial class ServiceLogs
         chart.SetValue("grid", new { top = "10%", left = "2%", right = "5%", bottom = "15%", containLabel = true });
         //if (data.Previous != null && data.Previous.Any())
         {
-            chart.SetValue($"series[0]", new { name = $"{lineName}", type = "line", smooth = true, areaStyle = new { }, lineStyle = new { width = 1 }, symbol = "none", data = data?.Select(item => item.Currents.First().Value) });
+            chart.SetValue($"series[0]", new { name = $"{lineName}", type = "line", smooth = true, areaStyle = new { }, lineStyle = new { width = 1 }, symbol = "none", data = data?.Currents?.Select(item => item.Value) ?? [] });
         }
 
         return chart;

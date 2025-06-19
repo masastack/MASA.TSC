@@ -6,7 +6,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Cubejs.Response.EndpointDetail;
 internal record EndpointDetailLatencyResponse<TData>([property: JsonPropertyName(CubejsConstants.ENDPOINT_DETAIL_LATENCY_CHART_VIEW)] TData Data);
 
 internal record EndpointDetailLatencyChartItemResponse(
-    long Duration,
+    string Duration,
     int Total
 );
 

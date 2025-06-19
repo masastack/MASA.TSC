@@ -74,7 +74,7 @@ public partial class TimeLine
     {
         await base.OnParametersSetAsync();
 
-        var str = $"{JsonSerializer.Serialize(Data)}";
+        var str = $"{JsonSerializer.Serialize(Data)}{JsonSerializer.Serialize(Errors)}";
         var key = Encrypt(str);
         if (lastKey != key)
         {
@@ -272,6 +272,11 @@ public partial class TimeLine
                 Trace = item,
                 Children = GetChildren(item.SpanId, traces)
             };
+            var spanError = Errors?.FirstOrDefault(t => t.X == item.SpanId);
+            if (spanError != null)
+            {
+                timeLine.ErrorCount = Convert.ToInt32(spanError.Y);
+            }
             timeLine.SetValue(item, start, end, totalDuration, errorStatus);
             result.Add(timeLine);
         }

@@ -21,4 +21,28 @@ public record CubejsAggDateTimeResponse([property: JsonPropertyName(CubejsConsta
 /// group query timestamp value
 /// </summary>
 /// <param name="Value"></param>
-public record CubejsAggDateTimeValueResponse([property: JsonPropertyName(CubejsConstants.TIMESTAMP_AGG_VALUE)] DateTime Value);
+
+public record CubejsAggDateTimeValueResponse(DateTime? Value, DateTime? Minute, DateTime? Hour, DateTime? Day)
+{
+    public DateTime? DateTime
+    {
+        get
+        {
+            if (Value.HasValue)
+                return Value.Value;
+            if (Minute != null)
+                return Minute.Value;
+            if (Hour != null)
+                return Hour.Value;
+            if (Day != null)
+                return Day.Value;
+            return default;
+        }
+    }
+}
+
+public record CubejsAggDateTimeMinuteValueResponse([property: JsonPropertyName(CubejsConstants.TIMESTAMP_MINITE_VALUE)] DateTime Value);
+
+public record CubejsAggDateTimeHourValueResponse([property: JsonPropertyName(CubejsConstants.TIMESTAMP_HOUR_VALUE)] DateTime Value);
+
+public record CubejsAggDateTimeDayValueResponse([property: JsonPropertyName(CubejsConstants.TIMESTAMP_DAY_VALUE)] DateTime Value);

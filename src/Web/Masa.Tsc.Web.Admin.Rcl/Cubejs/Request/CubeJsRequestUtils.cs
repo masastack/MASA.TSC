@@ -51,20 +51,26 @@ internal static partial class CubeJsRequestUtils
         var text = new StringBuilder(AppendEnvService(startUtc, endUtc, env, service, endpoint, method));
         if (!string.IsNullOrEmpty(statusCode))
             text.Append($",{CubejsConstants.STATUS_CODE}:{{equals:\"{statusCode}\"}}");
+        text.Append(AppendTextField(textField, textValue));
+        return text.ToString();
+    }
+
+    private static string AppendTextField(string? textField = default, string? textValue = default)
+    {
         if (!string.IsNullOrEmpty(textField) && !string.IsNullOrEmpty(textValue))
         {
             if (textField == StorageConst.Current.TraceId)
-                text.Append($",{CubejsConstants.TRACEID}:{{equals:\"{textValue}\"}}");
+                return $",{CubejsConstants.TRACEID}:{{equals:\"{textValue}\"}}";
             else if (textField == StorageConst.Current.SpanId)
-                text.Append($",{CubejsConstants.SPANID}:{{equals:\"{textValue}\"}}");
+                return $",{CubejsConstants.SPANID}:{{equals:\"{textValue}\"}}";
             else if (textField == StorageConst.Current.Trace.UserId)
-                text.Append($",{CubejsConstants.USERID}:{{equals:\"{textValue}\"}}");
+                return $",{CubejsConstants.USERID}:{{equals:\"{textValue}\"}}";
             else if (textField == StorageConst.Current.Trace.URLFull)
-                text.Append($",{CubejsConstants.REQUEST_QUERY}:{{contains:\"{textValue}\"}}");
+                return $",{CubejsConstants.REQUEST_QUERY}:{{contains:\"{textValue}\"}}";
             else if (textField == StorageConst.Current.Trace.HttpRequestBody)
-                text.Append($",{CubejsConstants.REQUEST_BODY}:{{contains:\"{textValue}\"}}");
+                return $",{CubejsConstants.REQUEST_BODY}:{{contains:\"{textValue}\"}}";
         }
-        return text.ToString();
+        return default!;
     }
 
     public static string GetEndpintListWhere(DateTime startUtc, DateTime endUtc, Guid teamId, string? env, string? appType = default, string? service = default, string? endpoint = default, string? method = default, string? project = default, List<EndpointListItemByDetailResponse>? filters = default)
@@ -74,19 +80,6 @@ internal static partial class CubeJsRequestUtils
         //text.Append(AppendDetailFilter(filters, env, service, endpoint, method));
         return text.ToString();
     }
-
-    //private static string AppendDetailFilter(List<EndpointListItemByDetailResponse>? filters, string? env, string? service, string? endpoint, string? method)
-    //{
-    //    if (filters == null || filters.Count == 0) return default!;
-    //    var text = new StringBuilder();
-    //    foreach (var item in filters)
-    //    {
-    //        text.Append(",or:");
-    //        text.Append($"{{{CubejsConstants.SERVICENAME}:{{equals:\"{item.ServiceName}\"}},{CubejsConstants.TARGET}:{{equals:\"{item.Target}\"}},{CubejsConstants.METHOD}:{{equals:\"{item.Method}\"}}}}");
-    //    }
-    //    text.Remove(0, 4).Append("}").Insert(0, ",and: {");
-    //    return text.ToString();
-    //}
 
     public static string AppendEnvService(DateTime startUtc, DateTime endUtc, string? env, string? service = default, string? endpoint = default, string? method = default, List<EndpointListItemByDetailResponse>? filters = default, bool hasPeriod = false)
     {
@@ -167,16 +160,68 @@ internal static partial class CubeJsRequestUtils
         return text.ToString();
     }
 
-    public static string GetEndpintDetailTracePageWhere(DateTime startUtc, DateTime endUtc, string? env, string service, string endpoint, string method, long startDuration, long endDuration)
+    public static string GetEndpintDetailTracePageWhere(DateTime startUtc, DateTime endUtc, string? env, string service, string endpoint, string method, string? traceId, long startDuration, long endDuration)
     {
         var text = new StringBuilder(GetEndpintDetailChartWhere(startUtc, endUtc, env, service, endpoint, method, false));
 
         if (startDuration > 0 && endDuration > 0 && endDuration - startDuration > 0)
             text.Append($",{CubejsConstants.LATENCY_DURATION}:{{gte:{startDuration * 1e6},lte:{endDuration * 1e6}}}");
+        if (!string.IsNullOrEmpty(traceId))
+            text.Append($",traceId:{{equals:\"{traceId}\"}}");
 
         return text.ToString();
     }
 
+    public static string GetEndpintDetailTracePageByDetailWhere(DateTime startUtc, DateTime endUtc, string? env, string service, string endpoint, string method, string? statusCode, string textField, string textValue, long startDuration, long endDuration)
+    {
+        var text = new StringBuilder(GetEndpintDetailChartWhere(startUtc, endUtc, env, service, endpoint, method, false));
+
+        if (startDuration > 0 && endDuration > 0 && endDuration - startDuration > 0)
+            text.Append($",{CubejsConstants.LATENCY_DURATION}:{{gte:{startDuration * 1e6},lte:{endDuration * 1e6}}}");
+        text.Append(AppendTextField(textField, textValue));
+        if (!string.IsNullOrEmpty(statusCode))
+            text.Append($",{CubejsConstants.STATUS_CODE}:{{equals:\"{statusCode}\"}}");
+
+        return text.ToString();
+    }
+
+    public static string GetTraceDetailWhere(DateTime startUtc, DateTime endUtc, string? env, string traceId)
+    {
+        var text = new StringBuilder();
+        text.Append($"{CubejsConstants.TIMESTAMP_AGG}: {{inDateRange: [\"{startUtc}\",\"{endUtc}\"]}}");
+
+        if (!string.IsNullOrEmpty(env))
+            text.Append($",{CubejsConstants.ENV_AGG}:{{equals:\"{env}\"}}");
+        text.Append($",{CubejsConstants.TRACEID}:{{equals:\"{traceId}\"}}");
+        return text.ToString();
+    }
+
+    public static string GetErrorChartWhere(DateTime startUtc, DateTime endUtc, string? env, string service, string endpoint, string method, string? traceId = default, string? spanId = default)
+    {
+        var text = new StringBuilder(GetEndpintDetailChartWhere(startUtc, endUtc, env, service, endpoint, method, false));
+
+        if (!string.IsNullOrEmpty(traceId))
+            text.Append($",{CubejsConstants.TRACEID}:{{equals:\"{traceId}\"}}");
+
+        if (!string.IsNullOrEmpty(spanId))
+            text.Append($",{CubejsConstants.SPANID}:{{equals:\"{spanId}\"}}");
+
+        return text.ToString();
+    }
+
+    public static string GetCubeTimePeriod(DateTime start, DateTime end)
+    {
+        var timeSpan = end - start;
+        if (timeSpan.TotalHours - 12 < 0)
+        {
+            return CubejsConstants.TIMESTAMP_MINITE_VALUE;
+        }
+        if (timeSpan.TotalDays - 30 < 0)
+        {
+            return CubejsConstants.TIMESTAMP_HOUR_VALUE;
+        }
+        return CubejsConstants.TIMESTAMP_DAY_VALUE;
+    }
 
     public static string GetEndpintListOrderBy(string? order, bool? isDesc)
     {

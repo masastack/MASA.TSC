@@ -3,17 +3,16 @@
 
 using System.Globalization;
 using System.Timers;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.SystemTextJson;
 using Timer = System.Timers.Timer;
 
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 {
-    public partial class AppVisitAnalysis : TscComponentBase
+    public partial class AppVisitAnalysis 
     {
-        [Inject] private IHttpClientFactory HttpClientFactory { get; set; } = null!;
-
         [Inject] private MasaBlazor MasaBlazor { get; set; } = null!;
+
+        [Inject(Key = RclServiceCollectionExtensions.Cubejs_Client_Name)]
+        public GraphQL.Client.Http.GraphQLHttpClient CubejsClient { get; set; }
 
         private const string UvTitle = "访问人数";
         private const string UvtTitle = "打开次数";
@@ -29,8 +28,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
             overflow = "break",
             width = 150
         };
-
-        private GraphQLHttpClient _graphClient = null!;
+       
         private AppVisit? _uva;
         private AppVisit? _uvta;
         private AppVisit? _pva;
@@ -57,12 +55,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
         protected override void OnInitialized()
         {
             base.OnInitialized();
-
-            var httpClient = HttpClientFactory.CreateClient("analysis");
-            _graphClient = new GraphQLHttpClient("http://10.130.0.33:4000/cubejs-api/graphql",
-                new SystemTextJsonSerializer(),
-                httpClient: httpClient);
-
             MasaBlazor.BreakpointChanged += MasaBlazorOnBreakpointChanged;
         }
 
@@ -153,7 +145,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private async Task RefreshMapDataAsync()
         {
-            var response = await _graphClient.SendQueryAsync<CubeData<AreaVisitItem>>(GetMapDataQuery());
+            var response = await CubejsClient.SendQueryAsync<CubeData<AreaVisitItem>>(GetMapDataQuery());
             var data = response.Data.Items.Select(x => new
             {
                 name = TerminalAnalysisData.ADCodeName[x.AreaVisit.ADCode],
@@ -168,7 +160,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private async Task RefreshAppVisitHourAsync()
         {
-            var response = await _graphClient.SendQueryAsync<CubeData<AppVisitHourItem>>(GetAppVisitHourQuery());
+            var response = await CubejsClient.SendQueryAsync<CubeData<AppVisitHourItem>>(GetAppVisitHourQuery());
 
             var currentHour = DateTime.UtcNow.Add(CurrentTimeZone.BaseUtcOffset).Hour;
 
@@ -228,7 +220,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         private async Task<object> RefreshSharedAppVisitPageAsync(AppVisitType type)
         {
-            var response = await _graphClient.SendQueryAsync<CubeData<AppVisitPageItem>>(GetAppVisitPageQuery(type));
+            var response = await CubejsClient.SendQueryAsync<CubeData<AppVisitPageItem>>(GetAppVisitPageQuery(type));
             var data = response.Data.Items.Select(x => new
             {
                 x.AppVisitPage.Path,
@@ -254,7 +246,7 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
         private async Task<AppVisit> GetAppVisitAsync(AppVisitType type)
         {
             var query = GetAppVisitQuery(type);
-            var response = await _graphClient.SendQueryAsync<CubeData<AppVisitItem>>(query);
+            var response = await CubejsClient.SendQueryAsync<CubeData<AppVisitItem>>(query);
             return response.Data.Items.First().AppVisit;
         }
 
@@ -555,8 +547,6 @@ namespace Masa.Tsc.Web.Admin.Rcl.Pages.Analysis
 
         protected override ValueTask DisposeAsyncCore()
         {
-            _graphClient.Dispose();
-
             if (_timer != null)
             {
                 _timer.Stop();

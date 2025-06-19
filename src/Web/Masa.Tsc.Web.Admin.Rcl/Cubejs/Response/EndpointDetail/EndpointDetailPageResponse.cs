@@ -5,4 +5,4 @@ namespace Masa.Tsc.Web.Admin.Rcl.Cubejs.Response.EndpointDetail;
 
 internal record EndpointDetailPageResponse([property: JsonPropertyName(CubejsConstants.ENDPOINT_DETAIL_TRACE_PAGE_VIEW)] EndpointDetailPageItemResponse Data);
 
-internal record EndpointDetailPageItemResponse(string TraceId, long Duration, CubejsAggDateTimeValueResponse DateKey);
+internal record EndpointDetailPageItemResponse(string TraceId, string Duration, CubejsAggDateTimeValueResponse DateKey);

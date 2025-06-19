@@ -1,8 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using Masa.Tsc.Web.Admin.Rcl.Cubejs.Response.EndpointDetail;
-
 namespace Masa.Tsc.Web.Admin.Rcl.Pages.Apm.Endpoints;
 
 public partial class OverView
@@ -231,15 +229,9 @@ public partial class OverView
         percentile = lessTotal * 1.0 / sum;
     }
 
-
-
-
     private async Task LoadCubeChartDataAsync()
     {
-        //var teamId = CurrentTeamId;
-        var teamId = Guid.Parse("77ad20db-729f-4120-bf9c-6978f2d0ec2c");
-
-        var result = new List<ChartLineDto>() { new ChartLineDto() { Currents = new List<ChartLineItemDto>(), Previous = new List<ChartLineItemDto>() } };
+        var result = new List<ChartLineDto>() { new() { Currents = new List<ChartLineItemDto>(), Previous = new List<ChartLineItemDto>() } };
         if (!string.IsNullOrEmpty(Search.Endpoint))
         {
             var list = await GetChartDataAsync(Search.Start, Search.End);
@@ -290,7 +282,7 @@ public partial class OverView
         do
         {
             var item = data[index];
-            var name = item.DateKey.Value;
+            var name = item.DateKey.Value!.Value;
             var time = new DateTimeOffset(name).ToUnixTimeSeconds();
             ((List<ChartLineItemDto>)(isPrevious ? current.Previous : current.Currents)).Add(
                 new()
@@ -320,25 +312,8 @@ public partial class OverView
                 endDuration = chartData[lastSelect.End][0].FormatTimeToNumber(isEqal);
             }
 
-            var where = CubeJsRequestUtils.GetEndpintDetailTracePageWhere(Search.Start, Search.End, Search.Environment, Search.Service!, Search.Endpoint!, Search.Method, startDuration, endDuration);
-            var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
-            var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_TRACE_PAGE_VIEW, where, orderBy, page: 1, pageSize: 500, fields: ["traceId", "duration", $"{CubejsConstants.TIMESTAMP_AGG}{{{CubejsConstants.TIMESTAMP_AGG_VALUE}}}"]));
-            var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailPageResponse>>(request);
-            if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
-            {
-                total = response.Data.Data.Count;
-                traceIds = response.Data.Data.Select(item => new SimpleTraceListDto
-                {
-                    TraceId = item.Data.TraceId,
-                    Timestamp = item.Data.DateKey.Value,
-                    EndTimestamp = item.Data.DateKey.Value.AddMilliseconds(item.Data.Duration)
-                }).ToList();
-            }
-            else
-            {
-                total = 0;
-                traceIds.Clear();
-            }
+            await LoadCubeTracePageByListAsync(startDuration, endDuration);
+            await LoadCubeTracePageByDetailAsync(startDuration, endDuration);
         }
         if (traceIds.Count - page >= 0)
             trace = traceIds[page - 1];
@@ -347,12 +322,68 @@ public partial class OverView
 
         if (trace != null)
         {
-            traceDetails = (await ApiCaller.TraceService.GetAsync(trace.TraceId, trace.Timestamp.AddHours(-6), trace.EndTimestamp.AddHours(6)))?.ToList()!;
+            traceDetails = await LoadTraceDetailByTraceIdAsync(trace);
+            //traceDetails = (await ApiCaller.TraceService.GetAsync(trace.TraceId, trace.Timestamp.AddHours(-6), trace.EndTimestamp.AddHours(6)))?.ToList()!;
             CaculatePercentil();
             StateHasChanged();
-            await LoadTraceErrorsAsync(trace.TraceId);
+            await LoadCubeTraceErrorsAsync(trace);
+            //await LoadTraceErrorsAsync(trace.TraceId);
         }
         StateHasChanged();
+    }
+
+    private async Task LoadCubeTracePageByListAsync(long startDuration, long endDuration)
+    {
+        if (!string.IsNullOrEmpty(Search.Status) || !string.IsNullOrEmpty(Search.TextValue) && Search.TextField != StorageConst.Current.TraceId)
+            return;
+
+        var traceId = !string.IsNullOrEmpty(Search.TextValue) && Search.TextField == "TraceId" ? Search.TextValue : null;
+        var where = CubeJsRequestUtils.GetEndpintDetailTracePageWhere(Search.Start, Search.End, Search.Environment, Search.Service!, Search.Endpoint!, Search.Method, traceId, startDuration, endDuration);
+        var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
+        var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_TRACE_PAGE_VIEW, where, orderBy, page: 1, pageSize: 500, fields: [CubejsConstants.TRACEID, CubejsConstants.LATENCY_DURATION, $"{CubejsConstants.TIMESTAMP_AGG}{{{CubejsConstants.TIMESTAMP_AGG_VALUE}}}"]));
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailPageResponse>>(request);
+        if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
+        {
+            total = response.Data.Data.Count;
+            traceIds = response.Data.Data.Select(item => new SimpleTraceListDto
+            {
+                TraceId = item.Data.TraceId,
+                Timestamp = item.Data.DateKey.DateTime!.Value,
+                EndTimestamp = item.Data.DateKey.DateTime!.Value.AddMilliseconds(long.Parse(item.Data.Duration))
+            }).ToList();
+        }
+        else
+        {
+            total = 0;
+            traceIds.Clear();
+        }
+    }
+
+
+    private async Task LoadCubeTracePageByDetailAsync(long startDuration, long endDuration)
+    {
+        if (string.IsNullOrEmpty(Search.Status) && (string.IsNullOrEmpty(Search.TextValue) || Search.TextField == StorageConst.Current.TraceId))
+            return;
+
+        var where = CubeJsRequestUtils.GetEndpintDetailTracePageByDetailWhere(Search.Start, Search.End, Search.Environment, Search.Service!, Search.Endpoint!, Search.Method, Search.Status, Search.TextField, Search.TextValue, startDuration, endDuration);
+        var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
+        var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_TRACE_DETAIL_VIEW, where, orderBy, page: 1, pageSize: 500, fields: [CubejsConstants.TRACEID, CubejsConstants.LATENCY_DURATION, $"{CubejsConstants.TIMESTAMP_AGG}{{{CubejsConstants.TIMESTAMP_AGG_VALUE}}}"]));
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailTraceDetailResponse<EndpointDetailPageItemResponse>>>(request);
+        if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
+        {
+            total = response.Data.Data.Count;
+            traceIds = response.Data.Data.Select(item => new SimpleTraceListDto
+            {
+                TraceId = item.Data.TraceId,
+                Timestamp = item.Data.DateKey.DateTime!.Value,
+                EndTimestamp = item.Data.DateKey.DateTime!.Value.AddMilliseconds(long.Parse(item.Data.Duration))
+            }).ToList();
+        }
+        else
+        {
+            total = 0;
+            traceIds.Clear();
+        }
     }
 
     private async Task LoadDistributioncCubeDataAsync()
@@ -377,15 +408,15 @@ public partial class OverView
             }).ToList()
         };
 
-        var currentSpan = traceDetails?.Find(item => item.Attributes.TryGetValue("http.target", out var value) && value.ToString().Equals(SearchData.Endpoint, StringComparison.OrdinalIgnoreCase));
+        var currentSpan = traceDetails?.Find(item => item.Attributes.TryGetValue("http.target", out var value) && value.ToString()!.Equals(SearchData.Endpoint, StringComparison.OrdinalIgnoreCase));
         if (data != null && data.Latencies.Any())
         {
             int p95Index = GetIndex(data.P95 ?? 0, data.Latencies),
                 currentIndex = GetIndex(currentSpan?.Duration ?? 0, data.Latencies);
 
-            var list = data.Latencies?.Select(item => Convert.ToDouble(item.X)).Select(item => Math.Abs(item - data.P95.Value)).ToList();
+            var list = data.Latencies?.Select(item => Convert.ToDouble(item.X)).Select(item => Math.Abs(item - data.P95!.Value)).ToList();
 
-            timeTypeCount.Data = ConvertDistributionChartData(data.Latencies, currentIndex, p95Index).Json;
+            timeTypeCount.Data = ConvertDistributionChartData(data.Latencies!, currentIndex, p95Index).Json;
             timeTypeCount.HasChart = true;
         }
         else
@@ -404,6 +435,36 @@ public partial class OverView
         if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
             return (long)response.Data.Data[0].Data.PNinetyFive;
         return 0;
+    }
+
+    private async Task<List<TraceResponseDto>> LoadTraceDetailByTraceIdAsync(SimpleTraceListDto current)
+    {
+        var where = CubeJsRequestUtils.GetTraceDetailWhere(current.Timestamp.AddHours(-6), current.EndTimestamp.AddHours(6), Search.Environment, current.TraceId);
+        var orderby = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
+        var fields = new string[] { CubejsConstants.TRACEID, CubejsConstants.SPANID, "parentspanid", "spankind", CubejsConstants.LATENCY_DURATION, "spans", "resources", $"{CubejsConstants.TIMESTAMP_AGG}{{{CubejsConstants.TIMESTAMP_AGG_VALUE}}}" };
+        var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_TRACE_DETAIL_VIEW, where, orderby, page: 1, pageSize: 500, fields));
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailTraceDetailResponse<EndpointDetailTraceDetailItemResponse>>>(request);
+        if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
+        {
+            return response.Data.Data.Select(item => item.Data.ToTraceResponse()).ToList();
+        }
+        return [];
+    }
+
+    private async Task LoadCubeTraceErrorsAsync(SimpleTraceListDto current)
+    {
+        var where = CubeJsRequestUtils.GetTraceDetailWhere(current.Timestamp.AddHours(-6), current.EndTimestamp.AddHours(6), Search.Environment, current.TraceId);
+        var fields = new string[] { CubejsConstants.SPANID, CubejsConstants.COUNT };
+        var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_ERROR_LIST_VIEW, where, fields: fields));
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailErrorResponse<EndpointDetailErrorChartItemResponse>>>(request);
+        if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
+        {
+            errors = response.Data.Data.Select(item => new ChartPointDto { X = item.Data.SpanId, Y = item.Data.Cnt.ToString() }).ToList();
+        }
+        else
+        {
+            errors = [];
+        }
     }
 
     private async Task LoadChartDataAsync()
