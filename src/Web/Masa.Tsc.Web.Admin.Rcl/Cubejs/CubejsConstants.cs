@@ -70,4 +70,9 @@ internal sealed class CubejsConstants
     public const string ENDPOINT_DETAIL_TRACE_PAGE_VIEW = "metricspagethreep";
     public const string ENDPOINT_DETAIL_ERROR_LIST_VIEW = "errorsdetail";
     #endregion
+
+    #region
+    public const string ENDPOINT_DETAIL_ERROR_CHART_VIEW = "errorsdetail_duration";
+    public const string ENDPOINT_DETAIL_LOG_CHART_VIEW = "";
+    #endregion
 }

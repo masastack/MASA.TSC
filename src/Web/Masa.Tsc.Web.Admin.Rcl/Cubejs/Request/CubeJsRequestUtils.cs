@@ -160,7 +160,7 @@ internal static partial class CubeJsRequestUtils
         return text.ToString();
     }
 
-    public static string GetEndpintDetailTracePageWhere(DateTime startUtc, DateTime endUtc, string? env, string service, string endpoint, string method, string? traceId, long startDuration, long endDuration)
+    public static string GetEndpintDetailTracePageWhere(DateTime startUtc, DateTime endUtc, string? env, string service, string endpoint, string method, string? traceId, long startDuration, long endDuration,string? statusCode)
     {
         var text = new StringBuilder(GetEndpintDetailChartWhere(startUtc, endUtc, env, service, endpoint, method, false));
 
@@ -168,6 +168,8 @@ internal static partial class CubeJsRequestUtils
             text.Append($",{CubejsConstants.LATENCY_DURATION}:{{gte:{startDuration * 1e6},lte:{endDuration * 1e6}}}");
         if (!string.IsNullOrEmpty(traceId))
             text.Append($",traceId:{{equals:\"{traceId}\"}}");
+        if (!string.IsNullOrEmpty(statusCode))
+            text.Append($",{CubejsConstants.STATUS_CODE}:{{equals:\"{statusCode}\"}}");
 
         return text.ToString();
     }
@@ -196,15 +198,20 @@ internal static partial class CubeJsRequestUtils
         return text.ToString();
     }
 
-    public static string GetErrorChartWhere(DateTime startUtc, DateTime endUtc, string? env, string service, string endpoint, string method, string? traceId = default, string? spanId = default)
+    public static string GetErrorChartWhere(DateTime startUtc, DateTime endUtc, string? env, string service, string endpoint, string method, string? statusCode, string traceId, string? spanId, string[] traceIds = default!)
     {
         var text = new StringBuilder(GetEndpintDetailChartWhere(startUtc, endUtc, env, service, endpoint, method, false));
 
-        if (!string.IsNullOrEmpty(traceId))
-            text.Append($",{CubejsConstants.TRACEID}:{{equals:\"{traceId}\"}}");
+        //if (!string.IsNullOrEmpty(traceId))
+        //    text.Append($",{CubejsConstants.TRACEID}:{{equals:\"{traceId}\"}}");
+        if (traceIds != null && traceIds.Length > 0)
+            text.Append($",{CubejsConstants.TRACEID}:{{in:[\"{string.Join("\",\"", traceIds)}\"]}}");
 
         if (!string.IsNullOrEmpty(spanId))
             text.Append($",{CubejsConstants.SPANID}:{{equals:\"{spanId}\"}}");
+
+        if (!string.IsNullOrEmpty(statusCode))
+            text.Append($",{CubejsConstants.STATUS_CODE}:{{equals:\"{statusCode}\"}}");
 
         return text.ToString();
     }
@@ -233,12 +240,12 @@ internal static partial class CubeJsRequestUtils
             case "service":
                 return $"{CubejsConstants.SERVICENAME}:{desc}";
             case "latency":
-                return $"{CubejsConstants.LATENCY}:{desc}";
+                return $"{CubejsConstants.LATENCY_AGG}:{desc}";
             case "throughput":
                 return $"{CubejsConstants.THROUGHPUT}:{desc}";
             case "failed":
             default:
-                return $"{CubejsConstants.FAILED}:{desc}";
+                return $"{CubejsConstants.FAILED_AGG}:{desc}";
 
         }
     }

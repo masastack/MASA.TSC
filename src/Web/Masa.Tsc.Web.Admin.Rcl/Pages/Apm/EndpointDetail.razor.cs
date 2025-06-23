@@ -9,9 +9,10 @@ public partial class EndpointDetail
     protected override bool IsPage => true;
 
     private string spanId = default!;
+    private string[] traceIds = default!;
 
     [Parameter]
-    public string Name { get; set; }   
+    public string Name { get; set; }
 
     private void OnSearchValueChanged(SearchData data)
     {
@@ -19,5 +20,10 @@ public partial class EndpointDetail
         StateHasChanged();
     }
 
-    private void SpanIdChange(string spanId)=>this.spanId = spanId;
+    private void SpanIdChange(string spanId) => this.spanId = spanId;
+
+    private void TraceIdsChange(string[] traceIds)
+    {
+        this.traceIds = traceIds;
+    }
 }

@@ -15,6 +15,9 @@ public partial class ServiceErrors
     public bool ShowChart { get; set; } = true;
 
     [Parameter]
+    public string[] TraceIds { get; set; }
+
+    [Parameter]
     public MetricTypes MetricType { get; set; }
 
     private List<DataTableHeader<ErrorMessageDto>> headers => new()
@@ -51,7 +54,7 @@ public partial class ServiceErrors
 
     protected override async Task OnParametersSetAsync()
     {
-        var key = Encrypt(JsonSerializer.Serialize(SearchData));
+        var key = Encrypt(JsonSerializer.Serialize(SearchData) + JsonSerializer.Serialize(TraceIds));
         if (lastKey != key || SpanId != null && SpanId != lastSpanId || SpanId == null && lastSpanId.Length > 0)
         {
             lastKey = key;
@@ -79,9 +82,8 @@ public partial class ServiceErrors
     private async Task LoadASync()
     {
         await LoadCubePageDataAsync();
-        //await LoadPageDataAsync();
     }
-
+    
     private async Task LoadCubePageDataAsync()
     {
         if (string.IsNullOrEmpty(SearchData.Service) && string.IsNullOrEmpty(SearchData.TraceId))
@@ -93,11 +95,11 @@ public partial class ServiceErrors
         if (isTableLoading) return;
         isTableLoading = true;
         var traceId = !string.IsNullOrEmpty(SearchData.TextValue) && SearchData.TextField == StorageConst.Current.TraceId ? SearchData.TextValue : null;
-        var where = CubeJsRequestUtils.GetErrorChartWhere(SearchData.Start, SearchData.End, default, SearchData.Service!, default!, default!, traceId, SpanId);
+        var where = CubeJsRequestUtils.GetErrorChartWhere(SearchData.Start, SearchData.End, default, SearchData.Service!, default!, default!, default, traceId!, SpanId, TraceIds);
         var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
 
         var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_ERROR_LIST_VIEW, where, orderBy, fields: [CubejsConstants.ERROR_PAGE_COUNT]));
-        var responseTotal = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailErrorResponse<ServiceErrorListItemTotalResponse>>>(request);
+        var responseTotal = await CubejsClient.SendQueryAsync<CubejsBaseResponse<ServiceErrorResponse<ServiceErrorListItemTotalResponse>>>(request);
         if (responseTotal.Data != null && responseTotal.Data.Data != null && responseTotal.Data.Data.Count > 0)
         {
             total = responseTotal.Data.Data[0].Data.GrCnt;
@@ -111,7 +113,7 @@ public partial class ServiceErrors
         }
 
         request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_ERROR_LIST_VIEW, where, orderBy, page, defaultSize, fields: [CubejsConstants.ERROR_TYPE, CubejsConstants.ERROR_MESSAGE, CubejsConstants.COUNT, CubejsConstants.ERROR_PAGE_MAX_TIME]));
-        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailErrorResponse<ServiceErrorListItemResponse>>>(request);
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<ServiceErrorResponse<ServiceErrorListItemResponse>>>(request);
         if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
         {
             data = response.Data.Data.Select(item => new ErrorMessageDto
@@ -129,12 +131,11 @@ public partial class ServiceErrors
         isTableLoading = false;
     }
 
-
     private async Task LoadCubeChartDataAsync()
     {
         if (!ShowChart)
             return;
-        List<ChartLineCountDto> result = [];
+        List<ChartLineCountDto> result = [new() { Previous = new List<ChartLineCountItemDto>(), Currents = new List<ChartLineCountItemDto>() }];
 
         var traceId = !string.IsNullOrEmpty(SearchData.TextValue) && SearchData.TextField == StorageConst.Current.TraceId ? SearchData.TextValue : null;
         var list = await GetChartDataAsync(Search.Start, Search.End, traceId);
@@ -153,9 +154,32 @@ public partial class ServiceErrors
 
     private async Task<List<ServiceErrorChartResponse>> GetChartDataAsync(DateTime start, DateTime end, string? traceId = default)
     {
-        var where = CubeJsRequestUtils.GetErrorChartWhere(start, end, SearchData.Environment, SearchData.Service!, default!, default!, traceId,SpanId);
+        if (!string.IsNullOrEmpty(Search.Endpoint) && !string.IsNullOrEmpty(Search.Method))
+            return await GetEndpointChartDataAsync(start, end, traceId);
+        return await GetServiceChartDataAsync(start, end, traceId);
+    }
+
+    private async Task<List<ServiceErrorChartResponse>> GetServiceChartDataAsync(DateTime start, DateTime end, string? traceId = default)
+    {
+        var where = CubeJsRequestUtils.GetErrorChartWhere(start, end, SearchData.Environment, SearchData.Service!, default!, default!, default, traceId, SpanId, TraceIds);
         var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
         var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_ERROR_LIST_VIEW, where, orderBy, fields: [CubejsConstants.COUNT, $"{CubejsConstants.TIMESTAMP_AGG}{{{CubeJsRequestUtils.GetCubeTimePeriod(SearchData.Start, SearchData.End)}}}"]));
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<ServiceErrorResponse<ServiceErrorChartResponse>>>(request);
+        if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
+        {
+            return response.Data.Data.Select(item => item.Data).ToList();
+        }
+        else
+        {
+            return [];
+        }
+    }
+
+    private async Task<List<ServiceErrorChartResponse>> GetEndpointChartDataAsync(DateTime start, DateTime end, string? traceId = default)
+    {
+        var where = CubeJsRequestUtils.GetErrorChartWhere(start, end, SearchData.Environment, SearchData.Service!, SearchData.Endpoint!, SearchData.Method!, SearchData.Status, traceId, SpanId);
+        var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
+        var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_ERROR_CHART_VIEW, where, orderBy, fields: [CubejsConstants.COUNT, $"{CubejsConstants.TIMESTAMP_AGG}{{{CubeJsRequestUtils.GetCubeTimePeriod(SearchData.Start, SearchData.End)}}}"]));
         var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailErrorResponse<ServiceErrorChartResponse>>>(request);
         if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
         {
@@ -187,38 +211,19 @@ public partial class ServiceErrors
 
     private void SetChartData(List<ChartLineCountDto> result, List<ServiceErrorChartResponse> data, bool isPrevious = false)
     {
-        ChartLineCountDto? current = null;
+        ChartLineCountDto current = result[0];
         int index = 0;
         if (data == null || data.Count == 0) return;
         do
         {
             var item = data[index];
             var time = item.DateKey.DateTime!.Value.ToUnixTimestamp();
-            var name = time.ToString();
-            if (current == null || current.Name != name)
-            {
-                if (isPrevious && result.Exists(item => item.Name == name))
+            ((List<ChartLineCountItemDto>)(isPrevious ? current.Previous : current.Currents)).Add(
+                new()
                 {
-                    current = result.First(item => item.Name == name);
-                }
-                else
-                {
-                    current = new ChartLineCountDto
-                    {
-                        Name = name,
-                        Previous = new List<ChartLineCountItemDto>(),
-                        Currents = new List<ChartLineCountItemDto>()
-                    };
-                    result.Add(current);
-                }
-            }
-
-        ((List<ChartLineCountItemDto>)(isPrevious ? current.Previous : current.Currents)).Add(
-            new()
-            {
-                Value = item.Cnt.ToString(),
-                Time = time
-            });
+                    Value = item.Cnt.ToString(),
+                    Time = time
+                });
             index++;
         } while (data.Count - index > 0);
     }

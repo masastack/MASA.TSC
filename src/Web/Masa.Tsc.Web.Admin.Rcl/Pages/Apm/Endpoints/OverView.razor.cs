@@ -16,10 +16,19 @@ public partial class OverView
     [Parameter]
     public EventCallback<string> OnSpanIdChanged { get; set; }
 
+    [Parameter]
+    public EventCallback<string[]> OnTraceIdsChanged { get; set; }
+
     private async Task SpanIdChange(string spanId)
     {
         if (OnSpanIdChanged.HasDelegate)
             await OnSpanIdChanged.InvokeAsync(spanId);
+    }
+
+    private async Task TraceIdsChange(string[] traceIds)
+    {
+        if (OnTraceIdsChanged.HasDelegate)
+            await OnTraceIdsChanged.InvokeAsync(traceIds);
     }
 
     private static readonly List<(MetricTypes, string)> metricTypes = new() { (MetricTypes.Avg, "avg"), (MetricTypes.P95, "p95"), (MetricTypes.P99, "p99") };
@@ -82,7 +91,7 @@ public partial class OverView
         bool isRefresh = false;
         if (args.IsClear && !lastSelect.IsClear)
         {
-            lastSelect.IsClear = false;
+            lastSelect.IsClear = true;
             isRefresh = true;
         }
         else if (!args.IsClear && (lastSelect.IsClear || !lastSelect.IsClear && (lastSelect.Start - args.Start != 0 || lastSelect.End - args.Start != 0)))
@@ -314,6 +323,7 @@ public partial class OverView
 
             await LoadCubeTracePageByListAsync(startDuration, endDuration);
             await LoadCubeTracePageByDetailAsync(startDuration, endDuration);
+            await TraceIdsChange(traceIds.Select(item => item.TraceId).ToArray());
         }
         if (traceIds.Count - page >= 0)
             trace = traceIds[page - 1];
@@ -338,7 +348,7 @@ public partial class OverView
             return;
 
         var traceId = !string.IsNullOrEmpty(Search.TextValue) && Search.TextField == "TraceId" ? Search.TextValue : null;
-        var where = CubeJsRequestUtils.GetEndpintDetailTracePageWhere(Search.Start, Search.End, Search.Environment, Search.Service!, Search.Endpoint!, Search.Method, traceId, startDuration, endDuration);
+        var where = CubeJsRequestUtils.GetEndpintDetailTracePageWhere(Search.Start, Search.End, Search.Environment, Search.Service!, Search.Endpoint!, Search.Method, traceId, startDuration, endDuration, Search.Status);
         var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
         var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_TRACE_PAGE_VIEW, where, orderBy, page: 1, pageSize: 500, fields: [CubejsConstants.TRACEID, CubejsConstants.LATENCY_DURATION, $"{CubejsConstants.TIMESTAMP_AGG}{{{CubejsConstants.TIMESTAMP_AGG_VALUE}}}"]));
         var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailPageResponse>>(request);
@@ -349,7 +359,7 @@ public partial class OverView
             {
                 TraceId = item.Data.TraceId,
                 Timestamp = item.Data.DateKey.DateTime!.Value,
-                EndTimestamp = item.Data.DateKey.DateTime!.Value.AddMilliseconds(long.Parse(item.Data.Duration))
+                EndTimestamp = item.Data.DateKey.DateTime!.Value.AddMilliseconds(item.Data.Duration)
             }).ToList();
         }
         else
@@ -368,7 +378,7 @@ public partial class OverView
         var where = CubeJsRequestUtils.GetEndpintDetailTracePageByDetailWhere(Search.Start, Search.End, Search.Environment, Search.Service!, Search.Endpoint!, Search.Method, Search.Status, Search.TextField, Search.TextValue, startDuration, endDuration);
         var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
         var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_TRACE_DETAIL_VIEW, where, orderBy, page: 1, pageSize: 500, fields: [CubejsConstants.TRACEID, CubejsConstants.LATENCY_DURATION, $"{CubejsConstants.TIMESTAMP_AGG}{{{CubejsConstants.TIMESTAMP_AGG_VALUE}}}"]));
-        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailTraceDetailResponse<EndpointDetailPageItemResponse>>>(request);
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailTraceDetailResponse<EndpointDetailByDetailPageItemResponse>>>(request);
         if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
         {
             total = response.Data.Data.Count;
@@ -456,7 +466,7 @@ public partial class OverView
         var where = CubeJsRequestUtils.GetTraceDetailWhere(current.Timestamp.AddHours(-6), current.EndTimestamp.AddHours(6), Search.Environment, current.TraceId);
         var fields = new string[] { CubejsConstants.SPANID, CubejsConstants.COUNT };
         var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_ERROR_LIST_VIEW, where, fields: fields));
-        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailErrorResponse<EndpointDetailErrorChartItemResponse>>>(request);
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<ServiceErrorResponse<EndpointDetailErrorChartItemResponse>>>(request);
         if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
         {
             errors = response.Data.Data.Select(item => new ChartPointDto { X = item.Data.SpanId, Y = item.Data.Cnt.ToString() }).ToList();

@@ -18,6 +18,9 @@ public partial class ServiceLogs
     public string SpanId { get; set; }
 
     [Parameter]
+    public string[] TraceIds { get; set; }
+
+    [Parameter]
     public bool ShowAppEvent { get; set; } = true;
 
     private List<DataTableHeader<LogResponseDto>> headers => new()
@@ -118,7 +121,7 @@ public partial class ServiceLogs
         ChartLineCountDto result = new ChartLineCountDto { Currents = new List<ChartLineCountItemDto>() };
         var traceId = !string.IsNullOrEmpty(SearchData.TextValue) && SearchData.TextField == StorageConst.Current.TraceId ? SearchData.TextValue : null;
 
-        var where = CubeJsRequestUtils.GetErrorChartWhere(SearchData.Start, SearchData.End, SearchData.Environment, SearchData.Service!, default!, default!, traceId, SpanId);
+        var where = CubeJsRequestUtils.GetErrorChartWhere(SearchData.Start, SearchData.End, SearchData.Environment, SearchData.Service!, default!, default!, default, traceId, SpanId, TraceIds);
         var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
         var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_LOG_DETAIL_VIEW, where, orderBy, fields: [CubejsConstants.COUNT, $"{CubejsConstants.TIMESTAMP_AGG}{{{CubeJsRequestUtils.GetCubeTimePeriod(SearchData.Start, SearchData.End)}}}"]));
         var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailLogResponse<EndpointDetailLogChartItemResponse>>>(request);
@@ -213,7 +216,7 @@ public partial class ServiceLogs
         if (isTableLoading) return;
         isTableLoading = true;
         var traceId = !string.IsNullOrEmpty(SearchData.TextValue) && SearchData.TextField == StorageConst.Current.TraceId ? SearchData.TextValue : null;
-        var where = CubeJsRequestUtils.GetErrorChartWhere(SearchData.Start, SearchData.End, default, SearchData.Service!, default!, default!, traceId, SpanId);
+        var where = CubeJsRequestUtils.GetErrorChartWhere(SearchData.Start, SearchData.End, default, SearchData.Service!, default!, default!, default, traceId, SpanId, TraceIds);
         var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
 
         var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_LOG_DETAIL_VIEW, where, orderBy, 1, 1, fields: [CubejsConstants.COUNT]));
