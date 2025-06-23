@@ -161,7 +161,7 @@
         <div class="d-flex mt-1 text-caption @(isSelected?"grey pl-1":"")" @onclick="()=>ChangeCurrent(item)">
             <div class="pl-1 py-1 @color">@item.Time.UtcFormatLocal(CurrentTimeZone)</div>
             <div class="pl-4 pr-2 py-1 @color rounded-r-sm flex-grow-1">
-                <MTooltip Top>
+                <MTooltip Top MaxWidth="400">
                     <ActivatorContent>
                         <div @attributes="@context.Attrs" class="text-truncate" style="width:210px">
                             @item.Text @item.Url

@@ -20,7 +20,7 @@
     <ItemColContent>
         @if (context.Header.Value == nameof(ExceptErrorDto.Message) || context.Header.Value == nameof(ExceptErrorDto.Comment))
         {
-            <MTooltip Top Left Context="tooltipContent">
+            <MTooltip Top Left Context="tooltipContent" MaxWidth="400">
                 <ActivatorContent>
                     <div @attributes="@tooltipContent.Attrs" class="text-truncate">
                         @context.Value

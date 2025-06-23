@@ -36,7 +36,7 @@
                 }
                 else if (context.Header.Value == nameof(ErrorMessageDto.Message))
                 {
-                    <MTooltip Top Context="tooltipContent">
+                    <MTooltip Bottom Context="tooltipContent" MaxWidth="400">
                         <ActivatorContent>
                             <div @attributes="@tooltipContent.Attrs" style="width:400px;cursor:pointer" class="text-truncate" @onclick="@(()=>Show(context.Item.Type,context.Item.Message))">
                                 <a style="text-decoration:none" onclick="javascript:;">@context.Item.Message</a>

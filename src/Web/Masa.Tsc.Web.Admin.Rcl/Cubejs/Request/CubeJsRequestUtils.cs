@@ -167,7 +167,7 @@ internal static partial class CubeJsRequestUtils
         if (startDuration > 0 && endDuration > 0 && endDuration - startDuration > 0)
             text.Append($",{CubejsConstants.LATENCY_DURATION}:{{gte:{startDuration * 1e6},lte:{endDuration * 1e6}}}");
         if (!string.IsNullOrEmpty(traceId))
-            text.Append($",traceId:{{equals:\"{traceId}\"}}");
+            text.Append($",{CubejsConstants.TRACEID}:{{equals:\"{traceId}\"}}");
         if (!string.IsNullOrEmpty(statusCode))
             text.Append($",{CubejsConstants.STATUS_CODE}:{{equals:\"{statusCode}\"}}");
 

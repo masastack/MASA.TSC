@@ -48,7 +48,7 @@
                 }
                 else if (context.Header.Value == nameof(LogResponseDto.Body))
                 {
-                    <MTooltip Top Context="tooltipContent">
+                    <MTooltip Bottom Context="tooltipContent" MaxWidth="400">
                         <ActivatorContent>
                             <div @attributes="@tooltipContent.Attrs" style="width:400px" class="text-truncate">
                                 @context.Item.Body

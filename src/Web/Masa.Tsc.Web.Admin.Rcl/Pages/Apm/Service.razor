@@ -23,7 +23,7 @@
             var text = GetService(context.Item.Name)?.AppDescription;
             if (string.IsNullOrEmpty(text))
                 text = "无";
-            <MTooltip Top Left Context="tooltipContent">
+            <MTooltip Top Left Context="tooltipContent" MaxWidth="400">
                 <ActivatorContent>
                     <div @attributes="@tooltipContent.Attrs" class="text-truncate">
                         <a href="/apm/services/@(context.Item.Name+ GetUrlParam(service: context.Item.Name, env: GetSearchEnv(Search.Environment, context.Item.Envs?.Split(',')), comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End))">

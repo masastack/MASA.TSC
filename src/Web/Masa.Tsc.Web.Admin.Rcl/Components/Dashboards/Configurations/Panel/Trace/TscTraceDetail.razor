@@ -92,7 +92,7 @@
                        Style='@($"height: calc(100vh - {(_timelineView.Count-15>0? 300:_timelineView.Count*20) + 254}px)")'
                        @key="@_treeData">
                 <LabelContent>
-                    <MTooltip Left Top Context="tooltipContent">
+                    <MTooltip Left Top Context="tooltipContent" MaxWidth="400" >
                         <ActivatorContent>
                             <div style="max-width:1000px;white-space:nowrap" class="d-flex justify-start">
                                 <div @attributes="@tooltipContent.Attrs" class="text-truncate pt-1">@context.Item.Name</div>

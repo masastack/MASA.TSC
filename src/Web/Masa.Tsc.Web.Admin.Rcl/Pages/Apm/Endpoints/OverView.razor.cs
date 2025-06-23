@@ -344,7 +344,7 @@ public partial class OverView
 
     private async Task LoadCubeTracePageByListAsync(long startDuration, long endDuration)
     {
-        if (!string.IsNullOrEmpty(Search.Status) || !string.IsNullOrEmpty(Search.TextValue) && Search.TextField != StorageConst.Current.TraceId)
+        if (!string.IsNullOrEmpty(Search.TextValue) && Search.TextField != StorageConst.Current.TraceId)
             return;
 
         var traceId = !string.IsNullOrEmpty(Search.TextValue) && Search.TextField == "TraceId" ? Search.TextValue : null;
@@ -372,7 +372,7 @@ public partial class OverView
 
     private async Task LoadCubeTracePageByDetailAsync(long startDuration, long endDuration)
     {
-        if (string.IsNullOrEmpty(Search.Status) && (string.IsNullOrEmpty(Search.TextValue) || Search.TextField == StorageConst.Current.TraceId))
+        if (string.IsNullOrEmpty(Search.TextValue) || Search.TextField == StorageConst.Current.TraceId)
             return;
 
         var where = CubeJsRequestUtils.GetEndpintDetailTracePageByDetailWhere(Search.Start, Search.End, Search.Environment, Search.Service!, Search.Endpoint!, Search.Method, Search.Status, Search.TextField, Search.TextValue, startDuration, endDuration);

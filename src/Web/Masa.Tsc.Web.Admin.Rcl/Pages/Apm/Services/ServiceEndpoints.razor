@@ -42,7 +42,7 @@
             <ItemColContent>
                 @if (context.Header.Value == nameof(ListChartData.Name))
                 {
-                    <MTooltip Top Context="tooltipContent">
+                    <MTooltip Top Context="tooltipContent" MaxWidth="400">
                         <ActivatorContent>
                             <div @attributes="@tooltipContent.Attrs" style="width:400px;overflow:hidden" class="text-truncate">
                                 <a href="/apm/endpoints/@(HttpUtility.UrlEncode(context.Item.Name)+ GetUrlParam(service: context.Item.Service, env: GetSearchEnv(Search.Environment, context.Item.Envs?.Split(',')),endpoint:context.Item.Endpoint,method:context.Item.Method, comparisonType: Search.ComparisonType, start: Search.Start, end: Search.End))"
