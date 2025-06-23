@@ -160,7 +160,7 @@ internal static partial class CubeJsRequestUtils
         return text.ToString();
     }
 
-    public static string GetEndpintDetailTracePageWhere(DateTime startUtc, DateTime endUtc, string? env, string service, string endpoint, string method, string? traceId, long startDuration, long endDuration,string? statusCode)
+    public static string GetEndpintDetailTracePageWhere(DateTime startUtc, DateTime endUtc, string? env, string service, string endpoint, string method, string? traceId, long startDuration, long endDuration, string? statusCode)
     {
         var text = new StringBuilder(GetEndpintDetailChartWhere(startUtc, endUtc, env, service, endpoint, method, false));
 
@@ -247,6 +247,40 @@ internal static partial class CubeJsRequestUtils
             default:
                 return $"{CubejsConstants.FAILED_AGG}:{desc}";
 
+        }
+    }
+
+    public static string GetEndpintErrorsOrderBy(string? order, bool? isDesc)
+    {
+        var desc = isDesc ?? true ? "desc" : "asc";
+        switch (order?.ToLower())
+        {
+            case "type":
+                return $"{CubejsConstants.ERROR_TYPE}:{desc}";
+            case "message":
+                return $"{CubejsConstants.ERROR_MESSAGE}:{desc}";
+            case "total":
+                return $"{CubejsConstants.COUNT}:{desc}";
+            case "lastTime":
+            default:
+                return $"{CubejsConstants.ERROR_PAGE_MAX_TIME}:{desc}";
+        }
+    }
+
+    public static string GetEndpintLogsOrderBy(string? order, bool? isDesc)
+    {
+        var desc = isDesc ?? true ? "desc" : "asc";
+        switch (order?.ToLower())
+        {
+            case "traceid":
+                return $"{CubejsConstants.TRACEID}:{desc}";
+            case "severitytext":
+                return $"severitytext:{desc}";
+            case "body":
+                return $"body:{desc}";
+            case "timestamp":
+            default:
+                return $"{CubejsConstants.TIMESTAMP_AGG}:{desc}";
         }
     }
 

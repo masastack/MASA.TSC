@@ -83,7 +83,7 @@ public partial class ServiceErrors
     {
         await LoadCubePageDataAsync();
     }
-    
+
     private async Task LoadCubePageDataAsync()
     {
         if (string.IsNullOrEmpty(SearchData.Service) && string.IsNullOrEmpty(SearchData.TraceId))
@@ -96,7 +96,7 @@ public partial class ServiceErrors
         isTableLoading = true;
         var traceId = !string.IsNullOrEmpty(SearchData.TextValue) && SearchData.TextField == StorageConst.Current.TraceId ? SearchData.TextValue : null;
         var where = CubeJsRequestUtils.GetErrorChartWhere(SearchData.Start, SearchData.End, default, SearchData.Service!, default!, default!, default, traceId!, SpanId, TraceIds);
-        var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
+        var orderBy = CubeJsRequestUtils.GetEndpintErrorsOrderBy(sortFiled!, sortBy);
 
         var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_ERROR_LIST_VIEW, where, orderBy, fields: [CubejsConstants.ERROR_PAGE_COUNT]));
         var responseTotal = await CubejsClient.SendQueryAsync<CubejsBaseResponse<ServiceErrorResponse<ServiceErrorListItemTotalResponse>>>(request);
@@ -154,33 +154,10 @@ public partial class ServiceErrors
 
     private async Task<List<ServiceErrorChartResponse>> GetChartDataAsync(DateTime start, DateTime end, string? traceId = default)
     {
-        if (!string.IsNullOrEmpty(Search.Endpoint) && !string.IsNullOrEmpty(Search.Method))
-            return await GetEndpointChartDataAsync(start, end, traceId);
-        return await GetServiceChartDataAsync(start, end, traceId);
-    }
-
-    private async Task<List<ServiceErrorChartResponse>> GetServiceChartDataAsync(DateTime start, DateTime end, string? traceId = default)
-    {
         var where = CubeJsRequestUtils.GetErrorChartWhere(start, end, SearchData.Environment, SearchData.Service!, default!, default!, default, traceId, SpanId, TraceIds);
         var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
         var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_ERROR_LIST_VIEW, where, orderBy, fields: [CubejsConstants.COUNT, $"{CubejsConstants.TIMESTAMP_AGG}{{{CubeJsRequestUtils.GetCubeTimePeriod(SearchData.Start, SearchData.End)}}}"]));
         var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<ServiceErrorResponse<ServiceErrorChartResponse>>>(request);
-        if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
-        {
-            return response.Data.Data.Select(item => item.Data).ToList();
-        }
-        else
-        {
-            return [];
-        }
-    }
-
-    private async Task<List<ServiceErrorChartResponse>> GetEndpointChartDataAsync(DateTime start, DateTime end, string? traceId = default)
-    {
-        var where = CubeJsRequestUtils.GetErrorChartWhere(start, end, SearchData.Environment, SearchData.Service!, SearchData.Endpoint!, SearchData.Method!, SearchData.Status, traceId, SpanId);
-        var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
-        var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_ERROR_CHART_VIEW, where, orderBy, fields: [CubejsConstants.COUNT, $"{CubejsConstants.TIMESTAMP_AGG}{{{CubeJsRequestUtils.GetCubeTimePeriod(SearchData.Start, SearchData.End)}}}"]));
-        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailErrorResponse<ServiceErrorChartResponse>>>(request);
         if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
         {
             return response.Data.Data.Select(item => item.Data).ToList();

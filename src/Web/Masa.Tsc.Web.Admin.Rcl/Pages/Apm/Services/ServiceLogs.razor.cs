@@ -138,7 +138,6 @@ public partial class ServiceLogs
         chart.ChartLoading = false;
     }
 
-
     private async Task LoadPageDataAsync()
     {
         if (isTableLoading) return;
@@ -217,7 +216,7 @@ public partial class ServiceLogs
         isTableLoading = true;
         var traceId = !string.IsNullOrEmpty(SearchData.TextValue) && SearchData.TextField == StorageConst.Current.TraceId ? SearchData.TextValue : null;
         var where = CubeJsRequestUtils.GetErrorChartWhere(SearchData.Start, SearchData.End, default, SearchData.Service!, default!, default!, default, traceId, SpanId, TraceIds);
-        var orderBy = $"{CubejsConstants.TIMESTAMP_AGG}:asc";
+        var orderBy = CubeJsRequestUtils.GetEndpintLogsOrderBy(sortFiled!, sortBy);
 
         var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_DETAIL_LOG_DETAIL_VIEW, where, orderBy, 1, 1, fields: [CubejsConstants.COUNT]));
         var responseTotal = await CubejsClient.SendQueryAsync<CubejsBaseResponse<EndpointDetailLogResponse<EndpointDetailLogListTotalResponse>>>(request);
