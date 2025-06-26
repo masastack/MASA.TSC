@@ -1,6 +1,8 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using Masa.Tsc.Web.Admin.Rcl.Cubejs.Response.Search;
+
 namespace Masa.Tsc.Web.Admin.Rcl.Components.Apm;
 
 public partial class ApmSearchComponent
@@ -312,6 +314,42 @@ public partial class ApmSearchComponent
         isEnvLoading = false;
     }
 
+    private async Task LoadCubeEnvironmentAsync()
+    {
+        isEnvLoading = true;
+        var where = CubeJsRequestUtils.GetEndpintListWhere(Search.Start, Search.End, CurrentTeamId, Search.Environment);
+        var orderBy = $"{CubejsConstants.ENV_AGG}:asc";
+        var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_VIEW, where, orderBy, fields: [CubejsConstants.ENV_AGG, CubejsConstants.SERVICENAME, CubejsConstants.PROJECT, "appdescription", CubejsConstants.APPTYPE]));
+        var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<SearchResponseBase<SearchEnvServiceResponse>>>(request);
+        if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
+        {
+            EnvironmentServices = response.Data.Data.GroupBy(item => item.Data.NameSpace).Select(item => new KeyValuePair<string, List<EnvironmentAppDto>>(item.Key, item.Select(d => new EnvironmentAppDto
+            {
+                AppDescription = d.Data.AppDescription,
+                AppId = d.Data.ServiceName,
+                ProjectId = d.Data.ProjectIdentity,
+                AppType = Enum.Parse<AppTypes>(d.Data.AppType, true)
+            }).ToList())).ToDictionary();
+        }
+        else
+        {
+            EnvironmentServices = [];
+        }
+        environments = EnvironmentServices.Keys.ToList();
+        if (!string.IsNullOrEmpty(Search.Service))
+        {
+            var findEnv = EnvironmentServices.FirstOrDefault(item => (string.IsNullOrEmpty(Search.Environment) || Search.Environment == item.Key) && item.Value.Exists(app => (string.IsNullOrEmpty(Search.Project) || app.ProjectId == Search.Project) && (app.AppId == Search.Service)));
+            if (string.IsNullOrEmpty(findEnv.Key))
+                Search.Service = default!;
+            else
+                Search.Environment = findEnv.Key;
+        }
+
+        if (!string.IsNullOrEmpty(Search.Environment) && !environments.Contains(Search.Environment))
+            Search.Environment = default!;
+        isEnvLoading = false;
+    }
+
     private async Task LoadProjectAsync()
     {
         List<EnvironmentAppDto> projects = new();
@@ -394,6 +432,27 @@ public partial class ApmSearchComponent
             Search.Endpoint = default!;
     }
 
+    private async Task LoadCubeEndpointAsync()
+    {
+        if (!string.IsNullOrEmpty(Search.Service))
+        {
+            var where = CubeJsRequestUtils.GetEndpintListWhere(Search.Start, Search.End, CurrentTeamId, Search.Environment, service: Search.Service);
+            var orderBy = $"{CubejsConstants.TARGET}:asc";
+            var request = new GraphQLHttpRequest(CubeJsRequestUtils.GetCompleteCubejsQuery(CubejsConstants.ENDPOINT_LIST_VIEW, where, orderBy, fields: [CubejsConstants.TARGET]));
+            var response = await CubejsClient.SendQueryAsync<CubejsBaseResponse<SearchResponseBase<SearchEndpointResponse>>>(request);
+            if (response.Data != null && response.Data.Data != null && response.Data.Data.Count > 0)
+            {
+                endpoints = response.Data.Data.Select(item => item.Data.Target).ToList();
+            }
+            else
+            {
+                endpoints = [];
+            }
+        }
+        if (!string.IsNullOrEmpty(Search.Endpoint) && endpoints != null && !endpoints.Contains(Search.Endpoint))
+            Search.Endpoint = default!;
+    }
+
     private async Task LoadErrorAsync()
     {
         exceptions = await ApiCaller.ApmService.GetExceptionTypesAsync(new BaseRequestDto { Service = Search.Service!, End = Search.End, Start = Search.Start });
@@ -418,11 +477,13 @@ public partial class ApmSearchComponent
 
     private async Task InitAsync()
     {
-        await LoadEnvironmentAsync();
+        //await LoadEnvironmentAsync();
+        await LoadCubeEnvironmentAsync();
         await LoadProjectAsync();
         await LoadServiceTypeAsync();
         await LoadServiceAsync();
-        await LoadEndpointAsync();
+        //await LoadEndpointAsync();
+        await LoadCubeEndpointAsync();
         await LoadErrorAsync();
     }
 
@@ -441,7 +502,8 @@ public partial class ApmSearchComponent
         Search.Project = project;
         await LoadServiceTypeAsync();
         await LoadServiceAsync();
-        await LoadEndpointAsync();
+        await LoadCubeEndpointAsync();
+        //await LoadEndpointAsync();
         await LoadErrorAsync();
         await OnValueChanged();
         StateHasChanged();
@@ -452,7 +514,8 @@ public partial class ApmSearchComponent
         Search.Service = service;
         await LoadProjectAsync();
         await LoadServiceTypeAsync();
-        await LoadEndpointAsync();
+        await LoadCubeEndpointAsync();
+        //await LoadEndpointAsync();
         await LoadErrorAsync();
         await OnValueChanged();
         StateHasChanged();
