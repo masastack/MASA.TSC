@@ -11,6 +11,8 @@ internal static class Constants
 
     private const string AggregateTable = "otel_trace_metrics@interval";
 
+    public static string AggregateRootTable { get; private set; }
+
     public static string DurationTable { get; private set; }
 
     public static string DurationCountTable { get; private set; }
@@ -21,7 +23,7 @@ internal static class Constants
 
     public static readonly string[] INTERVALS = new string[] { "1 minute", "30 minute", "1 hour", "1 day", "1 week", "1 month" };
 
-    private static string GetAggregateTable(string interval, string suffix)
+    private static string InitAggregateTable(string interval, string suffix)
     {
         if (string.IsNullOrEmpty(interval))
             interval = INTERVALS[0];
@@ -44,9 +46,10 @@ internal static class Constants
         DurationCountTable = $"{database}otel_traces_spans_duration_count_{suffix}";
         ModelsTable = $"{database}tsc_phone_models_{suffix}";
         ExceptErrorTable = $"{database}tsc_except_errors_{suffix}";
+        AggregateRootTable = $"{database}otel_trace_metrics_masa";
         foreach (var key in INTERVALS)
         {
-            DicAggregateTable.Add(key, database + GetAggregateTable(key, suffix));
+            DicAggregateTable.Add(key, database + InitAggregateTable(key, suffix));
         }
         MasaStackClickhouseConnection.SetEnableExceptError(ExceptErrorTable);
     }

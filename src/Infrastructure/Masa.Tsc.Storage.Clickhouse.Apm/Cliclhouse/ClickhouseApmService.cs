@@ -1,6 +1,8 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
+using System.Security.Cryptography.X509Certificates;
+
 namespace Masa.Tsc.Storage.Clickhouse.Apm;
 
 internal partial class ClickhouseApmService : IApmService
@@ -67,9 +69,9 @@ internal partial class ClickhouseApmService : IApmService
     public async Task<EndpointLatencyDistributionDto> EndpointLatencyDistributionAsync(ApmEndpointRequestDto query)
     {
         filter.IsTrace = true;
-        var (where, parameters) = GetMetricWhere(query, filter, true);
-        var period = GetPeriod(query);
-        var tableName = Constants.GetAggregateTable(period);
+        var period = GetPeriod(query, true);
+        var (where, parameters) = GetMetricWhere(query, filter, true, period);
+        var tableName = Constants.AggregateRootTable;
         var result = new EndpointLatencyDistributionDto();
 
         var p95 = Convert.ToDouble(await Scalar($"select floor(quantileMerge(P95)/{MILLSECOND}) p95 from {tableName} where {where}", parameters));
@@ -215,13 +217,13 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
     {
         filter.IsServer = true;
         filter.IsMetric = true;
-        var period = GetPeriod(query);
+        var period = GetPeriod(query, true);
         var result = new Dictionary<string, List<string>>();
-        var tableName = Constants.GetAggregateTable(period);
+        var tableName = Constants.AggregateRootTable;
         var sql = $@"select        
         ServiceName,`Resource.service.namespace`
             from {tableName}
-            where Timestamp between @start and @end
+            where dimensions='{period}' and Timestamp between @start and @end
             group by `Resource.service.namespace`,ServiceName
             order by `Resource.service.namespace`,ServiceName";
         //lock (lockObj)
@@ -384,15 +386,15 @@ from {MasaStackClickhouseConnection.LogTable} where {where} {groupby}";
         filter.IsServer = true;
         filter.IsTrace = true;
         var (where, ors, parameters) = AppendWhere(query, filter);
-        var (metricWhere, _) = GetMetricWhere(query, filter, true);
+        var period = GetPeriod(query, true);
+        var (metricWhere, _) = GetMetricWhere(query, filter, true, period);
         string countSql, sql;
 
         string groupAppend = isEndpoint ? ",`Attributes.http.target`,`Attributes.http.method`" : string.Empty;
         var groupby = $"group by ServiceName{groupAppend}";
         var orderBy = GetOrderBy(query, isEndpoint ? endpointOrders : serviceOrders, defaultSort: isEndpoint ? endpointOrders["Name"] : serviceOrders["Name"]);
 
-        var period = GetPeriod(query);
-        var tableName = Constants.GetAggregateTable(period);
+        var tableName = Constants.AggregateRootTable;
         if (filter.IsInstrument)
         {
             var sql2 = CombineOrs($"select DISTINCT  ServiceName{groupAppend} from {MasaStackClickhouseConnection.TraceHttpServerTable} where {where}", ors);
@@ -559,8 +561,8 @@ from(
         filter.IsTrace = true;
         bool isInstrument = !string.IsNullOrEmpty(query.Queries);
         filter.IsMetric = !isInstrument;
-        var period = GetPeriod(query);
-        var tableName = Constants.GetAggregateTable(period);
+        var period = GetPeriod(query, true);
+        var tableName = Constants.AggregateRootTable;
         var (where, ors, parameters) = AppendWhere(query, filter);
         bool isEndpoint = query is ApmEndpointRequestDto;
         string groupAppend = isEndpoint ? ",`Attributes.http.target`,`Attributes.http.method`" : string.Empty;
@@ -605,7 +607,7 @@ from(
                     quantileMerge(P95) P951,
                     ServiceName{groupAppend}
             from {tableName}
-            where {where}
+            where dimensions='{period}' and {where}
             group by ServiceName{groupAppend},Timestamp
             order by ServiceName{groupAppend},Timestamp
             ) t";
@@ -636,9 +638,9 @@ order by `Attributes.http.status_code`";
 
     public async Task<List<string>> GetEndpointsAsync(BaseApmRequestDto query)
     {
-        var period = GetPeriod(query);
-        var tableName = Constants.GetAggregateTable(period);
-        var (where, ors, parameters) = AppendWhere(query, filter);
+        var period = GetPeriod(query, true);
+        var tableName = Constants.AggregateRootTable;
+        var (where, ors, parameters) = AppendWhere(query, filter, period);
         var sql = @$"select {StorageConst.Current.Trace.URL}
             from {tableName}
             where {where}
@@ -686,9 +688,9 @@ order by `Attributes.http.status_code`";
         }
     }
 
-    private static (string where, List<string> ors, List<ClickHouseParameter> parameters) AppendWhere<TQuery>(TQuery query, QueryFilter filter) where TQuery : BaseApmRequestDto
+    private static (string where, List<string> ors, List<ClickHouseParameter> parameters) AppendWhere<TQuery>(TQuery query, QueryFilter filter, string? period = null) where TQuery : BaseApmRequestDto
     {
-        (string where, List<ClickHouseParameter> parameters) = GetMetricWhere(query, filter);
+        (string where, List<ClickHouseParameter> parameters) = GetMetricWhere(query, filter, period: period);
         var sql = new StringBuilder(where);
         var ors = new List<string>();
 
@@ -710,7 +712,11 @@ order by `Attributes.http.status_code`";
         {
             filter.IsInstrument = true;
             sql.AppendLine($" and {StorageConst.Current.ExceptionType}=@exType");
-            parameters.Add(new ClickHouseParameter { ParameterName = "exType", Value = query.ExType });
+            parameters.Add(new ClickHouseParameter
+            {
+                ParameterName = "exType",
+                Value = query.ExType
+            });
         }
 
         if (!string.IsNullOrEmpty(query.TraceId))
@@ -985,19 +991,21 @@ order by `Attributes.http.status_code`";
         Log(start, end, default!, default!, true);
     }
 
-    private static string GetPeriod(BaseApmRequestDto query)
+    private static string GetPeriod(BaseApmRequestDto query, bool replace = false)
     {
         var reg = new Regex(@"/d+", default, TimeSpan.FromSeconds(5));
         if (string.IsNullOrEmpty(query.Period) || !reg.IsMatch(query.Period))
         {
-            return GetDefaultPeriod(query.End - query.Start);
+            var period = GetDefaultPeriod(query.End - query.Start);
+            return replace ? period.Replace(' ', '_') : period;
         }
         var unit = reg.Replace(query.Period, "").Trim().ToLower();
         var units = new List<string> { "year", "month", "week", "day", "hour", "minute", "second" };
         var find = units.Find(s => s.StartsWith(unit));
         if (string.IsNullOrEmpty(find))
             find = "minute";
-        return $"{reg.Match(query.Period).Result} {find}";
+        var value = $"{reg.Match(query.Period).Result} {find}";
+        return replace ? value.Replace(' ', '_') : value;
     }
 
     private static string GetDefaultPeriod(TimeSpan timeSpan)
@@ -1035,11 +1043,15 @@ order by `Attributes.http.status_code`";
         return "1 month";
     }
 
-    private static (string, List<ClickHouseParameter>) GetMetricWhere<TRequest>(TRequest query, QueryFilter filter, bool isContainsEndpoint = false) where TRequest : BaseApmRequestDto
+    private static (string, List<ClickHouseParameter>) GetMetricWhere<TRequest>(TRequest query, QueryFilter filter, bool isContainsEndpoint = false, string? period = null) where TRequest : BaseApmRequestDto
     {
         List<ClickHouseParameter> parameters = new();
         var sql = new StringBuilder();
         sql.AppendLine($" {StorageConst.Current.Timestimap} between @startTime and @endTime");
+        if (!string.IsNullOrEmpty(period))
+        {
+            sql.AppendLine($" and dimensions='{period}' ");
+        }
         parameters.Add(new ClickHouseParameter { ParameterName = "startTime", Value = MasaStackClickhouseConnection.ToTimeZone(query.Start), DbType = DbType.DateTime });
         parameters.Add(new ClickHouseParameter { ParameterName = "endTime", Value = MasaStackClickhouseConnection.ToTimeZone(query.End), DbType = DbType.DateTime });
         if (!string.IsNullOrEmpty(query.Env))

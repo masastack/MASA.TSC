@@ -103,17 +103,18 @@ WHERE SeverityText in ['Error','Critical'] and mapContains(LogAttributes, 'excep
 
     private static void InitAggregateTable(MasaStackClickhouseConnection connection)
     {
+        InitAggregateRootTable(connection);
         foreach (var item in Constants.DicAggregateTable)
         {
             InitAggregateTable(connection, item.Key, item.Value);
         }
     }
 
-    private static void InitAggregateTable(MasaStackClickhouseConnection connection, string interval, string tableName)
+    private static void InitAggregateRootTable(MasaStackClickhouseConnection connection)
     {
-        var viewTable = tableName.Replace(".", ".v_");
-        var sql = $@"CREATE TABLE {tableName}
+        var sql = $@"CREATE TABLE {Constants.AggregateRootTable}
 (
+   `dimensions` String,
     `ServiceName` String,
     `Resource.service.namespace` String,
     `Attributes.http.target` String,
@@ -126,8 +127,9 @@ WHERE SeverityText in ['Error','Critical'] and mapContains(LogAttributes, 'excep
     `P95` AggregateFunction(quantile(0.95), Int64)
 )
 ENGINE = AggregatingMergeTree()
-PARTITION BY toYYYYMM(Timestamp)
+PARTITION BY (dimensions,toYYYYMM(Timestamp))
 ORDER BY (
+dimensions,
 Timestamp,
  ServiceName,
  Attributes.http.target,
@@ -137,7 +139,12 @@ Attributes.http.method,
  TTL toDateTime(Timestamp) + toIntervalDay({MasaStackClickhouseConnection.TTL_Days})
 SETTINGS index_granularity = 8192
 {MasaStackClickhouseConnection.StorgePolicy};";
-        ClickhouseInit.InitTable(connection, tableName, sql);
+        ClickhouseInit.InitTable(connection, Constants.AggregateRootTable, sql);
+    }
+
+    private static void InitAggregateTable(MasaStackClickhouseConnection connection, string interval, string tableName)
+    {
+        var viewTable = tableName.Replace(".", ".v_");
         InitAggregateTable1_5_1(connection, interval, tableName, viewTable, MasaStackClickhouseConnection.TraceSourceTable);
         if (!string.IsNullOrEmpty(AppTraceTable))
         {
@@ -151,8 +158,9 @@ SETTINGS index_granularity = 8192
     {
         viewTable = $"{viewTable}_{OpenTelemetrySdks.OpenTelemetrySdk1_5_1.Replace('.', '_')}";
         var sql =
-$@"CREATE MATERIALIZED VIEW {viewTable} TO {tableName}
+$@"CREATE MATERIALIZED VIEW {viewTable} TO {Constants.AggregateRootTable}
 (
+   `dimensions` String,
     `ServiceName` String,
     `Resource.service.namespace` String,
      `Attributes.http.target` String,
@@ -165,6 +173,7 @@ $@"CREATE MATERIALIZED VIEW {viewTable} TO {tableName}
     `P95` AggregateFunction(quantile(0.95), Int64)
 ) AS
 SELECT
+     '{interval.Replace(' ', '_')}' AS dimensions,
     ServiceName,
     ResourceAttributes['service.namespace'] `Resource.service.namespace`,
     SpanAttributes['http.target'] `Attributes.http.target`,
@@ -192,8 +201,9 @@ GROUP BY
     {
         viewTable = $"{viewTable}_{OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1.Replace('.', '_')}";
         var sql =
-$@"CREATE MATERIALIZED VIEW {viewTable} TO {tableName}
+$@"CREATE MATERIALIZED VIEW {viewTable} TO {Constants.AggregateRootTable}
 (
+    `dimensions` String,
     `ServiceName` String,
     `Resource.service.namespace` String,
      `Attributes.http.target` String,
@@ -206,6 +216,7 @@ $@"CREATE MATERIALIZED VIEW {viewTable} TO {tableName}
     `P95` AggregateFunction(quantile(0.95), Int64)
 ) AS
 SELECT
+     '{interval.Replace(' ', '_')}' AS dimensions,
     ServiceName,
     ResourceAttributes['service.namespace'] `Resource.service.namespace`,
     SpanAttributes['http.target'] `Attributes.http.target`,
@@ -233,8 +244,9 @@ GROUP BY
     {
         viewTable = $"{viewTable}_{OpenTelemetrySdks.OpenTelemetrySdk1_9_0.Replace('.', '_')}";
         var sql =
-$@"CREATE MATERIALIZED VIEW {viewTable} TO {tableName}
+$@"CREATE MATERIALIZED VIEW {viewTable} TO {Constants.AggregateRootTable}
 (
+    `dimensions` String,
     `ServiceName` String,
     `Resource.service.namespace` String,
      `Attributes.http.target` String,
@@ -247,6 +259,7 @@ $@"CREATE MATERIALIZED VIEW {viewTable} TO {tableName}
     `P95` AggregateFunction(quantile(0.95), Int64)
 ) AS
 SELECT
+     '{interval.Replace(' ', '_')}' AS dimensions,
     ServiceName,
     ResourceAttributes['service.namespace'] `Resource.service.namespace`,
     if(mapContains(SpanAttributes,'http.route'),SpanAttributes['http.route'],SpanAttributes['url.path']) `Attributes.http.target`,
