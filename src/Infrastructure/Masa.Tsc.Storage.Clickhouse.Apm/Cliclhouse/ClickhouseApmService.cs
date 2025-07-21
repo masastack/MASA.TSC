@@ -70,11 +70,11 @@ internal partial class ClickhouseApmService : IApmService
     {
         filter.IsTrace = true;
         var period = GetPeriod(query, true);
-        var (where, parameters) = GetMetricWhere(query, filter, true, period);
+        var (where, parameters) = GetMetricWhere(query, filter, true);
         var tableName = Constants.AggregateRootTable;
         var result = new EndpointLatencyDistributionDto();
 
-        var p95 = Convert.ToDouble(await Scalar($"select floor(quantileMerge(P95)/{MILLSECOND}) p95 from {tableName} where {where}", parameters));
+        var p95 = Convert.ToDouble(await Scalar($"select floor(quantileMerge(P95)/{MILLSECOND}) p95 from {tableName} where dimensions='{period}' and {where}", parameters));
         if (p95 is not double.NaN)
             result.P95 = (long)Math.Floor(p95);
 
