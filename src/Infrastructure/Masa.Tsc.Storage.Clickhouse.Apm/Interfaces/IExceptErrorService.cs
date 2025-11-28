@@ -3,7 +3,7 @@
 
 namespace Masa.Tsc.Storage.Clickhouse.Apm;
 
-public interface IExceptErrorService
+internal interface IExceptErrorService
 {
     Task AddAsync(params ExceptErrorDto[] values);
 }

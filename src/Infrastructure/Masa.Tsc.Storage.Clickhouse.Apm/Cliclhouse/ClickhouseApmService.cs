@@ -1,8 +1,6 @@
 // Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-using System.Security.Cryptography.X509Certificates;
-
 namespace Masa.Tsc.Storage.Clickhouse.Apm;
 
 internal partial class ClickhouseApmService : IApmService

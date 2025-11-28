@@ -6,12 +6,10 @@ namespace Masa.Tsc.Service.Admin.Application;
 internal class ExceptErrorHandler
 {
     private readonly IExceptErrorRepository _repository;
-    private readonly IExceptErrorService _exceptErrorClickhouse;
 
-    public ExceptErrorHandler(IExceptErrorRepository repository, IExceptErrorService exceptErrorClickhouse)
+    public ExceptErrorHandler(IExceptErrorRepository repository)
     {
         _repository = repository;
-        _exceptErrorClickhouse = exceptErrorClickhouse;
     }
 
     [EventHandler]
@@ -34,8 +32,7 @@ internal class ExceptErrorHandler
             Message = command.Data.Message,
             Comment = command.Data.Comment,
         };
-        await _repository.AddAsync(entity);
-        await _exceptErrorClickhouse.AddAsync(entity.Adapt<ExceptErrorDto>());
+        await _repository.AddAsync(entity);        
     }
 
     [EventHandler]
@@ -51,7 +48,6 @@ internal class ExceptErrorHandler
 
         entity.Comment = command.Comment;
         await _repository.UpdateAsync(entity);
-        await _exceptErrorClickhouse.AddAsync(entity.Adapt<ExceptErrorDto>());
     }
 
     [EventHandler]
@@ -61,7 +57,6 @@ internal class ExceptErrorHandler
         if (entity == null)
             return;
         await _repository.RemoveAsync(entity);
-        await _exceptErrorClickhouse.AddAsync(entity.Adapt<ExceptErrorDto>());
     }
 
     [EventHandler]
@@ -70,6 +65,5 @@ internal class ExceptErrorHandler
         var entities = await _repository.GetListAsync(x => command.Ids.Contains(x.Id));
         if (entities != null && entities.Any())
             await _repository.RemoveRangeAsync(entities);
-        await _exceptErrorClickhouse.AddAsync(entities!.Select(entity => entity.Adapt<ExceptErrorDto>()).ToArray());
     }
 }

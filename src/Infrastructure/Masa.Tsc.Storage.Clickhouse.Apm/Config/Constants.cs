@@ -7,7 +7,7 @@ internal static class Constants
 {
     public static string ErrorTable { get; private set; }
 
-    public static string ExceptErrorTable { get; private set; }
+    public static string ExceptErrorTable { get;}= "v_pg_tsc_t_excepterror";
 
     private const string AggregateTable = "otel_trace_metrics@interval";
 
@@ -45,7 +45,6 @@ internal static class Constants
         DurationTable = $"{database}otel_traces_spans_duration_{suffix}";
         DurationCountTable = $"{database}otel_traces_spans_duration_count_{suffix}";
         ModelsTable = $"{database}tsc_phone_models_{suffix}";
-        ExceptErrorTable = $"{database}tsc_except_errors_{suffix}";
         AggregateRootTable = $"{database}otel_trace_metrics_masa";
         foreach (var key in INTERVALS)
         {

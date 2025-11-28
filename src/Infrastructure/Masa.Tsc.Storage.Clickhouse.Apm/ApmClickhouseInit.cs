@@ -16,7 +16,7 @@ internal static class ApmClickhouseInit
         InitAggregateTable(connection);
         InitDurationTable(connection);
         InitDurationCountTable(connection);
-        InitExceptErrorTable(connection);
+        //InitExceptErrorTable(connection);
     }
 
     private static void InitErrorTable(MasaStackClickhouseConnection connection)
