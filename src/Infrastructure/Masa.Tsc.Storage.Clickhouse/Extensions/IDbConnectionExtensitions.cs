@@ -140,7 +140,7 @@ internal static class IDbConnectionExtensitions
                     select {timeField},TraceId,SpanId,ParentSpanId,TraceState,SpanKind,Duration,SpanName,Spans,Resources from {MasaStackClickhouseConnection.TraceOtherClientTable} where {where}
                 ) as t 
             order by {timeField}
-            limit 300", parameters.ToArray(), ConvertTraceDto);
+            limit 5000", parameters.ToArray(), ConvertTraceDto);
     }
 
     public static string AppendOrderBy(BaseRequestDto query, bool isLog)
