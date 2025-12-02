@@ -57,9 +57,11 @@ public partial class TimeLine
     private string urlService, UrlEndpoint, urlMethod;
 
     private static List<string> colors = new() {
-        "rgb(84, 179, 153)",
+         "rgb(84, 179, 153)",
         "#5b9bd5","#ed7d31","#70ad47","#ffc000","#4472c4","#91d024","#b235e6","#02ae75",
-        "#a565ef","#628cee","#eb9358","#bb60b2","#433e7c","#f47a75","#009db2","#024b51","#0780cf","#765005"
+        "#a565ef","#628cee","#eb9358","#bb60b2","#433e7c","#f47a75","#009db2","#024b51","#0780cf","#765005",
+"#FFFF33","#FFFF66","#FFCC33","#FF9933","#FF6633","#FF3333","#FF0033","#FF3366","#FF6666","#FF9966","#FFCC66","#FFFF99",
+"#FF9999","#FF6699","#FF3399","#FF0066","#FF33CC","#FF66CC","#FF99CC","#FF99FF","#FF66FF","#FF33FF","#CC0033","#CC0000",
     };
 
     string ShowTimeLineIcon
