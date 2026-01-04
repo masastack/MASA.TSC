@@ -91,31 +91,37 @@ public class TreeLineDto
             Icon = "fa:fas fa-database";
 
             var sqlKey = "db.statement";
+            string table = "unkown";
             if (trace.Attributes.ContainsKey(sqlKey))
             {
-                var regAction = @"(?<=\s*)(select|update|insert|delete)(?=\s+)";
                 var sql = trace.Attributes[sqlKey].ToString();
-                var action = Regex.Match(sql!, regAction, RegexOptions.IgnoreCase).Value;
-                string table = "unkown";
-                if (!string.IsNullOrEmpty(action))
+                if (database.System == "redis")
                 {
-                    bool isSelect = action.Equals("select", StringComparison.CurrentCultureIgnoreCase);
-                    var regTable = @$"(?<={(isSelect ? "from" : action)}\s+[\[`])\S+(?=[`\]]\s*)";
-                    var regTable2 = @$"(?<={(isSelect ? "from" : action)}\s+)\S+(?=\s*)";
-                    var matches = Regex.Matches(sql, regTable, RegexOptions.IgnoreCase);
-                    if (matches.Count == 0) matches = Regex.Matches(sql, regTable2, RegexOptions.IgnoreCase);
-
-                    if (matches.Count > 0)
-                        table = matches[0].Value;
+                    Type = $"{database.System} {sql!.Split(' ')[0]}";
                 }
                 else
                 {
-                    table = database.System;
+                    var regAction = @"(?<=\s*)(select|update|insert|delete)(?=\s+)";
+                    var action = Regex.Match(sql!, regAction, RegexOptions.IgnoreCase).Value;
+
+                    if (!string.IsNullOrEmpty(action))
+                    {
+                        bool isSelect = action.Equals("select", StringComparison.CurrentCultureIgnoreCase);
+                        var regTable = @$"(?<={(isSelect ? "from" : action)}\s+[\[`])\S+(?=[`\]]\s*)";
+                        var regTable2 = @$"(?<={(isSelect ? "from" : action)}\s+)\S+(?=\s*)";
+                        var matches = Regex.Matches(sql, regTable, RegexOptions.IgnoreCase);
+                        if (matches.Count == 0) matches = Regex.Matches(sql, regTable2, RegexOptions.IgnoreCase);
+
+                        if (matches.Count > 0)
+                            table = matches[0].Value;
+                    }
+                    else
+                    {
+                        table = database.System;
+                    }
+                    Type = $"{action} {table}";
                 }
-
-                Type = $"{action} {table}";
             }
-
         }
         else if (trace.Attributes.ContainsKey("http.scheme") || trace.Attributes.ContainsKey("http.url"))
         {
