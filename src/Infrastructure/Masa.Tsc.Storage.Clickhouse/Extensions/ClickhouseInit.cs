@@ -22,9 +22,9 @@ public static class ClickhouseInit
             if (!ExistsTable(Connection, MasaStackClickhouseConnection.LogSourceTable))
                 throw new ArgumentNullException(MasaStackClickhouseConnection.LogSourceTable);
             InitLog(MasaStackClickhouseConnection.LogTable, MasaStackClickhouseConnection.LogTable.Replace(".", ".v_"), MasaStackClickhouseConnection.LogSourceTable);
-            InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceHttpServerTable.Replace(".", ".v_"), "where SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')");
-            InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_"), "where SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%')");
-            InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_"), "where not (SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind in('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%'))");
+            InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceHttpServerTable.Replace(".", ".v_"), "where SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')", [OpenTelemetrySdks.OpenTelemetrySdk1_9_0]);
+            InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_"), "where SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%')", [OpenTelemetrySdks.OpenTelemetrySdk1_9_0]);
+            InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_"), "where not (SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind in('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%'))", [OpenTelemetrySdks.OpenTelemetrySdk1_9_0]);
             InitMappingTable();
             var timezoneStr = GetTimezone(Connection);
             MasaStackClickhouseConnection.TimeZone = TZConvert.GetTimeZoneInfo(timezoneStr);
@@ -63,6 +63,7 @@ public static class ClickhouseInit
     `Attributes.exception.type`  String CODEC(ZSTD(1)),
 	`Attributes.exception.message`  String CODEC(ZSTD(1)),   
     `Attributes.http.target`  String CODEC(ZSTD(1)),
+    `Attributes.userid`  String CODEC(ZSTD(1)),
     
     ResourceAttributesKeys Array(String) CODEC(ZSTD(1)),
     ResourceAttributesValues Array(String) CODEC(ZSTD(1)),
@@ -76,6 +77,7 @@ public static class ClickhouseInit
 	INDEX idx_log_severitytext SeverityText TYPE bloom_filter(0.001) GRANULARITY 1,
 	INDEX idx_log_taskid `Attributes.TaskId` TYPE bloom_filter(0.001) GRANULARITY 1,
     INDEX idx_log_exceptiontype `Attributes.exception.type` TYPE bloom_filter(0.001) GRANULARITY 1,
+    INDEX idx_log_userid `Attributes.userid` TYPE bloom_filter(0.001) GRANULARITY 1,
 
 	INDEX idx_string_body Body TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1,
 	INDEX idx_string_exceptionmessage Attributes.exception.message TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1    
@@ -90,6 +92,7 @@ ORDER BY (
  Body,
  Attributes.TaskId,
  Attributes.http.target,
+ Attributes.userid,
  SeverityText,
  `Resource.service.namespace`,
  Attributes.exception.message,
@@ -108,7 +111,10 @@ SETTINGS index_granularity = 8192
         var sql = $@"CREATE MATERIALIZED VIEW {name} TO {MasaStackClickhouseConnection.LogTable}
 AS
 SELECT
-Timestamp,TraceId,SpanId,TraceFlags,SeverityText,SeverityNumber,ServiceName,Body,ResourceSchemaUrl,toJSONString(ResourceAttributes) as Resources,
+Timestamp,
+if((LogAttributes['traceid']) != '', LogAttributes['traceid'], TraceId) AS TraceId,
+if((LogAttributes['spanid']) != '', LogAttributes['spanid'], SpanId) AS SpanId,
+TraceFlags,SeverityText,SeverityNumber,ServiceName,Body,ResourceSchemaUrl,toJSONString(ResourceAttributes) as Resources,
 ScopeSchemaUrl,ScopeName,ScopeVersion,toJSONString(ScopeAttributes) as Scopes,toJSONString(LogAttributes) as Logs,
 ResourceAttributes['service.namespace'] as `Resource.service.namespace`,ResourceAttributes['service.version'] as `Resource.service.version`,
 ResourceAttributes['service.instance.id'] as `Resource.service.instance.id`,
@@ -116,6 +122,7 @@ LogAttributes['TaskId'] as `Attributes.TaskId`,
 LogAttributes['exception.type'] as `Attributes.exception.type`,
 LogAttributes['exception.message'] as `Attributes.exception.message`,
 LogAttributes['RequestPath'] as `Attributes.http.target`,
+LogAttributes['userid'] as `Attributes.userid`,
 mapKeys(ResourceAttributes) as ResourceAttributesKeys,mapValues(ResourceAttributes) as ResourceAttributesValues,
 mapKeys(LogAttributes) as LogAttributesKeys,mapValues(LogAttributes) as LogAttributesValues
 FROM {sourceName}
@@ -161,8 +168,9 @@ FROM {sourceName}
 	`Attributes.http.request_content_body` String CODEC(ZSTD(1)),
 	`Attributes.http.target` String CODEC(ZSTD(1)),
     `Attributes.http.url` String CODEC(ZSTD(1)),
-    `Attributes.http.method` String CODEC(ZSTD(1)),
+    `Attributes.http.method` String CODEC(ZSTD(1)),    
     `Attributes.enduser.id` String CODEC( ZSTD(1)),
+    `Attributes.masa.ui.traceid` String CODEC(ZSTD(1)),
     `Attributes.exception.type` String CODEC(ZSTD(1)),
 	`Attributes.exception.message` String CODEC(ZSTD(1)),    
 
@@ -178,10 +186,11 @@ FROM {sourceName}
 	INDEX idx_trace_serviceinstanceid Resource.service.instance.id TYPE bloom_filter(0.001) GRANULARITY 1,
 	INDEX idx_trace_statuscode Attributes.http.status_code TYPE bloom_filter(0.001) GRANULARITY 1,
     INDEX idx_trace_exceptiontype Attributes.exception.type TYPE bloom_filter(0.001) GRANULARITY 1,	
-    INDEX idx_string_target Attributes.http.target TYPE bloom_filter(0.001) GRANULARITY 1,    
+    INDEX idx_string_target Attributes.http.target TYPE bloom_filter(0.001) GRANULARITY 1, 
     INDEX idx_string_method Attributes.http.method TYPE bloom_filter(0.001) GRANULARITY 1,	
     INDEX idx_string_userid Attributes.enduser.id TYPE bloom_filter(0.001) GRANULARITY 1,
-    INDEX idx_string_url Attributes.http.url TYPE bloom_filter(0.001) GRANULARITY 1,	
+    INDEX idx_string_url Attributes.http.url TYPE bloom_filter(0.001) GRANULARITY 1,	    
+    INDEX idx_string_masa_ui_traceId Attributes.masa.ui.traceid TYPE bloom_filter(0.001) GRANULARITY 1,
 	
 	INDEX idx_string_requestbody Attributes.http.request_content_body TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1,
 	INDEX idx_string_responsebody Attributes.http.response_content_body TYPE tokenbf_v1(30720, 2, 0) GRANULARITY 1,
@@ -199,6 +208,7 @@ ORDER BY (
  Attributes.http.status_code,
  Attributes.http.method,
  `Attributes.enduser.id`,
+ Attributes.masa.ui.traceid,
  Attributes.exception.message, 
  Resource.service.namespace,
  SpanKind,
@@ -211,24 +221,28 @@ SETTINGS index_granularity = 8192
         InitTable(table, sql);
     }
 
-    public static void InitTrace(string table, string sourceTable, string viewTable, string where)
+    public static void InitTrace(string table, string sourceTable, string viewTable, string where, string[] versions)
     {
         InitTraceTable(table);
-        InitTraceView(viewTable, table, sourceTable, where);
+        InitTraceView(viewTable, table, sourceTable, where, versions);
     }
 
-    private static void InitTraceView(string viewTable, string table, string sourceTable, string where)
+    private static void InitTraceView(string viewTable, string table, string sourceTable, string where, string[] versions)
     {
-        InitTraceView1_5_1(viewTable, table, sourceTable, where);
-        InitTraceView1_9_0(viewTable, table, sourceTable, where);
-        InitTraceView1_25_1(viewTable, table, sourceTable, where);
+        if (versions.Contains(OpenTelemetrySdks.OpenTelemetrySdk1_5_1))
+            InitTraceView1_5_1(viewTable, table, sourceTable, OpenTelemetrySdks.OpenTelemetrySdk1_5_1, where);
+        if (versions.Contains(OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid))
+            InitTraceView1_5_1_Lonsid(viewTable, table, sourceTable, where);
+        if (versions.Contains(OpenTelemetrySdks.OpenTelemetrySdk1_9_0))
+            InitTraceView1_9_0(viewTable, table, sourceTable, where);
+        if (versions.Contains(OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1))
+            InitTraceView1_25_1(viewTable, table, sourceTable, where);
     }
 
-    private static void InitTraceView1_5_1(string viewTable, string table, string sourceTable, string? where = null)
+    private static void InitTraceView1_5_1(string viewTable, string table, string sourceTable, string version, string? where = null)
     {
-        var versions = new string[] { OpenTelemetrySdks.OpenTelemetrySdk1_5_1, OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid };
-        viewTable = $"{viewTable}_{versions[0].Replace('.', '_')}";
-        where = $"{where} and ResourceAttributes ['telemetry.sdk.version'] in ['{string.Join("','", versions!)}']";
+        viewTable = $"{viewTable}_{version.Replace('-', '_').Replace('.', '_')}";
+        where = $"{where} and ResourceAttributes ['telemetry.sdk.version'] ='{version}'";
         var sql = $@"CREATE MATERIALIZED VIEW {viewTable} TO {table}
 AS
 SELECT
@@ -247,6 +261,7 @@ SELECT
     SpanAttributes['http.url'] as `Attributes.http.url`,
     SpanAttributes['http.method'] as `Attributes.http.method`,
     SpanAttributes['enduser.id'] as `Attributes.enduser.id`,
+    SpanAttributes['masa.ui.traceid'] as `Attributes.masa.ui.traceid`,
     SpanAttributes['exception.type'] as `Attributes.exception.type`,   
     SpanAttributes['exception.message'] as `Attributes.exception.message`, 
     //concat(SpanAttributes['http.url'],' ',SpanAttributes['http.request.content_body'],' ',SpanAttributes['http.request_content_body'],' ',SpanAttributes['enduser.id'],' ',SpanAttributes['exception.type'],' ',SpanAttributes['exception.message']) as MasaKeyword, 
@@ -260,6 +275,9 @@ FROM {sourceTable}
 ";
         InitTable(viewTable, sql);
     }
+
+    private static void InitTraceView1_5_1_Lonsid(string viewTable, string table, string sourceTable, string? where = null) =>
+        InitTraceView1_5_1(viewTable, table, sourceTable, OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid, where);
 
     private static void InitTraceView1_9_0(string viewTable, string table, string sourceTable, string? where = null)
     {
@@ -284,6 +302,8 @@ SELECT
     concat(SpanAttributes['url.path'],SpanAttributes['url.query']) as `Attributes.http.url`,
     SpanAttributes['http.request.method'] as `Attributes.http.method`,
     SpanAttributes['enduser.id'] as `Attributes.enduser.id`,
+    SpanAttributes['userid'] as `Attributes.userid`,
+    SpanAttributes['masa.ui.traceid'] as `Attributes.masa.ui.traceid`,
     SpanAttributes['exception.type'] as `Attributes.exception.type`,
     SpanAttributes['exception.message'] as `Attributes.exception.message`, 
 
@@ -320,6 +340,8 @@ SELECT
     SpanAttributes['http.url'] as `Attributes.http.url`,
     SpanAttributes['http.method'] as `Attributes.http.method`,
     SpanAttributes['enduser.id'] as `Attributes.enduser.id`,
+    SpanAttributes['userid'] as `Attributes.userid`,
+    SpanAttributes['masa.ui.traceid'] as `Attributes.masa.ui.traceid`,
     SpanAttributes['exception.type'] as `Attributes.exception.type`,   
     SpanAttributes['exception.message'] as `Attributes.exception.message`, 
     mapKeys(ResourceAttributes) AS ResourceAttributesKeys,

@@ -10,7 +10,7 @@ internal static class ApmClickhouseInit
 
     public static void Init(MasaStackClickhouseConnection connection, string suffix, string? logTable = null, string? traceTable = null)
     {
-        InitAppTable(connection, suffix, logTable, traceTable);
+        InitAppTable(connection, suffix,[OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1, OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid], logTable, traceTable);
         InitModelTable(connection);
         InitErrorTable(connection);
         InitAggregateTable(connection);
@@ -85,7 +85,7 @@ WHERE SeverityText in ['Error','Critical'] and mapContains(LogAttributes, 'excep
         ClickhouseInit.InitTable(connection, table, sql);
     }
 
-    private static void InitAppTable(MasaStackClickhouseConnection connection, string suffix, string? logTable, string? traceTable)
+    private static void InitAppTable(MasaStackClickhouseConnection connection, string suffix, string[] versions, string? logTable, string? traceTable)
     {
         if (!string.IsNullOrEmpty(logTable))
         {
@@ -95,9 +95,9 @@ WHERE SeverityText in ['Error','Critical'] and mapContains(LogAttributes, 'excep
         if (!string.IsNullOrEmpty(traceTable))
         {
             AppTraceTable = traceTable;
-            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, traceTable, MasaStackClickhouseConnection.TraceHttpServerTable.Replace(".", ".v_app_"), "where SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')");
-            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, traceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_app_"), "where SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%')");
-            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, traceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_app_"), "where not (SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%'))");
+            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, traceTable, MasaStackClickhouseConnection.TraceHttpServerTable.Replace(".", ".v_app_"), "where SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')", [OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid,OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1]);
+            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, traceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_app_"), "where SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%')", [OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid, OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1]);
+            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, traceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_app_"), "where not (SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%'))", [OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid, OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1]);
         }
     }
 
