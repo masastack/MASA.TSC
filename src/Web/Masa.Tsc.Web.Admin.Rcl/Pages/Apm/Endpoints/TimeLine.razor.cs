@@ -373,4 +373,14 @@ public partial class TimeLine
 
         StateHasChanged();
     }
+    bool _selectAll = false;
+    private void SelectAllChange()
+    {
+        _selectAll = !_selectAll;
+        if (_selectAll)
+            selectedServices = [.. services];
+        else
+            selectedServices = [urlService];
+        StateHasChanged();
+    }
 }
