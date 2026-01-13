@@ -33,8 +33,19 @@
         </div>
 
         <div class="d-flex justify-start pt-4">
-            <div class="font-weight-bold align-self-center">Services</div>
-            <div class="d-flex justify-start flex-wrap">
+            <div class="text-center text-no-wrap">
+                <div class="font-weight-bold subtitle-1">Services</div>
+                @if (services.Count - 1 > 0)
+                {
+                    <div>
+                        <SButton Class="white--text blue darken-1"
+                                 Style="text-transform: none"
+                                 BorderRadiusClass="rounded-lg"
+                                 OnClick="SelectAllChange">@(!_selectAll ? "全选" : "取消全选")</SButton>
+                    </div>
+                }
+            </div>  
+            <div class="d-flex justify-start flex-wrap" style="align-items: center;">
                 @foreach (var service in services)
                 {
                     <div class="pl-2">
