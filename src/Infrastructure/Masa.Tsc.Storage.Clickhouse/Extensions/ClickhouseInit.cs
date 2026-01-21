@@ -302,7 +302,6 @@ SELECT
     concat(SpanAttributes['url.path'],SpanAttributes['url.query']) as `Attributes.http.url`,
     SpanAttributes['http.request.method'] as `Attributes.http.method`,
     SpanAttributes['enduser.id'] as `Attributes.enduser.id`,
-    SpanAttributes['userid'] as `Attributes.userid`,
     SpanAttributes['masa.ui.traceid'] as `Attributes.masa.ui.traceid`,
     SpanAttributes['exception.type'] as `Attributes.exception.type`,
     SpanAttributes['exception.message'] as `Attributes.exception.message`, 
