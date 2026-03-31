@@ -9,7 +9,7 @@ internal class ClientService : ServiceBase
     {
         RouteHandlerBuilder = builder =>
         {
-            builder.RequireAuthorization();
+            
         };
     }
 
