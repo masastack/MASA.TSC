@@ -132,7 +132,7 @@ public class TreeLineDto
 
             var userAgent = trace.UserAgent();
             bool isMaui = trace.Attributes.TryGetValue("client.type", out var clientType) && clientType.ToString() == "maui-blazor";
-            bool isDapr = target!.ToString()!.StartsWith("http://127.0.0.1:3500/");
+            bool isDapr = target == null ? false : target!.ToString()!.StartsWith("http://127.0.0.1:3500/");
             bool isMasaSdk = userAgent != null && userAgent.Contains("masastack_sdk");
             if (isMaui)
             {
