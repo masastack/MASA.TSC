@@ -10,7 +10,7 @@ internal static class ApmClickhouseInit
 
     public static void Init(MasaStackClickhouseConnection connection, string suffix, string? logTable = null, string? traceTable = null)
     {
-        InitAppTable(connection, suffix,[OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1, OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1, OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid], logTable, traceTable);
+        InitAppTable(connection, suffix, logTable, traceTable);
         InitModelTable(connection);
         InitErrorTable(connection);
         InitAggregateTable(connection);
@@ -85,7 +85,7 @@ WHERE SeverityText in ['Error','Critical'] and mapContains(LogAttributes, 'excep
         ClickhouseInit.InitTable(connection, table, sql);
     }
 
-    private static void InitAppTable(MasaStackClickhouseConnection connection, string suffix, string[] versions, string? logTable, string? traceTable)
+    private static void InitAppTable(MasaStackClickhouseConnection connection, string suffix, string? logTable, string? traceTable)
     {
         if (!string.IsNullOrEmpty(logTable))
         {
@@ -95,9 +95,9 @@ WHERE SeverityText in ['Error','Critical'] and mapContains(LogAttributes, 'excep
         if (!string.IsNullOrEmpty(traceTable))
         {
             AppTraceTable = traceTable;
-            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, traceTable, MasaStackClickhouseConnection.TraceHttpServerTable.Replace(".", ".v_app_"), "where SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')", versions);
-            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, traceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_app_"), "where SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%')", versions);
-            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, traceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_app_"), "where not (SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%'))", versions);
+            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, traceTable, MasaStackClickhouseConnection.TraceHttpServerTable.Replace(".", ".v_app_"), "where SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')", ClickhouseInit.FrontendTraceSdkVersions, TraceMaterializedViewKind.ApmFrontend);
+            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, traceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_app_"), "where SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%')", ClickhouseInit.FrontendTraceSdkVersions, TraceMaterializedViewKind.ApmFrontend);
+            ClickhouseInit.InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, traceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_app_"), "where not (SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%'))", ClickhouseInit.FrontendTraceSdkVersions, TraceMaterializedViewKind.ApmFrontend);
         }
     }
 
@@ -145,18 +145,14 @@ SETTINGS index_granularity = 8192
     private static void InitAggregateTable(MasaStackClickhouseConnection connection, string interval, string tableName)
     {
         var viewTable = tableName.Replace(".", ".v_");
-        InitAggregateTable1_5_1(connection, interval, tableName, viewTable, MasaStackClickhouseConnection.TraceSourceTable);
+        InitAggregateTableBackendMerged(connection, interval, tableName, viewTable, MasaStackClickhouseConnection.TraceSourceTable);
         if (!string.IsNullOrEmpty(AppTraceTable))
-        {
-            InitAggregateTable1_5_1(connection, interval, tableName, tableName.Replace(".", ".v_app_"), AppTraceTable);
-            InitAggregateTable1_25_1(connection, interval, tableName, tableName.Replace(".", ".v_app_"), AppTraceTable);
-        }
-        InitAggregateTable1_9_0(connection, interval, tableName, viewTable, MasaStackClickhouseConnection.TraceSourceTable);
+            InitAggregateTableAppFrontendMerged(connection, interval, tableName, tableName.Replace(".", ".v_app_"), AppTraceTable);
     }
-
-    private static void InitAggregateTable1_5_1(MasaStackClickhouseConnection connection, string interval, string tableName, string viewTable, string sourceTable)
+   
+    private static void InitAggregateTableBackendMerged(MasaStackClickhouseConnection connection, string interval, string tableName, string viewTable, string sourceTable)
     {
-        viewTable = $"{viewTable}_{OpenTelemetrySdks.OpenTelemetrySdk1_5_1.Replace('.', '_')}";
+        viewTable = $"{viewTable}_backend_merged";
         var sql =
 $@"CREATE MATERIALIZED VIEW {viewTable} TO {Constants.AggregateRootTable}
 (
@@ -173,37 +169,59 @@ $@"CREATE MATERIALIZED VIEW {viewTable} TO {Constants.AggregateRootTable}
     `P95` AggregateFunction(quantile(0.95), Int64)
 ) AS
 SELECT
-     '{interval.Replace(' ', '_')}' AS dimensions,
-    ServiceName,
-    ResourceAttributes['service.namespace'] `Resource.service.namespace`,
-    SpanAttributes['http.target'] `Attributes.http.target`,
-    SpanAttributes['http.method'] `Attributes.http.method`,
-    toStartOfInterval(Timestamp,INTERVAL {interval}) AS Timestamp,
-    avgState(Duration) AS Latency,
-    countState(1) AS Throughput,
-    sumState(has(['400','500','501','502','503'],SpanAttributes['http.status_code'])) as Failed,
-    quantileState(0.99)(Duration) as P99,
-    quantileState(0.95)(Duration) as P95 
-FROM {sourceTable}
-WHERE
-SpanKind in ('SPAN_KIND_SERVER','Server')
-and ResourceAttributes ['telemetry.sdk.version'] in ['{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}','{OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid}']
-GROUP BY
+    dimensions,
     ServiceName,
     `Resource.service.namespace`,
     `Attributes.http.target`,
     `Attributes.http.method`,
-    Timestamp";
+    bucket_ts AS `Timestamp`,
+    avgState(Duration) AS Latency,
+    countState(1) AS Throughput,
+    sumState(has(['400','500','501','502','503'], status_for_failed)) AS Failed,
+    quantileState(0.99)(Duration) AS P99,
+    quantileState(0.95)(Duration) AS P95
+FROM (
+    SELECT
+        '{interval.Replace(' ', '_')}' AS dimensions,
+        ServiceName,
+        ResourceAttributes['service.namespace'] AS `Resource.service.namespace`,
+        multiIf(
+            ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
+                SpanAttributes['http.target'],
+            if(mapContains(SpanAttributes,'http.route'),SpanAttributes['http.route'],SpanAttributes['url.path'])) AS `Attributes.http.target`,
+        multiIf(
+            ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
+                SpanAttributes['http.method'],
+            SpanAttributes['http.request.method']) AS `Attributes.http.method`,
+        toStartOfInterval(Timestamp, INTERVAL {interval}) AS bucket_ts,
+        Duration,
+        multiIf(
+            ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
+                SpanAttributes['http.status_code'],
+            SpanAttributes['http.response.status_code']) AS status_for_failed
+    FROM {sourceTable}
+    WHERE
+        SpanKind IN ('SPAN_KIND_SERVER','Server')
+        AND ResourceAttributes['telemetry.sdk.version'] IN ('{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}','{OpenTelemetrySdks.OpenTelemetrySdk1_9_0}')
+) AS _backend_agg_in
+GROUP BY
+    dimensions,
+    ServiceName,
+    `Resource.service.namespace`,
+    `Attributes.http.target`,
+    `Attributes.http.method`,
+    bucket_ts";
         ClickhouseInit.InitTable(connection, viewTable, sql);
     }
 
-    private static void InitAggregateTable1_25_1(MasaStackClickhouseConnection connection, string interval, string tableName, string viewTable, string sourceTable)
+    
+    private static void InitAggregateTableAppFrontendMerged(MasaStackClickhouseConnection connection, string interval, string tableName, string viewTable, string sourceTable)
     {
-        viewTable = $"{viewTable}_{OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1.Replace('.', '_')}";
+        viewTable = $"{viewTable}_app_frontend_merged";
         var sql =
 $@"CREATE MATERIALIZED VIEW {viewTable} TO {Constants.AggregateRootTable}
 (
-    `dimensions` String,
+   `dimensions` String,
     `ServiceName` String,
     `Resource.service.namespace` String,
      `Attributes.http.target` String,
@@ -216,70 +234,43 @@ $@"CREATE MATERIALIZED VIEW {viewTable} TO {Constants.AggregateRootTable}
     `P95` AggregateFunction(quantile(0.95), Int64)
 ) AS
 SELECT
-     '{interval.Replace(' ', '_')}' AS dimensions,
-    ServiceName,
-    ResourceAttributes['service.namespace'] `Resource.service.namespace`,
-    SpanAttributes['http.target'] `Attributes.http.target`,
-    SpanAttributes['http.method'] `Attributes.http.method`,
-    toStartOfInterval(Timestamp,INTERVAL {interval}) AS Timestamp,
-    avgState(Duration) AS Latency,
-    countState(1) AS Throughput,
-    sumState(has(['400','500','501','502','503'],SpanAttributes['http.status_code'])) as Failed,
-    quantileState(0.99)(Duration) as P99,
-    quantileState(0.95)(Duration) as P95 
-FROM {sourceTable}
-WHERE
-SpanKind in ('SPAN_KIND_SERVER','Server') and `Attributes.http.target`!=''
-and ResourceAttributes ['telemetry.sdk.version'] in ['{OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1}']
-GROUP BY
+    dimensions,
     ServiceName,
     `Resource.service.namespace`,
     `Attributes.http.target`,
     `Attributes.http.method`,
-    Timestamp";
-        ClickhouseInit.InitTable(connection, viewTable, sql);
-    }
-
-    private static void InitAggregateTable1_9_0(MasaStackClickhouseConnection connection, string interval, string tableName, string viewTable, string sourceTable)
-    {
-        viewTable = $"{viewTable}_{OpenTelemetrySdks.OpenTelemetrySdk1_9_0.Replace('.', '_')}";
-        var sql =
-$@"CREATE MATERIALIZED VIEW {viewTable} TO {Constants.AggregateRootTable}
-(
-    `dimensions` String,
-    `ServiceName` String,
-    `Resource.service.namespace` String,
-     `Attributes.http.target` String,
-    `Attributes.http.method` String,
-    `Timestamp` DateTime64(9),
-    `Latency` AggregateFunction(avg, Float64),
-    `Throughput` AggregateFunction(count, UInt8),
-    `Failed` AggregateFunction(count, UInt8),
-    `P99` AggregateFunction(quantile(0.99),Int64),
-    `P95` AggregateFunction(quantile(0.95), Int64)
-) AS
-SELECT
-     '{interval.Replace(' ', '_')}' AS dimensions,
-    ServiceName,
-    ResourceAttributes['service.namespace'] `Resource.service.namespace`,
-    if(mapContains(SpanAttributes,'http.route'),SpanAttributes['http.route'],SpanAttributes['url.path']) `Attributes.http.target`,
-    SpanAttributes['http.request.method'] `Attributes.http.method`,
-    toStartOfInterval(Timestamp,INTERVAL {interval}) AS Timestamp,
+    bucket_ts AS `Timestamp`,
     avgState(Duration) AS Latency,
     countState(1) AS Throughput,
-    sumState(has(['400','500','501','502','503'],SpanAttributes['http.response.status_code'])) as Failed,
-    quantileState(0.99)(Duration) as P99,
-    quantileState(0.95)(Duration) as P95 
-FROM {sourceTable}
-WHERE
-SpanKind in ('SPAN_KIND_SERVER','Server')
-and ResourceAttributes ['telemetry.sdk.version'] in ['{OpenTelemetrySdks.OpenTelemetrySdk1_9_0}']
+    sumState(has(['400','500','501','502','503'], status_for_failed)) AS Failed,
+    quantileState(0.99)(Duration) AS P99,
+    quantileState(0.95)(Duration) AS P95
+FROM (
+    SELECT
+        '{interval.Replace(' ', '_')}' AS dimensions,
+        ServiceName,
+        ResourceAttributes['service.namespace'] AS `Resource.service.namespace`,
+        SpanAttributes['http.target'] AS `Attributes.http.target`,
+        SpanAttributes['http.method'] AS `Attributes.http.method`,
+        toStartOfInterval(Timestamp, INTERVAL {interval}) AS bucket_ts,
+        Duration,
+        coalesce(nullIf(SpanAttributes['http.status_code'], ''), SpanAttributes['http.response.status_code']) AS status_for_failed
+    FROM {sourceTable}
+    WHERE
+        SpanKind IN ('SPAN_KIND_SERVER','Server')
+        AND SpanAttributes['http.target'] != ''
+        AND (
+            ResourceAttributes['telemetry.sdk.version'] IN ('{OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid}','{OpenTelemetrySdks.OpenTelemetrySdk1_9_0}')
+            OR (ResourceAttributes['telemetry.sdk.language'] = 'webjs' AND ResourceAttributes['telemetry.sdk.version'] IN ('{OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1}'))
+        )
+) AS _agg_in
 GROUP BY
+    dimensions,
     ServiceName,
     `Resource.service.namespace`,
     `Attributes.http.target`,
     `Attributes.http.method`,
-    Timestamp";
+    bucket_ts";
         ClickhouseInit.InitTable(connection, viewTable, sql);
     }
 

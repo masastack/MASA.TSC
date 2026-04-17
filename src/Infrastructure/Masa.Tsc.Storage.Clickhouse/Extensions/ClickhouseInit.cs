@@ -5,6 +5,21 @@ namespace Masa.Tsc.Storage.Clickhouse.Extensions;
 
 public static class ClickhouseInit
 {
+    /// <summary>后端 Trace 写入：1.5.1（旧 Span 键）、1.9.0（semconv，与历史 InitTraceView1_9_0 一致）。</summary>
+    public static readonly string[] BackendTraceSdkVersions =
+    [
+        OpenTelemetrySdks.OpenTelemetrySdk1_5_1,
+        OpenTelemetrySdks.OpenTelemetrySdk1_9_0
+    ];
+
+    /// <summary>APM 前端 Trace 写入：lonsid、1.9.0（同 lonsid）、webjs 1.25.1。</summary>
+    public static readonly string[] FrontendTraceSdkVersions =
+    [
+        OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid,
+        OpenTelemetrySdks.OpenTelemetrySdk1_9_0,
+        OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1
+    ];
+
     internal static ILogger Logger { get; set; }
 
     internal static MasaStackClickhouseConnection Connection { get; private set; }
@@ -22,9 +37,9 @@ public static class ClickhouseInit
             if (!ExistsTable(Connection, MasaStackClickhouseConnection.LogSourceTable))
                 throw new ArgumentNullException(MasaStackClickhouseConnection.LogSourceTable);
             InitLog(MasaStackClickhouseConnection.LogTable, MasaStackClickhouseConnection.LogTable.Replace(".", ".v_"), MasaStackClickhouseConnection.LogSourceTable);
-            InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceHttpServerTable.Replace(".", ".v_"), "where SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')", [OpenTelemetrySdks.OpenTelemetrySdk1_9_0]);
-            InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_"), "where SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%')", [OpenTelemetrySdks.OpenTelemetrySdk1_9_0]);
-            InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_"), "where not (SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind in('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%'))", [OpenTelemetrySdks.OpenTelemetrySdk1_9_0]);
+            InitTrace(MasaStackClickhouseConnection.TraceHttpServerTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceHttpServerTable.Replace(".", ".v_"), "where SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')", BackendTraceSdkVersions, TraceMaterializedViewKind.BackendApi);
+            InitTrace(MasaStackClickhouseConnection.TraceHttpClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceHttpClientTable.Replace(".", ".v_"), "where SpanKind in ('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%')", BackendTraceSdkVersions, TraceMaterializedViewKind.BackendApi);
+            InitTrace(MasaStackClickhouseConnection.TraceOtherClientTable, MasaStackClickhouseConnection.TraceSourceTable, MasaStackClickhouseConnection.TraceOtherClientTable.Replace(".", ".v_"), "where not (SpanKind in ('SPAN_KIND_SERVER','Server') and mapContainsKeyLike(SpanAttributes, 'http.%')) and not (SpanKind in('SPAN_KIND_CLIENT','Client') and mapContainsKeyLike(SpanAttributes, 'http.%'))", BackendTraceSdkVersions, TraceMaterializedViewKind.BackendApi);
             InitMappingTable();
             var timezoneStr = GetTimezone(Connection);
             MasaStackClickhouseConnection.TimeZone = TZConvert.GetTimeZoneInfo(timezoneStr);
@@ -227,28 +242,26 @@ SETTINGS index_granularity = 8192
         InitTable(table, sql);
     }
 
-    public static void InitTrace(string table, string sourceTable, string viewTable, string where, string[] versions)
+    public static void InitTrace(string table, string sourceTable, string viewTable, string where, string[] versions, TraceMaterializedViewKind viewKind = TraceMaterializedViewKind.BackendApi)
     {
         InitTraceTable(table);
-        InitTraceView(viewTable, table, sourceTable, where, versions);
+        InitTraceViewUnified(viewTable, table, sourceTable, where, versions, viewKind);
     }
 
-    private static void InitTraceView(string viewTable, string table, string sourceTable, string where, string[] versions)
+    /// <summary>单条物化视图：按 TraceMaterializedViewKind 合并各 SDK 的 WHERE 与字段分支。</summary>
+    private static void InitTraceViewUnified(string viewTable, string table, string sourceTable, string where, string[] versions, TraceMaterializedViewKind viewKind)
     {
-        if (versions.Contains(OpenTelemetrySdks.OpenTelemetrySdk1_5_1))
-            InitTraceView1_5_1(viewTable, table, sourceTable, OpenTelemetrySdks.OpenTelemetrySdk1_5_1, where);
-        if (versions.Contains(OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid))
-            InitTraceView1_5_1_Lonsid(viewTable, table, sourceTable, where);
-        if (versions.Contains(OpenTelemetrySdks.OpenTelemetrySdk1_9_0))
-            InitTraceView1_9_0(viewTable, table, sourceTable, where);
-        if (versions.Contains(OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1))
-            InitTraceView1_25_1(viewTable, table, sourceTable, where);
-    }
+        var versionFilter = BuildTraceSdkVersionWhere(versions, viewKind);
+        if (versionFilter is null)
+            return;
 
-    private static void InitTraceView1_5_1(string viewTable, string table, string sourceTable, string version, string? where = null)
-    {
-        viewTable = $"{viewTable}_{version.Replace('-', '_').Replace('.', '_')}";
-        where = $"{where} and ResourceAttributes ['telemetry.sdk.version'] ='{version}'";
+        var httpFieldSelect = viewKind switch
+        {
+            TraceMaterializedViewKind.BackendApi => BuildBackendTraceHttpFieldSelect(),
+            TraceMaterializedViewKind.ApmFrontend => BuildApmFrontendTraceHttpFieldSelect(),
+            _ => throw new ArgumentOutOfRangeException(nameof(viewKind), viewKind, null)
+        };
+
         var sql = $@"CREATE MATERIALIZED VIEW {viewTable} TO {table}
 AS
 SELECT
@@ -256,111 +269,84 @@ SELECT
     ScopeName,ScopeVersion,toJSONString(SpanAttributes) AS Spans,
     Duration,StatusCode,StatusMessage,Events.Timestamp,Events.Name,Events.Attributes,
     Links.TraceId,Links.SpanId,Links.TraceState,Links.Attributes,
-    
-    ResourceAttributes['service.namespace'] as `Resource.service.namespace`,ResourceAttributes['service.version'] as `Resource.service.version`,
-    ResourceAttributes['service.instance.id'] as `Resource.service.instance.id`,
-    
-    SpanAttributes['http.status_code'] as `Attributes.http.status_code`,
-    SpanAttributes['http.response_content_body'] as `Attributes.http.response_content_body`,
-    SpanAttributes['http.request_content_body'] as `Attributes.http.request_content_body`,
-    SpanAttributes['http.target'] as `Attributes.http.target`,    
-    SpanAttributes['http.url'] as `Attributes.http.url`,
-    SpanAttributes['http.method'] as `Attributes.http.method`,
-    SpanAttributes['enduser.id'] as `Attributes.enduser.id`,
-    SpanAttributes['masa.ui.traceid'] as `Attributes.masa.ui.traceid`,
-    SpanAttributes['exception.type'] as `Attributes.exception.type`,   
-    SpanAttributes['exception.message'] as `Attributes.exception.message`, 
+
+    ResourceAttributes['service.namespace'] AS `Resource.service.namespace`,
+    ResourceAttributes['service.version'] AS `Resource.service.version`,
+    ResourceAttributes['service.instance.id'] AS `Resource.service.instance.id`,
+
+{httpFieldSelect}
+    SpanAttributes['enduser.id'] AS `Attributes.enduser.id`,
+    SpanAttributes['masa.ui.traceid'] AS `Attributes.masa.ui.traceid`,
+    SpanAttributes['exception.type'] AS `Attributes.exception.type`,
+    SpanAttributes['exception.message'] AS `Attributes.exception.message`,
 
     mapKeys(ResourceAttributes) AS ResourceAttributesKeys,
     mapValues(ResourceAttributes) AS ResourceAttributesValues,
     mapKeys(SpanAttributes) AS SpanAttributesKeys,
     mapValues(SpanAttributes) AS SpanAttributesValues,
-    cast((mapKeys(SpanAttributes), mapValues(SpanAttributes)), 'Map(String, String)') as SpanAttributes,
-    cast((mapKeys(ResourceAttributes), mapValues(ResourceAttributes)), 'Map(String, String)') as ResourceAttributes
+    cast((mapKeys(SpanAttributes), mapValues(SpanAttributes)), 'Map(String, String)') AS SpanAttributes,
+    cast((mapKeys(ResourceAttributes), mapValues(ResourceAttributes)), 'Map(String, String)') AS ResourceAttributes
 FROM {sourceTable}
-{where}
+{where}{versionFilter}
 ";
         InitTable(viewTable, sql);
     }
 
-    private static void InitTraceView1_5_1_Lonsid(string viewTable, string table, string sourceTable, string? where = null) =>
-        InitTraceView1_5_1(viewTable, table, sourceTable, OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid, where);
+    /// <summary>后端：1.5.1 使用旧键；1.9.0 使用原 semconv（http.response.status_code、http.route/url.path、concat url、http.request.method）。</summary>
+    private static string BuildBackendTraceHttpFieldSelect() =>
+        $@"    multiIf(
+        ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
+            SpanAttributes['http.status_code'],
+        SpanAttributes['http.response.status_code']) AS `Attributes.http.status_code`,
+    SpanAttributes['http.response_content_body'] AS `Attributes.http.response_content_body`,
+    SpanAttributes['http.request_content_body'] AS `Attributes.http.request_content_body`,
+    multiIf(
+        ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
+            SpanAttributes['http.target'],
+        if(mapContains(SpanAttributes,'http.route'),SpanAttributes['http.route'],SpanAttributes['url.path'])) AS `Attributes.http.target`,
+    multiIf(
+        ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
+            SpanAttributes['http.url'],
+        concat(SpanAttributes['url.path'],SpanAttributes['url.query'])) AS `Attributes.http.url`,
+    multiIf(
+        ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
+            SpanAttributes['http.method'],
+        SpanAttributes['http.request.method']) AS `Attributes.http.method`,";
 
-    private static void InitTraceView1_9_0(string viewTable, string table, string sourceTable, string? where = null)
+    /// <summary>前端：lonsid/1.9.0 用 http.status_code；webjs 1.25.1 用 http.response.status_code；其余 HTTP 列与历史一致。</summary>
+    private static string BuildApmFrontendTraceHttpFieldSelect() =>
+        $@"    multiIf(
+        ResourceAttributes['telemetry.sdk.version'] IN ('{OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid}','{OpenTelemetrySdks.OpenTelemetrySdk1_9_0}'),
+            SpanAttributes['http.status_code'],
+        SpanAttributes['http.response.status_code']) AS `Attributes.http.status_code`,
+    SpanAttributes['http.response_content_body'] AS `Attributes.http.response_content_body`,
+    SpanAttributes['http.request_content_body'] AS `Attributes.http.request_content_body`,
+    SpanAttributes['http.target'] AS `Attributes.http.target`,
+    SpanAttributes['http.url'] AS `Attributes.http.url`,
+    SpanAttributes['http.method'] AS `Attributes.http.method`,";
+
+    private static string? BuildTraceSdkVersionWhere(string[] versions, TraceMaterializedViewKind viewKind)
     {
-        var versions = new string[] { OpenTelemetrySdks.OpenTelemetrySdk1_9_0 };
-        viewTable = $"{viewTable}_{versions[0].Replace('.', '_')}";
-        where = $"{where} and ResourceAttributes ['telemetry.sdk.version'] in ['{string.Join("','", versions!)}']";
-        var sql = $@"CREATE MATERIALIZED VIEW {viewTable} TO {table}
-AS
-SELECT
-    Timestamp,TraceId,SpanId,ParentSpanId,TraceState,SpanName,SpanKind,ServiceName,toJSONString(ResourceAttributes) AS Resources,
-    ScopeName,ScopeVersion,toJSONString(SpanAttributes) AS Spans,
-    Duration,StatusCode,StatusMessage,Events.Timestamp,Events.Name,Events.Attributes,
-    Links.TraceId,Links.SpanId,Links.TraceState,Links.Attributes,
-    
-    ResourceAttributes['service.namespace'] as `Resource.service.namespace`,ResourceAttributes['service.version'] as `Resource.service.version`,
-    ResourceAttributes['service.instance.id'] as `Resource.service.instance.id`,
-    
-    SpanAttributes['http.response.status_code'] as `Attributes.http.status_code`,
-    SpanAttributes['http.response_content_body'] as `Attributes.http.response_content_body`,
-    SpanAttributes['http.request_content_body'] as `Attributes.http.request_content_body`,
-    if(mapContains(SpanAttributes,'http.route'),SpanAttributes['http.route'],SpanAttributes['url.path']) as `Attributes.http.target`,
-    concat(SpanAttributes['url.path'],SpanAttributes['url.query']) as `Attributes.http.url`,
-    SpanAttributes['http.request.method'] as `Attributes.http.method`,
-    SpanAttributes['enduser.id'] as `Attributes.enduser.id`,
-    SpanAttributes['masa.ui.traceid'] as `Attributes.masa.ui.traceid`,
-    SpanAttributes['exception.type'] as `Attributes.exception.type`,
-    SpanAttributes['exception.message'] as `Attributes.exception.message`, 
+        var set = new HashSet<string>(versions ?? Array.Empty<string>());
+        var parts = new List<string>(4);
+        if (viewKind == TraceMaterializedViewKind.BackendApi)
+        {
+            if (set.Contains(OpenTelemetrySdks.OpenTelemetrySdk1_5_1))
+                parts.Add($"ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}'");
+            if (set.Contains(OpenTelemetrySdks.OpenTelemetrySdk1_9_0))
+                parts.Add($"ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_9_0}'");
+        }
+        else
+        {
+            if (set.Contains(OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid))
+                parts.Add($"ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid}'");
+            if (set.Contains(OpenTelemetrySdks.OpenTelemetrySdk1_9_0))
+                parts.Add($"ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_9_0}'");
+            if (set.Contains(OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1))
+                parts.Add($"(ResourceAttributes['telemetry.sdk.language'] = 'webjs' AND ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1}')");
+        }
 
-    mapKeys(ResourceAttributes) AS ResourceAttributesKeys,
-    mapValues(ResourceAttributes) AS ResourceAttributesValues,
-    mapKeys(SpanAttributes) AS SpanAttributesKeys,
-    mapValues(SpanAttributes) AS SpanAttributesValues,
-    cast((mapKeys(SpanAttributes), mapValues(SpanAttributes)), 'Map(String, String)') as SpanAttributes,
-    cast((mapKeys(ResourceAttributes), mapValues(ResourceAttributes)), 'Map(String, String)') as ResourceAttributes
-FROM {sourceTable}
-{where}
-";
-        InitTable(viewTable, sql);
-    }
-
-    private static void InitTraceView1_25_1(string viewTable, string table, string sourceTable, string? where = null)
-    {
-        var versions = new string[] { OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1 };
-        viewTable = $"{viewTable}_{versions[0].Replace('.', '_')}";
-        where = $"{where} and ResourceAttributes ['telemetry.sdk.language']='webjs' and ResourceAttributes ['telemetry.sdk.version'] in ['{string.Join("','", versions!)}']";
-        var sql = $@"CREATE MATERIALIZED VIEW {viewTable} TO {table}
-AS
-SELECT
-    Timestamp,TraceId,SpanId,ParentSpanId,TraceState,SpanName,SpanKind,ServiceName,toJSONString(ResourceAttributes) AS Resources,
-    ScopeName,ScopeVersion,toJSONString(SpanAttributes) AS Spans,
-    Duration,StatusCode,StatusMessage,Events.Timestamp,Events.Name,Events.Attributes,
-    Links.TraceId,Links.SpanId,Links.TraceState,Links.Attributes,
-    
-    ResourceAttributes['service.namespace'] as `Resource.service.namespace`,ResourceAttributes['service.version'] as `Resource.service.version`,
-    ResourceAttributes['service.instance.id'] as `Resource.service.instance.id`,
-    
-    SpanAttributes['http.response.status_code'] as `Attributes.http.status_code`,
-    SpanAttributes['http.response_content_body'] as `Attributes.http.response_content_body`,
-    SpanAttributes['http.request_content_body'] as `Attributes.http.request_content_body`,
-    SpanAttributes['http.target'] as `Attributes.http.target`,    
-    SpanAttributes['http.url'] as `Attributes.http.url`,
-    SpanAttributes['http.method'] as `Attributes.http.method`,
-    SpanAttributes['enduser.id'] as `Attributes.enduser.id`,
-    SpanAttributes['masa.ui.traceid'] as `Attributes.masa.ui.traceid`,
-    SpanAttributes['exception.type'] as `Attributes.exception.type`,
-    SpanAttributes['exception.message'] as `Attributes.exception.message`, 
-    mapKeys(ResourceAttributes) AS ResourceAttributesKeys,
-    mapValues(ResourceAttributes) AS ResourceAttributesValues,
-    mapKeys(SpanAttributes) AS SpanAttributesKeys,
-    mapValues(SpanAttributes) AS SpanAttributesValues,
-    cast((mapKeys(SpanAttributes), mapValues(SpanAttributes)), 'Map(String, String)') as SpanAttributes,
-    cast((mapKeys(ResourceAttributes), mapValues(ResourceAttributes)), 'Map(String, String)') as ResourceAttributes
-FROM {sourceTable}
-{where}
-";
-        InitTable(viewTable, sql);
+        return parts.Count == 0 ? null : $" and ({string.Join(" or ", parts)})";
     }
 
     private static void InitMappingTable()
