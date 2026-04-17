@@ -68,7 +68,9 @@ public static class ClickhouseInit
     ResourceAttributesKeys Array(String) CODEC(ZSTD(1)),
     ResourceAttributesValues Array(String) CODEC(ZSTD(1)),
     LogAttributesKeys Array(String) CODEC(ZSTD(1)),
-    LogAttributesValues Array(String) CODEC(ZSTD(1)),    
+    LogAttributesValues Array(String) CODEC(ZSTD(1)),
+    `LogAttributes` JSON CODEC(ZSTD(1)),
+    `ResourceAttributes` JSON CODEC(ZSTD(1)),
 
     INDEX idx_log_id TraceId TYPE bloom_filter(0.001) GRANULARITY 1,
     INDEX idx_span_id SpanId TYPE bloom_filter(0.001) GRANULARITY 1,
@@ -124,7 +126,9 @@ LogAttributes['exception.message'] as `Attributes.exception.message`,
 LogAttributes['RequestPath'] as `Attributes.http.target`,
 LogAttributes['userid'] as `Attributes.userid`,
 mapKeys(ResourceAttributes) as ResourceAttributesKeys,mapValues(ResourceAttributes) as ResourceAttributesValues,
-mapKeys(LogAttributes) as LogAttributesKeys,mapValues(LogAttributes) as LogAttributesValues
+mapKeys(LogAttributes) as LogAttributesKeys,mapValues(LogAttributes) as LogAttributesValues,
+cast((mapKeys(LogAttributes), mapValues(LogAttributes)), 'Map(String, String)') as LogAttributes,
+cast((mapKeys(ResourceAttributes), mapValues(ResourceAttributes)), 'Map(String, String)') as ResourceAttributes
 FROM {sourceName}
 ";
 
@@ -177,7 +181,9 @@ FROM {sourceName}
     `ResourceAttributesKeys` Array(String) CODEC(ZSTD(1)),
     `ResourceAttributesValues` Array(String) CODEC(ZSTD(1)),
     `SpanAttributesKeys` Array(String) CODEC(ZSTD(1)),
-    `SpanAttributesValues` Array(String) CODEC(ZSTD(1)),    
+    `SpanAttributesValues` Array(String) CODEC(ZSTD(1)),
+    `SpanAttributes` JSON CODEC(ZSTD(1)),
+    `ResourceAttributes` JSON CODEC(ZSTD(1)),
 
     INDEX idx_trace_id TraceId TYPE bloom_filter(0.001) GRANULARITY 1,
     INDEX idx_span_id SpanId TYPE bloom_filter(0.001) GRANULARITY 1,
@@ -264,12 +270,13 @@ SELECT
     SpanAttributes['masa.ui.traceid'] as `Attributes.masa.ui.traceid`,
     SpanAttributes['exception.type'] as `Attributes.exception.type`,   
     SpanAttributes['exception.message'] as `Attributes.exception.message`, 
-    //concat(SpanAttributes['http.url'],' ',SpanAttributes['http.request.content_body'],' ',SpanAttributes['http.request_content_body'],' ',SpanAttributes['enduser.id'],' ',SpanAttributes['exception.type'],' ',SpanAttributes['exception.message']) as MasaKeyword, 
 
     mapKeys(ResourceAttributes) AS ResourceAttributesKeys,
     mapValues(ResourceAttributes) AS ResourceAttributesValues,
     mapKeys(SpanAttributes) AS SpanAttributesKeys,
-    mapValues(SpanAttributes) AS SpanAttributesValues
+    mapValues(SpanAttributes) AS SpanAttributesValues,
+    cast((mapKeys(SpanAttributes), mapValues(SpanAttributes)), 'Map(String, String)') as SpanAttributes,
+    cast((mapKeys(ResourceAttributes), mapValues(ResourceAttributes)), 'Map(String, String)') as ResourceAttributes
 FROM {sourceTable}
 {where}
 ";
@@ -309,7 +316,9 @@ SELECT
     mapKeys(ResourceAttributes) AS ResourceAttributesKeys,
     mapValues(ResourceAttributes) AS ResourceAttributesValues,
     mapKeys(SpanAttributes) AS SpanAttributesKeys,
-    mapValues(SpanAttributes) AS SpanAttributesValues
+    mapValues(SpanAttributes) AS SpanAttributesValues,
+    cast((mapKeys(SpanAttributes), mapValues(SpanAttributes)), 'Map(String, String)') as SpanAttributes,
+    cast((mapKeys(ResourceAttributes), mapValues(ResourceAttributes)), 'Map(String, String)') as ResourceAttributes
 FROM {sourceTable}
 {where}
 ";
@@ -339,14 +348,15 @@ SELECT
     SpanAttributes['http.url'] as `Attributes.http.url`,
     SpanAttributes['http.method'] as `Attributes.http.method`,
     SpanAttributes['enduser.id'] as `Attributes.enduser.id`,
-    SpanAttributes['userid'] as `Attributes.userid`,
     SpanAttributes['masa.ui.traceid'] as `Attributes.masa.ui.traceid`,
-    SpanAttributes['exception.type'] as `Attributes.exception.type`,   
+    SpanAttributes['exception.type'] as `Attributes.exception.type`,
     SpanAttributes['exception.message'] as `Attributes.exception.message`, 
     mapKeys(ResourceAttributes) AS ResourceAttributesKeys,
     mapValues(ResourceAttributes) AS ResourceAttributesValues,
     mapKeys(SpanAttributes) AS SpanAttributesKeys,
-    mapValues(SpanAttributes) AS SpanAttributesValues
+    mapValues(SpanAttributes) AS SpanAttributesValues,
+    cast((mapKeys(SpanAttributes), mapValues(SpanAttributes)), 'Map(String, String)') as SpanAttributes,
+    cast((mapKeys(ResourceAttributes), mapValues(ResourceAttributes)), 'Map(String, String)') as ResourceAttributes
 FROM {sourceTable}
 {where}
 ";
