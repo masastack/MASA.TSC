@@ -10,5 +10,6 @@ public sealed class OpenTelemetrySdks
     public const string OpenTelemetrySdk1_5_1 = "1.5.1";
     public const string OpenTelemetrySdk1_5_1_Lonsid = "1.15.1-lonsid";
     public const string OpenTelemetrySdk1_9_0 = "1.9.0";
+    public const string OpenTelemetrySdk1_15_3 = "1.15.3";
     public const string OpenTelemetryJSSdk1_25_1 = "1.25.1";
 }

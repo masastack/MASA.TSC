@@ -9,7 +9,8 @@ public static class ClickhouseInit
     public static readonly string[] BackendTraceSdkVersions =
     [
         OpenTelemetrySdks.OpenTelemetrySdk1_5_1,
-        OpenTelemetrySdks.OpenTelemetrySdk1_9_0
+        OpenTelemetrySdks.OpenTelemetrySdk1_9_0,
+        OpenTelemetrySdks.OpenTelemetrySdk1_15_3
     ];
 
     /// <summary>APM 前端 Trace 写入：lonsid、1.9.0（同 lonsid）、webjs 1.25.1。</summary>
@@ -17,6 +18,7 @@ public static class ClickhouseInit
     [
         OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid,
         OpenTelemetrySdks.OpenTelemetrySdk1_9_0,
+        OpenTelemetrySdks.OpenTelemetrySdk1_15_3,
         OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1
     ];
 
@@ -251,9 +253,10 @@ SETTINGS index_granularity = 8192
     /// <summary>单条物化视图：按 TraceMaterializedViewKind 合并各 SDK 的 WHERE 与字段分支。</summary>
     private static void InitTraceViewUnified(string viewTable, string table, string sourceTable, string where, string[] versions, TraceMaterializedViewKind viewKind)
     {
-        var versionFilter = BuildTraceSdkVersionWhere(versions, viewKind);
-        if (versionFilter is null)
-            return;
+        //var versionFilter = BuildTraceSdkVersionWhere(versions, viewKind);
+        //if (versionFilter is null)
+        //    return;
+        var versionFilter = "";
 
         var httpFieldSelect = viewKind switch
         {
@@ -294,31 +297,25 @@ FROM {sourceTable}
 
     /// <summary>后端：1.5.1 使用旧键；1.9.0 使用原 semconv（http.response.status_code、http.route/url.path、concat url、http.request.method）。</summary>
     private static string BuildBackendTraceHttpFieldSelect() =>
-        $@"    multiIf(
-        ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
-            SpanAttributes['http.status_code'],
-        SpanAttributes['http.response.status_code']) AS `Attributes.http.status_code`,
+        $@"if(mapContains(SpanAttributes,'http.status_code'),SpanAttributes['http.status_code'],SpanAttributes['http.response.status_code']) AS `Attributes.http.status_code`,
     SpanAttributes['http.response_content_body'] AS `Attributes.http.response_content_body`,
     SpanAttributes['http.request_content_body'] AS `Attributes.http.request_content_body`,
     multiIf(
-        ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
+            mapContains(SpanAttributes,'http.target'),
             SpanAttributes['http.target'],
         if(mapContains(SpanAttributes,'http.route'),SpanAttributes['http.route'],SpanAttributes['url.path'])) AS `Attributes.http.target`,
     multiIf(
-        ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
+            mapContains(SpanAttributes,'http.url'),
             SpanAttributes['http.url'],
         concat(SpanAttributes['url.path'],SpanAttributes['url.query'])) AS `Attributes.http.url`,
     multiIf(
-        ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
+            mapContains(SpanAttributes,'http.method'),
             SpanAttributes['http.method'],
         SpanAttributes['http.request.method']) AS `Attributes.http.method`,";
 
     /// <summary>前端：lonsid/1.9.0 用 http.status_code；webjs 1.25.1 用 http.response.status_code；其余 HTTP 列与历史一致。</summary>
     private static string BuildApmFrontendTraceHttpFieldSelect() =>
-        $@"    multiIf(
-        ResourceAttributes['telemetry.sdk.version'] IN ('{OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid}','{OpenTelemetrySdks.OpenTelemetrySdk1_9_0}'),
-            SpanAttributes['http.status_code'],
-        SpanAttributes['http.response.status_code']) AS `Attributes.http.status_code`,
+        $@"if(mapContains(SpanAttributes,'http.status_code'),SpanAttributes['http.status_code'],SpanAttributes['http.response.status_code']) AS `Attributes.http.status_code`,
     SpanAttributes['http.response_content_body'] AS `Attributes.http.response_content_body`,
     SpanAttributes['http.request_content_body'] AS `Attributes.http.request_content_body`,
     SpanAttributes['http.target'] AS `Attributes.http.target`,

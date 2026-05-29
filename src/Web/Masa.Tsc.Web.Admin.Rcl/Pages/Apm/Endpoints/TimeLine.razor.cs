@@ -176,28 +176,20 @@ public partial class TimeLine
 
     private bool IsTarget(TreeLineDto item)
     {
-        if (item.ServiceName == urlService
-               && (item.Trace.Kind == "SPAN_KIND_SERVER" || item.Trace.Kind == "Server")
-               && item.Trace.Resource.TryGetValue("telemetry.sdk.version", out var sdkVersion))
+        if (item.ServiceName == urlService && (item.Trace.Kind == "SPAN_KIND_SERVER" || item.Trace.Kind == "Server"))
         {
-            if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid) || string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1))
-            {
-                return IsNullOrEquals(item.Trace.Attributes, "http.method", urlMethod)
-                     && IsNullOrEquals(item.Trace.Attributes, "http.target", UrlEndpoint);
+            if (IsNullOrEquals(item.Trace.Attributes, "http.method", urlMethod)
+                     && IsNullOrEquals(item.Trace.Attributes, "http.target", UrlEndpoint))
+                return true;
 
-            }
+            if (IsNullOrEquals(item.Trace.Attributes, "http.request.method", urlMethod)
+                     && (IsNullOrEquals(item.Trace.Attributes, "http.route", UrlEndpoint) || IsNullOrEquals(item.Trace.Attributes, "url.path", UrlEndpoint)))
+                return true;
 
-            if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_9_0))
-            {
-                return IsNullOrEquals(item.Trace.Attributes, "http.request.method", urlMethod)
-                     && (IsNullOrEquals(item.Trace.Attributes, "http.route", UrlEndpoint) || IsNullOrEquals(item.Trace.Attributes, "url.path", UrlEndpoint));
-            }
+            if (IsNullOrEquals(item.Trace.Attributes, "http.method", urlMethod)
+                     && IsNullOrEquals(item.Trace.Attributes, "http.target", UrlEndpoint))
+                return true;
 
-            if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1))
-            {
-                return IsNullOrEquals(item.Trace.Attributes, "http.method", urlMethod)
-                     && IsNullOrEquals(item.Trace.Attributes, "http.target", UrlEndpoint);
-            }
         }
         return false;
     }
@@ -214,14 +206,9 @@ public partial class TimeLine
             return default;
         foreach (var item in data)
         {
-            if (item.Trace.Resource.TryGetValue("telemetry.sdk.version", out var sdkVersion))
-            {
-                if (string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid) || string.Equals(sdkVersion.ToString(), OpenTelemetrySdks.OpenTelemetrySdk1_5_1))
-                {
-                    if (item.Trace.Attributes.TryGetValue("http.target", out var target) && string.Equals(RoutePath, target.ToString()!, StringComparison.CurrentCultureIgnoreCase))
-                        return item;
-                }
-            }
+            if (item.Trace.Attributes.TryGetValue("http.target", out var target) && string.Equals(RoutePath, target.ToString()!, StringComparison.CurrentCultureIgnoreCase))
+                return item;
+            
             var find = GetMauiDefaultLines(item.Children);
             if (find != null) return find;
         }

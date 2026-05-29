@@ -8,28 +8,20 @@ internal static class TraceResponseDtoExtenistion
     public static int? StatusCode(this TraceResponseDto trace)
     {
         if (!trace.IsHttp()) return default;
-        var sdkVersion = trace.SdkVersion();
-
-        if (sdkVersion == OpenTelemetrySdks.OpenTelemetrySdk1_5_1 || sdkVersion == OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid)
-            return trace.Attributes.TryGetValue("http.status_code", out var statusCode) && int.TryParse(statusCode.ToString(), out var num) ? num : default;
-        else if (sdkVersion == OpenTelemetrySdks.OpenTelemetrySdk1_9_0)
-            return trace.Attributes.TryGetValue("http.response.status_code", out var statusCode) && int.TryParse(statusCode.ToString(), out var num) ? num : default;
-        else if (sdkVersion == OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1)
-            return trace.Attributes.TryGetValue("http.response.status_code", out var statusCode) && int.TryParse(statusCode.ToString(), out var num) ? num : default;
+        if (trace.Attributes.TryGetValue("http.status_code", out var statusCode))
+            return int.TryParse(statusCode.ToString(), out var num) ? num : default;
+        else if (trace.Attributes.TryGetValue("http.response.status_code", out statusCode))
+            return int.TryParse(statusCode.ToString(), out var num) ? num : default;
         return default;
     }
 
     public static string? Method(this TraceResponseDto trace)
     {
         if (!trace.IsHttp()) return default;
-        var sdkVersion = trace.SdkVersion();
-
-        if (sdkVersion == OpenTelemetrySdks.OpenTelemetrySdk1_5_1 || sdkVersion == OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid)
-            return trace.Attributes.TryGetValue("http.method", out var method) ? method.ToString() : default;
-        else if (sdkVersion == OpenTelemetrySdks.OpenTelemetrySdk1_9_0)
-            return trace.Attributes.TryGetValue("http.request.method", out var method) ? method.ToString() : default;
-        else if (sdkVersion == OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1)
-            return trace.Attributes.TryGetValue("http.method", out var method) ? method.ToString() : default;
+        if (trace.Attributes.TryGetValue("http.method", out var method))
+            return method?.ToString();
+        else if (trace.Attributes.TryGetValue("http.request.method", out method))
+            return method?.ToString();
         return default;
     }
 
@@ -46,12 +38,12 @@ internal static class TraceResponseDtoExtenistion
         if (!trace.IsHttp()) return default;
         var sdkVersion = trace.SdkVersion();
 
-        if (sdkVersion == OpenTelemetrySdks.OpenTelemetrySdk1_5_1 || sdkVersion == OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid)
-            return trace.Attributes.TryGetValue("http.url", out var url) ? url.ToString() : default;
-        else if (sdkVersion == OpenTelemetrySdks.OpenTelemetrySdk1_9_0)
-            return trace.Attributes.TryGetValue("url.path", out var url) ? url.ToString() : default;
-        else if (sdkVersion == OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1)
-            return trace.Attributes.TryGetValue("http.target", out var url) ? url.ToString() : default;
+        if (trace.Attributes.TryGetValue("http.url", out var url))
+            return url?.ToString();
+        else if (trace.Attributes.TryGetValue("url.path", out url))
+            return url?.ToString();
+        else if (trace.Attributes.TryGetValue("http.target", out url))
+            return url?.ToString();
         return default;
     }
 

@@ -186,23 +186,22 @@ FROM (
         ServiceName,
         ResourceAttributes['service.namespace'] AS `Resource.service.namespace`,
         multiIf(
-            ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
+            mapContains(SpanAttributes,'http.target'),
                 SpanAttributes['http.target'],
             if(mapContains(SpanAttributes,'http.route'),SpanAttributes['http.route'],SpanAttributes['url.path'])) AS `Attributes.http.target`,
         multiIf(
-            ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
+            mapContains(SpanAttributes,'http.method'),
                 SpanAttributes['http.method'],
             SpanAttributes['http.request.method']) AS `Attributes.http.method`,
         toStartOfInterval(Timestamp, INTERVAL {interval}) AS bucket_ts,
         Duration,
         multiIf(
-            ResourceAttributes['telemetry.sdk.version'] = '{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}',
+            mapContains(SpanAttributes,'http.status_code'),
                 SpanAttributes['http.status_code'],
             SpanAttributes['http.response.status_code']) AS status_for_failed
     FROM {sourceTable}
     WHERE
         SpanKind IN ('SPAN_KIND_SERVER','Server')
-        AND ResourceAttributes['telemetry.sdk.version'] IN ('{OpenTelemetrySdks.OpenTelemetrySdk1_5_1}','{OpenTelemetrySdks.OpenTelemetrySdk1_9_0}')
 ) AS _backend_agg_in
 GROUP BY
     dimensions,
@@ -259,10 +258,6 @@ FROM (
     WHERE
         SpanKind IN ('SPAN_KIND_SERVER','Server')
         AND SpanAttributes['http.target'] != ''
-        AND (
-            ResourceAttributes['telemetry.sdk.version'] IN ('{OpenTelemetrySdks.OpenTelemetrySdk1_5_1_Lonsid}','{OpenTelemetrySdks.OpenTelemetrySdk1_9_0}')
-            OR (ResourceAttributes['telemetry.sdk.language'] = 'webjs' AND ResourceAttributes['telemetry.sdk.version'] IN ('{OpenTelemetrySdks.OpenTelemetryJSSdk1_25_1}'))
-        )
 ) AS _agg_in
 GROUP BY
     dimensions,
