@@ -7,7 +7,7 @@ internal static class Constants
 {
     public static string ErrorTable { get; private set; }
 
-    public static string ExceptErrorTable { get;}= "v_pg_tsc_t_excepterror";
+    public static string ExceptErrorTable { get; } = "v_pg_tsc_t_excepterror";
 
     private const string AggregateTable = "otel_trace_metrics@interval";
 
@@ -41,7 +41,7 @@ internal static class Constants
     {
         if (!string.IsNullOrEmpty(database))
             database = $"{database}.";
-        ErrorTable = $"{database}otel_errors_{suffix}";
+        ErrorTable = $"{database}otel_logs_errors";
         DurationTable = $"{database}otel_traces_spans_duration_{suffix}";
         DurationCountTable = $"{database}otel_traces_spans_duration_count_{suffix}";
         ModelsTable = $"{database}tsc_phone_models_{suffix}";
