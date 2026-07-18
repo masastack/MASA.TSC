@@ -41,7 +41,7 @@ internal static class Constants
     {
         if (!string.IsNullOrEmpty(database))
             database = $"{database}.";
-        ErrorTable = $"{database}otel_logs_errors";
+        ErrorTable = $"{database}otel_logs_errors_{suffix}";
         DurationTable = $"{database}otel_traces_spans_duration_{suffix}";
         DurationCountTable = $"{database}otel_traces_spans_duration_count_{suffix}";
         ModelsTable = $"{database}tsc_phone_models_{suffix}";

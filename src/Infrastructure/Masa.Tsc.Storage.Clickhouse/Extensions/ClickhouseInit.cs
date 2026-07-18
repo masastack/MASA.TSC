@@ -52,6 +52,34 @@ public static class ClickhouseInit
         }
     }
 
+    public static string GetExceptionMessage(bool isLog = false, bool isTrace = false)
+    {
+        var attribue = isLog ? "LogAttributes" : isTrace ? "SpanAttributes" : "";
+        if (string.IsNullOrEmpty(attribue)) throw new Exception("isLog or isTrace must be true");
+        return $@"multiIf(position({attribue}['exception.stacktrace'],
+ '\n') = 0,
+ substring({attribue}['exception.stacktrace'],
+ position({attribue}['exception.stacktrace'],
+ ': ') + 2),
+ ((position({attribue}['exception.stacktrace'],
+ '\n') - position({attribue}['exception.stacktrace'],
+ ': ')) - 2) <= 0,
+ substring({attribue}['exception.stacktrace'],
+ position({attribue}['exception.stacktrace'],
+ '\n') + 1,
+ (position({attribue}['exception.stacktrace'],
+ '\n',
+ position({attribue}['exception.stacktrace'],
+ '\n') + 1) - position({attribue}['exception.stacktrace'],
+ '\n')) - 2),
+ substring({attribue}['exception.stacktrace'],
+ position({attribue}['exception.stacktrace'],
+ ': ') + 2,
+ (position({attribue}['exception.stacktrace'],
+ '\n') - position({attribue}['exception.stacktrace'],
+ ': ')) - 2)) AS `Attributes.exception.message`";
+    }
+
     public static void InitLog(string table, string viewTable, string sourceTable)
     {
         string sql = @$"CREATE TABLE {MasaStackClickhouseConnection.LogTable}
@@ -139,7 +167,7 @@ ResourceAttributes['service.namespace'] as `Resource.service.namespace`,Resource
 ResourceAttributes['service.instance.id'] as `Resource.service.instance.id`,
 LogAttributes['TaskId'] as `Attributes.TaskId`,
 LogAttributes['exception.type'] as `Attributes.exception.type`,
-LogAttributes['exception.message'] as `Attributes.exception.message`,
+{ClickhouseInit.GetExceptionMessage(isLog: true)},
 LogAttributes['RequestPath'] as `Attributes.http.target`,
 LogAttributes['userid'] as `Attributes.userid`,
 mapKeys(ResourceAttributes) as ResourceAttributesKeys,mapValues(ResourceAttributes) as ResourceAttributesValues,
@@ -281,8 +309,7 @@ SELECT
     SpanAttributes['enduser.id'] AS `Attributes.enduser.id`,
     SpanAttributes['masa.ui.traceid'] AS `Attributes.masa.ui.traceid`,
     SpanAttributes['exception.type'] AS `Attributes.exception.type`,
-    SpanAttributes['exception.message'] AS `Attributes.exception.message`,
-
+    {GetExceptionMessage(isTrace: true)},
     mapKeys(ResourceAttributes) AS ResourceAttributesKeys,
     mapValues(ResourceAttributes) AS ResourceAttributesValues,
     mapKeys(SpanAttributes) AS SpanAttributesKeys,

@@ -71,11 +71,7 @@ $@"CREATE MATERIALIZED VIEW {table} TO {Constants.ErrorTable}
 AS
 SELECT
     Timestamp,TraceId,SpanId, 
-   multiIf(position(LogAttributes['exception.stacktrace'],'\n')==0,substring(LogAttributes['exception.stacktrace'],position(LogAttributes['exception.stacktrace'],': ')+2),
-position(LogAttributes['exception.stacktrace'],'\n')-position(LogAttributes['exception.stacktrace'],': ')-2<=0,substring(LogAttributes['exception.stacktrace'],position(LogAttributes['exception.stacktrace'],'\n')+1,position(LogAttributes['exception.stacktrace'],'\n',position(LogAttributes['exception.stacktrace'],'\n')+1)-position(LogAttributes['exception.stacktrace'],'\n')-2),
-substring(LogAttributes['exception.stacktrace'],
-position(LogAttributes['exception.stacktrace'],': ')+2,
-position(LogAttributes['exception.stacktrace'],'\n')-position(LogAttributes['exception.stacktrace'],': ')-2)) AS `Attributes.exception.message`,
+    {ClickhouseInit.GetExceptionMessage(isLog: true)},
     LogAttributes['exception.type'] AS `Attributes.exception.type`,
     ServiceName,ResourceAttributes['service.namespace'] AS `Resource.service.namespace`, LogAttributes['RequestPath'] AS `Attributes.http.target`,
 `Attributes.exception.message` AS MsgGroupKey
