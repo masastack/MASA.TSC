@@ -74,19 +74,15 @@ var redisOption = new RedisConfigurationOptions
 };
 builder.Services.AddSchedulerClient(masaStackConfig.GetSchedulerServiceDomain());
 
-RedisConfigurationOptions redis;
 string pmServiceUrl, authServiceUrl;
 
 #if DEBUG
-redis = builder.Environment.EnvironmentName == "Development" ? AppSettings.GetModel<RedisConfigurationOptions>("LocalRedisOptions") : redisOption;
 builder.Services.AddDaprStarter(opt =>
 {
     opt.AppId = appid;
     opt.DaprHttpPort = 3606;
     opt.DaprGrpcPort = 3607;
 });
-#else
-redis = redisOption;
 #endif
 
 pmServiceUrl = masaStackConfig.GetPmServiceDomain();
@@ -104,7 +100,7 @@ builder.Services.AddMasaIdentity(options =>
     .AddPmClient(pmServiceUrl)
     .AddDccClient(redisOption)
     .AddMultilevelCache(envAppid,
-        distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redis),
+        distributedCacheOptions => distributedCacheOptions.UseStackExchangeRedisCache(redisOption),
         multilevelCacheOptions =>
         {
             multilevelCacheOptions.SubscribeKeyPrefix = MasaStackProject.TSC.Name;
