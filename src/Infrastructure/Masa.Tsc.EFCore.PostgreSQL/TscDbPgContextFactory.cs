@@ -5,16 +5,21 @@ namespace Masa.Tsc.EFCore.PostgreSQL;
 
 public class TscDbPgContextFactory : IDesignTimeDbContextFactory<TscDbContext>
 {
+    public const string ConnectionStringKey = "MasaTscMssqlStaging";
+
     public TscDbContext CreateDbContext(string[] args)
     {
         TscDbContext.RegistAssembly(typeof(TscDbPgContextFactory).Assembly);
-        var optionsBuilder = new MasaDbContextOptionsBuilder<TscDbContext>();
-        var configurationBuilder = new ConfigurationBuilder();
-        var configuration = configurationBuilder
-            .AddJsonFile("migrate-pgsql.json")
+
+        var configuration = new ConfigurationBuilder()
+            .AddUserSecrets(typeof(TscDbPgContextFactory).Assembly, optional: true)
             .Build();
-       
-        optionsBuilder.DbContextOptionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection")!, b => b.MigrationsAssembly("Masa.Tsc.EFCore.PostgreSQL"));
+
+        var connectionString = configuration[ConnectionStringKey];
+        var optionsBuilder = new MasaDbContextOptionsBuilder<TscDbContext>();
+        optionsBuilder.DbContextOptionsBuilder.UseNpgsql(
+            connectionString,
+            b => b.MigrationsAssembly("Masa.Tsc.EFCore.PostgreSQL"));
 
         return new TscDbContext(optionsBuilder.MasaOptions);
     }

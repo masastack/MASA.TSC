@@ -2,7 +2,18 @@
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
 var builder = WebApplication.CreateBuilder(args);
-
+var redisKey = "REDIS";
+if (string.IsNullOrEmpty(builder.Configuration.GetValue<string>(redisKey)))
+{
+    var redis = builder.Configuration["MasaDccRedisStaging"];
+    if (!string.IsNullOrEmpty(redis))
+    {
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            [redisKey] = redis
+        });
+    }
+}
 await builder.Services.AddMasaStackConfigAsync(MasaStackProject.TSC, MasaStackApp.WEB);
 var masaStackConfig = builder.Services.GetMasaStackConfig();
 
