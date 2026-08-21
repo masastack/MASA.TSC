@@ -348,3 +348,8 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+/src/Services/Masa.Tsc.Service.Admin/Properties/launchSettings.json
+/src/Services/Masa.Tsc.Service.Admin/Properties/launchSettings.json
+/src/Web/Masa.Tsc.Web.Admin.Server/Properties/launchSettings.json
+/src/Infrastructure/Masa.Tsc.EFCore.PostgreSQL/migrate-pgsql.json
+/src/Infrastructure/Masa.Tsc.EFCore.Sqlserver/migrate-sqlserver.json
