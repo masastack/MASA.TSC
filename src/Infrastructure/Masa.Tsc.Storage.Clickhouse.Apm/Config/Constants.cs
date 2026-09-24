@@ -7,6 +7,8 @@ internal static class Constants
 {
     public static string ErrorTable { get; private set; }
 
+    public static string MetricSumTable { get; } = "otel_metrics_masa_sum";
+
     public static string ExceptErrorTable { get; } = "v_pg_tsc_t_excepterror";
 
     private const string AggregateTable = "otel_trace_metrics@interval";

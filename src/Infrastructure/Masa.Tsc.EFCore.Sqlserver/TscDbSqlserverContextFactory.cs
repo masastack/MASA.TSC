@@ -5,7 +5,7 @@ namespace Masa.Tsc.EFCore.Sqlserver;
 
 public class TscDbSqlserverContextFactory : IDesignTimeDbContextFactory<TscDbContext>
 {
-    public const string ConnectionStringKey = "MasaTscPgsqlStaging";
+    public const string ConnectionStringKey = "MasaTscMssqlStaging";
 
     public TscDbContext CreateDbContext(string[] args)
     {
@@ -15,7 +15,7 @@ public class TscDbSqlserverContextFactory : IDesignTimeDbContextFactory<TscDbCon
 
         var connectionString = configuration[ConnectionStringKey];
         var optionsBuilder = new MasaDbContextOptionsBuilder<TscDbContext>();
-        optionsBuilder.DbContextOptionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection")!, b => b.MigrationsAssembly("Masa.Tsc.EFCore.Sqlserver"));
+        optionsBuilder.DbContextOptionsBuilder.UseSqlServer(connectionString, b => b.MigrationsAssembly("Masa.Tsc.EFCore.Sqlserver"));
 
         return new TscDbContext(optionsBuilder.MasaOptions);
     }

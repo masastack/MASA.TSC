@@ -538,16 +538,16 @@ from(
                     }
                 }
 
-            ((List<ChartLineItemDto>)(isPrevious ? current.Previous : current.Currents)).Add(
-                new()
-                {
-                    Latency = (long)Math.Floor(Convert.ToDouble(reader[1])),
-                    Throughput = Math.Round(Convert.ToDouble(reader[2]), 2, MidpointRounding.ToZero),
-                    Failed = Math.Round(Convert.ToDouble(reader[3]), 2, MidpointRounding.ToZero),
-                    P99 = Math.Round(Convert.ToDouble(reader[4]), 2, MidpointRounding.ToZero),
-                    P95 = Math.Round(Convert.ToDouble(reader[5]), 2, MidpointRounding.ToZero),
-                    Time = time
-                });
+                ((List<ChartLineItemDto>)(isPrevious ? current.Previous : current.Currents)).Add(
+                    new()
+                    {
+                        Latency = (long)Math.Floor(Convert.ToDouble(reader[1])),
+                        Throughput = Math.Round(Convert.ToDouble(reader[2]), 2, MidpointRounding.ToZero),
+                        Failed = Math.Round(Convert.ToDouble(reader[3]), 2, MidpointRounding.ToZero),
+                        P99 = Math.Round(Convert.ToDouble(reader[4]), 2, MidpointRounding.ToZero),
+                        P95 = Math.Round(Convert.ToDouble(reader[5]), 2, MidpointRounding.ToZero),
+                        Time = time
+                    });
             }
         var end = DateTime.Now;
         Log(start, end, default!, default!, true);
@@ -977,12 +977,12 @@ order by `Attributes.http.status_code`";
                     }
                 }
 
-            ((List<ChartLineCountItemDto>)(isPrevious ? current.Previous : current.Currents)).Add(
-                new()
-                {
-                    Value = reader.GetValue(1),
-                    Time = time
-                });
+                ((List<ChartLineCountItemDto>)(isPrevious ? current.Previous : current.Currents)).Add(
+                    new()
+                    {
+                        Value = reader.GetValue(1),
+                        Time = time
+                    });
                 list.Add(DateTime.Now);
             }
         var end = DateTime.Now;
@@ -1070,5 +1070,45 @@ order by `Attributes.http.status_code`";
         if (isContainsEndpoint)
             AppendEndpoint(query as ApmEndpointRequestDto, filter, sql, parameters, true);
         return (sql.ToString(), parameters);
+    }
+
+    public async Task<IEnumerable<ServiceTopologiesDto>> GetTopologiesAsync()
+    {
+        var sql = $@"select 
+DISTINCT
+`Attributes` ['client'] client,
+`Attributes` ['server'] server
+from {Constants.MetricSumTable}
+where ScopeName='traces_service_graph'
+and MetricName='traces_service_graph_request_total'
+and Attributes['connection_type'] not in ('database','virtual_node')
+and server not in ('unknown')
+and client!=server
+order by client";
+
+        List<ServiceTopologiesDto> result = [];
+
+        using var reader = await Query(sql, default!);
+        while (await reader.NextResultAsync())
+            while (await reader.ReadAsync())
+            {
+                var client = reader["client"].ToString()!;
+                var server = reader["server"].ToString()!;
+                var find = result.FirstOrDefault(x => x.Service == client);
+                if (find == null)
+                {
+                    result.Add(new ServiceTopologiesDto
+                    {
+                        Service = client,
+                        Servers = new List<string> { server }
+                    });
+                }
+                else
+                {
+                    ((List<string>)find.Servers).Add(server);
+                }
+            }
+
+        return result;
     }
 }

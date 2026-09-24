@@ -10,6 +10,7 @@ global using Masa.Tsc.Storage.Clickhouse.Apm.Config;
 global using Masa.Tsc.Storage.Clickhouse.Apm.Models;
 global using Masa.Tsc.Storage.Clickhouse.Apm.Models.Request;
 global using Masa.Tsc.Storage.Clickhouse.Apm.Models.Response;
+global using Masa.Tsc.Storage.Clickhouse.Apm.Shared.Models.Response;
 global using Masa.Tsc.Storage.Clickhouse.Extensions;
 global using Masa.Tsc.Storage.Contracts;
 global using Masa.Utils.Models;

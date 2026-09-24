@@ -1,7 +1,6 @@
 ﻿// Copyright (c) MASA Stack All rights reserved.
 // Licensed under the Apache License. See LICENSE.txt in the project root for license information.
 
-global using Mapster;
 global using Masa.BuildingBlocks.Caching;
 global using Masa.BuildingBlocks.Ddd.Domain.Repositories;
 global using Masa.BuildingBlocks.Isolation;
@@ -32,6 +31,7 @@ global using Masa.Tsc.Domain.Shared.Entities;
 global using Masa.Tsc.Repository;
 global using Masa.Tsc.Storage.Clickhouse.Apm;
 global using Masa.Tsc.Storage.Clickhouse.Apm.Models.Request;
+global using Masa.Tsc.Storage.Clickhouse.Apm.Shared.Models.Response;
 global using Masa.Tsc.Storage.Contracts;
 global using Masa.Tsc.Storage.Prometheus;
 global using Masa.Tsc.Storage.Prometheus.Enums;
