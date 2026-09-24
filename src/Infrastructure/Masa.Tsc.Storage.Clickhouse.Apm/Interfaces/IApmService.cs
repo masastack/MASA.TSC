@@ -76,4 +76,6 @@ public interface IApmService : IDisposable
     Task<List<string>> GetStatusCodesAsync();
 
     Task<List<string>> GetEndpointsAsync(BaseApmRequestDto query);
+
+    Task<IEnumerable<ServiceTopologiesDto>> GetTopologiesAsync();
 }

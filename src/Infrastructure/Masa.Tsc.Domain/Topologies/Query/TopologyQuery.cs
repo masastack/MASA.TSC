@@ -7,3 +7,8 @@ public record TopologyQuery(TopologyRequestDto Data) : Query<TopologyResultDto>
 {
     public override TopologyResultDto Result { get; set; }
 }
+
+public record TopologySimpleQuery(string? Service) : Query<IEnumerable<ServiceTopologiesDto>>
+{
+    public override IEnumerable<ServiceTopologiesDto> Result { get; set; }
+}

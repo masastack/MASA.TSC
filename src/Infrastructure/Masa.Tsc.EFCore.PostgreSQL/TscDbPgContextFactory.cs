@@ -5,7 +5,7 @@ namespace Masa.Tsc.EFCore.PostgreSQL;
 
 public class TscDbPgContextFactory : IDesignTimeDbContextFactory<TscDbContext>
 {
-    public const string ConnectionStringKey = "MasaTscMssqlStaging";
+    public const string ConnectionStringKey = "MasaTscPgsqlStaging";
 
     public TscDbContext CreateDbContext(string[] args)
     {
