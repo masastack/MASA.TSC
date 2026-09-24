@@ -187,10 +187,10 @@ var app = builder.Services
     })
     .AddServices(builder, new[] { typeof(IDirectoryRepository).Assembly, typeof(Masa.Tsc.Service.Admin.Services.TraceService).Assembly });
 
-//#if DEBUG
+#if DEBUG
 app.UseSwagger();
 app.UseSwaggerUI();
-//#endif
+#endif
 app.UseRouting();
 app.UseCors();
 
