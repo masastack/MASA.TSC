@@ -123,7 +123,7 @@ builder.Services.AddStackMiddleware().AddHealthChecks();
 
 var app = builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-//#if DEBUG
+#if DEBUG
     .AddEndpointsApiExplorer()
     //.AddSwaggerGen()
     .AddSwaggerGen(options =>
@@ -152,7 +152,7 @@ var app = builder.Services
             }
         });
     })
-//#endif
+#endif
     .AddDomainEventBus(dispatcherOptions =>
     {
         dispatcherOptions
