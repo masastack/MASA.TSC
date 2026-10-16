@@ -20,7 +20,7 @@ internal class QueryHandler : EnvQueryHandler
         {
             Start = DateTime.Parse(query.Start),
             End = DateTime.Parse(query.End),
-            TraceId = query.TraceId,
+            TraceId = query.TraceId,            
         });
         if (query.Result == null)
             query.Result = Array.Empty<TraceResponseDto>();

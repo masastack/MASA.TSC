@@ -12,6 +12,7 @@ internal class TraceService : ServiceBase
             builder.RequireAuthorization();
         };
         App.MapGet($"{BaseUri}/{{traceId}}", GetAsync).RequireAuthorization();
+        App.MapGet($"{BaseUri}/batch", GetBatchAsync).RequireAuthorization();
         App.MapGet($"{BaseUri}/list", GetListAsync).RequireAuthorization();
         App.MapPost($"{BaseUri}/attr-values", GetAttrValuesAsync).RequireAuthorization();
         App.MapGet($"{BaseUri}/aggregate", AggregateAsync).RequireAuthorization();
@@ -23,6 +24,27 @@ internal class TraceService : ServiceBase
         var query = new TraceDetailQuery(traceId, start, end);
         await eventBus.PublishAsync(query);
         return query.Result;
+    }
+
+    private async Task<IEnumerable<TraceResponseDto>> GetBatchAsync([FromServices] ITraceService traceService, [FromQuery] string traceId, [FromQuery] string start, [FromQuery] string end)
+    {
+        if (string.IsNullOrEmpty(traceId))
+        {
+            return Enumerable.Empty<TraceResponseDto>();
+        }
+
+        return await traceService.GetAsync(new BaseRequestDto
+        {
+            Start = DateTime.Parse(start),
+            End = DateTime.Parse(end),
+            Conditions = new List<FieldConditionDto> {
+                new FieldConditionDto{
+                    Name = "traceId",
+                    Type = ConditionTypes.In,
+                    Value = traceId.Trim().Split(',')
+                }
+            }
+        });
     }
 
     private async Task<string> GetTraceIdByMetricAsync([FromServices] IEventBus eventBus, string service, string url, string start, string end)

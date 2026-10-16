@@ -20,7 +20,7 @@ internal class TraceService : ITraceService
     public Task<IEnumerable<TraceResponseDto>> GetAsync(BaseRequestDto query)
     {
         return Task.FromResult(_dbConnection.GetTraceByTraceId(query).AsEnumerable());
-    }
+    }   
 
     public Task<string> GetMaxDelayTraceIdAsync(BaseRequestDto query)
     {
