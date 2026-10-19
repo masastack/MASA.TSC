@@ -26,9 +26,9 @@ internal class TraceService : ServiceBase
         return query.Result;
     }
 
-    private async Task<IEnumerable<TraceResponseDto>> GetBatchAsync([FromServices] ITraceService traceService, [FromQuery] string tracesId, [FromQuery] string start, [FromQuery] string end)
+    private async Task<IEnumerable<TraceResponseDto>> GetBatchAsync([FromServices] ITraceService traceService, [FromQuery] string traceIds, [FromQuery] string start, [FromQuery] string end)
     {
-        if (string.IsNullOrEmpty(tracesId))
+        if (string.IsNullOrEmpty(traceIds))
         {
             return Enumerable.Empty<TraceResponseDto>();
         }
@@ -39,9 +39,9 @@ internal class TraceService : ServiceBase
             End = DateTime.Parse(end),
             Conditions = new List<FieldConditionDto> {
                 new FieldConditionDto{
-                    Name = "traceId",
+                    Name ="TraceId",
                     Type = ConditionTypes.In,
-                    Value = tracesId.Trim().Split(',')
+                    Value = traceIds.Trim().Split(',')
                 }
             }
         });
